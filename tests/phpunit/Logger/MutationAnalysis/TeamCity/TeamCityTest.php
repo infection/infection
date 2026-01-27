@@ -37,6 +37,11 @@ namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
 use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutator\Boolean\LogicalAnd as LogicalAndMutator;
+use Infection\Testing\MutatorName;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -48,7 +53,7 @@ final class TeamCityTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->teamcity = new TeamCity();
+        $this->teamcity = new TeamCity(timeoutsAsEscaped: false);
     }
 
     /**
@@ -124,6 +129,54 @@ final class TeamCityTest extends TestCase
             MessageName::FLOW_STARTED,
             '\'\u99AA[||]\u00FF',
             "##teamcity[flowStarted '|'|0x99AA|[|||||]|0x00FF']\n",
+        ];
+    }
+
+    #[DataProvider('executionResultProvider')]
+    public function test_it_can_map_the_execution_result_to_a_finished_test(
+        bool $timeoutsAsEscaped,
+        MutantExecutionResult $executionResult,
+        string $flowId,
+        string $parentFlowId,
+        string $expected,
+    ): void {
+        $teamCity = new TeamCity($timeoutsAsEscaped);
+
+        $actual = $teamCity->testFinished(
+            $executionResult,
+            $flowId,
+            $parentFlowId,
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function executionResultProvider(): iterable
+    {
+        $mutationDiff = <<<'PHP_DIFF'
+            --- Original
+            +++ Mutated
+            @@ @@
+            -$a = 10;
+            +$a = 20;
+            PHP_DIFF;
+        $escapedMutationDiff = '--- Original|n+++ Mutated|n@@ @@|n-$a = 10;|n+$a = 20;';
+
+        yield [
+            false,
+            MutantExecutionResultBuilder::withMinimalTestData()
+                ->withMutatorClass(LogicalAndMutator::class)
+                ->withMutatorName(MutatorName::getName(LogicalAndMutator::class))
+                ->withMutantHash('mutantHash')
+                ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
+                ->withMutantDiff($mutationDiff)
+                ->build(),
+            '1A',
+            'A',
+            <<<TEAM_CITY
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}']
+
+                TEAM_CITY,
         ];
     }
 }

@@ -38,6 +38,7 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
 use function array_keys;
 use function array_map;
 use function implode;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use function is_int;
@@ -56,7 +57,7 @@ use function str_replace;
  *
  * @internal
  */
-final class TeamCity
+final readonly class TeamCity
 {
     // `|` must be escaped FIRST to avoid double-escaping.
     private const CHARACTERS_TO_ESCAPE = ['|', "'", "\n", "\r", '[', ']'];
@@ -64,6 +65,22 @@ final class TeamCity
     private const ESCAPED_CHARACTERS = ['||', "|'", '|n', '|r', '|[', '|]'];
 
     private const UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
+
+    public function __construct(
+        private bool $timeoutsAsEscaped,
+    ) {
+    }
+
+    /**
+     * @param positive-int $count
+     */
+    public function testCount(int $count): string
+    {
+        return $this->write(
+            MessageName::TEST_COUNT,
+            ['count' => (string) $count],
+        );
+    }
 
     public function testSuiteStarted(
         string $name,
@@ -86,17 +103,6 @@ final class TeamCity
                 'name' => $name,
                 'nodeId' => $flowId,
             ],
-        );
-    }
-
-    /**
-     * @param positive-int $count
-     */
-    public function testCount(int $count): string
-    {
-        return $this->write(
-            MessageName::TEST_COUNT,
-            ['count' => (string) $count],
         );
     }
 
@@ -125,11 +131,14 @@ final class TeamCity
         string $parentFlowId,
     ): string {
         return $this->write(
-            MessageName::TEST_FINISHED,
+            $this->mapExecutionResultToTestStatus($executionResult),
             [
                 'name' => self::createTestName($executionResult),
                 'nodeId' => $flowId,
                 'parentNodeId' => $parentFlowId,
+                // TODO: looks like this information is not used when the test is marked as successful or ignored :/
+                'message' => $executionResult->getDetectionStatus()->value,
+                'details' => $executionResult->getMutantDiff(),
                 // 'duration' => $durationMs,
             ],
         );
@@ -154,6 +163,31 @@ final class TeamCity
                 ],
             ),
         );
+    }
+
+    /**
+     * @return array{MessageName, array<non-empty-string|int, string|int|float>}
+     */
+    private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
+    {
+        $detectionStatus = $executionResult->getDetectionStatus();
+
+        return match ($detectionStatus) {
+            DetectionStatus::KILLED_BY_TESTS,
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
+            DetectionStatus::ERROR,
+            DetectionStatus::SYNTAX_ERROR => MessageName::TEST_FINISHED,
+
+            DetectionStatus::ESCAPED => MessageName::TEST_FAILED,
+
+            DetectionStatus::SKIPPED,
+            DetectionStatus::NOT_COVERED,
+            DetectionStatus::IGNORED => MessageName::TEST_IGNORED,
+
+            DetectionStatus::TIMED_OUT => $this->timeoutsAsEscaped
+                ? MessageName::TEST_FAILED
+                : MessageName::TEST_FINISHED,
+        };
     }
 
     private function createTestName(Mutation|MutantExecutionResult $subject): string

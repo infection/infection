@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use EmptyIterator;
-use Infection\Framework\Iterable\IterableCounter;
 use function array_key_exists;
 use function array_map;
 use function count;
 use function hash;
 use function implode;
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
