@@ -39,6 +39,7 @@ use function extension_loaded;
 use function implode;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkOption;
@@ -148,9 +149,6 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
-
-    /** @var string */
-    private const OPTION_DEBUG = 'debug';
 
     /** @var string */
     private const OPTION_DRY_RUN = 'dry-run';
@@ -349,20 +347,16 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_OPTIONAL,
                 'Ignore MSI violations with zero mutations',
                 self::OPTION_VALUE_NOT_PROVIDED,
-            )
-            ->addOption(
-                self::OPTION_DEBUG,
-                null,
-                InputOption::VALUE_NONE,
-                'Will not clean up utility files from Infection temporary folder. Adds command lines to the logs and prints Initial Tests output to stdout.',
-            )
-            ->addOption(
-                self::OPTION_DRY_RUN,
-                null,
-                InputOption::VALUE_NONE,
-                'Runs mutation testing and does not run killer processes.',
-            )
-        ;
+            );
+
+        DebugOption::addOption($this);
+
+        $this->addOption(
+            self::OPTION_DRY_RUN,
+            null,
+            InputOption::VALUE_NONE,
+            'Runs mutation testing and does not run killer processes.',
+        );
     }
 
     protected function executeCommand(IO $io): bool
@@ -459,8 +453,7 @@ final class RunCommand extends BaseCommand
             mutatorsInput: $commandHelper->getStringOption(self::OPTION_MUTATORS, Container::DEFAULT_MUTATORS_INPUT),
             numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
             logVerbosity: $commandHelper->getStringOption(self::OPTION_LOG_VERBOSITY, Container::DEFAULT_LOG_VERBOSITY),
-            // To keep in sync with Container::DEFAULT_DEBUG
-            debug: (bool) $input->getOption(self::OPTION_DEBUG),
+            debug: DebugOption::get($io),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
             loggerName: self::getMutationAnalysisLoggerName($commandHelper),
