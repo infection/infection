@@ -84,17 +84,17 @@ final class InitialTestRunCommand extends BaseCommand
             logger: $logger,
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
+            debug: true,
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
-            debug: true,
         );
 
         $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
 
         $configuration = $container->getConfiguration();
-        $initialTestsPhpOptions = self::getInitialtestsPhpOptions($configuration);
+        $initialTestsPhpOptions = self::getInitialTestsPhpOptions($configuration);
 
         $initialTestSuiteInnerProcess = $container
             ->getInitialTestsRunProcessFactory()
@@ -133,7 +133,7 @@ final class InitialTestRunCommand extends BaseCommand
     /**
      * @return string[]
      */
-    private static function getInitialtestsPhpOptions(Configuration $configuration): array
+    private static function getInitialTestsPhpOptions(Configuration $configuration): array
     {
         return explode(' ', (string) $configuration->initialTestsPhpOptions);
     }

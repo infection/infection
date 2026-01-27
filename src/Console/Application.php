@@ -44,7 +44,6 @@ use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Command\Git\GitChangedLinesCommand;
 use Infection\Command\Git\GitDefaultBaseCommand;
-use Infection\Command\InitialTest\InitialTestConfigCommand;
 use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
@@ -107,8 +106,6 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
-        Container::create()->getGit();
-
         return array_merge(
             parent::getDefaultCommands(),
             [
@@ -121,7 +118,6 @@ final class Application extends BaseApplication
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
-                new InitialTestConfigCommand(),
                 new InitialTestRunCommand(),
             ],
         );
