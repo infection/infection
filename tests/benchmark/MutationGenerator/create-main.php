@@ -104,7 +104,6 @@ return static function (int $maxCount): Closure {
         $container->getSourceLineMatcher(),
         new EmptyTraceTracer(),
         $container->getFileStore(),
-        $container->getEventDispatcher(),
     );
 
     return static function () use ($sources, $fileMutationGenerator, $mutators, $maxCount): int {

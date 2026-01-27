@@ -95,13 +95,26 @@ class MutationGenerator
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
         foreach ($sources as $source) {
-            yield from $this->fileMutationGenerator->generate(
+            $sourceFileMutationIds = [];
+
+            $sourceMutations = $this->fileMutationGenerator->generate(
                 $source,
                 $onlyCovered,
                 $this->mutators,
             );
 
-            $this->eventDispatcher->dispatch(new MutableFileWasProcessed());
+            foreach ($sourceMutations as $mutation) {
+                $sourceFileMutationIds[] = $mutation->getHash();
+
+                yield $mutation;
+            }
+
+            $this->eventDispatcher->dispatch(
+                new MutableFileWasProcessed(
+                    $source->getRealPath(),
+                    $sourceFileMutationIds,
+                ),
+            );
         }
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());

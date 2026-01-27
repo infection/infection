@@ -33,11 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
  */
-final readonly class MutationGenerationForSourceFileWasStarted
+final readonly class MutantProcessWasFinished
 {
+    public function __construct(
+        public MutantExecutionResult $executionResult,
+    ) {
+    }
 }

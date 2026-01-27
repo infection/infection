@@ -33,19 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationGenerationForSourceFileWasFinished
+interface MutantProcessWasFinishedSubscriber extends EventSubscriber
 {
-    /**
-     * @param list<string> $mutationIds
-     */
-    public function __construct(
-        public string $sourceFilePath,
-        public array $mutationIds,
-    ) {
-    }
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void;
 }

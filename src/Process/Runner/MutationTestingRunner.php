@@ -38,7 +38,7 @@ namespace Infection\Process\Runner;
 use function array_key_exists;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
@@ -138,7 +138,7 @@ class MutationTestingRunner
                 continue;
             }
 
-            $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished(
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
                 MutantExecutionResult::createFromIgnoredMutant($mutant),
             ));
 
@@ -155,7 +155,7 @@ class MutationTestingRunner
             return true;
         }
 
-        $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished(
+        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
             MutantExecutionResult::createFromNonCoveredMutant($mutant),
         ));
 
@@ -169,7 +169,7 @@ class MutationTestingRunner
             return true;
         }
 
-        $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished(
+        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
             MutantExecutionResult::createFromTimeSkippedMutant($mutant),
         ));
 
@@ -183,8 +183,8 @@ class MutationTestingRunner
         return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
     }
 
-    private static function containerToFinishedEvent(MutantProcessContainer $container): MutationEvaluationWasFinished
+    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
     {
-        return new MutationEvaluationWasFinished($container->getCurrent()->getMutantExecutionResult());
+        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
     }
 }

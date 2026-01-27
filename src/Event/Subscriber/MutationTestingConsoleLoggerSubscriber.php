@@ -39,12 +39,12 @@ use function count;
 use function floor;
 use Generator;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
@@ -67,9 +67,10 @@ use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
+ * TODO: should be renamed
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriberWas implements MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationForSourceFileWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     private const PAD_LENGTH = 8;
 
@@ -105,22 +106,22 @@ final class MutationTestingConsoleLoggerSubscriberWas implements MutationEvaluat
         $this->logger->startAnalysis($this->mutationCount);
     }
 
-    public function onMutationGenerationForSourceFileWasFinished(MutationGenerationForSourceFileWasFinished $event): void
-    {
-        if (count($event->mutationIds) > 0) {
-            $this->logger->finishMutationGenerationForFile(
-                $event->sourceFilePath,
-                $event->mutationIds,
-            );
-        }
-    }
-
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
     {
         $this->logger->startEvaluation($event->mutation);
     }
 
-    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    {
+        if (count($event->mutationHashes) > 0) {
+            $this->logger->finishMutationGenerationForFile(
+                $event->sourceFilePath,
+                $event->mutationHashes,
+            );
+        }
+    }
+
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
         $executionResult = $event->executionResult;
 

@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -70,7 +67,6 @@ class FileMutationGenerator
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
-        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -120,12 +116,10 @@ class FileMutationGenerator
         bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
-        $sourceFilePath = $sourceFile->getRealPath();
-
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $sourceFilePath,
+                filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
@@ -136,27 +130,10 @@ class FileMutationGenerator
             ),
         );
 
-        $this->eventDispatcher->dispatch(
-            new MutationGenerationForSourceFileWasStarted(),
-        );
-
         $traverser = $this->traverserFactory->create($mutationCollectorVisitor);
         $traverser->traverse($initialStatements);
 
-        $sourceFileMutationIds = [];
-
-        foreach ($mutationCollectorVisitor->getMutations() as $mutation) {
-            $sourceFileMutationIds[] = $mutation->getHash();
-
-            yield $mutation;
-        }
-
-        $this->eventDispatcher->dispatch(
-            new MutationGenerationForSourceFileWasFinished(
-                $sourceFilePath,
-                $sourceFileMutationIds,
-            ),
-        );
+        yield from $mutationCollectorVisitor->getMutations();
     }
 
     /**

@@ -40,7 +40,7 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberWas;
+use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -65,12 +65,12 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
-#[CoversClass(MutationTestingConsoleLoggerSubscriberWas::class)]
+#[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     private MockObject&OutputInterface $output;
 
-    private MockObject&MutationAnalysisLogger $outputFormatter;
+    private MockObject&MutationAnalysisLogger $logger;
 
     private MockObject&MetricsCalculator $metricsCalculator;
 
@@ -81,7 +81,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
-        $this->outputFormatter = $this->createMock(MutationAnalysisLogger::class);
+        $this->logger = $this->createMock(MutationAnalysisLogger::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->resultsCollector = $this->createMock(ResultsCollector::class);
         $this->diffColorizer = $this->createMock(DiffColorizer::class);
@@ -89,14 +89,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_started(): void
     {
-        $this->outputFormatter
+        $this->logger
             ->expects($this->once())
             ->method('startAnalysis');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -117,14 +117,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->expects($this->never())
             ->method('collect');
 
-        $this->outputFormatter
+        $this->logger
             ->expects($this->once())
             ->method('finishEvaluation');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -143,14 +143,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $this->outputFormatter
+        $this->logger
             ->expects($this->once())
             ->method('finishAnalysis');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -195,9 +195,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->willReturn([$notCoveredExecutionResult]);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -270,9 +270,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->willReturn(0);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -374,9 +374,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->willReturn(1);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -441,9 +441,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -492,9 +492,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -517,9 +517,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -559,9 +559,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->willReturn([$executionResult, $executionResult]);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -605,9 +605,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->willReturn([$executionResult, $executionResult, $executionResult]);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -627,14 +627,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
-        $this->outputFormatter
+        $this->logger
             ->expects($this->once())
             ->method('finishAnalysis');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $this->output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -668,9 +668,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->metricsCalculator->method('getSkippedCount')->willReturn(0);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -710,9 +710,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->metricsCalculator->method('getSkippedCount')->willReturn(0);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -746,9 +746,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->method('getTimedOutExecutionResults');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
@@ -798,9 +798,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->willReturn([$timedOutExecutionResult]);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
             $output,
-            $this->outputFormatter,
+            $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,

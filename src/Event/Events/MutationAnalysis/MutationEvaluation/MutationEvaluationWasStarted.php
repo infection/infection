@@ -38,9 +38,6 @@ namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 use Infection\Mutation\Mutation;
 
 /**
- * TODO: I had the idea "source" to indicate that it applies an an item rather
- *   than the general process but not sure about that.
- *
  * @internal
  */
 final readonly class MutationEvaluationWasStarted
