@@ -55,26 +55,26 @@ final class ModEqualTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates mod equal' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a %= 2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a *= 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a %= 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a *= 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate normal mod' => [
-            <<<'PHP'
-                <?php
-
-                $a = 10 % 3;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 10 % 3;
+                    PHP,
+            ),
         ];
     }
 }

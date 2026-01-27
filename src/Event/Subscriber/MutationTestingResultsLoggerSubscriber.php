@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Logger\MutationTestingResultsLogger;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriber implements EventSubscriber
+final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
 {
     public function __construct(
         private MutationTestingResultsLogger $logger,

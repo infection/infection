@@ -81,20 +81,20 @@ final class BCMathTest extends BaseMutatorTestCase
     private static function mutationsProviderForBinaryOperator(string $bcFunc, string $op, string $expression): iterable
     {
         yield "It converts $bcFunc to $expression expression" => [
-            "<?php \\$bcFunc('3', \$b);",
-            "<?php (string) ('3' $op \$b);",
+            self::wrapCodeInMethod("\\$bcFunc('3', \$b);"),
+            self::wrapCodeInMethod("(string) ('3' $op \$b);"),
         ];
 
         $ranmizelyCasedFunction = self::randomizeCase($bcFunc);
 
         yield "It converts correctly when $bcFunc is wrongly capitalized" => [
-            "<?php \\{$ranmizelyCasedFunction}(func(), \$b->test());",
-            "<?php (string) (func() $op \$b->test());",
+            self::wrapCodeInMethod("\\{$ranmizelyCasedFunction}(func(), \$b->test());"),
+            self::wrapCodeInMethod("(string) (func() $op \$b->test());"),
         ];
 
         yield "It converts $bcFunc with scale to $expression expression" => [
-            "<?php $bcFunc(CONSTANT, \$b, 2);",
-            "<?php (string) (CONSTANT $op \$b);",
+            self::wrapCodeInMethod("$bcFunc(CONSTANT, \$b, 2);"),
+            self::wrapCodeInMethod("(string) (CONSTANT $op \$b);"),
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply($bcFunc);
@@ -103,18 +103,18 @@ final class BCMathTest extends BaseMutatorTestCase
     private static function mutationsProviderForPowerOperator(): iterable
     {
         yield 'It converts bcpow to power expression' => [
-            '<?php \\bcpow(5, $b);',
-            '<?php (string) 5 ** $b;',
+            self::wrapCodeInMethod('\\bcpow(5, $b);'),
+            self::wrapCodeInMethod('(string) 5 ** $b;'),
         ];
 
         yield 'It converts correctly when bcpow is wrongly capitalized' => [
-            '<?php \\bCpOw(5, $b);',
-            '<?php (string) 5 ** $b;',
+            self::wrapCodeInMethod('\\bCpOw(5, $b);'),
+            self::wrapCodeInMethod('(string) 5 ** $b;'),
         ];
 
         yield 'It converts bcpow with scale to power expression' => [
-            '<?php bcpow($a, $b, 2);',
-            '<?php (string) $a ** $b;',
+            self::wrapCodeInMethod('bcpow($a, $b, 2);'),
+            self::wrapCodeInMethod('(string) $a ** $b;'),
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcpow');
@@ -123,18 +123,18 @@ final class BCMathTest extends BaseMutatorTestCase
     private static function mutationsProviderForSquareRoot(): iterable
     {
         yield 'It converts bcsqrt to sqrt call' => [
-            '<?php \\bcsqrt(2);',
-            "<?php (string) \sqrt(2);",
+            self::wrapCodeInMethod('\\bcsqrt(2);'),
+            self::wrapCodeInMethod('(string) \\sqrt(2);'),
         ];
 
         yield 'It converts correctly when bcsqrt is wrongly capitalized' => [
-            '<?php \\BCsqRt($a);',
-            "<?php (string) \sqrt(\$a);",
+            self::wrapCodeInMethod('\\BCsqRt($a);'),
+            self::wrapCodeInMethod('(string) \\sqrt($a);'),
         ];
 
         yield 'It converts bcsqrt with scale to sqrt call' => [
-            '<?php bcsqrt($a, 2);',
-            "<?php (string) \sqrt(\$a);",
+            self::wrapCodeInMethod('bcsqrt($a, 2);'),
+            self::wrapCodeInMethod('(string) \\sqrt($a);'),
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcsqrt', 1);
@@ -143,18 +143,18 @@ final class BCMathTest extends BaseMutatorTestCase
     private static function mutationsProviderForPowerModulo(): iterable
     {
         yield 'It converts bcpowmod to power modulo expression' => [
-            '<?php \\bcpowmod($a, $b, $mod);',
-            "<?php (string) (\pow(\$a, \$b) % \$mod);",
+            self::wrapCodeInMethod('\\bcpowmod($a, $b, $mod);'),
+            self::wrapCodeInMethod('(string) (\\pow($a, $b) % $mod);'),
         ];
 
         yield 'It converts correctly when bcpowmod is wrongly capitalized' => [
-            '<?php \\BcPowMod($a, $b, $mod);',
-            "<?php (string) (\pow(\$a, \$b) % \$mod);",
+            self::wrapCodeInMethod('\\BcPowMod($a, $b, $mod);'),
+            self::wrapCodeInMethod('(string) (\\pow($a, $b) % $mod);'),
         ];
 
         yield 'It converts bcpowmod with scale to power modulo expression' => [
-            '<?php bcpowmod($a, $b, 2);',
-            "<?php (string) (\pow(\$a, \$b) % 2);",
+            self::wrapCodeInMethod('bcpowmod($a, $b, 2);'),
+            self::wrapCodeInMethod('(string) (\\pow($a, $b) % 2);'),
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcpowmod', 3);
@@ -163,18 +163,18 @@ final class BCMathTest extends BaseMutatorTestCase
     private static function mutationsProviderForComparision(): iterable
     {
         yield 'It converts bccomp to spaceship expression' => [
-            '<?php \\bccomp(\'3\', $b);',
-            "<?php '3' <=> \$b;",
+            self::wrapCodeInMethod("\\bccomp('3', \$b);"),
+            self::wrapCodeInMethod("'3' <=> \$b;"),
         ];
 
         yield 'It converts correctly when bccomp is wrongly capitalized' => [
-            '<?php \\bCCoMp(func(), $b->test());',
-            '<?php func() <=> $b->test();',
+            self::wrapCodeInMethod('\\bCCoMp(func(), $b->test());'),
+            self::wrapCodeInMethod('func() <=> $b->test();'),
         ];
 
         yield 'It converts bccomp with scale to spaceship expression' => [
-            '<?php bccomp(CONSTANT, $b, 2);',
-            '<?php CONSTANT <=> $b;',
+            self::wrapCodeInMethod('bccomp(CONSTANT, $b, 2);'),
+            self::wrapCodeInMethod('CONSTANT <=> $b;'),
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bccomp', 2);
@@ -186,15 +186,15 @@ final class BCMathTest extends BaseMutatorTestCase
         $validArgumentsExpression = self::generateArgumentsExpression($requiredArgumentsCount);
 
         yield "It does not convert $bcFunc when no enough arguments" => [
-            "<?php $bcFunc($invalidArgumentsExpression);",
+            self::wrapCodeInMethod("$bcFunc($invalidArgumentsExpression);"),
         ];
 
         yield "It does not mutate $bcFunc called via variable" => [
-            "<?php \$a = '$bcFunc'; \$a($validArgumentsExpression);",
+            self::wrapCodeInMethod("\$a = '$bcFunc'; \$a($validArgumentsExpression);"),
         ];
 
         yield "It does not convert $bcFunc when disabled" => [
-            "<?php $bcFunc($validArgumentsExpression);",
+            self::wrapCodeInMethod("$bcFunc($validArgumentsExpression);"),
             null,
             [$bcFunc => false],
         ];

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;

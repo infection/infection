@@ -55,31 +55,31 @@ final class Continue_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It replaces continue with break in while' => [
-            <<<'PHP'
-                <?php
-
-                while (true) {
-                    continue;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                while (true) {
-                    break;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                        continue;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                        break;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not replaces continue with break in switch' => [
-            <<<'PHP'
-                <?php
-
-                switch (1) {
-                    case 1:
-                        continue;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch (1) {
+                        case 1:
+                            continue;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

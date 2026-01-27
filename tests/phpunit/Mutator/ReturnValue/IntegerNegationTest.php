@@ -57,71 +57,71 @@ final class IntegerNegationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates negative -1 int return to positive' => [
-            <<<'PHP'
-                <?php
-
-                return -1;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return -1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 1;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates negative -2 int return to positive' => [
-            <<<'PHP'
-                <?php
-
-                return -2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return -2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 2;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates positive 1 int return to negative' => [
-            <<<'PHP'
-                <?php
-
-                return 1;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return -1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return -1;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates positive 2 int return to negative' => [
-            <<<'PHP'
-                <?php
-
-                return 2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return -2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return -2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate int zero' => [
-            <<<'PHP'
-                <?php
-
-                return 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate floats' => [
-            <<<'PHP'
-                <?php
-
-                return 1.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 1.0;
+                    PHP,
+            ),
         ];
     }
 

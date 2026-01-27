@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

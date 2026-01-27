@@ -57,9 +57,7 @@ parameters:
             path: ../src/Mutator/Extensions/BCMath.php
         -
             identifier: arrayFilter.strict
-        -
-            identifier: shipmonk.deadMethod
-            path: ../src/Testing
+
         # While it's not used yet, left for consistency as we have ending column passed and used
         -
             message: '#^Unused Infection\\Mutant\\MutantExecutionResult\:\:getOriginalStartingColumn$#'

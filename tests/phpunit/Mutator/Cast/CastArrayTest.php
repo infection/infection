@@ -55,86 +55,86 @@ final class CastArrayTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to array' => [
-            <<<'PHP'
-                <?php
-
-                (array) 1.0;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                1.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (array) 1.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1.0;
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to array in conditions' => [
-            <<<'PHP'
-                <?php
-
-                if ((array) implode()) {
-                    echo 'Hello';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (implode()) {
-                    echo 'Hello';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ((array) implode()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (implode()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to array in global return' => [
-            <<<'PHP'
-                <?php
-
-                return (array) implode();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return implode();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return (array) implode();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return implode();
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to array in return of untyped-function' => [
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return (array) implode();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return implode();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return (array) implode();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return implode();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to array in return of array-function when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsArray(): array
-                {
-                    return (array) implode();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsArray(): array
-                {
-                    return implode();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsArray(): array
+                    {
+                        return (array) implode();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsArray(): array
+                    {
+                        return implode();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to array in return of array-function when strict-types=1' => [
@@ -161,24 +161,24 @@ final class CastArrayTest extends BaseMutatorTestCase
         ];
 
         yield 'It removes casting to array in function parameters when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    implode((array) 5);
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    implode(5);
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        implode((array) 5);
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        implode(5);
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to array in function parameters when strict-types=1' => [
