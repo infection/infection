@@ -38,6 +38,7 @@ namespace Infection\Logger\MutationAnalysis;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use function sprintf;
 use function str_repeat;
 use function strlen;
@@ -58,9 +59,9 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     ) {
     }
 
-    public function start(int $mutationCount): void
+    public function startAnalysis(int $mutationCount): void
     {
-        parent::start($mutationCount);
+        parent::startAnalysis($mutationCount);
 
         $this->mutationCount = $mutationCount;
 
@@ -79,9 +80,14 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         ]);
     }
 
-    public function advance(MutantExecutionResult $executionResult): void
+    public function startEvaluation(Mutation $mutation): void
     {
-        parent::advance($executionResult);
+        // Do nothing.
+    }
+
+    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    {
+        parent::finishEvaluation($executionResult);
 
         $mutationCount = $this->mutationCount;
         Assert::notNull($mutationCount);

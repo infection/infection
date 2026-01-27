@@ -51,15 +51,14 @@ use Infection\Tests\WithConsecutive;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use SplFileInfo;
 
 #[CoversClass(MutationGenerator::class)]
 final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfoA = new MockSplFileInfo('testA.txt');
-        $fileInfoB = new MockSplFileInfo('testB.txt');
+        $fileInfoA = new MockSplFileInfo(realPath: '/path/to/fileA.txt');
+        $fileInfoB = new MockSplFileInfo(realPath: '/path/to/fileB.txt');
 
         $sourceCollector = new FixedSourceCollector(
             [
@@ -121,8 +120,14 @@ final class MutationGeneratorTest extends TestCase
             ->method('dispatch')
             ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(2)],
-                [new MutableFileWasProcessed()],
-                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed(
+                    'path/to/fileA',
+                    [],
+                )],
+                [new MutableFileWasProcessed(
+                    'path/to/fileB',
+                    [],
+                )],
                 [new MutationGenerationWasFinished()],
             ))
         ;
@@ -135,8 +140,8 @@ final class MutationGeneratorTest extends TestCase
 
         $sourceCollector = new FixedSourceCollector(
             [
-                new SplFileInfo('fileA'),
-                new SplFileInfo('fileB'),
+                new MockSplFileInfo(realPath: 'path/to/fileA'),
+                new MockSplFileInfo(realPath: 'path/to/fileB'),
             ],
         );
 

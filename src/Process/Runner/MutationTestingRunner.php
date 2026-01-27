@@ -39,6 +39,7 @@ use function array_key_exists;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
@@ -85,6 +86,9 @@ class MutationTestingRunner
         $processContainers = take($mutations)
             ->stream()
             ->filter($this->ignoredByMutantId(...))
+            // Emitting the start of the event must be done _after_ checking the mutant ID
+            // as the latter does not dispatch any finished event.
+            ->tap($this->emitEvaluationStarted(...))
             ->cast($this->mutationToMutant(...))
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
@@ -103,6 +107,13 @@ class MutationTestingRunner
     private function mutationToMutant(Mutation $mutation): Mutant
     {
         return $this->mutantFactory->create($mutation);
+    }
+
+    private function emitEvaluationStarted(Mutation $mutation): void
+    {
+        $this->eventDispatcher->dispatch(
+            new MutationEvaluationWasStarted($mutation),
+        );
     }
 
     private function ignoredByMutantId(Mutation $mutation): bool

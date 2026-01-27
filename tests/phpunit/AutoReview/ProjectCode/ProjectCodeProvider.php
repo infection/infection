@@ -58,6 +58,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\XdebugHandler;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
@@ -155,6 +156,7 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
+        MutationEvaluationWasStarted::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutatorName::class,
         NameResolverFactory::class,
