@@ -41,6 +41,7 @@ use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Configuration;
@@ -62,7 +63,7 @@ final class InitialTestRunCommand extends BaseCommand
     protected function configure(): void
     {
         $this->setDescription(
-            'Executes the initial test run as orchestrated by Infection.',
+            'Executes the initial test run as orchestrated by Infection with the debug mode enabled by default.',
         );
 
         ConfigurationOption::addOption($this);
@@ -71,6 +72,7 @@ final class InitialTestRunCommand extends BaseCommand
         InitialTestsPhpOptionsOption::addOption($this);
         TestFrameworkOption::addOption($this);
         TestFrameworkOptionsOption::addOption($this);
+        DebugOption::addOption($this, default: true);
     }
 
     protected function executeCommand(IO $io): bool
@@ -84,7 +86,7 @@ final class InitialTestRunCommand extends BaseCommand
             logger: $logger,
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
-            debug: true,
+            debug: DebugOption::get($io),
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
