@@ -40,6 +40,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Testing\MutatorName;
+use function is_string;
 use Later\Interfaces\Deferred;
 use function Later\now;
 
@@ -232,10 +233,12 @@ final class MutantExecutionResultBuilder
     /**
      * @param Deferred<string> $mutantDiff
      */
-    public function withMutantDiff(Deferred $mutantDiff): self
+    public function withMutantDiff(Deferred|string $mutantDiff): self
     {
         $clone = clone $this;
-        $clone->mutantDiff = $mutantDiff;
+        $clone->mutantDiff = is_string($mutantDiff)
+            ? now($mutantDiff)
+            : $mutantDiff;
 
         return $clone;
     }

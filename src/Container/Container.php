@@ -89,6 +89,7 @@ use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
@@ -454,6 +455,7 @@ final class Container extends DIContainer
                 $container->getSourceLineMatcher(),
                 $container->getTracer(),
                 $container->getFileStore(),
+                $container->getEventDispatcher(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -596,6 +598,14 @@ final class Container extends DIContainer
                         ),
                     );
                 },
+            ),
+            TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
+                $container->getConfiguration()->timeoutsAsEscaped,
+            ),
+            MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
+                $container->getOutput(),
+                $container->get(TeamCity::class),
+                $container->getConfiguration()->configurationPathname,
             ),
         ]);
 
@@ -1064,6 +1074,26 @@ final class Container extends DIContainer
     public function getFileStore(): FileStore
     {
         return $this->get(FileStore::class);
+    }
+
+    /**
+     * TODO: should allow string as the ID
+     *
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @param T $value
+     */
+    public function withService(string $id, object $value): self
+    {
+        $clone = clone $this;
+
+        $clone->set(
+            $id,
+            static fn () => $value,
+        );
+
+        return $clone;
     }
 
     private function getMutatedCodePrinter(): MutantCodePrinter

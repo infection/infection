@@ -33,44 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
+use function count;
+use function explode;
+use function implode;
+use Infection\CannotBeInstantiated;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
- * @internal
+ * This service is a utility to make the TeamCity logs more readable by indenting
+ * them based on the opening/closing blocks.
  *
- * Abstract empty class to simplify particular implementations
+ * Note that this is purely for testing purposes for better readability: teamcity
+ * logs do not need to be indented.
  */
-abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
+final class RemoveInternalBlankLines
 {
-    protected int $callsCount = 0;
+    use CannotBeInstantiated;
 
-    public function startAnalysis(int $mutationCount): void
+    public static function remove(string $lines): string
     {
-        $this->callsCount = 0;
-    }
+        $lineArray = explode("\n", $lines);
+        $lineCount = count($lineArray);
 
-    public function finishMutationGenerationForFile(
-        string $sourceFilePath,
-        array $mutationIds,
-    ): void {
-        // Do nothing.
-    }
+        $firstNonBlank = null;
+        $lastNonBlank = null;
 
-    public function startEvaluation(Mutation $mutation): void
-    {
-        // Do nothing.
-    }
+        foreach ($lineArray as $i => $line) {
+            if (trim($line) !== '') {
+                $firstNonBlank ??= $i;
+                $lastNonBlank = $i;
+            }
+        }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
-    {
-        ++$this->callsCount;
-    }
+        if ($firstNonBlank === null) {
+            return $lines;
+        }
 
-    public function finishAnalysis(): void
-    {
-        // Do nothing.
+        Assert::integer($lastNonBlank);
+        $result = [];
+
+        for ($i = 0; $i < $firstNonBlank; ++$i) {
+            $result[] = $lineArray[$i];
+        }
+
+        for ($i = $firstNonBlank; $i <= $lastNonBlank; ++$i) {
+            if (trim($lineArray[$i]) !== '') {
+                $result[] = $lineArray[$i];
+            }
+        }
+
+        for ($i = $lastNonBlank + 1; $i < $lineCount; ++$i) {
+            $result[] = $lineArray[$i];
+        }
+
+        return implode("\n", $result);
     }
 }

@@ -33,44 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
-
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
 /**
- * @internal
+ * Only contains a subset of the allowed messages.
  *
- * Abstract empty class to simplify particular implementations
+ * @see https://www.jetbrains.com/help/teamcity/service-messages.html
  */
-abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
+enum MessageName: string
 {
-    protected int $callsCount = 0;
-
-    public function startAnalysis(int $mutationCount): void
-    {
-        $this->callsCount = 0;
-    }
-
-    public function finishMutationGenerationForFile(
-        string $sourceFilePath,
-        array $mutationIds,
-    ): void {
-        // Do nothing.
-    }
-
-    public function startEvaluation(Mutation $mutation): void
-    {
-        // Do nothing.
-    }
-
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
-    {
-        ++$this->callsCount;
-    }
-
-    public function finishAnalysis(): void
-    {
-        // Do nothing.
-    }
+    case FLOW_STARTED = 'flowStarted';
+    case FLOW_FINISHED = 'flowFinished';
+    case TEST_COUNT = 'testCount';
+    case TEST_SUITE_STARTED = 'testSuiteStarted';
+    case TEST_SUITE_FINISHED = 'testSuiteFinished';
+    case TEST_STARTED = 'testStarted';
+    case TEST_FINISHED = 'testFinished';
+    case TEST_FAILED = 'testFailed';
+    case TEST_IGNORED = 'testIgnored';
 }

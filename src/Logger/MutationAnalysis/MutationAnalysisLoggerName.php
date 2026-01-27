@@ -46,4 +46,5 @@ enum MutationAnalysisLoggerName: string
 
     case DOT = 'dot';
     case PROGRESS = 'progress';
+    case TEAMCITY = 'teamcity';
 }

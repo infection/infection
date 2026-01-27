@@ -33,75 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command;
+namespace Infection\Command\Debug\Option;
 
-use function array_map;
-use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\SourceFilterOptions;
+use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use Infection\Logger\Console\ConsoleLogger;
-use Infection\Source\Collector\SourceCollector;
-use function Safe\getcwd;
-use function sort;
-use SplFileInfo;
-use Symfony\Component\Filesystem\Path;
+use function sprintf;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ListSourcesCommand extends BaseCommand
+final class BaseOption
 {
-    public function __construct()
+    use CannotBeInstantiated;
+
+    public const NAME = 'base';
+
+    /**
+     * @template T of Command
+     * @param T $command
+     *
+     * @return T
+     */
+    public static function addOption(Command $command): Command
     {
-        parent::__construct('config:list-sources');
-    }
-
-    protected function configure(): void
-    {
-        ConfigurationOption::addOption($this);
-        SourceFilterOptions::addOption($this);
-
-        $this->setDescription(
-            'Finds the paths of the collected source files.',
+        return $command->addOption(
+            self::NAME,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Git base, can be a commit hash, a short name or full name. Will lookup for the default base branch if none provided.',
         );
-    }
-
-    protected function executeCommand(IO $io): bool
-    {
-        $container = $this->getApplication()->getContainer()->withValues(
-            logger: new ConsoleLogger($io),
-            output: $io->getOutput(),
-            configFile: ConfigurationOption::get($io),
-            sourceFilter: SourceFilterOptions::get($io),
-        );
-
-        $filePaths = self::collectPaths(
-            getcwd(),
-            $container->getSourceCollector(),
-        );
-
-        $io->writeln($filePaths);
-
-        return true;
     }
 
     /**
-     * @return string[]
+     * @return non-empty-string|null
      */
-    private static function collectPaths(
-        string $cwd,
-        SourceCollector $sourceCollector,
-    ): array {
-        $paths = array_map(
-            static fn (SplFileInfo $fileInfo) => Path::makeRelative(
-                $fileInfo->getRealPath(),
-                $cwd,
+    public static function get(IO $io): ?string
+    {
+        $value = $io->getInput()->getOption(self::NAME);
+
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmedValue = trim((string) $value);
+
+        Assert::stringNotEmpty(
+            $trimmedValue,
+            sprintf(
+                'Expected a non-blank value for the option "--%s".',
+                self::NAME,
             ),
-            $sourceCollector->collect(),
         );
 
-        sort($paths);
-
-        return $paths;
+        return $trimmedValue;
     }
 }

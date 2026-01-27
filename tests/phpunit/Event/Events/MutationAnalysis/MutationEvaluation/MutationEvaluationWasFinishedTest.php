@@ -33,44 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\Event\Events\MutationAnalysis\MutationEvaluation;
 
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * Abstract empty class to simplify particular implementations
- */
-abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
+#[CoversClass(MutationEvaluationWasFinished::class)]
+final class MutationEvaluationWasFinishedTest extends TestCase
 {
-    protected int $callsCount = 0;
-
-    public function startAnalysis(int $mutationCount): void
+    public function test_it_exposes_its_mutant_process(): void
     {
-        $this->callsCount = 0;
-    }
+        $executionResultMock = $this->createMock(MutantExecutionResult::class);
 
-    public function finishMutationGenerationForFile(
-        string $sourceFilePath,
-        array $mutationIds,
-    ): void {
-        // Do nothing.
-    }
+        $event = new MutationEvaluationWasFinished($executionResultMock);
 
-    public function startEvaluation(Mutation $mutation): void
-    {
-        // Do nothing.
-    }
-
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
-    {
-        ++$this->callsCount;
-    }
-
-    public function finishAnalysis(): void
-    {
-        // Do nothing.
+        $this->assertSame($executionResultMock, $event->executionResult);
     }
 }

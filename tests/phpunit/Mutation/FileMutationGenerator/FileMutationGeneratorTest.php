@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
@@ -95,6 +96,7 @@ final class FileMutationGeneratorTest extends TestCase
             $this->createMock(SourceLineMatcher::class),
             $this->tracerMock,
             new FileStore($fileSystemStub),
+            $this->createMock(EventDispatcher::class),
         );
     }
 

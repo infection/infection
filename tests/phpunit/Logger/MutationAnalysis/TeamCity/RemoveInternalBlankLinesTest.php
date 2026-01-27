@@ -33,60 +33,101 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use function current;
-use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\TestFramework\Tracing\Tracer;
-use Infection\Testing\MutatorName;
-use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestFramework\Tracing\DummyTracer;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
-use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
-#[CoversClass(FileMutationGenerator::class)]
-final class FileMutationGeneratorIntegrationTest extends TestCase
+#[CoversClass(RemoveInternalBlankLines::class)]
+final class RemoveInternalBlankLinesTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    #[DataProvider('linesProvider')]
+    public function test_it_remove_internal_blank_lines(
+        string $lines,
+        string $expected,
+    ): void {
+        $actual = RemoveInternalBlankLines::remove($lines);
 
-    public function test_it_generates_mutations_for_a_given_file(): void
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function linesProvider(): iterable
     {
-        $fileInfoMock = new MockSplFileInfo(realPath: self::FIXTURES_DIR . '/TwoAdditions.php');
+        yield 'empty string' => [
+            <<<'TEXT'
 
-        $mutators = [new Plus()];
+                TEXT,
+            <<<'TEXT'
 
-        $mutationGenerator = SingletonContainer::getContainer()
-            ->withService(
-                Tracer::class,
-                new DummyTracer(),
-            )
-            ->getFileMutationGenerator();
+                TEXT,
+        ];
 
-        $mutations = $mutationGenerator->generate(
-            $fileInfoMock,
-            false,
-            $mutators,
-        );
+        yield 'no-op' => [
+            <<<'TEXT'
+                line1
+                line2
+                TEXT,
+            <<<'TEXT'
+                line1
+                line2
+                TEXT,
+        ];
 
-        $mutations = iterator_to_array($mutations, false);
+        yield 'a blank line' => [
+            <<<'TEXT'
+                line1
 
-        $this->assertContainsOnlyInstancesOf(Mutation::class, $mutations);
+                line2
+                TEXT,
+            <<<'TEXT'
+                line1
+                line2
+                TEXT,
+        ];
 
-        $this->assertCount(1, $mutations);
-        $this->assertArrayHasKey(0, $mutations);
+        yield 'leading and trailing blank lines' => [
+            <<<'TEXT'
 
-        /** @var Mutation $mutation */
-        $mutation = current($mutations);
 
-        $this->assertSame(
-            MutatorName::getName(Plus::class),
-            $mutation->getMutatorName(),
-        );
+                line1
+                line2
+
+
+                TEXT,
+            <<<'TEXT'
+
+
+                line1
+                line2
+
+
+                TEXT,
+        ];
+
+        yield 'nominal' => [
+            <<<'TEXT'
+
+
+                line1
+                line2
+
+                line3
+
+                line4
+
+
+                TEXT,
+            <<<'TEXT'
+
+
+                line1
+                line2
+                line3
+                line4
+
+
+                TEXT,
+        ];
     }
 }
