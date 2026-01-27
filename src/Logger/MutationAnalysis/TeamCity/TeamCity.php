@@ -73,7 +73,7 @@ final class TeamCity
             MessageName::TEST_SUITE_STARTED,
             [
                 'name' => $name,
-                'flowId' => $flowId,
+                'nodeId' => $flowId,
             ],
         );
     }
@@ -84,7 +84,7 @@ final class TeamCity
             MessageName::TEST_SUITE_FINISHED,
             [
                 'name' => $name,
-                'flowId' => $flowId,
+                'nodeId' => $flowId,
             ],
         );
     }
@@ -101,13 +101,18 @@ final class TeamCity
     /**
      * @param string $flowId Flow ID of the test suite the test belongs to.
      */
-    public function testStarted(Mutation $mutation, string $flowId): string
-    {
+    public function testStarted(
+        Mutation $mutation,
+        string $flowId,
+        string $parentFlowId,
+    ): string {
+        // TODO: feels stupid that we are computing the name multiple times
         return $this->write(
             MessageName::TEST_STARTED,
             [
-                'name' => self::createTestId($mutation),
-                'flowId' => $flowId,
+                'name' => self::createTestName($mutation),
+                'nodeId' => $flowId,
+                'parentNodeId' => $parentFlowId,
             ],
         );
     }
@@ -115,12 +120,14 @@ final class TeamCity
     public function testFinished(
         MutantExecutionResult $executionResult,
         string $flowId,
+        string $parentFlowId,
     ): string {
         return $this->write(
             MessageName::TEST_FINISHED,
             [
-                'name' => self::createTestId($executionResult),
-                'flowId' => $flowId,
+                'name' => self::createTestName($executionResult),
+                'nodeId' => $flowId,
+                'parentNodeId' => $parentFlowId,
                 // 'duration' => $durationMs,
             ],
         );
@@ -147,7 +154,7 @@ final class TeamCity
         );
     }
 
-    private function createTestId(Mutation|MutantExecutionResult $subject): string
+    private function createTestName(Mutation|MutantExecutionResult $subject): string
     {
         // TODO: add a test to make it obvious: a test name must be unique
         return sprintf(
