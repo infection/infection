@@ -81,7 +81,8 @@ final class MockTeamCityCommand extends BaseCommand
     ) {
         // TODO: should be debug:mock-teamcity
         //  https://github.com/j-plugins/infection-plugin/issues/28
-        parent::__construct('run');
+        parent::__construct('debug:mock-teamcity');
+        //parent::__construct('run');
 
         $this->sleep = $sleep ?? usleep(...);
     }

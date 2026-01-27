@@ -94,6 +94,7 @@ final readonly class TeamCity
             [
                 'name' => $name,
                 'nodeId' => $flowId,
+                'parentNodeId' => '0',
             ],
         );
     }
@@ -142,7 +143,13 @@ final readonly class TeamCity
                 'parentNodeId' => $parentFlowId,
                 // TODO: looks like this information is not used when the test is marked as successful or ignored :/
                 'message' => sprintf(
-                    'Mutation result: %s',
+                    <<<'MESSAGE'
+                    Mutator: %s
+                    Mutation ID: %s
+                    Mutation result: %s
+                    MESSAGE,
+                    $executionResult->getMutatorName(),
+                    $executionResult->getMutantHash(),
                     $executionResult->getDetectionStatus()->value,
                 ),
                 'details' => $executionResult->getMutantDiff(),

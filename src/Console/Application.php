@@ -119,7 +119,7 @@ final class Application extends BaseApplication
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),
                 new GitDefaultBaseCommand(),
-                //new RunCommand(),
+                new RunCommand(),
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
