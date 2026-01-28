@@ -52,7 +52,6 @@ use Webmozart\Assert\Assert;
 // TODO: explain somewhere the concept of TestSuite and Test for TeamCity
 
 /**
- * @phpstan-type TestSuite = array{name: string, flowId: string}
  * @phpstan-type Test = array{flowId: string, parentFlowId: string}
  * @phpstan-type MutationRecord = array{hash: string, message: string}
  */
@@ -157,26 +156,17 @@ final class TeamCityLogger implements MutationAnalysisLogger
      */
     private function startTestSuite(string $sourceFilePath): string
     {
-        $relativeSourceFilePath = Path::makeRelative(
+        $testSuite = TestSuite::create(
             $sourceFilePath,
             $this->configurationDirPathname,
         );
-        $flowId = self::createFlowId($relativeSourceFilePath);
 
-        $this->openedTestSuites[$sourceFilePath] = [
-            'name' => $relativeSourceFilePath,
-            'flowId' => $flowId,
-        ];
-
+        $this->openedTestSuites[$sourceFilePath] = $testSuite;
         $this->write(
-            $this->teamcity->testSuiteStarted(
-                location: $sourceFilePath,
-                name: $relativeSourceFilePath,
-                flowId: $flowId,
-            ),
+            $this->teamcity->testSuiteStarted($testSuite),
         );
 
-        return $flowId;
+        return $testSuite->flowId;
     }
 
     private function finishTestSuite(string $sourceFilePath): void
@@ -184,10 +174,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
         $testSuite = $this->openedTestSuites[$sourceFilePath];
 
         $this->write(
-            $this->teamcity->testSuiteFinished(
-                name: $testSuite['name'],
-                flowId: $testSuite['flowId'],
-            ),
+            $this->teamcity->testSuiteFinished($testSuite),
         );
 
         unset($this->generatedMutationHashesBySourceFilePath[$sourceFilePath]);

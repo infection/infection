@@ -54,7 +54,7 @@ use function str_replace;
  * make any assumption about the order of the calls made or the support the logs
  * are written to.
  *
- * @see https://www.jetbrains.com/help/teamcity/2025.07/service-messages.html
+ * @phpstan-type MessageAttributes = array<non-empty-string|int, string|int|float>
  *
  * @internal
  */
@@ -85,26 +85,14 @@ final readonly class TeamCity
         );
     }
 
-    public function testSuiteStarted(
-        string $location,
-        string $name,
-        string $flowId,
-    ): string {
+    public function testSuiteStarted(TestSuite $suite): string {
         return $this->write(
             MessageName::TEST_SUITE_STARTED,
-            [
-                'name' => $name,
-                'nodeId' => $flowId,
-                'parentNodeId' => '0',
-                'locationHint' => sprintf(
-                    'file://%s',
-                    $location,
-                ),
-            ],
+            $suite->toAttributes() + ['parentNodeId' => '0'],
         );
     }
 
-    public function testSuiteFinished(string $name, string $flowId): string
+    public function testSuiteFinished(TestSuite $suite): string
     {
         return $this->write(
             MessageName::TEST_SUITE_FINISHED,
@@ -166,7 +154,7 @@ final readonly class TeamCity
     /**
      * @see https://www.jetbrains.com/help/teamcity/2025.07/service-messages.html#Service+Messages+Formats
      *
-     * @param string|array<non-empty-string|int, string|int|float> $valueOrAttributes
+     * @param string|MessageAttributes $valueOrAttributes
      */
     public function write(
         MessageName $messageName,
@@ -184,9 +172,6 @@ final readonly class TeamCity
         );
     }
 
-    /**
-     * @return array{MessageName, array<non-empty-string|int, string|int|float>}
-     */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
     {
         $detectionStatus = $executionResult->getDetectionStatus();
