@@ -70,65 +70,63 @@ final class TeamCityTest extends TestCase
             $valueOrAttributes,
         );
 
-        $indentedActual = TeamCityLogIndenter::indent($actual);
-
-        $this->assertSame($expected, $indentedActual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function messageProvider(): iterable
     {
         yield 'single-attribute message' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             'value',
-            "##teamcity[flowStarted 'value']\n",
+            "##teamcity[testCount 'value']\n",
         ];
 
         yield 'multiple-attribute message' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             ['name1' => 'value1', 'name2' => 'value2'],
-            "##teamcity[flowStarted name1='value1' name2='value2']\n",
+            "##teamcity[testCount name1='value1' name2='value2']\n",
         ];
 
         yield '[escape] apostrophe' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             "'",
-            "##teamcity[flowStarted '|'']\n",
+            "##teamcity[testCount '|'']\n",
         ];
 
         yield '[escape] line feed' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             "\n",
-            "##teamcity[flowStarted '|n']\n",
+            "##teamcity[testCount '|n']\n",
         ];
 
         yield '[escape] carriage return' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             "\r",
-            "##teamcity[flowStarted '|r']\n",
+            "##teamcity[testCount '|r']\n",
         ];
 
         yield '[escape] vertical bar' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             '|',
-            "##teamcity[flowStarted '||']\n",
+            "##teamcity[testCount '||']\n",
         ];
 
         yield '[escape] opening bracket' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             '[',
-            "##teamcity[flowStarted '|[']\n",
+            "##teamcity[testCount '|[']\n",
         ];
 
         yield '[escape] closing bracket' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             ']',
-            "##teamcity[flowStarted '|]']\n",
+            "##teamcity[testCount '|]']\n",
         ];
 
         yield '[escape] message with escaped characters' => [
-            MessageName::FLOW_STARTED,
+            MessageName::TEST_COUNT,
             '\'\u99AA[||]\u00FF',
-            "##teamcity[flowStarted '|'|0x99AA|[|||||]|0x00FF']\n",
+            "##teamcity[testCount '|'|0x99AA|[|||||]|0x00FF']\n",
         ];
     }
 

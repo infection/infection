@@ -33,21 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\EventDispatcher;
+namespace Infection\Tests\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\UnsupportedMethod;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final class FakeEventDispatcher implements EventDispatcher
+#[CoversClass(MutantProcessWasFinished::class)]
+final class MutantProcessWasFinishedTest extends TestCase
 {
-    public function dispatch(object $event): void
+    public function test_it_exposes_its_mutant_process(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
+        $executionResultMock = $this->createMock(MutantExecutionResult::class);
 
-    public function addSubscriber(EventSubscriber $eventSubscriber): void
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $event = new MutantProcessWasFinished($executionResultMock);
+
+        $this->assertSame($executionResultMock, $event->executionResult);
     }
 }
