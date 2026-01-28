@@ -55,7 +55,7 @@ use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -156,6 +156,8 @@ final class RunCommand extends BaseCommand
     private const OPTION_DRY_RUN = 'dry-run';
 
     private const OPTION_MUTANT_ID = 'id';
+
+    private const OPTION_TEAMCITY = 'teamcity';
 
     protected function configure(): void
     {
@@ -362,6 +364,12 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Runs mutation testing and does not run killer processes.',
             )
+            ->addOption(
+                self::OPTION_TEAMCITY,
+                null,
+                InputOption::VALUE_NONE,
+                'Changes the progress output to Teamcity.',
+            )
         ;
     }
 
@@ -463,7 +471,10 @@ final class RunCommand extends BaseCommand
             debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            loggerName: self::getMutationAnalysisLoggerName($commandHelper),
+            loggerName: self::getMutationAnalysisLoggerName(
+                $commandHelper,
+                (bool) $input->getOption(self::OPTION_TEAMCITY),
+            ),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             noProgress: $noProgress,
             forceProgress: $forceProgress,
@@ -605,10 +616,17 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getMutationAnalysisLoggerName(RunCommandHelper $commandHelper): MutationAnalysisLoggerName
-    {
-        return MutationAnalysisLoggerName::from(
-            $commandHelper->getStringOption(self::OPTION_FORMATTER, Container::DEFAULT_FORMATTER_NAME->value),
-        );
+    private static function getMutationAnalysisLoggerName(
+        RunCommandHelper $commandHelper,
+        bool $teamcity,
+    ): MutationAnalysisLoggerName {
+        return $teamcity
+            ? MutationAnalysisLoggerName::TEAMCITY
+            : MutationAnalysisLoggerName::from(
+                $commandHelper->getStringOption(
+                    self::OPTION_FORMATTER,
+                    Container::DEFAULT_FORMATTER_NAME->value,
+                ),
+            );
     }
 }

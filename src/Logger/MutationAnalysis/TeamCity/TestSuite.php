@@ -33,75 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use function array_map;
-use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\SourceFilterOptions;
-use Infection\Console\IO;
-use Infection\Logger\Console\ConsoleLogger;
-use Infection\Source\Collector\SourceCollector;
-use function Safe\getcwd;
-use function sort;
-use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 
 /**
+ * @phpstan-import-type MessageAttributes from TeamCity
+ *
  * @internal
  */
-final class ListSourcesCommand extends BaseCommand
+final readonly class TestSuite
 {
-    public function __construct()
-    {
-        parent::__construct('config:list-sources');
+    /**
+     * @param string $sourceFilePath Absolute path of the source file.
+     */
+    public function __construct(
+        public string $sourceFilePath,
+        public string $name,
+        public string $flowId,
+    ) {
     }
 
-    protected function configure(): void
-    {
-        ConfigurationOption::addOption($this);
-        SourceFilterOptions::addOption($this);
-
-        $this->setDescription(
-            'Finds the paths of the collected source files.',
-        );
-    }
-
-    protected function executeCommand(IO $io): bool
-    {
-        $container = $this->getApplication()->getContainer()->withValues(
-            logger: new ConsoleLogger($io),
-            output: $io->getOutput(),
-            configFile: ConfigurationOption::get($io),
-            sourceFilter: SourceFilterOptions::get($io),
+    public static function create(
+        string $sourceFilePath,
+        string $basePath,
+    ): self {
+        $relativeSourceFilePath = Path::makeRelative(
+            $sourceFilePath,
+            $basePath,
         );
 
-        $filePaths = self::collectPaths(
-            getcwd(),
-            $container->getSourceCollector(),
+        return new self(
+            sourceFilePath: $sourceFilePath,
+            name: $relativeSourceFilePath,
+            flowId: FlowIdFactory::create($relativeSourceFilePath),
         );
-
-        $io->writeln($filePaths);
-
-        return true;
     }
 
     /**
-     * @return string[]
+     * @return MessageAttributes
      */
-    private static function collectPaths(
-        string $cwd,
-        SourceCollector $sourceCollector,
-    ): array {
-        $paths = array_map(
-            static fn (SplFileInfo $fileInfo) => Path::makeRelative(
-                $fileInfo->getRealPath(),
-                $cwd,
-            ),
-            $sourceCollector->collect(),
-        );
-
-        sort($paths);
-
-        return $paths;
+    public function toAttributes(): array
+    {
+        return [
+            'name' => $this->name,
+            'nodeId' => $this->flowId,
+        ];
     }
 }

@@ -33,18 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use function hash;
+use Infection\CannotBeInstantiated;
 
 /**
  * @internal
  */
-enum MutationAnalysisLoggerName: string
+final class FlowIdFactory
 {
-    use ImplodableEnum;
+    use CannotBeInstantiated;
 
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+    public static function create(string $value): string
+    {
+        // Any hash which avoids collision, is fast and deterministic will do.
+        return hash('xxh3', $value);
+    }
 }
