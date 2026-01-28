@@ -595,6 +595,26 @@ final class TeamCityLoggerTest extends TestCase
         ];
     }
 
+    public function test_it_cannot_finish_the_mutation_analysis_with_unclosed_test_suite(): void
+    {
+        $sourceFilePath = '/path/to/project/src/Service/UserService.php';
+
+        $this->teamCityLogger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
+
+        $mutation = self::createMutation(
+            $sourceFilePath,
+            LogicalOrMutator::class,
+        );
+
+        $this->teamCityLogger->startEvaluation($mutation);
+
+        $this->expectExceptionMessage(
+            'Expected all test suites to be closed. Found: "src/Service/UserService.php"',
+        );
+
+        $this->teamCityLogger->finishAnalysis();
+    }
+
     private static function createMutation(
         string $sourceFilePath,
         string $mutatorClassName,

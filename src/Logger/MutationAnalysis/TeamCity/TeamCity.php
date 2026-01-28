@@ -79,7 +79,7 @@ final readonly class TeamCity
     {
         return $this->write(
             MessageName::TEST_COUNT,
-            ['count' => (string) $count],
+            ['count' => $count],
         );
     }
 
