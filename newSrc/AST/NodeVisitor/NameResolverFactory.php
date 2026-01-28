@@ -33,18 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\NodeVisitor\NameResolver;
+
+final class NameResolverFactory
 {
-    // TODO: should be leverage in the new code
     private function __construct()
     {
+    }
+
+    public static function create(): NameResolver
+    {
+        return new NameResolver(
+            null,
+            [
+                'preserveOriginalNames' => true,
+                'replaceNodes' => false,
+            ],
+        );
     }
 }

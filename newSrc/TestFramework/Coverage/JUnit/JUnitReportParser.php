@@ -33,18 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Coverage\JUnit;
+
+use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
+ * TODO: heavily inspired from JUnitTestFileDataProvider
+ * @see JUnitTestFileDataProvider
  */
-trait CannotBeInstantiated
+final class JUnitReportParser
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function parse(string $fileName): PHPUnitXmlReport
     {
+        // TODO: the implementation need to be lazy and streamed.
     }
 }

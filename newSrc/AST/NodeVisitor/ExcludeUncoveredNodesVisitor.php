@@ -33,18 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
+
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
+use newSrc\AST\Metadata\TraverseContext;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use newSrc\TestFramework\Tracing\Tracer;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
+ * All files being traversed are covered by tests, but not all the code of that file is covered by tests.
  *
- * @internal
+ * Indeed, files that are not covered at all by tests can be excluded upstream before any parsing is done.
  */
-trait CannotBeInstantiated
+final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function __construct(
+        private readonly Tracer $tracer,
+        private readonly TraverseContext $context,
+    ) {
+    }
+
+    public function enterNode(Node $node): ?int
     {
+        $hasTests = $this->tracer->hasTests(
+            $this->context->filePathname,
+            $node,
+        );
+
+        // Note that, for instance, a static Analyser may or may not cover a symbol. We could configure
+        // that within the tracer if we want to take PHPStan as a full-fledged test framework.
+        if (!$hasTests) {
+            NodeAnnotator::annotate($node, Annotation::NOT_COVERED_BY_TESTS);
+
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
     }
 }

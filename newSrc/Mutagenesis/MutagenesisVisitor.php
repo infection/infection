@@ -33,18 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutagenesis;
+
+use Closure;
+use newSrc\Mutator\MutatorRegistry;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use SplObjectStorage;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
+ * @phpstan-type MutationFactory = Closure(Node $node): iterable<\newSrc\Mutagenesis\Mutation>
  */
-trait CannotBeInstantiated
+final class MutagenesisVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @var SplObjectStorage<Node, MutationFactory>
+     */
+    private readonly SplObjectStorage $potentialMutations;
+
+    public function __construct(
+        private readonly MutatorRegistry $mutatorRegistry,
+    ) {
+        $this->potentialMutations = new SplObjectStorage();
+    }
+
+    public function enterNode(Node $node): null
     {
+        $this->potentialMutations->attach(
+            $node,
+            $this->mutatorRegistry->mutate(...),
+        );
+
+        return null;
+    }
+
+    /**
+     * @return SplObjectStorage<Node, MutationFactory>
+     */
+    public function getPotentialMutations(): SplObjectStorage
+    {
+        return $this->potentialMutations;
     }
 }
