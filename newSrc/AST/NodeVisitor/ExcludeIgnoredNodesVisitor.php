@@ -33,18 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use function iter\any;
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
+use PhpParser\Comment;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use function str_contains;
+
+final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
+
+    public function enterNode(Node $node): ?int
     {
+        if ($this->hasIgnoreAnnotation($node)) {
+            NodeAnnotator::annotate($node, Annotation::IGNORED_WITH_ANNOTATION);
+
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
+    }
+
+    private function hasIgnoreAnnotation(Node $node): bool
+    {
+        return any(
+            self::commentContainsAnnotation(...),
+            $node->getComments(),
+        );
+    }
+
+    private static function commentContainsAnnotation(Comment $comment): bool
+    {
+        return str_contains(
+            $comment->getText(),
+            self::IGNORE_ALL_MUTATIONS_ANNOTATION,
+        );
     }
 }

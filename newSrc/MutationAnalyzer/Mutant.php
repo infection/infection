@@ -33,18 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+final class Mutant
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    // TODO: lazily evaluated, dumps the mutation on the FS and other info
+    //  shouldn't dump on the FS right away, e.g. for a dry-run we could use only the diff but not needed to dump to the FS
 }

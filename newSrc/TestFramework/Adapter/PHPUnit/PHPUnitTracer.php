@@ -33,18 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Adapter\PHPUnit;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use newSrc\TestFramework\Tracing\Tracer;
+
+final class PHPUnitTracer implements Tracer
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function __construct(
+    ) {
+    }
+
+    public function hasTests(Symbol $symbol): bool
     {
+        // TODO: Implement hasTests() method.
     }
 }
