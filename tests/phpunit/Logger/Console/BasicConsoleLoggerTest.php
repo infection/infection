@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\Console;
 
 use Infection\Logger\Console\BasicConsoleLogger;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -86,9 +87,10 @@ final class BasicConsoleLoggerTest extends TestCase
 
     public static function logProvider(): iterable
     {
-        foreach (self::provideLogsInNormalVerbosity() as $title => $scenario) {
-            yield '[verbosity=normal] ' . $title => $scenario;
-        }
+        yield from DataProviderFactory::prefix(
+            '[verbosity=normal] ',
+            self::provideLogsInNormalVerbosity(),
+        );
     }
 
     private static function provideLogsInNormalVerbosity(): iterable
