@@ -55,231 +55,215 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates negated instanceof with 1 concrete class and 1 trait' => [
-            <<<'PHP'
-                <?php
-
-                $var = !$node instanceof Node\Expr\PostDec && !$node instanceof Infection\Tests\Mutant\MutantAssertions;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $var = $node instanceof Node\Expr\PostDec && $node instanceof Infection\Tests\Mutant\MutantAssertions;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = !$node instanceof Node\Expr\PostDec && !$node instanceof Infection\Tests\Mutant\MutantAssertions;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $node instanceof Node\Expr\PostDec && $node instanceof Infection\Tests\Mutant\MutantAssertions;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates negated instanceof with 1 concrete class and 1 interface' => [
-            <<<'PHP'
-                <?php
-
-                $var = !$node instanceof \Countable && !$node instanceof Node\Expr\PostDec;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $var = $node instanceof \Countable && $node instanceof Node\Expr\PostDec;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = !$node instanceof \Countable && !$node instanceof Node\Expr\PostDec;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $node instanceof \Countable && $node instanceof Node\Expr\PostDec;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates negated instanceof with 2 concrete classes (different variables)' => [
-            <<<'PHP'
-                <?php
-
-                $var = !$node1 instanceof PhpParser\Node\Expr\PreDec && !$node2 instanceof PhpParser\Node\Expr\PostDec;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $var = $node1 instanceof PhpParser\Node\Expr\PreDec && $node2 instanceof PhpParser\Node\Expr\PostDec;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = !$node1 instanceof PhpParser\Node\Expr\PreDec && !$node2 instanceof PhpParser\Node\Expr\PostDec;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $node1 instanceof PhpParser\Node\Expr\PreDec && $node2 instanceof PhpParser\Node\Expr\PostDec;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate negated instanceof with 2 concrete classes (same variable)' => [
-            <<<'PHP'
-                <?php
-
-                $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate negated instanceof with 3 concrete classes' => [
-            <<<'PHP'
-                <?php
-
-                $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec && !$node instanceof PhpParser\Node\Expr\BooleanNot;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec && !$node instanceof PhpParser\Node\Expr\BooleanNot;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates and with two expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() && b();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !a() && !b();
+                    $var = a() && b();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !a() && !b();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates and with more expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() && b() && c() && d();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !a() && !b() && !c() && !d();
+                    $var = a() && b() && c() && d();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !a() && !b() && !c() && !d();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates already negated expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = !(a() && !b());
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !(!a() && b());
+                    $var = !(a() && !b());
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !(!a() && b());
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates assignments in boolean expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = ($a = 1) && $b;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !($a = 1) && !$b;
+                    $var = ($a = 1) && $b;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !($a = 1) && !$b;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates more complex expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = $A > 1 && $this->foo() === false && self::bar() >= 10;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !($A > 1) && $this->foo() === false && !(self::bar() >= 10);
+                    $var = $A > 1 && $this->foo() === false && self::bar() >= 10;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !($A > 1) && $this->foo() === false && !(self::bar() >= 10);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate if all are identical comparisons' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a === false && b() === false && $c !== false && d() !== true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $a === false && b() === false && $c !== false && d() !== true;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if all are identical comparisons - with first OR' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a === false || b() === false && $c !== false && d() !== true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $a === false || b() === false && $c !== false && d() !== true;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if all are identical comparisons - with second OR' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a === false && b() === false || $c !== false && d() !== true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $a === false && b() === false || $c !== false && d() !== true;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if all are identical comparisons - with third OR' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a === false && b() === false && $c !== false || d() !== true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $a === false && b() === false && $c !== false || d() !== true;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates the only one mutable expression on the left when others are not mutable' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a && b() === false && $c !== false;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !$a && b() === false && $c !== false;
+                    $var = $a && b() === false && $c !== false;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !$a && b() === false && $c !== false;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates the only one mutable expression in the middle when others are not mutable' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a === false && b() && $c !== false;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = $a === false && !b() && $c !== false;
+                    $var = $a === false && b() && $c !== false;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = $a === false && !b() && $c !== false;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates the only one mutable expression on the right when others are not mutable' => [
-            <<<'PHP'
-                <?php
-
-                $var = $a === false && b() === false && $c;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = $a === false && b() === false && !$c;
+                    $var = $a === false && b() === false && $c;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = $a === false && b() === false && !$c;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It preserves formatting for non-modified code' => [
-            <<<'PHP'
-                <?php
-
-                class TestFormatPreserving {
-                    // some comment
-                    public function test(): bool { // and comment here
-                        return 1
-
-                          || 2;
-                    }
-                }
-
-                $var = a() && b();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
                     class TestFormatPreserving {
                         // some comment
                         public function test(): bool { // and comment here
@@ -289,8 +273,24 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                         }
                     }
 
-                    $var = !a() && !b();
+                    $var = a() && b();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class TestFormatPreserving {
+                            // some comment
+                            public function test(): bool { // and comment here
+                                return 1
+
+                                  || 2;
+                            }
+                        }
+
+                        $var = !a() && !b();
+                        PHP,
+                ),
             ],
         ];
     }

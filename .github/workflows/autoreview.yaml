@@ -42,28 +42,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure PHP-CS-Fixer GitHub Actions cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ./var/cache/php-cs-fixer
           key: "${{ matrix.php-version }}-php-cs-fixer-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-php-cs-fixer"
 
       - name: Configure Rector GitHub Actions cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ./var/cache/rector
           key: "${{ matrix.php-version }}-rector-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-rector"
 
       - name: Configure PHPStan GitHub Actions cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ./var/cache/phpstan
           key: "${{ matrix.php-version }}-phpstan-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-phpstan"
 
       - name: Configure Psalm GitHub Actions cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ./var/cache/psalm
           key: "${{ matrix.php-version }}-psalm-${{ github.run_id }}"
@@ -74,7 +74,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}

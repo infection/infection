@@ -61,15 +61,15 @@ final class NewObjectTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate if no class name found' => [
-            <<<'PHP'
-                <?php
-
-                function test()
-                {
-                    $className = 'SimpleClass';
-                    $instance = new $className();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function test()
+                    {
+                        $className = 'SimpleClass';
+                        $instance = new $className();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate with not nullable return typehint' => [

@@ -199,11 +199,8 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
         ];
 
         yield 'it mutates an anonymous class' => [
-            <<<'PHP'
-                <?php
-
-                function something()
-                {
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     return new class
                     {
                         protected function anything()
@@ -211,13 +208,10 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                             return null;
                         }
                     };
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                function something()
-                {
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     return new class
                     {
                         private function anything()
@@ -225,12 +219,12 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                             return null;
                         }
                     };
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove attributes' => [
-            <<<'PHP_WRAP'
+            <<<'PHP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
@@ -245,8 +239,8 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP_WRAP,
-            <<<'PHP_WRAP'
+                PHP,
+            <<<'PHP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
@@ -261,7 +255,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP_WRAP,
+                PHP,
         ];
     }
 }
