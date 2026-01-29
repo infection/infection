@@ -47,6 +47,13 @@ use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
+ * Since we are launching test suites and tests in parallel, we need to do a fair amount of tracking.
+ *
+ * This service is responsible for doing that state tracking. Once a test suite is closed, all of its
+ * related states are cleaned up. This is for both memory efficiency and making it easier that there is
+ * no dangling state at the end of the run, which would translate to not everything having been logged
+ * correctly.
+ *
  * @internal
  */
 final class TeamCityLoggerState

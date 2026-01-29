@@ -103,19 +103,13 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         $this->state->assertAllTestSuitesAreClosed();
     }
 
-    /**
-     * @return string TestSuite node ID.
-     */
     private function startTestSuiteIfNotStarted(string $sourceFilePath): string
     {
         return $this->state->findTestSuite($sourceFilePath)->nodeId
-            ?? $this->startTestSuite($sourceFilePath);
+            ?? $this->startTestSuite($sourceFilePath)->nodeId;
     }
 
-    /**
-     * @return string TestSuite node ID.
-     */
-    private function startTestSuite(string $sourceFilePath): string
+    private function startTestSuite(string $sourceFilePath): TestSuite
     {
         $testSuite = TestSuite::create(
             $sourceFilePath,
@@ -127,7 +121,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
             $this->teamcity->testSuiteStarted($testSuite),
         );
 
-        return $testSuite->nodeId;
+        return $testSuite;
     }
 
     private function finishTestSuite(string $sourceFilePath): void

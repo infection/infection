@@ -40,7 +40,6 @@ use function array_map;
 use function implode;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
 use function is_int;
 use function is_string;
 use function Safe\preg_replace;
@@ -49,10 +48,8 @@ use function str_contains;
 use function str_replace;
 
 /**
- * This service provides the primitives to write a TeamCity log record. It is
- * adapted to Infection in the context of mutation testing, but it does not
- * make any assumption about the order of the calls made or the support the logs
- * are written to.
+ * This is the basic TeamCity service. Its role is to write the TeamCity messages
+ * without making any assumption about the support they will be written to.
  *
  * @phpstan-type MessageAttributes = array<non-empty-string|int, string|int|float>
  *
