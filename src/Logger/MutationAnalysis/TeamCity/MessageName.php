@@ -33,18 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
-
-use Infection\Framework\Enum\ImplodableEnum;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
 /**
+ * Only contains a subset of the allowed messages.
+ *
+ * @see https://www.jetbrains.com/help/teamcity/service-messages.html
+ *
  * @internal
  */
-enum MutationAnalysisLoggerName: string
+enum MessageName: string
 {
-    use ImplodableEnum;
-
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+    case TEST_COUNT = 'testCount';
+    case TEST_SUITE_STARTED = 'testSuiteStarted';
+    case TEST_SUITE_FINISHED = 'testSuiteFinished';
+    case TEST_STARTED = 'testStarted';
+    case TEST_FINISHED = 'testFinished';
+    case TEST_FAILED = 'testFailed';
+    case TEST_IGNORED = 'testIgnored';
 }

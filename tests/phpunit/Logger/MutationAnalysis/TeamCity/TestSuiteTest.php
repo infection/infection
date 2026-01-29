@@ -33,18 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use Infection\Logger\MutationAnalysis\TeamCity\TestSuite;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-enum MutationAnalysisLoggerName: string
+#[CoversClass(TestSuite::class)]
+final class TestSuiteTest extends TestCase
 {
-    use ImplodableEnum;
+    #[DataProvider('suiteProvider')]
+    public function test_it_can_be_created(
+        string $sourceFilePath,
+        string $basePath,
+        TestSuite $expected,
+    ): void {
+        $actual = TestSuite::create($sourceFilePath, $basePath);
 
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+        $this->assertEquals($expected, $actual);
+    }
+
+    // We cannot use "testSuiteProvider" here, PHPUnit would otherwise understand it as a test.
+    public static function suiteProvider(): iterable
+    {
+        yield [
+            '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
+            '/path/to/project',
+            new TestSuite(
+                '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
+                'src/Infrastructure/Http/Action/Greet.php',
+                'a93f8006e20d02d1',
+            ),
+        ];
+    }
 }

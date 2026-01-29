@@ -33,18 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\Logger\Console;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use Infection\Tests\UnsupportedMethod;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-enum MutationAnalysisLoggerName: string
+final class BufferedOutputWithStdErrOutput extends BufferedOutput implements ConsoleOutputInterface
 {
-    use ImplodableEnum;
+    public function __construct(
+        ?int $verbosity = self::VERBOSITY_NORMAL,
+        bool $decorated = false,
+        ?OutputFormatterInterface $formatter = null,
+        private readonly OutputInterface $stderr = new NullOutput(),
+    ) {
+        parent::__construct($verbosity, $decorated, $formatter);
+    }
 
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+    public function getErrorOutput(): OutputInterface
+    {
+        return $this->stderr;
+    }
+
+    public function setErrorOutput(OutputInterface $error): void
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function section(): ConsoleSectionOutput
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
 }

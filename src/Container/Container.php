@@ -89,6 +89,7 @@ use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
@@ -596,6 +597,14 @@ final class Container extends DIContainer
                         ),
                     );
                 },
+            ),
+            TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
+                $container->getConfiguration()->timeoutsAsEscaped,
+            ),
+            MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
+                $container->getOutput(),
+                $container->get(TeamCity::class),
+                $container->getConfiguration()->configurationPathname,
             ),
         ]);
 

@@ -38,7 +38,7 @@ namespace Infection\Tests\Metrics;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
 use Infection\Framework\Str;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use const PHP_EOL;
