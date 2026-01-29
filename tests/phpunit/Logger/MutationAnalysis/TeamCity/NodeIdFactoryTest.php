@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Logger\MutationAnalysis\TeamCity\FlowIdFactory;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function strlen;
 
-#[CoversClass(FlowIdFactory::class)]
-final class FlowIdFactoryTest extends TestCase
+#[CoversClass(NodeIdFactory::class)]
+final class NodeIdFactoryTest extends TestCase
 {
     public function test_it_generates_a_short_and_deterministic_hash(): void
     {
         $value = '49a5dfcd2f4a0b33d4a02e662812af55';
 
-        $id1 = FlowIdFactory::create($value);
-        $id2 = FlowIdFactory::create($value);
+        $id1 = NodeIdFactory::create($value);
+        $id2 = NodeIdFactory::create($value);
 
         $this->assertNotSame($value, $id1);
         $this->assertSame($id1, $id2);

@@ -50,10 +50,10 @@ final class TestTest extends TestCase
     #[DataProvider('caseProvider')]
     public function test_it_can_be_created(
         Mutation $mutation,
-        string $parentFlowId,
+        string $parentNodeId,
         Test $expected,
     ): void {
-        $actual = Test::create($mutation, $parentFlowId);
+        $actual = Test::create($mutation, $parentNodeId);
 
         $this->assertEquals($expected, $actual);
     }

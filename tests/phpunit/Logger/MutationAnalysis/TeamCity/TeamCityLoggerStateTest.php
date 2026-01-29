@@ -58,7 +58,7 @@ final class TeamCityLoggerStateTest extends TestCase
             'mutationId1',
             'MutatorName (mutationId1)',
             'TA',
-            $testSuite->flowId,
+            $testSuite->nodeId,
         );
 
         $state->openTestSuite($testSuite);
@@ -66,7 +66,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $state->closeTest($testA);
 
         $this->expectExceptionMessage(
-            'Cannot close the test suite "src/Infrastructure/Http/Action/Greet.php" (flowId=TS1): its list of tests is not known yet.',
+            'Cannot close the test suite "src/Infrastructure/Http/Action/Greet.php" (nodeId=TS1): its list of tests is not known yet.',
         );
 
         $state->closeTestSuite($testSuite->sourceFilePath);
@@ -86,14 +86,14 @@ final class TeamCityLoggerStateTest extends TestCase
             'mutationId1',
             'MutatorName (mutationId1)',
             'TA',
-            $testSuite->flowId,
+            $testSuite->nodeId,
         );
 
         $testB = new Test(
             'mutationId2',
             'MutatorName (mutationId2)',
             'T2',
-            $testSuite->flowId,
+            $testSuite->nodeId,
         );
 
         $state->openTestSuite($testSuite);
@@ -105,7 +105,7 @@ final class TeamCityLoggerStateTest extends TestCase
         );
 
         $this->expectExceptionMessage(
-            'Found 1 opened or non-executed test(s) for the test suite "src/Infrastructure/Http/Action/Greet.php" (flowId=TS1): mutationId2.',
+            'Found 1 opened or non-executed test(s) for the test suite "src/Infrastructure/Http/Action/Greet.php" (nodeId=TS1): mutationId2.',
         );
 
         $state->closeTestSuite($testSuite->sourceFilePath);
@@ -125,14 +125,14 @@ final class TeamCityLoggerStateTest extends TestCase
             'mutationId1',
             'MutatorName (mutationId1)',
             'TA',
-            $testSuite->flowId,
+            $testSuite->nodeId,
         );
 
         $testB = new Test(
             'mutationId2',
             'MutatorName (mutationId2)',
             'T2',
-            $testSuite->flowId,
+            $testSuite->nodeId,
         );
 
         $state->openTestSuite($testSuite);
@@ -145,7 +145,7 @@ final class TeamCityLoggerStateTest extends TestCase
         );
 
         $this->expectExceptionMessage(
-            'Found 1 opened or non-executed test(s) for the test suite "src/Infrastructure/Http/Action/Greet.php" (flowId=TS1): mutationId2.',
+            'Found 1 opened or non-executed test(s) for the test suite "src/Infrastructure/Http/Action/Greet.php" (nodeId=TS1): mutationId2.',
         );
 
         $state->closeTestSuite($testSuite->sourceFilePath);
@@ -181,7 +181,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $state->openTestSuite($testSuite);
 
         $this->expectExceptionMessage(
-            'Expected all test suites to be closed. Found: "src/Infrastructure/Http/Action/Greet.php" (flowId=TS1)',
+            'Expected all test suites to be closed. Found: "src/Infrastructure/Http/Action/Greet.php" (nodeId=TS1)',
         );
 
         $state->assertAllTestSuitesAreClosed();
@@ -201,11 +201,11 @@ final class TeamCityLoggerStateTest extends TestCase
             'mutationId1',
             'MutatorName (mutationId1)',
             'TA',
-            $testSuite->flowId,
+            $testSuite->nodeId,
         );
 
         $this->expectExceptionMessage(
-            'Cannot close the test "MutatorName (mutationId1)" (flowId=TA): its test suite flowId=TS1 was not opened.',
+            'Cannot close the test "MutatorName (mutationId1)" (nodeId=TA): its test suite nodeId=TS1 was not opened.',
         );
 
         $state->closeTest($testA);

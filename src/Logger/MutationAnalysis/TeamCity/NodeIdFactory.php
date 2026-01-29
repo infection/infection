@@ -41,13 +41,23 @@ use Infection\CannotBeInstantiated;
 /**
  * @internal
  */
-final class FlowIdFactory
+final class NodeIdFactory
 {
     use CannotBeInstantiated;
 
     public static function create(string $value): string
     {
-        // Any hash which avoids collision, is fast and deterministic will do.
+        // The hash must meet the following criteria:
+        // - have a very low collision rate
+        // - be fast
+        // - be deterministic
+        // - be short (~20chars max – not a hard limit)
+        //
+        // I choose xxh3 as it was a recommendation, but
+        // any other hash algorithm meeting the aforementioned
+        // criteria will do.
+        // https://xxhash.com/
+        // https://php.watch/versions/8.1/xxHash
         return hash('xxh3', $value);
     }
 }

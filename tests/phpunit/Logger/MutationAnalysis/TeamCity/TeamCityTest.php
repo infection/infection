@@ -165,8 +165,8 @@ final class TeamCityTest extends TestCase
         $nominalTest = new Test(
             id: 'mutantHash',
             name: 'Infection\Mutator\Boolean\LogicalAnd (mutantHash)',
-            flowId: '1A',
-            parentFlowId: 'A',
+            nodeId: '1A',
+            parentNodeId: 'A',
         );
 
         $mutationDiff = <<<'PHP_DIFF'

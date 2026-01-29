@@ -52,21 +52,21 @@ final readonly class Test
     public function __construct(
         public string $id,
         public string $name,
-        public string $flowId,
-        public string $parentFlowId,
+        public string $nodeId,
+        public string $parentNodeId,
     ) {
     }
 
     public static function create(
         Mutation $mutation,
-        string $parentFlowId,
+        string $parentNodeId,
     ): self {
         return new self(
             id: $mutation->getHash(),
             name: self::createName($mutation),
-            // The Mutation hash is too long to be suitable to be a flowId.
-            flowId: FlowIdFactory::create($mutation->getHash()),
-            parentFlowId: $parentFlowId,
+            // The Mutation hash is too long to be suitable to be a nodeId.
+            nodeId: NodeIdFactory::create($mutation->getHash()),
+            parentNodeId: $parentNodeId,
         );
     }
 
@@ -77,8 +77,8 @@ final readonly class Test
     {
         return [
             'name' => $this->name,
-            'nodeId' => $this->flowId,
-            'parentNodeId' => $this->parentFlowId,
+            'nodeId' => $this->nodeId,
+            'parentNodeId' => $this->parentNodeId,
         ];
     }
 

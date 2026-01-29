@@ -59,7 +59,7 @@ final class TeamCityLoggerState
     /**
      * @var array<string, TestSuite>
      */
-    private array $openedTestSuitesByFlowId = [];
+    private array $openedTestSuitesByNodeId = [];
 
     /**
      * @var array<string, Test>
@@ -69,7 +69,7 @@ final class TeamCityLoggerState
     /**
      * @var array<string, array<string, true>>
      */
-    private array $finishedTestIdsAsKeysByTestSuiteFlowId = [];
+    private array $finishedTestIdsAsKeysByTestSuiteNodeId = [];
 
     /**
      * @var array<array<string, true>>
@@ -79,7 +79,7 @@ final class TeamCityLoggerState
     public function openTestSuite(TestSuite $suite): void
     {
         $this->openedTestSuitesBySourceFilePath[$suite->sourceFilePath] = $suite;
-        $this->openedTestSuitesByFlowId[$suite->flowId] = $suite;
+        $this->openedTestSuitesByNodeId[$suite->nodeId] = $suite;
     }
 
     public function closeTestSuite(string $sourceFilePath): void
@@ -89,9 +89,9 @@ final class TeamCityLoggerState
         $this->assertAllTestsAreFinished($testSuite);
 
         unset($this->openedTestSuitesBySourceFilePath[$sourceFilePath]);
-        unset($this->openedTestSuitesByFlowId[$testSuite->flowId]);
+        unset($this->openedTestSuitesByNodeId[$testSuite->nodeId]);
         unset($this->remainingTestIdsByTestSuiteSourceFilePath[$sourceFilePath]);
-        unset($this->finishedTestIdsAsKeysByTestSuiteFlowId[$testSuite->flowId]);
+        unset($this->finishedTestIdsAsKeysByTestSuiteNodeId[$testSuite->nodeId]);
     }
 
     public function findTestSuite(string $sourceFilePath): ?TestSuite
@@ -125,7 +125,7 @@ final class TeamCityLoggerState
         // Note that the test suite may not be opened yet at this point! So there may not be any
         $finishedTestIds = $testSuite === null
             ? []
-            : array_keys($this->finishedTestIdsAsKeysByTestSuiteFlowId[$testSuite->flowId] ?? []);
+            : array_keys($this->finishedTestIdsAsKeysByTestSuiteNodeId[$testSuite->nodeId] ?? []);
         $remainingTestIds = array_diff($testIds, $finishedTestIds);
 
         $this->remainingTestIdsByTestSuiteSourceFilePath[$sourceFilePath] = array_fill_keys($remainingTestIds, true);
@@ -138,22 +138,22 @@ final class TeamCityLoggerState
 
     public function closeTest(Test $test): void
     {
-        $testSuiteFlowId = $test->parentFlowId;
+        $testSuiteNodeId = $test->parentNodeId;
 
         Assert::keyExists(
-            $this->openedTestSuitesByFlowId,
-            $testSuiteFlowId,
+            $this->openedTestSuitesByNodeId,
+            $testSuiteNodeId,
             sprintf(
-                'Cannot close the test "%s" (flowId=%s): its test suite flowId=%s was not opened.',
+                'Cannot close the test "%s" (nodeId=%s): its test suite nodeId=%s was not opened.',
                 $test->name,
-                $test->flowId,
-                $testSuiteFlowId,
+                $test->nodeId,
+                $testSuiteNodeId,
             ),
         );
-        $testSuite = $this->openedTestSuitesByFlowId[$testSuiteFlowId];
+        $testSuite = $this->openedTestSuitesByNodeId[$testSuiteNodeId];
 
         unset($this->openedTestsById[$test->id]);
-        $this->finishedTestIdsAsKeysByTestSuiteFlowId[$testSuiteFlowId][$test->id] = true;
+        $this->finishedTestIdsAsKeysByTestSuiteNodeId[$testSuiteNodeId][$test->id] = true;
 
         // We may not know the complete list of tests of a test suite. Until we know it, we track
         // the list of finished tests for that test suite.
@@ -169,10 +169,10 @@ final class TeamCityLoggerState
 
     public function areAllTestsOfTheTestSuiteFinished(string $sourceFilePath): bool
     {
-        $testSuiteFlowId = $this->findTestSuite($sourceFilePath)?->flowId;
+        $testSuiteNodeId = $this->findTestSuite($sourceFilePath)?->nodeId;
 
         if (
-            $testSuiteFlowId === null
+            $testSuiteNodeId === null
             || !array_key_exists($sourceFilePath, $this->remainingTestIdsByTestSuiteSourceFilePath)
         ) {
             return false;
@@ -191,9 +191,9 @@ final class TeamCityLoggerState
                         ', ',
                         array_map(
                             static fn (TestSuite $suite): string => sprintf(
-                                '"%s" (flowId=%s)',
+                                '"%s" (nodeId=%s)',
                                 $suite->name,
-                                $suite->flowId,
+                                $suite->nodeId,
                             ),
                             $this->openedTestSuitesBySourceFilePath,
                         ),
@@ -204,10 +204,10 @@ final class TeamCityLoggerState
 
         // These are for good measure, they should not be possible, hence cannot
         // be tested without extremely artificial tests.
-        Assert::count($this->openedTestSuitesByFlowId, 0);
+        Assert::count($this->openedTestSuitesByNodeId, 0);
         Assert::count($this->openedTestsById, 0);
         Assert::count($this->remainingTestIdsByTestSuiteSourceFilePath, 0);
-        Assert::count($this->finishedTestIdsAsKeysByTestSuiteFlowId, 0);
+        Assert::count($this->finishedTestIdsAsKeysByTestSuiteNodeId, 0);
     }
 
     private function assertAllTestsAreFinished(TestSuite $testSuite): void
@@ -215,9 +215,9 @@ final class TeamCityLoggerState
         if (!array_key_exists($testSuite->sourceFilePath, $this->remainingTestIdsByTestSuiteSourceFilePath)) {
             throw new LogicException(
                 sprintf(
-                    'Cannot close the test suite "%s" (flowId=%s): its list of tests is not known yet.',
+                    'Cannot close the test suite "%s" (nodeId=%s): its list of tests is not known yet.',
                     $testSuite->name,
-                    $testSuite->flowId,
+                    $testSuite->nodeId,
                 ),
             );
         }
@@ -228,10 +228,10 @@ final class TeamCityLoggerState
             $remainingTestIds,
             0,
             sprintf(
-                'Found %d opened or non-executed test(s) for the test suite "%s" (flowId=%s): %s.',
+                'Found %d opened or non-executed test(s) for the test suite "%s" (nodeId=%s): %s.',
                 count($remainingTestIds),
                 $testSuite->name,
-                $testSuite->flowId,
+                $testSuite->nodeId,
                 implode(
                     ', ',
                     $remainingTestIds,

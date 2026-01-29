@@ -50,7 +50,7 @@ final readonly class TestSuite
     public function __construct(
         public string $sourceFilePath,
         public string $name,
-        public string $flowId,
+        public string $nodeId,
     ) {
     }
 
@@ -66,7 +66,7 @@ final readonly class TestSuite
         return new self(
             sourceFilePath: $sourceFilePath,
             name: $relativeSourceFilePath,
-            flowId: FlowIdFactory::create($relativeSourceFilePath),
+            nodeId: NodeIdFactory::create($relativeSourceFilePath),
         );
     }
 
@@ -77,7 +77,7 @@ final readonly class TestSuite
     {
         return [
             'name' => $this->name,
-            'nodeId' => $this->flowId,
+            'nodeId' => $this->nodeId,
         ];
     }
 }

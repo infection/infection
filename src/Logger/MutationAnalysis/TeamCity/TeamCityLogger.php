@@ -70,9 +70,9 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
     {
         $sourceFilePath = $mutation->getOriginalFilePath();
 
-        $testSuiteFlowId = $this->startTestSuiteIfNotStarted($sourceFilePath);
+        $testSuiteNodeId = $this->startTestSuiteIfNotStarted($sourceFilePath);
 
-        $this->startTest($mutation, $testSuiteFlowId);
+        $this->startTest($mutation, $testSuiteNodeId);
     }
 
     public function finishEvaluation(MutantExecutionResult $executionResult): void
@@ -104,16 +104,16 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
     }
 
     /**
-     * @return string TestSuite flowID.
+     * @return string TestSuite node ID.
      */
     private function startTestSuiteIfNotStarted(string $sourceFilePath): string
     {
-        return $this->state->findTestSuite($sourceFilePath)->flowId
+        return $this->state->findTestSuite($sourceFilePath)->nodeId
             ?? $this->startTestSuite($sourceFilePath);
     }
 
     /**
-     * @return string TestSuite flowID.
+     * @return string TestSuite node ID.
      */
     private function startTestSuite(string $sourceFilePath): string
     {
@@ -127,7 +127,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
             $this->teamcity->testSuiteStarted($testSuite),
         );
 
-        return $testSuite->flowId;
+        return $testSuite->nodeId;
     }
 
     private function finishTestSuite(string $sourceFilePath): void
@@ -140,9 +140,9 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         );
     }
 
-    private function startTest(Mutation $mutation, string $parentFlowId): void
+    private function startTest(Mutation $mutation, string $parentNodeId): void
     {
-        $test = Test::create($mutation, $parentFlowId);
+        $test = Test::create($mutation, $parentNodeId);
 
         $this->state->openTest($test);
         $this->write(
