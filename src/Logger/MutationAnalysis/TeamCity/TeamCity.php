@@ -103,7 +103,7 @@ final readonly class TeamCity
     {
         return $this->write(
             MessageName::TEST_STARTED,
-            $test->toAttributes(),
+            $test->toAttributes() + ['parentNodeId' => $test->parentNodeId],
         );
     }
 

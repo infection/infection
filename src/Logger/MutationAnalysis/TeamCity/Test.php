@@ -78,7 +78,6 @@ final readonly class Test
         return [
             'name' => $this->name,
             'nodeId' => $this->nodeId,
-            'parentNodeId' => $this->parentNodeId,
         ];
     }
 
@@ -120,11 +119,8 @@ final readonly class Test
 
     private static function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
     {
-        // TODO: this is actually incorrect! Or is it?
-        //  this could be either the (singular) process, but what about:
-        //  - the other processes executed prior?
-        //  - the time taken by the heuristics?
-        //  - the waiting time in-between being generated and processes?
+        // TODO: this duration is not correct.
+        //  see: https://github.com/infection/infection/issues/2900
         return (string) round($executionResult->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
     }
 }
