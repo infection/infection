@@ -57,10 +57,8 @@ use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
@@ -74,6 +72,10 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
@@ -103,10 +105,7 @@ use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
-use Infection\Testing\SimpleMutation;
-use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
@@ -136,6 +135,7 @@ final class ProjectCodeProvider
         ConcreteComposerExecutableFinder::class,
         ConfigureCommand::class,
         ConfigurationOption::class,
+        ConsoleProgressBarLogger::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         DummyFileSystem::class,
@@ -148,7 +148,6 @@ final class ProjectCodeProvider
         FilterOption::class,
         FixedSourceCollector::class,
         SourceFilterOptions::class,
-        FormatterName::class,
         GitDiffFilter::class,
         GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
@@ -156,7 +155,10 @@ final class ProjectCodeProvider
         LoggerFactory::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MessageName::class,
+        MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
+        MutationEvaluationWasStarted::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutatorName::class,
         NameResolverFactory::class,
@@ -166,14 +168,10 @@ final class ProjectCodeProvider
         NullSourceLineMatcher::class,
         NullSubscriber::class,
         OperatingSystem::class,
-        ProgressFormatter::class,
         SchemaConfiguration::class,
-        SimpleMutation::class,
-        SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
         Source::class,
         StopInfectionOnSigintSignalSubscriber::class,
-        StringNormalizer::class,
         StrykerCurlClient::class,
         TooManyReportsFound::class,
         XdebugHandler::class,
@@ -210,8 +208,8 @@ final class ProjectCodeProvider
         BaseMutatorTestCase::class,
         Definition::class,
         Mutator::class,
+        MutationAnalysisLogger::class,
         MutatorCategory::class,
-        OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,

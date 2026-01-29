@@ -55,39 +55,27 @@ final class ShiftRightTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates shift right' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a >> 2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a << 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a >> 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a << 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate shift left' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a << 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a << 2;
+                    PHP,
+            ),
         ];
-    }
-
-    public function test_replaces_post_decrement(): void
-    {
-        $code = '<?php $a = 1; $a >> 2;';
-        $mutations = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'PHP'
-            <?php $a = 1; $a << 2;
-            PHP;
-
-        $this->assertSame($expectedMutatedCode, $mutations[0]);
     }
 }

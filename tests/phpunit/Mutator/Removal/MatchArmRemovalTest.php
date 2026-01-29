@@ -55,120 +55,120 @@ final class MatchArmRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes match arm when more than one is defined' => [
-            <<<'PHP'
-                <?php
-
-                match ($x) {
-                    0 => false,
-                    1 => true,
-                    2 => null,
-                    default => throw new \Exception(),
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match ($x) {
+                        0 => false,
+                        1 => true,
+                        2 => null,
+                        default => throw new \Exception(),
+                    };
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        1 => true,
-                        2 => null,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        0 => false,
-                        2 => null,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        0 => false,
-                        1 => true,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        0 => false,
-                        1 => true,
-                        2 => null,
-                    };
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            1 => true,
+                            2 => null,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            0 => false,
+                            2 => null,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            0 => false,
+                            1 => true,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            0 => false,
+                            1 => true,
+                            2 => null,
+                        };
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not remove one match arm' => [
-            <<<'PHP'
-                <?php
-
-                match ($x) {
-                    0 => false,
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match ($x) {
+                        0 => false,
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It removes match arm condition when more than one is defined' => [
-            <<<'PHP'
-                <?php
-
-                match ($x) {
-                    'cond1', 'cond2', 'cond3' => false,
-                    2 => null,
-                    default => throw new \Exception(),
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match ($x) {
+                        'cond1', 'cond2', 'cond3' => false,
+                        2 => null,
+                        default => throw new \Exception(),
+                    };
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        'cond2', 'cond3' => false,
-                        2 => null,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        'cond1', 'cond3' => false,
-                        2 => null,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        'cond1', 'cond2' => false,
-                        2 => null,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        'cond1', 'cond2', 'cond3' => false,
-                        default => throw new \Exception(),
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    match ($x) {
-                        'cond1', 'cond2', 'cond3' => false,
-                        2 => null,
-                    };
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            'cond2', 'cond3' => false,
+                            2 => null,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            'cond1', 'cond3' => false,
+                            2 => null,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            'cond1', 'cond2' => false,
+                            2 => null,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            'cond1', 'cond2', 'cond3' => false,
+                            default => throw new \Exception(),
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        match ($x) {
+                            'cond1', 'cond2', 'cond3' => false,
+                            2 => null,
+                        };
+                        PHP,
+                ),
             ],
         ];
     }

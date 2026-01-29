@@ -55,118 +55,118 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes a method call without parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->foo();
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                $this->foo();
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It removes a method call with parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo->bar(3, 4);
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                $foo->bar(3, 4);
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It remove a static method call without parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    self::foo();
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                self::foo();
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It remove a static method call with parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    THatClass::bar(3, 4);
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                THatClass::bar(3, 4);
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It remove a null-safe method call with parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo?->bar(3, 4);
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                $foo?->bar(3, 4);
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a method call that is assigned to something' => [
-            <<<'PHP'
-                <?php
-
-                $b = $this->foo();
-                $a = 3;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b = $this->foo();
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a method call within a statement' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($this->foo()) {
+                        $a = 3;
+                    }
+                    while ($foo->foo()) {
+                        $a = 3;
+                    }
 
-                if ($this->foo()) {
-                    $a = 3;
-                }
-                while ($foo->foo()) {
-                    $a = 3;
-                }
-
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a method call that is the parameter of another function or method' => [
-            <<<'PHP'
-                <?php
-
-                $a = $this->foo(3, $a->bar());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $this->foo(3, $a->bar());
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a function call' => [
-            <<<'PHP'
-                <?php
-
-                foo();
-                $a = 3;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    foo();
+                    $a = 3;
+                    PHP,
+            ),
         ];
     }
 }

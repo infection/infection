@@ -55,290 +55,290 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates array item fetch' => [
-            <<<'PHP'
-                <?php
-
-                $var = $array[0] || $array[1];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $array[0] || $array[1];
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !$array[0] || $array[1];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = $array[0] || !$array[1];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !$array[0] || $array[1];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = $array[0] || !$array[1];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates variable' => [
-            <<<'PHP'
-                <?php
-
-                $var = $foo || $bar;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $foo || $bar;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !$foo || $bar;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = $foo || !$bar;
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !$foo || $bar;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = $foo || !$bar;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates method call' => [
-            <<<'PHP'
-                <?php
-
-                $var = $this->foo() || $bar->baz();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $this->foo() || $bar->baz();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !$this->foo() || $bar->baz();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = $this->foo() || !$bar->baz();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !$this->foo() || $bar->baz();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = $this->foo() || !$bar->baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates static calls' => [
-            <<<'PHP'
-                <?php
-
-                $var = self::foo() || static::bar() || Test::baz();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = self::foo() || static::bar() || Test::baz();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !self::foo() || static::bar() || Test::baz();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = self::foo() || !static::bar() || Test::baz();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = self::foo() || static::bar() || !Test::baz();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !self::foo() || static::bar() || Test::baz();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = self::foo() || !static::bar() || Test::baz();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = self::foo() || static::bar() || !Test::baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates constant calls' => [
-            <<<'PHP'
-                <?php
-
-                $var = self::FOO || self::BAR;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = self::FOO || self::BAR;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !self::FOO || self::BAR;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = self::FOO || !self::BAR;
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !self::FOO || self::BAR;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = self::FOO || !self::BAR;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates closure calls' => [
-            <<<'PHP'
-                <?php
-
-                $var = $foo() || $bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = $foo() || $bar();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !$foo() || $bar();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = $foo() || !$bar();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !$foo() || $bar();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = $foo() || !$bar();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates invoke calls' => [
-            <<<'PHP'
-                <?php
-
-                $var = ($this->foo)() || ($this->bar)();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = ($this->foo)() || ($this->bar)();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !($this->foo)() || ($this->bar)();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = ($this->foo)() || !($this->bar)();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !($this->foo)() || ($this->bar)();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = ($this->foo)() || !($this->bar)();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates function calls' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() || b();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = a() || b();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !a() || b();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = a() || !b();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !a() || b();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = a() || !b();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates and with more expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() || b() || c() || d();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = a() || b() || c() || d();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $var = !a() || b() || c() || d();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = a() || !b() || c() || d();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = a() || b() || !c() || d();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $var = a() || b() || c() || !d();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !a() || b() || c() || d();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = a() || !b() || c() || d();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = a() || b() || !c() || d();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = a() || b() || c() || !d();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate equal\'s expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() != 1 || b() == 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = a() != 1 || b() == 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate identical\'s expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() !== 1 || b() === 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = a() !== 1 || b() === 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate already negated expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = !(a() || !b());
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !(!a() || !b());
+                    $var = !(a() || !b());
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !(!a() || !b());
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates expressions with logical and' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() || b() && c();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !a() || b() && c();
+                    $var = a() || b() && c();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !a() || b() && c();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It preserves formatting for non-modified code' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
 
-                class TestFormatPreserving {
-                    // some comment
-                    public function test(): bool { // and comment here
-                        return 1
-
-                          && 2;
+                              && 2;
+                        }
                     }
-                }
 
-                $var = a() || b();
-                PHP,
+                    $var = a() || b();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class TestFormatPreserving {
+                            // some comment
+                            public function test(): bool { // and comment here
+                                return 1
 
-                    class TestFormatPreserving {
-                        // some comment
-                        public function test(): bool { // and comment here
-                            return 1
-
-                              && 2;
+                                  && 2;
+                            }
                         }
-                    }
 
-                    $var = !a() || b();
-                    PHP,
-                <<<'PHP'
-                    <?php
+                        $var = !a() || b();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class TestFormatPreserving {
+                            // some comment
+                            public function test(): bool { // and comment here
+                                return 1
 
-                    class TestFormatPreserving {
-                        // some comment
-                        public function test(): bool { // and comment here
-                            return 1
-
-                              && 2;
+                                  && 2;
+                            }
                         }
-                    }
 
-                    $var = a() || !b();
-                    PHP,
+                        $var = a() || !b();
+                        PHP,
+                ),
             ],
         ];
     }

@@ -37,10 +37,10 @@ namespace Infection\Tests\PhpParser;
 
 use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
+use Infection\Framework\Str;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\StringNormalizer;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PhpParser\Error;
 use PhpParser\Node;
@@ -122,7 +122,7 @@ final class FileParserTest extends TestCase
 
         $this->assertSame(
             $expectedPrintedParsedContents,
-            StringNormalizer::normalizeString($actualPrintedParsedContents),
+            Str::rTrimLines($actualPrintedParsedContents),
         );
     }
 
