@@ -84,7 +84,13 @@ final readonly class TeamCity
     {
         return $this->write(
             MessageName::TEST_SUITE_STARTED,
-            $suite->toAttributes() + ['parentNodeId' => '0'],
+            $suite->toAttributes() + [
+                'parentNodeId' => '0',
+                'locationHint' => sprintf(
+                    'file://%s',
+                    $suite->sourceFilePath,
+                ),
+            ],
         );
     }
 
