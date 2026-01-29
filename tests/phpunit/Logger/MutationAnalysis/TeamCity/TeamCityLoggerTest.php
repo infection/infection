@@ -129,7 +129,7 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
@@ -162,7 +162,7 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
@@ -195,7 +195,7 @@ final class TeamCityLoggerTest extends TestCase
                 ##teamcity[testCount count='1']
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
@@ -229,7 +229,7 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
@@ -280,10 +280,10 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"aa35bf87f287aa4e383112a632fde848"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' message='Mutator: For_|nMutation ID: aa35bf87f287aa4e383112a632fde848|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
@@ -344,9 +344,9 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Operator\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' nodeId='03fbbaaabc71e694' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"aa35bf87f287aa4e383112a632fde848"}']
+                ##teamcity[testStarted name='Infection\Mutator\Operator\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' nodeId='03fbbaaabc71e694' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"9272ac9a2aff44767733cf23a4acb7c6"}']
 
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' message='Mutator: For_|nMutation ID: aa35bf87f287aa4e383112a632fde848|nMutation result: killed by tests' details='mutationDiff' duration='120']
                 ##teamcity[testFinished name='Infection\Mutator\Operator\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' nodeId='03fbbaaabc71e694' message='Mutator: For_|nMutation ID: 9272ac9a2aff44767733cf23a4acb7c6|nMutation result: killed by tests' details='mutationDiff' duration='120']
@@ -398,8 +398,8 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"aa35bf87f287aa4e383112a632fde848"}']
 
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' message='Mutator: For_|nMutation ID: aa35bf87f287aa4e383112a632fde848|nMutation result: killed by tests' details='mutationDiff' duration='120']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
@@ -450,14 +450,14 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteStarted name='src/Service/ContactService.php' nodeId='12f6def551a5aae7' parentNodeId='0' locationHint='file:///path/to/project/src/Service/ContactService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' nodeId='ea74aba5c3e84a26' parentNodeId='12f6def551a5aae7']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' nodeId='ea74aba5c3e84a26' parentNodeId='12f6def551a5aae7' metainfo='{"mutationId":"0a451675763250c03e95b626f7bcfb7d"}']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' nodeId='ea74aba5c3e84a26' message='Mutator: For_|nMutation ID: 0a451675763250c03e95b626f7bcfb7d|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
                 ##teamcity[testSuiteFinished name='src/Service/ContactService.php' nodeId='12f6def551a5aae7']
@@ -507,10 +507,10 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
 
                 ##teamcity[testSuiteStarted name='src/Service/ContactService.php' nodeId='12f6def551a5aae7' parentNodeId='0' locationHint='file:///path/to/project/src/Service/ContactService.php']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' nodeId='ea74aba5c3e84a26' parentNodeId='12f6def551a5aae7']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' nodeId='ea74aba5c3e84a26' parentNodeId='12f6def551a5aae7' metainfo='{"mutationId":"0a451675763250c03e95b626f7bcfb7d"}']
 
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' nodeId='ea74aba5c3e84a26' message='Mutator: For_|nMutation ID: 0a451675763250c03e95b626f7bcfb7d|nMutation result: killed by tests' details='mutationDiff' duration='120']
 
@@ -578,11 +578,11 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f' parentNodeId='0' locationHint='file:///path/to/project/src/Service/UserService.php']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"49a5dfcd2f4a0b33d4a02e662812af55"}']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' parentNodeId='5568c7d4af5ccc7f' metainfo='{"mutationId":"aa35bf87f287aa4e383112a632fde848"}']
 
                 ##teamcity[testSuiteStarted name='src/Service/ContactService.php' nodeId='12f6def551a5aae7' parentNodeId='0' locationHint='file:///path/to/project/src/Service/ContactService.php']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\TrueValue (e3730421e94b49783edb72f8c94e02dc)' nodeId='02a0e7865ef9a594' parentNodeId='12f6def551a5aae7']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\TrueValue (e3730421e94b49783edb72f8c94e02dc)' nodeId='02a0e7865ef9a594' parentNodeId='12f6def551a5aae7' metainfo='{"mutationId":"e3730421e94b49783edb72f8c94e02dc"}']
 
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' message='Mutator: For_|nMutation ID: 49a5dfcd2f4a0b33d4a02e662812af55|nMutation result: killed by tests' details='mutationDiff' duration='120']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' nodeId='a20ac7aa8518e530' message='Mutator: For_|nMutation ID: aa35bf87f287aa4e383112a632fde848|nMutation result: killed by tests' details='mutationDiff' duration='120']

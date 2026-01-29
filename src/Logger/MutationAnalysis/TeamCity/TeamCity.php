@@ -42,6 +42,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use function is_int;
 use function is_string;
+use function Safe\json_encode;
 use function Safe\preg_replace;
 use function sprintf;
 use function str_contains;
@@ -106,7 +107,12 @@ final readonly class TeamCity
     {
         return $this->write(
             MessageName::TEST_STARTED,
-            $test->toAttributes() + ['parentNodeId' => $test->parentNodeId],
+            $test->toAttributes() + [
+                'parentNodeId' => $test->parentNodeId,
+                'metainfo' => json_encode([
+                    'mutationId' => $test->id,
+                ]),
+            ],
         );
     }
 
