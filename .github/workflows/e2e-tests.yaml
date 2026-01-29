@@ -113,18 +113,11 @@ jobs:
           packages: expect moreutils
 
       - name: Install Composer dependencies for E2E tests
-        if: runner.os != 'Windows'
         shell: bash
         run: |
+          CHRONIC=$(command -v chronic || true)
           ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} -P 4 chronic composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
-
-      - name: Install Composer dependencies for E2E tests (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
+             xargs -I{} -P 4 $CHRONIC composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
