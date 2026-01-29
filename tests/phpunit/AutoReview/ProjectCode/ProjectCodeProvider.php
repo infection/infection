@@ -75,6 +75,7 @@ use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
@@ -154,6 +155,7 @@ final class ProjectCodeProvider
         LoggerFactory::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MessageName::class,
         MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
         MutationEvaluationWasStarted::class,

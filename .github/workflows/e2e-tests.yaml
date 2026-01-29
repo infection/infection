@@ -106,22 +106,24 @@ jobs:
             e2e-vendor-${{ runner.os }}-
             composer-
 
+      - name: Install Linux dependencies for E2E tests
+        if: runner.os != 'Windows'
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: expect moreutils
+
       - name: Install Composer dependencies for E2E tests
         shell: bash
         run: |
+          CHRONIC=$(command -v chronic || true)
           ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
+             xargs -I{} -P 4 $CHRONIC composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
         shell: bash
         run: |
           make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
-
-      - name: Install Linux dependencies for E2E tests
-        if: runner.os != 'Windows'
-        run: |
-          sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
         if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'

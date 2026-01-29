@@ -55,6 +55,22 @@ jobs:
           ini-values: memory_limit=512M, xdebug.mode=off
           tools: composer
 
+      - name: Get composer cache directory
+        id: composer-cache
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+            composer-
+
       - name: Remove the configured PHP platform
         if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
@@ -74,22 +90,6 @@ jobs:
         run: |
             composer global config --no-plugins allow-plugins.symfony/flex true
             composer global require --no-progress --no-scripts --no-plugins symfony/flex
-
-      - name: Get composer cache directory
-        id: composer-cache
-        shell: bash
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
-          restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
-            composer-${{ runner.os }}-${{ matrix.php-version }}-
-            composer-${{ runner.os }}-
-            composer-
 
       - name: Install dependencies
         if: ${{ matrix.dependencies == 'locked' }}
