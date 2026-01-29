@@ -20,6 +20,11 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "audit": {
+            "ignore": {
+                "CVE-2026-24765": "Testing PHPUnit 12.0 compatibility"
+            }
+        }
     }
 }

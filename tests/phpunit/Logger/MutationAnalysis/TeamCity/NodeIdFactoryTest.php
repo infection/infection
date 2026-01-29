@@ -33,18 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function strlen;
 
-/**
- * @internal
- */
-enum MutationAnalysisLoggerName: string
+#[CoversClass(NodeIdFactory::class)]
+final class NodeIdFactoryTest extends TestCase
 {
-    use ImplodableEnum;
+    public function test_it_generates_a_short_and_deterministic_hash(): void
+    {
+        $value = '49a5dfcd2f4a0b33d4a02e662812af55';
 
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+        $id1 = NodeIdFactory::create($value);
+        $id2 = NodeIdFactory::create($value);
+
+        $this->assertNotSame($value, $id1);
+        $this->assertSame($id1, $id2);
+        $this->assertSame(16, strlen($id1));
+    }
 }

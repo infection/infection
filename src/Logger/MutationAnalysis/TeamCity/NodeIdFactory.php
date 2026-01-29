@@ -33,18 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use function hash;
+use Infection\CannotBeInstantiated;
 
 /**
  * @internal
  */
-enum MutationAnalysisLoggerName: string
+final class NodeIdFactory
 {
-    use ImplodableEnum;
+    use CannotBeInstantiated;
 
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+    public static function create(string $value): string
+    {
+        // The hash must meet the following criteria:
+        // - have a very low collision rate
+        // - be fast
+        // - be deterministic
+        // - be short (~20chars max – not a hard limit)
+        //
+        // I choose xxh3 as it was a recommendation, but
+        // any other hash algorithm meeting the aforementioned
+        // criteria will do.
+        // https://xxhash.com/
+        // https://php.watch/versions/8.1/xxHash
+        return hash('xxh3', $value);
+    }
 }

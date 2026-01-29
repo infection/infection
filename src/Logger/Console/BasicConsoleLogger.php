@@ -33,27 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Logger\Console;
 
-use DateTime;
-use DateTimeInterface;
-use function gettype;
-use Infection\Console\IO;
-use function is_object;
-use function is_scalar;
-use function method_exists;
 use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use function sprintf;
-use function str_contains;
-use function strtr;
+use Stringable;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
 /**
+ * Differs from ConsoleLogger in the fact that:
+ * - it gets the errorOutput earlier
+ * - do not change the format and discards the context
+ *
  * @internal
  */
-final class ConsoleLogger extends AbstractLogger
+final class BasicConsoleLogger extends AbstractLogger implements LoggerInterface
 {
     private const INFO = 'info';
 
@@ -81,23 +78,17 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::DEBUG => self::INFO,
     ];
 
-    private const IO_MAP = [
-        LogLevel::ERROR => 'error',
-        LogLevel::WARNING => 'warning',
-        LogLevel::NOTICE => 'note',
-    ];
+    private readonly OutputInterface $errorOutput;
 
     public function __construct(
-        private readonly IO $io,
+        private readonly OutputInterface $output,
     ) {
+        $this->errorOutput = $output instanceof ConsoleOutputInterface
+            ? $output->getErrorOutput()
+            : $output;
     }
 
-    /**
-     * @param string $level
-     * @param string $message
-     * @param mixed[] $context
-     */
-    public function log($level, $message, array $context = []): void
+    public function log($level, Stringable|string $message, array $context = []): void
     {
         Assert::keyExists(
             self::VERBOSITY_LEVEL_MAP,
@@ -105,70 +96,17 @@ final class ConsoleLogger extends AbstractLogger
             'The log level %s does not exist',
         );
 
-        $output = $this->io->getOutput();
+        /** @psalm-suppress InvalidArrayOffset */
+        $output = self::FORMAT_LEVEL_MAP[$level] === self::ERROR
+            ? $this->errorOutput
+            : $this->output;
 
-        // The if condition check isn't necessary per se – it's the same one that $output will do
-        // internally anyway. We only do it for efficiency here as the message formatting is
-        // relatively expensive
-        if ($output->getVerbosity() < self::VERBOSITY_LEVEL_MAP[$level]) {
-            return;
-        }
-
-        $interpolatedMessage = $this->interpolate($message, $context);
-
-        if (!isset($context['block'])) {
-            $output->writeln(
-                sprintf(
-                    '<%1$s>[%2$s] %3$s</%1$s>',
-                    self::FORMAT_LEVEL_MAP[$level],
-                    $level,
-                    $interpolatedMessage,
-                ),
-                self::VERBOSITY_LEVEL_MAP[$level],
+        /** @psalm-suppress InvalidArrayOffset */
+        if ($output->getVerbosity() >= self::VERBOSITY_LEVEL_MAP[$level]) {
+            $output->write(
+                (string) $message,
+                options: self::VERBOSITY_LEVEL_MAP[$level],
             );
-
-            return;
         }
-
-        Assert::keyExists(
-            self::IO_MAP,
-            $level,
-            'The log level "%s" does not exist for the IO mapping',
-        );
-
-        $this->io->{self::IO_MAP[$level]}($interpolatedMessage);
-    }
-
-    /**
-     * Interpolates context values into the message placeholders.
-     *
-     * @param mixed[] $context
-     *
-     * @author PHP Framework Interoperability Group
-     */
-    private function interpolate(string $message, array $context): string
-    {
-        if (!str_contains($message, '{')) {
-            return $message;
-        }
-
-        $replacements = [];
-
-        foreach ($context as $key => $val) {
-            if ($val === null
-                || is_scalar($val)
-                || (is_object($val) && method_exists($val, '__toString'))
-            ) {
-                $replacements["{{$key}}"] = $val;
-            } elseif ($val instanceof DateTimeInterface) {
-                $replacements["{{$key}}"] = $val->format(DateTime::RFC3339);
-            } elseif (is_object($val)) {
-                $replacements["{{$key}}"] = '[object ' . $val::class . ']';
-            } else {
-                $replacements["{{$key}}"] = '[' . gettype($val) . ']';
-            }
-        }
-
-        return strtr($message, $replacements);
     }
 }

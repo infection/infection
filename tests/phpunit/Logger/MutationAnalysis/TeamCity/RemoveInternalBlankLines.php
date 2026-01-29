@@ -33,18 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use function count;
+use function explode;
+use function implode;
+use Infection\CannotBeInstantiated;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
- * @internal
+ * This service is a utility to make the TeamCity logs more readable by allowing
+ * them to have blank lines for visual spacing.
+ *
+ * Note that this is purely for testing purposes for better readability: teamcity
+ * logs do not need to be indented.
  */
-enum MutationAnalysisLoggerName: string
+final class RemoveInternalBlankLines
 {
-    use ImplodableEnum;
+    use CannotBeInstantiated;
 
-    case DOT = 'dot';
-    case PROGRESS = 'progress';
-    case TEAMCITY = 'teamcity';
+    public static function remove(string $lines): string
+    {
+        $lineArray = explode("\n", $lines);
+        $lineCount = count($lineArray);
+
+        $firstNonBlank = null;
+        $lastNonBlank = null;
+
+        foreach ($lineArray as $i => $line) {
+            if (trim($line) !== '') {
+                $firstNonBlank ??= $i;
+                $lastNonBlank = $i;
+            }
+        }
+
+        if ($firstNonBlank === null) {
+            return $lines;
+        }
+
+        Assert::integer($lastNonBlank);
+        $result = [];
+
+        for ($i = 0; $i < $firstNonBlank; ++$i) {
+            $result[] = $lineArray[$i];
+        }
+
+        for ($i = $firstNonBlank; $i <= $lastNonBlank; ++$i) {
+            if (trim($lineArray[$i]) !== '') {
+                $result[] = $lineArray[$i];
+            }
+        }
+
+        for ($i = $lastNonBlank + 1; $i < $lineCount; ++$i) {
+            $result[] = $lineArray[$i];
+        }
+
+        return implode("\n", $result);
+    }
 }
