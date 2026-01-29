@@ -1075,26 +1075,6 @@ final class Container extends DIContainer
         return $this->get(FileStore::class);
     }
 
-    /**
-     * TODO: should allow string as the ID
-     *
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @param T $value
-     */
-    public function withService(string $id, object $value): self
-    {
-        $clone = clone $this;
-
-        $clone->set(
-            $id,
-            static fn () => $value,
-        );
-
-        return $clone;
-    }
-
     private function getMutatedCodePrinter(): MutantCodePrinter
     {
         return $this->get(MutantCodePrinter::class);
