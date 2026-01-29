@@ -120,8 +120,9 @@ jobs:
 
       - name: Install Linux dependencies for E2E tests
         if: runner.os != 'Windows'
-        run: |
-          sudo apt-get install -y --no-install-recommends expect
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: expect
 
       - name: Run the whole set of E2E tests
         if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
