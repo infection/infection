@@ -59,341 +59,341 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
     {
         // @see https://github.com/infection/infection/pull/639
         yield 'It does not decrement an integer in a comparison to not overlap with GreaterThan and similar' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo < 10) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo < 10) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) === 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero with yoda style when it is being compared as identical with result of count()' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === count($a)) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === count($a)) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero with when it is being compared as identical with result of cOunT()' => [
-            <<<'PHP'
-                <?php
-
-                if (cOunT($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (cOunT($a) === 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of sizeOf()' => [
-            <<<'PHP'
-                <?php
-
-                if (sizeOf($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (sizeOf($a) === 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is being compared as not identical with result of count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) !== 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) !== 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as equal with result of count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) == 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) == 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as not equal with result of count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) != 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) != 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as more than count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) > 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) > 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as less than count() on the right side' => [
-            <<<'PHP'
-                <?php
-
-                if (0 < count($a)) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 < count($a)) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as less than or equal to count() on the right side' => [
-            <<<'PHP'
-                <?php
-
-                if (0 <= count($a)) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 <= count($a)) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as equal to count() on the right side' => [
-            <<<'PHP'
-                <?php
-
-                if (0 == count($a)) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 == count($a)) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as greater than count() on the right side' => [
-            <<<'PHP'
-                <?php
-
-                if (0 > count($a)) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 > count($a)) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement zero when it is compared as more or equal than count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) >= 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) >= 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It doest not decrement zero when it is compared as less than count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) < 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) < 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does decrement when compared against a variable function' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === 0) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($foo === -1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === -1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It decrements zero when it is compared any other, not count() function' => [
-            <<<'PHP'
-                <?php
-
-                if (abs($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (abs($a) === -1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (abs($a) === 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (abs($a) === -1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It doest not decrements zero when it is compared as less or equal than count()' => [
-            <<<'PHP'
-                <?php
-
-                if (count($a) <= 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (count($a) <= 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It decrements zero' => [
-            <<<'PHP'
-                <?php
-
-                $a = 0;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = -1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = -1;
+                    PHP,
+            ),
         ];
 
         yield 'It decrements a negative integer' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === -10) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($foo === -11) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === -10) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === -11) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It decrements an assignment' => [
-            <<<'PHP'
-                <?php
-
-                $foo = 10;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $foo = 9;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 10;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 9;
+                    PHP,
+            ),
         ];
 
         yield 'It decrements an assignment of 0' => [
-            <<<'PHP'
-                <?php
-
-                $foo = 0;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $foo = -1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = -1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement an assignment of 1' => [
-            <<<'PHP'
-                <?php
-
-                $foo = 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in greater comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo > 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo > 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in greater or equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo >= 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo >= 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in smaller comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo < 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo < 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in smaller or equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo <= 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo <= 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo == 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo == 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in not equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo != 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo != 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in identical comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement 1 in not identical comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo !== 1) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo !== 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         foreach (DecrementInteger::NON_NEGATIVE_INT_RETURNING_FUNCTIONS as $name) {
@@ -401,44 +401,45 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
         }
 
         yield 'It does not decrement when it is accessed zero index of an array' => [
-            <<<'PHP'
-                <?php
-                $b = $a[0];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b = $a[0];
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement limit argument of preg_split function when it equals to 0' => [
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', 0);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', 0);
+                    PHP,
+            ),
         ];
 
         yield 'It does decrement limit argument of preg_split function when it greater than 0' => [
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', 1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', 0);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', 0);
+                    PHP,
+            ),
         ];
 
         yield 'It does decrement limit argument of preg_split function when it equal to -1' => [
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', -2);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', -2);
+                    PHP,
+            ),
         ];
 
         $minInt = PHP_INT_MIN;
@@ -466,183 +467,183 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
         ];
 
         yield 'It decrements property fetch left' => [
-            <<<'PHP'
-                <?php
-
-                if ($nodes->someProperty === 0) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($nodes->someProperty === -1) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes->someProperty === 0) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes->someProperty === -1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It decrements property fetch right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $nodes->someProperty) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (-1 === $nodes->someProperty) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $nodes->someProperty) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (-1 === $nodes->someProperty) {}
+                    PHP,
+            ),
         ];
 
         yield 'It decrements method call left' => [
-            <<<'PHP'
-                <?php
-
-                if ($nodes->someMethod() === 0) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($nodes->someMethod() === -1) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes->someMethod() === 0) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes->someMethod() === -1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It decrements method call right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $nodes->someMethod()) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (-1 === $nodes->someMethod()) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $nodes->someMethod()) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (-1 === $nodes->someMethod()) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *length* property comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($nodes->length === 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes->length === 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *length* property comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $nodes->length) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $nodes->length) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* property comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($nodes->countX === 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes->countX === 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* property comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $nodes->countY) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $nodes->countY) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *numberOf* methodCall comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($constructor->getNumberOfParameters() === 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($constructor->getNumberOfParameters() === 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *numberOf* methodCall comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $constructor->getNumberOfParameters()) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $constructor->getNumberOfParameters()) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *numberOf* nullsafe methodCall comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($constructor?->getNumberOfParameters() === 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($constructor?->getNumberOfParameters() === 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *numberOf* nullsafe methodCall comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $constructor?->getNumberOfParameters()) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $constructor?->getNumberOfParameters()) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* nullsafe property comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($nodes?->countX === 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($nodes?->countX === 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* nullsafe property comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 === $nodes?->countY) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 === $nodes?->countY) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* variable comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($totalCount !== 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($totalCount !== 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* variable comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 !== $totalCounts) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 !== $totalCounts) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *length* variable comparison left' => [
-            <<<'PHP'
-                <?php
-
-                if ($xyzLength !== 0) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($xyzLength !== 0) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *length* variable comparison right' => [
-            <<<'PHP'
-                <?php
-
-                if (0 !== $xyzLength) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (0 !== $xyzLength) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *count* property assignment' => [
-            <<<'PHP'
-                <?php
-
-                $this->callsCount = 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->callsCount = 0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not decrement with *length* property assignment' => [
-            <<<'PHP'
-                <?php
-
-                $this->callsLength = 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->callsLength = 0;
+                    PHP,
+            ),
         ];
     }
 }

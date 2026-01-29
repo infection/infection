@@ -55,135 +55,135 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-                <?php
-
-                $a = str_repeat('Hello!', 3);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Hello!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = str_repeat('Hello!', 3);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Hello!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = str_repeat(\Class_With_Const::Const, 3);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = str_repeat(\Class_With_Const::Const, 3);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_repeat' => [
-            <<<'PHP'
-                <?php
-
-                $a = \str_repeat('Hello!');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Hello!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \str_repeat('Hello!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Hello!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'Hello!';
-                if (str_repeat($a, 3) === $b) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Hello!';
-                if ($a === $b) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Hello!';
+                    if (str_repeat($a, 3) === $b) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Hello!';
+                    if ($a === $b) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when str_repeat is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = sTr_RePeAt('Hello!', 3);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Hello!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = sTr_RePeAt('Hello!', 3);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Hello!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when str_repeat uses other functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = str_repeat(
-                    $foo->bar(),
-                    $foo->baz()
-                );
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = str_repeat(
+                        $foo->bar(),
+                        $foo->baz()
+                    );
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map(function ($b) {
-                    return str_repeat($b, 3);
-                }, ['A', 'B']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_map(function ($b) {
-                    return $b;
-                }, ['A', 'B']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map(function ($b) {
+                        return str_repeat($b, 3);
+                    }, ['A', 'B']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map(function ($b) {
+                        return $b;
+                    }, ['A', 'B']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other str_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = str_pad('Hello!', 8, '!');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = str_pad('Hello!', 8, '!');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named str_repeat' => [
-            <<<'PHP'
-                <?php
-
-                function str_repeat($input, $multiplier)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function str_repeat($input, $multiplier)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'str_repeat';
 
-                $a = 'str_repeat';
-
-                $b = $a('foo', 3);
-                PHP,
+                    $b = $a('foo', 3);
+                    PHP,
+            ),
         ];
     }
 }

@@ -39,7 +39,6 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
@@ -56,16 +55,15 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function create(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
 
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $nodeIgnorers = [
+            $changingIgnorer,
+            new InterfaceIgnorer(),
+            new AbstractMethodIgnorer(),
+        ];
 
         $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
 

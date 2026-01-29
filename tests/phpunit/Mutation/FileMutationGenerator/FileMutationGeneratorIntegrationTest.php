@@ -73,7 +73,6 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
             $fileInfoMock,
             false,
             $mutators,
-            [],
         );
 
         $mutations = iterator_to_array($mutations, false);

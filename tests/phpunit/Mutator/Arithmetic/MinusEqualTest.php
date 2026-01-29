@@ -55,27 +55,27 @@ final class MinusEqualTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates minus equals' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a -=2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a += 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a -=2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a += 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate normal minus' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a = $a - 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a = $a - 2;
+                    PHP,
+            ),
         ];
     }
 }

@@ -344,7 +344,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not remove attributes' => [
-            <<<'PHP_WRAP'
+            <<<'PHP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
@@ -359,8 +359,8 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP_WRAP,
-            <<<'PHP_WRAP'
+                PHP,
+            <<<'PHP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
@@ -375,7 +375,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP_WRAP,
+                PHP,
         ];
     }
 }

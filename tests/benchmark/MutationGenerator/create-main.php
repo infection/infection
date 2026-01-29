@@ -113,7 +113,6 @@ return static function (int $maxCount): Closure {
                 $source,
                 false,
                 $mutators,
-                [],
             );
 
             foreach ($mutations as $_) {

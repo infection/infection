@@ -55,141 +55,141 @@ final class ArrayFirstTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a variable' => [
-            <<<'PHP'
-                <?php
-
-                $first = array_first($numbers);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $first = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = array_first($numbers);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $first = array_first(['A', 1, 'C']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $first = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = array_first(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $first = array_first(\Class_With_Const::Const);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $first = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = array_first(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_first' => [
-            <<<'PHP'
-                <?php
-
-                $first = \array_first(['A', 1, 'C']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $first = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = \array_first(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $first = null;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_first' => [
-            <<<'PHP'
-                <?php
-
-                function array_first($text)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_first($text)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                if (array_first(['A', 1, 'C'])) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (null) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (array_first(['A', 1, 'C'])) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (null) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_first is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRray_First(['A', 1, 'C']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRray_First(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_first uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_first($foo->bar());
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_first($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_first(array_filter(['A', 1, 'C'], function($char): bool {
-                    return !is_int($char);
-                }));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_first(array_filter(['A', 1, 'C'], function($char): bool {
+                        return !is_int($char);
+                    }));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = null;
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_first';
 
-                $a = 'array_first';
-
-                $b = $a([1, 2, 3]);
-                PHP,
+                    $b = $a([1, 2, 3]);
+                    PHP,
+            ),
         ];
     }
 }
