@@ -146,6 +146,30 @@ final class TeamCityTest extends TestCase
         ];
     }
 
+    #[DataProvider('startedProvider')]
+    public function test_it_can_write_a_test_started_message(
+        Test $test,
+        string $expected,
+    ): void {
+        $actual = $this->teamcity->testStarted($test);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    // We cannot use "testStartedProvider" here, PHPUnit would otherwise understand it as a test.
+    public static function startedProvider(): iterable
+    {
+        yield [
+            new Test(
+                '49a5dfcd2f4a0b33d4a02e662812af55',
+                'MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)',
+                'A1',
+                'A',
+            ),
+            "##teamcity[testStarted name='MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='A1' parentNodeId='A' metainfo='{\"mutationId\":\"49a5dfcd2f4a0b33d4a02e662812af55\"}']\n",
+        ];
+    }
+
     #[DataProvider('executionResultProvider')]
     public function test_it_can_map_the_execution_result_to_a_finished_test(
         bool $timeoutsAsEscaped,
