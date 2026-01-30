@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
-use function array_map;
-use function explode;
-use function implode;
 use Infection\Differ\Differ;
+use Infection\Framework\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +54,10 @@ final class DifferTest extends TestCase
     ): void {
         $actualDiff = (new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())))->diff($sourceA, $sourceB);
 
-        $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
+        $this->assertSame(
+            $expectedDiff,
+            Str::rTrimLines($actualDiff),
+        );
     }
 
     public static function diffProvider(): iterable
@@ -178,13 +179,5 @@ final class DifferTest extends TestCase
 
                 PHP,
         ];
-    }
-
-    private static function normalizeString(string $string): string
-    {
-        return implode(
-            "\n",
-            array_map(rtrim(...), explode("\n", $string)),
-        );
     }
 }
