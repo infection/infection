@@ -42,6 +42,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -65,7 +66,10 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
 
         $factory = new MutationAnalysisLoggerFactory(
             $outputMock,
-            new TeamCity(timeoutsAsEscaped: false),
+            new TeamCity(
+                timeoutsAsEscaped: false,
+                differ: SingletonContainer::getContainer()->getDiffer(),
+            ),
             '/path/to/project/infection.json5',
         );
 

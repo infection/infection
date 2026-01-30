@@ -55,6 +55,7 @@ use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
 use Infection\Mutator\Boolean\TrueValue as TrueValueMutator;
 use Infection\Mutator\Operator\Continue_;
 use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -79,7 +80,10 @@ final class TeamCityLoggerTest extends TestCase
         $this->testLogger = new TestLogger();
 
         $this->teamCityLogger = new TeamCityLogger(
-            new TeamCity(timeoutsAsEscaped: false),
+            new TeamCity(
+                timeoutsAsEscaped: false,
+                differ: SingletonContainer::getContainer()->getDiffer(),
+            ),
             new TeamCityLoggerState(),
             $this->testLogger,
             '/path/to/project',

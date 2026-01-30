@@ -600,6 +600,7 @@ final class Container extends DIContainer
             ),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
+                $container->getDiffer(),
             ),
             MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
                 $container->getOutput(),
@@ -1075,6 +1076,11 @@ final class Container extends DIContainer
         return $this->get(FileStore::class);
     }
 
+    public function getDiffer(): Differ
+    {
+        return $this->get(Differ::class);
+    }
+
     private function getMutatedCodePrinter(): MutantCodePrinter
     {
         return $this->get(MutantCodePrinter::class);
@@ -1138,11 +1144,6 @@ final class Container extends DIContainer
             ? $this->get(DryProcessRunner::class)
             : $this->get(ParallelProcessRunner::class)
         ;
-    }
-
-    private function getDiffer(): Differ
-    {
-        return $this->get(Differ::class);
     }
 
     private function getMutantFactory(): MutantFactory

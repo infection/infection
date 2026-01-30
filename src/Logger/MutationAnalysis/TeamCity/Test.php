@@ -94,6 +94,13 @@ final readonly class Test
         ];
     }
 
+    public static function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
+    {
+        // TODO: this duration is not correct.
+        //  see: https://github.com/infection/infection/issues/2900
+        return (string) round($executionResult->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
+    }
+
     private static function createName(Mutation $mutation): string
     {
         return sprintf(
@@ -115,12 +122,5 @@ final readonly class Test
             $executionResult->getMutantHash(),
             $executionResult->getDetectionStatus()->value,
         );
-    }
-
-    private static function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
-    {
-        // TODO: this duration is not correct.
-        //  see: https://github.com/infection/infection/issues/2900
-        return (string) round($executionResult->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
     }
 }

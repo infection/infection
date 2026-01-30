@@ -43,6 +43,7 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Boolean\LogicalAnd as LogicalAndMutator;
 use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,7 +58,10 @@ final class TeamCityTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->teamcity = new TeamCity(timeoutsAsEscaped: false);
+        $this->teamcity = new TeamCity(
+            timeoutsAsEscaped: false,
+            differ: SingletonContainer::getContainer()->getDiffer(),
+        );
     }
 
     /**
@@ -177,7 +181,10 @@ final class TeamCityTest extends TestCase
         MutantExecutionResult $executionResult,
         string $expected,
     ): void {
-        $teamCity = new TeamCity($timeoutsAsEscaped);
+        $teamCity = new TeamCity(
+            $timeoutsAsEscaped,
+            differ: SingletonContainer::getContainer()->getDiffer(),
+        );
 
         $actual = $teamCity->testFinished($test, $executionResult);
 

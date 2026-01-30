@@ -38,6 +38,7 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
 use function array_keys;
 use function array_map;
 use function implode;
+use Infection\Differ\Differ;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use function is_int;
@@ -52,6 +53,7 @@ use function str_replace;
  * This is the basic TeamCity service. Its role is to write the TeamCity messages
  * without making any assumption about the support they will be written to.
  *
+ * @phpstan-import-type TestClosingMessage from MessageName
  * @phpstan-type MessageAttributes = array<non-empty-string|int, string|int|float>
  *
  * @internal
@@ -67,6 +69,7 @@ final readonly class TeamCity
 
     public function __construct(
         private bool $timeoutsAsEscaped,
+        private Differ $differ,
     ) {
     }
 
@@ -120,9 +123,24 @@ final readonly class TeamCity
         Test $test,
         MutantExecutionResult $executionResult,
     ): string {
+        $messageName = $this->mapExecutionResultToTestStatus($executionResult);
+        $attributes = $test->toFinishedAttributes($executionResult);
+
+        if ($messageName !== MessageName::TEST_SUITE_FINISHED) {
+            unset($attributes['details']);
+            [$from, $to] = $this->differ->diffToArray(
+                from: $executionResult->getMutatedCode(),
+                to: $executionResult->getOriginalCode(),
+            );
+
+            $attributes['type'] = 'comparisonFailure';
+            $attributes['actual'] = $from;
+            $attributes['expected'] = $to;
+        }
+
         return $this->write(
-            $this->mapExecutionResultToTestStatus($executionResult),
-            $test->toFinishedAttributes($executionResult),
+            $messageName,
+            $attributes,
         );
     }
 
@@ -147,6 +165,9 @@ final readonly class TeamCity
         );
     }
 
+    /**
+     * @return TestClosingMessage
+     */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
     {
         $detectionStatus = $executionResult->getDetectionStatus();

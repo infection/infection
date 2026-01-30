@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use SebastianBergmann\Diff\LongestCommonSubsequenceCalculator;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -61,5 +64,81 @@ class Differ
     public function diff(string $from, string $to): string
     {
         return $this->differ->diff($from, $to);
+    }
+
+    /**
+     * @param list<string>|string $from
+     * @param list<string>|string $to
+     *
+     * @return array{string, string}
+     */
+    public function diffToArray(array|string $from, array|string $to, ?LongestCommonSubsequenceCalculator $lcs = null): array
+    {
+        $tokens = $this->differ->diffToArray($from, $to);
+
+        $from = new Tokens();
+        $to = new Tokens();
+
+        foreach ($tokens as [$token, $type]) {
+            if ($type === BaseDiffer::OLD) {
+                $from->addUnchangedToken($token);
+                $to->addUnchangedToken($token);
+            } elseif ($type === BaseDiffer::ADDED) {
+                $to->addChangedToken($token);
+            } elseif ($type === BaseDiffer::REMOVED) {
+                $from->addChangedToken($token);
+            } else {
+                Assert::oneOf(
+                    $type,
+                    [
+                        BaseDiffer::DIFF_LINE_END_WARNING,
+                        BaseDiffer::NO_LINE_END_EOF_WARNING,
+                    ],
+                    sprintf(
+                        'Unknown token type "%s" for the token "%s".',
+                        $type,
+                        $token,
+                    ),
+                );
+            }
+        }
+
+        return [
+            $from->getLines(),
+            $to->getLines(),
+        ];
+    }
+
+    /**
+     * @param array{string, BaseDiffer::*} $tokenPair
+     */
+    private static function processTokens(
+        array $tokenPair,
+        Tokens $from,
+        Tokens $to,
+    ): void {
+        [$token, $type] = $tokenPair;
+
+        if ($type === BaseDiffer::OLD) {
+            $from->addUnchangedToken($token);
+            $to->addUnchangedToken($token);
+        } elseif ($type === BaseDiffer::ADDED) {
+            $to->addChangedToken($token);
+        } elseif ($type === BaseDiffer::REMOVED) {
+            $from->addChangedToken($token);
+        } else {
+            Assert::oneOf(
+                $type,
+                [
+                    BaseDiffer::DIFF_LINE_END_WARNING,
+                    BaseDiffer::NO_LINE_END_EOF_WARNING,
+                ],
+                sprintf(
+                    'Unknown token type "%s" for the token "%s".',
+                    $type,
+                    $token,
+                ),
+            );
+        }
     }
 }

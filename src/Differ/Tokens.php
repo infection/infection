@@ -33,23 +33,81 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis\TeamCity;
+namespace Infection\Differ;
+
+use function array_slice;
+use function count;
+use function current;
+use function end;
+use function implode;
+use function max;
+use function min;
+use Webmozart\Assert\Assert;
 
 /**
- * Only contains a subset of the allowed messages.
- *
- * @see https://www.jetbrains.com/help/teamcity/service-messages.html
- *
- * @phpstan-type TestClosingMessage = MessageName::TEST_FINISHED | self::TEST_FAILED | self::TEST_IGNORED
  * @internal
  */
-enum MessageName: string
+final class Tokens
 {
-    case TEST_COUNT = 'testCount';
-    case TEST_SUITE_STARTED = 'testSuiteStarted';
-    case TEST_SUITE_FINISHED = 'testSuiteFinished';
-    case TEST_STARTED = 'testStarted';
-    case TEST_FINISHED = 'testFinished';
-    case TEST_FAILED = 'testFailed';
-    case TEST_IGNORED = 'testIgnored';
+    private const CONTEXT_LINES = 3;
+
+    private int $lastIndex = -1;
+
+    /**
+     * @var list<string>
+     */
+    private array $tokens = [];
+
+    private array $changedIndexes = [];
+
+    public function addUnchangedToken(string $token): void
+    {
+        $this->tokens[] = $token;
+        ++$this->lastIndex;
+    }
+
+    public function addChangedToken(string $token): void
+    {
+        $this->addUnchangedToken($token);
+
+        $this->changedIndexes[] = $this->lastIndex;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getLines(): string
+    {
+        if (count($this->changedIndexes) === 0) {
+            return '';
+        }
+
+        [$start, $end] = $this->computeRange();
+
+        $lines = array_slice(
+            $this->tokens,
+            $start,
+            $end - $start + 1,
+        );
+
+        return implode('', $lines);
+    }
+
+    /**
+     * @return array{positive-int|0, positive-int}
+     */
+    private function computeRange(): array
+    {
+        $firstChangedLine = current($this->changedIndexes);
+        Assert::notFalse($firstChangedLine);
+
+        $start = max($firstChangedLine - self::CONTEXT_LINES, 0);
+
+        $lastChangedLine = end($this->changedIndexes);
+        Assert::notFalse($lastChangedLine);
+
+        $end = min($lastChangedLine + self::CONTEXT_LINES, $this->tokens);
+
+        return [$start, $end];
+    }
 }
