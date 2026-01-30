@@ -52,6 +52,7 @@ use function str_replace;
  * This is the basic TeamCity service. Its role is to write the TeamCity messages
  * without making any assumption about the support they will be written to.
  *
+ * @phpstan-import-type TestClosingMessage from MessageName
  * @phpstan-type MessageAttributes = array<non-empty-string|int, string|int|float>
  *
  * @internal
@@ -147,6 +148,9 @@ final readonly class TeamCity
         );
     }
 
+    /**
+     * @return TestClosingMessage
+     */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
     {
         $detectionStatus = $executionResult->getDetectionStatus();
