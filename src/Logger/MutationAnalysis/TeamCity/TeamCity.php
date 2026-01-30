@@ -149,6 +149,8 @@ final readonly class TeamCity
     }
 
     /**
+     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
+     *
      * @return TestClosingMessage
      */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
