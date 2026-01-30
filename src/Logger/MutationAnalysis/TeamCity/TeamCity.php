@@ -122,6 +122,7 @@ final readonly class TeamCity
         MutantExecutionResult $executionResult,
     ): string {
         return $this->write(
+            /** @psalm-suppress InvalidArgument */
             $this->mapExecutionResultToTestStatus($executionResult),
             $test->toFinishedAttributes($executionResult),
         );
