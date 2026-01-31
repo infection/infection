@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\Differ;
+use Infection\Differ\Tokens;
 use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,22 +44,43 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Differ::class)]
+#[CoversClass(Tokens::class)]
 final class DifferTest extends TestCase
 {
+    private Differ $differ;
+
+    protected function setUp(): void
+    {
+        $this->differ = SingletonContainer::getContainer()->getDiffer();
+    }
+
     #[DataProvider('diffProvider')]
     public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
         string $sourceA,
         string $sourceB,
-        string $expectedDiff,
+        string $expected,
     ): void {
-        $actualDiff = SingletonContainer::getContainer()
-            ->getDiffer()
-            ->diff($sourceA, $sourceB);
+        $actualDiff = $this->differ->diff($sourceA, $sourceB);
 
         $this->assertSame(
-            $expectedDiff,
+            $expected,
             Str::rTrimLines($actualDiff),
         );
+    }
+
+    /**
+     * @param array{string, string} $expected
+     */
+    #[DataProvider('diffProvider')]
+    public function test_it_can_diff_the_code_as_arrays(
+        string $sourceA,
+        string $sourceB,
+        string $_expectedStringDiff,
+        array $expected,
+    ): void {
+        $actual = $this->differ->diffToArray($sourceA, $sourceB);
+
+        $this->assertSame($expected, $actual);
     }
 
     public static function diffProvider(): iterable
@@ -69,6 +91,7 @@ final class DifferTest extends TestCase
             <<<'PHP'
 
                 PHP,
+            ['', ''],
         ];
 
         yield 'nominal' => [
@@ -98,6 +121,24 @@ final class DifferTest extends TestCase
                  }
 
                 PHP,
+            [
+                <<<'PHP'
+
+                    public function echo(): void
+                    {
+                        echo 10;
+                    }
+
+                    PHP,
+                <<<'PHP'
+
+                    public function echo(): void
+                    {
+                        echo 15;
+                    }
+
+                    PHP,
+            ],
         ];
 
         yield 'no change' => [
@@ -120,6 +161,14 @@ final class DifferTest extends TestCase
             <<<'PHP'
 
                 PHP,
+            [
+                <<<'PHP'
+
+                    PHP,
+                <<<'PHP'
+
+                    PHP,
+            ],
         ];
 
         yield 'line excess' => [
@@ -171,6 +220,177 @@ final class DifferTest extends TestCase
                  9
 
                 PHP,
+            [
+                <<<'PHP'
+                    3
+                    4
+                    5
+                    6
+                    7
+                    8
+                    9
+
+                    PHP,
+                <<<'PHP'
+                    3
+                    4
+                    5
+                    (6)
+                    7
+                    8
+                    9
+
+                    PHP,
+            ],
+        ];
+
+        yield 'line excess with multiple changes' => [
+            <<<'PHP'
+                0
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+                10
+                11
+                12
+                13
+                14
+                15
+                PHP,
+            <<<'PHP'
+                0
+                1
+                2
+                3
+                4
+                5
+                (6)
+                7
+                8
+                (9)
+                10
+                11
+                12
+                13
+                14
+                15
+                PHP,
+            <<<'PHP'
+                @@ @@
+                 3
+                 4
+                 5
+                -6
+                +(6)
+                 7
+                 8
+                -9
+                +(9)
+                 10
+                 11
+                 12
+
+                PHP,
+            [
+                <<<'PHP'
+                    3
+                    4
+                    5
+                    6
+                    7
+                    8
+                    9
+                    10
+                    11
+                    12
+
+                    PHP,
+                <<<'PHP'
+                    3
+                    4
+                    5
+                    (6)
+                    7
+                    8
+                    (9)
+                    10
+                    11
+                    12
+
+                    PHP,
+            ],
+        ];
+
+        $windowsLineReturn = "\r\n";
+
+        yield 'a line with the carriage return as the only difference' => [
+            <<<'PHP'
+                0
+                1
+                2
+                PHP,
+            <<<PHP
+                0
+                1{$windowsLineReturn}2
+                PHP,
+            <<<'PHP'
+                @@ @@
+                 #Warning: Strings contain different line endings!
+                 0
+                -1
+                +1
+                 2
+
+                PHP,
+            [
+                <<<'PHP'
+                    0
+                    1
+                    2
+                    PHP,
+                <<<PHP
+                    0
+                    1{$windowsLineReturn}2
+                    PHP,
+            ],
+        ];
+
+        yield 'a line with change and the carriage return as the only difference' => [
+            <<<'PHP'
+                0
+                1
+                2
+                PHP,
+            <<<PHP
+                0
+                (1){$windowsLineReturn}2
+                PHP,
+            <<<'PHP'
+                @@ @@
+                 #Warning: Strings contain different line endings!
+                 0
+                -1
+                +(1)
+                 2
+
+                PHP,
+            [
+                <<<'PHP'
+                    0
+                    1
+                    2
+                    PHP,
+                <<<PHP
+                    0
+                    (1){$windowsLineReturn}2
+                    PHP,
+            ],
         ];
     }
 }
