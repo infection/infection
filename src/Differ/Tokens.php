@@ -45,6 +45,10 @@ use function min;
 use Webmozart\Assert\Assert;
 
 /**
+ * Internal utility service used to keep track of the tokens used for a diff
+ * and which line changed and did not change. This allows us to extract the
+ * lines that change with the surrounding context.
+ *
  * @internal
  */
 final class Tokens
@@ -58,6 +62,9 @@ final class Tokens
      */
     private array $tokens = [];
 
+    /**
+     * @var list<int>
+     */
     private array $changedIndexes = [];
 
     public function addUnchangedToken(string $token): void
@@ -73,9 +80,6 @@ final class Tokens
         $this->changedIndexes[] = $this->lastIndex;
     }
 
-    /**
-     * @return list<string>
-     */
     public function getLines(): string
     {
         if (count($this->changedIndexes) === 0) {
@@ -106,7 +110,8 @@ final class Tokens
         $lastChangedLine = end($this->changedIndexes);
         Assert::notFalse($lastChangedLine);
 
-        $end = min($lastChangedLine + self::CONTEXT_LINES, $this->tokens);
+        $end = min($lastChangedLine + self::CONTEXT_LINES, $this->lastIndex);
+        Assert::greaterThan($end, 0);
 
         return [$start, $end];
     }

@@ -58,6 +58,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\XdebugHandler;
+use Infection\Differ\Tokens;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
@@ -173,6 +174,7 @@ final class ProjectCodeProvider
         Source::class,
         StopInfectionOnSigintSignalSubscriber::class,
         StrykerCurlClient::class,
+        Tokens::class,
         TooManyReportsFound::class,
         XdebugHandler::class,
     ];

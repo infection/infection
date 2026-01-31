@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\Differ;
+use Infection\Differ\Tokens;
 use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,6 +44,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Differ::class)]
+#[CoversClass(Tokens::class)]
 final class DifferTest extends TestCase
 {
     private Differ $differ;

@@ -67,40 +67,22 @@ class Differ
     }
 
     /**
-     * @param list<string>|string $from
-     * @param list<string>|string $to
+     * Returns the diff between two pieces of code, but instead of a unified diff,
+     * it provides the relevant sections of the original and modified code.
+     * As with a unified diff, only changed lines and their surrounding context
+     * are included.
      *
      * @return array{string, string}
      */
-    public function diffToArray(array|string $from, array|string $to, ?LongestCommonSubsequenceCalculator $lcs = null): array
+    public function diffToArray(string $from, string $to, ?LongestCommonSubsequenceCalculator $lcs = null): array
     {
         $tokens = $this->differ->diffToArray($from, $to);
 
         $from = new Tokens();
         $to = new Tokens();
 
-        foreach ($tokens as [$token, $type]) {
-            if ($type === BaseDiffer::OLD) {
-                $from->addUnchangedToken($token);
-                $to->addUnchangedToken($token);
-            } elseif ($type === BaseDiffer::ADDED) {
-                $to->addChangedToken($token);
-            } elseif ($type === BaseDiffer::REMOVED) {
-                $from->addChangedToken($token);
-            } else {
-                Assert::oneOf(
-                    $type,
-                    [
-                        BaseDiffer::DIFF_LINE_END_WARNING,
-                        BaseDiffer::NO_LINE_END_EOF_WARNING,
-                    ],
-                    sprintf(
-                        'Unknown token type "%s" for the token "%s".',
-                        $type,
-                        $token,
-                    ),
-                );
-            }
+        foreach ($tokens as $tokenPair) {
+            self::processTokens($tokenPair, $from, $to);
         }
 
         return [
