@@ -57,24 +57,15 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
-    public function create(NodeVisitor $mutationVisitor): NodeTraverserInterface
-    {
-        return new NodeTraverser(
-            new NodeVisitor\CloningVisitor(),
-            $mutationVisitor,
-        );
-    }
-
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function createPreTraverser(array $nodeIgnorers): NodeTraverserInterface
+    public function createPreTraverser(): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
 
-        $nodeIgnorers[] = $changingIgnorer;
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $nodeIgnorers = [
+            $changingIgnorer,
+            new InterfaceIgnorer(),
+            new AbstractMethodIgnorer(),
+        ];
 
         return new NodeTraverser(
             new NextConnectingVisitor(),
@@ -84,6 +75,14 @@ class NodeTraverserFactory
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
             new LabelNodesAsEligibleVisitor(),
+        );
+    }
+
+    public function create(NodeVisitor $mutationVisitor): NodeTraverserInterface
+    {
+        return new NodeTraverser(
+            new NodeVisitor\CloningVisitor(),
+            $mutationVisitor,
         );
     }
 }

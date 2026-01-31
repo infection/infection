@@ -65,11 +65,6 @@ final class NodeTraverserFactoryTest extends TestCase
     {
         $traverser = (new NodeTraverserFactory())->create(new FakeVisitor());
 
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
-
         $this->assertSame(
             [
                 CloningVisitor::class,
@@ -81,7 +76,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_pre_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->createPreTraverser([]);
+        $traverser = (new NodeTraverserFactory())->createPreTraverser();
 
         $this->assertSame(
             [
@@ -97,14 +92,11 @@ final class NodeTraverserFactoryTest extends TestCase
         );
     }
 
-    public function test_it_can_create_a_pre_traverser(): void
+    private static function getVisitorClassNames(NodeTraverserInterface $traverser): array
     {
-        $visitors = self::getVisitorReflection()->getValue($traverser);
-
-        // @phpstan-ignore return.type
         return array_map(
             get_class(...),
-            $visitors,
+            self::getVisitorReflection()->getValue($traverser),
         );
     }
 
