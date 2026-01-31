@@ -98,7 +98,7 @@ final class Tokens
     }
 
     /**
-     * @return array{positive-int|0, positive-int}
+     * @return array{positive-int|0, positive-int|0}
      */
     private function computeRange(): array
     {
@@ -111,7 +111,7 @@ final class Tokens
         Assert::notFalse($lastChangedLine);
 
         $end = min($lastChangedLine + self::CONTEXT_LINES, $this->lastIndex);
-        Assert::greaterThan($end, 0);
+        Assert::greaterThanEq($end, 0);
 
         return [$start, $end];
     }
