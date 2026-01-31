@@ -96,7 +96,7 @@ return static function (int $maxCount): Closure {
     );
 
     $fileMutationGenerator = Container::create()
-        ->withService(
+        ->cloneWithService(
             Tracer::class,
             new EmptyTraceTracer(),
         )

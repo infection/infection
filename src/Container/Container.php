@@ -145,7 +145,6 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
@@ -1085,10 +1084,10 @@ final class Container extends DIContainer
     /**
      * @template T of object
      *
-     * @param string|class-string<T> $id
+     * @param non-empty-string|class-string<T> $id
      * @param T|(Closure(static): T) $value
      */
-    public function withService(string $id, object $value): self
+    public function cloneWithService(string $id, object $value): self
     {
         $clone = clone $this;
 
@@ -1217,11 +1216,13 @@ final class Container extends DIContainer
     }
 
     /**
-     * @param class-string<object> $id
-     * @param callable(static): object $value
+     * @template T of object
+     *
+     * @param non-empty-string|class-string<T> $id
+     * @param Closure(static): T $value
      */
     private function offsetSet(string $id, callable $value): void
     {
-        $this->set($id, $value);
+        $this->bind($id, $value);
     }
 }
