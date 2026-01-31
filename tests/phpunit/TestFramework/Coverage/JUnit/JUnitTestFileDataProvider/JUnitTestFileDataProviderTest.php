@@ -58,8 +58,6 @@ final class JUnitTestFileDataProviderTest extends TestCase
 {
     use ExpectsThrowables;
 
-    private const FIXTURES_DIR = __DIR__ . '/../Fixtures';
-
     private string $generatedJunitPath;
 
     protected function setUp(): void

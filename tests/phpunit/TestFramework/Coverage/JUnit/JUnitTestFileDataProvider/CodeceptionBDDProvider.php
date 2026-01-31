@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 
-use function file_get_contents;
 use Infection\CannotBeInstantiated;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use InvalidArgumentException;
+use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Path;
 
 final class CodeceptionBDDProvider

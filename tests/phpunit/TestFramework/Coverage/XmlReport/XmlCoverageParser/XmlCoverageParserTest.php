@@ -52,8 +52,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(XmlCoverageParser::class)]
 final class XmlCoverageParserTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures';
-
     private XmlCoverageParser $parser;
 
     protected function setUp(): void

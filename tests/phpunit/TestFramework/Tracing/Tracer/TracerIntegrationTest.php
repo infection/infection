@@ -61,8 +61,6 @@ use Symfony\Component\Filesystem\Path;
 #[CoversNothing]
 final class TracerIntegrationTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../Coverage/Fixtures';
-
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
         string $indexXmlPath,
