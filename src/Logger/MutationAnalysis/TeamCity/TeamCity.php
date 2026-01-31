@@ -127,7 +127,7 @@ final readonly class TeamCity
         $messageName = $this->mapExecutionResultToTestStatus($executionResult);
         $attributes = $test->toFinishedAttributes($executionResult);
 
-        if ($messageName !== MessageName::TEST_SUITE_FINISHED) {
+        if ($messageName !== MessageName::TEST_FINISHED) {
             unset($attributes['details']);
             [$from, $to] = $this->differ->diffToArray(
                 from: $executionResult->getMutatedCode(),

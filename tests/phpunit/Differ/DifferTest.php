@@ -41,8 +41,6 @@ use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
 #[CoversClass(Differ::class)]
 final class DifferTest extends TestCase
