@@ -39,19 +39,18 @@ use Closure;
 use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Configuration\Configuration;
 use Infection\Console\IO;
 use const PHP_EOL;
+use function Safe\stream_get_contents;
 use function sprintf;
 use const STDIN;
-use function stream_get_contents;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-use function usleep;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -59,16 +58,18 @@ use Webmozart\Assert\Assert;
  */
 final class MockTeamCityCommand extends BaseCommand
 {
+    private const MILLISECONDS_IN_MICROSECONDS = 1000;
+
     private const LOG_FILE_PATH_ARGUMENT = 'log';
 
     private const TIME_IN_MICRO_SECONDS_OPTION = 'time';
 
-    private const DEFAULT_TIME_IN_MICRO_SECONDS = 100;  // 1ms
+    private const DEFAULT_TIME_IN_MILLISECONDS = 500;  // 0.5s
 
     private readonly Closure $sleep;
 
     /**
-     * @param (Closure(positive-int):void)|null $sleep
+     * @param (Closure(positive-int|0):void)|null $sleep
      */
     public function __construct(
         private readonly Filesystem $filesystem,
@@ -117,8 +118,8 @@ final class MockTeamCityCommand extends BaseCommand
             self::TIME_IN_MICRO_SECONDS_OPTION,
             null,
             InputOption::VALUE_REQUIRED,
-            'Time to wait in-between each log, in microseconds (μs).',
-            self::DEFAULT_TIME_IN_MICRO_SECONDS,
+            'Time to wait in-between each log, in milliseconds (ms).',
+            self::DEFAULT_TIME_IN_MILLISECONDS,
         );
         // This is not used; this is purely to allow the function to be executed by the plugin which
         // always appends the configuration.
@@ -128,7 +129,7 @@ final class MockTeamCityCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logLines = $this->getLogLines($io);
-        $timeInMicroSeconds = self::getTimeInMicroseconds($io);
+        $timeInMicroSeconds = self::getTimeInMilliseconds($io);
 
         foreach ($logLines as $logLine) {
             $io->writeln($logLine);
@@ -159,15 +160,14 @@ final class MockTeamCityCommand extends BaseCommand
      */
     private function getLinesFromStdin(InputInterface $input): iterable
     {
-        $inputStream = $input instanceof StreamableInputInterface ? $input->getStream() : null;
+        $inputStream = $input instanceof StreamableInputInterface
+            ? $input->getStream()
+            : null;
         $inputStream ??= STDIN;
-
-        $contents = stream_get_contents($inputStream);
-        Assert::notFalse($contents, ' Could not read the input stream.');
 
         return explode(
             PHP_EOL,
-            $contents,
+            stream_get_contents($inputStream),
         );
     }
 
@@ -176,19 +176,21 @@ final class MockTeamCityCommand extends BaseCommand
      */
     private function getLogFile(IO $io): ?string
     {
-        $path = $io->getInput()->getArgument(self::LOG_FILE_PATH_ARGUMENT);
+        $path = trim((string) $io->getInput()->getArgument(self::LOG_FILE_PATH_ARGUMENT));
 
-        if ($path === null) {
-            return null;
-        }
+        $canonicalPath = $path === ''
+            ? null
+            : Path::canonicalize($path);
 
-        return Path::canonicalize($path);
+        Assert::nullOrStringNotEmpty($canonicalPath);
+
+        return $canonicalPath;
     }
 
     /**
      * @return positive-int|0
      */
-    private static function getTimeInMicroseconds(IO $io): int
+    private static function getTimeInMilliseconds(IO $io): int
     {
         $value = $io->getInput()->getOption(self::TIME_IN_MICRO_SECONDS_OPTION);
 
@@ -212,6 +214,6 @@ final class MockTeamCityCommand extends BaseCommand
             ),
         );
 
-        return $intValue;
+        return $intValue * self::MILLISECONDS_IN_MICROSECONDS;
     }
 }
