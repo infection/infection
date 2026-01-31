@@ -35,7 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use function sprintf;
@@ -44,7 +45,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implements EventSubscriber
+final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implements InitialStaticAnalysisRunWasStartedSubscriber
 {
     public function __construct(
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,

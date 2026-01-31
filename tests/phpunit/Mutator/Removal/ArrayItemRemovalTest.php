@@ -59,75 +59,75 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate empty arrays' => [
-            '<?php $a = [];',
+            self::wrapCodeInMethod('$a = [];'),
         ];
 
         yield 'It removes only first item by default' => [
-            '<?php $a = [1, 2, 3];',
-            '<?php $a = [2, 3];',
+            self::wrapCodeInMethod('$a = [1, 2, 3];'),
+            self::wrapCodeInMethod('$a = [2, 3];'),
         ];
 
         yield 'It removes only last item when set to do so' => [
-            '<?php $a = [1, 2, 3];',
-            '<?php $a = [1, 2];',
+            self::wrapCodeInMethod('$a = [1, 2, 3];'),
+            self::wrapCodeInMethod('$a = [1, 2];'),
             ['remove' => 'last'],
         ];
 
         yield 'It removes every item on by one when set to `all`' => [
-            '<?php $a = [1, 2, 3];',
+            self::wrapCodeInMethod('$a = [1, 2, 3];'),
             [
-                '<?php $a = [2, 3];',
-                '<?php $a = [1, 3];',
-                '<?php $a = [1, 2];',
+                self::wrapCodeInMethod('$a = [2, 3];'),
+                self::wrapCodeInMethod('$a = [1, 3];'),
+                self::wrapCodeInMethod('$a = [1, 2];'),
             ],
             ['remove' => 'all'],
         ];
 
         yield 'It obeys limit when mutating arrays in `all` mode' => [
-            '<?php $a = [1, 2, 3];',
+            self::wrapCodeInMethod('$a = [1, 2, 3];'),
             [
-                '<?php $a = [2, 3];',
-                '<?php $a = [1, 3];',
+                self::wrapCodeInMethod('$a = [2, 3];'),
+                self::wrapCodeInMethod('$a = [1, 3];'),
             ],
             ['remove' => 'all', 'limit' => 2],
         ];
 
         yield 'It mutates arrays having required items count when removing `all` items' => [
-            '<?php $a = [1, 2];',
+            self::wrapCodeInMethod('$a = [1, 2];'),
             [
-                '<?php $a = [2];',
-                '<?php $a = [1];',
+                self::wrapCodeInMethod('$a = [2];'),
+                self::wrapCodeInMethod('$a = [1];'),
             ],
             ['remove' => 'all', 'limit' => 2],
         ];
 
         yield 'It mutates correctly for limit value (1)' => [
-            '<?php $a = [1];',
+            self::wrapCodeInMethod('$a = [1];'),
             [
-                '<?php $a = [];',
+                self::wrapCodeInMethod('$a = [];'),
             ],
             ['remove' => 'all', 'limit' => 1],
         ];
 
         yield 'It does not mutate lists with missing elements' => [
-            '<?php [, $a] = [];',
+            self::wrapCodeInMethod('[, $a] = [];'),
         ];
 
         yield 'It does not mutate lists with one element' => [
-            '<?php [$a] = [];',
+            self::wrapCodeInMethod('[$a] = [];'),
         ];
 
         yield 'It does not mutate array assignment to prevent runtime warning' => [
-            '<?php [$a, $b] = [$c, $d];',
+            self::wrapCodeInMethod('[$a, $b] = [$c, $d];'),
         ];
 
         yield 'It mutates array assignment with more elements on the right side' => [
-            '<?php [$a, $b] = [$c, $d, $e];',
-            '<?php [$a, $b] = [$d, $e];',
+            self::wrapCodeInMethod('[$a, $b] = [$c, $d, $e];'),
+            self::wrapCodeInMethod('[$a, $b] = [$d, $e];'),
         ];
 
         yield 'It does not mutate lists with any number of elements' => [
-            '<?php [$a, $b] = [];',
+            self::wrapCodeInMethod('[$a, $b] = [];'),
         ];
 
         yield 'It does not mutate arrays as an attribute argument' => [
@@ -135,40 +135,40 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not mutate destructured array values in foreach loops' => [
-            '<?php foreach ($items as [, $value]) {}',
+            self::wrapCodeInMethod('foreach ($items as [, $value]) {}'),
         ];
 
         yield 'It does not mutate in_array to prevent overlap with IfNegation' => [
-            '<?php if (in_array($a, [$b])) {}',
+            self::wrapCodeInMethod('if (in_array($a, [$b])) {}'),
         ];
 
         yield 'It does not mutate array_key_exists to prevent overlap with IfNegation' => [
-            '<?php if (array_key_exists($a, [$b])) {}',
+            self::wrapCodeInMethod('if (array_key_exists($a, [$b])) {}'),
         ];
 
         yield 'It mutates array_search which does not return bool, therefore not overlaps with IfNegation' => [
-            '<?php if (array_search($a, [$b])) {}',
-            '<?php if (array_search($a, [])) {}',
+            self::wrapCodeInMethod('if (array_search($a, [$b])) {}'),
+            self::wrapCodeInMethod('if (array_search($a, [])) {}'),
         ];
 
         yield 'It mutates arg of a userland function' => [
-            '<?php if (doFoo($a, [$b])) {}',
-            '<?php if (doFoo($a, [])) {}',
+            self::wrapCodeInMethod('if (doFoo($a, [$b])) {}'),
+            self::wrapCodeInMethod('if (doFoo($a, [])) {}'),
         ];
 
         yield 'It mutates arg of a dynamic function call' => [
-            <<<'PHP'
-                <?php
-
-                $fn = "doFoo";
-                if ($fn($a, [$b])) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $fn = "doFoo";
-                if ($fn($a, [])) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $fn = "doFoo";
+                    if ($fn($a, [$b])) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $fn = "doFoo";
+                    if ($fn($a, [])) {}
+                    PHP,
+            ),
         ];
     }
 }

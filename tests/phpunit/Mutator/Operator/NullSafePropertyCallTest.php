@@ -60,77 +60,77 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Mutate nullsafe property call' => [
-            <<<'PHP'
-                <?php
-
-                $class?->property;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $class->property;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->property;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class->property;
+                    PHP,
+            ),
         ];
 
         yield 'Mutate nullsafe property call only' => [
-            <<<'PHP'
-                <?php
-
-                $class?->getName()?->property;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $class?->getName()->property;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->getName()?->property;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->getName()->property;
+                    PHP,
+            ),
         ];
 
         yield 'Mutate chain of nullsafe property calls' => [
-            <<<'PHP'
-                <?php
-
-                $class?->property?->nextProperty;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->property?->nextProperty;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $class->property?->nextProperty;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $class?->property->nextProperty;
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $class->property?->nextProperty;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $class?->property->nextProperty;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Mutate nullsafe applied right when class has been instantiated' => [
-            <<<'PHP'
-                <?php
-
-                (new \stdClass())?->property;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                (new \stdClass())->property;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (new \stdClass())?->property;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (new \stdClass())->property;
+                    PHP,
+            ),
         ];
 
         yield 'Mutate nullsafe with dynamic property name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
+                    $class?->{$property};
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                $class?->{$property};
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $class->{$property};
-                PHP,
+                    $class->{$property};
+                    PHP,
+            ),
         ];
     }
 }

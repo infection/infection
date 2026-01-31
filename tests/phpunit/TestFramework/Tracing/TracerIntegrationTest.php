@@ -71,7 +71,7 @@ final class TracerIntegrationTest extends TestCase
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
         string $indexXmlPath,
-        string|false $junitXmlPath,
+        ?string $junitXmlPath,
         Trace $expected,
     ): void {
         $tracer = $this->createTracer(
@@ -97,6 +97,9 @@ final class TracerIntegrationTest extends TestCase
             '[PHPUnit 10] ',
             self::phpUnit10InfoProvider(),
         );
+        $coveragePath = Path::canonicalize(self::COVERAGE_REPORT_DIR);
+
+        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
 
         yield from DataProviderFactory::prefix(
             '[PHPUnit 11] ',
@@ -107,6 +110,7 @@ final class TracerIntegrationTest extends TestCase
             '[PHPUnit 12.0] ',
             self::phpUnit12_0InfoProvider(),
         );
+        $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');
 
         yield from DataProviderFactory::prefix(
             '[PHPUnit 12.5] ',
@@ -6064,14 +6068,14 @@ final class TracerIntegrationTest extends TestCase
 
     private function createTracer(
         string $indexXmlPath,
-        string|false $junitXmlPath,
+        ?string $junitXmlPath,
     ): Tracer {
         $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
         $testFrameworkAdapterStub
             ->method('hasJUnitReport')
-            ->willReturn($junitXmlPath !== false);
+            ->willReturn($junitXmlPath !== null);
 
-        $junitFileDataProvider = $junitXmlPath === false
+        $junitFileDataProvider = $junitXmlPath === null
             ? new FakeTestFileDataProvider()
             : new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider(

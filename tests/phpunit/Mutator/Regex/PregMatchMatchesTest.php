@@ -55,85 +55,85 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('/a/', 'b', $foo);
-                PHP,
-            (static fn () => <<<'PHP'
-                <?php
-
-                (int) $foo = [];
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $foo);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if the function is a variable' => [
-            <<<'PHP'
-                <?php
-
-                $foo = 'preg_match';
-                $foo('/a/', 'b', $bar);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'preg_match';
+                    $foo('/a/', 'b', $bar);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates if preg_match is incorrectly cased' => [
-            <<<'PHP'
-                <?php
-
-                PreG_maTch('/a/', 'b', $foo);
-                PHP,
-            (static fn () => <<<'PHP'
-                <?php
-
-                (int) $foo = [];
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PreG_maTch('/a/', 'b', $foo);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if there are less than 3 arguments' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('/asdfa/', 'foo');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/asdfa/', 'foo');
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly if the 3rd variable is a property' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('/a/', 'b', $a->b);
-                PHP,
-            (static fn () => <<<'PHP'
-                <?php
-
-                (int) $a->b = [];
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $a->b);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $a->b = [];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly even with four arguments' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
-                PHP,
-            (static fn () => <<<'PHP'
-                <?php
-
-                (int) $foo = [];
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly even with five arguments' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
-                PHP,
-            (static fn () => <<<'PHP'
-                <?php
-
-                (int) $foo = [];
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
     }
 }

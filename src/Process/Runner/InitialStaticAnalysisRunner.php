@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Symfony\Component\Process\Process;
 

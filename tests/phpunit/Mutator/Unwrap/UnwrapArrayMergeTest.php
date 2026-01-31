@@ -55,246 +55,246 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_merge(['A', 1, 'C'], ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_merge(['A', 1, 'C'], ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_merge(\Class_With_Const::Const, ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_merge(\Class_With_Const::Const, ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = \Class_With_Const::Const;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = \Class_With_Const::Const;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_merge' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_merge(['A', 1, 'C'], ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_merge(['A', 1, 'C'], ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                if (array_merge($a, ['D']) === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    if (array_merge($a, ['D']) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    if ($a === $a) {
-                        return true;
-                    }
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    if (['D'] === $a) {
-                        return true;
-                    }
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        if ($a === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        if (['D'] === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_merge is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_MeRgE(['A', 1, 'C'], ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_MeRgE(['A', 1, 'C'], ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_merge uses functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_merge($foo->bar(), $foo->baz());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_merge($foo->bar(), $foo->baz());
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->bar();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->baz();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->bar();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_merge(['A', 1, 'C'], ['D']));
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_merge(['A', 1, 'C'], ['D']));
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['A', 1, 'C']);
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['D']);
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['A', 1, 'C']);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['D']);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when only one parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_merge(['A', 1, 'C']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_merge(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_merge(['A', 1, 'C'], ['D'], ['E', 'F']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_merge(['A', 1, 'C'], ['D'], ['E', 'F']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['E', 'F'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['E', 'F'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_merge' => [
-            <<<'PHP'
-                <?php
-
-                function array_merge($array, $array1, $array2)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_merge($array, $array1, $array2)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_merge';
 
-                $a = 'array_merge';
-
-                $b = $a([1,2,3], [3,4,5]);
-                PHP,
+                    $b = $a([1,2,3], [3,4,5]);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the input array is unpacked' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_merge(...$classes);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_merge(...$classes);
+                    PHP,
+            ),
         ];
 
         yield 'It does mutate the elements that are not unpacked' => [
-            <<<'PHP'
-                <?php
-
-                $first = [1, 2, 3, 4, 5];
-                $other = [[6, 7], [8]];
-
-                $result = array_merge($first, ...$other);
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
                     $first = [1, 2, 3, 4, 5];
                     $other = [[6, 7], [8]];
 
-                    $result = $first;
+                    $result = array_merge($first, ...$other);
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $first = [1, 2, 3, 4, 5];
+                        $other = [[6, 7], [8]];
+
+                        $result = $first;
+                        PHP,
+                ),
             ],
         ];
     }

@@ -55,105 +55,108 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Removes both operands' => [
-            <<<'PHP'
-                <?php
-                'foo' . 'bar';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    'foo' . 'bar';
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-                    'bar';
-                    PHP,
-                <<<'PHP'
-                    <?php
-                    'foo';
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        'bar';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        'foo';
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Removes each part of a 3-string concatenation' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'a';
-                $b = 'b';
-                $a . $b . 'c';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'a';
+                    $b = 'b';
+                    $a . $b . 'c';
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $b . 'c';
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $a . 'c';
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $a . $b;
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $b . 'c';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $a . 'c';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $a . $b;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Removes each part of multiple concatenations' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'a';
-                $b = 'b';
-                $d = 'd';
-                $a . $b . 'c' . $d . 'e';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . 'c' . $d . 'e';
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $d = 'd';
-                    $b . 'c' . $d . 'e';
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $d = 'd';
-                    $a . 'c' . $d . 'e';
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $d = 'd';
-                    $a . $b . $d . 'e';
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $d = 'd';
-                    $a . $b . 'c' . 'e';
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $d = 'd';
-                    $a . $b . 'c' . $d;
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $d = 'd';
+                        $b . 'c' . $d . 'e';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $d = 'd';
+                        $a . 'c' . $d . 'e';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $d = 'd';
+                        $a . $b . $d . 'e';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $d = 'd';
+                        $a . $b . 'c' . 'e';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $d = 'd';
+                        $a . $b . 'c' . $d;
+                        PHP,
+                ),
             ],
         ];
     }

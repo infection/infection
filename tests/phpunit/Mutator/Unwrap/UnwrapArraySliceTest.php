@@ -55,154 +55,154 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_slice(['foo', 'bar', 'baz'], 1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_slice(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_slice(\Class_With_Const::Const, 1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_slice(\Class_With_Const::Const, 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_slice' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_slice(['foo', 'bar', 'baz'], 1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_slice(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo', 'bar', 'baz']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_slice' => [
-            <<<'PHP'
-                <?php
-
-                function array_slice($array, $offset, $length = null, $preserveKeys = null)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_slice($array, $offset, $length = null, $preserveKeys = null)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                if (array_slice($a, 1) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    if (array_slice($a, 1) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_slice is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_SlIcE(['foo', 'bar', 'baz'], 1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_SlIcE(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_slice uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_slice($foo->bar(), 1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_slice($foo->bar(), 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_slice(['foo', 'bar', 'baz'], 1));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo', 'bar', 'baz']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_slice(['foo', 'bar', 'baz'], 1));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $length parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_slice(['foo', 'bar', 'baz'], 1, 2);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_slice(['foo', 'bar', 'baz'], 1, 2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $preserveKeys parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_slice(['foo', 'bar', 'baz'], 1, 2, true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'baz'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_slice(['foo', 'bar', 'baz'], 1, 2, true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_slice';
 
-                $a = 'array_slice';
-
-                $b = $a(['foo', 'bar', 'baz'], 1);
-                PHP,
+                    $b = $a(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
         ];
     }
 }
