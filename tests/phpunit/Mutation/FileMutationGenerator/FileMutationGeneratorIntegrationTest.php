@@ -39,6 +39,7 @@ use function current;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\TestFramework\Tracing\Tracer;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;
@@ -60,14 +61,12 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
 
         $mutators = [new Plus()];
 
-        $mutationGenerator = new FileMutationGenerator(
-            SingletonContainer::getContainer()->getFileParser(),
-            SingletonContainer::getContainer()->getNodeTraverserFactory(),
-            SingletonContainer::getContainer()->getLineRangeCalculator(),
-            SingletonContainer::getContainer()->getSourceLineMatcher(),
-            new DummyTracer(),
-            SingletonContainer::getContainer()->getFileStore(),
-        );
+        $mutationGenerator = SingletonContainer::getContainer()
+            ->cloneWithService(
+                Tracer::class,
+                new DummyTracer(),
+            )
+            ->getFileMutationGenerator();
 
         $mutations = $mutationGenerator->generate(
             $fileInfoMock,

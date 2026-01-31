@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -1080,6 +1081,25 @@ final class Container extends DIContainer
         return $this->get(Differ::class);
     }
 
+    /**
+     * @template T of object
+     *
+     * @param non-empty-string|class-string<T> $id
+     * @param T|(Closure(static): T) $value
+     */
+    public function cloneWithService(string $id, object $value): self
+    {
+        $clone = clone $this;
+
+        if ($value instanceof Closure) {
+            $clone->offsetSet($id, $value);
+        } else {
+            $clone->inject($id, $value);
+        }
+
+        return $clone;
+    }
+
     private function getMutatedCodePrinter(): MutantCodePrinter
     {
         return $this->get(MutantCodePrinter::class);
@@ -1196,11 +1216,13 @@ final class Container extends DIContainer
     }
 
     /**
-     * @param class-string<object> $id
-     * @param callable(static): object $value
+     * @template T of object
+     *
+     * @param non-empty-string|class-string<T> $id
+     * @param Closure(static): T $value
      */
     private function offsetSet(string $id, callable $value): void
     {
-        $this->set($id, $value);
+        $this->bind($id, $value);
     }
 }
