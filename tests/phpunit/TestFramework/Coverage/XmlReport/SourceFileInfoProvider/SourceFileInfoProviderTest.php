@@ -226,7 +226,7 @@ final class SourceFileInfoProviderTest extends TestCase
         );
 
         yield from DataProviderFactory::prefix(
-            '[phpspec] ',
+            '[PhpSpec] ',
             PhpSpecProvider::infoProvider(),
         );
     }
