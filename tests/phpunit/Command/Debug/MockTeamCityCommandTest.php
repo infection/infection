@@ -41,6 +41,7 @@ use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
 use Infection\Container\Container;
+use Infection\FileSystem\FileSystem;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
@@ -49,7 +50,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_put_contents;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(MockTeamCityCommand::class)]
@@ -104,19 +104,18 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
     {
         $teamCityLog = $this->createTeamCityLog();
 
-        $sleepCalls = [];
-        $mockSleep = static function (int $microseconds) use (&$sleepCalls): void {
-            $sleepCalls[] = $microseconds;
-        };
+        $recordedSleepCalls = [];
 
-        $tester = $this->createCommandTester($mockSleep);
+        $tester = $this->createCommandTester(
+            self::createSleepMock($recordedSleepCalls),
+        );
 
         $tester->execute([
             'log' => $teamCityLog,
         ]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertSame([500_000, 500_000, 500_000, 500_000], $sleepCalls); // Default is 500ms = 500,000 microseconds
+        $this->assertSame([500_000, 500_000, 500_000, 500_000], $recordedSleepCalls); // Default is 500ms = 500,000 microseconds
     }
 
     public function test_it_handles_empty_log_file(): void
@@ -192,7 +191,7 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
         $application = new Application($container);
 
         $command = new MockTeamCityCommand(
-            new Filesystem(),
+            new FileSystem(),
             $sleep,
         );
         $command->setApplication($application);

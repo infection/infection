@@ -40,6 +40,7 @@ use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Console\IO;
+use Infection\FileSystem\FileSystem;
 use const PHP_EOL;
 use function Safe\stream_get_contents;
 use function sprintf;
@@ -48,7 +49,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StreamableInputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -72,7 +72,7 @@ final class MockTeamCityCommand extends BaseCommand
      * @param (Closure(positive-int|0):void)|null $sleep
      */
     public function __construct(
-        private readonly Filesystem $filesystem,
+        private readonly FileSystem $filesystem,
         ?Closure $sleep = null,
     ) {
         // TODO: should be debug:mock-teamcity
