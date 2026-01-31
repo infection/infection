@@ -71,86 +71,86 @@ final readonly class PhpUnit09Provider
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #0',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #1',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #2',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             14 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #0',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #1',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #2',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             19 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_multiply',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             24 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             25 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             28 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             33 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_is_positive',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                             38 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute_zero',
                                     filePath: $testPath,
-                                    executionTime: 0.006446,
+                                    executionTime: 0.005626,
                                 ),
                             ],
                         ],
@@ -183,118 +183,118 @@ final readonly class PhpUnit09Provider
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_log_method_is_public',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             16 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_log_method_is_public',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             21 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             26 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                         ],
@@ -325,331 +325,331 @@ final readonly class PhpUnit09Provider
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             14 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             15 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             18 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             19 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             20 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             23 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             24 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             25 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             30 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             31 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             32 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             35 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             36 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             37 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             42 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_null_for_non_existent_user',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             47 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                             52 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
                                     filePath: $testPath,
-                                    executionTime: 0.003686,
+                                    executionTime: 0.003983,
                                 ),
                             ],
                         ],
@@ -681,79 +681,79 @@ final readonly class PhpUnit09Provider
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_no_names',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                             8 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_no_names',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                             11 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                             12 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                             15 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                             16 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                             19 => [
                                 new TestLocation(
                                     method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
                                     filePath: $testPath,
-                                    executionTime: 0.000505,
+                                    executionTime: 0.000609,
                                 ),
                             ],
                         ],

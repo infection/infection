@@ -58,7 +58,7 @@ final readonly class PhpUnit09Provider
             'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest',
             new TestFileTimeData(
                 '/path/to/infection/tests/e2e/PHPUnit_09-3/tests/Covered/CalculatorTest.php',
-                0.006446,
+                0.005626,
             ),
         ];
 
@@ -103,7 +103,7 @@ final readonly class PhpUnit09Provider
             'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract',
             new TestFileTimeData(
                 '',
-                0.000386,
+                0.000462,
             ),
         ];
 
@@ -136,7 +136,7 @@ final readonly class PhpUnit09Provider
             'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add',
             new TestFileTimeData(
                 '',
-                0.004078,
+                0.003283,
             ),
         ];
     }
