@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -144,6 +145,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
@@ -263,7 +265,11 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            IndexXmlCoverageLocator::class => static fn (self $container) => IndexXmlCoverageLocator::create(
+            'app.coverage.junit_adder' => static fn (self $container) => new JUnitTestExecutionInfoAdder(
+                $container->getTestFrameworkAdapter(),
+                $container->get(TestFileDataProvider::class),
+            ),
+            'app.coverage.index_locator' => static fn (self $container) => IndexXmlCoverageLocator::create(
                 $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,
             ),
@@ -1080,6 +1086,25 @@ final class Container extends DIContainer
         return $this->get(Differ::class);
     }
 
+    /**
+     * @template T of object
+     *
+     * @param string|class-string<T> $id
+     * @param T|(Closure(static): T) $value
+     */
+    public function withService(string $id, object $value): self
+    {
+        $clone = clone $this;
+
+        if ($value instanceof Closure) {
+            $clone->offsetSet($id, $value);
+        } else {
+            $clone->inject($id, $value);
+        }
+
+        return $clone;
+    }
+
     private function getMutatedCodePrinter(): MutantCodePrinter
     {
         return $this->get(MutantCodePrinter::class);
@@ -1170,9 +1195,9 @@ final class Container extends DIContainer
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
-    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
+    private function getIndexXmlCoverageLocator(): ReportLocator
     {
-        return $this->get(IndexXmlCoverageLocator::class);
+        return $this->get('app.coverage.index_locator');
     }
 
     private function getProjectDir(): string
