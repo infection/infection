@@ -37,6 +37,7 @@ namespace Infection\Tests\Differ;
 
 use Infection\Differ\Differ;
 use Infection\Framework\Str;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -50,8 +51,7 @@ final class DifferTest extends TestCase
 
     protected function setUp(): void
     {
-        // TODO: change to use the container version instead
-        $this->differ = new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder()));
+        $this->differ = SingletonContainer::getContainer()->getDiffer();
     }
 
     #[DataProvider('diffProvider')]
@@ -89,8 +89,6 @@ final class DifferTest extends TestCase
             '',
             '',
             <<<'PHP'
-                --- Original
-                +++ New
 
                 PHP,
             ['', ''],
@@ -114,8 +112,6 @@ final class DifferTest extends TestCase
 
                 PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
 
                  public function echo(): void
@@ -163,8 +159,6 @@ final class DifferTest extends TestCase
 
                 PHP,
             <<<'PHP'
-                --- Original
-                +++ New
 
                 PHP,
             [
@@ -215,8 +209,6 @@ final class DifferTest extends TestCase
                 15
                 PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
                  3
                  4
@@ -290,8 +282,6 @@ final class DifferTest extends TestCase
                 15
                 PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
                  3
                  4
@@ -350,8 +340,6 @@ final class DifferTest extends TestCase
                 1{$windowsLineReturn}2
                 PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
                  #Warning: Strings contain different line endings!
                  0
@@ -384,8 +372,6 @@ final class DifferTest extends TestCase
                 (1){$windowsLineReturn}2
                 PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
                  #Warning: Strings contain different line endings!
                  0

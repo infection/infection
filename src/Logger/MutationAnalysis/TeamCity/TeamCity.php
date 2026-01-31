@@ -123,6 +123,7 @@ final readonly class TeamCity
         Test $test,
         MutantExecutionResult $executionResult,
     ): string {
+        /** @psalm-suppress InvalidArgument */
         $messageName = $this->mapExecutionResultToTestStatus($executionResult);
         $attributes = $test->toFinishedAttributes($executionResult);
 
@@ -166,6 +167,8 @@ final readonly class TeamCity
     }
 
     /**
+     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
+     *
      * @return TestClosingMessage
      */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
