@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
@@ -50,7 +50,9 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
+use PhpParser\Node\Stmt;
+use PhpParser\Token;
+use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -65,12 +67,12 @@ class FileMutationGenerator
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
+        private readonly FileStore $fileStore,
     ) {
     }
 
     /**
      * @param Mutator<Node>[] $mutators
-     * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws NoSourceFound
      * @throws UnparsableFile
@@ -81,10 +83,8 @@ class FileMutationGenerator
         SplFileInfo $sourceFile,
         bool $onlyCovered,
         array $mutators,
-        array $nodeIgnorers,
     ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
-        Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
         $trace = $this->trace($sourceFile);
 
@@ -92,13 +92,32 @@ class FileMutationGenerator
             return;
         }
 
-        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
+        [$initialStatements, $originalFileTokens] = $this->createAst($sourceFile);
 
-        // Pre-traverse the nodes to connect them
-        $this->traverserFactory
-            ->createPreTraverser($nodeIgnorers)
-            ->traverse($initialStatements);
+        yield from $this->generateMutations(
+            $mutators,
+            $sourceFile,
+            $initialStatements,
+            $trace,
+            $onlyCovered,
+            $originalFileTokens,
+        );
+    }
 
+    /**
+     * @param Mutator<Node>[] $mutators
+     * @param Stmt[] $initialStatements
+     * @param Token[] $originalFileTokens
+     *
+     * @return iterable<Mutation>
+     */
+    private function generateMutations(array $mutators,
+        SplFileInfo $sourceFile,
+        mixed $initialStatements,
+        Trace $trace,
+        bool $onlyCovered,
+        mixed $originalFileTokens,
+    ): iterable {
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
@@ -109,15 +128,30 @@ class FileMutationGenerator
                 lineRangeCalculator: $this->lineRangeCalculator,
                 sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,
-                originalFileContent: $sourceFile->getContents(),
+                originalFileContent: $this->fileStore->getContents($sourceFile),
             ),
         );
 
-        $this->traverserFactory
-            ->create($mutationCollectorVisitor)
-            ->traverse($initialStatements);
+        $traverser = $this->traverserFactory->create($mutationCollectorVisitor);
+        $traverser->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();
+    }
+
+    /**
+     * @throws UnparsableFile
+     *
+     * @return array{Stmt[], Token[]}
+     */
+    private function createAst(SplFileInfo $sourceFile): array
+    {
+        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
+
+        // Pre-traverse the nodes to connect them
+        $preTraverser = $this->traverserFactory->createPreTraverser();
+        $preTraverser->traverse($initialStatements);
+
+        return [$initialStatements, $originalFileTokens];
     }
 
     private function trace(SplFileInfo $sourceFile): Trace

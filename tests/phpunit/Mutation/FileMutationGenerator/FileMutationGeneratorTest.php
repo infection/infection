@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
+use Infection\FileSystem\FileStore;
+use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -44,9 +46,9 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\Parser;
@@ -54,7 +56,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use function sprintf;
 
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
@@ -73,30 +75,37 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
 
+        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub
+            ->method('readFile')
+            ->willReturnCallback(
+                static fn (string $path): string => sprintf(
+                    'contents(%s)',
+                    $path,
+                ),
+            );
+
         $this->mutationGenerator = new FileMutationGenerator(
             new FileParser(
                 $this->phpParserMock,
+                new FileStore($fileSystemStub),
             ),
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
             $this->createMock(SourceLineMatcher::class),
             $this->tracerMock,
+            new FileStore($fileSystemStub),
         );
     }
 
     public function test_it_parses_the_source_file_and_yields_the_generated_mutations(): void
     {
-        $fileInfoMock = $this->createSplFileInfoMock(
-            '/path/to/file',
-            'contents',
-        );
+        $fileInfoMock = new MockSplFileInfo(realPath: '/path/to/file');
 
         $mutators = [
             new FakeMutator(),
             new FakeMutator(),
         ];
-
-        $nodeIgnorers = [new FakeIgnorer()];
 
         $initialStatements = [
             new FakeNode(),
@@ -111,7 +120,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->phpParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with('contents')
+            ->with('contents(/path/to/file)')
             ->willReturn($initialStatements);
         $this->phpParserMock
             ->expects($this->once())
@@ -172,7 +181,6 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfoMock,
             false,
             $mutators,
-            $nodeIgnorers,
         );
 
         // We cannot really check more than that here as controlling the mutations yielded
@@ -193,14 +201,12 @@ final class FileMutationGeneratorTest extends TestCase
     public function test_it_traverses_the_source_statements(
         Scenario $scenario,
     ): void {
-        $fileInfoMock = $this->createSplFileInfoMock('/path/to/file');
+        $fileInfoMock = new MockSplFileInfo(realPath: '/path/to/file');
 
         $mutators = [
             new FakeMutator(),
             new FakeMutator(),
         ];
-
-        $nodeIgnorers = [new FakeIgnorer()];
 
         $initialStatements = [
             new FakeNode(),
@@ -259,7 +265,6 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfoMock,
             $scenario->onlyCovered,
             $mutators,
-            $nodeIgnorers,
         );
 
         // See the test description: we do not check the result itself only the mocks
@@ -309,16 +314,5 @@ final class FileMutationGeneratorTest extends TestCase
                 ->withHasTrace(false)
                 ->withTraceHasTests(false),
         ];
-    }
-
-    private function createSplFileInfoMock(
-        string $path,
-        string $contents = '',
-    ): SplFileInfo&MockObject {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock->method('getRealPath')->willReturn($path);
-        $splFileInfoMock->method('getContents')->willReturn($contents);
-
-        return $splFileInfoMock;
     }
 }

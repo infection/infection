@@ -56,9 +56,8 @@ final class TraceAssertion
     private static function collectState(Trace $trace): array
     {
         return [
-            'sourceFileInfo' => $trace->getSourceFileInfo(),
+            'sourceFileInfo' => $trace->getSourceFileInfo()->getPathname(),
             'realPath' => $trace->getRealPath(),
-            'relativePathname' => $trace->getRelativePathname(),
             'hasTests' => $trace->hasTests(),
             'tests' => $trace->getTests(),
         ];

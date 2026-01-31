@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use function array_map;
 use function Safe\realpath;
 
 final class XmlCoverageFixture
@@ -49,8 +53,32 @@ final class XmlCoverageFixture
         public string $relativeCoverageFilePath,
         public string $projectSource,
         string $sourceFilePath,
-        public array $normalizedTests
+        public array $normalizedTests,
     ) {
         $this->sourceFilePath = realpath($this->projectSource . DIRECTORY_SEPARATOR . $sourceFilePath);
+    }
+
+    public function getTests(): TestLocations
+    {
+        return new TestLocations(
+            byLine: array_map(
+                static fn (array $tests) => array_map(
+                    static fn (array $testLocation) => new TestLocation(
+                        method: $testLocation['testMethod'],
+                        filePath: $testLocation['testFilePath'],
+                        executionTime: $testLocation['testExecutionTime'],
+                    ),
+                    $tests,
+                ),
+                $this->normalizedTests['byLine'],
+            ),
+            byMethod: array_map(
+                static fn (array $range) => new SourceMethodLineRange(
+                    startLine: $range['startLine'],
+                    endLine: $range['endLine'],
+                ),
+                $this->normalizedTests['byMethod'],
+            ),
+        );
     }
 }

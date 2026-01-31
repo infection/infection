@@ -45,8 +45,8 @@ use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SplFileInfo;
 use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 #[CoversClass(FilterBuilder::class)]
@@ -86,8 +86,8 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     {
         $builder = new ArgumentsAndOptionsBuilder(false,
             [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/bar/Baz.php', 'src/bar/Baz.php', 'src/bar/Baz.php'),
+                new SplFileInfo('src/Foo.php'),
+                new SplFileInfo('src/bar/Baz.php'),
             ],
             'simple',
         );

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * @internal

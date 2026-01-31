@@ -39,14 +39,15 @@ use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Metrics\MaxTimeoutCountReached;
+use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -61,7 +62,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Webmozart\Assert\Assert;
@@ -81,6 +81,7 @@ final readonly class Engine
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
+        private MaxTimeoutsChecker $maxTimeoutsChecker,
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
@@ -93,6 +94,7 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
+     * @throws MaxTimeoutCountReached
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
@@ -118,6 +120,10 @@ final readonly class Engine
         $this->runMutationAnalysis();
 
         try {
+            $this->maxTimeoutsChecker->checkTimeouts(
+                $this->metricsCalculator->getTimedOutCount(),
+            );
+
             $this->minMsiChecker->checkMetrics(
                 $this->metricsCalculator->getTestedMutantsCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
@@ -213,25 +219,12 @@ final readonly class Engine
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
-            $this->getNodeIgnorers(),
         );
 
         $this->mutationTestingRunner->run(
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
         );
-    }
-
-    /**
-     * @return NodeIgnorer[]
-     */
-    private function getNodeIgnorers(): array
-    {
-        if ($this->adapter instanceof IgnoresAdditionalNodes) {
-            return $this->adapter->getNodeIgnorers();
-        }
-
-        return [];
     }
 
     private function getFilteredExtraOptionsForMutant(): string

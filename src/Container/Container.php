@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -50,9 +51,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterFactory;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
@@ -73,6 +71,7 @@ use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
+use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
@@ -88,9 +87,14 @@ use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
+use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
@@ -182,7 +186,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_WITH_UNCOVERED = false;
 
-    public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_FORMATTER_NAME = MutationAnalysisLoggerName::DOT;
 
     public const DEFAULT_MUTANT_ID = null;
 
@@ -199,6 +203,8 @@ final class Container extends DIContainer
     public const DEFAULT_HTML_LOGGER_PATH = null;
 
     public const DEFAULT_TEXT_LOGGER_PATH = null;
+
+    public const DEFAULT_SUMMARY_JSON_LOGGER_PATH = null;
 
     public const DEFAULT_USE_NOOP_MUTATORS = false;
 
@@ -219,6 +225,10 @@ final class Container extends DIContainer
     public const DEFAULT_MIN_MSI = null;
 
     public const DEFAULT_MIN_COVERED_MSI = null;
+
+    public const DEFAULT_TIMEOUTS_AS_ESCAPED = false;
+
+    public const DEFAULT_MAX_TIMEOUTS = null;
 
     public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
 
@@ -314,6 +324,7 @@ final class Container extends DIContainer
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
                 $container->getConfiguration()->msiPrecision,
+                $container->getConfiguration()->timeoutsAsEscaped,
             ),
             MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
                 $container->getFileSystem(),
@@ -356,6 +367,9 @@ final class Container extends DIContainer
                     (float) $config->minCoveredMsi,
                 );
             },
+            MaxTimeoutsChecker::class => static fn (self $container): MaxTimeoutsChecker => new MaxTimeoutsChecker(
+                $container->getConfiguration()->maxTimeouts,
+            ),
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
@@ -424,8 +438,9 @@ final class Container extends DIContainer
                     $container->getDiffColorizer(),
                     $federatedMutationTestingResultsLogger,
                     $config->numberOfShownMutations,
-                    $container->getOutputFormatter(),
+                    $container->getMutationAnalysisLogger(),
                     !$config->mutateOnlyCoveredCode(),
+                    $config->timeoutsAsEscaped,
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
@@ -440,6 +455,7 @@ final class Container extends DIContainer
                 $container->getLineRangeCalculator(),
                 $container->getSourceLineMatcher(),
                 $container->getTracer(),
+                $container->getFileStore(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -473,6 +489,7 @@ final class Container extends DIContainer
                     $config->logVerbosity,
                     $config->mutateOnlyCoveredCode(),
                     $config->numberOfShownMutations,
+                    $config->timeoutsAsEscaped,
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -582,6 +599,14 @@ final class Container extends DIContainer
                     );
                 },
             ),
+            TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
+                $container->getConfiguration()->timeoutsAsEscaped,
+            ),
+            MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
+                $container->getOutput(),
+                $container->get(TeamCity::class),
+                $container->getConfiguration()->configurationPathname,
+            ),
         ]);
 
         return $container->withValues(
@@ -602,7 +627,7 @@ final class Container extends DIContainer
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
-        FormatterName $formatterName = self::DEFAULT_FORMATTER_NAME,
+        MutationAnalysisLoggerName $loggerName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
@@ -611,6 +636,8 @@ final class Container extends DIContainer
         ?bool $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
         ?float $minMsi = self::DEFAULT_MIN_MSI,
         ?float $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
+        bool $timeoutsAsEscaped = self::DEFAULT_TIMEOUTS_AS_ESCAPED,
+        ?int $maxTimeouts = self::DEFAULT_MAX_TIMEOUTS,
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
@@ -622,6 +649,7 @@ final class Container extends DIContainer
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
         ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
         ?string $textLogFilePath = self::DEFAULT_TEXT_LOGGER_PATH,
+        ?string $summaryJsonLogFilePath = self::DEFAULT_SUMMARY_JSON_LOGGER_PATH,
         bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
         bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
@@ -663,8 +691,8 @@ final class Container extends DIContainer
         );
 
         $clone->offsetSet(
-            OutputFormatter::class,
-            static fn (self $container): OutputFormatter => $container->getFormatterFactory()->create($formatterName),
+            MutationAnalysisLogger::class,
+            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($loggerName),
         );
 
         $clone->offsetSet(
@@ -686,6 +714,8 @@ final class Container extends DIContainer
                 minMsi: $minMsi,
                 numberOfShownMutations: $numberOfShownMutations,
                 minCoveredMsi: $minCoveredMsi,
+                timeoutsAsEscaped: $timeoutsAsEscaped,
+                maxTimeouts: $maxTimeouts,
                 msiPrecision: $msiPrecision,
                 mutatorsInput: $mutatorsInput,
                 testFramework: $testFramework,
@@ -698,6 +728,7 @@ final class Container extends DIContainer
                 gitlabLogFilePath: $gitlabLogFilePath,
                 htmlLogFilePath: $htmlLogFilePath,
                 textLogFilePath: $textLogFilePath,
+                summaryJsonLogFilePath: $summaryJsonLogFilePath,
                 useNoopMutators: $useNoopMutators,
                 executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
                 mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
@@ -975,14 +1006,14 @@ final class Container extends DIContainer
         return $this->get(OutputInterface::class);
     }
 
-    public function getFormatterFactory(): FormatterFactory
+    public function getMutationAnalysisLoggerFactory(): MutationAnalysisLoggerFactory
     {
-        return $this->get(FormatterFactory::class);
+        return $this->get(MutationAnalysisLoggerFactory::class);
     }
 
-    public function getOutputFormatter(): OutputFormatter
+    public function getMutationAnalysisLogger(): MutationAnalysisLogger
     {
-        return $this->get(OutputFormatter::class);
+        return $this->get(MutationAnalysisLogger::class);
     }
 
     public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher
@@ -1033,6 +1064,40 @@ final class Container extends DIContainer
     public function getMinMsiChecker(): MinMsiChecker
     {
         return $this->get(MinMsiChecker::class);
+    }
+
+    public function getMaxTimeoutsChecker(): MaxTimeoutsChecker
+    {
+        return $this->get(MaxTimeoutsChecker::class);
+    }
+
+    public function getFileStore(): FileStore
+    {
+        return $this->get(FileStore::class);
+    }
+
+    public function getDiffer(): Differ
+    {
+        return $this->get(Differ::class);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param non-empty-string|class-string<T> $id
+     * @param T|(Closure(static): T) $value
+     */
+    public function cloneWithService(string $id, object $value): self
+    {
+        $clone = clone $this;
+
+        if ($value instanceof Closure) {
+            $clone->offsetSet($id, $value);
+        } else {
+            $clone->inject($id, $value);
+        }
+
+        return $clone;
     }
 
     private function getMutatedCodePrinter(): MutantCodePrinter
@@ -1100,11 +1165,6 @@ final class Container extends DIContainer
         ;
     }
 
-    private function getDiffer(): Differ
-    {
-        return $this->get(Differ::class);
-    }
-
     private function getMutantFactory(): MutantFactory
     {
         return $this->get(MutantFactory::class);
@@ -1156,11 +1216,13 @@ final class Container extends DIContainer
     }
 
     /**
-     * @param class-string<object> $id
-     * @param callable(static): object $value
+     * @template T of object
+     *
+     * @param non-empty-string|class-string<T> $id
+     * @param Closure(static): T $value
      */
     private function offsetSet(string $id, callable $value): void
     {
-        $this->set($id, $value);
+        $this->bind($id, $value);
     }
 }

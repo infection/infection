@@ -35,43 +35,71 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
+use Infection\FileSystem\FileStore;
+use Infection\FileSystem\FileSystem;
+use Infection\Framework\Str;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\StringNormalizer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PhpParser\Error;
 use PhpParser\Node;
+use PhpParser\NodeDumper;
 use PhpParser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Exception as PhpUnitFrameworkException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
 #[CoversClass(FileParser::class)]
 final class FileParserTest extends TestCase
 {
+    private FileSystem&MockObject $fileSystemMock;
+
+    private FileParser $parser;
+
+    private NodeDumper $nodeDumper;
+
+    protected function setUp(): void
+    {
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
+
+        $this->parser = new FileParser(
+            SingletonContainer::getContainer()->getParser(),
+            new FileStore($this->fileSystemMock),
+        );
+
+        $this->nodeDumper = SingletonContainer::getNodeDumper();
+    }
+
     public function test_it_parses_the_given_file_only_once(): void
     {
-        $fileInfo = self::createFileInfo('/unknown', $fileContents = 'contents');
+        $fileInfo = $this->createFileInfo(
+            '/unknown',
+            $fileContents = 'contents',
+        );
 
-        $phpParser = $this->createMock(Parser::class);
-
-        $phpParser
+        $phpParserMock = $this->createMock(Parser::class);
+        $phpParserMock
             ->expects($this->once())
             ->method('parse')
             ->with($fileContents)
             ->willReturn($expectedReturnedStatements = []);
 
-        $phpParser
+        $phpParserMock
             ->expects($this->once())
             ->method('getTokens')
             ->willReturn($expectedReturnedTokens = []);
 
-        $parser = new FileParser($phpParser);
+        $parser = new FileParser(
+            $phpParserMock,
+            new FileStore($this->fileSystemMock),
+        );
 
         [$returnedStatements, $returnedTokens] = $parser->parse($fileInfo);
 
@@ -80,26 +108,35 @@ final class FileParserTest extends TestCase
     }
 
     #[DataProvider('fileToParserProvider')]
-    public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
-    {
-        [$statements] = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);
+    public function test_it_can_parse_a_file(
+        string $contents,
+        string $expectedPrintedParsedContents,
+    ): void {
+        $fileInfo = $this->createFileInfo('/unknown', $contents);
+
+        [$statements] = $this->parser->parse($fileInfo);
 
         $this->assertContainsOnlyInstancesOf(Node::class, $statements);
 
-        $actualPrintedParsedContents = SingletonContainer::getNodeDumper()->dump($statements);
+        $actualPrintedParsedContents = $this->nodeDumper->dump($statements);
 
         $this->assertSame(
             $expectedPrintedParsedContents,
-            StringNormalizer::normalizeString($actualPrintedParsedContents),
+            Str::rTrimLines($actualPrintedParsedContents),
         );
     }
 
     public function test_it_throws_upon_failure(): void
     {
-        $parser = SingletonContainer::getContainer()->getFileParser();
+        $contents = '<?php use foo as self;';
 
         try {
-            $parser->parse(self::createFileInfo('/unknown', '<?php use foo as self;'));
+            $this->parser->parse(
+                $this->createFileInfo(
+                    '/unknown',
+                    $contents,
+                ),
+            );
 
             $this->fail('Expected PHPParser to be unable to parse the above expression');
         } catch (UnparsableFile $exception) {
@@ -112,14 +149,24 @@ final class FileParserTest extends TestCase
         }
 
         $fileRealPath = realpath(__FILE__);
-
+        // Sanity check
         $this->assertNotFalse($fileRealPath);
 
         try {
-            $parser->parse(self::createFileInfo($fileRealPath, '<?php use foo as self;'));
+            $this->parser->parse(
+                $this->createFileInfo(
+                    $fileRealPath,
+                    $contents,
+                ),
+            );
 
             $this->fail('Expected PHPParser to be unable to parse the above expression');
         } catch (UnparsableFile $exception) {
+            // @phpstan-ignore instanceof.internalClass
+            if ($exception->getPrevious() instanceof PhpUnitFrameworkException) {
+                throw $exception->getPrevious();
+            }
+
             $this->assertSame(
                 sprintf(
                     'Could not parse the file "%s". Check if it is a valid PHP file',
@@ -135,7 +182,7 @@ final class FileParserTest extends TestCase
     public static function fileToParserProvider(): iterable
     {
         yield 'empty file' => [
-            self::createFileInfo('/unknown', ''),
+            '',
             <<<'AST'
                 array(
                 )
@@ -143,13 +190,10 @@ final class FileParserTest extends TestCase
         ];
 
         yield 'empty PHP file' => [
-            self::createFileInfo(
-                '/unknown',
-                <<<'PHP'
-                    <?php
+            <<<'PHP'
+                <?php
 
-                    PHP,
-            ),
+                PHP,
             <<<'AST'
                 array(
                 )
@@ -157,27 +201,24 @@ final class FileParserTest extends TestCase
         ];
 
         yield 'nominal' => [
-            self::createFileInfo(
-                '/unknown',
-                <<<'PHP'
-                    #!/usr/bin/env php
-                    <?php declare(strict_types=1);
+            <<<'PHP'
+                #!/usr/bin/env php
+                <?php declare(strict_types=1);
 
-                    /**
-                     * ...
-                     */
+                /**
+                 * ...
+                 */
 
-                    // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+                // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
-                    $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
+                $autoloaderInWorkingDirectory = getcwd() . '/vendor/autoload.php';
 
-                    use Infection\Console\Application;
-                    use Infection\Console\InfectionContainer;
+                use Infection\Console\Application;
+                use Infection\Console\InfectionContainer;
 
-                    (new Application(InfectionContainer::create()))->run();
+                (new Application(InfectionContainer::create()))->run();
 
-                    PHP,
-            ),
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_InlineHTML(
@@ -276,20 +317,14 @@ final class FileParserTest extends TestCase
         ];
     }
 
-    private static function createFileInfo(string $path, string $contents): SplFileInfo
+    private function createFileInfo(string $path, string $contents): MockSplFileInfo
     {
-        return new class($path, $contents) extends SplFileInfo {
-            public function __construct(
-                string $path,
-                private readonly string $contents,
-            ) {
-                parent::__construct($path, $path, $path);
-            }
+        $fileInfo = new MockSplFileInfo(realPath: $path);
 
-            public function getContents(): string
-            {
-                return $this->contents;
-            }
-        };
+        $this->fileSystemMock
+            ->method('readFile')
+            ->willReturn($contents);
+
+        return $fileInfo;
     }
 }

@@ -52,7 +52,7 @@ use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 #[CoversClass(JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
@@ -117,15 +117,17 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             [],
         );
 
-        $sourceFile = new SplFileInfo(__FILE__, 'JUnitTestExecutionInfoAdder.php', 'JUnitTestExecutionInfoAdder.php');
+        $sourceFile = new SplFileInfo(__FILE__);
 
         $proxyTrace = new ProxyTrace(
             $sourceFile,
+            '',
             now($tests),
         );
 
         $expected = new ProxyTrace(
             $sourceFile,
+            '',
             now(
                 new TestLocations(
                     [
@@ -160,10 +162,11 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ->willReturn(true)
         ;
 
-        $sourceFile = new SplFileInfo(__FILE__, 'JUnitTestExecutionInfoAdder.php', 'JUnitTestExecutionInfoAdder.php');
+        $sourceFile = new SplFileInfo(__FILE__);
 
         $proxyTrace = new ProxyTrace(
             $sourceFile,
+            '',
             // @phpstan-ignore argument.templateType,argument.type,callable.void
             lazy((static function () {
                 throw new Exception();

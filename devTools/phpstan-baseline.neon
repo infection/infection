@@ -13,12 +13,6 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: '#^Parameter \#2 \$value of method DIContainer\\Container\:\:set\(\) expects \(callable\(DIContainer\\Container\)\: object\)\|class\-string\<DIContainer\\Builder\<object\>\>, callable\(Infection\\Container\\Container\)\: object given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container/Container.php
-
-		-
 			message: '#^Variable \$end might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -181,30 +175,6 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: '#^Class Infection\\Testing\\SimpleMutation extends @final class Infection\\Mutation\\Mutation\.$#'
-			identifier: class.extendsFinalByPhpDoc
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Infection\\Testing\\SimpleMutation\:\:__construct\(\) does not call parent constructor from Infection\\Mutation\\Mutation\.$#'
-			identifier: constructor.missingParentCall
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Method Infection\\Testing\\SimpleMutation\:\:__construct\(\) has parameter \$mutator with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Method Infection\\Testing\\SimpleMutation\:\:getMutator\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -237,7 +207,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: ../tests/phpunit/AutoReview/Event/SubscriberProvider.php
 
 		-
@@ -370,7 +340,7 @@ parameters:
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
+			path: ../tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php
 
 		-
 			message: '#^Parameter \#1 \$environment of method Infection\\Environment\\StrykerApiKeyResolver\:\:resolve\(\) expects array\<string, string\>, array\<string, int\|stdClass\|string\> given\.$#'
@@ -475,10 +445,10 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
+			message: '#^Method Infection\\Tests\\Logger\\Console\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: ../tests/phpunit/Logger/ConsoleLoggerTest.php
+			path: ../tests/phpunit/Logger/Console/ConsoleLoggerTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\FileLoggerFactoryTest\:\:assertRegisteredLoggersAre\(\) has parameter \$expectedLoggerClasses with no value type specified in iterable type array\.$#'
@@ -727,12 +697,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
-			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<''Infection\\\\Mutator…'', array\{\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\Mutator\\NoopMutatorTest\:\:\$mutatorMock with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
@@ -763,12 +727,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
 
 		-
-			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:emptyIterable\(\) return type with generic class PHPUnit\\Framework\\Constraint\\Callback does not specify its types\: CallbackInput$#'
 			identifier: missingType.generics
 			count: 1
@@ -783,18 +741,6 @@ parameters:
 		-
 			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:someIterable\(\) return type with generic class PHPUnit\\Framework\\Constraint\\Callback does not specify its types\: CallbackInput$#'
 			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: '#^Parameter \#1 \$expectedEvents of method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:assertAreSameEvents\(\) expects array\<Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\>, array\<int, \(Infection\\Event\\MutantProcessWasFinished&PHPUnit\\Framework\\MockObject\\MockObject\)\|Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\> given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: '#^Parameter \#1 \$expectedEvents of method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:assertAreSameEvents\(\) expects array\<Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\>, array\<int, Infection\\Event\\MutantProcessWasFinished\|Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\> given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
@@ -901,12 +847,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#\$callback of function array_map expects#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
 			message: '#MutationConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'
 			identifier: missingType.generics
 			count: 1
@@ -987,3 +927,15 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			message: '#Access to an undefined property DOMNameSpaceNode\|DOMNode::\$attributes#'
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
+
+		-
+			message: '#^Parameter \#1 \$resolvedMutators of method .*\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php

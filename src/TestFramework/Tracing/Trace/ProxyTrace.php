@@ -37,8 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Later\Interfaces\Deferred;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
+use SplFileInfo;
 
 /**
  * Full-pledge trace that acts as a proxy i.e. for which the tracing of the test files will be done
@@ -56,6 +55,7 @@ class ProxyTrace implements Trace
      */
     public function __construct(
         private readonly SplFileInfo $sourceFile,
+        private readonly string $sourceRealPath,
         private readonly ?Deferred $lazyTestLocations = null,
     ) {
     }
@@ -67,16 +67,7 @@ class ProxyTrace implements Trace
 
     public function getRealPath(): string
     {
-        $realPath = $this->sourceFile->getRealPath();
-
-        Assert::string($realPath);
-
-        return $realPath;
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFile->getRelativePathname();
+        return $this->sourceRealPath;
     }
 
     public function hasTests(): bool

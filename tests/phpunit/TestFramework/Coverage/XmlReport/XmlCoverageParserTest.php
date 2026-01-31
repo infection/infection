@@ -35,17 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use const DIRECTORY_SEPARATOR;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\SafeDOMXPath;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(XmlCoverageParser::class)]
@@ -55,141 +60,131 @@ final class XmlCoverageParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parser = new XmlCoverageParser();
+        $this->parser = new XmlCoverageParser(
+            new FileSystem(),
+        );
+    }
+
+    #[DataProvider('lineCoverageProvider')]
+    public function test_it_can_get_the_line_coverage(
+        SafeDOMXPath $xPath,
+        TestLocations $expected,
+    ): void {
+        $sourceFileInfoProviderStub = $this->createSourceFileInfoProviderStub($xPath);
+
+        $actual = $this->parser
+            ->parse($sourceFileInfoProviderStub)
+            ->getTests();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function lineCoverageProvider(): iterable
+    {
+        yield 'coverage with empty percentage' => [
+            SafeDOMXPath::fromString(
+                <<<'XML'
+                    <?xml version="1.0"?>
+                    <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                        <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+                            <totals>
+                                <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent=""/>
+                            </totals>
+                            <coverage>
+                                <line nr="11">
+                                    <covered by="ExampleTest::test_it_just_works"/>
+                                </line>
+                            </coverage>
+                        </file>
+                    </phpunit>
+                    XML,
+                namespace: 'p',
+            ),
+            new TestLocations(),
+        ];
+
+        yield 'coverage with percent sign' => [
+            SafeDOMXPath::fromString(
+                <<<'XML'
+                    <?xml version="1.0"?>
+                    <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                        <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+                            <totals>
+                                <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent="1.0%"/>
+                            </totals>
+                            <coverage>
+                                <line nr="11">
+                                    <covered by="ExampleTest::test_it_just_works"/>
+                                </line>
+                            </coverage>
+                        </file>
+                    </phpunit>
+                    XML,
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    11 => [
+                        new TestLocation(
+                            method: 'ExampleTest::test_it_just_works',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'coverage with no covered lines' => [
+            SafeDOMXPath::fromString(
+                <<<'XML'
+                    <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                        <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+                            <totals>
+                                <lines total="1" comments="0" code="1" executable="1" executed="1" percent="100"/>
+                            </totals>
+                            <coverage>
+                            </coverage>
+                        </file>
+                    </phpunit>
+                    XML,
+                namespace: 'p',
+            ),
+            new TestLocations(),
+        ];
+
+        // @phpstan-ignore argument.templateType
+        yield from take(XmlCoverageFixtures::provideAllFixtures())
+            ->map(self::createScenarioFromFixture(...))
+            ->stream();
+    }
+
+    private function createSourceFileInfoProviderStub(SafeDOMXPath $xPath): SourceFileInfoProvider
+    {
+        $sourceFileInfoProviderStub = $this->createStub(SourceFileInfoProvider::class);
+        $sourceFileInfoProviderStub
+            ->method('provideFileInfo')
+            ->willReturn(new MockSplFileInfo(''));
+        $sourceFileInfoProviderStub
+            ->method('provideXPath')
+            ->willReturn($xPath);
+
+        return $sourceFileInfoProviderStub;
     }
 
     /**
-     * @param array<string, mixed> $expectedTests
+     * @return array{SafeDOMXPath, TestLocations}
      */
-    #[DataProvider('sourceFileInfoProviderProvider')]
-    public function test_it_reads_every_type_of_fixture(
-        SourceFileInfoProvider $provider,
-        array $expectedTests,
-    ): void {
-        $fileData = $this->parser->parse($provider);
-
-        $this->assertSame(
-            $fileData->getSourceFileInfo()->getRealPath(),
-            $provider->provideFileInfo()->getRealPath(),
-        );
-
-        $coverageData = $fileData->getTests();
-
-        $this->assertSame(
-            $expectedTests,
-            TestLocationsNormalizer::normalize([$coverageData])[0],
-        );
-    }
-
-    public function test_it_reads_report_with_no_covered_lines(): void
+    private static function createScenarioFromFixture(XmlCoverageFixture $fixture): array
     {
-        $xml = <<<'XML'
-            <?xml version="1.0"?>
-            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-                <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
-                    <totals>
-                        <lines total="1" comments="0" code="1" executable="1" executed="1" percent="100"/>
-                    </totals>
-                    <coverage>
-                    </coverage>
-                </file>
-            </phpunit>
-            XML;
-
-        $coverageData = $this->parser
-            ->parse($this->createSourceFileInfoProvider($xml))
-            ->getTests()
-        ;
-
-        $this->assertSame([], $coverageData->getTestsLocationsBySourceLine());
-        $this->assertSame([], $coverageData->getSourceMethodRangeByMethod());
-    }
-
-    public function test_it_reads_report_with_percent_signs(): void
-    {
-        $xml = <<<'XML'
-            <?xml version="1.0"?>
-            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-                <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
-                    <totals>
-                        <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent="1.0%"/>
-                    </totals>
-                    <coverage>
-                        <line nr="11">
-                            <covered by="ExampleTest::test_it_just_works"/>
-                        </line>
-                    </coverage>
-                </file>
-            </phpunit>
-            XML;
-
-        $coverageData = $this->parser
-            ->parse($this->createSourceFileInfoProvider($xml))
-            ->getTests()
-        ;
-
-        $this->assertArrayHasKey(11, $coverageData->getTestsLocationsBySourceLine());
-    }
-
-    public function test_it_reads_report_with_empty_percentage(): void
-    {
-        $xml = <<<'XML'
-            <?xml version="1.0"?>
-            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-                <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
-                    <totals>
-                        <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent=""/>
-                    </totals>
-                    <coverage>
-                        <line nr="11">
-                            <covered by="ExampleTest::test_it_just_works"/>
-                        </line>
-                    </coverage>
-                </file>
-            </phpunit>
-            XML;
-
-        $coverageData = $this->parser
-            ->parse($this->createSourceFileInfoProvider($xml))
-            ->getTests()
-        ;
-
-        $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());
-    }
-
-    public static function sourceFileInfoProviderProvider(): iterable
-    {
-        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
-            yield [
-                new SourceFileInfoProvider(
-                    '/path/to/index.xml',
-                    $fixture->coverageDir,
-                    $fixture->relativeCoverageFilePath,
-                    $fixture->projectSource,
+        return [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(
+                    $fixture->coverageDir . DIRECTORY_SEPARATOR . $fixture->relativeCoverageFilePath,
                 ),
-                $fixture->normalizedTests,
-            ];
-        }
-    }
-
-    private function createSourceFileInfoProvider(string $xml): SourceFileInfoProvider&MockObject
-    {
-        $xPath = SafeDOMXPath::fromString($xml, 'p');
-
-        $providerMock = $this->createMock(SourceFileInfoProvider::class);
-
-        $providerMock
-            ->expects($this->once())
-            ->method('provideFileInfo')
-            ->willReturn(new MockSplFileInfo(['file' => 'test.txt']))
-        ;
-
-        $providerMock
-            ->expects($this->once())
-            ->method('provideXPath')
-            ->willReturn($xPath)
-        ;
-
-        return $providerMock;
+                namespace: 'p',
+            ),
+            $fixture->getTests(),
+        ];
     }
 }

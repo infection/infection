@@ -53,6 +53,8 @@ final class ConfigurationFactoryInputBuilder
         private ?float $minMsi,
         private ?int $numberOfShownMutations,
         private ?float $minCoveredMsi,
+        private bool $timeoutsAsEscaped,
+        private ?int $maxTimeouts,
         private int $msiPrecision,
         private string $mutatorsInput,
         private ?string $testFramework,
@@ -65,6 +67,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $gitlabLogFilePath,
         private ?string $htmlLogFilePath,
         private ?string $textLogFilePath,
+        private ?string $summaryJsonLogFilePath,
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
@@ -158,6 +161,22 @@ final class ConfigurationFactoryInputBuilder
     {
         $clone = clone $this;
         $clone->minCoveredMsi = $minCoveredMsi;
+
+        return $clone;
+    }
+
+    public function withTimeoutsAsEscaped(bool $timeoutsAsEscaped): self
+    {
+        $clone = clone $this;
+        $clone->timeoutsAsEscaped = $timeoutsAsEscaped;
+
+        return $clone;
+    }
+
+    public function withMaxTimeouts(?int $maxTimeouts): self
+    {
+        $clone = clone $this;
+        $clone->maxTimeouts = $maxTimeouts;
 
         return $clone;
     }
@@ -258,6 +277,14 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    public function withSummaryJsonLogFilePath(?string $summaryJsonLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->summaryJsonLogFilePath = $summaryJsonLogFilePath;
+
+        return $clone;
+    }
+
     public function withUseNoopMutators(bool $useNoopMutators): self
     {
         $clone = clone $this;
@@ -320,24 +347,27 @@ final class ConfigurationFactoryInputBuilder
      *     9: float|null,
      *     10: int|null,
      *     11: float|null,
-     *     12: int,
-     *     13: string,
-     *     14: string|null,
-     *     15: string|null,
+     *     12: bool,
+     *     13: int|null,
+     *     14: int,
+     *     15: string,
      *     16: string|null,
-     *     17: PlainFilter|IncompleteGitDiffFilter|null,
-     *     18: int|null,
-     *     19: bool,
-     *     20: bool|null,
-     *     21: string|null,
-     *     22: string|null,
+     *     17: string|null,
+     *     18: string|null,
+     *     19: PlainFilter|IncompleteGitDiffFilter|null,
+     *     20: int|null,
+     *     21: bool,
+     *     22: bool|null,
      *     23: string|null,
-     *     24: bool,
-     *     25: bool,
+     *     24: string|null,
+     *     25: string|null,
      *     26: string|null,
-     *     27: string|null,
-     *     28: string|null,
-     *     29: string|null
+     *     27: bool,
+     *     28: bool,
+     *     29: string|null,
+     *     30: string|null,
+     *     31: string|null,
+     *     32: string|null
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -355,6 +385,8 @@ final class ConfigurationFactoryInputBuilder
             $this->minMsi,
             $this->numberOfShownMutations,
             $this->minCoveredMsi,
+            $this->timeoutsAsEscaped,
+            $this->maxTimeouts,
             $this->msiPrecision,
             $this->mutatorsInput,
             $this->testFramework,
@@ -367,6 +399,7 @@ final class ConfigurationFactoryInputBuilder
             $this->gitlabLogFilePath,
             $this->htmlLogFilePath,
             $this->textLogFilePath,
+            $this->summaryJsonLogFilePath,
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,

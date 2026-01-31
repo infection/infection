@@ -39,7 +39,7 @@ use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\UnsupportedMethod;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * @internal
@@ -52,11 +52,6 @@ final readonly class FakeTrace implements Trace
     }
 
     public function getRealPath(): string
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
-
-    public function getRelativePathname(): string
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
