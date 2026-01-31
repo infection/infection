@@ -38,6 +38,7 @@ namespace Infection\Mutator;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Exception\NoSourceFound;
@@ -97,6 +98,10 @@ class NodeMutationGenerator
      */
     public function generate(Node $node): iterable
     {
+        if (!NodeAnnotator::isEligible($node)) {
+            return;
+        }
+
         $this->currentNode = $node;
         $this->testsMemoized = null;
         $this->isOnFunctionSignatureMemoized = null;

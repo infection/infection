@@ -38,11 +38,16 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
+use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
@@ -60,22 +65,12 @@ final class NodeTraverserFactoryTest extends TestCase
     {
         $traverser = (new NodeTraverserFactory())->create(new FakeVisitor());
 
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
-
         $this->assertSame(
             [
                 CloningVisitor::class,
-                IgnoreAllMutationsAnnotationReaderVisitor::class,
-                NonMutableNodesIgnorerVisitor::class,
-                NameResolver::class,
-                ParentConnectingVisitor::class,
-                ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitors,
+            self::getVisitorClassNames($traverser),
         );
     }
 
@@ -83,16 +78,25 @@ final class NodeTraverserFactoryTest extends TestCase
     {
         $traverser = (new NodeTraverserFactory())->createPreTraverser();
 
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
-
         $this->assertSame(
             [
                 NextConnectingVisitor::class,
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
+                NonMutableNodesIgnorerVisitor::class,
+                NameResolver::class,
+                ParentConnectingVisitor::class,
+                ReflectionVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
             ],
-            $visitors,
+            self::getVisitorClassNames($traverser),
+        );
+    }
+
+    private static function getVisitorClassNames(NodeTraverserInterface $traverser): array
+    {
+        return array_map(
+            get_class(...),
+            self::getVisitorReflection()->getValue($traverser),
         );
     }
 
