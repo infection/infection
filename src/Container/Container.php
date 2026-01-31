@@ -265,11 +265,7 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            'app.coverage.junit_adder' => static fn (self $container) => new JUnitTestExecutionInfoAdder(
-                $container->getTestFrameworkAdapter(),
-                $container->get(TestFileDataProvider::class),
-            ),
-            'app.coverage.index_locator' => static fn (self $container) => IndexXmlCoverageLocator::create(
+            IndexXmlCoverageLocator::class => static fn (self $container) => IndexXmlCoverageLocator::create(
                 $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,
             ),
@@ -1195,9 +1191,9 @@ final class Container extends DIContainer
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
-    private function getIndexXmlCoverageLocator(): ReportLocator
+    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
     {
-        return $this->get('app.coverage.index_locator');
+        return $this->get(IndexXmlCoverageLocator::class);
     }
 
     private function getProjectDir(): string
