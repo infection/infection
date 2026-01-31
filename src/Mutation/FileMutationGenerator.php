@@ -42,6 +42,7 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
@@ -73,6 +74,7 @@ class FileMutationGenerator
     /**
      * @param Mutator<Node>[] $mutators
      *
+     * @throws NoSourceFound
      * @throws UnparsableFile
      *
      * @return iterable<Mutation>

@@ -71,6 +71,5 @@ abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
 
     public function finishAnalysis(): void
     {
-        // Do nothing.
     }
 }

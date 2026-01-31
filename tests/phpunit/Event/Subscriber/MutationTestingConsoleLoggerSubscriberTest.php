@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
@@ -135,7 +135,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(
-            new MutationEvaluationWasFinished(
+            new MutantProcessWasFinished(
                 $this->createMock(MutantExecutionResult::class),
             ),
         );

@@ -2,7 +2,6 @@
     "$schema": "./resources/schema.json",
     "timeout": 25,
     "threads": "max",
-    "tmpDir": "var/tmp",
     "source": {
         "directories": [
             "src"
@@ -49,8 +48,5 @@
                 "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator",
             ]
         }
-    },
-    "phpUnit": {
-        "customPath": "vendor/bin/phpunit"
     }
 }
