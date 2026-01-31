@@ -1,26 +1,30 @@
 # TeamCity Logger
 
-Outputs mutation results using [TeamCity service messages][tc-service-messages], enabling
-integration with JetBrains IDEs and TeamCity CI.
+Outputs mutation results as [TeamCity service messages][tc-service-messages] for integration
+with JetBrains IDEs and TeamCity CI. Used by the [Infection plugin][infection-plugin].
 
-This is used for the [Infection plugin][infection-plugin].
 
-## How It Works
+## Service Message Format
 
-TeamCity service messages are specially formatted text:
+TeamCity service messages follow this format:
 
 ```
 ##teamcity[messageName key='value']
 ```
 
-The logger uses test reporting messages to represent mutation results.
+The logger maps mutation results to test reporting messages.
 
-We encountered several issues during the integration; it appears
-the [TeamCity service messages][tc-service-messages] are for their on-promise service and do not
-reflect how the TeamCity logs are interpreted by the JetBrains SDK in the plugin (at the time of
-writing).
 
-A key difference is regarding the `flowId` usages. The document gives the following examples:
+## Implementation Notes
+
+The official [TeamCity service messages documentation][tc-service-messages] describes the
+on-premise service format, which differs from how the JetBrains SDK interprets these messages
+in IDE plugins.
+
+The key difference: use `nodeId`/`parentNodeId` instead of `flowId` for proper hierarchy
+rendering in IDE plugins.
+
+**Official documentation example (flow-based):**
 
 ```
 # TEST SUITE A
@@ -50,11 +54,7 @@ A key difference is regarding the `flowId` usages. The document gives the follow
 ##teamcity[testSuiteFinished name='Test Suite A']
 ```
 
-Instead, what it should be in our case is:
-
-TODO: to check if parentNode=0 is necessary
-TODO: to check if the node/parentNode is necessary on the *Finished message
-TODO: check if that double nesting works fine
+**Infection implementation (node-based):**
 
 ```
 # TEST SUITE A
@@ -78,6 +78,7 @@ TODO: check if that double nesting works fine
 ##teamcity[testSuiteFinished name='Test Suite A' nodeId='TSA']
 ```
 
+
 ## Terminology Mapping
 
 | TeamCity     | Infection                            |
@@ -88,6 +89,11 @@ TODO: check if that double nesting works fine
 | Test failed  | Mutation escaped                     |
 | Test ignored | Mutation ignored/skipped/not covered |
 
-[infection-plugin]: https://github.com/j-plugins/infection-plugin
+| TeamCity      | Infection                           |
+|---------------|-------------------------------------|
+| Test Suite ID | Source file canonical absolute path |
+| Test ID       | mutation ID = Mutant hash           |
 
+
+[infection-plugin]: https://github.com/j-plugins/infection-plugin
 [tc-service-messages]: https://www.jetbrains.com/help/teamcity/service-messages.html

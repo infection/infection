@@ -43,9 +43,13 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
-// Differs from ConsoleLogger in the fact that:
-// - it gets the errorOutput earlier
-// - do not change the format and discards the context
+/**
+ * Differs from ConsoleLogger in the fact that:
+ * - it gets the errorOutput earlier
+ * - do not change the format and discards the context
+ *
+ * @internal
+ */
 final class BasicConsoleLogger extends AbstractLogger implements LoggerInterface
 {
     private const INFO = 'info';
@@ -92,10 +96,12 @@ final class BasicConsoleLogger extends AbstractLogger implements LoggerInterface
             'The log level %s does not exist',
         );
 
+        /** @psalm-suppress InvalidArrayOffset */
         $output = self::FORMAT_LEVEL_MAP[$level] === self::ERROR
             ? $this->errorOutput
             : $this->output;
 
+        /** @psalm-suppress InvalidArrayOffset */
         if ($output->getVerbosity() >= self::VERBOSITY_LEVEL_MAP[$level]) {
             $output->write(
                 (string) $message,

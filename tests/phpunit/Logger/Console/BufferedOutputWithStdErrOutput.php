@@ -33,33 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\Logger\Console;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
+use Infection\Tests\UnsupportedMethod;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
-final class TraceAssertion
+final class BufferedOutputWithStdErrOutput extends BufferedOutput implements ConsoleOutputInterface
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
+    public function __construct(
+        ?int $verbosity = self::VERBOSITY_NORMAL,
+        bool $decorated = false,
+        ?OutputFormatterInterface $formatter = null,
+        private readonly OutputInterface $stderr = new NullOutput(),
+    ) {
+        parent::__construct($verbosity, $decorated, $formatter);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public function getErrorOutput(): OutputInterface
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo()->getPathname(),
-            'realPath' => $trace->getRealPath(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        return $this->stderr;
+    }
+
+    public function setErrorOutput(OutputInterface $error): void
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function section(): ConsoleSectionOutput
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

@@ -33,33 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
+use function hash;
+use Infection\CannotBeInstantiated;
 
-final class TraceAssertion
+/**
+ * @internal
+ */
+final class NodeIdFactory
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
-    }
+    use CannotBeInstantiated;
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public static function create(string $value): string
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo()->getPathname(),
-            'realPath' => $trace->getRealPath(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        // The hash must meet the following criteria:
+        // - have a very low collision rate
+        // - be fast
+        // - be deterministic
+        // - be short (~20chars max – not a hard limit)
+        //
+        // I choose xxh3 as it was a recommendation, but
+        // any other hash algorithm meeting the aforementioned
+        // criteria will do.
+        // https://xxhash.com/
+        // https://php.watch/versions/8.1/xxHash
+        return hash('xxh3', $value);
     }
 }

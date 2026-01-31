@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Tests\Logger\Console;
 
 use DateTimeImmutable as UnsafeDateTimeImmutable;
 use Infection\Console\IO;

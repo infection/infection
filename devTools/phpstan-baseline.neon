@@ -445,10 +445,10 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
+			message: '#^Method Infection\\Tests\\Logger\\Console\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: ../tests/phpunit/Logger/ConsoleLoggerTest.php
+			path: ../tests/phpunit/Logger/Console/ConsoleLoggerTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\FileLoggerFactoryTest\:\:assertRegisteredLoggersAre\(\) has parameter \$expectedLoggerClasses with no value type specified in iterable type array\.$#'

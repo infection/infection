@@ -35,38 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use Symfony\Component\Filesystem\Path;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
+use function round;
+use function sprintf;
 
 /**
  * @phpstan-import-type MessageAttributes from TeamCity
  *
  * @internal
  */
-final readonly class TestSuite
+final readonly class Test
 {
-    /**
-     * @param string $sourceFilePath Absolute path of the source file.
-     */
+    private const MILLISECONDS_PER_SECOND = 1000;
+
     public function __construct(
-        public string $sourceFilePath,
+        public string $id,
         public string $name,
         public string $nodeId,
+        public string $parentNodeId,
     ) {
     }
 
     public static function create(
-        string $sourceFilePath,
-        string $basePath,
+        Mutation $mutation,
+        string $parentNodeId,
     ): self {
-        $relativeSourceFilePath = Path::makeRelative(
-            $sourceFilePath,
-            $basePath,
-        );
-
         return new self(
-            sourceFilePath: $sourceFilePath,
-            name: $relativeSourceFilePath,
-            nodeId: NodeIdFactory::create($relativeSourceFilePath),
+            id: $mutation->getHash(),
+            name: self::createName($mutation),
+            // The Mutation hash is too long to be suitable to be a nodeId.
+            nodeId: NodeIdFactory::create($mutation->getHash()),
+            parentNodeId: $parentNodeId,
         );
     }
 
@@ -79,5 +79,48 @@ final readonly class TestSuite
             'name' => $this->name,
             'nodeId' => $this->nodeId,
         ];
+    }
+
+    /**
+     * @return MessageAttributes
+     */
+    public function toFinishedAttributes(MutantExecutionResult $executionResult): array
+    {
+        return $this->toAttributes() + [
+            // TODO: looks like this information is not used when the test is marked as successful or ignored :/
+            'message' => self::createMutationMessage($executionResult),
+            'details' => $executionResult->getMutantDiff(),
+            'duration' => self::getExecutionDurationInMs($executionResult),
+        ];
+    }
+
+    private static function createName(Mutation $mutation): string
+    {
+        return sprintf(
+            '%s (%s)',
+            $mutation->getMutatorClass(),
+            $mutation->getHash(),
+        );
+    }
+
+    private static function createMutationMessage(MutantExecutionResult $executionResult): string
+    {
+        return sprintf(
+            <<<'MESSAGE'
+                Mutator: %s
+                Mutation ID: %s
+                Mutation result: %s
+                MESSAGE,
+            $executionResult->getMutatorName(),
+            $executionResult->getMutantHash(),
+            $executionResult->getDetectionStatus()->value,
+        );
+    }
+
+    private static function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
+    {
+        // TODO: this duration is not correct.
+        //  see: https://github.com/infection/infection/issues/2900
+        return (string) round($executionResult->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
     }
 }

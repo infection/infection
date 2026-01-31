@@ -62,7 +62,7 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
         $mutators = [new Plus()];
 
         $mutationGenerator = SingletonContainer::getContainer()
-            ->withService(
+            ->cloneWithService(
                 Tracer::class,
                 new DummyTracer(),
             )

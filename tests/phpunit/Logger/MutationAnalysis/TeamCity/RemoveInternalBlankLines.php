@@ -43,8 +43,8 @@ use function trim;
 use Webmozart\Assert\Assert;
 
 /**
- * This service is a utility to make the TeamCity logs more readable by indenting
- * them based on the opening/closing blocks.
+ * This service is a utility to make the TeamCity logs more readable by allowing
+ * them to have blank lines for visual spacing.
  *
  * Note that this is purely for testing purposes for better readability: teamcity
  * logs do not need to be indented.

@@ -39,6 +39,9 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
  * Only contains a subset of the allowed messages.
  *
  * @see https://www.jetbrains.com/help/teamcity/service-messages.html
+ *
+ * @phpstan-type TestClosingMessage = MessageName::TEST_FINISHED | self::TEST_FAILED | self::TEST_IGNORED
+ * @internal
  */
 enum MessageName: string
 {

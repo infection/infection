@@ -33,33 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function strlen;
 
-final class TraceAssertion
+#[CoversClass(NodeIdFactory::class)]
+final class NodeIdFactoryTest extends TestCase
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public function test_it_generates_a_short_and_deterministic_hash(): void
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo()->getPathname(),
-            'realPath' => $trace->getRealPath(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        $value = '49a5dfcd2f4a0b33d4a02e662812af55';
+
+        $id1 = NodeIdFactory::create($value);
+        $id2 = NodeIdFactory::create($value);
+
+        $this->assertNotSame($value, $id1);
+        $this->assertSame($id1, $id2);
+        $this->assertSame(16, strlen($id1));
     }
 }

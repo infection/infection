@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -455,7 +456,6 @@ final class Container extends DIContainer
                 $container->getSourceLineMatcher(),
                 $container->getTracer(),
                 $container->getFileStore(),
-                $container->getEventDispatcher(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -1076,22 +1076,26 @@ final class Container extends DIContainer
         return $this->get(FileStore::class);
     }
 
+    public function getDiffer(): Differ
+    {
+        return $this->get(Differ::class);
+    }
+
     /**
-     * TODO: should allow string as the ID
-     *
      * @template T of object
      *
-     * @param class-string<T> $id
-     * @param T $value
+     * @param non-empty-string|class-string<T> $id
+     * @param T|(Closure(static): T) $value
      */
-    public function withService(string $id, object $value): self
+    public function cloneWithService(string $id, object $value): self
     {
         $clone = clone $this;
 
-        $clone->set(
-            $id,
-            static fn () => $value,
-        );
+        if ($value instanceof Closure) {
+            $clone->offsetSet($id, $value);
+        } else {
+            $clone->inject($id, $value);
+        }
 
         return $clone;
     }
@@ -1161,11 +1165,6 @@ final class Container extends DIContainer
         ;
     }
 
-    private function getDiffer(): Differ
-    {
-        return $this->get(Differ::class);
-    }
-
     private function getMutantFactory(): MutantFactory
     {
         return $this->get(MutantFactory::class);
@@ -1217,11 +1216,13 @@ final class Container extends DIContainer
     }
 
     /**
-     * @param class-string<object> $id
-     * @param callable(static): object $value
+     * @template T of object
+     *
+     * @param non-empty-string|class-string<T> $id
+     * @param Closure(static): T $value
      */
     private function offsetSet(string $id, callable $value): void
     {
-        $this->set($id, $value);
+        $this->bind($id, $value);
     }
 }

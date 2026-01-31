@@ -35,56 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use function array_key_exists;
-use function array_map;
-use function count;
 use function hash;
-use function implode;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Psr\Log\LoggerInterface;
-use function sprintf;
-use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
-
-// TODO: explain somewhere the concept of TestSuite and Test for TeamCity
 
 /**
- * @phpstan-type Test = array{flowId: string, parentFlowId: string}
  * @phpstan-type MutationRecord = array{hash: string, message: string}
+ *
+ * @internal
  */
-final class TeamCityLogger implements MutationAnalysisLogger
+final readonly class TeamCityLogger implements MutationAnalysisLogger
 {
-    /**
-     * @var array<string, array<string, bool>>
-     */
-    private array $evaluatedMutationIdsBySourceFilePath = [];
-
-    /**
-     * Populated when all the mutations were generated. This may happen while
-     * some mutants are still being evaluated.
-     *
-     * @var array<string, list<string>> The index is the unchanged (absolute) source path of the source file.
-     */
-    private array $generatedMutationHashesBySourceFilePath = [];
-
-    /**
-     * @var array<string, TestSuite> The index is the unchanged (absolute) source path of the source file.
-     */
-    private array $openedTestSuites = [];
-
-    /**
-     * @var array<string, array<string, Test>> The index is the unchanged (absolute) source path of
-     *                                         the source file and the inner array key is the mutation hash.
-     */
-    private array $openedTests = [];
-
     public function __construct(
-        private readonly TeamCity $teamcity,
-        private readonly LoggerInterface $logger,
-        private readonly string $configurationDirPathname,
+        private TeamCity $teamcity,
+        private TeamCityLoggerState $state,
+        private LoggerInterface $logger,
+        private string $configurationDirPathname,
     ) {
     }
 
@@ -101,24 +70,18 @@ final class TeamCityLogger implements MutationAnalysisLogger
     {
         $sourceFilePath = $mutation->getOriginalFilePath();
 
-        $testSuiteFlowId = $this->startTestSuiteIfNotStarted($sourceFilePath);
+        $testSuiteNodeId = $this->startTestSuiteIfNotStarted($sourceFilePath);
 
-        $this->startTest($mutation, $testSuiteFlowId);
+        $this->startTest($mutation, $testSuiteNodeId);
     }
 
     public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
         $sourceFilePath = $executionResult->getOriginalFilePath();
-        [
-            'flowId' => $flowId,
-            'parentFlowId' => $parentFlowId,
-        ] = $this->openedTests[$sourceFilePath][$executionResult->getMutantHash()];
 
-        $this->finishTest(
-            $executionResult,
-            $flowId,
-            $parentFlowId,
-        );
+        $test = $this->state->getTest($executionResult->getMutantHash());
+
+        $this->finishTest($test, $executionResult);
 
         $this->finishTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
     }
@@ -127,162 +90,80 @@ final class TeamCityLogger implements MutationAnalysisLogger
         string $sourceFilePath,
         array $mutationIds,
     ): void {
-        $this->generatedMutationHashesBySourceFilePath[$sourceFilePath] = $mutationIds;
+        $this->state->registerTestsForTestSuite(
+            sourceFilePath: $sourceFilePath,
+            testIds: $mutationIds,
+        );
 
         $this->finishTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
     }
 
     public function finishAnalysis(): void
     {
-        Assert::count($this->openedTestSuites, 0);
-        Assert::count($this->openedTests, 0);
-        Assert::count($this->generatedMutationHashesBySourceFilePath, 0);
+        $this->state->assertAllTestSuitesAreClosed();
     }
 
-    /**
-     * @return string TestSuite flowID.
-     */
     private function startTestSuiteIfNotStarted(string $sourceFilePath): string
     {
-        return array_key_exists($sourceFilePath, $this->openedTestSuites)
-            ? $this->openedTestSuites[$sourceFilePath]['flowId']
-            : $this->startTestSuite(
-                $sourceFilePath,
-            );
+        return $this->state->findTestSuite($sourceFilePath)->nodeId
+            ?? $this->startTestSuite($sourceFilePath)->nodeId;
     }
 
-    /**
-     * @return string TestSuite flowID.
-     */
-    private function startTestSuite(string $sourceFilePath): string
+    private function startTestSuite(string $sourceFilePath): TestSuite
     {
         $testSuite = TestSuite::create(
             $sourceFilePath,
             $this->configurationDirPathname,
         );
 
-        $this->openedTestSuites[$sourceFilePath] = $testSuite;
+        $this->state->openTestSuite($testSuite);
         $this->write(
             $this->teamcity->testSuiteStarted($testSuite),
         );
 
-        return $testSuite->flowId;
+        return $testSuite;
     }
 
     private function finishTestSuite(string $sourceFilePath): void
     {
-        $testSuite = $this->openedTestSuites[$sourceFilePath];
+        $testSuite = $this->state->getTestSuite($sourceFilePath);
+        $this->state->closeTestSuite($sourceFilePath);
 
         $this->write(
             $this->teamcity->testSuiteFinished($testSuite),
         );
-
-        unset($this->generatedMutationHashesBySourceFilePath[$sourceFilePath]);
-        unset($this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath]);
-        unset($this->openedTestSuites[$sourceFilePath]);
-
-        $this->ensureAllTestsAreFinished($testSuite['name'], $sourceFilePath);
     }
 
-    private function ensureAllTestsAreFinished(
-        string $testSuiteName,
-        string $sourceFilePath,
-    ): void {
-        $openedTests = $this->openedTests[$sourceFilePath];
-
-        Assert::count(
-            $openedTests,
-            0,
-            sprintf(
-                'Found %d opened tests for the test suite "%s": %s.',
-                count($openedTests),
-                $testSuiteName,
-                implode(
-                    ', ',
-                    array_map(
-                        static fn (array $test) => $test['flowId'],
-                        $openedTests,
-                    ),
-                ),
-            ),
-        );
-
-        unset($this->openedTests[$sourceFilePath]);
-    }
-
-    private function startTest(Mutation $mutation, string $parentFlowId): void
+    private function startTest(Mutation $mutation, string $parentNodeId): void
     {
-        // The Mutation hash is too long to be suitable to be a flowId.
-        $flowId = self::createFlowId($mutation->getHash());
+        $test = Test::create($mutation, $parentNodeId);
 
+        $this->state->openTest($test);
         $this->write(
-            $this->teamcity->testStarted(
-                $mutation,
-                $flowId,
-                $parentFlowId,
-            ),
+            $this->teamcity->testStarted($test),
         );
-
-        $this->openedTests[$mutation->getOriginalFilePath()][$mutation->getHash()] = [
-            'flowId' => $flowId,
-            'parentFlowId' => $parentFlowId,
-        ];
     }
 
     private function finishTest(
+        Test $test,
         MutantExecutionResult $executionResult,
-        string $flowId,
-        string $parentFlowId,
     ): void {
         $this->write(
-            $this->teamcity->testFinished(
-                $executionResult,
-                $flowId,
-                $parentFlowId,
-            ),
+            $this->teamcity->testFinished($test, $executionResult),
         );
 
-        unset($this->openedTests[$executionResult->getOriginalFilePath()][$executionResult->getMutantHash()]);
-        $this->evaluatedMutationIdsBySourceFilePath[$executionResult->getOriginalFilePath()][$executionResult->getMutantHash()] = true;
+        $this->state->closeTest($test);
     }
 
     private function finishTestSuiteIfAllMutationsWereExecuted(string $sourceFilePath): void
     {
-        if (!$this->areAllMutationsOfSourceFileExecuted($sourceFilePath)) {
-            return;
+        if ($this->state->areAllTestsOfTheTestSuiteFinished($sourceFilePath)) {
+            $this->finishTestSuite($sourceFilePath);
         }
-
-        $this->finishTestSuite($sourceFilePath);
-    }
-
-    private function areAllMutationsOfSourceFileExecuted(string $sourceFilePath): bool
-    {
-        if (!array_key_exists($sourceFilePath, $this->generatedMutationHashesBySourceFilePath)) {
-            return false;
-        }
-
-        $mutationIds = $this->generatedMutationHashesBySourceFilePath[$sourceFilePath];
-        $evaluatedMutationsByMutationId = $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] ?? [];
-
-        foreach ($mutationIds as $mutationId) {
-            $evaluated = $evaluatedMutationsByMutationId[$mutationId] ?? false;
-
-            if (!$evaluated) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function write(string $messsage): void
     {
         $this->logger->warning($messsage);
-    }
-
-    private static function createFlowId(string $value): string
-    {
-        // Any hash which avoids collision, is fast and deterministic will do.
-        return hash('xxh3', $value);
     }
 }

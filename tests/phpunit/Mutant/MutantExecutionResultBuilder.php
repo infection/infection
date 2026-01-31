@@ -231,7 +231,7 @@ final class MutantExecutionResultBuilder
     }
 
     /**
-     * @param Deferred<string> $mutantDiff
+     * @param Deferred<string>|string $mutantDiff
      */
     public function withMutantDiff(Deferred|string $mutantDiff): self
     {

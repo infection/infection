@@ -44,9 +44,11 @@ use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[Group('integration')]
 #[CoversClass(MutationAnalysisLoggerFactory::class)]
 final class MutationAnalysisLoggerFactoryTest extends TestCase
 {
@@ -63,7 +65,7 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
 
         $factory = new MutationAnalysisLoggerFactory(
             $outputMock,
-            new TeamCity(),
+            new TeamCity(timeoutsAsEscaped: false),
             '/path/to/project/infection.json5',
         );
 
