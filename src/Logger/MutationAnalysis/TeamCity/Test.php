@@ -94,7 +94,7 @@ final readonly class Test
         ];
     }
 
-    private mstatic function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
+    private static function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
     {
         // TODO: this duration is not correct.
         //  see: https://github.com/infection/infection/issues/2900
