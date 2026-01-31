@@ -53,11 +53,10 @@ final class PhpUnit125Provider
         $coverageDirectory = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-12-5/');
 
         $indexXmlPath = Path::canonicalize($coverageDirectory . '/index.xml');
-        $junitXmlPath = false;
+        $junitXmlPath = null;
 
         yield 'covered class' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/Calculator.php';
-            $testPath = '/path/to/infection/tests/e2e/PHPUnit_12-5/tests/Covered/CalculatorTest.php';
 
             return [
                 $indexXmlPath,
@@ -149,7 +148,6 @@ final class PhpUnit125Provider
 
         yield 'covered trait' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/LoggerTrait.php';
-            $testPath = '/path/to/infection/tests/e2e/PHPUnit_12-5/tests/Covered/UserServiceTest.php';
 
             return [
                 $indexXmlPath,
@@ -291,7 +289,6 @@ final class PhpUnit125Provider
 
         yield 'covered class with trait' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/UserService.php';
-            $testPath = '/path/to/infection/tests/e2e/PHPUnit_12-5/tests/Covered/UserServiceTest.php';
 
             return [
                 $indexXmlPath,
@@ -647,7 +644,6 @@ final class PhpUnit125Provider
 
         yield 'covered function' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/functions.php';
-            $testPath = '/path/to/infection/tests/e2e/PHPUnit_12-5/tests/Covered/FunctionsTest.php';
 
             return [
                 $indexXmlPath,

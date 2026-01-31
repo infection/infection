@@ -53,11 +53,10 @@ final class PhpSpecProvider
         $coverageDirectory = Path::canonicalize(self::FIXTURES_DIR . '/phpspec/');
 
         $indexXmlPath = Path::canonicalize($coverageDirectory . '/index.xml');
-        $junitXmlPath = false;
+        $junitXmlPath = null;
 
         yield 'covered class' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/Calculator.php';
-            $testPath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/spec/Covered/CalculatorSpec.php';
 
             return [
                 $indexXmlPath,
@@ -224,7 +223,6 @@ final class PhpSpecProvider
 
         yield 'covered trait' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/LoggerTrait.php';
-            $testPath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/spec/Covered/UserServiceSpec.php';
 
             return [
                 $indexXmlPath,
@@ -366,7 +364,6 @@ final class PhpSpecProvider
 
         yield 'covered class with trait' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/UserService.php';
-            $testPath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/spec/Covered/UserServiceSpec.php';
 
             return [
                 $indexXmlPath,
@@ -722,7 +719,6 @@ final class PhpSpecProvider
 
         yield 'covered function' => (static function () use ($indexXmlPath, $junitXmlPath) {
             $sourcePath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/functions.php';
-            $testPath = '/path/to/phpspec-adapter/tests/e2e/PhpSpec/spec/Covered/FormatNameFunctionSpec.php';
 
             return [
                 $indexXmlPath,
