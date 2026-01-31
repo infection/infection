@@ -42,7 +42,7 @@ use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Symfony\Component\Filesystem\Path;
 
-final class PhpUnit12Provider
+final class PhpUnit120Provider
 {
     use CannotBeInstantiated;
 

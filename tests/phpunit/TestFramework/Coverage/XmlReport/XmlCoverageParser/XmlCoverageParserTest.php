@@ -168,7 +168,7 @@ final class XmlCoverageParserTest extends TestCase
 
         yield from DataProviderFactory::prefix(
             '[PHPUnit 12.0] ',
-            PhpUnit125Provider::infoProvider(),
+            PhpUnit120Provider::infoProvider(),
         );
 
         yield from DataProviderFactory::prefix(
