@@ -33,43 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompletedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use InvalidArgumentException;
-use function sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class CiInitialTestsConsoleLoggerSubscriber implements InitialTestSuiteWasStartedSubscriber
+final readonly class InitialTestExecutionLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
 {
     public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        private InitialTestExecutionLogger $logger,
     ) {
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
+        $this->logger->start();
+    }
 
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-        ]);
+    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
+    {
+        $this->logger->advance();
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }

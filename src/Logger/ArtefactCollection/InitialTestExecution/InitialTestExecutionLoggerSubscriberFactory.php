@@ -33,32 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class InitialTestExecutionLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private bool $skipProgressBar,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-        private bool $debug,
+        private InitialTestExecutionLoggerFactory $loggerFactory,
     ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
     {
-        return $this->skipProgressBar
-            ? new CiInitialTestsConsoleLoggerSubscriber($output, $this->testFrameworkAdapter)
-            : new InitialTestsConsoleLoggerSubscriber(
-                $output,
-                $this->testFrameworkAdapter,
-                $this->debug,
-            )
-        ;
+        return new InitialTestExecutionLoggerSubscriber(
+            $this->loggerFactory->create($output),
+        );
     }
 }

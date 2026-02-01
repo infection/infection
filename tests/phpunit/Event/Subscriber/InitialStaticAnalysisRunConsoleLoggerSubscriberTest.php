@@ -38,7 +38,7 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;

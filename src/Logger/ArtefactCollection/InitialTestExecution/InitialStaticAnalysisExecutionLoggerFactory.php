@@ -33,54 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Logger\ArtefactCollection\InitialTestExecution\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiInitialTestsConsoleLoggerSubscriber::class)]
-final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class InitialStaticAnalysisExecutionLoggerFactory
 {
-    private MockObject&OutputInterface $output;
-
-    private MockObject&AbstractTestFrameworkAdapter $testFramework;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
-        $this->testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+    public function __construct(
+        private bool $skipProgressBar,
+        private bool $debug,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+    ) {
     }
 
-    public function test_it_reacts_on_mutants_creating_event(): void
+    public function create(OutputInterface $output): InitialTestExecutionLogger
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Running initial test suite...',
-                '',
-                'PHPUnit version: 6.5.4',
-            ]);
-
-        $this->testFramework->expects($this->once())
-            ->method('getVersion')
-            ->willReturn('6.5.4');
-
-        $this->testFramework->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPUnit');
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
-
-        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
+        return $this->skipProgressBar
+            ? new ConsoleNoProgressLogger(
+                $output,
+                $this->staticAnalysisToolAdapter,
+            )
+            : new ConsoleProgressBarLogger(
+                $output,
+                $this->staticAnalysisToolAdapter,
+                $this->debug,
+            );
     }
 }

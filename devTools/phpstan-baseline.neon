@@ -367,7 +367,7 @@ parameters:
 			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
 
 		-
-			message: '#^Parameter \#1 \$output of method Infection\\Event\\Subscriber\\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory\:\:create\(\) expects Symfony\\Component\\Console\\Output\\OutputInterface, Infection\\Tests\\Fixtures\\Console\\FakeOutput given\.$#'
+			message: '#^Parameter \#1 \$output of method Infection\\Logger\\ArtefactCollection\\InitialTestExecution\\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory\:\:create\(\) expects Symfony\\Component\\Console\\Output\\OutputInterface, Infection\\Tests\\Fixtures\\Console\\FakeOutput given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Event/Subscriber/InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest.php

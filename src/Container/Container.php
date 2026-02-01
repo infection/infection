@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -60,8 +61,6 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
-use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
@@ -84,6 +83,9 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerSubscriberFactory;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutionLoggerFactory;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutionLoggerSubscriberFactory;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
@@ -398,19 +400,19 @@ final class Container extends DIContainer
                     $config->tmpDir,
                 );
             },
-            InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
+            InitialTestExecutionLoggerFactory::class => static function (self $container): InitialTestExecutionLoggerFactory {
                 $config = $container->getConfiguration();
 
-                return new InitialTestsConsoleLoggerSubscriberFactory(
+                return new InitialTestExecutionLoggerFactory(
                     $config->noProgress,
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled,
                 );
             },
-            InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
+            InitialStaticAnalysisExecutionLoggerFactory::class => static function (self $container): InitialStaticAnalysisExecutionLoggerFactory {
                 $config = $container->getConfiguration();
 
-                return new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+                return new InitialStaticAnalysisExecutionLoggerFactory(
                     $config->noProgress,
                     $config->isDebugEnabled,
                     $container->getStaticAnalysisToolAdapter(),
@@ -816,14 +818,14 @@ final class Container extends DIContainer
         return $this->get(DispatchPcntlSignalSubscriberFactory::class);
     }
 
-    public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestsConsoleLoggerSubscriberFactory
+    public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestExecutionLoggerSubscriberFactory
     {
-        return $this->get(InitialTestsConsoleLoggerSubscriberFactory::class);
+        return $this->get(InitialTestExecutionLoggerSubscriberFactory::class);
     }
 
-    public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory
+    public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisExecutionLoggerSubscriberFactory
     {
-        return $this->get(InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class);
+        return $this->get(InitialStaticAnalysisExecutionLoggerSubscriberFactory::class);
     }
 
     public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory

@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Subscriber\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;

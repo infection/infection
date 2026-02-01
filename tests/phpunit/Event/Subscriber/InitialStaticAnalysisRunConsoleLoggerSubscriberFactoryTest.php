@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Subscriber\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerSubscriberFactory;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -46,7 +46,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class)]
+#[CoversClass(InitialStaticAnalysisExecutionLoggerSubscriberFactory::class)]
 final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
@@ -63,7 +63,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+        $factory = new InitialStaticAnalysisExecutionLoggerSubscriberFactory(
             true,
             $debug,
             $this->staticAnalysisToolAdapter,
@@ -77,7 +77,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+        $factory = new InitialStaticAnalysisExecutionLoggerSubscriberFactory(
             false,
             $debug,
             $this->staticAnalysisToolAdapter,

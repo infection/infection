@@ -33,17 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompletedSubscriber;
+use Infection\AbstractTestFramework\InvalidVersion;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
-use const PHP_EOL;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,53 +46,44 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber
+final readonly class ConsoleNoProgressLogger implements InitialTestExecutionLogger
 {
     private ProgressBar $progressBar;
 
     public function __construct(
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
-        private bool $debug,
+        private TestFrameworkAdapter|StaticAnalysisToolAdapter $testFramework,
     ) {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
     }
 
-    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
+    public function start(): void
     {
         try {
-            $version = $this->staticAnalysisToolAdapter->getVersion();
-        } catch (InvalidArgumentException) {
+            $version = $this->testFramework->getVersion();
+        } catch (InvalidVersion|InvalidArgumentException) {
             $version = 'unknown';
         }
 
         $this->output->writeln([
             '',
-            '',
-            'Running initial Static Analysis...',
-            '',
             sprintf(
-                '%s version: %s',
-                $this->staticAnalysisToolAdapter->getName(),
+                'Initial execution of %s version: %s',
+                $this->testFramework->getName(),
                 $version,
             ),
             '',
         ]);
-        $this->progressBar->start();
     }
 
-    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    public function advance(): void
     {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->outputText);
-        }
     }
 
-    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
+    public function finish(string $executionOutput): void
     {
-        $this->progressBar->advance();
+        // TODO: currently we do not log anything... But I don't think that's good.
+        //   for example we could at least log metrics... or still if debug mode is enabled.
     }
 }
