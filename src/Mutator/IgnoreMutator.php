@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use DomainException;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
 use function sprintf;
@@ -84,7 +84,7 @@ final readonly class IgnoreMutator implements Mutator
             return false;
         }
 
-        $reflectionClass = ReflectionVisitor::findReflectionClass($node);
+        $reflectionClass = NodeAnnotator::findReflectionClass($node);
 
         if (!$reflectionClass instanceof ClassReflection) {
             return true;
@@ -92,7 +92,7 @@ final readonly class IgnoreMutator implements Mutator
 
         return !$this->config->isIgnored(
             $reflectionClass->getName(),
-            $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
+            NodeAnnotator::getFunctionName($node),
             $node->getStartLine(),
         );
     }

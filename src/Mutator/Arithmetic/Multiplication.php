@@ -40,8 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeAttributes;
-use Infection\PhpParser\Visitor\ParentConnector;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use function is_string;
 use PhpParser\Node;
 
@@ -97,13 +96,13 @@ final class Multiplication implements Mutator
             return false;
         }
 
-        $functionScope = ReflectionVisitor::findFunctionScope($node);
+        $functionScope = NodeAnnotator::findFunctionScope($node);
 
         if (!$functionScope instanceof Node\Stmt\ClassMethod) {
             return true;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         if (!$parentNode instanceof Node\Stmt\Return_) {
             return true;

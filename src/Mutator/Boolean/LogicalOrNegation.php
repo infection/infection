@@ -40,7 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeAttributes;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -94,7 +94,7 @@ final class LogicalOrNegation implements Mutator
             return false;
         }
 
-        $parent = ParentConnector::findParent($node);
+        $parent = NodeAnnotator::findParent($node);
 
         if ($parent instanceof Node\Expr\BinaryOp\BooleanOr) {
             return false;

@@ -40,7 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use Webmozart\Assert\Assert;
@@ -93,7 +93,7 @@ final class Finally_ implements Mutator
     private function hasAtLeastOneCatchBlock(Node $node): bool
     {
         /** @var Node\Stmt\TryCatch $parentNode */
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
         Assert::isInstanceOf($parentNode, Node\Stmt\TryCatch::class);
 
         return count($parentNode->catches) > 0;
