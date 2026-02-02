@@ -38,6 +38,7 @@ namespace Infection\Event\Subscriber;
 use Infection\Differ\DiffColorizer;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,7 +52,7 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
         private MetricsCalculator $metricsCalculator,
         private ResultsCollector $resultsCollector,
         private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
+        private MutationTestingResultsLogger $mutationTestingResultsLogger,
         private ?int $numberOfShownMutations,
         private MutationAnalysisLogger $logger,
         private bool $withUncovered,

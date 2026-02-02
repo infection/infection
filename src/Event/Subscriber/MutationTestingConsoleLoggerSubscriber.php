@@ -91,7 +91,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         private readonly MetricsCalculator $metricsCalculator,
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
-        private readonly FederatedLogger $mutationTestingResultsLogger,
+        private readonly MutationTestingResultsLogger $reporter,
         private readonly ?int $numberOfShownMutations,
         private readonly bool $withUncovered,
         private readonly bool $withTimeouts,
@@ -145,7 +145,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         }
 
         $this->showMetrics();
-        $this->showGeneratedLogFiles();
+        $this->reporter->log();
 
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
@@ -273,47 +273,6 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         $this->output->writeln(
             $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>"),
         );
-    }
-
-    private function showGeneratedLogFiles(): void
-    {
-        $hasLoggers = false;
-
-        /** @var FileLogger $fileLogger */
-        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->loggers) as $fileLogger) {
-            if (!$hasLoggers) {
-                $this->output->writeln(['', 'Generated Reports:']);
-            }
-            $this->output->writeln(
-                $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
-            );
-            $hasLoggers = true;
-        }
-
-        if ($hasLoggers) {
-            return;
-        }
-
-        // for the case when no file loggers are configured and `--show-mutations` is not used
-        if ($this->numberOfShownMutations === 0) {
-            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.']);
-        }
-    }
-
-    /**
-     * @param array<int, MutationTestingResultsLogger> $allLoggers
-     *
-     * @return Generator<MutationTestingResultsLogger>
-     */
-    private function getFileLoggers(array $allLoggers): Generator
-    {
-        foreach ($allLoggers as $logger) {
-            if ($logger instanceof FederatedLogger) {
-                yield from $this->getFileLoggers($logger->loggers);
-            } elseif ($logger instanceof FileLogger && !str_starts_with($logger->getFilePath(), 'php://')) {
-                yield $logger;
-            }
-        }
     }
 
     private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string

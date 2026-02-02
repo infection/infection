@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use Infection\Logger\Console\FileLocationReporter;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -473,14 +474,20 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FederatedLogger(...array_filter([
-                $container->getFileLoggerFactory()->createFromLogEntries(
-                    $container->getConfiguration()->logs,
+            MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FileLocationReporter(
+                decoratedReporter: new FederatedLogger(
+                    ...array_filter([
+                        $container->getFileLoggerFactory()->createFromLogEntries(
+                            $container->getConfiguration()->logs,
+                        ),
+                        $container->getStrykerLoggerFactory()->createFromLogEntries(
+                            $container->getConfiguration()->logs,
+                        ),
+                    ]),
                 ),
-                $container->getStrykerLoggerFactory()->createFromLogEntries(
-                    $container->getConfiguration()->logs,
-                ),
-            ])),
+                numberOfShownMutations: $container->getConfiguration()->numberOfShownMutations,
+                output: $container->getOutput(),
+            ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 

@@ -15,6 +15,12 @@
         ]
     },
     "logs": {
+        "text": "var/reports/text",
+        "html": "var/reports/html",
+        "debug": "var/reports/debug",
+        "json": "var/reports/report.json",
+        "summary": "var/reports/summary",
+        "summaryJson": "var/reports/summary.json",
         "stryker": {
             "report": "master"
         }
