@@ -2856,16 +2856,16 @@
         },
         {
             "name": "nette/utils",
-            "version": "v4.1.1",
+            "version": "v4.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "b8334e6a9bd645c6b7662b527c163f4a7eb0cbde"
+                "reference": "bb9f899904e11f1e764014144c693ee983796965"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/b8334e6a9bd645c6b7662b527c163f4a7eb0cbde",
-                "reference": "b8334e6a9bd645c6b7662b527c163f4a7eb0cbde",
+                "url": "https://api.github.com/repos/nette/utils/zipball/bb9f899904e11f1e764014144c693ee983796965",
+                "reference": "bb9f899904e11f1e764014144c693ee983796965",
                 "shasum": ""
             },
             "require": {
@@ -2878,7 +2878,7 @@
             "require-dev": {
                 "jetbrains/phpstorm-attributes": "^1.2",
                 "nette/tester": "^2.5",
-                "phpstan/phpstan-nette": "^2.0@stable",
+                "phpstan/phpstan": "^2.0@stable",
                 "tracy/tracy": "^2.9"
             },
             "suggest": {
@@ -2939,9 +2939,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.1.1"
+                "source": "https://github.com/nette/utils/tree/v4.1.2"
             },
-            "time": "2025-12-22T12:06:15+00:00"
+            "time": "2026-02-03T17:00:23+00:00"
         },
         {
             "name": "phar-io/manifest",
