@@ -33,44 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Reporter\SummaryFileReporter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+#[CoversClass(SummaryFileReporter::class)]
+final class SummaryFileLoggerTest extends TestCase
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
+    use CreateMetricsCalculator;
+    use LineReporterAssertions;
+
+    #[DataProvider('metricsProvider')]
+    public function test_it_reports_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents,
+    ): void {
+        $reporter = new SummaryFileReporter($metricsCalculator);
+
+        $this->assertReportedContentIs($expectedContents, $reporter);
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public static function metricsProvider(): iterable
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        yield 'no mutations' => [
+            new MetricsCalculator(2),
+            <<<'TXT'
+                Total: 0
+
+                Killed by Test Framework: 0
+                Killed by Static Analysis: 0
+                Errored: 0
+                Syntax Errors: 0
+                Escaped: 0
+                Timed Out: 0
+                Skipped: 0
+                Ignored: 0
+                Not Covered: 0
+
+                TXT,
+        ];
+
+        yield 'all mutations' => [
+            self::createCompleteMetricsCalculator(),
+            <<<'TXT'
+                Total: 17
+
+                Killed by Test Framework: 2
+                Killed by Static Analysis: 1
+                Errored: 2
+                Syntax Errors: 2
+                Escaped: 2
+                Timed Out: 2
+                Skipped: 2
+                Ignored: 2
+                Not Covered: 2
+
+                TXT,
+        ];
     }
 }

@@ -33,44 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter\Http;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class Response
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
-    }
+    public const HTTP_OK = 200;
 
-    public function create(OutputInterface $output): EventSubscriber
-    {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
+    public const HTTP_CREATED = 201;
+
+    public const HTTP_MAX_ERROR_CODE = 599;
+
+    public function __construct(
+        public int $statusCode,
+        public string $body,
+    ) {
+        Assert::range(
+            $statusCode,
+            self::HTTP_OK,
+            self::HTTP_MAX_ERROR_CODE,
+            'Expected an HTTP status code. Got "%s"',
         );
     }
 }

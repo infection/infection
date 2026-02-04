@@ -50,13 +50,13 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
-use Infection\Logger\FederatedLogger;
-use Infection\Logger\FileLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\FileReporter;
+use Infection\Reporter\Reporter;
 use LogicException;
 use function sprintf;
 use function str_pad;
@@ -91,7 +91,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         private readonly MetricsCalculator $metricsCalculator,
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
-        private readonly FederatedLogger $mutationTestingResultsLogger,
+        private readonly FederatedReporter $mutationTestingResultsLogger,
         private readonly ?int $numberOfShownMutations,
         private readonly bool $withUncovered,
         private readonly bool $withTimeouts,
@@ -279,8 +279,8 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     {
         $hasLoggers = false;
 
-        /** @var FileLogger $fileLogger */
-        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->loggers) as $fileLogger) {
+        /** @var FileReporter $fileLogger */
+        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->reporters) as $fileLogger) {
             if (!$hasLoggers) {
                 $this->output->writeln(['', 'Generated Reports:']);
             }
@@ -301,16 +301,16 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     }
 
     /**
-     * @param array<int, MutationTestingResultsLogger> $allLoggers
+     * @param array<int, Reporter> $allLoggers
      *
-     * @return Generator<MutationTestingResultsLogger>
+     * @return Generator<Reporter>
      */
     private function getFileLoggers(array $allLoggers): Generator
     {
         foreach ($allLoggers as $logger) {
-            if ($logger instanceof FederatedLogger) {
-                yield from $this->getFileLoggers($logger->loggers);
-            } elseif ($logger instanceof FileLogger && !str_starts_with($logger->getFilePath(), 'php://')) {
+            if ($logger instanceof FederatedReporter) {
+                yield from $this->getFileLoggers($logger->reporters);
+            } elseif ($logger instanceof FileReporter && !str_starts_with($logger->getFilePath(), 'php://')) {
                 yield $logger;
             }
         }

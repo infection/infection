@@ -33,44 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class SummaryJsonReporter implements LineMutationTestingResultsReporter
 {
     public function __construct(
         private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    /**
+     * @return array{0: string}
+     */
+    public function getLines(): array
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        $data = [
+            'stats' => [
+                'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
+                'killedCount' => $this->metricsCalculator->getKilledByTestsCount(),
+                'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
+                'escapedCount' => $this->metricsCalculator->getEscapedCount(),
+                'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
+                'skippedCount' => $this->metricsCalculator->getSkippedCount(),
+                'ignoredCount' => $this->metricsCalculator->getIgnoredCount(),
+                'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
+                'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
+                'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
+                'coveredCodeMsi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            ],
+        ];
+
+        return [json_encode($data, JSON_THROW_ON_ERROR)];
     }
 }

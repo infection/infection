@@ -33,44 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
+use function sprintf;
+use function trim;
 
 /**
+ * Uses the GitHub Actions line grouping feature to make the output more digestable and collapsable.
+ *
+ * @see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#grouping-log-lines
+ *
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class GitHubActionsLogTextFileReporter extends BaseTextFileReporter
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
+    protected function getHeadlineLines(string $headlinePrefix): string
+    {
+        return '';
     }
 
-    public function create(OutputInterface $output): EventSubscriber
-    {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    protected function getResultsLine(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections,
+    ): string {
+        $results = trim(parent::getResultsLine($executionResults, $headlinePrefix, $separateSections));
+
+        if ($results === '') {
+            return sprintf('0 %s mutants' . PHP_EOL, $headlinePrefix);
+        }
+
+        return sprintf('::group::%s mutants' . PHP_EOL . '%s' . PHP_EOL . '::endgroup::' . PHP_EOL, $headlinePrefix, $results);
     }
 }

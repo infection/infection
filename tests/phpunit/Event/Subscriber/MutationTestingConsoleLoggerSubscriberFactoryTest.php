@@ -41,11 +41,11 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Framework\Str;
-use Infection\Logger\FederatedLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Reporter\FederatedReporter;
 use Infection\Tests\Logger\MutationAnalysis\FakeMutationAnalysisLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -96,7 +96,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $this->metricsCalculatorMock,
             $this->resultsCollectorMock,
             $this->diffColorizerMock,
-            new FederatedLogger(),
+            new FederatedReporter(),
             $numberOfShownMutations,
             new FakeMutationAnalysisLogger(),
             withUncovered: true,
@@ -142,7 +142,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $metricsCalculator,
             $resultsCollector,
             $diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             $outputFormatter,
             withUncovered: false,
@@ -196,7 +196,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $metricsCalculator,
             $resultsCollector,
             $diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             $outputFormatter,
             withUncovered: false,

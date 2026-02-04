@@ -33,44 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
+ * Simple loggers recording the mutation result counts. This is mostly intended for internal
+ * purposes e.g. some end-to-end tests.
+ *
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class SummaryFileReporter implements LineMutationTestingResultsReporter
 {
     public function __construct(
         private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function getLines(): array
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        return [
+            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
+            '',
+            'Killed by Test Framework: ' . $this->metricsCalculator->getKilledByTestsCount(),
+            'Killed by Static Analysis: ' . $this->metricsCalculator->getKilledByStaticAnalysisCount(),
+            'Errored: ' . $this->metricsCalculator->getErrorCount(),
+            'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
+            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
+            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
+            'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
+            'Ignored: ' . $this->metricsCalculator->getIgnoredCount(),
+            'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
+            '',
+        ];
     }
 }

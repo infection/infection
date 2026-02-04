@@ -33,44 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Configuration\Entry\Logs;
+use Infection\Environment\BuildContextResolver;
+use Infection\Environment\StrykerApiKeyResolver;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Reporter\Html\StrykerHtmlReportBuilder;
+use Infection\Reporter\Http\StrykerCurlClient;
+use Infection\Reporter\Http\StrykerDashboardClient;
+use OndraM\CiDetector\CiDetector;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
+ * @final
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+class StrykerLoggerFactory
 {
     public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
+        private readonly MetricsCalculator $metricsCalculator,
+        private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        private readonly CiDetector $ciDetector,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function createFromLogEntries(Logs $logConfig): ?Reporter
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
+        $strykerConfig = $logConfig->getStrykerConfig();
+
+        if ($strykerConfig === null) {
+            return null;
+        }
+
+        return new StrykerReporter(
+            new BuildContextResolver($this->ciDetector),
+            new StrykerApiKeyResolver(),
+            new StrykerDashboardClient(
+                new StrykerCurlClient(),
+                $this->logger,
+            ),
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
+            $this->strykerHtmlReportBuilder,
+            $strykerConfig,
+            $this->logger,
         );
     }
 }

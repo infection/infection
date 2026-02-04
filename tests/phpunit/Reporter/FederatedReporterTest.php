@@ -33,44 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Reporter\Reporter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+#[CoversClass(FederatedReporter::class)]
+final class FederatedReporterTest extends TestCase
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
-    }
-
-    public function create(OutputInterface $output): EventSubscriber
+    public function test_it_reports_with_all_the_registered_reporters(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        $reporter1 = $this->createMock(Reporter::class);
+        $reporter1
+            ->expects($this->once())
+            ->method('report')
+        ;
+
+        $reporter2 = $this->createMock(Reporter::class);
+        $reporter2
+            ->expects($this->once())
+            ->method('report')
+        ;
+
+        (new FederatedReporter($reporter1, $reporter2))->report();
     }
 }

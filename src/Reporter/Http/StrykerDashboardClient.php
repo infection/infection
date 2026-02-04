@@ -33,44 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter\Http;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use function in_array;
+use Psr\Log\LoggerInterface;
+use function sprintf;
 
 /**
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+class StrykerDashboardClient
 {
     public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
+        private readonly StrykerCurlClient $client,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
-    {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
+    public function sendReport(
+        string $repositorySlug,
+        string $branch,
+        string $apiKey,
+        string $reportJson,
+    ): void {
+        $response = $this->client->request(
+            $repositorySlug,
+            $branch,
+            $apiKey,
+            $reportJson,
         );
+
+        $statusCode = $response->statusCode;
+
+        if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
+            $this->logger->warning(sprintf(
+                'Stryker dashboard returned an unexpected response code: %s',
+                $statusCode),
+            );
+        }
+
+        $this->logger->notice(sprintf(
+            'Dashboard response:%s%s',
+            "\r\n",
+            $response->body,
+        ));
     }
 }

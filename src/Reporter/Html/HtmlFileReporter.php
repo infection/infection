@@ -33,44 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter\Html;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Reporter\LineMutationTestingResultsReporter;
+use function Safe\json_encode;
 
 /**
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class HtmlFileReporter implements LineMutationTestingResultsReporter
 {
     public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
+        private StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function getLines(): array
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        return [
+            <<<"HTML"
+                <!DOCTYPE html>
+                <html>
+                    <body>
+                        <a href="/">Back</a>
+                        <mutation-test-report-app title-postfix="Infection"></mutation-test-report-app>
+                        <script defer src="https://cdn.jsdelivr.net/npm/mutation-testing-elements/dist/mutation-test-elements.js"></script>
+                        <script>
+                            const app = document.getElementsByTagName('mutation-test-report-app').item(0);
+                            function updateTheme() {
+                                document.body.style.backgroundColor = app.themeBackgroundColor;
+                            }
+                            app.addEventListener('theme-changed', updateTheme);
+                            updateTheme();
+
+                            document.getElementsByTagName('mutation-test-report-app').item(0).report = {$this->getMutationTestingReport()}
+                            ;
+                        </script>
+                    </body>
+                </html>
+                HTML,
+        ];
+    }
+
+    private function getMutationTestingReport(): string
+    {
+        return json_encode($this->strykerHtmlReportBuilder->build());
     }
 }

@@ -33,44 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Reporter\Http;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Reporter\Http\Response;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+#[CoversClass(Response::class)]
+final class ResponseTest extends TestCase
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedReporter $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
+    #[DataProvider('valueProvider')]
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
+    {
+        $response = new Response($statusCode, $body);
+
+        $this->assertSame($statusCode, $response->statusCode);
+        $this->assertSame($body, $response->body);
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_http_status_code(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        try {
+            new Response(102, '');
+
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage(),
+            );
+        }
+    }
+
+    public static function valueProvider(): iterable
+    {
+        yield 'empty' => [200, ''];
+
+        yield 'nominal' => [200, 'body'];
     }
 }

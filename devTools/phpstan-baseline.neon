@@ -28,7 +28,7 @@ parameters:
 			message: '#^Offset ''name'' might not exist on array\{0\?\: string, name\?\: non\-falsy\-string, 1\?\: non\-falsy\-string, dataname\?\: non\-falsy\-string, 2\?\: non\-falsy\-string\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
 
 		-
 			message: '#^Parameter \#1 \$array of function array_intersect expects an array of values castable to string, list\<PhpParser\\Node\\Expr\|string\> given\.$#'
@@ -451,28 +451,28 @@ parameters:
 			path: ../tests/phpunit/Logger/Console/ConsoleLoggerTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\FileLoggerFactoryTest\:\:assertRegisteredLoggersAre\(\) has parameter \$expectedLoggerClasses with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Reporter\\FileReporterFactoryTest\:\:assertRegisteredReportersAre\(\) has parameter \$expectedReporterClassNames with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: ../tests/phpunit/Logger/FileLoggerFactoryTest.php
+			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\FileLoggerFactoryTest\:\:test_it_creates_a_logger_for_log_type_on_normal_verbosity\(\) has parameter \$expectedLoggerClasses with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Reporter\\FileReporterFactoryTest\:\:test_it_creates_a_reporter_for_log_type_on_normal_verbosity\(\) has parameter \$expectedReporterClassNames with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: ../tests/phpunit/Logger/FileLoggerFactoryTest.php
+			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
 
 		-
 			message: '#^Parameter \#2 \$processOutput of class Infection\\Mutant\\MutantExecutionResult constructor expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
+			path: ../tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php
 
 		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/Logger/StrykerLoggerFactoryTest.php
+			path: ../tests/phpunit/Reporter/StrykerLoggerFactoryTest.php
 
 		-
 			message: '#^Parameter \#4 \$mutantDiff of class Infection\\Mutant\\MutantExecutionResult constructor expects Later\\Interfaces\\Deferred\<string\>, Later\\Interfaces\\Deferred\<non\-falsy\-string\> given\.$#'

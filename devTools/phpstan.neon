@@ -25,10 +25,10 @@ parameters:
             message: '#^Method Infection\\Mutator\\MutatorResolver::resolveSettings\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
             count: 1
         -
-            path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
+            path: '../src/Reporter/Html/StrykerHtmlReportBuilder.php'
             message: '#return type has no value type specified in iterable type array#'
         -
-            path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
+            path: '../src/Reporter/Html/StrykerHtmlReportBuilder.php'
             message: '#return type with generic class ArrayObject does not specify its types\: TKey, TValue#'
 
         -

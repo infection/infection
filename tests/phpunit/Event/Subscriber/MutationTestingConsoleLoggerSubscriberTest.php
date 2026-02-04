@@ -41,16 +41,16 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasF
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
-use Infection\Logger\FederatedLogger;
-use Infection\Logger\FileLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
+use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\FileReporter;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
-use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
+use Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter;
+use Infection\Tests\Reporter\FakeReporter;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -100,7 +100,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             0,
             withUncovered: true,
             withTimeouts: false,
@@ -128,7 +128,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             0,
             withUncovered: true,
             withTimeouts: false,
@@ -154,7 +154,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             0,
             withUncovered: true,
             withTimeouts: false,
@@ -201,7 +201,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             withUncovered: true,
             withTimeouts: false,
@@ -276,7 +276,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             withUncovered: true,
             withTimeouts: false,
@@ -380,7 +380,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             withUncovered: true,
             withTimeouts: false,
@@ -447,23 +447,23 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(
-                new FederatedLogger(
-                    new FileLogger(
+            new FederatedReporter(
+                new FederatedReporter(
+                    new FileReporter(
                         'relative/path.log',
                         new Filesystem(),
-                        new DummyLineMutationTestingResultsLogger([]),
+                        new DummyLineMutationTestingResultsReporter([]),
                         new FakeLogger(),
                     ),
-                    new FileLogger(
+                    new FileReporter(
                         '/absolute/path.html',
                         new Filesystem(),
-                        new DummyLineMutationTestingResultsLogger([]),
+                        new DummyLineMutationTestingResultsReporter([]),
                         new FakeLogger(),
                     ),
-                    new FakeMutationTestingResultsLogger(),
+                    new FakeReporter(),
                 ),
-                new FakeMutationTestingResultsLogger(),
+                new FakeReporter(),
             ),
             0,
             withUncovered: true,
@@ -498,7 +498,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(/* no file loggers */),
+            new FederatedReporter(/* no file loggers */),
             0,
             withUncovered: true,
             withTimeouts: false,
@@ -523,7 +523,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(/* no file loggers */),
+            new FederatedReporter(/* no file loggers */),
             20,
             withUncovered: true,
             withTimeouts: false,
@@ -565,7 +565,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             1,
             withUncovered: true,
             withTimeouts: false,
@@ -611,7 +611,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             null,
             withUncovered: true,
             withTimeouts: false,
@@ -638,7 +638,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             1,
             withUncovered: true,
             withTimeouts: false,
@@ -674,7 +674,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
             withUncovered: true,
             withTimeouts: false,
@@ -716,7 +716,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20, // Use 20 to ensure getEscapedExecutionResults is called
             withUncovered: false,
             withTimeouts: false,
@@ -752,7 +752,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             withUncovered: false,
             withTimeouts: false,
@@ -804,7 +804,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedLogger(),
+            new FederatedReporter(),
             20,
             withUncovered: false,
             withTimeouts: true,
