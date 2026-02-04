@@ -75,10 +75,7 @@ final class MockTeamCityCommand extends BaseCommand
         private readonly FileSystem $filesystem,
         ?Closure $sleep = null,
     ) {
-        // TODO: should be debug:mock-teamcity
-        //  https://github.com/j-plugins/infection-plugin/issues/28
         parent::__construct('debug:mock-teamcity');
-        // parent::__construct('run');
 
         $this->sleep = $sleep ?? usleep(...);
     }
