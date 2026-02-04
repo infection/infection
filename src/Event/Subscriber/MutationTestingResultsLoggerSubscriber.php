@@ -45,12 +45,12 @@ use Infection\Reporter\Reporter;
 final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
 {
     public function __construct(
-        private Reporter $logger,
+        private Reporter $reporter,
     ) {
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->logger->report();
+        $this->reporter->report();
     }
 }

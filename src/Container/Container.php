@@ -118,7 +118,7 @@ use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
-use Infection\Reporter\StrykerLoggerFactory;
+use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -429,14 +429,14 @@ final class Container extends DIContainer
             ),
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
-                /** @var FederatedReporter $federatedMutationTestingResultsLogger */
-                $federatedMutationTestingResultsLogger = $container->getMutationTestingResultsLogger();
+                /** @var FederatedReporter $reporter */
+                $reporter = $container->getReporter();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
-                    $federatedMutationTestingResultsLogger,
+                    $reporter,
                     $config->numberOfShownMutations,
                     $container->getMutationAnalysisLogger(),
                     !$config->mutateOnlyCoveredCode(),
@@ -474,7 +474,7 @@ final class Container extends DIContainer
                 );
             },
             Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
-                $container->getFileLoggerFactory()->createFromConfiguration(
+                $container->getFileReporterFactory()->createFromConfiguration(
                     $container->getConfiguration()->logs,
                 ),
                 $container->getStrykerLoggerFactory()->createFromLogEntries(
@@ -866,17 +866,17 @@ final class Container extends DIContainer
         return $this->get(FileMutationGenerator::class);
     }
 
-    public function getFileLoggerFactory(): FileReporterFactory
+    public function getFileReporterFactory(): FileReporterFactory
     {
         return $this->get(FileReporterFactory::class);
     }
 
-    public function getStrykerLoggerFactory(): StrykerLoggerFactory
+    public function getStrykerLoggerFactory(): StrykerReporterFactory
     {
-        return $this->get(StrykerLoggerFactory::class);
+        return $this->get(StrykerReporterFactory::class);
     }
 
-    public function getMutationTestingResultsLogger(): Reporter
+    public function getReporter(): Reporter
     {
         return $this->get(Reporter::class);
     }

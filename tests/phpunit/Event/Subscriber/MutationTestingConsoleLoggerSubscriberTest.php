@@ -436,7 +436,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         );
     }
 
-    public function test_it_outputs_generated_file_log_paths_if_enabled(): void
+    public function test_it_outputs_generated_file_report_paths_if_enabled(): void
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
@@ -482,12 +482,12 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $output,
         );
         $this->assertStringNotContainsString(
-            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.',
+            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.',
             $output,
         );
     }
 
-    public function test_it_displays_a_tip_to_enable_file_loggers_or_show_mutations_option(): void
+    public function test_it_displays_a_tip_to_enable_file_reporters_or_show_mutations_option(): void
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
@@ -498,7 +498,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedReporter(/* no file loggers */),
+            new FederatedReporter(/* no file reporters */),
             0,
             withUncovered: true,
             withTimeouts: false,
@@ -507,7 +507,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $this->assertStringContainsString(
-            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.',
+            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.',
             $this->getDisplay($output),
         );
     }
@@ -523,7 +523,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            new FederatedReporter(/* no file loggers */),
+            new FederatedReporter(/* no file reporters */),
             20,
             withUncovered: true,
             withTimeouts: false,
@@ -532,7 +532,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $this->assertStringNotContainsString(
-            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
+            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file reporters.',
             $this->getDisplay($output),
         );
     }

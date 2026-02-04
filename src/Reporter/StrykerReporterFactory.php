@@ -49,7 +49,7 @@ use Psr\Log\LoggerInterface;
  * @internal
  * @final
  */
-class StrykerLoggerFactory
+class StrykerReporterFactory
 {
     public function __construct(
         private readonly MetricsCalculator $metricsCalculator,

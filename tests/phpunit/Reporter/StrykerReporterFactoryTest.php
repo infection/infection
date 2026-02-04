@@ -40,8 +40,8 @@ use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
-use Infection\Reporter\StrykerLoggerFactory;
 use Infection\Reporter\StrykerReporter;
+use Infection\Reporter\StrykerReporterFactory;
 use Infection\Tests\Fixtures\FakeCiDetector;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -50,8 +50,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
-#[CoversClass(StrykerLoggerFactory::class)]
-final class StrykerLoggerFactoryTest extends TestCase
+#[CoversClass(StrykerReporterFactory::class)]
+final class StrykerReporterFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_reporter_for_no_verbosity_level_and_no_badge(): void
     {
@@ -100,19 +100,19 @@ final class StrykerLoggerFactoryTest extends TestCase
     #[DataProvider('configProvider')]
     public function test_it_creates_a_reporter_for_log_type_on_normal_verbosity(
         Logs $logs,
-        ?string $expectedLogger,
+        ?string $expected,
     ): void {
         $factory = $this->createReporterFactory();
 
         $reporter = $factory->createFromLogEntries($logs);
 
-        if ($expectedLogger === null) {
+        if ($expected === null) {
             $this->assertNull($reporter);
 
             return;
         }
 
-        $this->assertInstanceOf($expectedLogger, $reporter);
+        $this->assertInstanceOf($expected, $reporter);
     }
 
     public static function configProvider(): iterable
@@ -171,11 +171,11 @@ final class StrykerLoggerFactoryTest extends TestCase
         ];
     }
 
-    private function createReporterFactory(): StrykerLoggerFactory
+    private function createReporterFactory(): StrykerReporterFactory
     {
         $metricsCalculator = new MetricsCalculator(2);
 
-        return new StrykerLoggerFactory(
+        return new StrykerReporterFactory(
             new MetricsCalculator(2),
             new StrykerHtmlReportBuilder($metricsCalculator, new ResultsCollector()),
             new FakeCiDetector(),

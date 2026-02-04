@@ -44,14 +44,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 final readonly class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private Reporter $logger,
+        private Reporter $reporter,
     ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
     {
         return new MutationTestingResultsLoggerSubscriber(
-            $this->logger,
+            $this->reporter,
         );
     }
 }

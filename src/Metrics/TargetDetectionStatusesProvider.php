@@ -60,8 +60,9 @@ class TargetDetectionStatusesProvider
     /**
      * Implementation follows the logic in LoggerFactory, TextFileLogger, etc.
      *
+     * @see TextFileReporter
+     *
      * @return array<key-of<DetectionStatus>, DetectionStatus>
-     *@see TextFileReporter
      */
     public function get(): array
     {
