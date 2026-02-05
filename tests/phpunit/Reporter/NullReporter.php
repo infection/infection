@@ -33,44 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\Reporter;
-use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final class NullReporter implements Reporter
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private Reporter $reporter,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
-    }
-
-    public function create(OutputInterface $output): EventSubscriber
+    public function report(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->reporter,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        // Do nothing
     }
 }
