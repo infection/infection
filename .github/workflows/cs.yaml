@@ -30,7 +30,7 @@ jobs:
           php-version: 8.2
 
       - name: Configure PHP-CS-Fixer GitHub Actions cache
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: ./var/cache/php-cs-fixer
           key: "8.2-php-cs-fixer-${{ github.run_id }}"
