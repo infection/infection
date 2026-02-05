@@ -91,7 +91,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         private readonly MetricsCalculator $metricsCalculator,
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
-        private readonly FederatedReporter $reporter,
+        private readonly Reporter $reporter,
         private readonly ?int $numberOfShownMutations,
         private readonly bool $withUncovered,
         private readonly bool $withTimeouts,
@@ -279,8 +279,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     {
         $hasReporters = false;
 
-        /** @var FileReporter $fileReporter */
-        foreach ($this->getFileReporters($this->reporter->reporters) as $fileReporter) {
+        foreach ($this->getFileReporters($this->reporter) as $fileReporter) {
             if (!$hasReporters) {
                 $this->output->writeln(['', 'Generated Reports:']);
             }
@@ -301,15 +300,13 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     }
 
     /**
-     * @param array<int, Reporter> $reporters
-     *
-     * @return Generator<Reporter>
+     * @return Generator<FileReporter>
      */
-    private function getFileReporters(array $reporters): Generator
+    private function getFileReporters(Reporter ...$reporters): Generator
     {
         foreach ($reporters as $reporter) {
             if ($reporter instanceof FederatedReporter) {
-                yield from $this->getFileReporters($reporter->reporters);
+                yield from $this->getFileReporters(...$reporter->reporters);
             } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
                 yield $reporter;
             }

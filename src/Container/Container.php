@@ -429,14 +429,12 @@ final class Container extends DIContainer
             ),
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
-                /** @var FederatedReporter $reporter */
-                $reporter = $container->getReporter();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
-                    $reporter,
+                    $container->getReporter(),
                     $config->numberOfShownMutations,
                     $container->getMutationAnalysisLogger(),
                     !$config->mutateOnlyCoveredCode(),

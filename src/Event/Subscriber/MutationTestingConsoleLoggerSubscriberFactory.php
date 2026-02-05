@@ -39,7 +39,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\Reporter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -51,7 +51,7 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
         private MetricsCalculator $metricsCalculator,
         private ResultsCollector $resultsCollector,
         private DiffColorizer $diffColorizer,
-        private FederatedReporter $reporter,
+        private Reporter $reporter,
         private ?int $numberOfShownMutations,
         private MutationAnalysisLogger $logger,
         private bool $withUncovered,
