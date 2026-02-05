@@ -43,13 +43,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(HtmlFileReporter::class)]
-final class HtmlFileLoggerTest extends TestCase
+final class HtmlFileReporterTest extends TestCase
 {
     public function test_it_builds_html(): void
     {
-        $htmlLogger = new HtmlFileReporter(new StrykerHtmlReportBuilder(new MetricsCalculator(2), new ResultsCollector()));
+        $reporter = new HtmlFileReporter(new StrykerHtmlReportBuilder(new MetricsCalculator(2), new ResultsCollector()));
 
-        $logLines = $htmlLogger->getLines();
+        $lines = $reporter->getLines();
 
         $this->assertSame(
             <<<'HTML'
@@ -73,7 +73,7 @@ final class HtmlFileLoggerTest extends TestCase
                     </body>
                 </html>
                 HTML,
-            $logLines[0],
+            $lines[0],
         );
     }
 }

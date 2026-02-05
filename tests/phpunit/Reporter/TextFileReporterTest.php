@@ -42,7 +42,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TextFileReporter::class)]
-final class TextFileLoggerTest extends TestCase
+final class TextFileReporterTest extends TestCase
 {
     use CreateMetricsCalculator;
     use LineReporterAssertions;

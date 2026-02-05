@@ -36,13 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Reporter;
 
 use Infection\Metrics\MetricsCalculator;
-use Infection\Reporter\SummaryFileReporter;
+use Infection\Metrics\ResultsCollector;
+use Infection\Reporter\PerMutatorReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SummaryFileReporter::class)]
-final class SummaryFileLoggerTest extends TestCase
+#[CoversClass(PerMutatorReporter::class)]
+final class PerMutatorReporterTest extends TestCase
 {
     use CreateMetricsCalculator;
     use LineReporterAssertions;
@@ -50,9 +51,10 @@ final class SummaryFileLoggerTest extends TestCase
     #[DataProvider('metricsProvider')]
     public function test_it_reports_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
+        ResultsCollector $resultsCollector,
         string $expectedContents,
     ): void {
-        $reporter = new SummaryFileReporter($metricsCalculator);
+        $reporter = new PerMutatorReporter($metricsCalculator, $resultsCollector, 20);
 
         $this->assertReportedContentIs($expectedContents, $reporter);
     }
@@ -61,36 +63,26 @@ final class SummaryFileLoggerTest extends TestCase
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
+            new ResultsCollector(),
             <<<'TXT'
-                Total: 0
+                # Effects per Mutator
 
-                Killed by Test Framework: 0
-                Killed by Static Analysis: 0
-                Errored: 0
-                Syntax Errors: 0
-                Escaped: 0
-                Timed Out: 0
-                Skipped: 0
-                Ignored: 0
-                Not Covered: 0
+                | Mutator | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out (Limit: 20 secs) | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | ------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | -------------------------- | ------- | ------- | -------- | ---------------- |
 
                 TXT,
         ];
 
         yield 'all mutations' => [
             self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             <<<'TXT'
-                Total: 17
+                # Effects per Mutator
 
-                Killed by Test Framework: 2
-                Killed by Static Analysis: 1
-                Errored: 2
-                Syntax Errors: 2
-                Escaped: 2
-                Timed Out: 2
-                Skipped: 2
-                Ignored: 2
-                Not Covered: 2
+                | Mutator   | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out (Limit: 20 secs) | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | --------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | -------------------------- | ------- | ------- | -------- | ---------------- |
+                | For_      |         8 |                        1 |  0.00 / 0.00 / 0.00 secs |                         0 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |                          1 |       1 |       1 |    66.67 |            80.00 |
+                | PregQuote |         9 |                        1 |  0.00 / 0.00 / 0.00 secs |                         1 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |                          1 |       1 |       1 |    71.43 |            83.33 |
 
                 TXT,
         ];
