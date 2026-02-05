@@ -86,6 +86,8 @@ final class FileLocationReporterTest extends TestCase
             0,
             <<<'EOF'
 
+                Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.
+
                 EOF,
         ];
 

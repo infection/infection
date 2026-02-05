@@ -41,6 +41,9 @@ use function str_repeat;
 use function str_starts_with;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @internal
+ */
 final readonly class FileLocationReporter implements Reporter
 {
     private const PAD_LENGTH = 8;
@@ -68,6 +71,11 @@ final readonly class FileLocationReporter implements Reporter
 
         if ($hasReporters) {
             return;
+        }
+
+        // for the case when no file reporters are configured and `--show-mutations` is not used
+        if ($this->numberOfShownMutations === 0) {
+            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.']);
         }
     }
 
