@@ -33,28 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter\Html;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Reporter\LineMutationTestingResultsReporter;
+use function Safe\json_encode;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class HtmlFileReporter implements LineMutationTestingResultsReporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    public function __construct(
+        private StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+    ) {
+    }
+
+    public function getLines(): array
     {
-        $logger = $this->createMock(Reporter::class);
+        return [
+            <<<"HTML"
+                <!DOCTYPE html>
+                <html>
+                    <body>
+                        <a href="/">Back</a>
+                        <mutation-test-report-app title-postfix="Infection"></mutation-test-report-app>
+                        <script defer src="https://cdn.jsdelivr.net/npm/mutation-testing-elements/dist/mutation-test-elements.js"></script>
+                        <script>
+                            const app = document.getElementsByTagName('mutation-test-report-app').item(0);
+                            function updateTheme() {
+                                document.body.style.backgroundColor = app.themeBackgroundColor;
+                            }
+                            app.addEventListener('theme-changed', updateTheme);
+                            updateTheme();
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
+                            document.getElementsByTagName('mutation-test-report-app').item(0).report = {$this->getMutationTestingReport()}
+                            ;
+                        </script>
+                    </body>
+                </html>
+                HTML,
+        ];
+    }
 
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+    private function getMutationTestingReport(): string
+    {
+        return json_encode($this->strykerHtmlReportBuilder->build());
     }
 }

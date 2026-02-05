@@ -33,28 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
+use function sprintf;
+use function trim;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * Uses the GitHub Actions line grouping feature to make the output more digestable and collapsable.
+ *
+ * @see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#grouping-log-lines
+ *
+ * @internal
+ */
+final readonly class GitHubActionsLogTextFileReporter extends BaseTextFileReporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    protected function getHeadlineLines(string $headlinePrefix): string
     {
-        $logger = $this->createMock(Reporter::class);
+        return '';
+    }
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    protected function getResultsLine(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections,
+    ): string {
+        $results = trim(parent::getResultsLine($executionResults, $headlinePrefix, $separateSections));
 
-        $subscriber = $factory->create(new FakeOutput());
+        if ($results === '') {
+            return sprintf('0 %s mutants' . PHP_EOL, $headlinePrefix);
+        }
 
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+        return sprintf('::group::%s mutants' . PHP_EOL . '%s' . PHP_EOL . '::endgroup::' . PHP_EOL, $headlinePrefix, $results);
     }
 }

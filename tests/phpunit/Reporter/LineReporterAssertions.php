@@ -33,28 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
+use function implode;
+use Infection\Framework\Str;
+use Infection\Reporter\LineMutationTestingResultsReporter;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @phpstan-require-extends TestCase
+ */
+trait LineReporterAssertions
 {
-    public function test_it_can_create_a_subscriber(): void
-    {
-        $logger = $this->createMock(Reporter::class);
-
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
+    private function assertReportedContentIs(
+        string $expectedContents,
+        LineMutationTestingResultsReporter $reporter,
+    ): void {
+        $this->assertSame(
+            $expectedContents,
+            Str::toUnixLineEndings(implode("\n", $reporter->getLines())),
         );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }

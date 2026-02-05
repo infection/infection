@@ -33,28 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Metrics\MetricsCalculator;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * Simple loggers recording the mutation result counts. This is mostly intended for internal
+ * purposes e.g. some end-to-end tests.
+ *
+ * @internal
+ */
+final readonly class SummaryFileReporter implements LineMutationTestingResultsReporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+    ) {
+    }
+
+    public function getLines(): array
     {
-        $logger = $this->createMock(Reporter::class);
-
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+        return [
+            'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
+            '',
+            'Killed by Test Framework: ' . $this->metricsCalculator->getKilledByTestsCount(),
+            'Killed by Static Analysis: ' . $this->metricsCalculator->getKilledByStaticAnalysisCount(),
+            'Errored: ' . $this->metricsCalculator->getErrorCount(),
+            'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
+            'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
+            'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
+            'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
+            'Ignored: ' . $this->metricsCalculator->getIgnoredCount(),
+            'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
+            '',
+        ];
     }
 }

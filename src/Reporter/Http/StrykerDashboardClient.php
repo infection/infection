@@ -33,28 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter\Http;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function in_array;
+use Psr\Log\LoggerInterface;
+use function sprintf;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+class StrykerDashboardClient
 {
-    public function test_it_can_create_a_subscriber(): void
-    {
-        $logger = $this->createMock(Reporter::class);
+    public function __construct(
+        private readonly StrykerCurlClient $client,
+        private readonly LoggerInterface $logger,
+    ) {
+    }
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
+    public function sendReport(
+        string $repositorySlug,
+        string $branch,
+        string $apiKey,
+        string $reportJson,
+    ): void {
+        $response = $this->client->request(
+            $repositorySlug,
+            $branch,
+            $apiKey,
+            $reportJson,
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $statusCode = $response->statusCode;
 
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+        if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
+            $this->logger->warning(sprintf(
+                'Stryker dashboard returned an unexpected response code: %s',
+                $statusCode),
+            );
+        }
+
+        $this->logger->notice(sprintf(
+            'Dashboard response:%s%s',
+            "\r\n",
+            $response->body,
+        ));
     }
 }

@@ -33,28 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter\Http;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class Response
 {
-    public function test_it_can_create_a_subscriber(): void
-    {
-        $logger = $this->createMock(Reporter::class);
+    public const HTTP_OK = 200;
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
+    public const HTTP_CREATED = 201;
+
+    public const HTTP_MAX_ERROR_CODE = 599;
+
+    public function __construct(
+        public int $statusCode,
+        public string $body,
+    ) {
+        Assert::range(
+            $statusCode,
+            self::HTTP_OK,
+            self::HTTP_MAX_ERROR_CODE,
+            'Expected an HTTP status code. Got "%s"',
         );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }

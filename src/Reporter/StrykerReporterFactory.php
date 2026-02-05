@@ -33,28 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Configuration\Entry\Logs;
+use Infection\Environment\BuildContextResolver;
+use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Reporter\Html\StrykerHtmlReportBuilder;
+use Infection\Reporter\Http\StrykerCurlClient;
+use Infection\Reporter\Http\StrykerDashboardClient;
+use OndraM\CiDetector\CiDetector;
+use Psr\Log\LoggerInterface;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class StrykerReporterFactory
 {
-    public function test_it_can_create_a_subscriber(): void
+    public function __construct(
+        private readonly MetricsCalculator $metricsCalculator,
+        private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        private readonly CiDetector $ciDetector,
+        private readonly LoggerInterface $logger,
+    ) {
+    }
+
+    public function createFromLogEntries(Logs $logConfig): ?Reporter
     {
-        $logger = $this->createMock(Reporter::class);
+        $strykerConfig = $logConfig->getStrykerConfig();
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
+        if ($strykerConfig === null) {
+            return null;
+        }
+
+        return new StrykerReporter(
+            new BuildContextResolver($this->ciDetector),
+            new StrykerApiKeyResolver(),
+            new StrykerDashboardClient(
+                new StrykerCurlClient(),
+                $this->logger,
+            ),
+            $this->metricsCalculator,
+            $this->strykerHtmlReportBuilder,
+            $strykerConfig,
+            $this->logger,
         );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }

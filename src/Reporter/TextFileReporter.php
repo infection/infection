@@ -33,28 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function implode;
+use const PHP_EOL;
+use function sprintf;
+use function str_repeat;
+use function strlen;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class TextFileReporter extends BaseTextFileReporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    protected function getHeadlineLines(string $headlinePrefix): string
     {
-        $logger = $this->createMock(Reporter::class);
+        $headline = sprintf('%s mutants:', $headlinePrefix);
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
+        return implode(
+            PHP_EOL,
+            [
+                $headline,
+                str_repeat('=', strlen($headline)),
+                '',
+            ],
         );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }

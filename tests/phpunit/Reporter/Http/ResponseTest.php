@@ -33,28 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Reporter\Http;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Reporter\Http\Response;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+#[CoversClass(Response::class)]
+final class ResponseTest extends TestCase
 {
-    public function test_it_can_create_a_subscriber(): void
+    #[DataProvider('valueProvider')]
+    public function test_it_can_be_instantiated(int $statusCode, string $body): void
     {
-        $logger = $this->createMock(Reporter::class);
+        $response = new Response($statusCode, $body);
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
+        $this->assertSame($statusCode, $response->statusCode);
+        $this->assertSame($body, $response->body);
+    }
 
-        $subscriber = $factory->create(new FakeOutput());
+    public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_http_status_code(): void
+    {
+        try {
+            new Response(102, '');
 
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+            $this->fail();
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame(
+                'Expected an HTTP status code. Got "102"',
+                $exception->getMessage(),
+            );
+        }
+    }
+
+    public static function valueProvider(): iterable
+    {
+        yield 'empty' => [200, ''];
+
+        yield 'nominal' => [200, 'body'];
     }
 }

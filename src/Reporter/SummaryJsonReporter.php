@@ -33,28 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Metrics\MetricsCalculator;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class SummaryJsonReporter implements LineMutationTestingResultsReporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+    ) {
+    }
+
+    /**
+     * @return array{0: string}
+     */
+    public function getLines(): array
     {
-        $logger = $this->createMock(Reporter::class);
+        $data = [
+            'stats' => [
+                'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
+                'killedCount' => $this->metricsCalculator->getKilledByTestsCount(),
+                'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
+                'escapedCount' => $this->metricsCalculator->getEscapedCount(),
+                'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
+                'skippedCount' => $this->metricsCalculator->getSkippedCount(),
+                'ignoredCount' => $this->metricsCalculator->getIgnoredCount(),
+                'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
+                'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
+                'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
+                'coveredCodeMsi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            ],
+        ];
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+        return [json_encode($data, JSON_THROW_ON_ERROR)];
     }
 }

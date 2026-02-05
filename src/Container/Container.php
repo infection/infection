@@ -84,15 +84,10 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Logger\FederatedLogger;
-use Infection\Logger\FileLoggerFactory;
-use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
-use Infection\Logger\MutationTestingResultsLogger;
-use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -119,6 +114,11 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\FileReporterFactory;
+use Infection\Reporter\Html\StrykerHtmlReportBuilder;
+use Infection\Reporter\Reporter;
+use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -429,14 +429,14 @@ final class Container extends DIContainer
             ),
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
-                /** @var FederatedLogger $federatedMutationTestingResultsLogger */
-                $federatedMutationTestingResultsLogger = $container->getMutationTestingResultsLogger();
+                /** @var FederatedReporter $reporter */
+                $reporter = $container->getReporter();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
-                    $federatedMutationTestingResultsLogger,
+                    $reporter,
                     $config->numberOfShownMutations,
                     $container->getMutationAnalysisLogger(),
                     !$config->mutateOnlyCoveredCode(),
@@ -457,10 +457,10 @@ final class Container extends DIContainer
                 $container->getTracer(),
                 $container->getFileStore(),
             ),
-            FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
+            FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
 
-                return new FileLoggerFactory(
+                return new FileReporterFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getFileSystem(),
@@ -473,8 +473,8 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FederatedLogger(...array_filter([
-                $container->getFileLoggerFactory()->createFromLogEntries(
+            Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
+                $container->getFileReporterFactory()->createFromConfiguration(
                     $container->getConfiguration()->logs,
                 ),
                 $container->getStrykerLoggerFactory()->createFromLogEntries(
@@ -866,19 +866,19 @@ final class Container extends DIContainer
         return $this->get(FileMutationGenerator::class);
     }
 
-    public function getFileLoggerFactory(): FileLoggerFactory
+    public function getFileReporterFactory(): FileReporterFactory
     {
-        return $this->get(FileLoggerFactory::class);
+        return $this->get(FileReporterFactory::class);
     }
 
-    public function getStrykerLoggerFactory(): StrykerLoggerFactory
+    public function getStrykerLoggerFactory(): StrykerReporterFactory
     {
-        return $this->get(StrykerLoggerFactory::class);
+        return $this->get(StrykerReporterFactory::class);
     }
 
-    public function getMutationTestingResultsLogger(): MutationTestingResultsLogger
+    public function getReporter(): Reporter
     {
-        return $this->get(MutationTestingResultsLogger::class);
+        return $this->get(Reporter::class);
     }
 
     public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider

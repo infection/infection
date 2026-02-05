@@ -151,36 +151,6 @@ parameters:
 			path: ../src/Logger/Console/ConsoleLogger.php
 
 		-
-			rawMessage: 'Method Infection\Logger\Html\StrykerHtmlReportBuilder::build() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Logger\Html\StrykerHtmlReportBuilder::getFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Logger\Html\StrykerHtmlReportBuilder::getTestFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Logger\Html\StrykerHtmlReportBuilder::retrieveMutants() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Offset ''name'' might not exist on array{0?: string, name?: non-falsy-string, 1?: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
-
-		-
 			rawMessage: 'Parameter #1 $array of function array_intersect expects an array of values castable to string, list<PhpParser\Node\Expr|string> given.'
 			identifier: argument.type
 			count: 1
@@ -344,6 +314,36 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: ../src/Reflection/CoreClassReflection.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::build() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::getFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::getTestFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::retrieveMutants() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Offset ''name'' might not exist on array{0?: string, name?: non-falsy-string, 1?: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
@@ -859,34 +859,10 @@ parameters:
 			path: ../tests/phpunit/Logger/Console/ConsoleLoggerTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Logger\FileLoggerFactoryTest::assertRegisteredLoggersAre() has parameter $expectedLoggerClasses with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/FileLoggerFactoryTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Logger\FileLoggerFactoryTest::test_it_creates_a_logger_for_log_type_on_normal_verbosity() has parameter $expectedLoggerClasses with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/FileLoggerFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #2 $processOutput of class Infection\Mutant\MutantExecutionResult constructor expects string, string|null given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
-
-		-
 			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Logger/StrykerLoggerFactoryTest.php
 
 		-
 			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
@@ -1241,6 +1217,30 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::assertRegisteredReportersAre() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::test_it_creates_a_reporter_for_log_type_on_normal_verbosity() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #2 $processOutput of class Infection\Mutant\MutantExecutionResult constructor expects string, string|null given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php
+
+		-
+			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Reporter/StrykerReporterFactoryTest.php
 
 		-
 			rawMessage: 'Parameter $sourceDirectories of static method Infection\Source\Collector\BasicSourceCollector::create() expects array<non-empty-string>, array{string} given.'

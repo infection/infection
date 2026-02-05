@@ -33,28 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Tests\UnsupportedMethod;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+final class FakeReporter implements Reporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    public function report(): void
     {
-        $logger = $this->createMock(Reporter::class);
-
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

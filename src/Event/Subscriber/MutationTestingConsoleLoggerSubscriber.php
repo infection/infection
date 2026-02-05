@@ -50,13 +50,13 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
-use Infection\Logger\FederatedLogger;
-use Infection\Logger\FileLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\FileReporter;
+use Infection\Reporter\Reporter;
 use LogicException;
 use function sprintf;
 use function str_pad;
@@ -91,7 +91,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         private readonly MetricsCalculator $metricsCalculator,
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
-        private readonly FederatedLogger $mutationTestingResultsLogger,
+        private readonly FederatedReporter $reporter,
         private readonly ?int $numberOfShownMutations,
         private readonly bool $withUncovered,
         private readonly bool $withTimeouts,
@@ -277,41 +277,41 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
 
     private function showGeneratedLogFiles(): void
     {
-        $hasLoggers = false;
+        $hasReporters = false;
 
-        /** @var FileLogger $fileLogger */
-        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->loggers) as $fileLogger) {
-            if (!$hasLoggers) {
+        /** @var FileReporter $fileReporter */
+        foreach ($this->getFileReporters($this->reporter->reporters) as $fileReporter) {
+            if (!$hasReporters) {
                 $this->output->writeln(['', 'Generated Reports:']);
             }
             $this->output->writeln(
-                $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
+                $this->addIndentation(sprintf('- %s', $fileReporter->getFilePath())),
             );
-            $hasLoggers = true;
+            $hasReporters = true;
         }
 
-        if ($hasLoggers) {
+        if ($hasReporters) {
             return;
         }
 
-        // for the case when no file loggers are configured and `--show-mutations` is not used
+        // for the case when no file reporters are configured and `--show-mutations` is not used
         if ($this->numberOfShownMutations === 0) {
-            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.']);
+            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.']);
         }
     }
 
     /**
-     * @param array<int, MutationTestingResultsLogger> $allLoggers
+     * @param array<int, Reporter> $reporters
      *
-     * @return Generator<MutationTestingResultsLogger>
+     * @return Generator<Reporter>
      */
-    private function getFileLoggers(array $allLoggers): Generator
+    private function getFileReporters(array $reporters): Generator
     {
-        foreach ($allLoggers as $logger) {
-            if ($logger instanceof FederatedLogger) {
-                yield from $this->getFileLoggers($logger->loggers);
-            } elseif ($logger instanceof FileLogger && !str_starts_with($logger->getFilePath(), 'php://')) {
-                yield $logger;
+        foreach ($reporters as $reporter) {
+            if ($reporter instanceof FederatedReporter) {
+                yield from $this->getFileReporters($reporter->reporters);
+            } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
+                yield $reporter;
             }
         }
     }

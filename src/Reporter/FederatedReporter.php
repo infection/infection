@@ -33,28 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class FederatedReporter implements Reporter
 {
-    public function test_it_can_create_a_subscriber(): void
+    /**
+     * @var Reporter[]
+     */
+    public array $reporters;
+
+    public function __construct(Reporter ...$loggers)
     {
-        $logger = $this->createMock(Reporter::class);
+        $this->reporters = $loggers;
+    }
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+    public function report(): void
+    {
+        foreach ($this->reporters as $logger) {
+            $logger->report();
+        }
     }
 }

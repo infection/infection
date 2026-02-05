@@ -33,28 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Reporter\SummaryFileReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+#[CoversClass(SummaryFileReporter::class)]
+final class SummaryFileReporterTest extends TestCase
 {
-    public function test_it_can_create_a_subscriber(): void
+    use CreateMetricsCalculator;
+    use LineReporterAssertions;
+
+    #[DataProvider('metricsProvider')]
+    public function test_it_reports_correctly_with_mutations(
+        MetricsCalculator $metricsCalculator,
+        string $expectedContents,
+    ): void {
+        $reporter = new SummaryFileReporter($metricsCalculator);
+
+        $this->assertReportedContentIs($expectedContents, $reporter);
+    }
+
+    public static function metricsProvider(): iterable
     {
-        $logger = $this->createMock(Reporter::class);
+        yield 'no mutations' => [
+            new MetricsCalculator(2),
+            <<<'TXT'
+                Total: 0
 
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
-        );
+                Killed by Test Framework: 0
+                Killed by Static Analysis: 0
+                Errored: 0
+                Syntax Errors: 0
+                Escaped: 0
+                Timed Out: 0
+                Skipped: 0
+                Ignored: 0
+                Not Covered: 0
 
-        $subscriber = $factory->create(new FakeOutput());
+                TXT,
+        ];
 
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+        yield 'all mutations' => [
+            self::createCompleteMetricsCalculator(),
+            <<<'TXT'
+                Total: 17
+
+                Killed by Test Framework: 2
+                Killed by Static Analysis: 1
+                Errored: 2
+                Syntax Errors: 2
+                Escaped: 2
+                Timed Out: 2
+                Skipped: 2
+                Ignored: 2
+                Not Covered: 2
+
+                TXT,
+        ];
     }
 }
