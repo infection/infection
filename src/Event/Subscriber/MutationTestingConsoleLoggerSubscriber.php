@@ -37,7 +37,6 @@ namespace Infection\Event\Subscriber;
 
 use function count;
 use function floor;
-use Generator;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
@@ -54,15 +53,12 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Reporter\FederatedReporter;
-use Infection\Reporter\FileReporter;
 use Infection\Reporter\Reporter;
 use LogicException;
 use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
-use function str_starts_with;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -145,7 +141,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         }
 
         $this->showMetrics();
-        $this->showGeneratedLogFiles();
+        $this->reporter->report();
 
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
@@ -273,44 +269,6 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         $this->output->writeln(
             $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>"),
         );
-    }
-
-    private function showGeneratedLogFiles(): void
-    {
-        $hasReporters = false;
-
-        foreach ($this->getFileReporters($this->reporter) as $fileReporter) {
-            if (!$hasReporters) {
-                $this->output->writeln(['', 'Generated Reports:']);
-            }
-            $this->output->writeln(
-                $this->addIndentation(sprintf('- %s', $fileReporter->getFilePath())),
-            );
-            $hasReporters = true;
-        }
-
-        if ($hasReporters) {
-            return;
-        }
-
-        // for the case when no file reporters are configured and `--show-mutations` is not used
-        if ($this->numberOfShownMutations === 0) {
-            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.']);
-        }
-    }
-
-    /**
-     * @return Generator<FileReporter>
-     */
-    private function getFileReporters(Reporter ...$reporters): Generator
-    {
-        foreach ($reporters as $reporter) {
-            if ($reporter instanceof FederatedReporter) {
-                yield from $this->getFileReporters(...$reporter->reporters);
-            } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
-                yield $reporter;
-            }
-        }
     }
 
     private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string

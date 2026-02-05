@@ -33,49 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\FileLocationReporter;
-use Infection\Reporter\Reporter;
+use Generator;
+use function sprintf;
+use function str_repeat;
+use function str_starts_with;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class FileLocationReporter implements Reporter
 {
+    private const PAD_LENGTH = 8;
+
     public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private Reporter $reporter,
+        private Reporter $decoratedReporter,
+        private OutputInterface $output,
         private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function report(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            new FileLocationReporter(
-                $this->reporter,
-                $output,
-                $this->numberOfShownMutations,
-            ),
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        $hasReporters = false;
+
+        foreach ($this->getFileReporters($this->decoratedReporter) as $fileReporter) {
+            if (!$hasReporters) {
+                $this->output->writeln(['', 'Generated Reports:']);
+            }
+            $this->output->writeln(
+                $this->addIndentation(sprintf('- %s', $fileReporter->getFilePath())),
+            );
+            $hasReporters = true;
+        }
+
+        if ($hasReporters) {
+            return;
+        }
+    }
+
+    /**
+     * @return Generator<FileReporter>
+     */
+    private function getFileReporters(Reporter ...$reporters): Generator
+    {
+        foreach ($reporters as $reporter) {
+            if ($reporter instanceof FederatedReporter) {
+                yield from $this->getFileReporters(...$reporter->reporters);
+            } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
+                yield $reporter;
+            }
+        }
+    }
+
+    private function addIndentation(string $string): string
+    {
+        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
     }
 }
