@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Reporter;
 
 use Infection\FileSystem\FakeFileSystem;
+use Infection\Framework\Str;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporter;
@@ -68,7 +69,10 @@ final class FileLocationReporterTest extends TestCase
 
         $actual = $output->fetch();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(
+            $expected,
+            Str::toUnixLineEndings($actual),
+        );
     }
 
     public static function reporterProvider(): iterable
