@@ -37,6 +37,7 @@ namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -45,6 +46,7 @@ final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
 {
     public function __construct(
         private readonly ProgressBar $progressBar,
+        private readonly OutputInterface $output,
     ) {
     }
 
@@ -67,5 +69,10 @@ final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
         parent::finishAnalysis();
 
         $this->progressBar->finish();
+
+        $this->output->writeln([
+            '',
+            'Please note that some mutants will inevitably be harmless (i.e. false positives).',
+        ]);
     }
 }
