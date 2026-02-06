@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
-use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -83,6 +82,7 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerSubscriberFactory;
 use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutionLoggerSubscriberFactory;
@@ -120,6 +120,7 @@ use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
@@ -473,7 +474,20 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
+            ShowMutationsReporter::class => static function (self $container): ShowMutationsReporter {
+                $config = $container->getConfiguration();
+
+                return new ShowMutationsReporter(
+                    $container->getOutput(),
+                    $container->getResultsCollector(),
+                    $container->getDiffColorizer(),
+                    $config->numberOfShownMutations,
+                    !$config->mutateOnlyCoveredCode(),
+                    $config->timeoutsAsEscaped,
+                );
+            },
             Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
+                $container->get(ShowMutationsReporter::class),
                 $container->getFileReporterFactory()->createFromConfiguration(
                     $container->getConfiguration()->logs,
                 ),

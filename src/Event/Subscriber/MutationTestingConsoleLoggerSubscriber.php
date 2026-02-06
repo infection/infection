@@ -37,7 +37,6 @@ namespace Infection\Event\Subscriber;
 
 use function count;
 use function floor;
-use Infection\Differ\DiffColorizer;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
@@ -51,15 +50,10 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Reporter\Reporter;
-use LogicException;
-use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
-use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -79,20 +73,8 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
      */
     private int $mutationCount = 0;
 
-    private ?int $numberOfMutationsBudget;
-
-    public function __construct(
-        private readonly OutputInterface $output,
-        private readonly MutationAnalysisLogger $logger,
-        private readonly MetricsCalculator $metricsCalculator,
-        private readonly ResultsCollector $resultsCollector,
-        private readonly DiffColorizer $diffColorizer,
-        private readonly Reporter $reporter,
-        private readonly ?int $numberOfShownMutations,
-        private readonly bool $withUncovered,
-        private readonly bool $withTimeouts,
-    ) {
-        $this->numberOfMutationsBudget = $this->numberOfShownMutations;
+    public function __construct(private readonly OutputInterface $output, private readonly MutationAnalysisLogger $logger, private readonly MetricsCalculator $metricsCalculator, private readonly Reporter $reporter, private readonly bool $withUncovered)
+    {
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
@@ -128,83 +110,10 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     {
         $this->logger->finishAnalysis();
 
-        if ($this->numberOfMutationsBudget !== 0) {
-            $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');
-
-            if ($this->withUncovered) {
-                $this->showMutations($this->resultsCollector->getNotCoveredExecutionResults(), 'Not covered');
-            }
-
-            if ($this->withTimeouts) {
-                $this->showMutations($this->resultsCollector->getTimedOutExecutionResults(), 'Timed out');
-            }
-        }
-
         $this->showMetrics();
         $this->reporter->report();
 
         $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
-    }
-
-    /**
-     * @param MutantExecutionResult[] $executionResults
-     */
-    private function showMutations(array $executionResults, string $headlinePrefix): void
-    {
-        if ($executionResults === [] || $this->numberOfMutationsBudget === 0) {
-            return;
-        }
-
-        $headline = sprintf('%s mutants:', $headlinePrefix);
-
-        $this->output->writeln([
-            '',
-            $headline,
-            str_repeat('=', strlen($headline)),
-            '',
-        ]);
-
-        $shortened = false;
-
-        foreach ($executionResults as $index => $executionResult) {
-            if ($this->numberOfMutationsBudget === 0) {
-                $shortened = true;
-
-                break;
-            }
-
-            $this->output->writeln([
-                '',
-                sprintf(
-                    '%d) %s:%d    [M] %s [ID] %s',
-                    $index + 1,
-                    $executionResult->getOriginalFilePath(),
-                    $executionResult->getOriginalStartingLine(),
-                    $executionResult->getMutatorName(),
-                    $executionResult->getMutantHash(),
-                ),
-            ]);
-
-            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
-
-            if ($this->numberOfMutationsBudget !== null) {
-                --$this->numberOfMutationsBudget;
-            }
-        }
-
-        if ($shortened) {
-            if (!isset($index)) {
-                throw new LogicException('$index should be set when $shortened is true');
-            }
-
-            $this->output->writeln([
-                '',
-                sprintf(
-                    '... and %d more mutants were omitted. Use "--show-mutations=max" to see all of them.',
-                    count($executionResults) - $index,
-                ),
-            ]);
-        }
     }
 
     private function showMetrics(): void
