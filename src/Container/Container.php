@@ -119,6 +119,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
+use Infection\Reporter\MetricsReporter;
 use Infection\Reporter\Reporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
@@ -486,8 +487,14 @@ final class Container extends DIContainer
                     $config->timeoutsAsEscaped,
                 );
             },
+            MetricsReporter::class => static fn (self $container): MetricsReporter => new MetricsReporter(
+                $container->getOutput(),
+                $container->getMetricsCalculator(),
+                !$container->getConfiguration()->mutateOnlyCoveredCode(),
+            ),
             Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
                 $container->get(ShowMutationsReporter::class),
+                $container->get(MetricsReporter::class),
                 $container->getFileReporterFactory()->createFromConfiguration(
                     $container->getConfiguration()->logs,
                 ),
