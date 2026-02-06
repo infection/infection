@@ -33,25 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompletedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class InitialTestExecutionLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
 {
     public function __construct(
-        private bool $skipProgressBar,
+        private InitialTestExecutionLogger $logger,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        return $this->skipProgressBar
-            ? new CiMutationGeneratingConsoleLoggerSubscriber($output)
-            : new MutationGeneratingConsoleLoggerSubscriber($output)
-        ;
+        $this->logger->start();
+    }
+
+    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
+    {
+        $this->logger->advance();
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }

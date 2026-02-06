@@ -33,43 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use InvalidArgumentException;
-use function sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
 /**
+ * Logger for the initial test execution.
+ *
  * @internal
  */
-final readonly class CiInitialTestsConsoleLoggerSubscriber implements InitialTestSuiteWasStartedSubscriber
+interface InitialTestExecutionLogger
 {
-    public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-    ) {
-    }
+    public function start(): void;
 
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
-    {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
+    public function advance(): void;
 
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-        ]);
-    }
+    public function finish(string $executionOutput): void;
 }

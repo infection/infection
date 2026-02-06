@@ -33,44 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Reporter\Reporter;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
+ * OK, we need to figure out what to do with this one.
+ *
+ * Indeed, currently it is used when "noProgress". If we move it as part of the MutationAnalysisLogger, it will
+ * then be the formatter name, not the progress, that will define it.
+ *
+ * So the question is, what do we expect when we have no progress + formatter/logger = progress?
+ *
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
 {
     public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private Reporter $reporter,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $logger,
-        private bool $withUncovered,
-        private bool $withTimeouts,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->reporter,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+            'Processing source code files...',
+        ]);
     }
 }

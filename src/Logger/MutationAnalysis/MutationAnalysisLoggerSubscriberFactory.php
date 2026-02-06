@@ -33,32 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
+use Infection\Reporter\Reporter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class InitialTestsConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class MutationAnalysisLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private bool $skipProgressBar,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-        private bool $debug,
+        private Reporter $reporter,
+        private MutationAnalysisLogger $logger,
     ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
     {
-        return $this->skipProgressBar
-            ? new CiInitialTestsConsoleLoggerSubscriber($output, $this->testFrameworkAdapter)
-            : new InitialTestsConsoleLoggerSubscriber(
-                $output,
-                $this->testFrameworkAdapter,
-                $this->debug,
-            )
-        ;
+        return new MutationAnalysisLoggerSubscriber(
+            $this->logger,
+            $this->reporter,
+        );
     }
 }

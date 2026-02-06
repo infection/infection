@@ -38,7 +38,7 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\InitialTestExecutionLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;
@@ -46,7 +46,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialTestsConsoleLoggerSubscriber::class)]
+#[CoversClass(InitialTestExecutionLoggerSubscriber::class)]
 final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_initial_test_suite_run(): void
@@ -60,7 +60,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->method('getVersion');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
+        $dispatcher->addSubscriber(new InitialTestExecutionLoggerSubscriber($output, $testFramework, false));
 
         $dispatcher->dispatch(new InitialTestSuiteWasStarted());
     }
@@ -88,7 +88,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->willThrowException(new InvalidArgumentException());
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
+        $dispatcher->addSubscriber(new InitialTestExecutionLoggerSubscriber($output, $testFramework, false));
 
         $dispatcher->dispatch(new InitialTestSuiteWasStarted());
     }
@@ -107,7 +107,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));
+        $dispatcher->addSubscriber(new InitialTestExecutionLoggerSubscriber($output, $testFramework, true));
 
         $dispatcher->dispatch(new InitialTestSuiteWasFinished($processText));
     }

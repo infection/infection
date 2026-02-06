@@ -33,29 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
+final readonly class InitialStaticAnalysisExecutionLoggerFactory
 {
     public function __construct(
-        private OutputInterface $output,
+        private bool $skipProgressBar,
+        private bool $debug,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    public function create(OutputInterface $output): InitialTestExecutionLogger
     {
-        $this->output->writeln([
-            '',
-            'Generate mutants...',
-            '',
-            'Processing source code files...',
-        ]);
+        return $this->skipProgressBar
+            ? new ConsoleNoProgressLogger(
+                $output,
+                $this->staticAnalysisToolAdapter,
+            )
+            : new ConsoleProgressBarLogger(
+                $output,
+                $this->staticAnalysisToolAdapter,
+                $this->debug,
+            );
     }
 }

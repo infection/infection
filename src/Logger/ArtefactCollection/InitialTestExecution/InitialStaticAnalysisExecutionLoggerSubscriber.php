@@ -33,25 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Reporter\Reporter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompletedSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final readonly class InitialStaticAnalysisExecutionLoggerSubscriber implements InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber
 {
     public function __construct(
-        private Reporter $reporter,
+        private InitialTestExecutionLogger $logger,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        return new MutationTestingResultsLoggerSubscriber(
-            $this->reporter,
-        );
+        $this->logger->start();
+    }
+
+    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
+    {
+        $this->logger->advance();
+    }
+
+    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }

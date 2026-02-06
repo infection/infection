@@ -33,24 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Infection\Reporter\Reporter;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
+final readonly class InitialTestExecutionLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private Reporter $reporter,
+        private InitialTestExecutionLoggerFactory $loggerFactory,
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function create(OutputInterface $output): EventSubscriber
     {
-        $this->reporter->report();
+        return new InitialTestExecutionLoggerSubscriber(
+            $this->loggerFactory->create($output),
+        );
     }
 }

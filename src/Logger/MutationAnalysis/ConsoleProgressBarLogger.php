@@ -37,6 +37,7 @@ namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -44,28 +45,64 @@ use Symfony\Component\Console\Helper\ProgressBar;
 final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
 {
     public function __construct(
-        private readonly ProgressBar $progressBar,
+        private readonly ProgressBar $mutationGenerationProgressBar,
+        private readonly ProgressBar $mutationAnalysisProgressBar,
+        private readonly OutputInterface $output,
     ) {
+    }
+
+    public function startMutationGeneration(int $mutableFilesCount): void
+    {
+        $this->output->writeln([
+            '',
+            '',
+            'Generate mutants...',
+            '',
+        ]);
+
+        $this->mutationGenerationProgressBar->start($event->mutableFilesCount);
+    }
+
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void {
+        parent::finishMutationGenerationForFile(
+            $sourceFilePath,
+            $mutationIds,
+        );
+
+        $this->mutationGenerationProgressBar->advance();
+    }
+
+    public function finishMutationGeneration(): void
+    {
+        $this->mutationGenerationProgressBar->finish();
     }
 
     public function startAnalysis(int $mutationCount): void
     {
         parent::startAnalysis($mutationCount);
 
-        $this->progressBar->start($mutationCount);
+        $this->mutationAnalysisProgressBar->start($mutationCount);
     }
 
     public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
         parent::finishEvaluation($executionResult);
 
-        $this->progressBar->advance();
+        $this->mutationAnalysisProgressBar->advance();
     }
 
     public function finishAnalysis(): void
     {
         parent::finishAnalysis();
 
-        $this->progressBar->finish();
+        $this->mutationAnalysisProgressBar->finish();
+
+        $this->output->writeln([
+            '',
+            'Please note that some mutants will inevitably be harmless (i.e. false positives).',
+        ]);
     }
 }
