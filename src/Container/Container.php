@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -59,9 +60,7 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
@@ -160,6 +159,7 @@ use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
+use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -171,8 +171,6 @@ use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
-use function array_filter;
-use function php_ini_loaded_file;
 
 /**
  * @internal
@@ -378,7 +376,6 @@ final class Container extends DIContainer
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
-                    $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingResultsCollectorSubscriberFactory(),
                     $container->getMutationTestingConsoleLoggerSubscriberFactory(),
                     $container->getPerformanceLoggerSubscriberFactory(),
@@ -420,9 +417,6 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisToolAdapter(),
                 );
             },
-            MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
-                $container->getConfiguration()->noProgress,
-            ),
             MutationTestingResultsCollectorSubscriberFactory::class => static fn (self $container): MutationTestingResultsCollectorSubscriberFactory => new MutationTestingResultsCollectorSubscriberFactory(
                 ...array_filter([
                     $container->getMetricsCalculator(),
@@ -839,11 +833,6 @@ final class Container extends DIContainer
     public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisExecutionLoggerSubscriberFactory
     {
         return $this->get(InitialStaticAnalysisExecutionLoggerSubscriberFactory::class);
-    }
-
-    public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory
-    {
-        return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
     }
 
     public function getMutationTestingResultsCollectorSubscriberFactory(): MutationTestingResultsCollectorSubscriberFactory

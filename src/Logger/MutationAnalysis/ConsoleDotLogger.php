@@ -42,6 +42,7 @@ use Infection\Mutation\Mutation;
 use function sprintf;
 use function str_repeat;
 use function strlen;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
@@ -55,8 +56,38 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     private ?int $mutationCount = null;
 
     public function __construct(
+        private readonly ProgressBar $mutationGenerationProgressBar,
         private readonly OutputInterface $output,
     ) {
+    }
+
+    public function startMutationGeneration(int $mutableFilesCount): void
+    {
+        $this->output->writeln([
+            '',
+            '',
+            'Generate mutants...',
+            '',
+        ]);
+
+        $this->mutationGenerationProgressBar->start($event->mutableFilesCount);
+    }
+
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void {
+        parent::finishMutationGenerationForFile(
+            $sourceFilePath,
+            $mutationIds,
+        );
+
+        $this->mutationGenerationProgressBar->advance();
+    }
+
+    public function finishMutationGeneration(): void
+    {
+        $this->mutationGenerationProgressBar->finish();
     }
 
     public function startAnalysis(int $mutationCount): void

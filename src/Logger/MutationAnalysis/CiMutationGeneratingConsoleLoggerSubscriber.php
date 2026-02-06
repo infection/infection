@@ -33,44 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
+ * OK, we need to figure out what to do with this one.
+ *
+ * Indeed, currently it is used when "noProgress". If we move it as part of the MutationAnalysisLogger, it will
+ * then be the formatter name, not the progress, that will define it.
+ *
+ * So the question is, what do we expect when we have no progress + formatter/logger = progress?
+ *
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
+final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
         private OutputInterface $output,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
-        $this->progressBar->start($event->mutableFilesCount);
-    }
-
-    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
-    {
-        $this->progressBar->advance();
-    }
-
-    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
-    {
-        $this->progressBar->finish();
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+            'Processing source code files...',
+        ]);
     }
 }

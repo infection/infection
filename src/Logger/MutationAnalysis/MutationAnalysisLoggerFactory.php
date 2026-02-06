@@ -60,6 +60,7 @@ final readonly class MutationAnalysisLoggerFactory
         return match ($name) {
             MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
                 new ProgressBar($this->output),
+                new ProgressBar($this->output),
                 $this->output,
             ),
             MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),

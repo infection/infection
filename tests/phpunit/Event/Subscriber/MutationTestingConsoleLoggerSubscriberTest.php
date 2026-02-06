@@ -48,18 +48,18 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Reporter\Reporter;
 use Infection\Tests\Reporter\NullReporter;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use function Safe\fopen;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
 use function str_replace;
-use const PHP_EOL;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 #[Group('integration')]
 #[CoversClass(MutationAnalysisLoggerSubscriber::class)]
