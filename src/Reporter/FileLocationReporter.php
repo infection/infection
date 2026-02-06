@@ -60,6 +60,8 @@ final readonly class FileLocationReporter implements Reporter
 
     public function report(): void
     {
+        $this->decoratedReporter->report();
+
         $hasReporters = false;
 
         foreach ($this->getFileReporters($this->decoratedReporter) as $fileReporter) {

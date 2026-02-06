@@ -33,9 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
-use function count;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
@@ -46,32 +45,23 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
-use Infection\Framework\Iterable\IterableCounter;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Reporter\Reporter;
+use function count;
 
 /**
- * TODO: should be renamed
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
-    /**
-     * @var positive-int|IterableCounter::UNKNOWN_COUNT
-     */
-    private int $mutationCount = 0;
-
     public function __construct(
-        private readonly MutationAnalysisLogger $logger,
-        private readonly Reporter $reporter,
+        private MutationAnalysisLogger $logger,
+        private Reporter $reporter,
     ) {
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
-        $this->mutationCount = $event->mutationCount;
-
-        $this->logger->startAnalysis($this->mutationCount);
+        $this->logger->startAnalysis($event->mutationCount);
     }
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void

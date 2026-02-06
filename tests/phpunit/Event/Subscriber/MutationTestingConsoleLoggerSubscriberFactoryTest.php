@@ -38,10 +38,10 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Framework\Str;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerSubscriber;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerSubscriberFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
@@ -52,13 +52,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use function Safe\fopen;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 
-#[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
+#[CoversClass(MutationAnalysisLoggerSubscriberFactory::class)]
 #[Group('integration')]
 final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
@@ -92,7 +92,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     #[DataProvider('showMutationsProvider')]
     public function test_it_creates_a_subscriber(?int $numberOfShownMutations): void
     {
-        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+        $factory = new MutationAnalysisLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
             $this->resultsCollectorMock,
             $this->diffColorizerMock,
@@ -111,7 +111,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 
         $subscriber = $factory->create($outputMock);
 
-        $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(MutationAnalysisLoggerSubscriber::class, $subscriber);
     }
 
     public static function showMutationsProvider(): iterable
@@ -138,7 +138,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $resultsCollector->expects($this->never())
             ->method('getTimedOutExecutionResults');
 
-        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+        $factory = new MutationAnalysisLoggerSubscriberFactory(
             $metricsCalculator,
             $resultsCollector,
             $diffColorizer,
@@ -192,7 +192,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             ->method('getTimedOutExecutionResults')
             ->willReturn([$timedOutExecutionResult]);
 
-        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+        $factory = new MutationAnalysisLoggerSubscriberFactory(
             $metricsCalculator,
             $resultsCollector,
             $diffColorizer,

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
-use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -61,7 +60,6 @@ use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
@@ -89,6 +87,7 @@ use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutio
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerSubscriberFactory;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
@@ -117,6 +116,7 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\MetricsReporter;
@@ -160,7 +160,6 @@ use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -172,6 +171,8 @@ use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function php_ini_loaded_file;
 
 /**
  * @internal
@@ -380,7 +381,6 @@ final class Container extends DIContainer
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingResultsCollectorSubscriberFactory(),
                     $container->getMutationTestingConsoleLoggerSubscriberFactory(),
-                    $container->getMutationTestingResultsLoggerSubscriberFactory(),
                     $container->getPerformanceLoggerSubscriberFactory(),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->getStopInfectionOnSigintSignalSubscriberFactory(),
@@ -431,20 +431,10 @@ final class Container extends DIContainer
                     ),
                 ]),
             ),
-            MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
-                $config = $container->getConfiguration();
-
-                return new MutationTestingConsoleLoggerSubscriberFactory(
-                    $container->getMetricsCalculator(),
-                    $container->getResultsCollector(),
-                    $container->getDiffColorizer(),
-                    $container->getReporter(),
-                    $config->numberOfShownMutations,
-                    $container->getMutationAnalysisLogger(),
-                    !$config->mutateOnlyCoveredCode(),
-                    $config->timeoutsAsEscaped,
-                );
-            },
+            MutationAnalysisLoggerSubscriberFactory::class => static fn (self $container): MutationAnalysisLoggerSubscriberFactory => new MutationAnalysisLoggerSubscriberFactory(
+                $container->getReporter(),
+                $container->getMutationAnalysisLogger(),
+            ),
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
@@ -492,16 +482,20 @@ final class Container extends DIContainer
                 $container->getMetricsCalculator(),
                 !$container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
-            Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
-                $container->get(ShowMutationsReporter::class),
-                $container->get(MetricsReporter::class),
-                $container->getFileReporterFactory()->createFromConfiguration(
-                    $container->getConfiguration()->logs,
-                ),
-                $container->getStrykerLoggerFactory()->createFromLogEntries(
-                    $container->getConfiguration()->logs,
-                ),
-            ])),
+            Reporter::class => static fn (self $container): Reporter => new FileLocationReporter(
+                new FederatedReporter(...array_filter([
+                    $container->get(ShowMutationsReporter::class),
+                    $container->get(MetricsReporter::class),
+                    $container->getFileReporterFactory()->createFromConfiguration(
+                        $container->getConfiguration()->logs,
+                    ),
+                    $container->getStrykerLoggerFactory()->createFromLogEntries(
+                        $container->getConfiguration()->logs,
+                    ),
+                ])),
+                $container->getOutput(),
+                $container->getConfiguration()->numberOfShownMutations,
+            ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 
@@ -857,14 +851,9 @@ final class Container extends DIContainer
         return $this->get(MutationTestingResultsCollectorSubscriberFactory::class);
     }
 
-    public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationTestingConsoleLoggerSubscriberFactory
+    public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationAnalysisLoggerSubscriberFactory
     {
-        return $this->get(MutationTestingConsoleLoggerSubscriberFactory::class);
-    }
-
-    public function getMutationTestingResultsLoggerSubscriberFactory(): MutationTestingResultsLoggerSubscriberFactory
-    {
-        return $this->get(MutationTestingResultsLoggerSubscriberFactory::class);
+        return $this->get(MutationAnalysisLoggerSubscriberFactory::class);
     }
 
     public function getPerformanceLoggerSubscriberFactory(): PerformanceLoggerSubscriberFactory
