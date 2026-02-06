@@ -53,12 +53,12 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
-use Infection\Logger\FileLogger;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
+use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -422,7 +422,7 @@ class ConfigurationFactory
             return null;
         }
 
-        if (in_array($path, FileLogger::ALLOWED_PHP_STREAMS, true)) {
+        if (in_array($path, FileReporter::ALLOWED_PHP_STREAMS, true)) {
             return $path;
         }
 

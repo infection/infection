@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Reporter\Reporter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -47,7 +47,7 @@ final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
 {
     public function test_it_can_create_a_subscriber(): void
     {
-        $logger = $this->createMock(MutationTestingResultsLogger::class);
+        $logger = $this->createMock(Reporter::class);
 
         $factory = new MutationTestingResultsLoggerSubscriberFactory(
             $logger,
