@@ -37,8 +37,7 @@ namespace Infection\Mutator\Cast;
 
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnector;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -62,14 +61,14 @@ abstract class AbstractCastMutator implements Mutator
 
     protected function willRuntimeErrorOnMismatch(Node\Expr\Cast $node, string $returnTypeName): bool
     {
-        $parent = ParentConnector::getParent($node);
+        $parent = NodeAnnotator::getParent($node);
 
         if ($parent instanceof Node\Arg) {
             $functionScope = $this->findFunctionScope($parent);
 
             if (
                 $functionScope !== null
-                && ReflectionVisitor::isStrictTypesEnabled($functionScope) === true
+                && NodeAnnotator::areStrictTypesEnabled($functionScope) === true
             ) {
                 return true;
             }
@@ -79,7 +78,7 @@ abstract class AbstractCastMutator implements Mutator
             $functionScope = $this->findFunctionScope($parent);
 
             if ($functionScope !== null) {
-                if (ReflectionVisitor::isStrictTypesEnabled($functionScope) === false) {
+                if (NodeAnnotator::areStrictTypesEnabled($functionScope) === false) {
                     return false;
                 }
 
@@ -99,7 +98,7 @@ abstract class AbstractCastMutator implements Mutator
         $parent = $node;
 
         do {
-            $parent = ParentConnector::findParent($parent);
+            $parent = NodeAnnotator::findParent($parent);
 
             if (
                 $parent instanceof Node\Stmt\ClassMethod

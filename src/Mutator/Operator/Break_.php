@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -86,7 +86,7 @@ final class Break_ implements Mutator
             return false;
         }
 
-        $parentNode = ParentConnector::findParent($node);
+        $parentNode = NodeAnnotator::findParent($node);
 
         return !$parentNode instanceof Node\Stmt\Case_;
     }

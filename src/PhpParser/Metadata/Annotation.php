@@ -33,29 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\PhpParser\Metadata;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use PhpParser\Node\Name\FullyQualified;
-use PhpParser\Node\Stmt\Nop;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(FullyQualifiedClassNameManipulator::class)]
-final class FullyQualifiedClassNameManipulatorTest extends TestCase
+enum Annotation: string
 {
-    public function test_it_can_provide_the_node_fqcn(): void
-    {
-        $fqcn = new FullyQualified('Acme\Foo');
-        $node = new Nop(['resolvedName' => $fqcn]);
-
-        $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public function test_it_can_provide_the_node_fqcn_for_an_anonymous_class(): void
-    {
-        $node = new Nop(['resolvedName' => null]);
-
-        $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
+    case IS_STRICT_TYPES = 'isStrictTypes';
+    case REFLECTION_CLASS = 'reflectionClass';
+    case IS_INSIDE_FUNCTION = 'isInsideFunction';
+    case IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
+    case FUNCTION_SCOPE = 'functionScope';
+    case FUNCTION_NAME = 'functionName';
+    case NEXT_NODE = 'next';
+    case PARENT_NODE = 'parent';
+    case RESOLVED_NAME = 'resolvedName';
+    case NAMESPACED_NAME = 'namespacedName';
 }

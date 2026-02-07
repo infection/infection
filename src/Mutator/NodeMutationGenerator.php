@@ -38,8 +38,8 @@ namespace Infection\Mutator;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\PhpParser\MutatedNode;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
@@ -64,10 +64,6 @@ class NodeMutationGenerator
 
     /** @var TestLocation[]|null */
     private ?array $testsMemoized = null;
-
-    private ?bool $isOnFunctionSignatureMemoized = null;
-
-    private ?bool $isInsideFunctionMemoized = null;
 
     /**
      * @param Mutator<Node>[] $mutators
@@ -99,11 +95,9 @@ class NodeMutationGenerator
     {
         $this->currentNode = $node;
         $this->testsMemoized = null;
-        $this->isOnFunctionSignatureMemoized = null;
-        $this->isInsideFunctionMemoized = null;
 
-        if (!$this->isOnFunctionSignature()
-            && !$this->isInsideFunction()
+        if (!NodeAnnotator::isOnFunctionSignature($this->currentNode)
+            && !NodeAnnotator::isInsideFunction($this->currentNode)
         ) {
             return;
         }
@@ -164,16 +158,6 @@ class NodeMutationGenerator
         }
     }
 
-    private function isOnFunctionSignature(): bool
-    {
-        return $this->isOnFunctionSignatureMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-    }
-
-    private function isInsideFunction(): bool
-    {
-        return $this->isInsideFunctionMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
-    }
-
     /**
      * @return TestLocation[]
      */
@@ -185,7 +169,7 @@ class NodeMutationGenerator
 
         $testsMemoized = $this->trace->getAllTestsForMutation(
             $this->lineRangeCalculator->calculateRange($this->currentNode),
-            $this->isOnFunctionSignature(),
+            NodeAnnotator::isOnFunctionSignature($this->currentNode),
         );
 
         if ($testsMemoized instanceof Traversable) {

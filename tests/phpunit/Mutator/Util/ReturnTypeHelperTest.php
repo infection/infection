@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\ReturnTypeHelper;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\Annotation;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,7 +49,7 @@ final class ReturnTypeHelperTest extends TestCase
     {
         $returnNode = new Node\Stmt\Return_();
         $returnNode->setAttribute(
-            ReflectionVisitor::FUNCTION_SCOPE_KEY,
+            Annotation::FUNCTION_SCOPE->value,
             new Node\Stmt\Function_('hello'),
         );
 
@@ -59,14 +58,13 @@ final class ReturnTypeHelperTest extends TestCase
         $this->assertFalse($returnTypeHelper->hasVoidReturnType());
         $this->assertFalse($returnTypeHelper->hasSpecificReturnType());
         $this->assertTrue($returnTypeHelper->isNullReturn());
-        $this->assertFalse($returnTypeHelper->hasNextStmtNode());
     }
 
     #[DataProvider('voidReturnTypeProvider')]
     public function test_it_detects_void_return_type(Node\FunctionLike $function, bool $expected): void
     {
         $returnNode = new Node\Stmt\Return_();
-        $returnNode->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $function);
+        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $function);
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -108,7 +106,7 @@ final class ReturnTypeHelperTest extends TestCase
     public function test_it_detects_specific_return_type(Node\FunctionLike $function, bool $expected): void
     {
         $returnNode = new Node\Stmt\Return_();
-        $returnNode->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $function);
+        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $function);
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -163,7 +161,7 @@ final class ReturnTypeHelperTest extends TestCase
     public function test_it_detects_null_return(Node\Stmt\Return_ $returnNode, bool $expected): void
     {
         $returnNode->setAttribute(
-            ReflectionVisitor::FUNCTION_SCOPE_KEY,
+            Annotation::FUNCTION_SCOPE->value,
             new Node\Stmt\Function_('test'),
         );
 
@@ -215,25 +213,7 @@ final class ReturnTypeHelperTest extends TestCase
         ];
     }
 
-    public function test_it_detects_next_statement_node(): void
-    {
-        $function = new Node\Stmt\Function_('test');
-
-        // Return with next statement
-        $returnWithNext = new Node\Stmt\Return_();
-        $returnWithNext->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $function);
-        $returnWithNext->setAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE, new Node\Stmt\Echo_([new Node\Scalar\String_('hello')]));
-
-        $helperWithNext = new ReturnTypeHelper($returnWithNext);
-        $this->assertTrue($helperWithNext->hasNextStmtNode());
-
-        // Return without next statement
-        $returnWithoutNext = new Node\Stmt\Return_();
-        $returnWithoutNext->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $function);
-
-        $helperWithoutNext = new ReturnTypeHelper($returnWithoutNext);
-        $this->assertFalse($helperWithoutNext->hasNextStmtNode());
-    }
+    // Test removed: hasNextStmtNode() method no longer exists in ReturnTypeHelper
 
     public function test_it_handles_method_return_types(): void
     {
@@ -243,7 +223,7 @@ final class ReturnTypeHelperTest extends TestCase
         ]);
 
         $returnNode = new Node\Stmt\Return_(new Node\Expr\Array_());
-        $returnNode->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $method);
+        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $method);
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -260,7 +240,7 @@ final class ReturnTypeHelperTest extends TestCase
         ]);
 
         $returnNode = new Node\Stmt\Return_(new Node\Scalar\String_('test'));
-        $returnNode->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $closure);
+        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $closure);
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -278,7 +258,7 @@ final class ReturnTypeHelperTest extends TestCase
         ]);
 
         $returnNode = new Node\Stmt\Return_(new Node\Scalar\Int_(42));
-        $returnNode->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $arrowFunction);
+        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $arrowFunction);
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
