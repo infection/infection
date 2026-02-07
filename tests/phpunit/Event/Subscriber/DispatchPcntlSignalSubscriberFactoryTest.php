@@ -40,16 +40,13 @@ use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
 use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 
 #[CoversClass(DispatchPcntlSignalSubscriberFactory::class)]
 final class DispatchPcntlSignalSubscriberFactoryTest extends TestCase
 {
     public function test_it_creates_a_subscriber(): void
     {
-        $outputMock = $this->createMock(OutputInterface::class);
-
-        $subscriber = (new DispatchPcntlSignalSubscriberFactory())->create($outputMock);
+        $subscriber = (new DispatchPcntlSignalSubscriberFactory())->create();
 
         $this->assertInstanceOf(DispatchPcntlSignalSubscriber::class, $subscriber);
         $this->assertInstanceOf(EventSubscriber::class, $subscriber);

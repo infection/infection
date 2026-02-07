@@ -56,13 +56,14 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
         private MutationAnalysisLogger $logger,
         private bool $withUncovered,
         private bool $withTimeouts,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return new MutationTestingConsoleLoggerSubscriber(
-            $output,
+            $this->output,
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
