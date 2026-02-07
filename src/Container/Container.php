@@ -405,6 +405,7 @@ final class Container extends DIContainer
                     $config->noProgress,
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled,
+                    $container->getOutput(),
                 );
             },
             InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
@@ -414,10 +415,12 @@ final class Container extends DIContainer
                     $config->noProgress,
                     $config->isDebugEnabled,
                     $container->getStaticAnalysisToolAdapter(),
+                    $container->getOutput(),
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
                 $container->getConfiguration()->noProgress,
+                $container->getOutput(),
             ),
             MutationTestingResultsCollectorSubscriber::class => static fn (self $container): MutationTestingResultsCollectorSubscriber => new MutationTestingResultsCollectorSubscriber(
                 ...array_filter([

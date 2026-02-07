@@ -20,6 +20,15 @@ parameters:
             count: 1
             path: ../src/Mutant/MutantExecutionResult.php
 
+        # It would be nice to properly address those; They are false positives, but we did not figure
+        # out how to properly configure PHPStan to understand it.
+        -
+            message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
+            path:  ../tests/*
+        -
+            message: "#^.*expects Symfony\\\\Component\\\\Console\\\\Output\\\\OutputInterface, Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput given\\.$#"
+            path:  ../tests/*
+
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
         - '#Method Infection\\Tests\\.*::.*\(\) return type has no value type specified in iterable type iterable#'
@@ -27,10 +36,6 @@ parameters:
             message: '#Do not (use|return|assign) magic number (.)#'
             paths:
                 - ../tests/*
-        -
-            message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
-            count: 9
-            path:  ../tests/*
         -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
             path: ../tests/*
