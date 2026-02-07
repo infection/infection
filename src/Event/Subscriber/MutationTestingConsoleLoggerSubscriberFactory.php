@@ -39,6 +39,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\Reporter;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -68,7 +69,11 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
-            $this->reporter,
+            new FileLocationReporter(
+                $this->reporter,
+                $output,
+                $this->numberOfShownMutations,
+            ),
             $this->numberOfShownMutations,
             $this->withUncovered,
             $this->withTimeouts,
