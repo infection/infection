@@ -38,6 +38,7 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
 use function array_keys;
 use function array_map;
 use function implode;
+use Infection\Differ\Differ;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use function is_int;
@@ -68,6 +69,7 @@ final readonly class TeamCity
 
     public function __construct(
         private bool $timeoutsAsEscaped,
+        private Differ $differ,
     ) {
     }
 
@@ -122,9 +124,24 @@ final readonly class TeamCity
         MutantExecutionResult $executionResult,
     ): string {
         /** @psalm-suppress InvalidArgument */
+        $messageName = $this->mapExecutionResultToTestStatus($executionResult);
+        $attributes = $test->toFinishedAttributes($executionResult);
+
+        if ($messageName !== MessageName::TEST_FINISHED) {
+            unset($attributes['details']);
+            [$from, $to] = $this->differ->diffToArray(
+                from: $executionResult->getMutatedCode(),
+                to: $executionResult->getOriginalCode(),
+            );
+
+            $attributes['type'] = 'comparisonFailure';
+            $attributes['actual'] = $from;
+            $attributes['expected'] = $to;
+        }
+
         return $this->write(
-            $this->mapExecutionResultToTestStatus($executionResult),
-            $test->toFinishedAttributes($executionResult),
+            $messageName,
+            $attributes,
         );
     }
 
