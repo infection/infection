@@ -71,7 +71,7 @@ final class ChainSubscriberFactoryTest extends TestCase
 
         $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber1),
-            new DummySubscriberFactory($subscriber2),
+            $subscriber2,
             new DummySubscriberFactory($subscriber3),
         );
 

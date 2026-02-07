@@ -775,18 +775,6 @@ parameters:
 			path: ../tests/phpunit/Event/Subscriber/MutationGeneratingConsoleLoggerSubscriberFactoryTest.php
 
 		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/PerformanceLoggerSubscriberFactoryTest.php
-
-		-
 			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\SubscriberRegisterer::registerSubscribers() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
 			identifier: argument.type
 			count: 2
