@@ -739,58 +739,10 @@ parameters:
 			path: ../tests/phpunit/Environment/StrykerApiKeyResolverTest.php
 
 		-
-			rawMessage: 'Parameter #1 $output of class Infection\Tests\Fixtures\Event\IONullSubscriber constructor expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 3
-			path: ../tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\ChainSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
+			rawMessage: 'Method Infection\Event\Subscriber\ChainSubscriberFactory::create() invoked with 1 parameter, 0 required.'
+			identifier: arguments.count
 			count: 2
 			path: ../tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/InitialTestsConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationGeneratingConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/PerformanceLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\SubscriberRegisterer::registerSubscribers() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php
 
 		-
 			rawMessage: 'Call to an undefined method object::setFilter().'

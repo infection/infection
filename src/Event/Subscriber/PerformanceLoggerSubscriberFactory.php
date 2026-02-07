@@ -51,17 +51,18 @@ final readonly class PerformanceLoggerSubscriberFactory implements SubscriberFac
         private TimeFormatter $timeFormatter,
         private MemoryFormatter $memoryFormatter,
         private int $threadCount,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return new PerformanceLoggerSubscriber(
             $this->stopwatch,
             $this->timeFormatter,
             $this->memoryFormatter,
             $this->threadCount,
-            $output,
+            $this->output,
         );
     }
 }

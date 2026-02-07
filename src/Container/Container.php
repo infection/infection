@@ -405,6 +405,7 @@ final class Container extends DIContainer
                     $config->noProgress,
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled,
+                    $container->getOutput(),
                 );
             },
             InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
@@ -414,10 +415,12 @@ final class Container extends DIContainer
                     $config->noProgress,
                     $config->isDebugEnabled,
                     $container->getStaticAnalysisToolAdapter(),
+                    $container->getOutput(),
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
                 $container->getConfiguration()->noProgress,
+                $container->getOutput(),
             ),
             MutationTestingResultsCollectorSubscriberFactory::class => static fn (self $container): MutationTestingResultsCollectorSubscriberFactory => new MutationTestingResultsCollectorSubscriberFactory(
                 ...array_filter([
@@ -439,6 +442,7 @@ final class Container extends DIContainer
                     $container->getMutationAnalysisLogger(),
                     !$config->mutateOnlyCoveredCode(),
                     $config->timeoutsAsEscaped,
+                    $container->getOutput(),
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
@@ -446,6 +450,7 @@ final class Container extends DIContainer
                 $container->getTimeFormatter(),
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
+                $container->getOutput(),
             ),
             FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
                 $container->getFileParser(),
