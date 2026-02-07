@@ -394,6 +394,25 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['13.0', true];
     }
 
+    public function test_it_provides_phpunit_12_recommendations(): void
+    {
+        $adapter = $this->getPHPUnitAdapter('12.0');
+
+        $recommendations = $adapter->getInitialTestsFailRecommendations('phpunit --configuration phpunit.xml');
+
+        $this->assertStringContainsString('PHPUnit 12+', $recommendations);
+        $this->assertStringContainsString('--filter', $recommendations);
+    }
+
+    public function test_it_does_not_provide_phpunit_12_recommendations_for_older_versions(): void
+    {
+        $adapter = $this->getPHPUnitAdapter('11.5');
+
+        $recommendations = $adapter->getInitialTestsFailRecommendations('phpunit --configuration phpunit.xml');
+
+        $this->assertStringNotContainsString('PHPUnit 12+', $recommendations);
+    }
+
     private function getPHPUnitAdapter(string $version = '9.0'): PhpUnitAdapter
     {
         return new PhpUnitAdapter(
