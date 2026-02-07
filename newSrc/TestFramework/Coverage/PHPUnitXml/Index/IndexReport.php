@@ -33,18 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Coverage\JUnit;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+// TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
+//  Need to be revisted.
+
+final class IndexReport
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
 }

@@ -33,18 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer\MutantExecutor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\MutationAnalyzer\Mutant;
+use newSrc\MutationAnalyzer\MutantExecutionResult;
+use newSrc\TestFramework\TestFramework;
+
+final class ParallelMutantExecutor implements MutantExecutor
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @param TestFramework[] $testFrameworks
+     */
+    public function __construct(
+        private array $testFrameworks,
+    ) {
+    }
+
+    public function execute(Mutant $mutant): MutantExecutionResult
     {
+        // TODO: adds the mutant to the bucket
     }
 }

@@ -33,18 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Trace\Symbol;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
+ * Represents a PHP Symbol: a class, a method or a function.
  *
- * @internal
+ * Currently, in the context of a traditional test framework, only those matter. Maybe for a static analyser there are
+ * more advanced symbols.
  */
-trait CannotBeInstantiated
+interface Symbol
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function toString(): string;
 }

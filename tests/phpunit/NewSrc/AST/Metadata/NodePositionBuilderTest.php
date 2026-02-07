@@ -33,18 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\NewSrc\AST\Metadata;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\AST\Metadata\NodePosition;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(NodePositionBuilder::class)]
+final class NodePositionBuilderTest extends TestCase
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function test_it_can_build_a_node_position(): void
     {
+        $builder = NodePositionBuilder::multiLineWithTestData();
+
+        $newBuilder = $builder
+            ->withStartLine(20)
+            ->withStartTokenPosition(5)
+            ->withEndLine(30)
+            ->withEndTokenPosition(132);
+
+        // Test immutability
+        $this->assertSame(
+            NodePositionBuilder::multiLineWithTestData()->build(),
+            $builder->build(),
+        );
+
+        $this->assertSame(
+            new NodePosition(20, 5, 30, 132),
+            $newBuilder->build(),
+        );
+    }
+
+    public function test_it_can_be_created_from_an_existing_instance(): void
+    {
+        $expected = new NodePosition(1, 2, 3, 4);
+
+        $actual = NodePositionBuilder::from($expected)->build();
+
+        $this->assertSame($expected, $actual);
     }
 }

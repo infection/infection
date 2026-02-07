@@ -33,18 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+// This is the current TestFrameworkAdapter
+use newSrc\MutationAnalyzer\Mutant;
+use newSrc\MutationAnalyzer\MutantExecutionResult;
+
+interface TestFramework
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function getName(): string;
+
+    public function isSkippable(): bool;
+
+    // E.g. code coverage for PHPUnit or Codeception, Cache for PHPStan
+    public function checkRequiredArtefacts(): void;
+
+    public function executeInitialRun(): void;
+
+    // TODO: for a test dry run, this would be better to do it there
+    public function test(Mutant $mutant): MutantExecutionResult;
 }

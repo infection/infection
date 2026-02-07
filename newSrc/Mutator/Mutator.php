@@ -33,18 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutator;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+// AKA MutationOperator
+use newSrc\Mutagenesis\Mutation;
+use PhpParser\Node;
+
+interface Mutator
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    /**
+     * @return iterable<Mutation>
+     */
+    public function mutate(Node $node): iterable;
 }

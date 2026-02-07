@@ -33,18 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Trace\Symbol;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+final readonly class FunctionReference implements Symbol
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function __construct(
+        private string $name,
+    ) {
+    }
+
+    public function toString(): string
     {
+        return $this->name;
     }
 }

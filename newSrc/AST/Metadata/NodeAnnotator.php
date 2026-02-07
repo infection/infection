@@ -33,18 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\Metadata;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\Node;
+
+final class NodeAnnotator
 {
-    // TODO: should be leverage in the new code
     private function __construct()
     {
+    }
+
+    public static function annotate(
+        Node $node,
+        Annotation $annotation,
+        mixed $value = null,
+    ): void {
+        $node->setAttribute($annotation->name, $value ?? $annotation->value);
     }
 }

@@ -33,18 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutator\FirstOrder\ConditionalNegotiation;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use Infection\PhpParser\Visitor\ParentConnector;
+use newSrc\Mutator\Mutator;
+use PhpParser\Node;
+
+final class Equal implements Mutator
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @psalm-mutation-free
+     *
+     * @return iterable<Node\Expr\BinaryOp\NotEqual>
+     */
+    public function mutate(Node $node): iterable
     {
+        if (!$this->canMutate($node)) {
+            return [];
+        }
+
+        yield new Node\Expr\BinaryOp\NotEqual(
+            $node->left,
+            $node->right,
+            $node->getAttributes(),
+        );
+    }
+
+    private function canMutate(Node $node): bool
+    {
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
+        return $node instanceof Node\Expr\BinaryOp\Equal;
     }
 }

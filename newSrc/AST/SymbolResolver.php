@@ -33,18 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use Infection\PhpParser\Visitor\ParentConnector;
+use newSrc\TestFramework\Trace\Symbol\ClassReference;
+use newSrc\TestFramework\Trace\Symbol\FunctionReference;
+use newSrc\TestFramework\Trace\Symbol\MethodReference;
+use newSrc\TestFramework\Trace\Symbol\NamespaceReference;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use PhpParser\Node;
+use function sprintf;
+use Webmozart\Assert\Assert;
+
+final class SymbolResolver
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function tryToResolve(Node $node): ?Symbol
     {
+        return match (true) {
+            $node instanceof Node\Stmt\Namespace_ && $node->name !== null => new NamespaceReference(
+                $node->name->toString(),
+            ),
+            $node instanceof Node\Stmt\Function_ => new FunctionReference(
+                $node->name->toString(),
+            ),
+            $node instanceof Node\Stmt\Class_ => new ClassReference(
+                $node->namespacedName->toString(),
+            ),
+            $node instanceof Node\Stmt\ClassMethod => new MethodReference(
+                sprintf(
+                    '%s::%s()',
+                    self::getClassName($node)->toString(),
+                    $node->name->toString(),
+                ),
+            ),
+            default => null,
+        };
+    }
+
+    private static function getClassName(Node\Stmt\ClassMethod $classMethod): Node\Name
+    {
+        /** @var Node\Stmt\Class_ $parent */
+        $parent = ParentConnector::getParent($classMethod);
+        Assert::isInstanceOf($parent, Node\Stmt\Class_::class);
+
+        return $parent->namespacedName;
     }
 }
