@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\ReturnTypeHelper;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -59,7 +58,6 @@ final class ReturnTypeHelperTest extends TestCase
         $this->assertFalse($returnTypeHelper->hasVoidReturnType());
         $this->assertFalse($returnTypeHelper->hasSpecificReturnType());
         $this->assertTrue($returnTypeHelper->isNullReturn());
-        $this->assertFalse($returnTypeHelper->hasNextStmtNode());
     }
 
     #[DataProvider('voidReturnTypeProvider')]
@@ -213,26 +211,6 @@ final class ReturnTypeHelperTest extends TestCase
             new Node\Stmt\Return_(new Node\Expr\ConstFetch(new Node\Name('false'))),
             false,
         ];
-    }
-
-    public function test_it_detects_next_statement_node(): void
-    {
-        $function = new Node\Stmt\Function_('test');
-
-        // Return with next statement
-        $returnWithNext = new Node\Stmt\Return_();
-        $returnWithNext->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $function);
-        $returnWithNext->setAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE, new Node\Stmt\Echo_([new Node\Scalar\String_('hello')]));
-
-        $helperWithNext = new ReturnTypeHelper($returnWithNext);
-        $this->assertTrue($helperWithNext->hasNextStmtNode());
-
-        // Return without next statement
-        $returnWithoutNext = new Node\Stmt\Return_();
-        $returnWithoutNext->setAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, $function);
-
-        $helperWithoutNext = new ReturnTypeHelper($returnWithoutNext);
-        $this->assertFalse($helperWithoutNext->hasNextStmtNode());
     }
 
     public function test_it_handles_method_return_types(): void
