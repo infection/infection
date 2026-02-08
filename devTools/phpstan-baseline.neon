@@ -1081,7 +1081,7 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
 
 		-
-			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubject with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
+			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubjectStub with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php

@@ -46,7 +46,7 @@ final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
 {
     public function test_it_can_create_a_subscriber(): void
     {
-        $logger = $this->createMock(Reporter::class);
+        $logger = $this->createStub(Reporter::class);
 
         $factory = new MutationTestingResultsLoggerSubscriberFactory(
             $logger,
