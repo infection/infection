@@ -41,14 +41,14 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    private MockObject&Process $processMock;
+    private Stub&Process $processStub;
 
     private Mutant $mutant;
 
@@ -56,12 +56,12 @@ final class MutantProcessTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->processMock = $this->createMock(Process::class);
+        $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
-            $this->processMock,
+            $this->processStub,
             $this->mutant,
             $mutantExecutionResultFactory,
         );
@@ -71,7 +71,7 @@ final class MutantProcessTest extends TestCase
     {
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
-            $this->processMock,
+            $this->processStub,
             $this->mutant,
             false,
         );
@@ -83,7 +83,7 @@ final class MutantProcessTest extends TestCase
 
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
-            $this->processMock,
+            $this->processStub,
             $this->mutant,
             true,
         );

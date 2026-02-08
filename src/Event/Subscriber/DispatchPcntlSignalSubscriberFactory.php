@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 /**
  * @internal
  */
 final class DispatchPcntlSignalSubscriberFactory implements SubscriberFactory
 {
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return new DispatchPcntlSignalSubscriber();
     }

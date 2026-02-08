@@ -634,7 +634,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     public function test_container_to_finished_event(): void
     {
-        $result = $this->createMock(MutantExecutionResult::class);
+        $result = $this->createStub(MutantExecutionResult::class);
 
         $process = $this->createMock(MutantProcess::class);
         $process->expects($this->once())

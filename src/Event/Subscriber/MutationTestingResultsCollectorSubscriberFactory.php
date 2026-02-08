@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\Metrics\Collector;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -51,7 +50,7 @@ final readonly class MutationTestingResultsCollectorSubscriberFactory implements
         $this->collectors = $collectors;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return new MutationTestingResultsCollectorSubscriber(
             ...$this->collectors,

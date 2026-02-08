@@ -40,7 +40,6 @@ use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Metrics\Collector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 
 #[CoversClass(MutationTestingResultsCollectorSubscriberFactory::class)]
 final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCase
@@ -48,17 +47,11 @@ final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCas
     public function test_it_creates_a_subscriber(): void
     {
         $factory = new MutationTestingResultsCollectorSubscriberFactory(
-            $this->createMock(Collector::class),
-            $this->createMock(Collector::class),
+            $this->createStub(Collector::class),
+            $this->createStub(Collector::class),
         );
 
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-
-        $subscriber = $factory->create($outputMock);
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(MutationTestingResultsCollectorSubscriber::class, $subscriber);
     }

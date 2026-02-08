@@ -44,14 +44,15 @@ final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements
 {
     public function __construct(
         private bool $skipProgressBar,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return $this->skipProgressBar
-            ? new CiMutationGeneratingConsoleLoggerSubscriber($output)
-            : new MutationGeneratingConsoleLoggerSubscriber($output)
+            ? new CiMutationGeneratingConsoleLoggerSubscriber($this->output)
+            : new MutationGeneratingConsoleLoggerSubscriber($this->output)
         ;
     }
 }

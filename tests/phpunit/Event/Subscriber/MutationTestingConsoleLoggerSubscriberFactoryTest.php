@@ -92,6 +92,12 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     #[DataProvider('showMutationsProvider')]
     public function test_it_creates_a_subscriber(?int $numberOfShownMutations): void
     {
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
+
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
             $this->resultsCollectorMock,
@@ -101,15 +107,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             new FakeMutationAnalysisLogger(),
             withUncovered: true,
             withTimeouts: false,
+            output: $outputMock,
         );
 
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
-            ->method('isDecorated')
-            ->willReturn(false)
-        ;
-
-        $subscriber = $factory->create($outputMock);
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
     }
@@ -125,10 +126,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator = $this->createStub(MetricsCalculator::class);
         $resultsCollector = $this->createMock(ResultsCollector::class);
-        $diffColorizer = $this->createMock(DiffColorizer::class);
-        $outputFormatter = $this->createMock(MutationAnalysisLogger::class);
+        $diffColorizer = $this->createStub(DiffColorizer::class);
+        $outputFormatter = $this->createStub(MutationAnalysisLogger::class);
 
         $resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
@@ -147,9 +148,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $outputFormatter,
             withUncovered: false,
             withTimeouts: false,
+            output: $output,
         );
 
-        $subscriber = $factory->create($output);
+        $subscriber = $factory->create();
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($subscriber);
@@ -165,10 +167,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator = $this->createStub(MetricsCalculator::class);
         $resultsCollector = $this->createMock(ResultsCollector::class);
-        $diffColorizer = $this->createMock(DiffColorizer::class);
-        $outputFormatter = $this->createMock(MutationAnalysisLogger::class);
+        $diffColorizer = $this->createStub(DiffColorizer::class);
+        $outputFormatter = $this->createStub(MutationAnalysisLogger::class);
 
         $timedOutExecutionResult = $this->createMock(MutantExecutionResult::class);
         $timedOutExecutionResult->expects($this->once())
@@ -201,9 +203,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $outputFormatter,
             withUncovered: false,
             withTimeouts: true,
+            output: $output,
         );
 
-        $subscriber = $factory->create($output);
+        $subscriber = $factory->create();
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($subscriber);
