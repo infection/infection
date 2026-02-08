@@ -42,6 +42,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Function_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use stdClass;
@@ -49,8 +50,11 @@ use stdClass;
 #[CoversClass(AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
+    private Stub&AbstractValueToNullReturnValue $testSubjectStub;
+
     protected function setUp(): void
     {
+        $this->testSubjectStub = $this->createStub(AbstractValueToNullReturnValue::class);
     }
 
     public function test_attribute_not_found(): void
@@ -148,6 +152,6 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $reflectionMethod = new ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
 
-        return $reflectionMethod->invoke($this->createStub(AbstractValueToNullReturnValue::class), $mockNode);
+        return $reflectionMethod->invoke($this->testSubjectStub, $mockNode);
     }
 }

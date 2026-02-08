@@ -79,7 +79,10 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory('', $this->createStub(AbstractTestFrameworkAdapter::class));
+        $memoryLimiter->limitMemory(
+            '',
+            $this->createStub(AbstractTestFrameworkAdapter::class),
+        );
     }
 
     public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void

@@ -41,26 +41,27 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    private Mutant $mutant;
+    private Stub&Process $processStub;
 
-    private Process $process;
+    private Mutant $mutant;
 
     private MutantProcess $mutantProcess;
 
     protected function setUp(): void
     {
-        $this->process = $this->createStub(Process::class);
+        $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
-            $this->process,
+            $this->processStub,
             $this->mutant,
             $mutantExecutionResultFactory,
         );
@@ -69,10 +70,10 @@ final class MutantProcessTest extends TestCase
     public function test_it_exposes_its_state(): void
     {
         $this->assertMutantProcessStateIs(
-            mutantProcess: $this->mutantProcess,
-            expectedProcess: $this->process,
-            expectedMutant: $this->mutant,
-            expectedTimedOut: false,
+            $this->mutantProcess,
+            $this->processStub,
+            $this->mutant,
+            false,
         );
     }
 
@@ -81,10 +82,10 @@ final class MutantProcessTest extends TestCase
         $this->mutantProcess->markAsTimedOut();
 
         $this->assertMutantProcessStateIs(
-            mutantProcess: $this->mutantProcess,
-            expectedProcess: $this->process,
-            expectedMutant: $this->mutant,
-            expectedTimedOut: true,
+            $this->mutantProcess,
+            $this->processStub,
+            $this->mutant,
+            true,
         );
     }
 
