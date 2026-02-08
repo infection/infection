@@ -69,23 +69,17 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
-    private MockObject&OutputInterface $output;
-
     private MockObject&MutationAnalysisLogger $logger;
 
     private MockObject&MetricsCalculator $metricsCalculator;
 
     private MockObject&ResultsCollector $resultsCollector;
 
-    private MockObject&DiffColorizer $diffColorizer;
-
     protected function setUp(): void
     {
-        $this->output = $this->createMock(OutputInterface::class);
         $this->logger = $this->createMock(MutationAnalysisLogger::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->resultsCollector = $this->createMock(ResultsCollector::class);
-        $this->diffColorizer = $this->createMock(DiffColorizer::class);
     }
 
     public function test_it_reacts_on_mutation_testing_started(): void
@@ -96,18 +90,18 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             0,
             withUncovered: true,
             withTimeouts: false,
         ));
 
-        $processRunner = $this->createMock(ProcessRunner::class);
+        $processRunner = $this->createStub(ProcessRunner::class);
 
         $dispatcher->dispatch(new MutationTestingWasStarted(1, $processRunner));
     }
@@ -124,11 +118,11 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             0,
             withUncovered: true,
@@ -137,7 +131,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(
             new MutantProcessWasFinished(
-                $this->createMock(MutantExecutionResult::class),
+                $this->createStub(MutantExecutionResult::class),
             ),
         );
     }
@@ -150,11 +144,11 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             0,
             withUncovered: true,
@@ -189,7 +183,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->method('getEscapedExecutionResults')
             ->willReturn([$escapedExecutionResult]);
 
-        $notCoveredExecutionResult = $this->createMock(MutantExecutionResult::class);
+        $notCoveredExecutionResult = $this->createStub(MutantExecutionResult::class);
 
         $this->resultsCollector->expects($this->once())
             ->method('getNotCoveredExecutionResults')
@@ -201,7 +195,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20,
             withUncovered: true,
@@ -276,7 +270,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20,
             withUncovered: true,
@@ -380,7 +374,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20,
             withUncovered: true,
@@ -447,7 +441,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new FederatedReporter(
                 new FederatedReporter(
                     new FileReporter(
@@ -498,7 +492,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             0,
             withUncovered: true,
@@ -523,7 +517,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20,
             withUncovered: true,
@@ -565,7 +559,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             1,
             withUncovered: true,
@@ -611,7 +605,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             null,
             withUncovered: true,
@@ -634,11 +628,11 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             1,
             withUncovered: true,
@@ -674,7 +668,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
             withUncovered: true,
@@ -716,7 +710,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20, // Use 20 to ensure getEscapedExecutionResults is called
             withUncovered: false,
@@ -752,7 +746,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20,
             withUncovered: false,
@@ -804,7 +798,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->logger,
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->diffColorizer,
+            $this->createStub(DiffColorizer::class),
             new NullReporter(),
             20,
             withUncovered: false,

@@ -126,10 +126,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator = $this->createStub(MetricsCalculator::class);
         $resultsCollector = $this->createMock(ResultsCollector::class);
-        $diffColorizer = $this->createMock(DiffColorizer::class);
-        $outputFormatter = $this->createMock(MutationAnalysisLogger::class);
+        $diffColorizer = $this->createStub(DiffColorizer::class);
+        $outputFormatter = $this->createStub(MutationAnalysisLogger::class);
 
         $resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
@@ -167,10 +167,10 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator = $this->createStub(MetricsCalculator::class);
         $resultsCollector = $this->createMock(ResultsCollector::class);
-        $diffColorizer = $this->createMock(DiffColorizer::class);
-        $outputFormatter = $this->createMock(MutationAnalysisLogger::class);
+        $diffColorizer = $this->createStub(DiffColorizer::class);
+        $outputFormatter = $this->createStub(MutationAnalysisLogger::class);
 
         $timedOutExecutionResult = $this->createMock(MutantExecutionResult::class);
         $timedOutExecutionResult->expects($this->once())

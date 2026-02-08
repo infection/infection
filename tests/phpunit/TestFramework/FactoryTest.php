@@ -56,8 +56,8 @@ final class FactoryTest extends TestCase
         $factory = new Factory(
             '',
             '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            $this->createMock(TestFrameworkFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
@@ -73,8 +73,8 @@ final class FactoryTest extends TestCase
         $factory = new Factory(
             '',
             '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            $this->createMock(TestFrameworkFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),

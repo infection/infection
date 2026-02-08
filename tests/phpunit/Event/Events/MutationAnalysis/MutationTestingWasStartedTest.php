@@ -46,7 +46,7 @@ final class MutationTestingWasStartedTest extends TestCase
     public function test_it_exposes_its_mutation_count_and_process_runner(): void
     {
         $count = 5;
-        $processRunner = $this->createMock(ProcessRunner::class);
+        $processRunner = $this->createStub(ProcessRunner::class);
 
         $event = new MutationTestingWasStarted($count, $processRunner);
 
