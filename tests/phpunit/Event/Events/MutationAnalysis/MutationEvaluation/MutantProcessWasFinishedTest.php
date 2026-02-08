@@ -45,7 +45,7 @@ final class MutantProcessWasFinishedTest extends TestCase
 {
     public function test_it_exposes_its_mutant_process(): void
     {
-        $executionResultMock = $this->createMock(MutantExecutionResult::class);
+        $executionResultMock = $this->createStub(MutantExecutionResult::class);
 
         $event = new MutantProcessWasFinished($executionResultMock);
 
