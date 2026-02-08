@@ -55,11 +55,11 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 
     public function test_it_collects_the_generated_mutations(): void
     {
-        $mutation0 = $this->createMock(Mutation::class);
-        $mutation1 = $this->createMock(Mutation::class);
-        $mutation2 = $this->createMock(Mutation::class);
-        $mutation3 = $this->createMock(Mutation::class);
-        $mutation4 = $this->createMock(Mutation::class);
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation2 = $this->createStub(Mutation::class);
+        $mutation3 = $this->createStub(Mutation::class);
+        $mutation4 = $this->createStub(Mutation::class);
 
         $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
         $nodeMutationGeneratorMock
@@ -93,11 +93,11 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 
     public function test_it_resets_its_state_between_two_traverse(): void
     {
-        $mutation0 = $this->createMock(Mutation::class);
-        $mutation1 = $this->createMock(Mutation::class);
-        $mutation2 = $this->createMock(Mutation::class);
-        $mutation3 = $this->createMock(Mutation::class);
-        $mutation4 = $this->createMock(Mutation::class);
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation2 = $this->createStub(Mutation::class);
+        $mutation3 = $this->createStub(Mutation::class);
+        $mutation4 = $this->createStub(Mutation::class);
 
         $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
         $nodeMutationGeneratorMock

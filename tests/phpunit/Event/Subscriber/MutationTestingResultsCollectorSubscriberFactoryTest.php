@@ -47,8 +47,8 @@ final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCas
     public function test_it_creates_a_subscriber(): void
     {
         $factory = new MutationTestingResultsCollectorSubscriberFactory(
-            $this->createMock(Collector::class),
-            $this->createMock(Collector::class),
+            $this->createStub(Collector::class),
+            $this->createStub(Collector::class),
         );
 
         $subscriber = $factory->create();

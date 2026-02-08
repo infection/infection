@@ -41,27 +41,26 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    private MockObject&Process $processMock;
-
     private Mutant $mutant;
+
+    private Process $process;
 
     private MutantProcess $mutantProcess;
 
     protected function setUp(): void
     {
-        $this->processMock = $this->createMock(Process::class);
+        $this->process = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
-            $this->processMock,
+            $this->process,
             $this->mutant,
             $mutantExecutionResultFactory,
         );
@@ -70,10 +69,10 @@ final class MutantProcessTest extends TestCase
     public function test_it_exposes_its_state(): void
     {
         $this->assertMutantProcessStateIs(
-            $this->mutantProcess,
-            $this->processMock,
-            $this->mutant,
-            false,
+            mutantProcess: $this->mutantProcess,
+            expectedProcess: $this->process,
+            expectedMutant: $this->mutant,
+            expectedTimedOut: false,
         );
     }
 
@@ -82,10 +81,10 @@ final class MutantProcessTest extends TestCase
         $this->mutantProcess->markAsTimedOut();
 
         $this->assertMutantProcessStateIs(
-            $this->mutantProcess,
-            $this->processMock,
-            $this->mutant,
-            true,
+            mutantProcess: $this->mutantProcess,
+            expectedProcess: $this->process,
+            expectedMutant: $this->mutant,
+            expectedTimedOut: true,
         );
     }
 

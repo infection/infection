@@ -49,11 +49,8 @@ use stdClass;
 #[CoversClass(AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    private MockObject&AbstractValueToNullReturnValue $testSubject;
-
     protected function setUp(): void
     {
-        $this->testSubject = $this->createMock(AbstractValueToNullReturnValue::class);
     }
 
     public function test_attribute_not_found(): void
@@ -91,7 +88,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Node\NullableType::class),
+                        $this->createStub(Node\NullableType::class),
                     ),
                 ),
             ),
@@ -117,7 +114,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Name::class),
+                        $this->createStub(Name::class),
                     ),
                 ),
             ),
@@ -151,6 +148,6 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $reflectionMethod = new ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
 
-        return $reflectionMethod->invoke($this->testSubject, $mockNode);
+        return $reflectionMethod->invoke($this->createStub(AbstractValueToNullReturnValue::class), $mockNode);
     }
 }
