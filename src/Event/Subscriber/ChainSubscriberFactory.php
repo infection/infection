@@ -41,13 +41,14 @@ namespace Infection\Event\Subscriber;
 final readonly class ChainSubscriberFactory
 {
     /**
-     * @var SubscriberFactory[]
+     * @var array<SubscriberFactory|EventSubscriber>
      */
-    private array $factories;
+    private array $subscribersAndFactories;
 
-    public function __construct(SubscriberFactory ...$factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        SubscriberFactory|EventSubscriber ...$factories,
+    ) {
+        $this->subscribersAndFactories = $factories;
     }
 
     /**
@@ -55,8 +56,12 @@ final readonly class ChainSubscriberFactory
      */
     public function create(): iterable
     {
-        foreach ($this->factories as $factory) {
-            yield $factory->create();
+        foreach ($this->subscribersAndFactories as $subscriberOrFactory) {
+            if ($subscriberOrFactory instanceof EventSubscriber) {
+                yield $subscriberOrFactory;
+            } else {
+                yield $subscriberOrFactory->create();
+            }
         }
     }
 }
