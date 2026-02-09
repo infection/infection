@@ -83,15 +83,21 @@ abstract class VisitorTestCase extends TestCase
 
     /**
      * @param Node[]|Node $nodeOrNodes
+     *
+     * @return array<positive-int|0, Node>
      */
-    final protected function addIdsToNodes(array|Node $nodeOrNodes): void
+    final protected function addIdsToNodes(array|Node $nodeOrNodes): array
     {
         $nodes = (array) $nodeOrNodes;
 
+        $visitor = new AddIdToTraversedNodesVisitor();
+
         $nodeTraverser = new NodeTraverser(
-            new AddIdToTraversedNodesVisitor(),
+            $visitor,
         );
         $nodeTraverser->traverse($nodes);
+
+        return $visitor->getNodesById();
     }
 
     /**
