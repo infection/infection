@@ -89,7 +89,6 @@ abstract class VisitorTestCase extends TestCase
     final protected function addIdsToNodes(array|Node $nodeOrNodes): array
     {
         $nodes = (array) $nodeOrNodes;
-
         $visitor = new AddIdToTraversedNodesVisitor();
 
         $nodeTraverser = new NodeTraverser(
