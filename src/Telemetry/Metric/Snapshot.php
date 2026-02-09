@@ -32,65 +32,28 @@
  */
 
 declare(strict_types=1);
-
-namespace Infection\Resource\Memory;
-
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- * @final
+/*
+ * This file is part of PHPUnit.
+ *
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-class MemoryFormatter
+
+namespace Infection\Telemetry\Metric;
+
+use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorStatus;
+use Infection\Telemetry\Metric\Memory\MemoryUsage;
+use Infection\Telemetry\Metric\Time\HRTime;
+
+final readonly class Snapshot
 {
-    private const BYTES_IN_KB = 1024;
-
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
-    {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
-
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
-        );
-
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
-        );
+    public function __construct(
+        public HRTime $time,
+        public MemoryUsage $memoryUsage,
+        public MemoryUsage $peakMemoryUsage,
+        public GarbageCollectorStatus $garbageCollectorStatus,
+    ) {
     }
 }

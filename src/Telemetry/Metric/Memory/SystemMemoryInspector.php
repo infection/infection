@@ -33,17 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Telemetry\Metric\Memory;
 
-use Infection\Mutant\MutantExecutionResult;
+use function memory_get_peak_usage;
+use function memory_get_usage;
 
-/**
- * @internal
- */
-final readonly class MutantProcessWasFinished
+final class SystemMemoryInspector implements MemoryInspector
 {
-    public function __construct(
-        public MutantExecutionResult $executionResult,
-    ) {
+    public function readMemoryUsage(): MemoryUsage
+    {
+        return MemoryUsage::fromBytes(memory_get_usage());
+    }
+
+    public function readPeakMemoryUsage(): MemoryUsage
+    {
+        return MemoryUsage::fromBytes(memory_get_peak_usage());
     }
 }

@@ -33,64 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Utility;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use function bin2hex;
+use Infection\CannotBeInstantiated;
+use function random_bytes;
 
-/**
- * @internal
- * @final
- */
-class MemoryFormatter
+final class UniqueId
 {
-    private const BYTES_IN_KB = 1024;
+    use CannotBeInstantiated;
 
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
+    public static function generate(): string
     {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
-
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
-        );
-
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
-        );
+        return bin2hex(random_bytes(6));
     }
 }

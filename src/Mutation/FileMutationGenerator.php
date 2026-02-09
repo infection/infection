@@ -68,6 +68,7 @@ class FileMutationGenerator
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -145,11 +146,15 @@ class FileMutationGenerator
      */
     private function createAst(SplFileInfo $sourceFile): array
     {
+        $this->eventDispatcher->dispatch(new FileParsingWasStarted($sourceFile));
+
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
         $preTraverser->traverse($initialStatements);
+
+        $this->eventDispatcher->dispatch(new FileParsingWasFinished($sourceFile));
 
         return [$initialStatements, $originalFileTokens];
     }

@@ -48,6 +48,7 @@ use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
+use Infection\Command\Telemetry;
 use Infection\Container\Container;
 use OutOfBoundsException;
 use function preg_quote;
@@ -56,6 +57,7 @@ use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use function trim;
 
 /**
@@ -121,6 +123,9 @@ final class Application extends BaseApplication
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
+                new Telemetry\ShowTraceCommand(
+                    new Filesystem(),
+                ),
             ],
         );
     }

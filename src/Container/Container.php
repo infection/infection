@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
+use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -66,9 +67,9 @@ use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
+use Infection\Event\Subscriber\TracingSubscriberFactory;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\FileStore;
@@ -135,6 +136,15 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorInspector;
+use Infection\Telemetry\Metric\GarbageCollection\SystemGarbageCollectorInspector;
+use Infection\Telemetry\Metric\Memory\MemoryInspector;
+use Infection\Telemetry\Metric\Memory\SystemMemoryInspector;
+use Infection\Telemetry\Metric\ResourceInspector;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
+use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
+use Infection\Telemetry\Metric\Time\SystemStopwatch;
+use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -445,22 +455,34 @@ final class Container extends DIContainer
                     $container->getOutput(),
                 );
             },
-            PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
-                $container->getStopwatch(),
-                $container->getTimeFormatter(),
-                $container->getMemoryFormatter(),
-                $container->getConfiguration()->threadCount,
-                $container->getOutput(),
+            GarbageCollectorInspector::class => static fn (): GarbageCollectorInspector => SystemGarbageCollectorInspector::create(),
+            MemoryInspector::class => static fn (): MemoryInspector => new SystemMemoryInspector(),
+            TelemetryStopwatch::class => static fn (): TelemetryStopwatch => new SystemStopwatch(),
+            ResourceInspector::class => static fn (self $container): ResourceInspector => new ResourceInspector(
+                $container->get(TelemetryStopwatch::class),
+                $container->get(MemoryInspector::class),
+                $container->get(GarbageCollectorInspector::class),
             ),
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
-                $container->getSourceLineMatcher(),
-                $container->getTracer(),
-                $container->getFileStore(),
+            Tracer::class => static fn (self $container): Tracer => new Tracer(
+                $container->get(ResourceInspector::class),
             ),
-            FileReporterFactory::class => static function (self $container): FileReporterFactory {
+            TracingSubscriberFactory::class => static fn (self $container): TracingSubscriberFactory => new TracingSubscriberFactory(
+                $container->get(Tracer::class),
+            ),
+            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                $configuration = $container->getConfiguration();
+
+                return new FileMutationGenerator(
+                    $container->getFileParser(),
+                    $container->getNodeTraverserFactory(),
+                    $container->getLineRangeCalculator(),
+                    $container->getFilesDiffChangedLines(),
+                    $configuration->isForGitDiffLines(),
+                    $configuration->getGitDiffBase(),
+                    $container->getEventDispatcher(),
+                );
+            },
+            FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
                 return new FileReporterFactory(
@@ -849,9 +871,9 @@ final class Container extends DIContainer
         return $this->get(MutationTestingResultsLoggerSubscriberFactory::class);
     }
 
-    public function getPerformanceLoggerSubscriberFactory(): PerformanceLoggerSubscriberFactory
+    public function getPerformanceLoggerSubscriberFactory(): TracingSubscriberFactory
     {
-        return $this->get(PerformanceLoggerSubscriberFactory::class);
+        return $this->get(TracingSubscriberFactory::class);
     }
 
     public function getSourceCollector(): SourceCollector
@@ -1116,6 +1138,11 @@ final class Container extends DIContainer
     private function getTimeFormatter(): TimeFormatter
     {
         return $this->get(TimeFormatter::class);
+    }
+
+    private function getDurationFormatter(): DurationFormatter
+    {
+        return $this->get(DurationFormatter::class);
     }
 
     private function getMemoryFormatter(): MemoryFormatter

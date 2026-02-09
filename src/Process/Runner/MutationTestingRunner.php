@@ -42,6 +42,8 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasF
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\MutationHeuristicsWasFinished;
+use Infection\Event\MutationHeuristicsWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
@@ -81,10 +83,12 @@ class MutationTestingRunner
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
+
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
         $processContainers = take($mutations)
             ->stream()
+            ->cast($this->dispatchHeuristicsStartedEvent(...))
             ->filter($this->ignoredByMutantId(...))
             // Emitting the start of the event must be done _after_ checking the mutant ID
             // as the latter does not dispatch any finished event.
@@ -102,6 +106,15 @@ class MutationTestingRunner
         ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    private function dispatchHeuristicsStartedEvent(Mutation $mutation): Mutation
+    {
+        $this->eventDispatcher->dispatch(
+            new MutationHeuristicsWasStarted($mutation),
+        );
+
+        return $mutation;
     }
 
     private function mutationToMutant(Mutation $mutation): Mutant
@@ -122,6 +135,13 @@ class MutationTestingRunner
             return true;
         }
 
+        $this->eventDispatcher->dispatch(
+            new MutationHeuristicsWasFinished(
+                $mutation,
+                $isNotIgnored,
+            ),
+        );
+
         return $mutation->getHash() === $this->mutantId;
     }
 
@@ -132,6 +152,7 @@ class MutationTestingRunner
         if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
             return true;
         }
+        // TODO: get metrics of the eligible code coverage
 
         foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
             if (!$this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {

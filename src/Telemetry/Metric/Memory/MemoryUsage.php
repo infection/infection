@@ -33,64 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Telemetry\Metric\Memory;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- * @final
- */
-class MemoryFormatter
+final readonly class MemoryUsage
 {
-    private const BYTES_IN_KB = 1024;
-
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
+    private function __construct(public int $bytes)
     {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
+    }
 
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
+    public static function fromBytes(int $bytes): self
+    {
+        return new self($bytes);
+    }
 
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
-        );
-
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
-        );
+    public function diff(self $other): self
+    {
+        return self::fromBytes($this->bytes - $other->bytes);
     }
 }

@@ -33,64 +33,80 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Telemetry\Tracing;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use function array_map;
+use Infection\Telemetry\Metric\ResourceInspector;
+use Infection\Telemetry\Reporter\TraceProvider;
+use Infection\Utility\UniqueId;
 
-/**
- * @internal
- * @final
- */
-class MemoryFormatter
+final class Tracer implements TraceProvider
 {
-    private const BYTES_IN_KB = 1024;
+    /**
+     * @var list<SpanBuilder>
+     */
+    private array $spans;
 
-    private const DECIMALS_TO_SHOW = 2;
+    /**
+     * @var array<string, list<SpanBuilder>>
+     */
+    private array $allSpans;
 
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
+    public function __construct(
+        private readonly ResourceInspector $inspector,
+    ) {
+    }
 
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
-    {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
-
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
+    public function startSpan(
+        RootScopes $scope,
+        string|int|null $id = null,
+    ): SpanBuilder {
+        $span = new SpanBuilder(
+            (string) $id ?? UniqueId::generate(),
+            $scope->value,
+            $this->inspector->snapshot(),
         );
 
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
+        $this->spans[] = $span;
+        $this->allSpans[$span->id][] = $span;
 
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
+        return $span;
+    }
+
+    public function startChildSpan(
+        string $scope,
+        string|int $id,
+        SpanBuilder $parent,
+    ): SpanBuilder {
+        $span = new SpanBuilder(
+            (string) $id ?? UniqueId::generate(),
+            $scope,
+            $this->inspector->snapshot(),
+        );
+        $this->allSpans[$span->id][] = $span;
+
+        $parent->addChild($span);
+
+        return $span;
+    }
+
+    public function finishSpan(SpanBuilder ...$spans): void
+    {
+        $end = $this->inspector->snapshot();
+
+        foreach ($spans as $span) {
+            $span->finish($end);
+        }
+    }
+
+    public function getTrace(): Trace
+    {
+        return new Trace(
+            UniqueId::generate(),
+            array_map(
+                static fn (SpanBuilder $spanBuilder) => $spanBuilder->build(),
+                $this->spans,
             ),
-            self::UNITS[$power],
         );
     }
 }

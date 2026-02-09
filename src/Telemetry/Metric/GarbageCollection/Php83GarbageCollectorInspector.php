@@ -33,64 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Telemetry\GarbageCollection;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
+namespace Infection\Telemetry\Metric\GarbageCollection;
 
-/**
- * @internal
- * @final
- */
-class MemoryFormatter
+final class Php83GarbageCollectorInspector implements GarbageCollectorInspector
 {
-    private const BYTES_IN_KB = 1024;
-
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
+    public function readStatus(): GarbageCollectorStatus
     {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
+        $status = \gc_status();
 
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
-        );
-
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
+        return new GarbageCollectorStatus(
+            $status['runs'],
+            $status['collected'],
+            $status['threshold'],
+            $status['roots'],
+            $status['application_time'],
+            $status['collector_time'],
+            $status['destructor_time'],
+            $status['free_time'],
+            $status['running'],
+            $status['protected'],
+            $status['full'],
+            $status['buffer_size'],
         );
     }
 }

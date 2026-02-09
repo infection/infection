@@ -33,64 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Telemetry\Metric\GarbageCollection;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- * @final
- */
-class MemoryFormatter
+final readonly class GarbageCollectorStatus
 {
-    private const BYTES_IN_KB = 1024;
-
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
-    {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
-
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
-        );
-
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
-        );
+    public function __construct(
+        public int $runs,
+        public int $collected,
+        public int $threshold,
+        public int $roots,
+        // TODO: make it non-nullable when we make Infection require PHP 8.3+.
+        //  meanwhile null=info not available.
+        public ?float $applicationTime,
+        public ?float $collectorTime,
+        public ?float $destructorTime,
+        public ?float $freeTime,
+        public ?bool $running,
+        public ?bool $protected,
+        public ?bool $full,
+        public ?int $bufferSize,
+    ) {
     }
 }

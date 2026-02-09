@@ -33,11 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis;
+namespace Infection\Telemetry\Metric\GarbageCollection;
 
-/**
- * @internal
- */
-final readonly class MutationTestingWasFinished
+interface GarbageCollectorInspector
 {
+    public function readStatus(): GarbageCollectorStatus;
 }

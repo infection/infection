@@ -33,36 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Telemetry\Reporter;
 
-use Infection\Resource\Listener\PerformanceLoggerSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Telemetry\Tracing\Trace;
 
-/**
- * @internal
- */
-final readonly class PerformanceLoggerSubscriberFactory implements SubscriberFactory
+interface TraceProvider
 {
-    public function __construct(
-        private Stopwatch $stopwatch,
-        private TimeFormatter $timeFormatter,
-        private MemoryFormatter $memoryFormatter,
-        private int $threadCount,
-        private OutputInterface $output,
-    ) {
-    }
-
-    public function create(): EventSubscriber
-    {
-        return new PerformanceLoggerSubscriber(
-            $this->stopwatch,
-            $this->timeFormatter,
-            $this->memoryFormatter,
-            $this->threadCount,
-            $this->output,
-        );
-    }
+    public function getTrace(): Trace;
 }

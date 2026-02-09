@@ -33,19 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Event;
+
+use Infection\Mutation\Mutation;
 
 /**
  * @internal
  */
-final readonly class MutableFileWasProcessed
+final readonly class MutationHeuristicsWasStarted
 {
-    /**
-     * @param list<string> $mutationHashes
-     */
-    public function __construct(
-        public string $sourceFilePath,
-        public array $mutationHashes,
-    ) {
+    public function __construct(public Mutation $mutation)
+    {
     }
 }

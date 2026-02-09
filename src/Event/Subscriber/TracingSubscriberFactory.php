@@ -33,64 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Event\Subscriber;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use Infection\Telemetry\Listener\TracingSubscriber;
+use Infection\Telemetry\Tracing\Tracer;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
- * @final
  */
-class MemoryFormatter
+final readonly class TracingSubscriberFactory implements SubscriberFactory
 {
-    private const BYTES_IN_KB = 1024;
+    public function __construct(
+        private Tracer $tracer,
+    ) {
+    }
 
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
+    public function create(OutputInterface $output): EventSubscriber
     {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
-
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
-        );
-
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
+        return new TracingSubscriber(
+            $this->tracer,
         );
     }
 }

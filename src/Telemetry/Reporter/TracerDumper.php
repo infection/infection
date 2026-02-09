@@ -33,64 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Memory;
+namespace Infection\Telemetry\Reporter;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use function log;
-use function number_format;
-use function round;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use const DIRECTORY_SEPARATOR;
+use Infection\Telemetry\Tracing\Trace;
+use function serialize;
+use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @internal
- * @final
- */
-class MemoryFormatter
+final readonly class TracerDumper
 {
-    private const BYTES_IN_KB = 1024;
+    public function __construct(
+        private Filesystem $filesystem,
+        private string $dir,
+    ) {
+    }
 
-    private const DECIMALS_TO_SHOW = 2;
-
-    private const UNITS = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB',
-        'EB',
-        'ZB',
-        'YB',
-    ];
-
-    public function toHumanReadableString(float|MemoryUsage $bytes): string
+    public function report(Trace $trace): void
     {
-        if ($bytes instanceof MemoryUsage) {
-            $bytes = $bytes->bytes;
-        }
-
-        if ($bytes < 0) {
-            return '-' . $this->toHumanReadableString(-$bytes);
-        }
-
-        Assert::greaterThanEq(
-            $bytes,
-            0.,
-            'Expected a positive or null amount of bytes. Got: %s',
+        $this->filesystem->dumpFile(
+            $this->dir . DIRECTORY_SEPARATOR . self::createFileName($trace),
+            serialize($trace),
         );
+    }
 
-        $power = $bytes > 0 ? (int) round(log($bytes, self::BYTES_IN_KB - 1)) : 0;
-
-        return sprintf(
-            '%s%s',
-            number_format(
-                $bytes / (self::BYTES_IN_KB ** $power),
-                self::DECIMALS_TO_SHOW,
-                '.',
-                ',',
-            ),
-            self::UNITS[$power],
-        );
+    private static function createFileName(Trace $trace): string
+    {
+        return 'trace-' . $trace->id;
     }
 }

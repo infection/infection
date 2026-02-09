@@ -158,6 +158,7 @@ class NodeMutationGenerator
                 $tests,
                 $this->originalFileTokens,
                 $this->originalFileContent,
+                $this->trace,
             );
 
             ++$mutationByMutatorIndex;
