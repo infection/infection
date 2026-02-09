@@ -37,7 +37,6 @@ namespace Infection\Event\Subscriber;
 
 use Infection\Telemetry\Listener\TracingSubscriber;
 use Infection\Telemetry\Tracing\Tracer;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -49,7 +48,7 @@ final readonly class TracingSubscriberFactory implements SubscriberFactory
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return new TracingSubscriber(
             $this->tracer,

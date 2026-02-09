@@ -47,6 +47,9 @@ use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorStatus;
 use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use Infection\Telemetry\Metric\Time\HRTime;
 
+/**
+ * Captures a point-in-time measurement of runtime resource consumption.
+ */
 final readonly class Snapshot
 {
     public function __construct(

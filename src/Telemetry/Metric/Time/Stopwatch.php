@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Metric\Time;
 
+/**
+ * @internal
+ */
 interface Stopwatch
 {
     public function current(): HRTime;

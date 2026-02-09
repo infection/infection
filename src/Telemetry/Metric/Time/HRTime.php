@@ -38,6 +38,11 @@ namespace Infection\Telemetry\Metric\Time;
 use InvalidArgumentException;
 use function sprintf;
 
+/**
+ * Represents a high-resolution time point with nanosecond precision for telemetry measurements.
+ *
+ * @internal
+ */
 final readonly class HRTime
 {
     private const NANOSECONDS_MAX = 1e9;

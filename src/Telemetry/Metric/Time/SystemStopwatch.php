@@ -37,6 +37,9 @@ namespace Infection\Telemetry\Metric\Time;
 
 use function Safe\hrtime;
 
+/**
+ * @internal
+ */
 final class SystemStopwatch implements Stopwatch
 {
     public function current(): HRTime

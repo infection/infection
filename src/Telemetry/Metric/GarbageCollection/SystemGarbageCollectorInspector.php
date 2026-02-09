@@ -38,6 +38,9 @@ namespace Infection\Telemetry\Metric\GarbageCollection;
 use Infection\CannotBeInstantiated;
 use const PHP_VERSION_ID;
 
+/**
+ * @internal
+ */
 final class SystemGarbageCollectorInspector
 {
     use CannotBeInstantiated;

@@ -38,15 +38,20 @@ namespace Infection\Telemetry\Metric\Memory;
 use function memory_get_peak_usage;
 use function memory_get_usage;
 
+/**
+ * @internal
+ */
 final class SystemMemoryInspector implements MemoryInspector
 {
     public function readMemoryUsage(): MemoryUsage
     {
+        // @see https://www.php.net/manual/en/function.memory-get-usage.php
         return MemoryUsage::fromBytes(memory_get_usage());
     }
 
     public function readPeakMemoryUsage(): MemoryUsage
     {
+        // @see https://www.php.net/manual/en/function.memory-get-peak-usage.php
         return MemoryUsage::fromBytes(memory_get_peak_usage());
     }
 }

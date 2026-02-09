@@ -41,6 +41,11 @@ use function min;
 use function round;
 use function sprintf;
 
+/**
+ * Represents a precise time duration with nanosecond resolution.
+ *
+ * @internal
+ */
 final readonly class Duration
 {
     private const NANOSECONDS_MAX = 10e9;

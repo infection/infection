@@ -37,10 +37,39 @@ namespace Infection\Tests\Telemetry\Metric\Memory;
 
 use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MemoryUsage::class)]
 final class MemoryUsageTest extends TestCase
 {
-    // TODO
+    public function test_it_can_be_created_from_bytes(): void
+    {
+        $memoryUsage = MemoryUsage::fromBytes(1024);
+
+        $this->assertSame(1024, $memoryUsage->bytes);
+    }
+
+    #[DataProvider('diffProvider')]
+    public function test_it_can_calculate_difference(
+        int $currentBytes,
+        int $previousBytes,
+        int $expectedDiff,
+    ): void {
+        $current = MemoryUsage::fromBytes($currentBytes);
+        $previous = MemoryUsage::fromBytes($previousBytes);
+
+        $diff = $current->diff($previous);
+
+        $this->assertSame($expectedDiff, $diff->bytes);
+    }
+
+    public static function diffProvider(): iterable
+    {
+        yield 'positive difference' => [2048, 1024, 1024];
+
+        yield 'negative difference' => [1024, 2048, -1024];
+
+        yield 'zero difference' => [1024, 1024, 0];
+    }
 }

@@ -39,12 +39,17 @@ use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorInspector;
 use Infection\Telemetry\Metric\Memory\MemoryInspector;
 use Infection\Telemetry\Metric\Time\Stopwatch;
 
-final class ResourceInspector
+/**
+ * Captures point-in-time snapshots of runtime resource metrics.
+ *
+ * @internal
+ */
+final readonly class ResourceInspector
 {
     public function __construct(
-        private readonly Stopwatch $stopwatch,
-        private readonly MemoryInspector $memoryInspector,
-        private readonly GarbageCollectorInspector $garbageCollectorInspector,
+        private Stopwatch $stopwatch,
+        private MemoryInspector $memoryInspector,
+        private GarbageCollectorInspector $garbageCollectorInspector,
     ) {
     }
 

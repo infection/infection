@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Container;
 
 use function array_filter;
-use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -144,7 +143,6 @@ use Infection\Telemetry\Metric\ResourceInspector;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
 use Infection\Telemetry\Metric\Time\SystemStopwatch;
-use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -382,6 +380,7 @@ final class Container extends DIContainer
             ),
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
+                    $container->get(TracingSubscriberFactory::class),
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingResultsCollectorSubscriberFactory(),
@@ -463,26 +462,18 @@ final class Container extends DIContainer
                 $container->get(MemoryInspector::class),
                 $container->get(GarbageCollectorInspector::class),
             ),
-            Tracer::class => static fn (self $container): Tracer => new Tracer(
-                $container->get(ResourceInspector::class),
-            ),
-            TracingSubscriberFactory::class => static fn (self $container): TracingSubscriberFactory => new TracingSubscriberFactory(
-                $container->get(Tracer::class),
-            ),
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
-                $configuration = $container->getConfiguration();
-
                 return new FileMutationGenerator(
                     $container->getFileParser(),
                     $container->getNodeTraverserFactory(),
                     $container->getLineRangeCalculator(),
-                    $container->getFilesDiffChangedLines(),
-                    $configuration->isForGitDiffLines(),
-                    $configuration->getGitDiffBase(),
+                    $container->getSourceLineMatcher(),
+                    $container->getTracer(),
+                    $container->getFileStore(),
                     $container->getEventDispatcher(),
                 );
             },
-            FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
+            FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
 
                 return new FileReporterFactory(

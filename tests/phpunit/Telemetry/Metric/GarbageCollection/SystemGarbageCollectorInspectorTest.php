@@ -33,43 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Metric\GarbageCollection;
+namespace Infection\Tests\Telemetry\Metric\GarbageCollection;
 
-/**
- * Represents the state provided by `gc_status()`.
- *
- * @see https://www.php.net/manual/en/function.gc-status.php
- *
- * @internal
- */
-final readonly class GarbageCollectorStatus
+use Infection\Telemetry\Metric\GarbageCollection\Php81GarbageCollectorInspector;
+use Infection\Telemetry\Metric\GarbageCollection\Php83GarbageCollectorInspector;
+use Infection\Telemetry\Metric\GarbageCollection\SystemGarbageCollectorInspector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(SystemGarbageCollectorInspector::class)]
+#[CoversClass(Php81GarbageCollectorInspector::class)]
+#[CoversClass(Php83GarbageCollectorInspector::class)]
+final class SystemGarbageCollectorInspectorTest extends TestCase
 {
-    public function __construct(
-        // Number of times the garbage collector has run.
-        public int $runs,
-        // The number of objects collected.
-        public int $collected,
-        // The number of roots in the buffer which will trigger garbage collection.
-        public int $threshold,
-        // The current number of roots in the buffer.
-        public int $roots,
-        // TODO: make it non-nullable when we make Infection require PHP 8.3+.
-        //  meanwhile null=info not available.
-        // Total application time, in seconds. Including collector_time.
-        public ?float $applicationTime,
-        // Time spent collecting cycles, in seconds. Includes destructor_time and free_time.
-        public ?float $collectorTime,
-        // Time spent executing destructors during a cycle collection, in seconds. Subset of collectorTime.
-        public ?float $destructorTime,
-        // Time spent freeing values during a cycle collection, in seconds. Subset of collectorTime.
-        public ?float $freeTime,
-        public ?bool $running,
-        // Whether the garbage collector is protected and root additions are forbidden.
-        public ?bool $protected,
-        // Whether the root buffer size exceeded internal limits (GC_MAX_BUF_SIZE)
-        public ?bool $full,
-        // Current garbage collector buffer size.
-        public ?int $bufferSize,
-    ) {
+    public function test_it_can_create_an_inspector(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $inspector = SystemGarbageCollectorInspector::create();
+        $inspector->readStatus();
     }
 }

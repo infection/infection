@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Metric\Memory;
 
+/**
+ * Represents a memory usage measurement.
+ *
+ * @internal
+ */
 final readonly class MemoryUsage
 {
     private function __construct(public int $bytes)
