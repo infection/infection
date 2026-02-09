@@ -50,8 +50,8 @@ final class StaticAnalysisToolFactoryTest extends TestCase
     {
         $factory = new StaticAnalysisToolFactory(
             ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createMock(StaticAnalysisToolExecutableFinder::class),
-            $this->createMock(StaticAnalysisConfigLocator::class),
+            $this->createStub(StaticAnalysisToolExecutableFinder::class),
+            $this->createStub(StaticAnalysisConfigLocator::class),
         );
 
         $this->expectException(InvalidArgumentException::class);

@@ -739,12 +739,6 @@ parameters:
 			path: ../tests/phpunit/Environment/StrykerApiKeyResolverTest.php
 
 		-
-			rawMessage: 'Method Infection\Event\Subscriber\ChainSubscriberFactory::create() invoked with 1 parameter, 0 required.'
-			identifier: arguments.count
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php
-
-		-
 			rawMessage: 'Call to an undefined method object::setFilter().'
 			identifier: method.notFound
 			count: 1
@@ -1087,7 +1081,7 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
 
 		-
-			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubject with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
+			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubjectStub with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php

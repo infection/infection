@@ -269,7 +269,7 @@ final class EngineTest extends TestCase
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
 
-        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+        $maxTimeoutsChecker = $this->createStub(MaxTimeoutsChecker::class);
 
         $engine = new Engine(
             $config,
@@ -298,7 +298,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter = $this->createStub(TestFrameworkAdapter::class);
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
@@ -350,7 +350,7 @@ final class EngineTest extends TestCase
             ->willReturn($staticAnalysisProcess)
         ;
 
-        $staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
         $callOrder = [];
 
@@ -383,7 +383,7 @@ final class EngineTest extends TestCase
             ->with($this->callback(static fn (iterable $input): bool => true))
         ;
 
-        $consoleOutput = $this->createMock(ConsoleOutput::class);
+        $consoleOutput = $this->createStub(ConsoleOutput::class);
 
         $minMsiChecker = $this->createMock(MinMsiChecker::class);
         $minMsiChecker
@@ -409,9 +409,9 @@ final class EngineTest extends TestCase
             ->willReturn(85.0)
         ;
 
-        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
-        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+        $maxTimeoutsChecker = $this->createStub(MaxTimeoutsChecker::class);
 
         $engine = new Engine(
             $config,
@@ -444,7 +444,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter = $this->createStub(TestFrameworkAdapter::class);
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
@@ -508,9 +508,9 @@ final class EngineTest extends TestCase
             ->willReturn(0.0)
         ;
 
-        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
-        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+        $maxTimeoutsChecker = $this->createStub(MaxTimeoutsChecker::class);
 
         $engine = new Engine(
             $config,
@@ -538,7 +538,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter = $this->createStub(TestFrameworkAdapter::class);
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
@@ -607,7 +607,7 @@ final class EngineTest extends TestCase
             ->willReturn(0.0)
         ;
 
-        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
         $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
         $maxTimeoutsChecker
@@ -642,7 +642,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter = $this->createStub(TestFrameworkAdapter::class);
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
@@ -693,7 +693,7 @@ final class EngineTest extends TestCase
             ->willReturn(100)
         ;
 
-        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
         $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
         $maxTimeoutsChecker
@@ -731,7 +731,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
+        $adapter = $this->createStub(TestFrameworkAdapter::class);
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker
@@ -802,7 +802,7 @@ final class EngineTest extends TestCase
             ->willReturn(55.0)
         ;
 
-        $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
+        $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
         $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
         $maxTimeoutsChecker

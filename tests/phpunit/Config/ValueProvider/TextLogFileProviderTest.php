@@ -50,7 +50,7 @@ final class TextLogFileProviderTest extends BaseProviderTestCase
     protected function setUp(): void
     {
         $this->provider = new TextLogFileProvider(
-            $this->createMock(ConsoleHelper::class),
+            $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
         );
     }

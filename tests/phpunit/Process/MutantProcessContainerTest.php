@@ -78,7 +78,7 @@ final class MutantProcessContainerTest extends TestCase
         );
 
         // Build the first next process to advance the index
-        $newMutantProcess = $this->createMock(MutantProcess::class);
+        $newMutantProcess = $this->createStub(MutantProcess::class);
 
         $this->phpUnitMutantProcess
             ->expects($this->once())
@@ -114,7 +114,7 @@ final class MutantProcessContainerTest extends TestCase
             [$this->lazyMutantProcessCreator],
         );
 
-        $newMutantProcess = $this->createMock(MutantProcess::class);
+        $newMutantProcess = $this->createStub(MutantProcess::class);
 
         $this->phpUnitMutantProcess
             ->expects($this->once())
@@ -146,7 +146,7 @@ final class MutantProcessContainerTest extends TestCase
             [$this->lazyMutantProcessCreator],
         );
 
-        $newMutantProcess = $this->createMock(MutantProcess::class);
+        $newMutantProcess = $this->createStub(MutantProcess::class);
 
         $this->phpUnitMutantProcess
             ->expects($this->once())
