@@ -43,36 +43,87 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\TestFrameworkTypes;
 use stdClass;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @final
  */
 class SchemaConfigurationFactory
 {
-    public function create(string $path, stdClass $rawConfig): SchemaConfiguration
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function create(string $pathname, stdClass $rawConfig): SchemaConfiguration
     {
         return new SchemaConfiguration(
-            $path,
-            $rawConfig->timeout ?? null,
-            self::createSource($rawConfig->source),
-            self::createLogs($rawConfig->logs ?? new stdClass()),
-            self::normalizeString($rawConfig->tmpDir ?? null),
-            self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
-            self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
-            $rawConfig->ignoreMsiWithNoMutations ?? null,
-            $rawConfig->minMsi ?? null,
-            $rawConfig->minCoveredMsi ?? null,
-            (array) ($rawConfig->mutators ?? []),
-            $rawConfig->testFramework ?? null,
-            self::normalizeString($rawConfig->bootstrap ?? null),
-            self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
-            self::normalizeString($rawConfig->testFrameworkOptions ?? null),
-            self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
-            $rawConfig->threads ?? null,
-            $rawConfig->staticAnalysisTool ?? null,
+            pathname: $pathname,
+            timeout: self::getTimeout($rawConfig),
+            source: self::createSource($rawConfig->source),
+            logs: self::createLogs($rawConfig->logs ?? new stdClass()),
+            tmpDir: self::normalizeString($rawConfig->tmpDir ?? null),
+            phpUnit: self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
+            phpStan: self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
+            ignoreMsiWithNoMutations: $rawConfig->ignoreMsiWithNoMutations ?? null,
+            minMsi: $rawConfig->minMsi ?? null,
+            minCoveredMsi: $rawConfig->minCoveredMsi ?? null,
+            timeoutsAsEscaped: $rawConfig->timeoutsAsEscaped ?? null,
+            maxTimeouts: $rawConfig->maxTimeouts ?? null,
+            mutators: (array) ($rawConfig->mutators ?? []),
+            testFramework: self::getTestFramework($rawConfig),
+            bootstrap: self::normalizeString($rawConfig->bootstrap ?? null),
+            initialTestsPhpOptions: self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
+            testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
+            staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
+            threads: $rawConfig->threads ?? null,
+            staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
         );
+    }
+
+    private static function getTimeout(stdClass $rawConfig): ?float
+    {
+        $timeout = $rawConfig->timeout ?? null;
+
+        Assert::nullOrGreaterThanEq($timeout, 0);
+
+        return $timeout;
+    }
+
+    /**
+     * @return TestFrameworkTypes::*|null
+     */
+    private static function getTestFramework(stdClass $rawConfig): ?string
+    {
+        $testFramework = $rawConfig->testFramework ?? null;
+
+        // This value is already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
+
+        // @phpstan-ignore return.type
+        return $testFramework;
+    }
+
+    /**
+     * @return StaticAnalysisToolTypes::*|null
+     */
+    private static function getStaticAnalysisTool(stdClass $rawConfig): ?string
+    {
+        $staticAnalysisTool = $rawConfig->staticAnalysisTool ?? null;
+
+        // This value is already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+
+        // @phpstan-ignore return.type
+        return $staticAnalysisTool;
     }
 
     private static function createSource(stdClass $source): Source
@@ -137,11 +188,11 @@ class SchemaConfigurationFactory
     /**
      * @param string[] $values
      *
-     * @return string[]
+     * @return list<non-empty-string>
      */
     private static function normalizeStringArray(array $values): array
     {
-        $normalizedValue = array_filter(array_map('trim', $values));
+        $normalizedValue = array_filter(array_map(trim(...), $values));
 
         return array_values($normalizedValue);
     }

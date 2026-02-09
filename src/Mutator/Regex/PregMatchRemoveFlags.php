@@ -71,8 +71,7 @@ final class PregMatchRemoveFlags extends AbstractPregMatch
                 preg_match('/^test/g', $string);
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             'In order to kill this Mutant, write tests that cover every single flag used in a Regular Expression',
             <<<'DIFF'

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_flip;
 use Infection\Metrics\Collector;
 use Infection\Metrics\FilteringResultsCollector;
 use Infection\Metrics\FilteringResultsCollectorFactory;
@@ -55,11 +54,11 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
         $statusesProvider
             ->expects($this->once())
             ->method('get')
-            ->willReturn(array_flip(DetectionStatus::ALL));
+            ->willReturn(DetectionStatus::cases());
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
-        $targetCollector = $this->createMock(Collector::class);
+        $targetCollector = $this->createStub(Collector::class);
 
         $filteringCollector = $factory->create($targetCollector);
 
@@ -77,7 +76,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
-        $targetCollector = $this->createMock(Collector::class);
+        $targetCollector = $this->createStub(Collector::class);
 
         $filteringCollector = $factory->create($targetCollector);
 
@@ -91,7 +90,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
             ->expects($this->once())
             ->method('get')
             ->willReturn([
-                DetectionStatus::ESCAPED => true,
+                DetectionStatus::ESCAPED,
             ])
         ;
 

@@ -9,6 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: infection/tests-checker-action@v1.0.3
+      - uses: infection/tests-checker-action@d7c206b02342e492c91440a1234f8317ee316d8a # v1.0.3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

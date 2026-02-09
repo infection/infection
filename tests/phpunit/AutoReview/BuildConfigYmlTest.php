@@ -50,7 +50,7 @@ use Symfony\Component\Yaml\Yaml;
 final class BuildConfigYmlTest extends TestCase
 {
     #[DataProvider('providesYamlFilesForTesting')]
-    public function test_valid_yaml_has_key($filePath): void
+    public function test_valid_yaml_has_key(string $filePath): void
     {
         $this->assertFileExists($filePath);
 

@@ -1,8 +1,6 @@
 [![Minimum PHP version: 8.2.0](https://img.shields.io/badge/php-8.2.0%2B-blue.svg)](https://packagist.org/packages/infection/infection)
 [![Latest Stable Version](https://poser.pugx.org/infection/infection/v/stable)](https://packagist.org/packages/infection/infection)
-[![Continuous Integration](https://github.com/infection/infection/workflows/Continuous%20Integration/badge.svg)](https://github.com/infection/infection/actions)
-[![Build Status](https://travis-ci.org/infection/infection.svg?branch=master)](https://travis-ci.org/infection/infection)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/infection/infection/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/infection/infection/?branch=master)
+[![Unit & Integration Tests](https://github.com/infection/infection/actions/workflows/tests.yaml/badge.svg)](https://github.com/infection/infection/actions/workflows/tests.yaml)
 [![Infection MSI](https://img.shields.io/endpoint?url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Finfection%2Finfection%2Fmaster)](https://infection.github.io)
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/)
 

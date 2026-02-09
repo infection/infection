@@ -36,26 +36,37 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(InterfaceIgnorer::class)]
-final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
+final class InterfaceIgnorerTest extends VisitorTestCase
 {
-    #[DataProvider('provideIgnoreCases')]
-    public function test_it_ignores_the_correct_nodes(string $code, int $count): void
-    {
-        $spy = $this->createSpy();
+    #[DataProvider('nodeProvider')]
+    public function test_it_ignores_interfaces(
+        string $code,
+        string $expected,
+    ): void {
+        $nodes = $this->parse($code);
 
-        $this->parseAndTraverse($code, $spy);
+        $traverser = new NodeTraverser(
+            new NonMutableNodesIgnorerVisitor([new InterfaceIgnorer()]),
+            new MarkTraversedNodesAsVisitedVisitor(),
+        );
+        $traverser->traverse($nodes);
 
-        $this->assertSame($count, $spy->nodeCounter);
+        $actual = $this->dumper->dump($nodes);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function provideIgnoreCases(): iterable
+    public static function nodeProvider(): iterable
     {
-        yield 'interfaces are ignored' => [
+        yield 'only an interface (ignored)' => [
             <<<'PHP'
                 <?php
 
@@ -63,12 +74,16 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
                 {
                     public function nope(Bar $ignored): void;
                 }
-                PHP
-            ,
-            0,
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: <skipped>
+                )
+                AST,
         ];
 
-        yield 'classes arent ignored' => [
+        yield 'a regular class (not ignored)' => [
             <<<'PHP'
                 <?php
 
@@ -79,14 +94,85 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
                         $counted = true;
                     }
                 }
-                PHP
-            ,
-            2,
-        ];
-    }
 
-    protected function getIgnore(): NodeIgnorer
-    {
-        return new InterfaceIgnorer();
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Class(
+                        name: Identifier
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier
+                                params: array(
+                                    0: Param(
+                                        type: Name
+                                        var: Expr_Variable
+                                    )
+                                )
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable
+                                            expr: Expr_ConstFetch(
+                                                name: Name
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+                AST,
+        ];
+
+        yield 'interface + regular class: only the interface is ignored' => [
+            <<<'PHP'
+                <?php
+
+                interface Bar
+                {
+                    public function nope(Bar $ignored): void;
+                }
+
+                class Bar
+                {
+                    public function nope(Bar $counted)
+                    {
+                        $counted = true;
+                    }
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: <skipped>
+                    1: Stmt_Class(
+                        name: Identifier
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier
+                                params: array(
+                                    0: Param(
+                                        type: Name
+                                        var: Expr_Variable
+                                    )
+                                )
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable
+                                            expr: Expr_ConstFetch(
+                                                name: Name
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+                AST,
+        ];
     }
 }

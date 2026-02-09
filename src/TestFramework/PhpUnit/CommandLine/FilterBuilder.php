@@ -37,9 +37,9 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_key_exists;
 use function count;
-use function end;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Framework\ClassName;
 use function is_numeric;
 use function preg_quote;
 use function sprintf;
@@ -56,6 +56,8 @@ final class FilterBuilder
     // The real limit is likely higher, but it is better to be safe than sorry.
     private const PCRE_LIMIT = 30_000;
 
+    private const NO_OPTIMIZATION_LEVEL = 0;
+
     private const DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
 
     private const DROP_TEST_CASE_OPTIMIZATION_LEVEL = 2;
@@ -70,7 +72,7 @@ final class FilterBuilder
     public static function createFilters(
         array $tests,
         string $testFrameworkVersion,
-        int $optimizationLevel = 0,
+        int $optimizationLevel = self::NO_OPTIMIZATION_LEVEL,
     ): array {
         $usedTests = [];
         $filters = [];
@@ -91,7 +93,7 @@ final class FilterBuilder
 
                 // This may or not have the provider key.
                 $testMethod = self::getMethod($rawTestMethod, $testFrameworkVersion, $optimizationLevel);
-                $shortClassName = self::getShortClassName($testCaseClassName);
+                $shortClassName = ClassName::getShortClassName($testCaseClassName);
 
                 $test = $optimizationLevel >= self::DROP_TEST_CASE_OPTIMIZATION_LEVEL
                     ? $testMethod
@@ -163,13 +165,6 @@ final class FilterBuilder
         }
 
         return $rawTestMethod;
-    }
-
-    private static function getShortClassName(string $className): string
-    {
-        $parts = explode('\\', $className);
-
-        return end($parts);
     }
 
     /**

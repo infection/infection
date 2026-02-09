@@ -62,8 +62,7 @@ final class EnvManipulationTest extends TestCase
                 <<<'TXT'
                         Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
                         been found in the file "%s".
-                    TXT
-                ,
+                    TXT,
                 $testCaseClassName,
                 BacksUpEnvironmentVariables::class,
                 $fileWithEnvManipulations,

@@ -36,9 +36,12 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompletedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 use InvalidArgumentException;
 use const PHP_EOL;
 use function sprintf;
@@ -48,7 +51,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final readonly class InitialTestsConsoleLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
 {
     private ProgressBar $progressBar;
 
@@ -88,7 +91,7 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscri
         $this->progressBar->finish();
 
         if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->getOutputText());
+            $this->output->writeln(PHP_EOL . $event->outputText);
         }
     }
 

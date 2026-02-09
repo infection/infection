@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Listener;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\FileParsingWasFinished;
 use Infection\Event\FileParsingWasStarted;
 use Infection\Event\InitialStaticAnalysisRunWasFinished;
@@ -45,28 +43,20 @@ use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\MutantAnalysisWasFinished;
 use Infection\Event\MutantAnalysisWasStarted;
+use Infection\Event\MutationAnalysisWasFinished;
 use Infection\Event\MutationAnalysisWasStarted;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
 use Infection\Event\MutationHeuristicsWasFinished;
 use Infection\Event\MutationHeuristicsWasStarted;
-use Infection\Event\MutationAnalysisWasFinished;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Mutation\Mutation;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
 use Infection\Telemetry\Tracing\RootScopes;
 use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\SpanBuilder;
-use Infection\Telemetry\Tracing\SpanRecorder;
 use Infection\Telemetry\Tracing\Tracer;
 use Infection\Utility\UniqueId;
-use SplObjectStorage;
-use Symfony\Component\Console\Output\OutputInterface;
-use function memory_get_peak_usage;
 use function spl_object_id;
-use function sprintf;
 
 /**
  * @internal
@@ -74,6 +64,7 @@ use function sprintf;
 final class TracingSubscriber implements EventSubscriber
 {
     private SpanBuilder $initialTestSuiteSpan;
+
     private SpanBuilder $initialStaticAnalysisRunSpan;
 
     // will only contain the spans about the mutation generation
@@ -87,6 +78,7 @@ final class TracingSubscriber implements EventSubscriber
 
     /** @var array<int, SpanBuilder> Only the parsing part; child of mutationGeneration */
     private array $fileParsingSpansForMutationGeneration = [];
+
     /** @var array<int, SpanBuilder> Only the parsing part; child of fileSpans */
     private array $fileParsingSpansForFileSpans = [];
 

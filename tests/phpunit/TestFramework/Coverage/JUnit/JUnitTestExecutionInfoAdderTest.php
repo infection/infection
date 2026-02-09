@@ -35,60 +35,70 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use Exception;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
+use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use function iterator_to_array;
+use function Later\lazy;
 use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 #[CoversClass(JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
+    private TestFrameworkAdapter&MockObject $testFrameworkAdapterMock;
+
+    private TestFileDataProvider&MockObject $testFileDataProviderMock;
+
+    private JUnitTestExecutionInfoAdder $infoAdder;
+
+    protected function setUp(): void
+    {
+        $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
+        $this->testFileDataProviderMock = $this->createMock(TestFileDataProvider::class);
+
+        $this->infoAdder = new JUnitTestExecutionInfoAdder(
+            $this->testFrameworkAdapterMock,
+            $this->testFileDataProviderMock,
+        );
+    }
+
     public function test_it_does_not_add_if_junit_is_not_provided(): void
     {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
+        $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('hasJUnitReport')
             ->willReturn(false)
         ;
 
-        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
-        $testFileDataProvider
+        $this->testFileDataProviderMock
             ->expects($this->never())
             ->method($this->anything())
         ;
 
-        $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
-
-        $proxyTraceMock = $this->createMock(ProxyTrace::class);
-        $proxyTraceMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-
-        $adder->addTestExecutionInfo([$proxyTraceMock]);
+        $this->infoAdder->addTestExecutionInfo([new FakeTrace()]);
     }
 
     public function test_it_adds_if_junit_is_provided(): void
     {
-        $adapter = $this->createMock(TestFrameworkAdapter::class);
-        $adapter
+        $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('hasJUnitReport')
             ->willReturn(true)
         ;
 
-        $testFileDataProvider = $this->createMock(TestFileDataProvider::class);
-        $testFileDataProvider
+        $this->testFileDataProviderMock
             ->expects($this->once())
             ->method('getTestFileInfo')
             ->with('Acme\FooTest')
@@ -97,8 +107,6 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
                 0.000234,
             ))
         ;
-
-        $adder = new JUnitTestExecutionInfoAdder($adapter, $testFileDataProvider);
 
         $tests = new TestLocations(
             [
@@ -109,34 +117,77 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             [],
         );
 
+        $sourceFile = new SplFileInfo(__FILE__);
+
         $proxyTrace = new ProxyTrace(
-            new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
+            $sourceFile,
+            '',
             now($tests),
         );
 
-        $expected = [$proxyTrace];
-
-        $actual = $adder->addTestExecutionInfo($expected);
-        $actual = iterator_to_array($actual, false);
-
-        $this->assertSame($expected, $actual);
-
-        $this->assertSame(
-            [
-                [
-                    'byLine' => [
+        $expected = new ProxyTrace(
+            $sourceFile,
+            '',
+            now(
+                new TestLocations(
+                    [
                         11 => [
-                            [
-                                'testMethod' => 'Acme\FooTest::test_it_can_be_instantiated',
-                                'testFilePath' => '/path/to/acme/FooTest.php',
-                                'testExecutionTime' => 0.000234,
-                            ],
+                            new TestLocation(
+                                'Acme\FooTest::test_it_can_be_instantiated',
+                                '/path/to/acme/FooTest.php',
+                                0.000234,
+                            ),
                         ],
                     ],
-                    'byMethod' => [],
-                ],
-            ],
-            TestLocationsNormalizer::normalize([$proxyTrace->getTests()]),
+                    [],
+                ),
+            ),
         );
+
+        $completedTraces = iterator_to_array($this->infoAdder->addTestExecutionInfo([$proxyTrace]), false);
+
+        $this->assertCount(1, $completedTraces);
+        $this->assertArrayHasKey(0, $completedTraces);
+
+        $actual = $completedTraces[0];
+
+        TraceAssertion::assertEquals($expected, $actual);
+    }
+
+    public function test_it_does_not_load_the_trace_tests_until_necessary(): void
+    {
+        $this->testFrameworkAdapterMock
+            ->expects($this->once())
+            ->method('hasJUnitReport')
+            ->willReturn(true)
+        ;
+
+        $sourceFile = new SplFileInfo(__FILE__);
+
+        $proxyTrace = new ProxyTrace(
+            $sourceFile,
+            '',
+            // @phpstan-ignore argument.templateType,argument.type,callable.void
+            lazy((static function () {
+                throw new Exception();
+
+                // We need to include a yield statement to make it a generator even though
+                // it is not reachable.
+                // @phpstan-ignore deadCode.unreachable
+                yield new TestLocations();
+            })()),
+        );
+
+        $completedTraces = iterator_to_array($this->infoAdder->addTestExecutionInfo([$proxyTrace]), false);
+
+        $this->assertCount(1, $completedTraces);
+        $this->assertArrayHasKey(0, $completedTraces);
+
+        /** @var Trace $actual */
+        $actual = $completedTraces[0];
+
+        $this->expectException(Exception::class);
+
+        $actual->getTests();
     }
 }

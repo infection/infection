@@ -13,7 +13,7 @@ final class SubscriberCollectEventDispatcher implements EventDispatcher
     /**
      * @var EventSubscriber[]
      */
-    private $subscribers = [];
+    private array $subscribers = [];
 
     public function dispatch(object $event): void
     {

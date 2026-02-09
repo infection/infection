@@ -42,7 +42,7 @@ namespace Infection\Configuration\Entry;
 class Logs
 {
     public function __construct(
-        private readonly ?string $textLogFilePath,
+        private ?string $textLogFilePath,
         private ?string $htmlLogFilePath,
         private readonly ?string $summaryLogFilePath,
         private readonly ?string $jsonLogFilePath,
@@ -51,7 +51,7 @@ class Logs
         private readonly ?string $perMutatorFilePath,
         private bool $useGitHubAnnotationsLogger,
         private readonly ?StrykerConfig $strykerConfig,
-        private readonly ?string $summaryJsonLogFilePath,
+        private ?string $summaryJsonLogFilePath,
     ) {
     }
 
@@ -89,6 +89,11 @@ class Logs
     public function setHtmlLogFilePath(string $htmlLogFilePath): void
     {
         $this->htmlLogFilePath = $htmlLogFilePath;
+    }
+
+    public function setTextLogFilePath(string $textLogFilePath): void
+    {
+        $this->textLogFilePath = $textLogFilePath;
     }
 
     public function getSummaryLogFilePath(): ?string
@@ -134,5 +139,10 @@ class Logs
     public function getSummaryJsonLogFilePath(): ?string
     {
         return $this->summaryJsonLogFilePath;
+    }
+
+    public function setSummaryJsonLogFilePath(string $summaryJsonLogFilePath): void
+    {
+        $this->summaryJsonLogFilePath = $summaryJsonLogFilePath;
     }
 }

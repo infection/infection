@@ -35,14 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_flip;
-use function array_keys;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
-use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -134,9 +131,28 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         );
     }
 
+    public function test_it_provides_not_covered_when_with_uncovered_option_is_used(): void
+    {
+        $logs = $this->createStub(Logs::class);
+
+        $provider = new TargetDetectionStatusesProvider(
+            $logs,
+            logVerbosity: LogVerbosity::NORMAL,
+            onlyCoveredMode: false,
+            numberOfShownMutations: 0,
+        );
+
+        $this->assertProvides(
+            [
+                DetectionStatus::NOT_COVERED,
+            ],
+            $provider->get(),
+        );
+    }
+
     public function test_it_includes_escaped_when_requested(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 20);
 
@@ -147,7 +163,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
     public function test_it_provides_nothing_when_logging_verbosity_is_none(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 
@@ -290,34 +306,23 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $this->assertSame([], $provider->get());
     }
 
+    /**
+     * @param DetectionStatus[] $expected
+     * @param DetectionStatus[] $actual
+     */
     private function assertProvides(array $expected, array $actual): void
     {
-        $expected = array_flip($expected);
-        ksort($expected);
-
-        ksort($actual);
-
-        $this->assertSame(array_keys($expected), array_keys($actual));
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
+    /**
+     * @param DetectionStatus[] $excluding
+     * @param DetectionStatus[] $actual
+     */
     private function assertProvidesExcluding(array $excluding, array $actual): void
     {
-        $expected = $this->getDetectionStatusesIndexExcluding($excluding);
-        ksort($expected);
+        $expected = DetectionStatus::getCasesExcluding(...$excluding);
 
-        ksort($actual);
-
-        $this->assertSame(array_keys($expected), array_keys($actual));
-    }
-
-    private function getDetectionStatusesIndexExcluding(array $excludeList): array
-    {
-        $detectionStatuses = array_flip(DetectionStatus::ALL);
-
-        foreach ($excludeList as $exclude) {
-            unset($detectionStatuses[$exclude]);
-        }
-
-        return $detectionStatuses;
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 }

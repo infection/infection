@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class ArrayItemTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,116 +55,102 @@ final class ArrayItemTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is property' => [
-            <<<'PHP'
-                <?php
-
-                [$a->foo => $b->bar];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                [$a->foo > $b->bar];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a->foo => $b->bar];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a->foo > $b->bar];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is null safe property' => [
-            <<<'PHP'
-                <?php
-
-                [$a => $b?->bar];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                [$a > $b?->bar];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a => $b?->bar];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a > $b?->bar];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is method call' => [
-            <<<'PHP'
-                <?php
-
-                [$a->foo() => $b->bar()];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                [$a->foo() > $b->bar()];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a->foo() => $b->bar()];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a->foo() > $b->bar()];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is null safe method call' => [
-            <<<'PHP'
-                <?php
-
-                [$a => $b?->bar()];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                [$a > $b?->bar()];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a => $b?->bar()];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$a > $b?->bar()];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate double arrow operator to a greater than comparison when key is function call' => [
-            <<<'PHP'
-                <?php
-
-                [foo() => $b];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [foo() => $b];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate double arrow operator to a greater than comparison when value is function call' => [
-            <<<'PHP'
-                <?php
-
-                [$b => foo()];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$b => foo()];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is property' => [
-            <<<'PHP'
-                <?php
-
-                [$foo => $b->bar];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                [$foo > $b->bar];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$foo => $b->bar];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$foo > $b->bar];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate arrays without double arrow operator' => [
-            <<<'PHP'
-                <?php
-
-                [$b];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$b];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate arrays when side-effects are not expected' => [
-            <<<'PHP'
-                <?php
-
-                ['string' => 1];
-                [true => false];
-                [$a => $b];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ['string' => 1];
+                    [true => false];
+                    [$a => $b];
+                    PHP,
+            ),
         ];
     }
 }

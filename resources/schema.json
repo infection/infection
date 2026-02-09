@@ -168,6 +168,16 @@
             "maximum": 100,
             "description": "Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
         },
+        "timeoutsAsEscaped": {
+            "type": "boolean",
+            "default": false,
+            "description": "Treat timed-out mutants as escaped (affects MSI calculation)."
+        },
+        "maxTimeouts": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Maximum allowed number of timed-out mutants. Build fails if exceeded."
+        },
         "mutators": {
             "type": "object",
             "additionalProperties": false,
@@ -239,6 +249,8 @@
                 "ArrayAny": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayFind": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayFindKey": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayLast": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },

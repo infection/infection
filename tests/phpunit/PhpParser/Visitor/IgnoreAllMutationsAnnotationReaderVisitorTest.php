@@ -37,121 +37,227 @@ namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use PhpParser\Comment;
-use PhpParser\Node;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SplObjectStorage;
 
-#[Group('integration')]
 #[CoversClass(IgnoreAllMutationsAnnotationReaderVisitor::class)]
-final class IgnoreAllMutationsAnnotationReaderVisitorTest extends BaseVisitorTestCase
+final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCase
 {
-    public function test_it_does_not_toggle_ignorer_for_nodes_without_comments(): void
-    {
-        $changingIgnorer = $this->createMock(ChangingIgnorer::class);
-        $changingIgnorer
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+    #[DataProvider('nodeProvider')]
+    public function test_it_marks_nodes_with_the_ignore_all_comment_as_ignored(
+        string $code,
+        string $expected,
+    ): void {
+        $nodes = $this->parse($code);
 
-        $ignoredNodes = new SplObjectStorage();
+        $changingIgnorer = new ChangingIgnorer();
 
-        $visitor = new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, $ignoredNodes);
+        $traverser = new NodeTraverser(
+            new IgnoreAllMutationsAnnotationReaderVisitor(
+                $changingIgnorer,
+                new SplObjectStorage(),
+            ),
+            new NonMutableNodesIgnorerVisitor([$changingIgnorer]),
+            new MarkTraversedNodesAsVisitedVisitor(),
+        );
+        $traverser->traverse($nodes);
 
-        $nodeWithoutComments = $this->createMock(Node::class);
-        $nodeWithoutComments
-            ->expects($this->once())
-            ->method('getComments')
-            ->willReturn([])
-        ;
+        $actual = $this->dumper->dump($nodes);
 
-        $visitor->enterNode($nodeWithoutComments);
-
-        $this->assertCount(0, $ignoredNodes);
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_does_not_toggle_ignorer_for_nodes_with_comments_without_expected_annotation(): void
+    public static function nodeProvider(): iterable
     {
-        $changingIgnorer = $this->createMock(ChangingIgnorer::class);
-        $changingIgnorer
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        // Sanity check
+        yield 'no code ignored' => [
+            <<<'PHP'
+                <?php
 
-        $ignoredNodes = new SplObjectStorage();
+                namespace Infection\Tests\Virtual;
 
-        $visitor = new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, $ignoredNodes);
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
 
-        $comment = $this->createMock(Comment::class);
-        $comment
-            ->expects($this->once())
-            ->method('getText')
-            ->willReturn('This is a test')
-        ;
+                    function excludedMethod() {}
+                }
 
-        $nodeWithComments = $this->createMock(Node::class);
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                )
+                            )
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
 
-        $nodeWithComments
-            ->expects($this->once())
-            ->method('getComments')
-            ->willReturn([$comment])
-        ;
+        yield 'comment on a method' => [
+            <<<'PHP'
+                <?php
 
-        $visitor->enterNode($nodeWithComments);
+                namespace Infection\Tests\Virtual;
 
-        $this->assertCount(0, $ignoredNodes);
-    }
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
 
-    public function test_it_toggles_ignorer_for_nodes_commented_with_expected_annotation(): void
-    {
-        $changingIgnorer = $this->createMock(ChangingIgnorer::class);
-        $changingIgnorer
-            ->expects($this->once())
-            ->method('startIgnoring')
-        ;
+                    // @infection-ignore-all
+                    function excludedMethod() {}
+                }
 
-        $ignoredNodes = new SplObjectStorage();
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                    1: <skipped>
+                                )
+                            )
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
 
-        $visitor = new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, $ignoredNodes);
+        yield 'phpdoc on a method' => [
+            <<<'PHP'
+                <?php
 
-        $comment = $this->createMock(Comment::class);
-        $comment
-            ->expects($this->once())
-            ->method('getText')
-            ->willReturn('@infection-ignore-all')
-        ;
+                namespace Infection\Tests\Virtual;
 
-        $nodeWithComments = $this->createMock(Node::class);
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
 
-        $nodeWithComments
-            ->expects($this->once())
-            ->method('getComments')
-            ->willReturn([$comment])
-        ;
+                    /** @infection-ignore-all */
+                    function excludedMethod() {}
+                }
 
-        $visitor->enterNode($nodeWithComments);
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                    1: <skipped>
+                                )
+                            )
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
 
-        $this->assertCount(1, $ignoredNodes);
-    }
+        yield 'comment on the class' => [
+            <<<'PHP'
+                <?php
 
-    public function test_it_stops_ignorer_when_leaving_node_it_started_ignoring_with(): void
-    {
-        $changingIgnorer = $this->createMock(ChangingIgnorer::class);
-        $changingIgnorer
-            ->expects($this->once())
-            ->method('stopIgnoring')
-        ;
+                namespace Infection\Tests\Virtual;
 
-        $node = $this->createMock(Node::class);
+                // @infection-ignore-all
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
 
-        $ignoredNodes = new SplObjectStorage();
-        $ignoredNodes->attach($node);
+                    function excludedMethod() {}
+                }
 
-        $visitor = new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, $ignoredNodes);
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: <skipped>
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
 
-        $visitor->leaveNode($node);
+        yield 'comment on an expression' => [
+            <<<'PHP'
+                <?php
 
-        $this->assertCount(0, $ignoredNodes);
+                namespace Infection\Tests\Virtual;
+
+                $x = new Engine(
+                    static fn () => 'first',
+                    // @infection-ignore-all
+                    static fn () => 'second',
+                    static fn () => 'third',
+                );
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable
+                                    expr: Expr_New(
+                                        class: Name
+                                        args: array(
+                                            0: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'first'
+                                                    )
+                                                )
+                                            )
+                                            1: <skipped>
+                                            2: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'third'
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
     }
 }

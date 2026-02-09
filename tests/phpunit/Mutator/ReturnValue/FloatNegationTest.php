@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class FloatNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,51 +55,45 @@ final class FloatNegationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates negative float return to positive' => [
-            <<<'PHP'
-                <?php
-
-                return -2.0;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                return 2.0;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return -2.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 2.0;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates positive float return to negative' => [
-            <<<'PHP'
-                <?php
-
-                return 2.0;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                return -2.0;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 2.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return -2.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate float zero' => [
-            <<<'PHP'
-                <?php
-
-                return 0.0;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 0.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate integers' => [
-            <<<'PHP'
-                <?php
-
-                return 1;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 1;
+                    PHP,
+            ),
         ];
     }
 }

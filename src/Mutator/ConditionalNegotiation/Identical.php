@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -56,8 +57,7 @@ final class Identical implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an identical operator (`===`) with its counterpart the not identical operator (`!==`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -74,7 +74,7 @@ final class Identical implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

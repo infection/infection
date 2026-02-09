@@ -55,11 +55,11 @@ final class InvalidSchema extends UnexpectedValueException
     {
         Assert::allString($errors);
 
-        $errors = array_filter(array_map('trim', $errors));
+        $errors = array_filter(array_map(trim(...), $errors));
 
         return new self(sprintf(
             '"%s" does not match the expected JSON schema%s',
-            $config->getPath(),
+            $config->getPathname(),
             $errors === []
                 ? '.'
                 : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors),

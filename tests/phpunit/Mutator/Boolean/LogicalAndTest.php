@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class LogicalAndTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,27 +55,24 @@ final class LogicalAndTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical and' => [
-            <<<'PHP'
-                <?php
-
-                true && false;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                true || false;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    true && false;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    true || false;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate logical lower and' => [
-            <<<'PHP'
-                <?php
-
-                true and false;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    true and false;
+                    PHP,
+            ),
         ];
     }
 }

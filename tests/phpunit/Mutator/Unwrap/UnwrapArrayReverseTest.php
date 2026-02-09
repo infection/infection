@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayReverseTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,150 +55,141 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_reverse(['A', 1, 'C']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reverse(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_reverse(\Class_With_Const::Const);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reverse(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_reverse' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_reverse(['A', 1, 'C']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_reverse(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_reverse' => [
-            <<<'PHP'
-                <?php
-
-                function array_reverse($array)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_reverse($array)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                if (array_reverse($a) === $a) {
-                    return true;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    if (array_reverse($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_reverse is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_ReVeRsE(['A', 1, 'C']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_ReVeRsE(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_reverse uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_reverse($foo->bar());
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reverse($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_reverse(['A', 1, 'C']));
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 1, 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_reverse(['A', 1, 'C']));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 1, 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $preserveKeys parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_reverse(['A', 1, 'C'], $preserveKeys);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reverse(['A', 1, 'C'], $preserveKeys);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_reverse';
 
-                $a = 'array_reverse';
-
-                $b = $a([1,2,3]);
-                PHP
-            ,
+                    $b = $a([1,2,3]);
+                    PHP,
+            ),
         ];
     }
 }

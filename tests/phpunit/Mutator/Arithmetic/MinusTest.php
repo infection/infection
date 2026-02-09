@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class MinusTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,55 +55,49 @@ final class MinusTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal minus' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1 - 1;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = 1 + 1;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1 - 1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1 + 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate minus equals' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a -= 2;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a -= 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate decrement' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a--;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a--;
+                    PHP,
+            ),
         ];
 
         yield 'It does mutate a fake decrement' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a - -1;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = 1;
-                $a + -1;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a - -1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a + -1;
+                    PHP,
+            ),
         ];
     }
 }

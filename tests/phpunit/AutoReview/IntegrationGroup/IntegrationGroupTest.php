@@ -78,8 +78,7 @@ final class IntegrationGroupTest extends TestCase
             <<<'TXT'
                 Expected the test case "%s" to have the attribute `#[Group('integration')]` as I/O operations have been
                 found in the file "%s".
-                TXT
-            ,
+                TXT,
             $testCaseClassName,
             $fileWithIoOperations,
         ));

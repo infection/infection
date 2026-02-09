@@ -67,9 +67,10 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
             true,
             $debug,
             $this->staticAnalysisToolAdapter,
+            new FakeOutput(),
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(CiInitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
     }
@@ -77,19 +78,20 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
-            false,
-            $debug,
-            $this->staticAnalysisToolAdapter,
-        );
-
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
             ->method('isDecorated')
             ->willReturn(false)
         ;
 
-        $subscriber = $factory->create($outputMock);
+        $factory = new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+            false,
+            $debug,
+            $this->staticAnalysisToolAdapter,
+            $outputMock,
+        );
+
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(InitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
     }

@@ -45,10 +45,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class CastBoolTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -56,107 +56,99 @@ final class CastBoolTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to bool with "bool"' => [
-            <<<'PHP'
-                <?php
-
-                (bool) 1;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                1;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (bool) 1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1;
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to bool with "boolean"' => [
-            <<<'PHP'
-                <?php
-
-                (boolean) 1;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                1;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (boolean) 1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1;
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to bool in conditions' => [
-            <<<'PHP'
-                <?php
-
-                if ((bool) preg_match()) {
-                    echo 'Hello';
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                if (preg_match()) {
-                    echo 'Hello';
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ((bool) preg_match()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_match()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to bool in global return' => [
-            <<<'PHP'
-                <?php
-
-                return (bool) preg_match();
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                return preg_match();
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return (bool) preg_match();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return preg_match();
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to bool in return of untyped-function' => [
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return (bool) preg_match();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return preg_match();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return (bool) preg_match();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return preg_match();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to bool in return of bool-function when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsBool(): bool
-                {
-                    return (bool) preg_match();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsBool(): bool
-                {
-                    return preg_match();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsBool(): bool
+                    {
+                        return (bool) preg_match();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsBool(): bool
+                    {
+                        return preg_match();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to bool in return of bool-function when strict-types=1' => [
@@ -187,24 +179,24 @@ final class CastBoolTest extends BaseMutatorTestCase
         ];
 
         yield 'It removes casting to bool in function parameters when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    in_array(strict: (bool) $s);
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    in_array(strict: $s);
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        in_array(strict: (bool) $s);
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        in_array(strict: $s);
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to bool in function parameters when strict-types=1' => [

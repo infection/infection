@@ -41,7 +41,7 @@ use function Safe\putenv;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
-final class EnvBackup
+final readonly class EnvBackup
 {
     /**
      * @param array<string, string> $environmentVariables

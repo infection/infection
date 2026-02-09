@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class CloneRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,52 +55,46 @@ final class CloneRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes clone from expression clone-new' => [
-            <<<'PHP'
-                <?php
-
-                $class = clone (new stdClass());
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $class = new stdClass();
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class = clone (new stdClass());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class = new stdClass();
+                    PHP,
+            ),
         ];
 
         yield 'It removes clone from clone variable' => [
-            <<<'PHP'
-                <?php
-
-                $class = new stdClass();
-                $clonedClass = clone $class;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $class = new stdClass();
-                $clonedClass = $class;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class = new stdClass();
+                    $clonedClass = clone $class;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class = new stdClass();
+                    $clonedClass = $class;
+                    PHP,
+            ),
         ];
 
         yield 'It removes cloe from direct call object function right after cloning' => [
-            <<<'PHP'
-                <?php
-
-                $datetime = new DateTime();
-                $clonedClass = (clone $datetime)->format('Y');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $datetime = new DateTime();
-                $clonedClass = $datetime->format('Y');
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $datetime = new DateTime();
+                    $clonedClass = (clone $datetime)->format('Y');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $datetime = new DateTime();
+                    $clonedClass = ($datetime)->format('Y');
+                    PHP,
+            ),
         ];
     }
 }

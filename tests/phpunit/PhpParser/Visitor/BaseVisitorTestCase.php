@@ -39,18 +39,25 @@ use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
+use PhpParser\Token;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function sprintf;
+use Webmozart\Assert\Assert;
 
 abstract class BaseVisitorTestCase extends TestCase
 {
     /**
-     * @return Node[]
+     * @return array{0: Node[], 1: Token[]}
      */
     final protected static function parseCode(string $code): array
     {
-        return (array) SingletonContainer::getContainer()->getParser()->parse($code);
+        $parser = SingletonContainer::getContainer()->getParser();
+
+        $statements = $parser->parse($code);
+        $originalFileTokens = $parser->getTokens();
+
+        Assert::notNull($statements);
+
+        return [$statements, $originalFileTokens];
     }
 
     /**
@@ -68,10 +75,5 @@ abstract class BaseVisitorTestCase extends TestCase
         }
 
         return $traverser->traverse($nodes);
-    }
-
-    final protected function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../../autoloaded/mutator-fixtures/%s', $file));
     }
 }

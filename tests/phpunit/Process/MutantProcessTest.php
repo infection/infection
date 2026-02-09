@@ -39,44 +39,31 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    /**
-     * @var MockObject|Process
-     */
-    private $processMock;
+    private Stub&Process $processStub;
 
-    /**
-     * @var MockObject|TestFrameworkMutantExecutionResultFactory
-     */
-    private $mutantExecutionResultFactory;
+    private Mutant $mutant;
 
-    /**
-     * @var MockObject|Mutant
-     */
-    private $mutantMock;
-
-    /**
-     * @var MutantProcess
-     */
-    private $mutantProcess;
+    private MutantProcess $mutantProcess;
 
     protected function setUp(): void
     {
-        $this->processMock = $this->createMock(Process::class);
-        $this->mutantMock = $this->createMock(Mutant::class);
-        $this->mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
+        $this->processStub = $this->createStub(Process::class);
+        $this->mutant = MutantBuilder::withMinimalTestData()->build();
+        $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
-            $this->processMock,
-            $this->mutantMock,
-            $this->mutantExecutionResultFactory,
+            $this->processStub,
+            $this->mutant,
+            $mutantExecutionResultFactory,
         );
     }
 
@@ -84,8 +71,8 @@ final class MutantProcessTest extends TestCase
     {
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
-            $this->processMock,
-            $this->mutantMock,
+            $this->processStub,
+            $this->mutant,
             false,
         );
     }
@@ -96,8 +83,8 @@ final class MutantProcessTest extends TestCase
 
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
-            $this->processMock,
-            $this->mutantMock,
+            $this->processStub,
+            $this->mutant,
             true,
         );
     }

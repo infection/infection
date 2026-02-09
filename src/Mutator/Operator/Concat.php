@@ -66,8 +66,7 @@ final class Concat implements Mutator
                 ```php
                 'bar' . 'foo';
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

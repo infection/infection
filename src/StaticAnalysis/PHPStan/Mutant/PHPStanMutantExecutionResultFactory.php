@@ -91,7 +91,7 @@ class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactor
         return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
     }
 
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
     {
         if ($mutantProcess->isTimedOut()) {
             return DetectionStatus::TIMED_OUT;

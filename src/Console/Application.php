@@ -35,16 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Symfony\Component\Filesystem\Filesystem;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
+use Infection\Command\Git\GitBaseReferenceCommand;
+use Infection\Command\Git\GitChangedFilesCommand;
+use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
-use Infection\Command\Telemetry;
 use Infection\Command\RunCommand;
-use Infection\Container;
+use Infection\Command\Telemetry;
+use Infection\Container\Container;
 use OutOfBoundsException;
 use function preg_quote;
 use function Safe\preg_match;
@@ -52,6 +57,7 @@ use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use function trim;
 
 /**
@@ -102,20 +108,26 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
-        $commands = array_merge(
+        $fileSystem = Container::create()->getFileSystem();
+
+        return array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
+                new MockTeamCityCommand($fileSystem),
+                new GitBaseReferenceCommand(),
+                new GitChangedFilesCommand(),
+                new GitChangedLinesCommand(),
+                new GitDefaultBaseCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
+                new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
                 new Telemetry\ShowTraceCommand(
                     new Filesystem(),
                 ),
             ],
         );
-
-        return $commands;
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output): void

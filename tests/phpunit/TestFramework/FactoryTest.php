@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
@@ -56,11 +56,11 @@ final class FactoryTest extends TestCase
         $factory = new Factory(
             '',
             '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            $this->createMock(TestFrameworkFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
             '',
-            $this->createMock(Configuration::class),
-            $this->createMock(SourceFileFilter::class),
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeSourceCollector(),
             [],
         );
 
@@ -73,11 +73,11 @@ final class FactoryTest extends TestCase
         $factory = new Factory(
             '',
             '',
-            $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            $this->createMock(TestFrameworkFinder::class),
+            $this->createStub(TestFrameworkConfigLocatorInterface::class),
+            $this->createStub(TestFrameworkFinder::class),
             '',
-            $this->createMock(Configuration::class),
-            $this->createMock(SourceFileFilter::class),
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeSourceCollector(),
             [
                 'infection/codeception-adapter' => [
                     'install_path' => '/path/to/dummy/adapter/factory.php',

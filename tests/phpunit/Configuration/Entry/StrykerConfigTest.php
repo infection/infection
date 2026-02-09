@@ -54,27 +54,39 @@ final class StrykerConfigTest extends TestCase
         );
     }
 
-    /** @return non-empty-list<array{string, non-empty-string, bool}> */
-    public static function branch_names_to_be_matched(): array
+    public static function branch_names_to_be_matched(): iterable
     {
-        return [
-            ['master', 'master', true],
-            ['main', 'main', true],
-            ['main', 'master', false],
-            ['mast', 'master', false],
-            ['master ', 'master', false],
-            [' master', 'master', false],
-            [' master ', 'master', false],
-            ['master1', 'master', false],
-            ['foo', '/^(foo|bar)$/', true],
-            ['bar', '/^(foo|bar)$/', true],
-            ['foobar', '/^(foo|bar)$/', false],
-            ['fo', '/^(foo|bar)$/', false],
-            ['ba', '/^(foo|bar)$/', false],
-            ['foo ', '/^(foo|bar)$/', false],
-            [' foo', '/^(foo|bar)$/', false],
-            ['foo1', '/^(foo|bar)$/', false],
-        ];
+        yield ['master', 'master', true];
+
+        yield ['main', 'main', true];
+
+        yield ['main', 'master', false];
+
+        yield ['mast', 'master', false];
+
+        yield ['master ', 'master', false];
+
+        yield [' master', 'master', false];
+
+        yield [' master ', 'master', false];
+
+        yield ['master1', 'master', false];
+
+        yield ['foo', '/^(foo|bar)$/', true];
+
+        yield ['bar', '/^(foo|bar)$/', true];
+
+        yield ['foobar', '/^(foo|bar)$/', false];
+
+        yield ['fo', '/^(foo|bar)$/', false];
+
+        yield ['ba', '/^(foo|bar)$/', false];
+
+        yield ['foo ', '/^(foo|bar)$/', false];
+
+        yield [' foo', '/^(foo|bar)$/', false];
+
+        yield ['foo1', '/^(foo|bar)$/', false];
     }
 
     public function test_it_rejects_invalid_regex(): void

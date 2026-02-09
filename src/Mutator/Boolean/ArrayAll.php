@@ -55,8 +55,7 @@ final class ArrayAll implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a function call `array_all()` with boolean `true`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                 To kill this mutant, provide different values for the array so that your tests check

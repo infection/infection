@@ -1,0 +1,14 @@
+{
+    "$schema": "./../../../resources/schema.json",
+    "timeout": 10,
+    "threads": "max",
+    "source": {
+        "directories": [
+            "benchmark-source/src"
+        ],
+    },
+    "phpUnit": {
+        "configDir": "benchmark-source",
+        "customPath": "./../../../vendor/bin/phpunit"
+    }
+}

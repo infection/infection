@@ -41,6 +41,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\Util\NameResolver;
 use function is_string;
 use LogicException;
@@ -81,7 +82,7 @@ final class LogicalOr implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
@@ -229,10 +230,8 @@ final class LogicalOr implements Mutator
         ) {
             if ($this->seenVariabeName === null) {
                 $this->seenVariabeName = $node->expr->name;
-            } else {
-                if ($this->seenVariabeName !== $node->expr->name) {
-                    return true;
-                }
+            } elseif ($this->seenVariabeName !== $node->expr->name) {
+                return true;
             }
 
             $resolvedName = NameResolver::resolveName($node->class);

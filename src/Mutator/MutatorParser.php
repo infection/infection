@@ -61,7 +61,7 @@ final class MutatorParser
         }
 
         $parsedMutators = array_filter(array_map(
-            'trim',
+            trim(...),
             explode(',', $unparsedMutators),
         ));
 

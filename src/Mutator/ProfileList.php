@@ -152,6 +152,8 @@ final class ProfileList
     public const NULLIFY_PROFILE = [
         Nullify\ArrayFind::class,
         Nullify\ArrayFindKey::class,
+        Nullify\ArrayFirst::class,
+        Nullify\ArrayLast::class,
     ];
 
     public const NUMBER_PROFILE = [
@@ -377,6 +379,8 @@ final class ProfileList
         // Nullify
         'ArrayFind' => Nullify\ArrayFind::class,
         'ArrayFindKey' => Nullify\ArrayFindKey::class,
+        'ArrayFirst' => Nullify\ArrayFirst::class,
+        'ArrayLast' => Nullify\ArrayLast::class,
 
         // Number
         'DecrementInteger' => Number\DecrementInteger::class,

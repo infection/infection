@@ -61,8 +61,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 putenv("FOO=BAR");
-                PHP
-            ,
+                PHP,
             false,   // Cannot detect this case since this is not a FQ call
         ];
 
@@ -70,8 +69,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 \putenv("FOO=BAR");
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -79,8 +77,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 use function putenv;
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -88,8 +85,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 Safe\putenv('FOO=BAR');
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -97,8 +93,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 \Safe\putenv('FOO=BAR');
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -106,8 +101,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 use function Safe\putenv;
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -115,8 +109,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 getenv('FOO');
-                PHP
-            ,
+                PHP,
             false,
         ];
 
@@ -127,8 +120,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
                 /**
                  * putenv
                  */
-                PHP
-            ,
+                PHP,
             false,
         ];
     }

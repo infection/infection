@@ -54,9 +54,10 @@ final class PerformanceLoggerSubscriberFactoryTest extends TestCase
             new TimeFormatter(),
             new MemoryFormatter(),
             1,
+            new FakeOutput(),
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(TracingSubscriber::class, $subscriber);
     }

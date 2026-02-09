@@ -71,8 +71,7 @@ final class ArrayOneItem implements Mutator
                 ;
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

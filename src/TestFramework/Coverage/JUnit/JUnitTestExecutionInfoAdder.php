@@ -38,7 +38,10 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use function Later\lazy;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -59,6 +62,8 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<Trace> $traces
      *
+     * @throws TestFileNameNotFoundException
+     *
      * @return iterable<Trace>
      */
     public function addTestExecutionInfo(iterable $traces): iterable
@@ -73,29 +78,42 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<Trace> $traces
      *
+     * @throws TestFileNameNotFoundException
+     *
      * @return iterable<Trace>
      */
     private function testExecutionInfoAdder(iterable $traces): iterable
     {
         /** @var Trace $trace */
         foreach ($traces as $trace) {
-            $tests = $trace->getTests();
-
-            if ($tests === null) {
-                continue;
-            }
-
-            foreach ($tests->getTestsLocationsBySourceLine() as &$testsLocations) {
-                foreach ($testsLocations as $line => $test) {
-                    $testsLocations[$line] = $this->createCompleteTestLocation($test);
-                }
-            }
-            unset($testsLocations);
-
-            yield $trace;
+            yield new ProxyTrace(
+                $trace->getSourceFileInfo(),
+                $trace->getRealPath(),
+                lazy(self::createCompleteTestLocationsGenerator($trace)),
+            );
         }
     }
 
+    /**
+     * @return iterable<TestLocations>
+     */
+    private function createCompleteTestLocationsGenerator(Trace $trace): iterable
+    {
+        $incompleteTestLocations = $trace->getTests();
+
+        foreach ($incompleteTestLocations->getTestsLocationsBySourceLine() as &$testsLocations) {
+            foreach ($testsLocations as $line => $test) {
+                $testsLocations[$line] = $this->createCompleteTestLocation($test);
+            }
+        }
+        unset($testsLocations);
+
+        yield $incompleteTestLocations;
+    }
+
+    /**
+     * @throws TestFileNameNotFoundException
+     */
     private function createCompleteTestLocation(TestLocation $test): TestLocation
     {
         $class = explode(':', $test->getMethod(), self::MAX_EXPLODE_PARTS)[0];

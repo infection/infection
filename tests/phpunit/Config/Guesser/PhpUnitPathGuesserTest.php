@@ -63,8 +63,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             '.',
         ];
 
@@ -78,8 +77,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             'app',
         ];
 
@@ -92,8 +90,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             '.',
         ];
 
@@ -106,8 +103,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             '.',
         ];
 
@@ -120,8 +116,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             '.',
         ];
 
@@ -134,8 +129,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             '.',
         ];
 
@@ -148,8 +142,7 @@ final class PhpUnitPathGuesserTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             '.',
         ];
     }

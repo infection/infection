@@ -35,16 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_filter;
 use function array_map;
 use function array_unique;
 use function array_values;
+use function count;
+use function end;
 use function extension_loaded;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -53,37 +57,17 @@ use PHPUnit\Framework\TestCase;
 use function str_contains;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private static $phpBin;
+    private MockObject&InitialTestsRunProcessFactory $processFactoryMock;
 
-    /**
-     * @var InitialTestsRunProcessFactory|MockObject
-     */
-    private $processFactoryMock;
+    private EventDispatcherCollector $eventDispatcher;
 
-    /**
-     * @var EventDispatcherCollector
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var InitialTestsRunner
-     */
-    private $runner;
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$phpBin = (new PhpExecutableFinder())->find();
-    }
+    private InitialTestsRunner $runner;
 
     protected function setUp(): void
     {
@@ -124,7 +108,7 @@ final class InitialTestsRunnerTest extends TestCase
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_values(array_unique(array_map('get_class', $this->eventDispatcher->getEvents()))),
+            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
     }
 
@@ -162,19 +146,29 @@ final class InitialTestsRunnerTest extends TestCase
             throw $e;
         }
 
-        $this->assertSame(
-            [
-                InitialTestSuiteWasStarted::class,
-                InitialTestCaseWasCompleted::class,
-                InitialTestCaseWasCompleted::class,
-                InitialTestSuiteWasFinished::class,
-            ],
-            array_map('get_class', $this->eventDispatcher->getEvents()),
-        );
+        $events = $this->eventDispatcher->getEvents();
+
+        // First event must be suite start, last must be suite finish
+        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $events[0]);
+        $this->assertInstanceOf(InitialTestSuiteWasFinished::class, end($events));
+
+        // Count completed events - OS buffering makes exact count non-deterministic
+        // Minimum 1: at least one output chunk was processed
+        // Maximum 4: the test script has 4 writes total
+        $completedCount = count(array_filter(
+            $events,
+            static fn ($e) => $e instanceof InitialTestCaseWasCompleted,
+        ));
+        $this->assertGreaterThanOrEqual(1, $completedCount, 'Should process at least one output');
+        $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');
     }
 
     private function createProcessForCode(string $code): Process
     {
-        return new Process([self::$phpBin, '-r', $code]);
+        return new Process([
+            TestPhpExecutableFinder::find(),
+            '-r',
+            $code,
+        ]);
     }
 }

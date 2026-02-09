@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\ComplexType;
@@ -45,16 +44,16 @@ use PhpParser\Node\Name;
 /**
  * @internal
  */
-final class ReturnTypeHelper
+final readonly class ReturnTypeHelper
 {
     private const VOID = 'void';
 
     private const NULL = 'null';
 
-    private readonly Identifier|Name|ComplexType|null $returnType;
+    private Identifier|Name|ComplexType|null $returnType;
 
     public function __construct(
-        private readonly Node\Stmt\Return_ $node,
+        private Node\Stmt\Return_ $node,
     ) {
         // We do not expect to see a return statement outside a function-like node.
         $this->returnType = ReflectionVisitor::getFunctionScope($this->node)->getReturnType();
@@ -102,10 +101,5 @@ final class ReturnTypeHelper
 
         // Check for return null;
         return $this->node->expr->name->toLowerString() === self::NULL;
-    }
-
-    public function hasNextStmtNode(): bool
-    {
-        return $this->node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE) !== null;
     }
 }

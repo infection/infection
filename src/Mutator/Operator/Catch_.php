@@ -40,6 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -86,7 +87,7 @@ final class Catch_ implements Mutator
 
             unset($types[$i]);
 
-            yield new Node\Stmt\Catch_($types, $node->var, $node->stmts, $node->getAttributes());
+            yield new Node\Stmt\Catch_($types, $node->var, $node->stmts, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 }

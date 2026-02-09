@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 if [ "$DRIVER" = "pcov" ]
 then
     # `pcov` requires at least PHPUnit 8.0 (used by symfony/phpunit-bridge)
@@ -19,5 +21,9 @@ run () {
         php $PHPARGS $INFECTION
     fi
 
-    diff -u -w expected-output.txt infection.log
+    if [ -n "$GOLDEN" ]; then
+        cp -v infection.log expected-output.txt
+    fi
+
+    diff -u --ignore-all-space expected-output.txt infection.log
 }

@@ -47,10 +47,10 @@ final class TrueValueTest extends BaseMutatorTestCase
 {
     /**
      * @param string|string[] $expected
-     * @param mixed[] $settings
+     * @param array<string, bool> $settings
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate($input, $expected = [], array $settings = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = [], array $settings = []): void
     {
         $this->assertMutatesInput($input, $expected, $settings);
     }
@@ -58,253 +58,247 @@ final class TrueValueTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates true to false' => [
-            <<<'PHP'
-                <?php
-
-                return true;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return false;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return true;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return false;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates inside function call when function is a variable' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $a(true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $a(false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $a(true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $a(false);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates inside function call when function is a string' => [
-            <<<'PHP'
-                <?php
-
-                ('function_name')(true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                ('function_name')(false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ('function_name')(true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ('function_name')(false);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate the string true to false' => [
-            <<<'PHP'
-                <?php
-
-                return 'true';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 'true';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate switch true to false' => [
-            <<<'PHP'
-                <?php
-
-                switch (true) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch (true) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in ternary condition to prevent overlap with TernaryMutator' => [
-            <<<'PHP'
-                <?php
-
-                $x == true ? 'yes' : 'no';
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $x == true ? 'yes' : 'no';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with equal' => [
-            <<<'PHP'
-                <?php
-
-                if ($x == true) {
-                } else {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x == true) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-equal' => [
-            <<<'PHP'
-                <?php
-
-                if ($x != true) {
-                } else {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x != true) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with identical' => [
-            <<<'PHP'
-                <?php
-
-                if ($x === true) {
-                } else {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x === true) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-identical' => [
-            <<<'PHP'
-                <?php
-
-                if ($x !== true) {
-                } else {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x !== true) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate match(true) to prevent overlap with MatchArmRemoval' => [
-            <<<'PHP'
-                <?php
-
-                match(true) {
-                    $count > 0 && $count <= 10 => 'small',
-                    $count <= 50 => 'medium',
-                    $count > 50 => 'huge',
-                };
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match(true) {
+                        $count > 0 && $count <= 10 => 'small',
+                        $count <= 50 => 'medium',
+                        $count > 50 => 'huge',
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It mutates all caps true to false' => [
-            <<<'PHP'
-                <?php
-
-                return TRUE;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return false;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return TRUE;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return false;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when used in "in_array" function by default' => [
-            <<<'PHP'
-                <?php
-
-                in_array($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    in_array($a, $b, true);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when used in "\in_array" function by default' => [
-            <<<'PHP'
-                <?php
-
-                \in_array($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \in_array($a, $b, true);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates when used in a method named "in_array"' => [
-            <<<'PHP'
-                <?php
-
-                $a->in_array($b, $c, true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a->in_array($b, $c, false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a->in_array($b, $c, true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a->in_array($b, $c, false);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates when used in "\in_array" function and explicitly enabled in settings' => [
-            <<<'PHP'
-                <?php
-
-                \in_array($a, $b, true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                \in_array($a, $b, false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \in_array($a, $b, true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \in_array($a, $b, false);
+                    PHP,
+            ),
             ['in_array' => true],
         ];
 
         yield 'It does not mutate when used in "\in_array" function and explicitly disabled' => [
-            <<<'PHP'
-                <?php
-
-                \in_array($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \in_array($a, $b, true);
+                    PHP,
+            ),
             [],
             ['in_array' => false],
         ];
 
         yield 'It does not mutate when used in "array_search" function by default' => [
-            <<<'PHP'
-                <?php
-
-                array_search($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    array_search($a, $b, true);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when used in "\array_search" function by default' => [
-            <<<'PHP'
-                <?php
-
-                \array_search($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \array_search($a, $b, true);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates when used in a method named "array_search"' => [
-            <<<'PHP'
-                <?php
-
-                $a->array_search($b, $c, true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a->array_search($b, $c, false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a->array_search($b, $c, true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a->array_search($b, $c, false);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates when used in "array_search" function and explicitly enabled in settings' => [
-            <<<'PHP'
-                <?php
-
-                array_search($a, $b, true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                array_search($a, $b, false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    array_search($a, $b, true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    array_search($a, $b, false);
+                    PHP,
+            ),
             ['array_search' => true],
         ];
 
         yield 'It does not mutate when used in "\array_search" function and explicitly disabled' => [
-            <<<'PHP'
-                <?php
-
-                \array_search($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \array_search($a, $b, true);
+                    PHP,
+            ),
             [],
             ['array_search' => false],
         ];
 
         yield 'It does not mutate when used in "\array_search" function and explicitly disabled and function is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                \aRrAy_SeArCh($a, $b, true);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    \aRrAy_SeArCh($a, $b, true);
+                    PHP,
+            ),
             [],
             ['array_search' => false],
         ];

@@ -51,8 +51,6 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    private readonly string $detectionStatus;
-
     private readonly string $mutatorClass;
 
     /**
@@ -64,7 +62,7 @@ class MutantExecutionResult
     public function __construct(
         private readonly string $processCommandLine,
         private readonly string $processOutput,
-        string $detectionStatus,
+        private readonly DetectionStatus $detectionStatus,
         private readonly Deferred $mutantDiff,
         private readonly string $mutantHash,
         string $mutatorClass,
@@ -80,10 +78,8 @@ class MutantExecutionResult
         private readonly float $processRuntime,
         public readonly Trace $trace,
     ) {
-        Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
-        $this->detectionStatus = $detectionStatus;
         $this->mutatorClass = $mutatorClass;
     }
 
@@ -112,7 +108,7 @@ class MutantExecutionResult
         return $this->processOutput;
     }
 
-    public function getDetectionStatus(): string
+    public function getDetectionStatus(): DetectionStatus
     {
         return $this->detectionStatus;
     }
@@ -203,7 +199,7 @@ class MutantExecutionResult
         return $position - $lineStartPos;
     }
 
-    private static function createFromMutant(Mutant $mutant, string $detectionStatus): self
+    private static function createFromMutant(Mutant $mutant, DetectionStatus $detectionStatus): self
     {
         $mutation = $mutant->getMutation();
 

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function implode;
-use Infection\Logger\ConsoleLogger;
 use const PHP_EOL;
+use Psr\Log\LoggerInterface;
 use function sprintf;
 
 /**
@@ -51,7 +51,7 @@ class ConsoleOutput
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percentage points over the required %s. Consider increasing the required %s percentage the next time you run Infection.';
 
     public function __construct(
-        private readonly ConsoleLogger $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

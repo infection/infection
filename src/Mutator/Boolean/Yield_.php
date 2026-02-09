@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -57,8 +58,7 @@ final class Yield_ implements Mutator
                 Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only
                 (without key) where the key or the value are potentially impure (i.e. have a side-effect); For
                 example `yield foo() => $b->bar;`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                 This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
@@ -84,7 +84,7 @@ final class Yield_ implements Mutator
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        yield new Node\Expr\Yield_(new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes()));
+        yield new Node\Expr\Yield_(new Node\Expr\BinaryOp\Greater($key, $value, NodeAttributes::getAllExceptOriginalNode($node)));
     }
 
     public function canMutate(Node $node): bool

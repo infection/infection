@@ -36,35 +36,82 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AbstractMethodIgnorer::class)]
-final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
+final class AbstractMethodIgnorerTest extends VisitorTestCase
 {
-    public function test_it_ignores_abstract_methods(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-            <?php
+    #[DataProvider('nodeProvider')]
+    public function test_it_ignores_abstract_methods(
+        string $code,
+        string $expected,
+    ): void {
+        $nodes = $this->parse($code);
 
-            abstract class Foo
-            {
-                public function bar(string $counted)
-                {
-                }
-                abstract public function shouldBeIgnored($ignored);
-            }
-
-            PHP
-            ,
-            $spy = $this->createSpy(),
+        $traverser = new NodeTraverser(
+            new NonMutableNodesIgnorerVisitor([new AbstractMethodIgnorer()]),
+            new MarkTraversedNodesAsVisitedVisitor(),
         );
+        $traverser->traverse($nodes);
 
-        $this->assertSame(1, $spy->nodeCounter);
+        $actual = $this->dumper->dump($nodes);
+
+        $this->assertSame($expected, $actual);
     }
 
-    protected function getIgnore(): NodeIgnorer
+    public static function nodeProvider(): iterable
     {
-        return new AbstractMethodIgnorer();
+        yield [
+            <<<'PHP'
+                <?php
+
+                abstract class Service
+                {
+                    public function firstMethod(string $counted)
+                    {
+                    }
+
+                    abstract public function shouldBeIgnored($ignored);
+
+                    public function secondMethod(string $counted)
+                    {
+                    }
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Class(
+                        name: Identifier
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier
+                                params: array(
+                                    0: Param(
+                                        type: Identifier
+                                        var: Expr_Variable
+                                    )
+                                )
+                            )
+                            1: <skipped>
+                            2: Stmt_ClassMethod(
+                                name: Identifier
+                                params: array(
+                                    0: Param(
+                                        type: Identifier
+                                        var: Expr_Variable
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+                AST,
+        ];
     }
 }

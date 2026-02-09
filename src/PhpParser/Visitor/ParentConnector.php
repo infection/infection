@@ -65,6 +65,6 @@ final class ParentConnector
 
     public static function findParent(Node $node): ?Node
     {
-        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
     }
 }

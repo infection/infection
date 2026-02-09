@@ -81,8 +81,7 @@ final class BCMath implements ConfigurableMutator
                 ```php
                 $x = (string) ($a + $b);
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -103,7 +103,7 @@ final class DurationFormatter
 
     private static function formatMilliseconds(float $totalSeconds): string
     {
-        if ($totalSeconds == 0) {
+        if ($totalSeconds === 0) {
             return '0ms';
         }
 
@@ -129,7 +129,7 @@ final class DurationFormatter
         $rounded = round($value);
         $epsilon = abs($totalSeconds - ($rounded * ($totalSeconds / $value)));
 
-        return $rounded == $value
+        return $rounded === $value
             || $epsilon < self::MILLISECOND_DIVISOR;
     }
 
@@ -140,7 +140,7 @@ final class DurationFormatter
 
     private static function isWholeNumber(float $value): bool
     {
-        return $value == floor($value);
+        return $value === floor($value);
     }
 
     private static function hasCleanDecimal(float $value): bool

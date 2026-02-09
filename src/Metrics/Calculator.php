@@ -56,10 +56,11 @@ final class Calculator
         private readonly int $timedOutCount,
         private readonly int $notTestedCount,
         private readonly int $totalCount,
+        private readonly bool $timeoutsAsEscaped = false,
     ) {
     }
 
-    public static function fromMetrics(MetricsCalculator $calculator): self
+    public static function fromMetrics(MetricsCalculator $calculator, bool $timeoutsAsEscaped = false): self
     {
         return new self(
             $calculator->getRoundingPrecision(),
@@ -68,6 +69,7 @@ final class Calculator
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
             $calculator->getTestedMutantsCount(),
+            $timeoutsAsEscaped,
         );
     }
 
@@ -81,7 +83,12 @@ final class Calculator
         }
 
         $score = 0.;
-        $coveredTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
+        $coveredTotal = $this->killedCount + $this->errorCount;
+
+        if (!$this->timeoutsAsEscaped) {
+            $coveredTotal += $this->timedOutCount;
+        }
+
         $totalCount = $this->totalCount;
 
         if ($totalCount !== 0) {
@@ -122,7 +129,11 @@ final class Calculator
 
         $score = 0.;
         $testedTotal = $this->totalCount - $this->notTestedCount;
-        $coveredTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
+        $coveredTotal = $this->killedCount + $this->errorCount;
+
+        if (!$this->timeoutsAsEscaped) {
+            $coveredTotal += $this->timedOutCount;
+        }
 
         if ($testedTotal !== 0) {
             $score = 100 * $coveredTotal / $testedTotal;

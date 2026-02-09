@@ -44,6 +44,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BCMathConfig::class)]
 final class BCMathConfigTest extends TestCase
 {
+    /**
+     * @param array<string, bool> $settings
+     * @param string[] $expected
+     */
     #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(array $settings, array $expected): void
     {

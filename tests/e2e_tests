@@ -10,8 +10,8 @@ run_infection_for_dir() {
     dir=$1
     infection_executable=${2:-bin/infection}
 
+    echo -e "\nTesting $(realpath "$dir")\n";
     cd "$dir"
-    echo -e "\n$dir\n";
 
     if [ -f composer.json ] || [ -f composer.lock ]
     then

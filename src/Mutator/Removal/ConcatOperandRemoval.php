@@ -71,8 +71,7 @@ final class ConcatOperandRemoval implements Mutator
                 ```php
                 $x = 'bar';
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.11.0@c9b192ab8400fdaf04b2b13d110575adc879aa90">
+  <file src="src/Differ/DiffColorizer.php">
+    <InvalidArrayOffset>
+      <code>$lines[$prevIndex]</code>
+    </InvalidArrayOffset>
+  </file>
+  <file src="src/Mutator/Extensions/BCMath.php">
+    <ImpureFunctionCall>
+      <code><![CDATA[$this->converters[$name->toLowerString()]($node)]]></code>
+    </ImpureFunctionCall>
+  </file>
+  <file src="src/Mutator/Extensions/MBString.php">
+    <ImpureFunctionCall>
+      <code><![CDATA[$this->converters[$name->toLowerString()]($node)]]></code>
+    </ImpureFunctionCall>
+  </file>
+  <file src="src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php">
+    <InvalidReturnType>
+      <code><![CDATA[iterable<string, string>]]></code>
+    </InvalidReturnType>
+  </file>
+  <file src="src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php">
+    <InvalidTemplateParam>
+      <code><![CDATA[DOMNodeList<DOMNode|DOMNameSpaceNode>]]></code>
+      <code><![CDATA[DOMNodeList<DOMNode|DOMNameSpaceNode>]]></code>
+    </InvalidTemplateParam>
+  </file>
+  <file src="src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php">
+    <InvalidTemplateParam>
+      <code><![CDATA[DOMNodeList<DOMNameSpaceNode|DOMNode>]]></code>
+    </InvalidTemplateParam>
+  </file>
+  <file src="src/TestFramework/PhpUnit/Config/Path/PathReplacer.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$domElement->nodeValue]]></code>
+    </InaccessibleProperty>
+  </file>
+  <file src="src/TestFramework/SafeDOMXPath.php">
+    <InvalidTemplateParam>
+      <code><![CDATA[DOMNodeList<DOMNameSpaceNode|DOMNode>]]></code>
+    </InvalidTemplateParam>
+  </file>
+  <file src="src/TestFramework/TestFrameworkExtraOptionsFilter.php">
+    <InvalidReturnStatement>
+      <code><![CDATA[preg_replace('/\s+/', ' ', trim($actualExtraOptions))]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code>string</code>
+    </InvalidReturnType>
+  </file>
+</files>

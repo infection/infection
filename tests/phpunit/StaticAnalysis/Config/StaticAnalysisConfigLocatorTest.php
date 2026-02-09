@@ -37,11 +37,11 @@ namespace Infection\Tests\StaticAnalysis\Config;
 
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
-use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(StaticAnalysisConfigLocator::class)]
@@ -74,7 +74,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpstan.neon.dist',
-            p($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.neon.dist file.',
         );
     }
@@ -88,7 +88,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/AltDistFile/phpstan.dist.neon',
-            p($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.dist.neon file.',
         );
     }
@@ -102,7 +102,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/NeonFile/phpstan.neon',
-            p($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.neon file.',
         );
     }
@@ -116,7 +116,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/BothNeonAndDist/phpstan.neon',
-            p($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.neon file.',
         );
     }

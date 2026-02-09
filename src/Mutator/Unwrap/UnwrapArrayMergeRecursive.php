@@ -67,8 +67,7 @@ final class UnwrapArrayMergeRecursive extends AbstractFunctionUnwrapMutator
                 $x = ['oof'];
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

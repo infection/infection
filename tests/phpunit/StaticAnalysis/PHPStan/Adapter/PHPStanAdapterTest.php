@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
-use Generator;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -58,19 +57,13 @@ final class PHPStanAdapterTest extends TestCase
 
     private commandLineBuilder&MockObject $commandLineBuilder;
 
-    private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
-
-    private Filesystem&MockObject $fileSystem;
-
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
-        $this->mutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
-        $this->fileSystem = $this->createMock(Filesystem::class);
 
         $this->adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -106,8 +99,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -139,8 +132,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -174,8 +167,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -225,8 +218,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_accepts_valid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -247,8 +240,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -268,7 +261,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter->assertMinimumVersionSatisfied();
     }
 
-    public static function provideValidVersions(): Generator
+    public static function provideValidVersions(): iterable
     {
         yield 'major version 3' => ['3.0.0'];
 
@@ -289,6 +282,8 @@ final class PHPStanAdapterTest extends TestCase
         yield 'dev version 2.1.x' => ['2.1.x-dev@cfa0299'];
 
         yield 'dev version 2.2.x' => ['2.2.x-dev@cfa0299'];
+
+        yield 'PHPStan-src dev' => ['dev-648dbd911cef28707338fe5c25875d50e7875391@648dbd9'];
     }
 
     /**

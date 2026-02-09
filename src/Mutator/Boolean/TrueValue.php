@@ -50,7 +50,7 @@ use PhpParser\Node;
  *
  * @implements ConfigurableMutator<Node\Expr\ConstFetch>
  */
-final class TrueValue implements ConfigurableMutator
+final readonly class TrueValue implements ConfigurableMutator
 {
     use GetConfigClassName;
     use GetMutatorName;
@@ -58,7 +58,7 @@ final class TrueValue implements ConfigurableMutator
     /**
      * @var array<string, int>
      */
-    private readonly array $allowedFunctions;
+    private array $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)
     {

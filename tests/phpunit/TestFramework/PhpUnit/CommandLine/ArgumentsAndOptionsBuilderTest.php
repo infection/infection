@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 use function array_map;
 use function array_merge;
 use Closure;
-use Generator;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -46,8 +45,8 @@ use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SplFileInfo;
 use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 #[CoversClass(FilterBuilder::class)]
@@ -87,8 +86,8 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     {
         $builder = new ArgumentsAndOptionsBuilder(false,
             [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/bar/Baz.php', 'src/bar/Baz.php', 'src/bar/Baz.php'),
+                new SplFileInfo('src/Foo.php'),
+                new SplFileInfo('src/bar/Baz.php'),
             ],
             'simple',
         );
@@ -122,6 +121,9 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @param string[] $testCases
+     */
     #[DataProvider('provideTestCases')]
     public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(
         bool $executeOnlyCoveringTestCases,
@@ -148,7 +150,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             $configPath,
             '--path=/a path/with spaces',
             array_map(
-                static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
+                TestLocation::forTestMethod(...),
                 $testCases,
             ),
             $phpUnitVersion,
@@ -157,7 +159,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         $this->assertSame($expectedArgumentsAndOptions, $actual);
     }
 
-    public static function provideTestCases(): Generator
+    public static function provideTestCases(): iterable
     {
         $phpunit9 = '9.5';
         $phpunit10 = '10.1';

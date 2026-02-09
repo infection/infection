@@ -42,7 +42,7 @@ use Infection\FileSystem\Locator\Locator;
  */
 final readonly class SchemaConfigurationLoader
 {
-    public const POSSIBLE_DEFAULT_CONFIG_FILES = [
+    public const POSSIBLE_DEFAULT_CONFIG_FILE_NAMES = [
         self::DEFAULT_JSON5_CONFIG_FILE,
         self::DEFAULT_JSON_CONFIG_FILE,
         self::DEFAULT_DIST_JSON5_CONFIG_FILE,
@@ -64,12 +64,12 @@ final readonly class SchemaConfigurationLoader
     }
 
     /**
-     * @param string[] $potentialPaths
+     * @param non-empty-string[] $potentialFileNames
      */
-    public function loadConfiguration(array $potentialPaths): SchemaConfiguration
+    public function loadConfiguration(array $potentialFileNames): SchemaConfiguration
     {
         return $this->fileLoader->loadFile(
-            $this->locator->locateOneOf($potentialPaths),
+            $this->locator->locateOneOf($potentialFileNames),
         );
     }
 }

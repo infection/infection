@@ -55,7 +55,6 @@ use function str_replace;
 use function substr;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class ProfileListProvider
 {
@@ -64,12 +63,12 @@ final class ProfileListProvider
     /**
      * @var array<int, array<int, string>>|null
      */
-    private static $mutators;
+    private static ?array $mutators = null;
 
     /**
      * @var array<string,string[]>|null
      */
-    private static $profileConstants;
+    private static ?array $profileConstants = null;
 
     public static function mutatorNameAndClassProvider(): iterable
     {
@@ -96,7 +95,6 @@ final class ProfileListProvider
         $mutators = [];
 
         foreach ($finder as $file) {
-            /** @var SplFileInfo $file */
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 

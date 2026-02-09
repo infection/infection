@@ -72,8 +72,7 @@ final readonly class AdapterInstallationDecider
                 <<<TEXT
                     We noticed you are using a test framework supported by an external Infection plugin.
                     Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
-                    TEXT
-                ,
+                    TEXT,
                 AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName],
             ),
             true,

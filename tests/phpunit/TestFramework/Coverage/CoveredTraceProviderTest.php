@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\TraceProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -57,14 +56,6 @@ final class CoveredTraceProviderTest extends TestCase
             ->willReturn($canary)
         ;
 
-        $filter = $this->createMock(FileFilter::class);
-        $filter
-            ->expects($this->once())
-            ->method('filter')
-            ->with($canary)
-            ->willReturn($canary)
-        ;
-
         $testFileDataAdder = $this->createMock(JUnitTestExecutionInfoAdder::class);
         $testFileDataAdder
             ->expects($this->once())
@@ -73,7 +64,7 @@ final class CoveredTraceProviderTest extends TestCase
             ->willReturn($canary)
         ;
 
-        $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder, $filter);
+        $provider = new CoveredTraceProvider($traceProviderMock, $testFileDataAdder);
 
         /** @var array<Trace> $traces */
         $traces = $provider->provideTraces();

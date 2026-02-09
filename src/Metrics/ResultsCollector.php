@@ -56,8 +56,8 @@ class ResultsCollector implements Collector
 
     public function __construct()
     {
-        foreach (DetectionStatus::ALL as $status) {
-            $this->resultsByStatus[$status] = new SortableMutantExecutionResults();
+        foreach (DetectionStatus::cases() as $status) {
+            $this->resultsByStatus[$status->value] = new SortableMutantExecutionResults();
         }
 
         $this->allExecutionResults = new SortableMutantExecutionResults();
@@ -70,14 +70,14 @@ class ResultsCollector implements Collector
 
             $detectionStatus = $executionResult->getDetectionStatus();
 
-            if (!array_key_exists($detectionStatus, $this->resultsByStatus)) {
+            if (!array_key_exists($detectionStatus->value, $this->resultsByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
-                    $detectionStatus,
+                    $detectionStatus->value,
                 ));
             }
 
-            $this->resultsByStatus[$detectionStatus]->add($executionResult);
+            $this->resultsByStatus[$detectionStatus->value]->add($executionResult);
         }
     }
 
@@ -161,8 +161,8 @@ class ResultsCollector implements Collector
         return $this->getResultListForStatus(DetectionStatus::IGNORED)->getSortedExecutionResults();
     }
 
-    private function getResultListForStatus(string $detectionStatus): SortableMutantExecutionResults
+    private function getResultListForStatus(DetectionStatus $detectionStatus): SortableMutantExecutionResults
     {
-        return $this->resultsByStatus[$detectionStatus];
+        return $this->resultsByStatus[$detectionStatus->value];
     }
 }

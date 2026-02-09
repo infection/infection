@@ -49,14 +49,20 @@ final class SchemaConfigurationFile
 {
     private ?stdClass $decodedContents = null;
 
+    /**
+     * @param non-empty-string $pathname
+     */
     public function __construct(
-        private readonly string $path,
+        private readonly string $pathname,
     ) {
     }
 
-    public function getPath(): string
+    /**
+     * @return non-empty-string
+     */
+    public function getPathname(): string
     {
-        return $this->path;
+        return $this->pathname;
     }
 
     /**
@@ -68,15 +74,15 @@ final class SchemaConfigurationFile
             return $this->decodedContents;
         }
 
-        if (!is_file($this->path)) {
+        if (!is_file($this->pathname)) {
             throw InvalidFile::createForFileNotFound($this);
         }
 
-        if (!is_readable($this->path)) {
+        if (!is_readable($this->pathname)) {
             throw InvalidFile::createForFileNotReadable($this);
         }
 
-        $contents = file_get_contents($this->path);
+        $contents = file_get_contents($this->pathname);
 
         try {
             return $this->decodedContents = json5_decode($contents);

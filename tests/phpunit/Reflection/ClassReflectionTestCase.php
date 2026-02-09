@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reflection;
 
-use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -56,14 +56,14 @@ abstract class ClassReflectionTestCase extends TestCase
     public static function provideParentMethodCases(): iterable
     {
         yield [
-            static::createFromName(CloneVisitor::class),
+            static::createFromName(CloningVisitor::class),
             'enterNode',
             Visibility::asPublic(),
             true,
         ];
 
         yield [
-            static::createFromName(CloneVisitor::class),
+            static::createFromName(CloningVisitor::class),
             'enterNode',
             Visibility::asProtected(),
             false,

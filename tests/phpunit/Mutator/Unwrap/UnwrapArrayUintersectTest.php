@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayUintersectTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,230 +55,205 @@ final class UnwrapArrayUintersectTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['baz' => 'bar'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_uintersect(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_uintersect(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = \Class_With_Const::Const;
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = \Class_With_Const::Const;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['baz' => 'bar'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_uintersect' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['baz' => 'bar'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if (array_uintersect($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
-                    return true;
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if (array_uintersect($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    if ($a === $a) {
-                        return true;
-                    }
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    if (['baz' => 'bar'] === $a) {
-                        return true;
-                    }
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        if ($a === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        if (['baz' => 'bar'] === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_uintersect is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_UiNtErSeCt(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_UiNtErSeCt(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['baz' => 'bar'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_uintersect uses functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_uintersect($foo->bar(), $foo->baz(), $valueCompareFunc);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_uintersect($foo->bar(), $foo->baz(), $valueCompareFunc);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->bar();
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->baz();
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->bar();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['foo' => 'bar']);
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['baz' => 'bar']);
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['foo' => 'bar']);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['baz' => 'bar']);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_uintersect(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['baz' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['qux' => 'bar'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['baz' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['qux' => 'bar'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo' => 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_uintersect' => [
-            <<<'PHP'
-                <?php
-
-                function array_uintersect($array, $array1, $array2)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_uintersect($array, $array1, $array2)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_uintersect';
 
-                $a = 'array_uintersect';
-
-                $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP,
+                    $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
+                    PHP,
+            ),
         ];
     }
 }

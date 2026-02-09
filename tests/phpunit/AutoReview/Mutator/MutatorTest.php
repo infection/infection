@@ -90,8 +90,7 @@ final class MutatorTest extends TestCase
                     The mutator class "%s" has the following non-allowed public method(s) declared: "%s". Either
                     reconsider if it is necessary for it to be public and make it protected/private instead or add it
                     to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".
-                    TXT
-                ,
+                    TXT,
                 $className,
                 implode(
                     ', ',
@@ -144,8 +143,7 @@ final class MutatorTest extends TestCase
                         The mutator "%s" is a configurable mutator but its constructor does not require a configuration.
                         The constructor should either require a "%s" parameter or the mutator should not
                         implement "%s".
-                        TXT
-                    ,
+                        TXT,
                     $className,
                     $configClassName ?: MutatorConfig::class,
                     ConfigurableMutator::class,
@@ -157,8 +155,7 @@ final class MutatorTest extends TestCase
             $assertionErrorMessage = sprintf(
                 <<<'TXT'
                     Expected the mutator "%s" to have the constructor signature "__construct(%s $config)".
-                    TXT
-                ,
+                    TXT,
                 $className,
                 $configClassName,
             );
@@ -196,8 +193,7 @@ final class MutatorTest extends TestCase
             sprintf(
                 <<<'TXT'
                     Expected the mutator configuration class "%s" for the mutator "%s" to be a "%s".
-                    TXT
-                ,
+                    TXT,
                 $configClassName,
                 $className,
                 MutatorConfig::class,

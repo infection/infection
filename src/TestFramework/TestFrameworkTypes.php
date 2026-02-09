@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use function is_a;
@@ -71,18 +70,16 @@ final class TestFrameworkTypes
     ): array {
         $types = self::$defaultTypes;
 
-        if (count($installedExtensions) > 0) {
-            foreach ($installedExtensions as $installedExtension) {
-                $factory = $installedExtension['extra']['class'];
+        foreach ($installedExtensions as $installedExtension) {
+            $factory = $installedExtension['extra']['class'];
 
-                Assert::classExists($factory);
+            Assert::classExists($factory);
 
-                if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-                    continue;
-                }
-
-                $types[] = $factory::getAdapterName();
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+                continue;
             }
+
+            $types[] = $factory::getAdapterName();
         }
 
         return $types;

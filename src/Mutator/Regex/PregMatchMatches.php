@@ -73,8 +73,7 @@ final class PregMatchMatches implements Mutator
                 }
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

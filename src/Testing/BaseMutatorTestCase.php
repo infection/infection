@@ -37,18 +37,29 @@ namespace Infection\Testing;
 
 use function array_flip;
 use function array_key_exists;
+use function array_map;
 use function array_shift;
 use function count;
+use function explode;
 use function implode;
+use Infection\Framework\ClassName;
+use Infection\Framework\Str;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeMutationGenerator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\CloneVisitor;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function sprintf;
 use Throwable;
 use function token_get_all;
@@ -57,6 +68,8 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
+    private const WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
+
     protected Mutator $mutator;
 
     protected function setUp(): void
@@ -64,15 +77,38 @@ abstract class BaseMutatorTestCase extends TestCase
         $this->mutator = $this->createMutator();
     }
 
+    public static function wrapCodeInMethod(
+        string $code,
+        ?string $namespace = null,
+    ): string {
+        $namespaceDeclaration = $namespace !== null ? "namespace {$namespace};" : '';
+
+        $indentedCode = self::indentCode($code);
+
+        return <<<PHP
+            <?php
+            {$namespaceDeclaration}
+            class WrappingClass {
+                public function wrappedTestedCode() {
+            {$indentedCode}
+                }
+            }
+            PHP;
+    }
+
     /**
      * @param string|string[]|null $expectedCode
      * @param mixed[] $settings
      */
-    final protected function assertMutatesInput(string $inputCode, string|array|null $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
-    {
+    final protected function assertMutatesInput(
+        string $inputCode,
+        string|array|null $expectedCode = [],
+        array $settings = [],
+        bool $allowInvalidCode = false,
+    ): void {
         $expectedCodeSamples = (array) $expectedCode;
 
-        $inputCode = StringNormalizer::normalizeString($inputCode);
+        $inputCode = Str::rTrimLines($inputCode);
 
         if ($inputCode === $expectedCode) {
             $this->fail('Input code cant be the same as mutated code');
@@ -87,7 +123,7 @@ abstract class BaseMutatorTestCase extends TestCase
                 'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Make sure mutator is enabled and mutates the source code. Mutants are: %s',
                 count($expectedCodeSamples),
                 count($mutants),
-                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants)),
+                Str::rTrimLines(implode(PHP_EOL, $mutants)),
             ),
         );
 
@@ -102,8 +138,8 @@ abstract class BaseMutatorTestCase extends TestCase
             Assert::string($expectedCodeSample);
 
             $this->assertSame(
-                StringNormalizer::normalizeString($expectedCodeSample),
-                StringNormalizer::normalizeString($realMutatedCode),
+                Str::rTrimLines($expectedCodeSample),
+                Str::rTrimLines($realMutatedCode),
             );
 
             if (!$allowInvalidCode) {
@@ -129,7 +165,21 @@ abstract class BaseMutatorTestCase extends TestCase
 
     protected function getTestedMutatorClassName(): string
     {
-        return SourceTestClassNameScheme::getSourceClassName(static::class);
+        $mutatorClassName = ClassName::getCanonicalSourceClassName(static::class);
+
+        Assert::notNull(
+            $mutatorClassName,
+            sprintf(
+                'Could not find the tested mutator class name for "%s". Ensure the test case follow the Infection naming convention. The expected class name(s) was/were: "%s"',
+                static::class,
+                implode(
+                    ', ',
+                    ClassName::getCanonicalSourceClassNames(static::class),
+                ),
+            ),
+        );
+
+        return $mutatorClassName;
     }
 
     /**
@@ -140,7 +190,7 @@ abstract class BaseMutatorTestCase extends TestCase
         $mutations = $this->getMutationsFromCode($code, $settings);
 
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new CloningVisitor());
 
         $mutants = [];
 
@@ -151,7 +201,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = SingletonContainer::getPrinter()->print($mutatedStatements, $mutation);
 
             $traverser->removeVisitor($mutatorVisitor);
         }
@@ -159,31 +209,60 @@ abstract class BaseMutatorTestCase extends TestCase
         return $mutants;
     }
 
+    private static function indentCode(string $code): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                static fn (string $line) => self::WRAPPED_CODE_METHOD_BODY_INDENT . $line,
+                explode(
+                    "\n",
+                    $code,
+                ),
+            ),
+        );
+    }
+
     /**
-     * @return SimpleMutation[]
+     * @return Mutation[]
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $parser = SingletonContainer::getContainer()->getParser();
+        $nodes = $parser->parse($code);
+        $originalFileTokens = $parser->getTokens();
 
         $this->assertNotNull($nodes);
 
-        $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
-            $this->createMutator($settings),
-            $nodes,
+        // Note that in theory we could just use the FileMutationGenerator. However,
+        // we may add more visitors/traverses in the near future, which would become
+        // impossible with FileMutationGenerator, hence we leave it as is for now.
+        $mutationsCollectorVisitor = new MutationCollectorVisitor(
+            new NodeMutationGenerator(
+                mutators: [$this->createMutator($settings)],
+                filePath: '/path/to/test-file.php',
+                fileNodes: $nodes,
+                trace: new EmptyTrace(
+                    new MockSplFileInfo('/path/to/test-file.php'),
+                ),
+                onlyCovered: false,
+                lineRangeCalculator: new LineRangeCalculator(),
+                sourceLineMatcher: new NullSourceLineMatcher(),
+                originalFileTokens: $originalFileTokens,
+                originalFileContent: $code,
+            ),
         );
 
-        // Pre-traverse the nodes to connect them
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NextConnectingVisitor());
-        $traverser->traverse($nodes);
+        $factory = new NodeTraverserFactory();
 
-        (new NodeTraverserFactory())
-            ->create($mutationsCollectorVisitor, [])
-            ->traverse($nodes)
-        ;
+        $factory
+            ->createPreTraverser()
+            ->traverse($nodes);
+        $factory
+            ->create($mutationsCollectorVisitor)
+            ->traverse($nodes);
 
-        return $mutationsCollectorVisitor->getMutations();
+        return take($mutationsCollectorVisitor->getMutations())->toList();
     }
 
     private function assertSyntaxIsValid(string $realMutatedCode): void
@@ -191,8 +270,9 @@ abstract class BaseMutatorTestCase extends TestCase
         try {
             $tokens = token_get_all($realMutatedCode, TOKEN_PARSE);
 
-            $this->assertTrue(
-                $tokens !== [],
+            $this->assertNotSame(
+                [],
+                $tokens,
                 sprintf(
                     'Mutator %s produces invalid code: %s',
                     $this->mutator->getName(),

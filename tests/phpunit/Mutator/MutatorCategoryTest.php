@@ -95,6 +95,9 @@ final class MutatorCategoryTest extends TestCase
         );
     }
 
+    /**
+     * @param array<string, mixed> $constants
+     */
     private function assertAllDoesNotHaveDuplicatedValues(string $enumClass, array $constants): void
     {
         $all = $constants[self::ALL_CONSTANT_KEY];
@@ -111,6 +114,9 @@ final class MutatorCategoryTest extends TestCase
         );
     }
 
+    /**
+     * @param array<string, mixed> $constants
+     */
     private function assertAllListTheExposedConstants(string $enumClass, array $constants): void
     {
         $all = $constants[self::ALL_CONSTANT_KEY];
@@ -127,6 +133,9 @@ final class MutatorCategoryTest extends TestCase
         );
     }
 
+    /**
+     * @param array<string, mixed> $constants
+     */
     private function assertExposedConstantsArePublic(
         string $enumClass,
         ReflectionClass $classReflection,

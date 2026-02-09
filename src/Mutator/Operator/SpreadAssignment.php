@@ -67,8 +67,7 @@ final class SpreadAssignment implements Mutator
                 ```php
                 $x = $collection;
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -35,15 +35,36 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait MutantExecutionResultAssertions
 {
+    private function assertResultEquals(
+        MutantExecutionResult $expected,
+        MutantExecutionResult $actual,
+    ): void {
+        $this->assertResultStateIs(
+            result: $actual,
+            expectedProcessCommandLine: $expected->getProcessCommandLine(),
+            expectedProcessOutput: $expected->getProcessOutput(),
+            expectedDetectionStatus: $expected->getDetectionStatus(),
+            expectedMutantDiff: $expected->getMutantDiff(),
+            expectedMutatorName: $expected->getMutatorName(),
+            expectedOriginalFilePath: $expected->getOriginalFilePath(),
+            expectedOriginalStartingLine: $expected->getOriginalStartingLine(),
+        );
+    }
+
     private function assertResultStateIs(
         MutantExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
-        string $expectedDetectionStatus,
+        DetectionStatus $expectedDetectionStatus,
         string $expectedMutantDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,15 +47,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(CiInitialTestsConsoleLoggerSubscriber::class)]
 final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $testFramework;
+    private MockObject&AbstractTestFrameworkAdapter $testFramework;
 
     protected function setUp(): void
     {

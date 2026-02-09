@@ -50,10 +50,7 @@ use function trim;
 #[CoversClass(AdapterInstallationDecider::class)]
 final class AdapterInstallationDeciderTest extends BaseProviderTestCase
 {
-    /**
-     * @var AdapterInstallationDecider
-     */
-    private $installationDecider;
+    private AdapterInstallationDecider $installationDecider;
 
     protected function setUp(): void
     {

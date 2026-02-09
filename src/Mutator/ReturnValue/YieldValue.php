@@ -58,8 +58,7 @@ final class YieldValue implements Mutator
             <<<'TXT'
                 Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
                 For example `yield $value;`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

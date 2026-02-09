@@ -58,8 +58,7 @@ final class UnwrapUcFirst extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = 'Hello!';
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

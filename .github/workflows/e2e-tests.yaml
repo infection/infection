@@ -30,8 +30,8 @@ jobs:
         include:
           - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'dist/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'dist/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
@@ -41,10 +41,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
@@ -69,12 +69,12 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }}-${{ hashFiles('tests/e2e/*/composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
@@ -91,9 +91,12 @@ jobs:
         if: ${{ matrix.dependencies == 'lowest' }}
         run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
+      - name: Try to install paratest for parallel test execution
+        run: composer require --dev brianium/paratest:^7.8.4 --with-all-dependencies --minimal-changes --no-interaction --no-progress || true
+
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
-        uses: actions/cache@v4
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: tests/e2e/*/vendor
           key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}
@@ -103,22 +106,24 @@ jobs:
             e2e-vendor-${{ runner.os }}-
             composer-
 
+      - name: Install Linux dependencies for E2E tests
+        if: runner.os != 'Windows'
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: expect moreutils
+
       - name: Install Composer dependencies for E2E tests
         shell: bash
         run: |
+          CHRONIC=$(command -v chronic || true)
           ls tests/e2e/*/composer.json | xargs dirname |
-             xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
+             xargs -I{} -P 4 $CHRONIC composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
       - name: Run a subset of E2E tests
         if: runner.os == 'Windows'
         shell: bash
         run: |
           make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
-
-      - name: Install Linux dependencies for E2E tests
-        if: runner.os != 'Windows'
-        run: |
-          sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
         if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
@@ -127,14 +132,14 @@ jobs:
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && matrix.php-version == '8.2'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.2'
         env:
           TERM: xterm-256color
         run: |
           make compile
           # test PHAR works from subfolder
-          cd build && ./infection.phar -V && cd ..
-          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=build/infection.phar BENCHMARK_SOURCES=
+          cd dist && ./infection.phar -V && cd ..
+          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.

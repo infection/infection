@@ -43,7 +43,6 @@ use Infection\Configuration\Schema\SchemaValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -53,20 +52,11 @@ use function Safe\realpath;
 #[CoversClass(SchemaConfigurationFileLoader::class)]
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
-    /**
-     * @var SchemaValidator|MockObject
-     */
-    private $schemaValidatorStub;
+    private MockObject&SchemaValidator $schemaValidatorStub;
 
-    /**
-     * @var SchemaConfigurationFactory|MockObject
-     */
-    private $configFactoryStub;
+    private MockObject&SchemaConfigurationFactory $configFactoryStub;
 
-    /**
-     * @var SchemaConfigurationFileLoader
-     */
-    private $loader;
+    private SchemaConfigurationFileLoader $loader;
 
     protected function setUp(): void
     {
@@ -103,10 +93,11 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
         $this->assertSame($expectedConfig, $actual);
     }
 
-    private static function createRawConfigWithPathArgument(string $path): Constraint
+    /** @return Callback<SchemaConfigurationFile> */
+    private static function createRawConfigWithPathArgument(string $path): Callback
     {
         return new Callback(static function (SchemaConfigurationFile $config) use ($path): bool {
-            self::assertSame($path, $config->getPath());
+            self::assertSame($path, $config->getPathname());
 
             return true;
         });

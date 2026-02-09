@@ -59,8 +59,7 @@ final class UnwrapArrayDiffAssoc extends AbstractFunctionUnwrapMutator
                 $x = $array1;
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

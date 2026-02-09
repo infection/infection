@@ -35,55 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Command\Telemetry;
 
+use function array_map;
+use function implode;
+use function in_array;
 use Infection\Command\BaseCommand;
-use Infection\Command\RunCommandHelper;
-use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Console\ConsoleOutput;
-use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
-use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\XdebugHandler;
-use Infection\Container;
-use Infection\Engine;
-use Infection\Event\ApplicationExecutionWasStarted;
-use Infection\FileSystem\Locator\FileNotFound;
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\Locator\Locator;
-use Infection\Logger\ConsoleLogger;
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\TimeFormatter;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Reporter\ConsoleReporter;
-use Infection\Telemetry\Reporter\TracerDumper;
-use Infection\Telemetry\Reporter\TraceReporter;
 use Infection\Telemetry\Tracing\RootScopes;
 use Infection\Telemetry\Tracing\Trace;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
-use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Input\ArrayInput;
+use const PHP_INT_MAX;
+use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use UnitEnum;
 use Webmozart\Assert\Assert;
-use function array_map;
-use function extension_loaded;
-use function implode;
-use function in_array;
-use function sprintf;
-use function trim;
-use function var_dump;
-use const PHP_INT_MAX;
-use const PHP_SAPI;
 
 /**
  * @internal
@@ -91,14 +60,19 @@ use const PHP_SAPI;
 final class ShowTraceCommand extends BaseCommand
 {
     private const TRACE_PATHNAME_ARGUMENT = 'trace';
+
     private const SPAN_ID_ARGUMENT = 'span-id';
 
     private const FORMAT_OPTION = 'format';
+
     private const MAX_DEPTH_OPTION = 'max-depth';
+
     private const TOP_SCOPES_OPTION = 'root-scopes';
+
     private const MIN_TIME_THRESHOLD_OPTION = 'min-time-threshold';
 
     private const NO_MAX_DEPTH = 'all';
+
     private const ALL_TOP_SCOPES = 'all';
 
     public function __construct(
@@ -215,7 +189,7 @@ final class ShowTraceCommand extends BaseCommand
     {
         $value = $io->getInput()->getOption(self::MAX_DEPTH_OPTION);
 
-        if (self::NO_MAX_DEPTH === $value) {
+        if ($value === self::NO_MAX_DEPTH) {
             return PHP_INT_MAX;
         }
 
@@ -258,7 +232,7 @@ final class ShowTraceCommand extends BaseCommand
         return $integerValue;
     }
 
-    private static function getSpanId(IO $io): string|null
+    private static function getSpanId(IO $io): ?string
     {
         return $io->getInput()->getArgument(self::SPAN_ID_ARGUMENT);
     }

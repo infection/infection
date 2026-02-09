@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Logger\MutationTestingResultsLogger;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Reporter\Reporter;
 
 /**
  * @internal
@@ -44,14 +43,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 final readonly class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private MutationTestingResultsLogger $logger,
+        private Reporter $reporter,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return new MutationTestingResultsLoggerSubscriber(
-            $this->logger,
+            $this->reporter,
         );
     }
 }

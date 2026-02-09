@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\DevTools\PHPStan\Rules;
 
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\Node\Expr\New_;
@@ -43,7 +43,6 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use Symfony\Component\Filesystem\Path;
-use function realpath;
 use function sprintf;
 
 /**
@@ -80,18 +79,12 @@ final class InfectionContainerRule implements Rule {
      */
     private function getContainerFiles(): array
     {
-        if (self::$containerFiles !== null) {
-            return self::$containerFiles;
-        }
-
-        self::$containerFiles = array_map(
+        return self::$containerFiles ??= array_map(
             static fn (string $path): string => Path::canonicalize($path),
             [
-                __DIR__ . '/../../../tests/phpunit/ContainerTest.php',
+                __DIR__ . '/../../../tests/phpunit/Container/ContainerTest.php',
                 __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
             ],
         );
-
-        return self::$containerFiles;
     }
 }

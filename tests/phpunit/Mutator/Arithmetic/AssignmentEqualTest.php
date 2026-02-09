@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class AssignmentEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,61 +55,54 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates a comparison to an assignment' => [
-            <<<'PHP'
-                <?php
-
-                if ($a == $b) {
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                if ($a = $b) {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($a == $b) {
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($a = $b) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate comparsion to an impossible assignment' => [
-            <<<'PHP'
-                <?php
-
-                if (1 == $a) {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (1 == $a) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not try to assign a variable to a class constant' => [
-            <<<'PHP'
-                <?php
-
-                if (BaseClass::CLASS_CONST == $a) {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (BaseClass::CLASS_CONST == $a) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not try to assign a variable to a built in constant' => [
-            <<<'PHP_WRAP'
+            <<<'PHP'
                 <?php
 
                 if (PHP_EOL == $a) {
                 }
-                PHP_WRAP
-
-            ,
+                PHP,
         ];
 
         yield 'It does not try to assign a scalar to a result of a function call' => [
-            <<<'PHP'
-                <?php
-
-                if ($x->getFoo() == 1) {
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x->getFoo() == 1) {
+                    }
+                    PHP,
+            ),
         ];
     }
 }

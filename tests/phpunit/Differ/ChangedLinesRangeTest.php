@@ -36,17 +36,130 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\ChangedLinesRange;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ChangedLinesRange::class)]
 final class ChangedLinesRangeTest extends TestCase
 {
-    public function test_it_returns_lines(): void
+    public function test_it_can_be_created_for_a_line(): void
     {
-        $range = new ChangedLinesRange(3, 6);
+        $expected = ChangedLinesRange::create(3, 3);
+        $actual = ChangedLinesRange::forLine(3);
 
-        $this->assertSame(3, $range->getStartLine());
-        $this->assertSame(6, $range->getEndLine());
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_can_be_created_for_a_range(): void
+    {
+        $expected = ChangedLinesRange::create(12, 18);
+        $actual = ChangedLinesRange::forRange(12, 7);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_can_be_created_with_an_end_line_lesser_than_a_start_line(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        ChangedLinesRange::create(12, 11);
+    }
+
+    /**
+     * @param positive-int|0 $startLine
+     * @param positive-int|0 $endLine
+     */
+    #[DataProvider('rangeProvider')]
+    public function test_it_can_check_if_it_contains_the_given_range(
+        ChangedLinesRange $range,
+        int $startLine,
+        int $endLine,
+        bool $expected,
+    ): void {
+        $actual = $range->touches($startLine, $endLine);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function rangeProvider(): iterable
+    {
+        yield 'the mutation touches some of the changed lines' => [
+            ChangedLinesRange::create(10, 20),
+            11,
+            19,
+            true,
+        ];
+
+        yield 'the mutation touches all the changed lines' => [
+            ChangedLinesRange::create(10, 20),
+            10,
+            20,
+            true,
+        ];
+
+        yield 'the mutation touches all changed lines and more' => [
+            ChangedLinesRange::create(10, 20),
+            11,
+            21,
+            true,
+        ];
+
+        yield 'the first line of the mutation touches the changed lines' => [
+            ChangedLinesRange::forLine(11),
+            11,
+            19,
+            true,
+        ];
+
+        yield 'the last line of the mutation touches the changed lines' => [
+            ChangedLinesRange::forLine(19),
+            11,
+            19,
+            true,
+        ];
+
+        yield 'the mutation touches the changed lines' => [
+            ChangedLinesRange::forLine(15),
+            11,
+            19,
+            true,
+        ];
+
+        yield 'the mutation touches some of the changed lines (before)' => [
+            ChangedLinesRange::create(10, 20),
+            9,
+            18,
+            true,
+        ];
+
+        yield 'the mutation touches some of the changed lines (after)' => [
+            ChangedLinesRange::create(10, 20),
+            12,
+            21,
+            true,
+        ];
+
+        yield 'the mutation does not affect any changed lines (before)' => [
+            ChangedLinesRange::create(10, 20),
+            7,
+            9,
+            false,
+        ];
+
+        yield 'the mutation does not affect any changed lines (after)' => [
+            ChangedLinesRange::create(10, 20),
+            21,
+            23,
+            false,
+        ];
+
+        yield 'invalid range given (start & end inversed) still contained' => [
+            ChangedLinesRange::create(10, 20),
+            18,
+            12,
+            true,
+        ];
     }
 }

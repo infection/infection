@@ -47,10 +47,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class LogicalNotTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -58,39 +58,35 @@ final class LogicalNotTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes logical not' => [
-            <<<'PHP'
-                <?php
-
-                return !false;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                return false;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return !false;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return false;
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove double logical not' => [
-            <<<'PHP'
-                <?php
-
-                return !!false;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return !!false;
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove negation on match() to prevent overlap with MatchArmRemoval' => [
-            <<<'PHP'
-                <?php
-
-                $matched = !match ($potionItem->getTypeId()){
-                    ItemTypeIds::POTION, ItemTypeIds::LINGERING_POTION => true,
-                    default => false,
-                };
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $matched = !match ($potionItem->getTypeId()){
+                        ItemTypeIds::POTION, ItemTypeIds::LINGERING_POTION => true,
+                        default => false,
+                    };
+                    PHP,
+            ),
         ];
     }
 

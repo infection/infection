@@ -58,8 +58,7 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
         return new Definition(
             <<<'TXT'
                 Negates all sub-expressions of an AND expression (`&&`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -89,10 +88,8 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
         ) {
             if ($this->seenVariabeName === null) {
                 $this->seenVariabeName = $node->expr->expr->name;
-            } else {
-                if ($this->seenVariabeName !== $node->expr->expr->name) {
-                    return true;
-                }
+            } elseif ($this->seenVariabeName !== $node->expr->expr->name) {
+                return true;
             }
 
             $resolvedName = NameResolver::resolveName($node->expr->class);

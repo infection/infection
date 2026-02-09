@@ -47,7 +47,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
      * @param string|string[] $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,243 +55,218 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['bar' => 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_intersect_key(\Class_With_Const::Const, ['bar' => 'baz']);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_intersect_key(\Class_With_Const::Const, ['bar' => 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = \Class_With_Const::Const;
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = \Class_With_Const::Const;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['bar' => 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_intersect_key' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['bar' => 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if (array_intersect_key($a, ['bar' => 'baz']) === $a) {
-                    return true;
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if (array_intersect_key($a, ['bar' => 'baz']) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    if ($a === $a) {
-                        return true;
-                    }
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    if (['bar' => 'baz'] === $a) {
-                        return true;
-                    }
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        if ($a === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        if (['bar' => 'baz'] === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_intersect_key is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_InTeRsEcT_kEy(['foo' => 'bar'], ['bar' => 'baz']);
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_InTeRsEcT_kEy(['foo' => 'bar'], ['bar' => 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['bar' => 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_intersect_key uses functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_intersect_key($foo->bar(), $foo->baz());
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_intersect_key($foo->bar(), $foo->baz());
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->bar();
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->baz();
-                    PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->bar();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']));
-                PHP
-            ,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['foo' => 'bar']);
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['bar' => 'baz']);
+                    $a = array_map('strtolower', array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']));
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['foo' => 'bar']);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['bar' => 'baz']);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when only one parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_intersect_key(['foo' => 'bar']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_intersect_key(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz'], ['E', 'F']);
-                PHP
-            ,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $a = ['foo' => 'bar'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['bar' => 'baz'];
-                    PHP
-                ,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['E', 'F'];
+                    $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz'], ['E', 'F']);
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo' => 'bar'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['bar' => 'baz'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['E', 'F'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_intersect_key' => [
-            <<<'PHP'
-                <?php
-
-                function array_intersect_key($array, $array1, $array2)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_intersect_key($array, $array1, $array2)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_intersect_key';
 
-                $a = 'array_intersect_key';
-
-                $b = $a([1,2,3], [3,4,5]);
-                PHP
-            ,
+                    $b = $a([1,2,3], [3,4,5]);
+                    PHP,
+            ),
         ];
     }
 }

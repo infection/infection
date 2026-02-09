@@ -10,6 +10,8 @@ use function version_compare;
 
 if (version_compare((string)InstalledVersions::getPrettyVersion('symfony/console'), 'v6.0', '<')) {
     class_alias(FakeOutputSymfony5::class, \Infection\Tests\Fixtures\Console\FakeOutput::class);
-} else {
+} elseif (version_compare((string)InstalledVersions::getPrettyVersion('symfony/console'), 'v7.0', '<')) {
     class_alias(FakeOutputSymfony6::class, \Infection\Tests\Fixtures\Console\FakeOutput::class);
+} else {
+   class_alias(FakeOutputSymfony7::class, \Infection\Tests\Fixtures\Console\FakeOutput::class);
 }

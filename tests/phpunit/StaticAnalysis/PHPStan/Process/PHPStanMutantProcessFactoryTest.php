@@ -56,7 +56,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -81,6 +81,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -95,7 +97,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -107,7 +109,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                '--fail-without-result-cache',
                 '--memory-limit=-1',
             ])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
@@ -152,7 +153,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_with_multiple_options(): void
     {
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -177,6 +178,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -191,7 +194,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -203,7 +206,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                '--fail-without-result-cache',
                 '--memory-limit=-1',
                 '--level=max',
             ])
@@ -249,7 +251,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_without_options(): void
     {
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -274,6 +276,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -288,7 +292,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -300,7 +304,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                '--fail-without-result-cache',
             ])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;

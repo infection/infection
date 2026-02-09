@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayValuesTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,136 +55,128 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_values(['foo' => 'bar']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_values(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_values(\Class_With_Const::Const);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_values(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_values' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_values(['foo' => 'bar']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_values(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_values' => [
-            <<<'PHP'
-                <?php
-
-                function array_values($array)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_values($array)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if (array_values($a) === $a) {
-                    return true;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if (array_values($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_values is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_VaLuEs(['foo' => 'bar']);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_VaLuEs(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_values uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_values($foo->bar());
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_values($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_values(['foo' => 'bar']));
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo' => 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_values(['foo' => 'bar']));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_values';
 
-                $a = 'array_values';
-
-                $b = $a(['foo' => 'bar']);
-                PHP
-            ,
+                    $b = $a(['foo' => 'bar']);
+                    PHP,
+            ),
         ];
     }
 }

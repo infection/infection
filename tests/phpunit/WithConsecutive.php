@@ -95,10 +95,7 @@ final class WithConsecutive
                 $map ??= $values[$index];
 
                 $expectedArg = array_shift($map);
-
-                if ($expectedArg !== null) {
-                    $expectedArg->evaluate($value);
-                }
+                $expectedArg?->evaluate($value);
 
                 return true;
             });

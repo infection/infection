@@ -45,15 +45,12 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(TextLogFileProvider::class)]
 final class TextLogFileProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var TextLogFileProvider
-     */
-    private $provider;
+    private TextLogFileProvider $provider;
 
     protected function setUp(): void
     {
         $this->provider = new TextLogFileProvider(
-            $this->createMock(ConsoleHelper::class),
+            $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
         );
     }

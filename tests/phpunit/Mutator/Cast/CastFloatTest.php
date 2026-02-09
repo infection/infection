@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class CastFloatTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,122 +55,112 @@ final class CastFloatTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to float' => [
-            <<<'PHP'
-                <?php
-
-                (float) '1.1';
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                '1.1';
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (float) '1.1';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1.1';
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to double' => [
-            <<<'PHP'
-                <?php
-
-                (double) '1.1';
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                '1.1';
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (double) '1.1';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1.1';
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to real' => [
-            <<<'PHP'
-                <?php
-
-                (real) '1.1';
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                '1.1';
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (real) '1.1';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1.1';
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to float in conditions' => [
-            <<<'PHP'
-                <?php
-
-                if ((float) random_int()) {
-                    echo 'Hello';
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                if (random_int()) {
-                    echo 'Hello';
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ((float) random_int()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (random_int()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to float in global return' => [
-            <<<'PHP'
-                <?php
-
-                return (float) random_int();
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                return random_int();
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return (float) random_int();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return random_int();
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to float in return of untyped-function' => [
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return (float) random_int();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return random_int();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return (float) random_int();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return random_int();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to float in return of float-function when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsFloat(): float
-                {
-                    return (float) random_int();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsFloat(): float
-                {
-                    return random_int();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsFloat(): float
+                    {
+                        return (float) random_int();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsFloat(): float
+                    {
+                        return random_int();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to float in return of float-function when strict-types=1' => [
@@ -197,24 +187,24 @@ final class CastFloatTest extends BaseMutatorTestCase
         ];
 
         yield 'It removes casting to float in function parameters when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    round((float) $s);
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    round($s);
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        round((float) $s);
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        round($s);
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to float in function parameters when strict-types=1' => [

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis;
 
 use Infection\TestFramework\Coverage\Trace;
 

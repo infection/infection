@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -55,8 +56,7 @@ final class Plus implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an addition operator (`+`) with a subtraction operator (`-`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -73,7 +73,11 @@ final class Plus implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Minus($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Minus(
+            $node->left,
+            $node->right,
+            NodeAttributes::getAllExceptOriginalNode($node),
+        );
     }
 
     public function canMutate(Node $node): bool
@@ -82,10 +86,6 @@ final class Plus implements Mutator
             return false;
         }
 
-        if ($node->left instanceof Node\Expr\Array_ || $node->right instanceof Node\Expr\Array_) {
-            return false;
-        }
-
-        return true;
+        return !($node->left instanceof Node\Expr\Array_ || $node->right instanceof Node\Expr\Array_);
     }
 }

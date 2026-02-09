@@ -37,7 +37,7 @@ namespace Infection\Tests\Reflection;
 
 use Closure;
 use Error;
-use Infection\Container;
+use Infection\Container\Container;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -46,20 +46,20 @@ use function str_starts_with;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
-final class ContainerReflection
+final readonly class ContainerReflection
 {
     /** @var ReflectionClass<Container> */
-    private readonly ReflectionClass $reflection;
+    private ReflectionClass $reflection;
 
-    private readonly Closure $createServiceClosure;
+    private Closure $createServiceClosure;
 
-    private readonly Closure $getServiceClosure;
+    private Closure $getServiceClosure;
 
-    private readonly ReflectionProperty $factories;
+    private ReflectionProperty $factories;
 
-    private readonly ReflectionProperty $values;
+    private ReflectionProperty $values;
 
-    public function __construct(private readonly Container $container)
+    public function __construct(private Container $container)
     {
         $this->reflection = new ReflectionClass($container);
 

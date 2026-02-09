@@ -49,7 +49,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
             '/tmp',
-            __DIR__ . '/../../../Fixtures/Files/phpunit/phpunit.xml',
+            __FILE__,   // the FS is not mocked so it needs a real file; the content doesn't matter for this test though.
             '/path/to/config-dir',
             '/path/to/junit.xml',
             '/path/to/project',

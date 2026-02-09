@@ -36,13 +36,16 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use function Later\lazy;
 use Webmozart\Assert\Assert;
 
@@ -52,14 +55,18 @@ use Webmozart\Assert\Assert;
  */
 class XmlCoverageParser
 {
-    public function __construct()
-    {
+    public function __construct(
+        private readonly FileSystem $fileSystem,
+    ) {
     }
 
     public function parse(SourceFileInfoProvider $provider): Trace
     {
+        $fileInfo = $provider->provideFileInfo();
+
         return new ProxyTrace(
-            $provider->provideFileInfo(),
+            $fileInfo,
+            $this->fileSystem->realPath($fileInfo->getPathname()),
             lazy(self::createTestLocationsGenerator($provider->provideXPath())),
         );
     }
@@ -74,24 +81,24 @@ class XmlCoverageParser
 
     private static function retrieveTestLocations(SafeDOMXPath $xPath): TestLocations
     {
-        $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
-
-        $percentage = $linesNode->getAttribute('percent');
+        $percentage = $xPath
+            ->getElement('/p:phpunit/p:file/p:totals/p:lines')
+            ->getAttribute('percent');
 
         if (self::percentageToFloat($percentage) === .0) {
             return new TestLocations();
         }
 
-        $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
+        $coveredLineNodes = $xPath->queryList('/p:phpunit/p:file/p:coverage/p:line');
 
         if ($coveredLineNodes->length === 0) {
             return new TestLocations();
         }
 
-        $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
+        $coveredMethodNodes = $xPath->queryList('/p:phpunit/p:file/p:class/p:method');
 
         if ($coveredMethodNodes->length === 0) {
-            $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
+            $coveredMethodNodes = $xPath->queryList('/p:phpunit/p:file/p:trait/p:method');
         }
 
         return new TestLocations(
@@ -111,7 +118,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList<DOMElement> $coveredLineNodes
+     * @param DOMNodeList<DOMNode|DOMNameSpaceNode> $coveredLineNodes
      *
      * @return array<int, array<int, TestLocation>>
      */
@@ -120,19 +127,22 @@ class XmlCoverageParser
         $data = [];
 
         foreach ($coveredLineNodes as $lineNode) {
+            Assert::isInstanceOf($lineNode, DOMElement::class);
+
             $lineNumber = $lineNode->getAttribute('nr');
 
             Assert::integerish($lineNumber);
 
             $lineNumber = (int) $lineNumber;
 
-            /** @phpstan-var DOMNodeList<DOMElement> $coveredNodes */
             $coveredNodes = $lineNode->childNodes;
 
             foreach ($coveredNodes as $coveredNode) {
                 if ($coveredNode->nodeName !== 'covered') {
                     continue;
                 }
+
+                Assert::isInstanceOf($coveredNode, DOMElement::class);
 
                 $data[$lineNumber][] = TestLocation::forTestMethod(
                     $coveredNode->getAttribute('by'),
@@ -144,7 +154,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList<DOMElement> $methodsCoverageNodes
+     * @param DOMNodeList<DOMNode|DOMNameSpaceNode> $methodsCoverageNodes
      *
      * @return SourceMethodLineRange[]
      */
@@ -153,6 +163,8 @@ class XmlCoverageParser
         $methodsCoverage = [];
 
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
+            Assert::isInstanceOf($methodsCoverageNode, DOMElement::class);
+
             if ((int) $methodsCoverageNode->getAttribute('coverage') === 0) {
                 continue;
             }

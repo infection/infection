@@ -55,8 +55,7 @@ final class LogicalOrSingleSubExprNegation extends AbstractSingleSubExprNegation
         return new Definition(
             <<<'TXT'
                 Negates all sub-expressions separately in OR (`||`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

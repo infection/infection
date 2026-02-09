@@ -73,8 +73,7 @@ final class UnwrapArrayUintersect extends AbstractFunctionUnwrapMutator
                 $x = ['baz' => 'bar'];
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

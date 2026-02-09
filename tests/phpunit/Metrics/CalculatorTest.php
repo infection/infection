@@ -38,7 +38,7 @@ namespace Infection\Tests\Metrics;
 use function array_sum;
 use Infection\Metrics\Calculator;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Tests\Logger\CreateMetricsCalculator;
+use Infection\Tests\Reporter\CreateMetricsCalculator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

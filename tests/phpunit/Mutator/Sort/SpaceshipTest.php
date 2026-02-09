@@ -49,10 +49,10 @@ final class SpaceshipTest extends BaseMutatorTestCase
     }
 
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -60,98 +60,96 @@ final class SpaceshipTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It swaps spaceship operators' => [
-            <<<'PHP'
-                <?php
-
-                $a <=> $b;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $b <=> $a;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a <=> $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b <=> $a;
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is identical zero on the right side' => [
-            <<<'PHP'
-                <?php
-
-                ($a <=> $b) === 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($a <=> $b) === 0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is identical zero on the left side' => [
-            <<<'PHP'
-                <?php
-
-                0 === ($a <=> $b);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0 === ($a <=> $b);
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero on the right side' => [
-            <<<'PHP'
-                <?php
-
-                ($a <=> $b) == 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($a <=> $b) == 0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero as string on the right side' => [
-            <<<'PHP'
-                <?php
-
-                ($a <=> $b) == '0';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($a <=> $b) == '0';
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero on the left side' => [
-            <<<'PHP'
-                <?php
-
-                0 == ($a <=> $b);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0 == ($a <=> $b);
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero as string on the left side' => [
-            <<<'PHP'
-                <?php
-
-                '0' == ($a <=> $b);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '0' == ($a <=> $b);
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format on the right side' => [
-            <<<'PHP'
-                <?php
-
-                ($a <=> $b) == 0.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($a <=> $b) == 0.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format as string on the right side' => [
-            <<<'PHP'
-                <?php
-
-                ($a <=> $b) == '0.0';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ($a <=> $b) == '0.0';
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format on the left side' => [
-            <<<'PHP'
-                <?php
-
-                0.0 == ($a <=> $b);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0.0 == ($a <=> $b);
+                    PHP,
+            ),
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format as string on the left side' => [
-            <<<'PHP'
-                <?php
-
-                '0.0' == ($a <=> $b);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '0.0' == ($a <=> $b);
+                    PHP,
+            ),
         ];
     }
 }

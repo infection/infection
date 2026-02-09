@@ -1,26 +1,54 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
 namespace Infection\Telemetry\Reporter;
 
-use Infection\Console\IO;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\TimeFormatter;
-use Infection\Telemetry\Metric\Time\DurationFormatter;
-use Infection\Telemetry\Tracing\RootScopes;
-use Infection\Telemetry\Tracing\Span;
-use Infection\Telemetry\Tracing\Trace;
-use InvalidArgumentException;
-use Symfony\Component\Console\Output\OutputInterface;
 use function array_filter;
 use function array_map;
 use function array_values;
 use function count;
 use function in_array;
-use function memory_get_peak_usage;
+use Infection\Console\IO;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
+use Infection\Telemetry\Tracing\RootScopes;
+use Infection\Telemetry\Tracing\Span;
+use Infection\Telemetry\Tracing\Trace;
+use InvalidArgumentException;
 use function sprintf;
-use function str_repeat;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class ConsoleReporter
 {
@@ -34,12 +62,12 @@ final class ConsoleReporter
     /**
      * @var array{positive-int, bool}|null
      */
-    private array|null $lastFiltered = [];
+    private ?array $lastFiltered = [];
 
     public function __construct(
         private readonly DurationFormatter $durationFormatter,
-        private readonly MemoryFormatter   $memoryFormatter,
-        private readonly IO                $io,
+        private readonly MemoryFormatter $memoryFormatter,
+        private readonly IO $io,
     ) {
     }
 
@@ -50,12 +78,11 @@ final class ConsoleReporter
      */
     public function report(
         Trace $trace,
-        int   $maxDepth,
-        array  $rootScopes,
+        int $maxDepth,
+        array $rootScopes,
         int $minTimeThreshold,
-        string|null $spanId,
-    ): void
-    {
+        ?string $spanId,
+    ): void {
         $this->boxDrawer = new BoxDrawer();
         $this->resetLastFiltered();
 
@@ -85,14 +112,36 @@ final class ConsoleReporter
     }
 
     /**
+     * @param positive-int|0 $filteredCount
+     * @param positive-int|0 $lastFilteredDepth
+     * @param bool $lastFilteredIsLast
+     */
+    public function printPreviouslyFilteredSpans(
+        int $filteredCount,
+        int $lastFilteredDepth,
+        mixed $lastFilteredIsLast,
+    ): void {
+        $this->io->writeln(
+            sprintf(
+                '%s filtered%s',
+                $this->boxDrawer->draw($lastFilteredDepth, $lastFilteredIsLast),
+                $filteredCount === 1
+                    ? ''
+                    : ' (x' . $filteredCount . ')',
+            ),
+        );
+
+        $this->resetLastFiltered();
+    }
+
+    /**
      * @param list<RootScopes> $rootScopes
      */
     private static function filterSpans(
         Trace $trace,
         array $rootScopes,
-        string|null $spanId,
-    ): Trace
-    {
+        ?string $spanId,
+    ): Trace {
         $rootScopeValues = array_map(
             static fn (RootScopes $scope) => $scope->value,
             $rootScopes,
@@ -105,7 +154,7 @@ final class ConsoleReporter
             $filter,
         );
 
-        if (null !== $spanId) {
+        if ($spanId !== null) {
             $filteredSpans = [self::findSpanById($spanId, $filteredSpans)];
         }
 
@@ -118,7 +167,7 @@ final class ConsoleReporter
     {
         $span = self::findSpanByIdRecursively($id, $spans);
 
-        if (null === $span) {
+        if ($span === null) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Not span with the ID "%s" was found.',
@@ -133,7 +182,7 @@ final class ConsoleReporter
     /**
      * @param Span[] $spans
      */
-    private static function findSpanByIdRecursively(string $id, array $spans): Span|null
+    private static function findSpanByIdRecursively(string $id, array $spans): ?Span
     {
         if (count($spans) === 0) {
             return null;
@@ -146,7 +195,7 @@ final class ConsoleReporter
 
             $result = self::findSpanByIdRecursively($id, $span->children);
 
-            if (null !== $result) {
+            if ($result !== null) {
                 return $result;
             }
         }
@@ -165,8 +214,7 @@ final class ConsoleReporter
         int $minTimeThreshold,
         int $depth = 0,
         bool $isLast = false,
-    ): void
-    {
+    ): void {
         $childrenCount = count($span->children);
         $displayChildren = $childrenCount === 0 || $depth < $maxDepth;
 
@@ -187,20 +235,20 @@ final class ConsoleReporter
                 }
             }
 
-            $this->filteredCount++;
+            ++$this->filteredCount;
             $this->lastFiltered = [$depth, $isLast];
 
             return;
-        } else {
-            if ($this->filteredCount > 0) {
-                [$lastFilteredDepth, $lastFilteredIsLast] = $this->lastFiltered;
+        }
 
-                $this->printPreviouslyFilteredSpans(
-                    $this->filteredCount,
-                    $lastFilteredDepth,
-                    $lastFilteredIsLast,
-                );
-            }
+        if ($this->filteredCount > 0) {
+            [$lastFilteredDepth, $lastFilteredIsLast] = $this->lastFiltered;
+
+            $this->printPreviouslyFilteredSpans(
+                $this->filteredCount,
+                $lastFilteredDepth,
+                $lastFilteredIsLast,
+            );
         }
 
         self::printSpanLabel(
@@ -238,8 +286,7 @@ final class ConsoleReporter
         bool $displayChildren,
         int $childrenCount,
         int $durationPercentage,
-    ): void
-    {
+    ): void {
         $this->io->writeln(
             sprintf(
                 '%s %s - %s (%s%%), peak %s, Δ%s%s',
@@ -259,7 +306,7 @@ final class ConsoleReporter
                     ? ''
                     : self::getHiddenChildrenLabel($childrenCount),
             ),
-            OutputInterface::VERBOSITY_NORMAL
+            OutputInterface::VERBOSITY_NORMAL,
         );
     }
 
@@ -287,29 +334,5 @@ final class ConsoleReporter
     {
         $this->filteredCount = 0;
         $this->lastFiltered = null;
-    }
-
-    /**
-     * @param positive-int|0 $filteredCount
-     * @param positive-int|0 $lastFilteredDepth
-     * @param bool $lastFilteredIsLast
-     */
-    public function printPreviouslyFilteredSpans(
-        int $filteredCount,
-        int $lastFilteredDepth,
-        mixed $lastFilteredIsLast,
-    ): void
-    {
-        $this->io->writeln(
-            sprintf(
-                '%s filtered%s',
-                $this->boxDrawer->draw($lastFilteredDepth, $lastFilteredIsLast),
-                $filteredCount === 1
-                    ? ''
-                    : ' (x' . $filteredCount. ')',
-            ),
-        );
-
-        $this->resetLastFiltered();
     }
 }

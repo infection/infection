@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -93,7 +94,7 @@ final class UnwrapFinally implements Mutator
         }
 
         yield [
-            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, $node->getAttributes()),
+            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, NodeAttributes::getAllExceptOriginalNode($node)),
             ...($node->finally->stmts ?? []),
         ];
     }

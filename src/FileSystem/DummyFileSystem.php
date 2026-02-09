@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Traversable;
 
 /**
  * @internal
  */
-final class DummyFileSystem extends Filesystem
+final class DummyFileSystem extends FileSystem
 {
     public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
     {
@@ -88,7 +88,7 @@ final class DummyFileSystem extends Filesystem
     {
     }
 
-    public function readlink(string $path, bool $canonicalize = false): ?string
+    public function readlink(string $path, bool $canonicalize = false): string
     {
         return '';
     }
@@ -118,5 +118,25 @@ final class DummyFileSystem extends Filesystem
 
     public function appendToFile(string $filename, $content, bool $lock = false): void
     {
+    }
+
+    public function readFile(string $filename): string
+    {
+        return '';
+    }
+
+    public function isReadableFile(string $filename): bool
+    {
+        return false;
+    }
+
+    public function isReadableDirectory(string $filename): bool
+    {
+        return false;
+    }
+
+    public function createFinder(): Finder
+    {
+        return Finder::create();
     }
 }

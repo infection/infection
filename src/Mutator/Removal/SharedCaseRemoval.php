@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -102,7 +103,7 @@ final class SharedCaseRemoval implements Mutator
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes(),
+                    NodeAttributes::getAllExceptOriginalNode($node),
                 );
 
                 continue;
@@ -116,13 +117,13 @@ final class SharedCaseRemoval implements Mutator
                 $cases[$i - 1] = new Node\Stmt\Case_(
                     $lastCase->cond,
                     $case->stmts,
-                    $lastCase->getAttributes(),
+                    NodeAttributes::getAllExceptOriginalNode($lastCase),
                 );
 
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes(),
+                    NodeAttributes::getAllExceptOriginalNode($node),
                 );
             }
         }

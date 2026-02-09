@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
+use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
-use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -64,9 +64,8 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
             <<<'TXT'
                 The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
                 <lib-xml-errors>
-                TXT
-            ,
-            normalizeLineReturn($exception->getMessage()),
+                TXT,
+            Str::toUnixLineEndings($exception->getMessage()),
         );
     }
 }

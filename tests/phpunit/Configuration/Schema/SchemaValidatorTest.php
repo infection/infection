@@ -38,7 +38,7 @@ namespace Infection\Tests\Configuration\Schema;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
-use function Infection\Tests\normalizeLineReturn;
+use Infection\Framework\Str;
 use function json_last_error_msg;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -69,7 +69,7 @@ final class SchemaValidatorTest extends TestCase
             } else {
                 $this->assertSame(
                     $expectedErrorMessage,
-                    normalizeLineReturn($exception->getMessage()),
+                    Str::toUnixLineEndings($exception->getMessage()),
                 );
             }
         }
@@ -77,36 +77,34 @@ final class SchemaValidatorTest extends TestCase
 
     public static function configProvider(): iterable
     {
-        $path = '/path/to/config';
+        $pathname = '/path/to/config';
 
         yield 'empty JSON' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 '{}',
             ),
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
                  - [source] The property source is required
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'invalid timeout' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 '{"timeout": "10"}',
             ),
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
                  - [source] The property source is required
                  - [timeout] String value found, but a number is required
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'invalid custom mutator' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 <<<'JSON'
                     {
                         "source": {
@@ -121,13 +119,12 @@ final class SchemaValidatorTest extends TestCase
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
                  - [mutators] The property CustomMutator is not defined and the definition does not allow additional properties
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'valid custom mutator' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 <<<'JSON'
                     {
                         "source": {
@@ -144,7 +141,7 @@ final class SchemaValidatorTest extends TestCase
 
         yield 'valid schema' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 <<<'JSON'
                     {
                         "source": {
@@ -157,11 +154,14 @@ final class SchemaValidatorTest extends TestCase
         ];
     }
 
+    /**
+     * @param non-empty-string $pathname
+     */
     private static function createConfigWithContents(
-        string $path,
+        string $pathname,
         string $contents,
     ): SchemaConfigurationFile {
-        $config = new SchemaConfigurationFile($path);
+        $config = new SchemaConfigurationFile($pathname);
 
         $decodedContents = json_decode($contents);
 

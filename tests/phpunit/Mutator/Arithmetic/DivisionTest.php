@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class DivisionTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,89 +55,89 @@ final class DivisionTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It changes regular divison' => [
-            <<<'PHP'
-                <?php
-
-                $a = 10 / 2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 10 * 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 10 / 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 10 * 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not change division equals' => [
-            <<<'PHP'
-                <?php
-
-                $a = 10;
-                $a /= 5;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 10;
+                    $a /= 5;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is 1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1 / $b;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1 / $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is 1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = $b / 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b / 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is -1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = -1 / $b;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = -1 / $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is -1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = $b / -1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b / -1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is 1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = 1.0 / $b;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1.0 / $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is 1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = $b / 1.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b / 1.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is -1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = -1.0 / $b;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = -1.0 / $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is -1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-                <?php
-
-                $a = $b / -1.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b / -1.0;
+                    PHP,
+            ),
         ];
     }
 }

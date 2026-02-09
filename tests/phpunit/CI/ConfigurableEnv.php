@@ -40,7 +40,10 @@ use OndraM\CiDetector\Env;
 
 final class ConfigurableEnv extends Env
 {
-    private $variables = [];
+    /**
+     * @var array<string, string|false>
+     */
+    private array $variables = [];
 
     /**
      * @param array<string, string|false> $variables

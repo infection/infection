@@ -37,18 +37,15 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
-use function file_exists;
 use function implode;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\SafeDOMXPath;
-use Safe\Exceptions\FilesystemException;
-use function Safe\file_get_contents;
-use function Safe\realpath;
+use SplFileInfo;
 use function sprintf;
 use function str_replace;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -63,6 +60,7 @@ class SourceFileInfoProvider
         private readonly string $coverageDir,
         private readonly string $relativeCoverageFilePath,
         private readonly string $projectSource,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -82,7 +80,7 @@ class SourceFileInfoProvider
 
         $coverageFile = $this->coverageDir . '/' . $this->relativeCoverageFilePath;
 
-        if (!file_exists($coverageFile)) {
+        if (!$this->fileSystem->isReadableFile($coverageFile)) {
             throw new InvalidCoverage(sprintf(
                 'Could not find the XML coverage file "%s" listed in "%s". Make sure the '
                 . 'coverage used is up to date',
@@ -91,14 +89,15 @@ class SourceFileInfoProvider
             ));
         }
 
-        return $this->xPath = XPathFactory::createXPath(file_get_contents($coverageFile));
+        return $this->xPath = SafeDOMXPath::fromString(
+            $this->fileSystem->readFile($coverageFile),
+            namespace: 'p',
+        );
     }
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->query('/phpunit/file')[0];
-
-        Assert::notNull($fileNode);
+        $fileNode = $xPath->getElement('/p:phpunit/p:file');
 
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');
@@ -123,8 +122,8 @@ class SourceFileInfoProvider
         );
 
         try {
-            $realPath = realpath($path);
-        } catch (FilesystemException) {
+            $realPath = $this->fileSystem->realPath($path);
+        } catch (IOException) {
             $coverageFilePath = Path::canonicalize(
                 $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath,
             );
@@ -137,6 +136,6 @@ class SourceFileInfoProvider
             ));
         }
 
-        return new SplFileInfo($realPath, $relativeFilePath, $path);
+        return new SplFileInfo($realPath);
     }
 }

@@ -44,11 +44,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class SharedCaseRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      * @param mixed[] $settings
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = [], array $settings = []): void
     {
         $this->assertMutatesInput($input, $expected, $settings);
     }
@@ -56,87 +56,101 @@ final class SharedCaseRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate single cases with a body' => [
-            '<?php
-
- switch(true) {
-    case true:
-        $a = [];
-        break;
-    case false:
-        $a = [];
-        break;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch(true) {
+                        case true:
+                            $a = [];
+                            break;
+                        case false:
+                            $a = [];
+                            break;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes cases that share a body' => [
-            '<?php
-
-switch(true) {
-    case true:
-    case false:
-        $a = [];
-        break;
-    case null:
-        $a = [];
-        break;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch(true) {
+                        case true:
+                        case false:
+                            $a = [];
+                            break;
+                        case null:
+                            $a = [];
+                            break;
+                    }
+                    PHP,
+            ),
             [
-                '<?php
-
-switch (true) {
-    case false:
-        $a = [];
-        break;
-    case null:
-        $a = [];
-        break;
-}',
-                '<?php
-
-switch (true) {
-    case true:
-        $a = [];
-        break;
-    case null:
-        $a = [];
-        break;
-}',
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        switch (true) {
+                            case false:
+                                $a = [];
+                                break;
+                            case null:
+                                $a = [];
+                                break;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        switch (true) {
+                            case true:
+                                $a = [];
+                                break;
+                            case null:
+                                $a = [];
+                                break;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It removes default if it shares a body with a case' => [
-            '<?php
-
-switch(true) {
-    case true:
-        $a = [];
-        break;
-    case false:
-    default:
-        $b = [];
-        break;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch(true) {
+                        case true:
+                            $a = [];
+                            break;
+                        case false:
+                        default:
+                            $b = [];
+                            break;
+                    }
+                    PHP,
+            ),
             [
-                '<?php
-
-switch (true) {
-    case true:
-        $a = [];
-        break;
-    default:
-        $b = [];
-        break;
-}',
-                '<?php
-
-switch (true) {
-    case true:
-        $a = [];
-        break;
-    case false:
-        $b = [];
-        break;
-}',
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        switch (true) {
+                            case true:
+                                $a = [];
+                                break;
+                            default:
+                                $b = [];
+                                break;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        switch (true) {
+                            case true:
+                                $a = [];
+                                break;
+                            case false:
+                                $b = [];
+                                break;
+                        }
+                        PHP,
+                ),
             ],
         ];
     }

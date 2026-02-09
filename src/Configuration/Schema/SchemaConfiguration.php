@@ -46,135 +46,38 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class SchemaConfiguration
+final readonly class SchemaConfiguration
 {
-    private readonly ?float $timeout;
-
-    private readonly ?string $testFramework;
-
-    private readonly ?string $staticAnalysisTool;
-
     /**
+     * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
+     * @param TestFrameworkTypes::*|null $testFramework
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function __construct(
-        private readonly string $file,
-        ?float $timeout,
-        private readonly Source $source,
-        private readonly Logs $logs,
-        private readonly ?string $tmpDir,
-        private readonly PhpUnit $phpUnit,
-        private readonly PhpStan $phpStan,
-        private readonly ?bool $ignoreMsiWithNoMutations,
-        private readonly ?float $minMsi,
-        private readonly ?float $minCoveredMsi,
-        private readonly array $mutators,
-        ?string $testFramework,
-        private readonly ?string $bootstrap,
-        private readonly ?string $initialTestsPhpOptions,
-        private readonly ?string $testFrameworkExtraOptions,
-        private readonly ?string $staticAnalysisToolOptions,
-        private readonly string|int|null $threads,
-        ?string $staticAnalysisTool,
+        public string $pathname,
+        public ?float $timeout,
+        public Source $source,
+        public Logs $logs,
+        public ?string $tmpDir,
+        public PhpUnit $phpUnit,
+        public PhpStan $phpStan,
+        public ?bool $ignoreMsiWithNoMutations,
+        public ?float $minMsi,
+        public ?float $minCoveredMsi,
+        public ?bool $timeoutsAsEscaped,
+        public ?int $maxTimeouts,
+        public array $mutators,
+        public ?string $testFramework,
+        public ?string $bootstrap,
+        public ?string $initialTestsPhpOptions,
+        public ?string $testFrameworkExtraOptions,
+        public ?string $staticAnalysisToolOptions,
+        public string|int|null $threads,
+        public ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
-        $this->timeout = $timeout;
-        $this->testFramework = $testFramework;
-        $this->staticAnalysisTool = $staticAnalysisTool;
-    }
-
-    public function getFile(): string
-    {
-        return $this->file;
-    }
-
-    public function getTimeout(): ?float
-    {
-        return $this->timeout;
-    }
-
-    public function getSource(): Source
-    {
-        return $this->source;
-    }
-
-    public function getLogs(): Logs
-    {
-        return $this->logs;
-    }
-
-    public function getTmpDir(): ?string
-    {
-        return $this->tmpDir;
-    }
-
-    public function getPhpUnit(): PhpUnit
-    {
-        return $this->phpUnit;
-    }
-
-    public function getPhpStan(): PhpStan
-    {
-        return $this->phpStan;
-    }
-
-    public function getIgnoreMsiWithNoMutations(): ?bool
-    {
-        return $this->ignoreMsiWithNoMutations;
-    }
-
-    public function getMinMsi(): ?float
-    {
-        return $this->minMsi;
-    }
-
-    public function getMinCoveredMsi(): ?float
-    {
-        return $this->minCoveredMsi;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function getMutators(): array
-    {
-        return $this->mutators;
-    }
-
-    public function getTestFramework(): ?string
-    {
-        return $this->testFramework;
-    }
-
-    public function getStaticAnalysisTool(): ?string
-    {
-        return $this->staticAnalysisTool;
-    }
-
-    public function getBootstrap(): ?string
-    {
-        return $this->bootstrap;
-    }
-
-    public function getInitialTestsPhpOptions(): ?string
-    {
-        return $this->initialTestsPhpOptions;
-    }
-
-    public function getTestFrameworkExtraOptions(): ?string
-    {
-        return $this->testFrameworkExtraOptions;
-    }
-
-    public function getStaticAnalysisToolOptions(): ?string
-    {
-        return $this->staticAnalysisToolOptions;
-    }
-
-    public function getThreads(): string|int|null
-    {
-        return $this->threads;
     }
 }

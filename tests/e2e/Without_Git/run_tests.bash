@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 set -e
 
 # PRs from forked repositories are ignored cause we can't use such branches from another remote in composer.json below
@@ -27,8 +29,22 @@ sed -i "s/\"infection\/infection\": \"dev-master\"/\"infection\/infection\": \"d
 set -e pipefail
 
 rm -f composer.lock
+
+# For local testing on forks, detect the fork's remote URL and add it as a repository
+# This allows Composer to find branches that exist on the fork but not on the main repo
+if [ -z "$GITHUB_EVENT_NAME" ]; then
+  fork_url=$(git -C ../../.. remote get-url origin 2>/dev/null || true)
+  if [ -n "$fork_url" ]; then
+    composer config repositories.fork vcs "$fork_url" --no-interaction
+  fi
+fi
+
 composer install
 
-docker run -t -v "$PWD":/opt -w /opt php:8.2-alpine vendor/bin/infection --coverage=infection-coverage
+docker run -t -v "$PWD":/opt -w /opt php:8.4-alpine vendor/bin/infection --coverage=infection-coverage
 
-diff -w expected-output.txt infection.log
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+fi
+
+diff -u --ignore-all-space expected-output.txt infection.log

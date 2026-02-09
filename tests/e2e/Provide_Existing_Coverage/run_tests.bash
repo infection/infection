@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 set -e pipefail
 
 readonly INFECTION="../../../bin/infection --coverage=infection-coverage --with-uncovered"
@@ -20,8 +22,8 @@ else
     php $INFECTION
 fi
 
-if [[ -v GOLDEN ]]; then
-   cp -v infection.log expected-output_phpunit.txt
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output_phpunit.txt
 fi
 
 diff -u expected-output_phpunit.txt infection.log

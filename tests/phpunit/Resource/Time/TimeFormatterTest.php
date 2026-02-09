@@ -43,10 +43,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TimeFormatter::class)]
 final class TimeFormatterTest extends TestCase
 {
-    /**
-     * @var TimeFormatter
-     */
-    private $timeFormatter;
+    private TimeFormatter $timeFormatter;
 
     protected function setUp(): void
     {

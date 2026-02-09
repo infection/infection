@@ -39,6 +39,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 #[CoversClass(MetricsCalculator::class)]
 final class MetricsCalculatorTest extends TestCase
@@ -65,27 +66,27 @@ final class MetricsCalculatorTest extends TestCase
     {
         $calculator = new MetricsCalculator(2);
 
-        $expectedKilledResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::KILLED_BY_TESTS,
             7,
         );
-        $expectedErrorResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::ERROR,
             2,
         );
-        $expectedEscapedResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::ESCAPED,
             2,
         );
-        $expectedTimedOutResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::TIMED_OUT,
             2,
         );
-        $expectedNotCoveredResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::NOT_COVERED,
             1,
@@ -113,7 +114,7 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0.0, $calculator->getCoverageRate());
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
 
-        $expectedKilledResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::KILLED_BY_TESTS,
             1,
@@ -124,5 +125,29 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(100.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(100.0, $calculator->getCoverageRate());
         $this->assertSame(100.0, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    public function test_calculator_is_memoized(): void
+    {
+        $metricsCalculator = new MetricsCalculator(2);
+
+        $this->addMutantExecutionResult(
+            $metricsCalculator,
+            DetectionStatus::KILLED_BY_TESTS,
+            1,
+        );
+
+        // First call creates and memoizes Calculator
+        $metricsCalculator->getMutationScoreIndicator();
+
+        $calculatorProperty = new ReflectionProperty($metricsCalculator, 'calculator');
+        $firstCalculator = $calculatorProperty->getValue($metricsCalculator);
+
+        // Second call should reuse memoized Calculator
+        $metricsCalculator->getCoveredCodeMutationScoreIndicator();
+
+        $secondCalculator = $calculatorProperty->getValue($metricsCalculator);
+
+        $this->assertSame($firstCalculator, $secondCalculator, 'Calculator should be memoized between calls');
     }
 }

@@ -49,6 +49,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -56,7 +57,7 @@ use PhpParser\Node;
  *
  * @implements ConfigurableMutator<Node\Expr\FuncCall>
  */
-final class MBString implements ConfigurableMutator
+final readonly class MBString implements ConfigurableMutator
 {
     use GetConfigClassName;
     use GetMutatorName;
@@ -64,7 +65,7 @@ final class MBString implements ConfigurableMutator
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
-    private readonly array $converters;
+    private array $converters;
 
     public function __construct(MBStringConfig $config)
     {
@@ -87,8 +88,7 @@ final class MBString implements ConfigurableMutator
                 ```php
                 $x = strlen($str) < 10;
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -253,9 +253,9 @@ final class MBString implements ConfigurableMutator
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(
-            new Node\Name($newFuncName, $node->name->getAttributes()),
+            new Node\Name($newFuncName, NodeAttributes::getAllExceptOriginalNode($node->name)),
             $args,
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 }

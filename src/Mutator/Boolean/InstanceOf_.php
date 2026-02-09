@@ -109,11 +109,7 @@ final class InstanceOf_ implements Mutator
         }
 
         // prevent double negation, e.g. "!! $example instanceof Example"
-        if (ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot) {
-            return false;
-        }
-
-        return true;
+        return !(ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot);
     }
 
     private function isArgumentOfAssertFunction(Node\Expr\Instanceof_ $node): bool

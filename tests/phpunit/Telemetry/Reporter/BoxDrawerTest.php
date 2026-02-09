@@ -1,15 +1,48 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Reporter;
 
+use function count;
 use Infection\Telemetry\Reporter\BoxDrawer;
+use function is_array;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function count;
-use function is_array;
 use function sprintf;
-use const PHP_EOL;
 
 #[CoversClass(BoxDrawer::class)]
 final class BoxDrawerTest extends TestCase
@@ -18,13 +51,12 @@ final class BoxDrawerTest extends TestCase
     public function test_it_can_draw_lines_with_boxes(
         array $lines,
         string $expected,
-    ): void
-    {
+    ): void {
         $drawer = new BoxDrawer();
 
         $actual = self::drawLines($drawer, $lines);
 
-        self::assertSame($expected, $actual, $actual);
+        $this->assertSame($expected, $actual, $actual);
     }
 
     public static function linesProvider(): iterable
@@ -33,25 +65,25 @@ final class BoxDrawerTest extends TestCase
             [],
             <<<'OUTPUT'
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'one root item' => [
             [0],
             <<<'OUTPUT'
-            ─ d0
+                ─ d0
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'multiple root items' => [
             [0, 1, 2],
             <<<'OUTPUT'
-            ┌─ d0
-            ├─ d1
-            └─ d2
+                ┌─ d0
+                ├─ d1
+                └─ d2
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'one root item with child' => [
@@ -59,10 +91,10 @@ final class BoxDrawerTest extends TestCase
                 0 => [1],
             ],
             <<<'OUTPUT'
-            ─ d0
-                └─ d1
+                ─ d0
+                    └─ d1
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'one root item with children' => [
@@ -74,12 +106,12 @@ final class BoxDrawerTest extends TestCase
                 ],
             ],
             <<<'OUTPUT'
-            ─ d0
-                ├─ d1
-                ├─ d2
-                └─ d3
+                ─ d0
+                    ├─ d1
+                    ├─ d2
+                    └─ d3
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'multiple root items with children' => [
@@ -94,19 +126,19 @@ final class BoxDrawerTest extends TestCase
                 7,
             ],
             <<<'OUTPUT'
-            ┌─ d0
-            │   ├─ d1
-            │   ├─ d2
-            │   └─ d3
-            ├─ d4
-            ├─ d5
-            │   └─ d6
-            └─ d7
+                ┌─ d0
+                │   ├─ d1
+                │   ├─ d2
+                │   └─ d3
+                ├─ d4
+                ├─ d5
+                │   └─ d6
+                └─ d7
 
-            OUTPUT,
+                OUTPUT,
         ];
 
-        yield 'multiple root items with nested children' => array(
+        yield 'multiple root items with nested children' => [
             [
                 0 => [
                     1 => [
@@ -123,21 +155,21 @@ final class BoxDrawerTest extends TestCase
                 11,
             ],
             <<<'OUTPUT'
-            ┌─ d0
-            │   ├─ d1
-            │   │   └─ d2
-            │   │       └─ d3
-            │   ├─ d4
-            │   │   ├─ d5
-            │   │   └─ d6
-            │   └─ d7
-            ├─ d8
-            ├─ d9
-            │   └─ d10
-            └─ d11
+                ┌─ d0
+                │   ├─ d1
+                │   │   └─ d2
+                │   │       └─ d3
+                │   ├─ d4
+                │   │   ├─ d5
+                │   │   └─ d6
+                │   └─ d7
+                ├─ d8
+                ├─ d9
+                │   └─ d10
+                └─ d11
 
-            OUTPUT,
-        );
+                OUTPUT,
+        ];
 
         yield 'single deep nesting to test connector caching' => [
             [
@@ -150,13 +182,13 @@ final class BoxDrawerTest extends TestCase
                 ],
             ],
             <<<'OUTPUT'
-            ─ d0
-                └─ d1
-                    └─ d2
-                        └─ d3
-                            └─ d4
+                ─ d0
+                    └─ d1
+                        └─ d2
+                            └─ d3
+                                └─ d4
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'complex nesting with history management edge cases' => [
@@ -174,17 +206,17 @@ final class BoxDrawerTest extends TestCase
                 8,
             ],
             <<<'OUTPUT'
-            ┌─ d0
-            │   ├─ d1
-            │   │   └─ d2
-            │   └─ d3
-            ├─ d4
-            │   └─ d5
-            │       ├─ d6
-            │       └─ d7
-            └─ d8
+                ┌─ d0
+                │   ├─ d1
+                │   │   └─ d2
+                │   └─ d3
+                ├─ d4
+                │   └─ d5
+                │       ├─ d6
+                │       └─ d7
+                └─ d8
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'edge case' => [
@@ -200,23 +232,23 @@ final class BoxDrawerTest extends TestCase
                 14,
             ],
             <<<'OUTPUT'
-            ┌─ d0
-            │   ├─ d1
-            │   │   ├─ d2
-            │   │   └─ d3
-            │   └─ d4
-            │       ├─ d5
-            │       └─ d6
-            ├─ d7
-            │   ├─ d8
-            │   │   ├─ d9
-            │   │   └─ d10
-            │   └─ d11
-            │       ├─ d12
-            │       └─ d13
-            └─ d14
+                ┌─ d0
+                │   ├─ d1
+                │   │   ├─ d2
+                │   │   └─ d3
+                │   └─ d4
+                │       ├─ d5
+                │       └─ d6
+                ├─ d7
+                │   ├─ d8
+                │   │   ├─ d9
+                │   │   └─ d10
+                │   └─ d11
+                │       ├─ d12
+                │       └─ d13
+                └─ d14
 
-            OUTPUT,
+                OUTPUT,
         ];
     }
 
@@ -228,8 +260,7 @@ final class BoxDrawerTest extends TestCase
         array $lines,
         $depth = 0,
         $result = '',
-    ): string
-    {
+    ): string {
         $linesCount = count($lines);
         $sequenceIndex = 0;
 
@@ -264,7 +295,7 @@ final class BoxDrawerTest extends TestCase
                 );
             }
 
-            $sequenceIndex++;
+            ++$sequenceIndex;
         }
 
         return $result;

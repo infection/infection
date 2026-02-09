@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Event;
 
 use Infection\Mutation\Mutation;
-use Infection\TestFramework\Coverage\Trace;
 
 /**
  * @internal

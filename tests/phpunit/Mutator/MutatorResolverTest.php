@@ -59,10 +59,7 @@ use function sprintf;
 #[CoversClass(MutatorResolver::class)]
 final class MutatorResolverTest extends TestCase
 {
-    /**
-     * @var MutatorResolver
-     */
-    private $mutatorResolver;
+    private MutatorResolver $mutatorResolver;
 
     protected function setUp(): void
     {

@@ -120,7 +120,7 @@ class SourceDirGuesser
         if (is_array($path)) {
             array_walk_recursive(
                 $path,
-                function ($el) use (&$dirs): void {
+                function (array|string $el) use (&$dirs): void {
                     $this->parsePath($el, $dirs);
                 },
             );

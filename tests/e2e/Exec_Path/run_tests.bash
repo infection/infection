@@ -49,7 +49,12 @@ echo "Pre-generated coverage..."
 tputx sgr0
 
 PATH=$PATH:bin run "../../../bin/infection --coverage=coverage --quiet"
-diff -uw expected-output.txt infection.log
+
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+fi
+
+diff -u --ignore-all-space expected-output.txt infection.log
 
 tputx bold
 echo "Internal coverage..."
@@ -57,6 +62,6 @@ tputx sgr0
 
 PATH=$PATH:bin run "../../../bin/infection --quiet"
 
-diff -w expected-output.txt infection.log
+diff -u --ignore-all-space expected-output.txt infection.log
 
 rm -vfr coverage

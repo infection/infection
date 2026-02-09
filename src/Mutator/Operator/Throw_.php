@@ -67,8 +67,7 @@ final class Throw_ implements Mutator
                 new Exception();
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

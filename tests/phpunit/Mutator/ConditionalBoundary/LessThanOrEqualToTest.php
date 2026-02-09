@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class LessThanOrEqualToTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,36 +55,32 @@ final class LessThanOrEqualToTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates less than or equal to' => [
-            <<<'PHP'
-                <?php
-
-                1 <= 2;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                1 < 2;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 <= 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 < 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate an arrow' => [
-            <<<'PHP'
-                    <?php
-
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     [1 => 2];
-                PHP
-            ,
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate a spaceship' => [
-            <<<'PHP'
-                    <?php
-
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     1 <=> 2;
-                PHP
-            ,
+                    PHP,
+            ),
         ];
     }
 }

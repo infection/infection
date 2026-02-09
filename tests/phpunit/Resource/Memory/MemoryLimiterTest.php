@@ -53,25 +53,13 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MemoryLimiter::class)]
 final class MemoryLimiterTest extends FileSystemTestCase
 {
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $adapterMock;
-
-    /**
-     * @var MemoryLimiterEnvironment|MockObject
-     */
-    private $environmentMock;
+    private MockObject&MemoryLimiterEnvironment $environmentMock;
 
     protected function setUp(): void
     {
         $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->adapterMock = $this->createMock(AbstractTestFrameworkAdapter::class);
         $this->environmentMock = $this->createMock(MemoryLimiterEnvironment::class);
 
         parent::setUp();
@@ -91,7 +79,10 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory('', $this->adapterMock);
+        $memoryLimiter->limitMemory(
+            '',
+            $this->createStub(AbstractTestFrameworkAdapter::class),
+        );
     }
 
     public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void

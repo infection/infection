@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class While_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,51 +55,52 @@ final class While_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates expression part from variable to false' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $condition = true;
 
-                $condition = true;
+                    while ($condition) {
+                    }
 
-                while ($condition) {
-                }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $condition = true;
 
-                PHP
-            ,
-            <<<'PHP'
-                <?php
+                    while (false) {
+                    }
 
-                $condition = true;
-                while (false) {
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It mutates expression part from boolean true to false' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                    }
 
-                while (true) {
-                }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (false) {
+                    }
 
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                while (false) {
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate expression part in do-while loop to false' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    do {
 
-                do {
+                    } while (true);
 
-                } while (true);
-
-                PHP,
+                    PHP,
+            ),
         ];
     }
 }

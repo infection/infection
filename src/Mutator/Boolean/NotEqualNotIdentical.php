@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -56,8 +57,7 @@ final class NotEqualNotIdentical implements Mutator
             <<<'TXT'
                 Replaces a loose inequality comparison (using a not-equal operator (`!=`)) with a strict inequality
                 comparison (using a not-identical operator (`!==`)).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -74,7 +74,7 @@ final class NotEqualNotIdentical implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\NotIdentical($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

@@ -27,5 +27,26 @@
             "Assert::.*"
         ],
         "@default": true,
+
+        "ArrayItemRemoval": {
+            "ignore": [
+                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
+            ]
+        },
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                // This is for the Symfony Console commands: the description is purely for documentation purposes.
+                ".*\\$this\\->setDescription\\(.*"
+            ]
+        },
+        "ProtectedVisibility": {
+            "ignore": [
+                // The mutations are not covered because this would require more tweaks in the
+                // BaseReportLocatorTest and its DemoReportLocator implementation.
+                // However, it is a tested extension point already hence making those tests more
+                // complicated for this is not worth.
+                "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator",
+            ]
+        }
     }
 }

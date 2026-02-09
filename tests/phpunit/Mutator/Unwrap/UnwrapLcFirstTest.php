@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapLcFirstTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,132 +55,124 @@ final class UnwrapLcFirstTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-                <?php
-
-                $a = lcfirst('Good Afternoon!');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = lcfirst('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = lcfirst(\Class_With_Const::Const);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = lcfirst(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of lcfirst' => [
-            <<<'PHP'
-                <?php
-
-                $a = \lcfirst('Good Afternoon!');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \lcfirst('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                if (lcfirst($a) === $a) {
-                    return true;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if (lcfirst($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when lcfirst is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = lCfIrSt('Good Afternoon!');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = lCfIrSt('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when lcfirst uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = lcfirst($foo->bar());
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = lcfirst($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = lcfirst(array_reduce($words, function (string $carry, string $item) {
-                    return $carry . substr($item, 0, 1);
-                }));
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = array_reduce($words, function (string $carry, string $item) {
-                    return $carry . substr($item, 0, 1);
-                });
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = lcfirst(array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    }));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    });
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named lcfirst' => [
-            <<<'PHP'
-                <?php
-
-                function lcfirst($string)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function lcfirst($string)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'lcfirst';
 
-                $a = 'lcfirst';
-
-                $b = $a(' FooBar ');
-                PHP
-            ,
+                    $b = $a(' FooBar ');
+                    PHP,
+            ),
         ];
     }
 }

@@ -94,8 +94,7 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
                 Which elements it removes or how many elements it will attempt to remove will depend on its
                 configuration.
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -137,13 +136,11 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
 
         $parent = ParentConnector::findParent($node);
 
-        if ($parent instanceof Node\Expr\Assign) {
-            if (
-                $parent->var instanceof Node\Expr\List_
-                && count($parent->var->items) >= count($node->items)
-            ) {
-                return false;
-            }
+        if ($parent instanceof Node\Expr\Assign
+            && $parent->var instanceof Node\Expr\List_
+            && count($parent->var->items) >= count($node->items)
+        ) {
+            return false;
         }
 
         if ($parent instanceof Node\Arg) {
@@ -163,11 +160,7 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
         }
 
         // Don't mutate destructured values in foreach loops
-        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
-            return false;
-        }
-
-        return true;
+        return !($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node);
     }
 
     /**

@@ -47,10 +47,10 @@ use PHPUnit\Framework\Attributes\Group;
 final class ProtectedVisibilityTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -66,14 +66,13 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    private function foo(int $param, $test = 1): bool
+                    private function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate final method' => [
@@ -101,14 +100,13 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 abstract class Test
                 {
-                    private function foo(int $param, $test = 1): bool
+                    private function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate static flag' => [
@@ -120,14 +118,13 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    private static function foo(int $param, $test = 1): bool
+                    private static function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if parent abstract has same protected method' => [
@@ -143,18 +140,14 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class SameParent
                 {
-                    private function foo()
-                    {
-                    }
+                    private function foo() {}
                 }
+
                 class Child extends SameParent
                 {
-                    protected function foo()
-                    {
-                    }
+                    protected function foo() {}
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if grand parent class has same protected method' => [
@@ -166,21 +159,19 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class SameGrandParent
                 {
-                    private function foo()
-                    {
-                    }
+                    private function foo() {}
                 }
+
                 class SameParent extends SameGrandParent
                 {
+
                 }
+
                 class Child extends SameParent
                 {
-                    protected function foo()
-                    {
-                    }
+                    protected function foo() {}
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'it does mutate non-inherited methods' => [
@@ -192,7 +183,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 abstract class ProtectedNonSameAbstract
                 {
-                    abstract protected function foo();
+                    protected abstract function foo();
                 }
                 class Child extends ProtectedNonSameAbstract
                 {
@@ -203,15 +194,13 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                     {
                     }
                 }
+
                 PHP,
         ];
 
         yield 'it mutates an anonymous class' => [
-            <<<'PHP'
-                <?php
-
-                function something()
-                {
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     return new class
                     {
                         protected function anything()
@@ -219,14 +208,10 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                             return null;
                         }
                     };
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                function something()
-                {
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     return new class
                     {
                         private function anything()
@@ -234,8 +219,8 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                             return null;
                         }
                     };
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove attributes' => [
@@ -270,8 +255,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }

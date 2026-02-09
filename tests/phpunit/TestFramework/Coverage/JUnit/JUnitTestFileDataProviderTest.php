@@ -35,22 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
+use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function Safe\file_get_contents;
 use function Safe\file_put_contents;
-use function Safe\tempnam;
 use function Safe\unlink;
+use Symfony\Component\Filesystem\Path;
+use Throwable;
 
 #[Group('integration')]
 #[CoversClass(JUnitTestFileDataProvider::class)]
 final class JUnitTestFileDataProviderTest extends TestCase
 {
+    use ExpectsThrowables;
+
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
 
     private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit2.xml';
@@ -59,149 +66,129 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     private const JUNIT_CODECEPTION_CEST_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_codeception_cest.xml';
 
-    /**
-     * @var JUnitReportLocator|MockObject
-     */
-    private $jUnitLocatorMock;
-
-    /**
-     * @var JUnitTestFileDataProvider
-     */
-    private $provider;
-
-    /**
-     * @var string
-     */
-    private $tempfile;
+    private string $generatedJunitPath;
 
     protected function setUp(): void
     {
-        $this->jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
-
-        $this->provider = new JUnitTestFileDataProvider($this->jUnitLocatorMock);
-
-        $this->tempfile = tempnam('', '');
+        $this->generatedJunitPath = FS::tmpFile('JUnitTestFileDataProviderTest');
     }
 
     protected function tearDown(): void
     {
-        unlink($this->tempfile);
+        unlink($this->generatedJunitPath);
     }
 
-    public function test_it_returns_time_and_path(): void
-    {
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn(self::JUNIT)
-        ;
+    /**
+     * @param TestFileTimeData|class-string<Throwable> $expected
+     */
+    #[DataProvider('infoProvider')]
+    public function test_it_can_get_the_test_info_for_a_given_test_id(
+        string $xml,
+        string $testId,
+        TestFileTimeData|string $expected,
+    ): void {
+        $provider = $this->createProvider(
+            $this->createJUnit($xml),
+        );
 
-        $testFileInfo = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
+        if (is_string($expected)) {
+            $this->expectException($expected);
 
-        $this->assertSame('/project/tests/Config/InfectionConfigTest.php', $testFileInfo->path);
-        $this->assertSame(0.021983, $testFileInfo->time);
+            $provider->getTestFileInfo($testId);
+        } else {
+            $actual = $provider->getTestFileInfo($testId);
+
+            $this->assertEquals($expected, $actual);
+        }
     }
 
-    public function test_it_returns_the_same_result_on_consecutive_calls(): void
-    {
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn(self::JUNIT)
-        ;
+    /**
+     * @param TestFileTimeData|class-string<Throwable> $expected
+     */
+    #[DataProvider('infoProvider')]
+    public function test_it_is_idempotent(
+        string $xml,
+        string $testId,
+        TestFileTimeData|string $expected,
+    ): void {
+        $provider = $this->createProvider(
+            $this->createJUnit($xml),
+        );
 
-        $testFileInfo0 = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
-        $testFileInfo1 = $this->provider->getTestFileInfo('Infection\Tests\Config\InfectionConfigTest');
+        if (is_string($expected)) {
+            $resultOfTheFirstCall = $this->expectToThrow(
+                static fn () => $provider->getTestFileInfo($testId),
+            );
+            $resultOfTheSecondCall = $this->expectToThrow(
+                static fn () => $provider->getTestFileInfo($testId),
+            );
 
-        $this->assertSame($testFileInfo0->path, $testFileInfo1->path);
-        $this->assertSame($testFileInfo0->time, $testFileInfo1->time);
+            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
+        } else {
+            $resultOfTheFirstCall = $provider->getTestFileInfo($testId);
+            $resultOfTheSecondCall = $provider->getTestFileInfo($testId);
+
+            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
+        }
     }
 
-    public function test_it_throws_an_exception_if_the_junit_file_is_invalid_xml(): void
+    public static function infoProvider(): iterable
     {
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn($this->tempfile)
-        ;
+        yield 'PHPUnit' => [
+            file_get_contents(self::JUNIT),
+            'Infection\Tests\Config\InfectionConfigTest',
+            new TestFileTimeData(
+                '/project/tests/Config/InfectionConfigTest.php',
+                0.021983,
+            ),
+        ];
 
-        $this->expectException(InvalidArgumentException::class);
+        yield 'Codeception unit tests' => [
+            file_get_contents(self::JUNIT_DIFF_FORMAT),
+            'App\Tests\unit\SourceClassTest',
+            new TestFileTimeData(
+                '/codeception/tests/unit/SourceClassTest.php',
+                0.006096,
+            ),
+        ];
 
-        $this->provider->getTestFileInfo('Foo\BarTest');
+        yield 'Codeception BDD' => [
+            file_get_contents(self::JUNIT_FEATURE_FORMAT),
+            'FeatureA:Scenario A1',
+            new TestFileTimeData(
+                '/codeception/tests/bdd/FeatureA.feature',
+                0.039365,
+            ),
+        ];
+
+        yield 'Codeception Cest' => [
+            file_get_contents(self::JUNIT_CODECEPTION_CEST_FORMAT),
+            'app\controllers\ExampleCest:FeatureA',
+            new TestFileTimeData(
+                '/app/controllers/ExampleCest.php',
+                1.0E-6,
+            ),
+        ];
+
+        yield 'invalid XML' => [
+            '',
+            'Acme\Service',
+            InvalidArgumentException::class,
+        ];
     }
 
-    public function test_it_works_with_different_junit_format(): void
+    private function createProvider(string $file): JUnitTestFileDataProvider
     {
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn(self::JUNIT_DIFF_FORMAT)
-        ;
-
-        $testFileInfo = $this->provider->getTestFileInfo('App\Tests\unit\SourceClassTest');
-
-        $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $testFileInfo->path);
+        return new JUnitTestFileDataProvider(
+            new FixedLocator($file),
+        );
     }
 
-    public function test_it_works_with_feature_junit_format(): void
+    private function createJUnit(string $contents): string
     {
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn(self::JUNIT_FEATURE_FORMAT)
-        ;
+        $pathname = Path::canonicalize($this->generatedJunitPath);
+        file_put_contents($pathname, $contents);
 
-        $testFileInfo = $this->provider->getTestFileInfo('FeatureA:Scenario A1');
-
-        $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
-    }
-
-    public function test_it_works_with_codeception_cest_format(): void
-    {
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn(self::JUNIT_CODECEPTION_CEST_FORMAT)
-        ;
-
-        $testFileInfo = $this->provider->getTestFileInfo('app\controllers\ExampleCest:FeatureA');
-
-        $this->assertSame('/app/controllers/ExampleCest.php', $testFileInfo->path);
-    }
-
-    #[DataProvider('xmlProvider')]
-    public function test_it_does_not_trigger_count_assertion(string $xml): void
-    {
-        file_put_contents($this->tempfile, $xml);
-
-        $this->jUnitLocatorMock
-            ->method('locate')
-            ->willReturn($this->tempfile)
-        ;
-
-        $this->provider->getTestFileInfo('ExampleTest');
-
-        $this->addToAssertionCount(1);
-    }
-
-    public static function xmlProvider(): iterable
-    {
-        yield [<<<'XML'
-            <?xml version="1.0" encoding="UTF-8"?>
-            <testsuites>
-                <testsuite name="ExampleTest"/>
-                <testsuite name="ExampleTest"/>
-            </testsuites>
-            XML];
-
-        yield [<<<'XML'
-            <?xml version="1.0" encoding="UTF-8"?>
-            <testsuites>
-                <testcase class="ExampleTest"/>
-                <testcase class="ExampleTest"/>
-            </testsuites>
-            XML];
-
-        yield [<<<'XML'
-            <?xml version="1.0" encoding="UTF-8"?>
-            <testsuites>
-                <testcase file="foo/ExampleTest.feature"/>
-                <testcase file="foo/ExampleTest.feature"/>
-            </testsuites>
-            XML];
+        return $pathname;
     }
 }

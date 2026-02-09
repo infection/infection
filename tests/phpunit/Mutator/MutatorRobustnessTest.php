@@ -47,9 +47,9 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use const SORT_STRING;
+use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
 #[CoversNothing]
@@ -58,7 +58,7 @@ final class MutatorRobustnessTest extends TestCase
     /**
      * @var string[][]|null
      */
-    private static $files;
+    private static ?array $files = null;
 
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
@@ -134,7 +134,7 @@ final class MutatorRobustnessTest extends TestCase
         $initialStatements = SingletonContainer::getContainer()->getParser()->parse($code);
 
         (new NodeTraverserFactory())
-            ->create(new NullMutationVisitor($mutator), [])
+            ->create(new NullMutationVisitor($mutator))
             ->traverse($initialStatements)
         ;
     }

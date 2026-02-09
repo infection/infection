@@ -60,7 +60,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
-     * @param list<SplFileInfo> $filteredSourceFilesToMutate
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,

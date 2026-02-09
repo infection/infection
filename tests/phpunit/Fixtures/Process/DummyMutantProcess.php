@@ -13,10 +13,10 @@ use Symfony\Component\Process\Process;
 final class DummyMutantProcess extends MutantProcess
 {
     public function __construct(
-        private Process $process,
+        private readonly Process $process,
         Mutant $mutant,
         TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-        private bool $expectTimeOut
+        private readonly bool $expectTimeOut
     ) {
         parent::__construct($process, $mutant, $mutantExecutionResultFactory);
     }

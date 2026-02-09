@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class InstanceOf_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,83 +55,83 @@ final class InstanceOf_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates an instanceof comparison with a class literal to true and false' => [
-            <<<'PHP'
-                <?php
-
-                return $example instanceof Example;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    return !$example instanceof Example;
+                    return $example instanceof Example;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return !$example instanceof Example;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates an instanceof comparison with a variable to true and false' => [
-            <<<'PHP'
-                <?php
-
-                return $example instanceof $foo;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    return !$example instanceof $foo;
+                    return $example instanceof $foo;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return !$example instanceof $foo;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates an instanceof comparison without double negation' => [
-            <<<'PHP'
-                <?php
-
-                return !$example instanceof Example;
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    return $example instanceof Example;
+                    return !$example instanceof Example;
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return $example instanceof Example;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate an instanceof comparison inside `assert()` function call with a class literal' => [
-            <<<'PHP'
-                <?php
-
-                return assert($example instanceof Example);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return assert($example instanceof Example);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate an instanceof comparison inside `assert()` function call with variable' => [
-            <<<'PHP'
-                <?php
-
-                return assert($example instanceof $foo);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return assert($example instanceof $foo);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates an instanceof comparison inside other than `assert()` functions' => [
-            <<<'PHP'
-                <?php
-
-                return someFunc($example instanceof $foo);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return someFunc($example instanceof $foo);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    return someFunc(true);
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    return someFunc(false);
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return someFunc(true);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return someFunc(false);
+                        PHP,
+                ),
             ],
         ];
     }

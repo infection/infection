@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use function array_filter;
-use function array_key_exists;
+use function in_array;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 
 /**
@@ -46,7 +47,7 @@ use Infection\Mutant\MutantExecutionResult;
 class FilteringResultsCollector implements Collector
 {
     /**
-     * @param array<string, mixed> $targetDetectionStatuses
+     * @param DetectionStatus[] $targetDetectionStatuses
      */
     public function __construct(
         private readonly Collector $targetCollector,
@@ -56,13 +57,13 @@ class FilteringResultsCollector implements Collector
 
     public function collect(MutantExecutionResult ...$executionResults): void
     {
-        $executionResults = array_filter(
+        $filteredExecutionResults = array_filter(
             $executionResults,
-            fn (MutantExecutionResult $executionResults): bool => array_key_exists($executionResults->getDetectionStatus(), $this->targetDetectionStatuses),
+            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
         );
 
-        if ($executionResults !== []) {
-            $this->targetCollector->collect(...$executionResults);
+        if ($filteredExecutionResults !== []) {
+            $this->targetCollector->collect(...$filteredExecutionResults);
         }
     }
 }

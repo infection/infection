@@ -35,31 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\FileSystem\FileStore;
 use PhpParser\Node\Stmt;
 use PhpParser\Parser;
-use Symfony\Component\Finder\SplFileInfo;
+use PhpParser\Token;
+use SplFileInfo;
 use Throwable;
 
 /**
  * @internal
- * @final
  */
-class FileParser
+final readonly class FileParser
 {
     public function __construct(
-        private readonly Parser $parser,
+        private Parser $parser,
+        private FileStore $fileStore,
     ) {
     }
 
     /**
      * @throws UnparsableFile
      *
-     * @return Stmt[]
+     * @return array{Stmt[], Token[]}
      */
     public function parse(SplFileInfo $fileInfo): array
     {
         try {
-            return $this->parser->parse($fileInfo->getContents()) ?? [];
+            return [
+                $this->parser->parse(
+                    $this->fileStore->getContents($fileInfo),
+                ) ?? [],
+                $this->parser->getTokens(),
+            ];
         } catch (Throwable $throwable) {
             $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()

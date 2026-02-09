@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayChunkTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,150 +55,141 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_chunk(['A', 1, 'C'], 2);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_chunk(['A', 1, 'C'], 2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_chunk(\Class_With_Const::Const, 2);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_chunk(\Class_With_Const::Const, 2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_chunk' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_chunk(['A', 1, 'C'], 2);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_chunk(['A', 1, 'C'], 2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C'], 2);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C'], 2);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_chunk' => [
-            <<<'PHP'
-                <?php
-
-                function array_chunk($array, $size, $preserveKeys)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_chunk($array, $size, $preserveKeys)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                if (array_chunk($a, 2) === $a) {
-                    return true;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    if (array_chunk($a, 2) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_chunk is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_ChUnK(['A', 1, 'C'], 2);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_ChUnK(['A', 1, 'C'], 2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_chunk uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_chunk($foo->bar(), 2);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_chunk($foo->bar(), 2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_chunk(['A', 1, 'C'], 2));
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 1, 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_chunk(['A', 1, 'C'], 2));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 1, 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $preserveKeys parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_chunk(['A', 1, 'C'], 2, $preserveKeys);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_chunk(['A', 1, 'C'], 2, $preserveKeys);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_chunk';
 
-                $a = 'array_chunk';
-
-                $b = $a([1,2,3]);
-                PHP
-            ,
+                    $b = $a([1,2,3]);
+                    PHP,
+            ),
         ];
     }
 }

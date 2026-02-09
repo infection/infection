@@ -40,19 +40,20 @@ use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  * @final
  */
-class Configuration
+readonly class Configuration
 {
     private const LOG_VERBOSITY = [
         'all',
@@ -60,184 +61,61 @@ class Configuration
         'default',
     ];
 
-    private readonly float $timeout;
-
-    /** @var string[] */
-    private readonly array $sourceDirectories;
-
-    private readonly string $logVerbosity;
-
-    /** @var array<string, Mutator<Node>> */
-    private readonly array $mutators;
-
-    private readonly string $testFramework;
-
-    private readonly ?string $staticAnalysisTool;
-
-    private ?float $minMsi = null;
-
-    private readonly int $threadCount;
-
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $sourceFilesExcludes
-     * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string $configurationPathname
      */
     public function __construct(
-        float $timeout,
-        array $sourceDirectories,
-        private readonly iterable $sourceFiles,
-        private readonly string $sourceFilesFilter,
-        private readonly array $sourceFilesExcludes,
-        private readonly Logs $logs,
-        string $logVerbosity,
-        private readonly string $tmpDir,
-        private readonly PhpUnit $phpUnit,
-        private readonly PhpStan $phpStan,
-        array $mutators,
-        string $testFramework,
-        private readonly ?string $bootstrap,
-        private readonly ?string $initialTestsPhpOptions,
-        private readonly string $testFrameworkExtraOptions,
-        private readonly ?string $staticAnalysisToolOptions,
-        private readonly string $coveragePath,
-        private readonly bool $skipCoverage,
-        private readonly bool $skipInitialTests,
-        private readonly bool $debug,
-        private readonly bool $withUncovered,
-        private readonly bool $noProgress,
-        private readonly bool $ignoreMsiWithNoMutations,
-        ?float $minMsi,
-        private readonly ?int $numberOfShownMutations,
-        private readonly ?float $minCoveredMsi,
-        private readonly int $msiPrecision,
-        int $threadCount,
-        private readonly bool $dryRun,
-        private readonly array $ignoreSourceCodeMutatorsMap,
-        private readonly bool $executeOnlyCoveringTestCases,
-        private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
-        private readonly ?string $mapSourceClassToTestStrategy,
-        private readonly ?string $loggerProjectRootDirectory,
-        ?string $staticAnalysisTool,
-        private readonly ?string $mutantId,
+        public float $processTimeout,
+        public Source $source,
+        public ?SourceFilter $sourceFilter,
+        public Logs $logs,
+        public string $logVerbosity,
+        public string $tmpDir,
+        public PhpUnit $phpUnit,
+        public PhpStan $phpStan,
+        public array $mutators,
+        public string $testFramework,
+        public ?string $bootstrap,
+        public ?string $initialTestsPhpOptions,
+        public string $testFrameworkExtraOptions,
+        public ?string $staticAnalysisToolOptions,
+        public string $coveragePath,
+        public bool $skipCoverage,
+        public bool $skipInitialTests,
+        public bool $isDebugEnabled,
+        private bool $withUncovered,
+        public bool $noProgress,
+        public bool $ignoreMsiWithNoMutations,
+        public ?float $minMsi,
+        public ?int $numberOfShownMutations,
+        public ?float $minCoveredMsi,
+        public bool $timeoutsAsEscaped,
+        public ?int $maxTimeouts,
+        public int $msiPrecision,
+        public int $threadCount,
+        public bool $isDryRun,
+        public array $ignoreSourceCodeMutatorsMap,
+        public bool $executeOnlyCoveringTestCases,
+        public ?string $mapSourceClassToTestStrategy,
+        public ?string $loggerProjectRootDirectory,
+        public ?string $staticAnalysisTool,
+        public ?string $mutantId,
+        public string $configurationPathname,
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::allString($sourceDirectories);
+        Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
-
-        $this->timeout = $timeout;
-        $this->sourceDirectories = $sourceDirectories;
-        $this->logVerbosity = $logVerbosity;
-        $this->mutators = $mutators;
-        $this->testFramework = $testFramework;
-        $this->staticAnalysisTool = $staticAnalysisTool;
-        $this->minMsi = $minMsi;
-        $this->threadCount = $threadCount;
-    }
-
-    public function getProcessTimeout(): float
-    {
-        return $this->timeout;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getSourceDirectories(): array
-    {
-        return $this->sourceDirectories;
-    }
-
-    /**
-     * @return iterable<SplFileInfo>
-     */
-    public function getSourceFiles(): iterable
-    {
-        return $this->sourceFiles;
-    }
-
-    public function getSourceFilesFilter(): string
-    {
-        return $this->sourceFilesFilter;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getSourceFilesExcludes(): array
-    {
-        return $this->sourceFilesExcludes;
-    }
-
-    public function getLogs(): Logs
-    {
-        return $this->logs;
-    }
-
-    public function getLogVerbosity(): string
-    {
-        return $this->logVerbosity;
-    }
-
-    public function getTmpDir(): string
-    {
-        return $this->tmpDir;
-    }
-
-    public function getPhpUnit(): PhpUnit
-    {
-        return $this->phpUnit;
-    }
-
-    public function getPhpStan(): PhpStan
-    {
-        return $this->phpStan;
-    }
-
-    /**
-     * @return array<string, Mutator<Node>>
-     */
-    public function getMutators(): array
-    {
-        return $this->mutators;
-    }
-
-    public function getTestFramework(): string
-    {
-        return $this->testFramework;
-    }
-
-    public function getStaticAnalysisTool(): ?string
-    {
-        return $this->staticAnalysisTool;
     }
 
     public function isStaticAnalysisEnabled(): bool
     {
         return $this->staticAnalysisTool !== null;
-    }
-
-    public function getBootstrap(): ?string
-    {
-        return $this->bootstrap;
-    }
-
-    public function getInitialTestsPhpOptions(): ?string
-    {
-        return $this->initialTestsPhpOptions;
-    }
-
-    public function getTestFrameworkExtraOptions(): string
-    {
-        return $this->testFrameworkExtraOptions;
     }
 
     /**
@@ -252,107 +130,9 @@ class Configuration
         return $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions);
     }
 
-    public function getCoveragePath(): string
-    {
-        return $this->coveragePath;
-    }
-
-    public function shouldSkipCoverage(): bool
-    {
-        return $this->skipCoverage;
-    }
-
-    public function shouldSkipInitialTests(): bool
-    {
-        return $this->skipInitialTests;
-    }
-
-    public function isDebugEnabled(): bool
-    {
-        return $this->debug;
-    }
-
     public function mutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
-    }
-
-    public function noProgress(): bool
-    {
-        return $this->noProgress;
-    }
-
-    public function ignoreMsiWithNoMutations(): bool
-    {
-        return $this->ignoreMsiWithNoMutations;
-    }
-
-    public function getMinMsi(): ?float
-    {
-        return $this->minMsi;
-    }
-
-    public function getNumberOfShownMutations(): ?int
-    {
-        return $this->numberOfShownMutations;
-    }
-
-    public function getMinCoveredMsi(): ?float
-    {
-        return $this->minCoveredMsi;
-    }
-
-    public function getMsiPrecision(): int
-    {
-        return $this->msiPrecision;
-    }
-
-    public function getThreadCount(): int
-    {
-        return $this->threadCount;
-    }
-
-    public function isDryRun(): bool
-    {
-        return $this->dryRun;
-    }
-
-    /**
-     * @return array<string, array<int, string>>
-     */
-    public function getIgnoreSourceCodeMutatorsMap(): array
-    {
-        return $this->ignoreSourceCodeMutatorsMap;
-    }
-
-    public function getExecuteOnlyCoveringTestCases(): bool
-    {
-        return $this->executeOnlyCoveringTestCases;
-    }
-
-    public function isForGitDiffLines(): bool
-    {
-        return $this->isForGitDiffLines;
-    }
-
-    public function getGitDiffBase(): ?string
-    {
-        return $this->gitDiffBase;
-    }
-
-    public function getMapSourceClassToTestStrategy(): ?string
-    {
-        return $this->mapSourceClassToTestStrategy;
-    }
-
-    public function getLoggerProjectRootDirectory(): ?string
-    {
-        return $this->loggerProjectRootDirectory;
-    }
-
-    public function getMutantId(): ?string
-    {
-        return $this->mutantId;
     }
 
     /**

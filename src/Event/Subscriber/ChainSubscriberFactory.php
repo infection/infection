@@ -35,17 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 /**
  * @internal
  */
-final class ChainSubscriberFactory
+final readonly class ChainSubscriberFactory
 {
     /**
      * @var SubscriberFactory[]
      */
-    private readonly array $factories;
+    private array $factories;
 
     public function __construct(SubscriberFactory ...$factories)
     {
@@ -55,10 +53,10 @@ final class ChainSubscriberFactory
     /**
      * @return iterable<EventSubscriber>
      */
-    public function create(OutputInterface $output): iterable
+    public function create(): iterable
     {
         foreach ($this->factories as $factory) {
-            yield $factory->create($output);
+            yield $factory->create();
         }
     }
 }

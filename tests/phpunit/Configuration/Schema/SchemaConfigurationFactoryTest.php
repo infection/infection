@@ -59,7 +59,6 @@ use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 use function sprintf;
 use stdClass;
-use function var_export;
 
 #[CoversClass(Logs::class)]
 #[CoversClass(PhpUnit::class)]
@@ -105,10 +104,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             $rawConfig,
         );
 
-        $this->assertSame(
-            var_export($expected, true),
-            var_export($actual, true),
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public static function provideRawConfig(): iterable
@@ -121,8 +117,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "directories": ["src"]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
             ]),
@@ -135,8 +130,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "directories": ["src", "lib"]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(
                     ['src', 'lib'],
@@ -153,8 +147,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "excludes": ["fixtures", "tests"]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(
                     ['src'],
@@ -171,8 +164,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "excludes": [""]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source([], []),
             ]),
@@ -186,8 +178,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "excludes": [" fixtures ", ""]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], ['fixtures']),
             ]),
@@ -201,8 +192,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "directories": ["src"]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'timeout' => 100,
                 'source' => new Source(['src'], []),
@@ -219,8 +209,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "text": "text.log"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -248,8 +237,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "html": "report.html"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -277,8 +265,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "summary": "summary.log"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -306,8 +293,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "json": "json.log"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -335,8 +321,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "gitlab": "gitlab.log"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -364,8 +349,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "debug": "debug.log"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -393,8 +377,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "perMutator": "perMutator.log"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -424,8 +407,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -455,8 +437,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -486,8 +467,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -517,8 +497,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -546,8 +525,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "summaryJson": "summary.json"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -586,8 +564,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "summaryJson": "summary.json"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -621,8 +598,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => Logs::createEmpty(),
@@ -645,8 +621,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => Logs::createEmpty(),
@@ -674,8 +649,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "summaryJson": " summary.json "
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'logs' => new Logs(
@@ -701,8 +675,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "tmpDir": "custom-tmp"
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'tmpDir' => 'custom-tmp',
@@ -717,8 +690,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "tmpDir": ""
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'tmpDir' => null,
@@ -733,8 +705,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "tmpDir": " custom-tmp "
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'tmpDir' => 'custom-tmp',
@@ -749,8 +720,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "phpUnit": {}
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(null, null),
@@ -767,8 +737,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "configDir": "phpunit.xml"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
@@ -788,8 +757,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "customPath": "bin/phpunit"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
@@ -810,8 +778,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "customPath": "bin/phpunit"
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
@@ -832,8 +799,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "customPath": " bin/phpunit "
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'phpunit' => new PhpUnit(
@@ -851,8 +817,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "ignoreMsiWithNoMutations": true
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'ignoreMsiWithNoMutations' => true,
@@ -867,8 +832,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "ignoreMsiWithNoMutations": false
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'ignoreMsiWithNoMutations' => false,
@@ -883,8 +847,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "minMsi": 3.14
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'minMsi' => 3.14,
@@ -899,8 +862,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "minMsi": 32
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'minMsi' => 32.0,
@@ -915,8 +877,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "minCoveredMsi": 3.14
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'minCoveredMsi' => 3.14,
@@ -931,8 +892,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "minCoveredMsi": 32
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'minCoveredMsi' => 32.0,
@@ -947,8 +907,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "testFramework": "phpunit"
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFramework' => 'phpunit',
@@ -964,8 +923,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         },
                         "testFramework": "{$testFrameworkType}"
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'testFramework' => $testFrameworkType,
@@ -981,8 +939,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "bootstrap": "src/bootstrap.php"
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'bootstrap' => 'src/bootstrap.php',
@@ -997,8 +954,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "bootstrap": ""
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'bootstrap' => null,
@@ -1013,8 +969,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "bootstrap": " src/bootstrap.php "
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'bootstrap' => 'src/bootstrap.php',
@@ -1029,8 +984,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "initialTestsPhpOptions": "-d zend_extension=xdebug.so"
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
@@ -1045,8 +999,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "initialTestsPhpOptions": ""
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'initialTestsPhpOptions' => null,
@@ -1061,8 +1014,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "initialTestsPhpOptions": " -d zend_extension=xdebug.so "
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
@@ -1077,8 +1029,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "testFrameworkOptions": "--debug"
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFrameworkOptions' => '--debug',
@@ -1093,8 +1044,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "testFrameworkOptions": ""
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFrameworkOptions' => null,
@@ -1109,8 +1059,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     },
                     "testFrameworkOptions": "--debug"
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'testFrameworkOptions' => '--debug',
@@ -1127,8 +1076,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "global-ignore": ["A::B"]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1147,8 +1095,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "global-ignore": [" file ", " "]
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1167,8 +1114,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "global-ignore": []
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1187,8 +1133,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "TrueValue": true
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1207,8 +1152,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "TrueValue": false
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1229,8 +1173,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1256,8 +1199,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1282,8 +1224,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1311,8 +1252,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1339,8 +1279,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1369,8 +1308,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1395,8 +1333,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "ArrayItemRemoval": true
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1415,8 +1352,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "ArrayItemRemoval": false
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1437,8 +1373,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1464,8 +1399,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1490,8 +1424,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1519,8 +1452,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1547,8 +1479,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1577,8 +1508,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1603,8 +1533,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "BCMath": true
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1623,8 +1552,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "BCMath": false
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1645,8 +1573,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1672,8 +1599,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1698,8 +1624,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1740,8 +1665,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             }
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -1778,8 +1702,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1811,8 +1734,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "MBString": true
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1831,8 +1753,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "MBString": false
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1853,8 +1774,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1880,8 +1800,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1906,8 +1825,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -1957,8 +1875,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             }
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2004,8 +1921,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         }
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -2060,8 +1976,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             "$mutator": true
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2080,8 +1995,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             "$mutator": false
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2102,8 +2016,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             }
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2126,8 +2039,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             }
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2142,7 +2054,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ];
         }
 
-        foreach (self::PROFILES as $index => $profile) {
+        foreach (self::PROFILES as $profile) {
             yield '[mutators][profile] ' . $profile . ' false' => (static fn (): array => [
                 <<<JSON
                     {
@@ -2153,8 +2065,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             "$profile": false
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2173,8 +2084,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             "$profile": true
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2195,8 +2105,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             }
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2219,8 +2128,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                             }
                         }
                     }
-                    JSON
-                ,
+                    JSON,
                 self::createConfig([
                     'source' => new Source(['src'], []),
                     'mutators' => [
@@ -2258,8 +2166,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "@default": true
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'mutators' => [
@@ -2521,8 +2428,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "@default": true
                     }
                 }
-                JSON
-            ,
+                JSON,
             self::createConfig([
                 'timeout' => 5,
                 'source' => new Source(
@@ -2739,6 +2645,9 @@ final class SchemaConfigurationFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @param array<array<string, mixed>, mixed> $args
+     */
     private static function createConfig(array $args): SchemaConfiguration
     {
         $defaultArgs = [
@@ -2752,6 +2661,8 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'ignoreMsiWithNoMutations' => null,
             'minMsi' => null,
             'minCoveredMsi' => null,
+            'timeoutsAsEscaped' => null,
+            'maxTimeouts' => null,
             'mutators' => [],
             'testFramework' => null,
             'bootstrap' => null,

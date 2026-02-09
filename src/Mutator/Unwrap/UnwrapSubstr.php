@@ -58,8 +58,7 @@ final class UnwrapSubstr extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = 'abcde';
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

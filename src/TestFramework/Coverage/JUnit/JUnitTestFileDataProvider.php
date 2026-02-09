@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use DOMDocument;
-use DOMElement;
-use DOMNodeList;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function sprintf;
@@ -51,42 +49,39 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
-        private readonly JUnitReportLocator $jUnitLocator,
+        private readonly ReportLocator $jUnitLocator,
     ) {
     }
 
-    /**
-     * @throws TestFileNameNotFoundException
-     */
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
         $xPath = $this->getXPath();
 
-        /** @var DOMNodeList<DOMElement>|null $nodes */
-        $nodes = null;
+        $node = null;
+        $testFound = false;
 
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
-            $nodes = $xPath->query(sprintf($queryString, $placeholder));
+            $node = $xPath->queryElement(sprintf($queryString, $placeholder));
 
-            if ($nodes->length !== 0) {
+            if ($node !== null) {
+                $testFound = true;
+
                 break;
             }
         }
 
-        Assert::notNull($nodes);
-
-        if ($nodes->length === 0) {
+        if (!$testFound) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
                 $this->jUnitLocator->locate(),
             );
         }
 
-        Assert::same($nodes->length, 1);
+        Assert::notNull($node);
 
         return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time'),
+            $node->getAttribute('file'),
+            (float) $node->getAttribute('time'),
         );
     }
 
@@ -110,18 +105,6 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     private function getXPath(): SafeDOMXPath
     {
-        return $this->xPath ??= self::createXPath($this->jUnitLocator->locate());
-    }
-
-    private static function createXPath(string $jUnitPath): SafeDOMXPath
-    {
-        Assert::fileExists($jUnitPath);
-
-        $dom = new DOMDocument();
-        $success = @$dom->load($jUnitPath);
-
-        Assert::true($success);
-
-        return new SafeDOMXPath($dom);
+        return $this->xPath ??= SafeDOMXPath::fromFile($this->jUnitLocator->locate());
     }
 }

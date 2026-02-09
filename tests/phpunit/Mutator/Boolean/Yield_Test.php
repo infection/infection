@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Yield_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,32 +55,30 @@ final class Yield_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with a double arrow to a yield with a greater than comparison' => [
-            <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $a => $b);
-                };
-                PHP
-            ,
-            (static fn () => <<<'PHP'
-                <?php
-
-                $a = function () {
-                    yield $a > $b;
-                };
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a => $b);
+                    };
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a > $b);
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [
-            <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $b);
-                };
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $b);
+                    };
+                    PHP,
+            ),
         ];
     }
 }

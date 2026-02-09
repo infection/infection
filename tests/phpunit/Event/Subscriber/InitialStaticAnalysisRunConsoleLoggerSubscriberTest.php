@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
@@ -86,7 +86,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
             ->method('getName')
             ->willReturn('PHPStan');
         $staticAnalysisToolAdapter->method('getVersion')
-            ->will($this->throwException(new InvalidArgumentException()));
+            ->willThrowException(new InvalidArgumentException());
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
@@ -105,7 +105,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
         $output->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, true));

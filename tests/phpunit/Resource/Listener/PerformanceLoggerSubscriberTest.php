@@ -35,26 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
+use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Time\Stopwatch;
-use Infection\Telemetry\Listener\TracingSubscriber;
 use Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter;
 use Infection\Tests\Fixtures\Resource\Time\FakeTimeFormatter;
+use function is_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
-use function is_array;
 
-#[CoversClass(TracingSubscriber::class)]
+#[CoversClass(PerformanceLoggerSubscriber::class)]
 final class PerformanceLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
     protected function setUp(): void
     {
@@ -63,17 +60,16 @@ final class PerformanceLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_application_execution_events(): void
     {
-        $this->markTestSkipped();
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($this->callback(static function ($parameter): bool {
+            ->with($this->callback(static function (string|iterable $parameter): bool {
                 $expectedOutput = 'Time: 5s. Memory: 2.00KB. Threads: 1';
 
                 return is_array($parameter) && $parameter[0] === '' && $parameter[1] === $expectedOutput;
             }));
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new TracingSubscriber(
+        $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
             new Stopwatch(),
             new FakeTimeFormatter(5),
             new FakeMemoryFormatter(2048),

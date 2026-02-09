@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Processor;
 
-use function defined;
 use Fidry\CpuCoreCounter\CpuCoreCounter;
 use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
+use Infection\Framework\OperatingSystem;
 
 /**
  * @internal
@@ -49,7 +49,7 @@ final class CpuCoresCountProvider
      */
     public static function provide(): int
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (OperatingSystem::isWindows()) {
             return 1;
         }
 

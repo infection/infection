@@ -148,7 +148,7 @@ final class ProfileListTest extends TestCase
 
     private static function isMutatorInAtLeastOneProfile(string $className): bool
     {
-        foreach (ProfileListProvider::getProfiles() as $profile => $profileOrMutators) {
+        foreach (ProfileListProvider::getProfiles() as $profileOrMutators) {
             if (in_array($className, $profileOrMutators, true)) {
                 return true;
             }

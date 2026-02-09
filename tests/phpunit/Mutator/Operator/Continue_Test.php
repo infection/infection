@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Continue_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,34 +55,31 @@ final class Continue_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It replaces continue with break in while' => [
-            <<<'PHP'
-                <?php
-
-                while (true) {
-                    continue;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                while (true) {
-                    break;
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                        continue;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                        break;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not replaces continue with break in switch' => [
-            <<<'PHP'
-                <?php
-
-                switch (1) {
-                    case 1:
-                        continue;
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch (1) {
+                        case 1:
+                            continue;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

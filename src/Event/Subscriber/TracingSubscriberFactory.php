@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\TimeFormatter;
 use Infection\Telemetry\Listener\TracingSubscriber;
 use Infection\Telemetry\Tracing\Tracer;
 use Symfony\Component\Console\Output\OutputInterface;

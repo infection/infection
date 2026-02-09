@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -55,8 +56,7 @@ final class PowEqual implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an exponentiation assignment operator (`**=`) with a division assignment operator (`/=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -75,7 +75,7 @@ final class PowEqual implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

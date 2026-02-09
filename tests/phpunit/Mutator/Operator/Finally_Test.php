@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Finally_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,41 +55,38 @@ final class Finally_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes the finally statement' => [
-            <<<'PHP'
-                <?php
-
-                try {
-                    $a = 1;
-                } catch (\Exception $e) {
-                    $a = 2;
-                } finally {
-                    $a = 3;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                try {
-                    $a = 1;
-                } catch (\Exception $e) {
-                    $a = 2;
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $a = 1;
+                    } catch (\Exception $e) {
+                        $a = 2;
+                    } finally {
+                        $a = 3;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $a = 1;
+                    } catch (\Exception $e) {
+                        $a = 2;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when no catch() blocks are present' => [
-            <<<'PHP'
-                <?php
-
-                try {
-                    $a = 1;
-                } finally {
-                    $a = 2;
-                }
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $a = 1;
+                    } finally {
+                        $a = 2;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

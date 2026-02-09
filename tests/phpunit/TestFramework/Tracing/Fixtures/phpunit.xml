@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./../../../../../vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="./../../../../../vendor/autoload.php"
+         colors="true"
+         executionOrder="defects,random"
+         failOnWarning="true"
+         failOnRisky="true"
+         requireCoverageMetadata="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         cacheResult="false"
+>
+
+    <php>
+        <env name="COLUMNS" value="100" force="true" />
+    </php>
+
+    <testsuites>
+        <testsuite name="Demo Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <logging>
+        <junit outputFile="phpunit-coverage/junit.xml"/>
+    </logging>
+
+    <coverage>
+        <report>
+            <xml outputDirectory="phpunit-coverage/xml"/>
+        </report>
+    </coverage>
+
+</phpunit>

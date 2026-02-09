@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class SpreadRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,87 +55,76 @@ final class SpreadRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Spread removal for a raw array' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...[1, 2, 3], 4];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = [[1, 2, 3], 4];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...[1, 2, 3], 4];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [[1, 2, 3], 4];
+                    PHP,
+            ),
         ];
 
         yield 'Spread removal for a variable' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...$collection, 4];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = [$collection, 4];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...$collection, 4];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [$collection, 4];
+                    PHP,
+            ),
         ];
 
         yield 'Spread removal for a function call' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...getCollection(), 4];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = [getCollection(), 4];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...getCollection(), 4];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [getCollection(), 4];
+                    PHP,
+            ),
         ];
 
         yield 'Spread removal for a method call' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...$object->getCollection(), 4];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = [$object->getCollection(), 4];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...$object->getCollection(), 4];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [$object->getCollection(), 4];
+                    PHP,
+            ),
         ];
 
         yield 'Spread removal for a new iterator object' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...new ArrayIterator(['a', 'b', 'c'])];
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = [new ArrayIterator(['a', 'b', 'c'])];
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...new ArrayIterator(['a', 'b', 'c'])];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [new ArrayIterator(['a', 'b', 'c'])];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate argument unpacking' => [
-            <<<'PHP'
-                <?php
-
-                function foo(...$array) {}
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function foo(...$array) {}
+                    PHP,
+            ),
         ];
     }
 }

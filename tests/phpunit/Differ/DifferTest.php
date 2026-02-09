@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
-use function array_map;
-use function explode;
-use function implode;
 use Infection\Differ\Differ;
+use Infection\Framework\Str;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
 #[CoversClass(Differ::class)]
 final class DifferTest extends TestCase
@@ -54,9 +51,14 @@ final class DifferTest extends TestCase
         string $sourceB,
         string $expectedDiff,
     ): void {
-        $actualDiff = (new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())))->diff($sourceA, $sourceB);
+        $actualDiff = SingletonContainer::getContainer()
+            ->getDiffer()
+            ->diff($sourceA, $sourceB);
 
-        $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
+        $this->assertSame(
+            $expectedDiff,
+            Str::rTrimLines($actualDiff),
+        );
     }
 
     public static function diffProvider(): iterable
@@ -65,8 +67,6 @@ final class DifferTest extends TestCase
             '',
             '',
             <<<'PHP'
-                --- Original
-                +++ New
 
                 PHP,
         ];
@@ -79,8 +79,7 @@ final class DifferTest extends TestCase
                     echo 10;
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
 
                 public function echo(): void
@@ -88,11 +87,8 @@ final class DifferTest extends TestCase
                     echo 15;
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
 
                  public function echo(): void
@@ -112,8 +108,7 @@ final class DifferTest extends TestCase
                     echo 10;
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
 
                 public function echo(): void
@@ -121,11 +116,8 @@ final class DifferTest extends TestCase
                     echo 10;
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
-                --- Original
-                +++ New
 
                 PHP,
         ];
@@ -148,8 +140,7 @@ final class DifferTest extends TestCase
                 13
                 14
                 15
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 0
                 1
@@ -167,11 +158,8 @@ final class DifferTest extends TestCase
                 13
                 14
                 15
-                PHP
-            ,
+                PHP,
             <<<'PHP'
-                --- Original
-                +++ New
                 @@ @@
                  3
                  4
@@ -184,13 +172,5 @@ final class DifferTest extends TestCase
 
                 PHP,
         ];
-    }
-
-    private static function normalizeString(string $string): string
-    {
-        return implode(
-            "\n",
-            array_map('rtrim', explode("\n", $string)),
-        );
     }
 }

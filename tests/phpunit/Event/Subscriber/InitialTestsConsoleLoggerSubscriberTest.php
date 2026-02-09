@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
@@ -85,7 +85,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->method('getName')
             ->willReturn('PHPUnit');
         $testFramework->method('getVersion')
-            ->will($this->throwException(new InvalidArgumentException()));
+            ->willThrowException(new InvalidArgumentException());
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
@@ -104,7 +104,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $output->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFramework = $this->createStub(AbstractTestFrameworkAdapter::class);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));

@@ -58,8 +58,7 @@ final class UnwrapArraySlice extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = ['foo', 'bar', 'baz'];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

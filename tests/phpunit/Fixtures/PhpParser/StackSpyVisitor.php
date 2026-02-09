@@ -9,7 +9,7 @@ use PhpParser\NodeVisitor;
 
 final class StackSpyVisitor implements NodeVisitor
 {
-    private $nodes;
+    private ?array $nodes = null;
 
     public function beforeTraverse(array $nodes): void
     {

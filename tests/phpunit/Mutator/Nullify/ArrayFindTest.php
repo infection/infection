@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class ArrayFindTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -55,151 +55,141 @@ final class ArrayFindTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a variable' => [
-            <<<'PHP'
-                <?php
-
-                $positive = array_find($numbers, fn ($number) => $number > 0);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $positive = null;
-                PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = array_find($numbers, fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $positive = array_find(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $positive = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = array_find(['A', 1, 'C'], fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $positive = array_find(\Class_With_Const::Const, fn ($number) => $number > 0);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $positive = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = array_find(\Class_With_Const::Const, fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_find' => [
-            <<<'PHP'
-                <?php
-
-                $positive = \array_find(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $positive = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = \array_find(['A', 1, 'C'], fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $positive = null;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_find' => [
-            <<<'PHP'
-                <?php
-
-                function array_find($text, $other)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_find($text, $other)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                if (array_find(['A', 1, 'C'], fn ($number) => $number > 0)) {
-                    return true;
-                }
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                if (null) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (array_find(['A', 1, 'C'], fn ($number) => $number > 0)) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (null) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_find is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRray_Find(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRray_Find(['A', 1, 'C'], 'is_int');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_find uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_find($foo->bar(), 'is_int');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_find($foo->bar(), 'is_int');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_find(array_filter(['A', 1, 'C'], function($char): bool {
-                    return !is_int($char);
-                }), 'is_int');
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                $a = null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_find(array_filter(['A', 1, 'C'], function($char): bool {
+                        return !is_int($char);
+                    }), 'is_int');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = null;
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_find';
 
-                $a = 'array_find';
-
-                $b = $a([1, 2, 3], 'is_int');
-                PHP
-            ,
+                    $b = $a([1, 2, 3], 'is_int');
+                    PHP,
+            ),
         ];
     }
 }

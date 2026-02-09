@@ -36,11 +36,9 @@ declare(strict_types=1);
 namespace Infection\Event;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
- * @final
  */
 final readonly class MutantAnalysisWasStarted
 {

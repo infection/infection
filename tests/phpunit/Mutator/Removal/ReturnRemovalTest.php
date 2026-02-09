@@ -48,7 +48,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
      * @param mixed[] $settings
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = [], array $settings = []): void
     {
         $this->assertMutatesInput($input, $expected, $settings);
     }
@@ -68,30 +68,30 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
         yield from self::mutatesWithReturnType('', '"value"');
 
         yield 'It mutates duplicate return statements' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo(): array
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class Bar
                     {
-                        return [1];
-                        return [2];
+                        function foo(): array
+                        {
+                            return [1];
+                            return [2];
+                        }
                     }
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo(): array
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class Bar
                     {
+                        function foo(): array
+                        {
 
-                        return [2];
+                            return [2];
+                        }
                     }
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It leaves the last return statement alone if the method has a return type' => [
@@ -144,70 +144,38 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not mutate last return null in function without return type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        $a = 1;
-                        return null;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'It does not mutate last empty return in function without return type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        $a = 1;
-                        return;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'It mutates return null if not last statement' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        if (true) {
-                            return null;
-                            echo "never reached";
-                        }
-                        return "default";
-                    }
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
                     class Bar
                     {
                         function foo()
                         {
-                            if (true) {
-
-                                echo "never reached";
-                            }
-                            return "default";
+                            $a = 1;
+                            return null;
                         }
                     }
                     PHP,
-                <<<'PHP'
-                    <?php
+            ),
+        ];
 
+        yield 'It does not mutate last empty return in function without return type' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class Bar
+                    {
+                        function foo()
+                        {
+                            $a = 1;
+                            return;
+                        }
+                    }
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates return null if not last statement' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     class Bar
                     {
                         function foo()
@@ -216,10 +184,42 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                                 return null;
                                 echo "never reached";
                             }
-
+                            return "default";
                         }
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class Bar
+                        {
+                            function foo()
+                            {
+                                if (true) {
+
+                                    echo "never reached";
+                                }
+                                return "default";
+                            }
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class Bar
+                        {
+                            function foo()
+                            {
+                                if (true) {
+                                    return null;
+                                    echo "never reached";
+                                }
+
+                            }
+                        }
+                        PHP,
+                ),
             ],
         ];
     }
