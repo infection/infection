@@ -33,14 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Mutation\Mutation;
 
 /**
  * @internal
  */
-interface MutableFileWasProcessedSubscriber extends EventSubscriber
+final readonly class MutationHeuristicsWasFinished
 {
-    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void;
+    public function __construct(
+        public Mutation $mutation,
+        public bool $escaped,
+    ) {
+    }
 }

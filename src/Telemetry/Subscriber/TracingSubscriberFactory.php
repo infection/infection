@@ -33,31 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Telemetry\Subscriber;
 
-use function array_map;
-use function implode;
-use function sprintf;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
+use Infection\Telemetry\Tracing\Tracer;
 
-enum RootScopes: string
+/**
+ * @internal
+ */
+final readonly class TracingSubscriberFactory implements SubscriberFactory
 {
-    case INITIAL_TEST_SUITE = 'initial_test_suite';
-    case INITIAL_STATIC_ANALYSIS = 'initial_static_analysis';
-    case MUTATION_GENERATION = 'mutation_generation';
-    case MUTATION_ANALYSIS = 'mutation_analysis';
-    case FILE = 'file';
+    public function __construct(
+        private Tracer $tracer,
+    ) {
+    }
 
-    public static function getQuotedListOfValues(): string
+    public function create(): EventSubscriber
     {
-        return sprintf(
-            '"%s"',
-            implode(
-                '", "',
-                array_map(
-                    static fn (self $value) => $value->value,
-                    self::cases(),
-                ),
-            ),
+        return new TracingSubscriber(
+            $this->tracer,
         );
     }
 }

@@ -33,16 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use Infection\TestFramework\Coverage\Trace;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
+use Infection\Mutation\Mutation;
 
 /**
  * @internal
  */
-final readonly class FileParsingWasFinished
+final readonly class MutationHeuristicsWasStarted
 {
-    public function __construct(public Trace $trace)
-    {
+    public string $sourceFileId;
+
+    public function __construct(
+        public Mutation $mutation,
+    ) {
+        $this->sourceFileId = NodeIdFactory::create($this->mutation->getOriginalFilePath());
     }
 }

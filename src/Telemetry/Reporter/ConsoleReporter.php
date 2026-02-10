@@ -43,7 +43,7 @@ use function in_array;
 use Infection\Console\IO;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
-use Infection\Telemetry\Tracing\RootScopes;
+use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\Trace;
 use InvalidArgumentException;
@@ -73,7 +73,7 @@ final class ConsoleReporter
 
     /**
      * @param positive-int $maxDepth
-     * @param list<RootScopes> $rootScopes
+     * @param list<RootScope> $rootScopes
      * @param int<0, 100> $minTimeThreshold
      */
     public function report(
@@ -135,7 +135,7 @@ final class ConsoleReporter
     }
 
     /**
-     * @param list<RootScopes> $rootScopes
+     * @param list<RootScope> $rootScopes
      */
     private static function filterSpans(
         Trace $trace,
@@ -143,7 +143,7 @@ final class ConsoleReporter
         ?string $spanId,
     ): Trace {
         $rootScopeValues = array_map(
-            static fn (RootScopes $scope) => $scope->value,
+            static fn (RootScope $scope) => $scope->value,
             $rootScopes,
         );
 

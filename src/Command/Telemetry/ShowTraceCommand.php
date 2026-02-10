@@ -43,7 +43,7 @@ use Infection\Console\IO;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Reporter\ConsoleReporter;
-use Infection\Telemetry\Tracing\RootScopes;
+use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Trace;
 use const PHP_INT_MAX;
 use function sprintf;
@@ -128,10 +128,10 @@ final class ShowTraceCommand extends BaseCommand
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Scopes allowed. Default to "file" which is the most pertinent. Beware that a span may appear in multiple root scopes, which will distort the metrics. Allowed values: %s or "%s".',
-                    RootScopes::getQuotedListOfValues(),
+                    RootScope::quotedCommaSeparatedList(),
                     self::ALL_TOP_SCOPES,
                 ),
-                [RootScopes::FILE->value],
+                [RootScope::SOURCE_FILE->value],
             )
             ->addOption(
                 self::MIN_TIME_THRESHOLD_OPTION,
@@ -202,18 +202,18 @@ final class ShowTraceCommand extends BaseCommand
     }
 
     /**
-     * @return list<RootScopes>
+     * @return list<RootScope>
      */
     private static function getRootScopes(IO $io): array
     {
         $topScopes = $io->getInput()->getOption(self::TOP_SCOPES_OPTION);
 
         if (in_array(self::ALL_TOP_SCOPES, $topScopes, true)) {
-            return RootScopes::cases();
+            return RootScope::cases();
         }
 
         return array_map(
-            static fn (string $value) => RootScopes::from($value),
+            static fn (string $value) => RootScope::from($value),
             $topScopes,
         );
     }

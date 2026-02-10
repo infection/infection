@@ -37,7 +37,7 @@ namespace Infection\Mutation;
 
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
@@ -110,7 +110,7 @@ class MutationGenerator
             }
 
             $this->eventDispatcher->dispatch(
-                new MutableFileWasProcessed(
+                new MutationGenerationForFileWasFinished(
                     $source->getRealPath(),
                     $sourceFileMutationIds,
                 ),

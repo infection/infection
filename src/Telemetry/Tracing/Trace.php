@@ -40,6 +40,13 @@ use function current;
 use Infection\Telemetry\Metric\Time\Duration;
 use function unserialize;
 
+/**
+ * Record of how a logical operation flows through a system.
+ *
+ * @see https://opentelemetry.io/docs/specs/otel/overview/#traces
+ *
+ * @internal
+ */
 final readonly class Trace
 {
     /**

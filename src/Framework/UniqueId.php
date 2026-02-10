@@ -33,32 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Framework;
 
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use Infection\Telemetry\Subscriber\TracingSubscriber;
-use Infection\Telemetry\Subscriber\TracingSubscriberFactory;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use Infection\CannotBeInstantiated;
+use function random_bytes;
 
-#[CoversClass(TracingSubscriberFactory::class)]
-final class PerformanceLoggerSubscriberFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final class UniqueId
 {
-    public function test_it_can_create_a_subscriber(): void
+    use CannotBeInstantiated;
+
+    public static function generate(): string
     {
-        $factory = new TracingSubscriberFactory(
-            new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            1,
-            new FakeOutput(),
-        );
-
-        $subscriber = $factory->create();
-
-        $this->assertInstanceOf(TracingSubscriber::class, $subscriber);
+        return bin2hex(random_bytes(6));
     }
 }

@@ -33,17 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\Ast;
 
-use Infection\Mutant\Mutant;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutantAnalysisWasStarted
+interface AstGenerationWasStartedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        public Mutant $mutant,
-    ) {
-    }
+    public function onAstGenerationWasStarted(AstGenerationWasStarted $event): void;
 }

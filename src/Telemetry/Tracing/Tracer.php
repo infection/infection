@@ -36,10 +36,17 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Tracing;
 
 use function array_map;
+use Infection\Framework\UniqueId;
 use Infection\Telemetry\Metric\ResourceInspector;
 use Infection\Telemetry\Reporter\TraceProvider;
-use Infection\Utility\UniqueId;
 
+/**
+ * Service responsible for creating spans.
+ *
+ * @see https://opentelemetry.io/docs/specs/otel/trace/api/#tracer
+ *
+ * @internal
+ */
 final class Tracer implements TraceProvider
 {
     /**
@@ -58,7 +65,7 @@ final class Tracer implements TraceProvider
     }
 
     public function startSpan(
-        RootScopes $scope,
+        RootScope $scope,
         string|int|null $id = null,
     ): SpanBuilder {
         $span = new SpanBuilder(
@@ -74,7 +81,7 @@ final class Tracer implements TraceProvider
     }
 
     public function startChildSpan(
-        string $scope,
+        string|Scope $scope,
         string|int $id,
         SpanBuilder $parent,
     ): SpanBuilder {

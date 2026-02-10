@@ -33,25 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\Ast;
 
-use Infection\Telemetry\Listener\TracingSubscriber;
-use Infection\Telemetry\Tracing\Tracer;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class TracingSubscriberFactory implements SubscriberFactory
+interface AstGenerationWasFinishedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private Tracer $tracer,
-    ) {
-    }
-
-    public function create(): EventSubscriber
-    {
-        return new TracingSubscriber(
-            $this->tracer,
-        );
-    }
+    public function onAstGenerationWasFinished(AstGenerationWasFinished $event): void;
 }

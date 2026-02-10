@@ -33,18 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Telemetry\Tracing;
 
-use Infection\Mutation\Mutation;
+use Infection\Framework\Enum\ImplodableEnum;
 
-/**
- * @internal
- */
-final readonly class MutationHeuristicsWasFinished
+enum RootScope: string
 {
-    public function __construct(
-        public Mutation $mutation,
-        public bool $escaped,
-    ) {
-    }
+    use ImplodableEnum;
+
+    case ARTEFACT_COLLECTION = 'artefact_collection';
+    case MUTATION_ANALYSIS = 'mutation_analysis';
+    case SOURCE_FILE = 'source_file';
 }

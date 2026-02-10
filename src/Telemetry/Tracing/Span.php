@@ -39,6 +39,13 @@ use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Metric\Time\Duration;
 
+/**
+ * A span is a single unit of work.
+ *
+ * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
+ *
+ * @internal
+ */
 final readonly class Span
 {
     public function __construct(

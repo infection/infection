@@ -33,18 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Utility;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use function bin2hex;
-use Infection\CannotBeInstantiated;
-use function random_bytes;
+use Infection\Event\Subscriber\EventSubscriber;
 
-final class UniqueId
+/**
+ * @internal
+ */
+interface MutationHeuristicsWasFinishedSubscriber extends EventSubscriber
 {
-    use CannotBeInstantiated;
-
-    public static function generate(): string
-    {
-        return bin2hex(random_bytes(6));
-    }
+    public function onMutationHeuristicsWasFinished(MutationHeuristicsWasFinished $event): void;
 }

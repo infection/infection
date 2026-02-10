@@ -33,32 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Telemetry\Tracing;
 
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use Infection\Telemetry\Subscriber\TracingSubscriber;
-use Infection\Telemetry\Subscriber\TracingSubscriberFactory;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Framework\Enum\ImplodableEnum;
 
-#[CoversClass(TracingSubscriberFactory::class)]
-final class PerformanceLoggerSubscriberFactoryTest extends TestCase
+enum Scope: string
 {
-    public function test_it_can_create_a_subscriber(): void
-    {
-        $factory = new TracingSubscriberFactory(
-            new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            1,
-            new FakeOutput(),
-        );
+    use ImplodableEnum;
 
-        $subscriber = $factory->create();
-
-        $this->assertInstanceOf(TracingSubscriber::class, $subscriber);
-    }
+    case INITIAL_TESTS = 'initial_tests';
+    case INITIAL_STATIC_ANALYSIS = 'initial_static_analysis';
+    case MUTATION_GENERATION = 'mutation_generation';
+    case AST_GENERATION = 'ast_generation';
+    case MUTATION_EVALUATION = 'mutation_evaluation';
+    case MUTATION_HEURISTICS = 'mutation_heuristics';
+    case MUTANT_EVALUATION = 'mutant_evaluation';
 }

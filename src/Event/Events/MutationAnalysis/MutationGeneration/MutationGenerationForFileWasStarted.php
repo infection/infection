@@ -33,44 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use SplFileInfo;
 
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriber implements MutationGenerationForFileWasFinishedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
+final readonly class MutationGenerationForFileWasStarted
 {
-    private ProgressBar $progressBar;
+    public string $sourceFileId;
 
     public function __construct(
-        private OutputInterface $output,
+        public SplFileInfo $sourceFile,
+        public Trace $trace,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
-    }
-
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
-    {
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
-        $this->progressBar->start($event->mutableFilesCount);
-    }
-
-    public function onMutationGenerationForFileWasFinished(MutationGenerationForFileWasFinished $event): void
-    {
-        $this->progressBar->advance();
-    }
-
-    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
-    {
-        $this->progressBar->finish();
+        $this->sourceFileId = NodeIdFactory::create($sourceFile->getRealPath());
     }
 }

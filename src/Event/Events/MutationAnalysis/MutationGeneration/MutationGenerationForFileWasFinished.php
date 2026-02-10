@@ -33,16 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
-use Infection\Mutation\Mutation;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 
 /**
  * @internal
  */
-final readonly class MutationHeuristicsWasStarted
+final readonly class MutationGenerationForFileWasFinished
 {
-    public function __construct(public Mutation $mutation)
-    {
+    public string $sourceFileId;
+
+    /**
+     * @param list<string> $mutationHashes
+     */
+    public function __construct(
+        public string $sourceFilePath,
+        public array $mutationHashes,
+    ) {
+        $this->sourceFileId = NodeIdFactory::create($sourceFilePath);
     }
 }

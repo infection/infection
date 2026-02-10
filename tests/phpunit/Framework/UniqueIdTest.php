@@ -33,16 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis;
+namespace Infection\Tests\Framework;
 
-use Infection\TestFramework\Coverage\Trace;
+use function array_unique;
+use Infection\Framework\UniqueId;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class FileParsingWasStarted
+#[CoversClass(UniqueId::class)]
+final class UniqueIdTest extends TestCase
 {
-    public function __construct(public Trace $trace)
+    public function test_it_generates_a_12_character_hex_string(): void
     {
+        $id = UniqueId::generate();
+
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{12}$/', $id);
+    }
+
+    public function test_it_generates_different_ids_on_multiple_calls(): void
+    {
+        $ids = [];
+
+        for ($i = 0; $i < 100; ++$i) {
+            $ids[] = UniqueId::generate();
+        }
+
+        $uniqueIds = array_unique($ids);
+
+        $this->assertCount(100, $uniqueIds);
     }
 }

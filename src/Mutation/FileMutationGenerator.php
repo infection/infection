@@ -36,7 +36,11 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstGenerationWasFinished;
+use Infection\Event\Events\Ast\AstGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
 use Infection\FileSystem\FileStore;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -120,6 +124,13 @@ class FileMutationGenerator
         bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationForFileWasFinished(
+                $sourceFile,
+                $trace,
+            ),
+        );
+
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
@@ -147,7 +158,12 @@ class FileMutationGenerator
      */
     private function createAst(SplFileInfo $sourceFile): array
     {
-        $this->eventDispatcher->dispatch(new FileParsingWasStarted($sourceFile));
+        // TODO: move NodeIdFactory and rename it if we stick with it
+        $sourceFileId = NodeIdFactory::create($sourceFile->getRealPath());
+
+        $this->eventDispatcher->dispatch(
+            new AstGenerationWasStarted($sourceFileId),
+        );
 
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
@@ -155,7 +171,9 @@ class FileMutationGenerator
         $preTraverser = $this->traverserFactory->createPreTraverser();
         $preTraverser->traverse($initialStatements);
 
-        $this->eventDispatcher->dispatch(new FileParsingWasFinished($sourceFile));
+        $this->eventDispatcher->dispatch(
+            new AstGenerationWasFinished($sourceFileId),
+        );
 
         return [$initialStatements, $originalFileTokens];
     }
