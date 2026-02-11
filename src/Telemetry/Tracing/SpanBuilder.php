@@ -39,13 +39,23 @@ use function array_map;
 use function count;
 use function end;
 use Infection\Telemetry\Metric\Snapshot;
-use LogicException;
-use function sprintf;
+use Infection\Telemetry\Tracing\Throwable\AlreadyEndedSpan;
+use Infection\Telemetry\Tracing\Throwable\UnendedSpan;
 
+/**
+ * A span is a single unit of work. This builder is used to open a span. Once
+ * the span is ended, it can build its Span object.
+ *
+ * This class is meant as an internal tool of the Tracer.
+ *
+ * @see Span
+ * @see Tracer
+ * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
+ *
+ * @internal
+ */
 final class SpanBuilder
 {
-    public readonly string $id;
-
     private Snapshot $end;
 
     /**
@@ -54,19 +64,16 @@ final class SpanBuilder
     private array $children = [];
 
     public function __construct(
-        // The scope ID should be unique per scope, but the same ID can be
-        // re-used across different scopes.
-        private readonly string $scopeId,
-        private readonly string $scope,
+        public readonly SpanId $id,
         private readonly Snapshot $start,
     ) {
-        $this->id = $this->scope . ':' . $this->scopeId;
     }
 
     /** @internal Should only be used by the Tracer */
-    public function finish(Snapshot $end): void
+    public function end(Snapshot $end): void
     {
-        $this->assertSpanWasNotFinished();
+        $this->assertSpanWasNotEnded();
+        $this->assertAllChildrenSpansWereEnded();
 
         $this->end = $end;
     }
@@ -78,16 +85,12 @@ final class SpanBuilder
 
     public function build(): Span
     {
-        if (count($this->children) > 0) {
-            $this->end ??= $this->getChildrenLastSnapshot();
-        }
-
-        $this->assertSpanWasFinished();
+        $this->assertSpanWasEnded();
 
         return new Span(
             $this->id,
-            $this->scopeId,
-            $this->scope,
+            $this->id->scopeId,
+            $this->id->scope,
             $this->start,
             $this->end,
             array_map(
@@ -97,34 +100,33 @@ final class SpanBuilder
         );
     }
 
-    private function assertSpanWasFinished(): void
+    /**
+     * @throws UnendedSpan
+     */
+    private function assertSpanWasEnded(): void
     {
         if (!isset($this->end)) {
-            throw new LogicException(
-                sprintf(
-                    'The span "%s" for the scope "%s" was never finished.',
-                    $this->scopeId,
-                    $this->scope,
-                ),
-            );
+            throw UnendedSpan::create($this->id);
         }
     }
 
-    private function assertSpanWasNotFinished(): void
+    /**
+     * @throws AlreadyEndedSpan
+     */
+    private function assertSpanWasNotEnded(): void
     {
         if (isset($this->end)) {
-            throw new LogicException(
-                sprintf(
-                    'The span "%s" for the scope "%s" has already finished.',
-                    $this->scopeId,
-                    $this->scope,
-                ),
-            );
+            throw AlreadyEndedSpan::create($this->id);
         }
     }
 
-    private function getChildrenLastSnapshot(): Snapshot
+    /**
+     * @throws UnendedSpan
+     */
+    private function assertAllChildrenSpansWereEnded(): void
     {
-        return end($this->children)->end;
+        foreach ($this->children as $child) {
+            $child->assertSpanWasEnded();
+        }
     }
 }

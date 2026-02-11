@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Tracing;
 
+use function array_key_exists;
 use function array_map;
 use Infection\Framework\UniqueId;
 use Infection\Telemetry\Metric\ResourceInspector;
 use Infection\Telemetry\Reporter\TraceProvider;
+use Infection\Telemetry\Tracing\Throwable\AlreadyStartedSpan;
 
 /**
  * Service responsible for creating spans.
@@ -52,12 +54,12 @@ final class Tracer implements TraceProvider
     /**
      * @var list<SpanBuilder>
      */
-    private array $spans;
+    private array $spans = [];
 
     /**
      * @var array<string, list<SpanBuilder>>
      */
-    private array $allSpans;
+    private array $allSpans = [];
 
     public function __construct(
         private readonly ResourceInspector $inspector,
@@ -66,43 +68,54 @@ final class Tracer implements TraceProvider
 
     public function startSpan(
         RootScope $scope,
-        string|int|null $id = null,
+        ?string $id = null,
     ): SpanBuilder {
+        $spanId = SpanId::create($scope, $id);
+
         $span = new SpanBuilder(
-            (string) $id ?? UniqueId::generate(),
-            $scope->value,
+            $spanId,
             $this->inspector->snapshot(),
         );
 
+        if (array_key_exists((string) $spanId, $this->allSpans)) {
+            throw AlreadyStartedSpan::create($spanId);
+        }
+
         $this->spans[] = $span;
-        $this->allSpans[$span->id][] = $span;
+        $this->allSpans[(string) $spanId][] = $span;
 
         return $span;
     }
 
     public function startChildSpan(
-        string|Scope $scope,
-        string|int $id,
         SpanBuilder $parent,
+        Scope $scope,
+        ?string $id = null,
     ): SpanBuilder {
+        $spanId = SpanId::create($scope, $id, $parent->id);
+
         $span = new SpanBuilder(
-            (string) $id ?? UniqueId::generate(),
-            $scope,
+            $spanId,
             $this->inspector->snapshot(),
         );
-        $this->allSpans[$span->id][] = $span;
+
+        if (array_key_exists((string) $spanId, $this->allSpans)) {
+            throw AlreadyStartedSpan::create($spanId);
+        }
+
+        $this->allSpans[(string) $spanId][] = $span;
 
         $parent->addChild($span);
 
         return $span;
     }
 
-    public function finishSpan(SpanBuilder ...$spans): void
+    public function endSpan(SpanBuilder ...$spans): void
     {
         $end = $this->inspector->snapshot();
 
         foreach ($spans as $span) {
-            $span->finish($end);
+            $span->end($end);
         }
     }
 

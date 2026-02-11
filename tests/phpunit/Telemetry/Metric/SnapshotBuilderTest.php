@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,53 +34,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Tests\Telemetry\Metric;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use Infection\Telemetry\Metric\Snapshot;
-use Infection\Telemetry\Metric\Time\Duration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * A span is a single unit of work.
- *
- * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
- *
- * @internal
- */
-final readonly class Span
+#[CoversClass(SnapshotBuilder::class)]
+final class SnapshotBuilderTest extends TestCase
 {
-    /**
-     * @param list<Span> $children
-     */
-    public function __construct(
-        public SpanId $id,
-        public string $scopeId,
-        public RootScope|Scope $scope,
-        public Snapshot $start,
-        public Snapshot $end,
-        public array $children,
-    ) {
+    #[DataProvider('snapshotProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Snapshot $snapshot): void
+    {
+        $actual = SnapshotBuilder::from($snapshot)->build();
+
+        $this->assertEquals($snapshot, $actual);
     }
 
-    public function getDuration(): Duration
+    public static function snapshotProvider(): iterable
     {
-        return $this->end->time->getDuration(
-            $this->start->time,
-        );
-    }
-
-    public function getMemoryUsage(): MemoryUsage
-    {
-        return $this->end->memoryUsage->diff(
-            $this->start->memoryUsage,
-        );
-    }
-
-    /**
-     * @return int<0, 100>
-     */
-    public function getDurationPercentage(Duration $totalDuration): int
-    {
-        return $this->getDuration()->getPercentage($totalDuration);
+        yield [
+            SnapshotBuilder::withTestData()->build(),
+        ];
     }
 }

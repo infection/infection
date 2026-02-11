@@ -71,7 +71,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
-use Infection\Framework\UniqueId;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\SpanBuilder;
@@ -109,12 +108,6 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
     /** @var array<int, SpanBuilder> */
     private array $mutationHeuristicsSpans = [];
 
-    /** @var array<int, SpanBuilder> */
-    private array $mutationMutantSpans = [];
-
-    /** @var array<int, SpanBuilder> */
-    private array $mutationExecutionSpans = [];
-
     public function __construct(
         private readonly Tracer $tracer,
     ) {
@@ -122,70 +115,61 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
 
     public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
     {
-        $this->artefactCollectionSpan = $this->tracer->startSpan(
-            RootScope::ARTEFACT_COLLECTION,
-            UniqueId::generate(),
-        );
+        $this->artefactCollectionSpan = $this->tracer->startSpan(RootScope::ARTEFACT_COLLECTION);
     }
 
     public function onArtefactCollectionWasFinished(ArtefactCollectionWasFinished $event): void
     {
-        $this->tracer->finishSpan($this->artefactCollectionSpan);
+        $this->tracer->endSpan($this->artefactCollectionSpan);
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         $this->initialTestSuiteSpan = $this->tracer->startChildSpan(
-            Scope::INITIAL_TESTS,
-            UniqueId::generate(),
             $this->artefactCollectionSpan,
+            Scope::INITIAL_TESTS,
         );
     }
 
     public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
     {
-        $this->tracer->finishSpan($this->initialTestSuiteSpan);
+        $this->tracer->endSpan($this->initialTestSuiteSpan);
     }
 
     public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
         $this->initialStaticAnalysisRunSpan = $this->tracer->startChildSpan(
-            Scope::INITIAL_STATIC_ANALYSIS,
-            UniqueId::generate(),
             $this->artefactCollectionSpan,
+            Scope::INITIAL_STATIC_ANALYSIS,
         );
     }
 
     public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
     {
-        $this->tracer->finishSpan($this->initialStaticAnalysisRunSpan);
+        $this->tracer->endSpan($this->initialStaticAnalysisRunSpan);
     }
 
     public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
     {
-        $this->mutationAnalysisSpan = $this->tracer->startSpan(
-            RootScope::MUTATION_ANALYSIS,
-            UniqueId::generate(),
-        );
+        $this->mutationAnalysisSpan = $this->tracer->startSpan(RootScope::MUTATION_ANALYSIS);
     }
 
     public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
     {
-        $this->tracer->finishSpan($this->mutationAnalysisSpan);
+        $this->tracer->endSpan($this->mutationAnalysisSpan);
     }
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
         $this->mutationGenerationSpan = $this->tracer->startChildSpan(
-            Scope::MUTATION_GENERATION,
-            UniqueId::generate(),
             $this->mutationAnalysisSpan,
+            Scope::MUTATION_GENERATION,
         );
     }
 
     public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
     {
-        $this->tracer->finishSpan($this->mutationGenerationSpan);
+        $this->tracer->endSpan($this->mutationGenerationSpan);
     }
 
     public function onAstGenerationWasStarted(AstGenerationWasStarted $event): void
@@ -199,9 +183,9 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
         $this->sourceFileSpans[$sourceFileId] = $sourceFileSpan;
 
         $astGenerationSpan = $this->tracer->startChildSpan(
+            $sourceFileSpan,
             Scope::AST_GENERATION,
             $sourceFileId,
-            $sourceFileSpan,
         );
 
         $this->astGenerationSpans[$sourceFileId] = $astGenerationSpan;
@@ -210,7 +194,7 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
 
     public function onAstGenerationWasFinished(AstGenerationWasFinished $event): void
     {
-        $this->tracer->finishSpan(
+        $this->tracer->endSpan(
             $this->astGenerationSpans[$event->sourceFileId],
         );
     }
@@ -221,9 +205,8 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
         $sourceFileSpan = $this->sourceFileSpans[$sourceFileId];
 
         $sourceFileMutationGenerationSpan = $this->tracer->startChildSpan(
-            Scope::AST_GENERATION,
-            $sourceFileId,
             $sourceFileSpan,
+            Scope::AST_GENERATION,
         );
 
         $this->sourceFileMutationGenerationSpan[$sourceFileId] = $sourceFileMutationGenerationSpan;
@@ -232,7 +215,7 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
 
     public function onMutationGenerationForFileWasFinished(MutationGenerationForFileWasFinished $event): void
     {
-        $this->tracer->finishSpan(
+        $this->tracer->endSpan(
             $this->sourceFileMutationGenerationSpan[$event->sourceFileId],
         );
     }
@@ -240,15 +223,14 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
         $this->mutationEvaluationSpan = $this->tracer->startChildSpan(
-            Scope::MUTATION_EVALUATION,
-            UniqueId::generate(),
             $this->mutationAnalysisSpan,
+            Scope::MUTATION_EVALUATION,
         );
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->tracer->finishSpan($this->mutationEvaluationSpan);
+        $this->tracer->endSpan($this->mutationEvaluationSpan);
     }
 
     public function onMutationHeuristicsWasStarted(MutationHeuristicsWasStarted $event): void
@@ -259,17 +241,17 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
         $mutationId = $mutation->getHash();
 
         $mutationAnalysisSpan = $this->tracer->startChildSpan(
+            $this->sourceFileSpans[$sourceFileId],
             Scope::MUTATION_EVALUATION,
             $mutationId,
-            $this->sourceFileSpans[$sourceFileId],
         );
         $this->mutationAnalysisSpan->addChild($mutationAnalysisSpan);
         $this->individualMutationAnalysisSpans[$mutationId] = $mutationAnalysisSpan;
 
         $heuristicsSpan = $this->tracer->startChildSpan(
+            $mutationAnalysisSpan,
             Scope::MUTATION_HEURISTICS,
             $mutationId,
-            $mutationAnalysisSpan,
         );
         $this->mutationHeuristicsSpans[$mutationId] = $heuristicsSpan;
         $this->mutationAnalysisSpan->addChild($mutationAnalysisSpan);
@@ -285,30 +267,6 @@ final class TracingSubscriber implements ArtefactCollectionWasFinishedSubscriber
             $spansToFinish[] = $this->individualMutationAnalysisSpans[$mutationId];
         }
 
-        $this->tracer->finishSpan(...$spansToFinish);
-    }
-
-    public function whenMutantAnalysisWasStarted(MutantAnalysisWasStarted $event): void
-    {
-        $mutation = $event->mutant->getMutation();
-        $mutationId = $mutation->getHash();
-
-        $mutationExecutionSpan = $this->tracer->startChildSpan(
-            'execution',
-            $mutationId,
-            $this->individualMutationAnalysisSpans[$mutationId],
-        );
-
-        $this->mutationExecutionSpans[$mutationId] = $mutationExecutionSpan;
-    }
-
-    public function whenMutantAnalysisWasFinished(MutantAnalysisWasFinished $event): void
-    {
-        $mutationId = $event->getExecutionResult()->getMutantHash();
-
-        $this->tracer->finishSpan(
-            $this->mutationExecutionSpans[$mutationId],
-            $this->individualMutationAnalysisSpans[$mutationId],
-        );
+        $this->tracer->endSpan(...$spansToFinish);
     }
 }

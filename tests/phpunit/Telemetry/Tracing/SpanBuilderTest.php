@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,53 +34,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Tests\Telemetry\Tracing;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use Infection\Telemetry\Metric\Snapshot;
-use Infection\Telemetry\Metric\Time\Duration;
+use Infection\Telemetry\Tracing\Span;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * A span is a single unit of work.
- *
- * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
- *
- * @internal
- */
-final readonly class Span
+#[CoversClass(SpanBuilder::class)]
+final class SpanBuilderTest extends TestCase
 {
-    /**
-     * @param list<Span> $children
-     */
-    public function __construct(
-        public SpanId $id,
-        public string $scopeId,
-        public RootScope|Scope $scope,
-        public Snapshot $start,
-        public Snapshot $end,
-        public array $children,
-    ) {
+    #[DataProvider('spanProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Span $span): void
+    {
+        $actual = SpanBuilder::from($span)->build();
+
+        $this->assertEquals($span, $actual);
     }
 
-    public function getDuration(): Duration
+    public static function spanProvider(): iterable
     {
-        return $this->end->time->getDuration(
-            $this->start->time,
-        );
-    }
+        yield [
+            SpanBuilder::withRootTestData()->build(),
+        ];
 
-    public function getMemoryUsage(): MemoryUsage
-    {
-        return $this->end->memoryUsage->diff(
-            $this->start->memoryUsage,
-        );
-    }
-
-    /**
-     * @return int<0, 100>
-     */
-    public function getDurationPercentage(Duration $totalDuration): int
-    {
-        return $this->getDuration()->getPercentage($totalDuration);
+        yield [
+            SpanBuilder::withChildTestData()->build(),
+        ];
     }
 }

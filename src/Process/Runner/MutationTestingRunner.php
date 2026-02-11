@@ -131,9 +131,9 @@ class MutationTestingRunner
 
     private function ignoredByMutantId(Mutation $mutation): bool
     {
-        if ($this->mutantId === null) {
-            return true;
-        }
+        $isNotIgnored = $this->mutantId === null
+            ? true
+            : $mutation->getHash() === $this->mutantId;
 
         $this->eventDispatcher->dispatch(
             new MutationHeuristicsWasFinished(
@@ -142,7 +142,7 @@ class MutationTestingRunner
             ),
         );
 
-        return $mutation->getHash() === $this->mutantId;
+        return $isNotIgnored;
     }
 
     private function ignoredByRegex(Mutant $mutant): bool

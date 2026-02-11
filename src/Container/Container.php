@@ -83,6 +83,7 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Logger\DebugEventsSubscriberFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
@@ -390,6 +391,7 @@ final class Container extends DIContainer
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->getStopInfectionOnSigintSignalSubscriberFactory(),
                     $container->getDispatchPcntlSignalSubscriberFactory(),
+                    $container->get(DebugEventsSubscriberFactory::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {

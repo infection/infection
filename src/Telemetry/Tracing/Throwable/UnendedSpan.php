@@ -33,53 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Telemetry\Tracing\Throwable;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use Infection\Telemetry\Metric\Snapshot;
-use Infection\Telemetry\Metric\Time\Duration;
+use Infection\Telemetry\Tracing\SpanId;
+use LogicException;
+use function sprintf;
 
 /**
- * A span is a single unit of work.
- *
- * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
- *
  * @internal
  */
-final readonly class Span
+final class UnendedSpan extends LogicException implements InvalidSpanLifecycle
 {
-    /**
-     * @param list<Span> $children
-     */
-    public function __construct(
-        public SpanId $id,
-        public string $scopeId,
-        public RootScope|Scope $scope,
-        public Snapshot $start,
-        public Snapshot $end,
-        public array $children,
-    ) {
-    }
-
-    public function getDuration(): Duration
+    public static function create(SpanId $id): self
     {
-        return $this->end->time->getDuration(
-            $this->start->time,
+        return new self(
+            sprintf(
+                'The span "%s" for the scope "%s"%s was not ended.',
+                $id->scopeId,
+                $id->scope->value,
+                $id->parentId === null
+                    ? ''
+                    : sprintf(
+                        ', child of the span "%s",',
+                        $id->parentId,
+                    ),
+            ),
         );
-    }
-
-    public function getMemoryUsage(): MemoryUsage
-    {
-        return $this->end->memoryUsage->diff(
-            $this->start->memoryUsage,
-        );
-    }
-
-    /**
-     * @return int<0, 100>
-     */
-    public function getDurationPercentage(Duration $totalDuration): int
-    {
-        return $this->getDuration()->getPercentage($totalDuration);
     }
 }

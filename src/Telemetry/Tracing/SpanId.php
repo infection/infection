@@ -35,51 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Tracing;
 
-use Infection\Telemetry\Metric\Memory\MemoryUsage;
-use Infection\Telemetry\Metric\Snapshot;
-use Infection\Telemetry\Metric\Time\Duration;
+use function implode;
+use Infection\Framework\UniqueId;
+use Stringable;
 
 /**
- * A span is a single unit of work.
- *
- * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
- *
  * @internal
  */
-final readonly class Span
+final readonly class SpanId implements Stringable
 {
-    /**
-     * @param list<Span> $children
-     */
-    public function __construct(
-        public SpanId $id,
-        public string $scopeId,
+    private function __construct(
         public RootScope|Scope $scope,
-        public Snapshot $start,
-        public Snapshot $end,
-        public array $children,
+        public string $scopeId,
+        public ?self $parentId,
     ) {
     }
 
-    public function getDuration(): Duration
+    public function __toString(): string
     {
-        return $this->end->time->getDuration(
-            $this->start->time,
-        );
+        $values = [
+            $this->parentId ?? '#',
+            $this->scope->value,
+            $this->scopeId,
+        ];
+
+        return implode(':', $values);
     }
 
-    public function getMemoryUsage(): MemoryUsage
-    {
-        return $this->end->memoryUsage->diff(
-            $this->start->memoryUsage,
+    public static function create(
+        RootScope|Scope $scope,
+        ?string $id,
+        ?self $parentId = null,
+    ): self {
+        return new self(
+            $scope,
+            $id ?? UniqueId::generate(),
+            $parentId,
         );
-    }
-
-    /**
-     * @return int<0, 100>
-     */
-    public function getDurationPercentage(Duration $totalDuration): int
-    {
-        return $this->getDuration()->getPercentage($totalDuration);
     }
 }
