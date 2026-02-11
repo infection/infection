@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Tracing;
 
 use function array_map;
-use function count;
-use function end;
 use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Tracing\Throwable\AlreadyEndedSpan;
 use Infection\Telemetry\Tracing\Throwable\UnendedSpan;

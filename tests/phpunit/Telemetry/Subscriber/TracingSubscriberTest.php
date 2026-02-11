@@ -63,11 +63,10 @@ use Infection\Telemetry\Metric\ResourceInspector;
 use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Metric\Time\HRTime;
 use Infection\Telemetry\Metric\Time\Stopwatch;
-use Infection\Telemetry\Subscriber\TracingSubscriber;
+use Infection\Telemetry\Subscriber\TelemetrySubscriber;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\Span;
-use Infection\Telemetry\Tracing\SpanId;
 use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\Telemetry\Metric\SnapshotBuilder;
@@ -76,7 +75,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
-#[CoversClass(TracingSubscriber::class)]
+#[CoversClass(TelemetrySubscriber::class)]
 final class TracingSubscriberTest extends TestCase
 {
     private Stopwatch&MockObject $stopwatchMock;
@@ -87,7 +86,7 @@ final class TracingSubscriberTest extends TestCase
 
     private Tracer $tracer;
 
-    private TracingSubscriber $subscriber;
+    private TelemetrySubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -103,7 +102,7 @@ final class TracingSubscriberTest extends TestCase
             ),
         );
 
-        $this->subscriber = new TracingSubscriber($this->tracer);
+        $this->subscriber = new TelemetrySubscriber($this->tracer);
     }
 
     public function test_it_traces_nominal_application_execution(): void
