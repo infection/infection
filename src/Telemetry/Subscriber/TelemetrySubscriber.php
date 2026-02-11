@@ -73,6 +73,7 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\SpanBuilder;
@@ -208,7 +209,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
         $sourceFileMutationGenerationSpan = $this->tracer->startChildSpan(
             $sourceFileSpan,
-            Scope::AST_GENERATION,
+            Scope::MUTATION_GENERATION,
         );
 
         $this->sourceFileMutationGenerationSpan[$sourceFileId] = $sourceFileMutationGenerationSpan;
@@ -270,10 +271,27 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         }
 
         $this->tracer->endSpan(...$spansToFinish);
+
+        $this->endFileSpanIfAllMutationsAreEvaluated(
+            NodeIdFactory::create($event->mutation->getOriginalFilePath()),
+        );
     }
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        // TODO: Implement onMutantProcessWasFinished() method.
+        $mutationId = $event->executionResult->getMutantHash();
+
+        $this->tracer->endSpan(
+            $this->individualMutationAnalysisSpans[$mutationId],
+        );
+
+        $this->endFileSpanIfAllMutationsAreEvaluated(
+            NodeIdFactory::create($event->executionResult->getOriginalFilePath()),
+        );
+    }
+
+    private function endFileSpanIfAllMutationsAreEvaluated(string $sourceFileId): void
+    {
+        // TODO
     }
 }

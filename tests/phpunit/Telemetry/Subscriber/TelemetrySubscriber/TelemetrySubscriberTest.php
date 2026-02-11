@@ -74,6 +74,7 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Telemetry\Metric\SnapshotBuilder;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Tests\TestingUtility\Telemetry\TraceDumper\TestTraceDumper\TestTraceDumper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -92,6 +93,8 @@ final class TelemetrySubscriberTest extends TestCase
 
     private TelemetrySubscriber $subscriber;
 
+    private TestTraceDumper $traceDumper;
+
     protected function setUp(): void
     {
         $this->stopwatchMock = $this->createMock(Stopwatch::class);
@@ -107,6 +110,8 @@ final class TelemetrySubscriberTest extends TestCase
         );
 
         $this->subscriber = new TelemetrySubscriber($this->tracer);
+
+        $this->traceDumper = new TestTraceDumper();
     }
 
     public function test_it_traces_nominal_application_execution(): void
@@ -117,22 +122,6 @@ final class TelemetrySubscriberTest extends TestCase
         $sourceFile1 = new MockSplFileInfo(realPath: '/path/to/source1.php');
         $sourceFile2 = new MockSplFileInfo(realPath: '/path/to/source2.php');
 
-        $sourceFileId1 = NodeIdFactory::create($sourceFilePath1);
-        $sourceFileId2 = NodeIdFactory::create($sourceFilePath2);
-
-        $mutation = $this->createMock(Mutation::class);
-        $mutation
-            ->method('getHash')
-            ->willReturn('mutation-hash-456');
-        $mutation
-            ->method('getOriginalFilePath')
-            ->willReturn($sourceFilePath1);
-
-        $sourceFile = $this->createMock(SplFileInfo::class);
-        $sourceFile
-            ->method('getRealPath')
-            ->willReturn($sourceFilePath1);
-
         $this->gatherArtefacts();
 
         $this->runMutationAnalysis(
@@ -140,60 +129,15 @@ final class TelemetrySubscriberTest extends TestCase
             $sourceFile2,
         );
 
-        // Verify the trace structure
-        $actualTrace = $this->tracer->getTrace();
+        $expected = <<<'TRACE'
 
-        $this->assertCount(2, $actualTrace->spans);
+        TRACE;
 
-        [$artefactCollectionSpan, $mutationAnalysisSpan] = $actualTrace->spans;
+        $trace = $this->tracer->getTrace();
 
-        // Verify artefact collection span
-        $this->assertSame(RootScope::ARTEFACT_COLLECTION, $artefactCollectionSpan->scope);
-        $this->assertSame($snapshots[0], $artefactCollectionSpan->start);
-        $this->assertSame($snapshots[5], $artefactCollectionSpan->end);
-        $this->assertCount(2, $artefactCollectionSpan->children);
+        $actual = $this->traceDumper->dump($trace);
 
-        [$initialTestSuiteSpan, $initialStaticAnalysisSpan] = $artefactCollectionSpan->children;
-
-        $this->assertSame(Scope::INITIAL_TESTS, $initialTestSuiteSpan->scope);
-        $this->assertSame($snapshots[1], $initialTestSuiteSpan->start);
-        $this->assertSame($snapshots[2], $initialTestSuiteSpan->end);
-        $this->assertEmpty($initialTestSuiteSpan->children);
-
-        $this->assertSame(Scope::INITIAL_STATIC_ANALYSIS, $initialStaticAnalysisSpan->scope);
-        $this->assertSame($snapshots[3], $initialStaticAnalysisSpan->start);
-        $this->assertSame($snapshots[4], $initialStaticAnalysisSpan->end);
-        $this->assertEmpty($initialStaticAnalysisSpan->children);
-
-        // Verify mutation analysis span
-        $this->assertSame(RootScope::MUTATION_ANALYSIS, $mutationAnalysisSpan->scope);
-        $this->assertSame($snapshots[6], $mutationAnalysisSpan->start);
-        $this->assertSame($snapshots[18], $mutationAnalysisSpan->end);
-        $this->assertCount(2, $mutationAnalysisSpan->children);
-
-        [$mutationGenerationSpan, $mutationEvaluationSpan] = $mutationAnalysisSpan->children;
-
-        $this->assertSame(Scope::MUTATION_GENERATION, $mutationGenerationSpan->scope);
-        $this->assertSame($snapshots[7], $mutationGenerationSpan->start);
-        $this->assertSame($snapshots[12], $mutationGenerationSpan->end);
-        $this->assertCount(2, $mutationGenerationSpan->children);
-
-        [$astGenerationSpan, $sourceFileMutationGenerationSpan] = $mutationGenerationSpan->children;
-
-        $this->assertSame(Scope::AST_GENERATION, $astGenerationSpan->scope);
-        $this->assertSame($snapshots[9], $astGenerationSpan->start);
-        $this->assertSame($snapshots[10], $astGenerationSpan->end);
-        $this->assertEmpty($astGenerationSpan->children);
-
-        $this->assertSame(Scope::AST_GENERATION, $sourceFileMutationGenerationSpan->scope);
-        $this->assertSame($snapshots[11], $sourceFileMutationGenerationSpan->start);
-        $this->assertSame($snapshots[12], $sourceFileMutationGenerationSpan->end);
-        $this->assertEmpty($sourceFileMutationGenerationSpan->children);
-
-        $this->assertSame(Scope::MUTATION_EVALUATION, $mutationEvaluationSpan->scope);
-        $this->assertSame($snapshots[13], $mutationEvaluationSpan->start);
-        $this->assertSame($snapshots[17], $mutationEvaluationSpan->end);
-        $this->assertEmpty($mutationEvaluationSpan->children);
+        $this->assertSame($expected, $actual);
     }
 
     private function gatherArtefacts(): void
@@ -231,12 +175,15 @@ final class TelemetrySubscriberTest extends TestCase
 
         $mutation1A = MutationBuilder::withMinimalTestData()
             ->withHash('mutation1-A')
+            ->withOriginalFilePath($sourceFile1->getRealPath())
             ->build();
         $mutation1B = MutationBuilder::withMinimalTestData()
             ->withHash('mutation1-B')
+            ->withOriginalFilePath($sourceFile1->getRealPath())
             ->build();
         $mutation2A = MutationBuilder::withMinimalTestData()
             ->withHash('mutation2-A')
+            ->withOriginalFilePath($sourceFile2->getRealPath())
             ->build();
 
         $this->subscriber->onMutationAnalysisWasStarted(
@@ -248,10 +195,14 @@ final class TelemetrySubscriberTest extends TestCase
         );
 
         $this->subscriber->onAstGenerationWasStarted(
-            new AstGenerationWasStarted($sourceFile1->getRealPath()),
+            new AstGenerationWasStarted(
+                NodeIdFactory::create($sourceFile1->getRealPath()),
+            ),
         );
         $this->subscriber->onAstGenerationWasFinished(
-            new AstGenerationWasFinished($sourceFile2->getRealPath()),
+            new AstGenerationWasFinished(
+                NodeIdFactory::create($sourceFile1->getRealPath()),
+            ),
         );
 
         $this->subscriber->onMutationGenerationForFileWasStarted(
@@ -303,10 +254,14 @@ final class TelemetrySubscriberTest extends TestCase
         );
 
         $this->subscriber->onAstGenerationWasStarted(
-            new AstGenerationWasStarted($sourceFile2->getRealPath()),
+            new AstGenerationWasStarted(
+                NodeIdFactory::create($sourceFile2->getRealPath()),
+            ),
         );
         $this->subscriber->onAstGenerationWasFinished(
-            new AstGenerationWasFinished($sourceFile2->getRealPath()),
+            new AstGenerationWasFinished(
+                NodeIdFactory::create($sourceFile2->getRealPath()),
+            ),
         );
 
         $this->subscriber->onMutationGenerationForFileWasStarted(

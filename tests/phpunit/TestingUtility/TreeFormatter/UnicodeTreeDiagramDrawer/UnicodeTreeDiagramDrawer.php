@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\Telemetry\TraceDumper;
+namespace Infection\Tests\TestingUtility\TreeFormatter\UnicodeTreeDiagramDrawer;
 
+use Infection\Tests\TestingUtility\TreeFormatter\TreeFormatter;
 use function array_key_exists;
 use function array_key_last;
 use function array_pop;
@@ -43,6 +44,13 @@ use function implode;
 
 /**
  * Utility to print an ASCII tree diagram using the box-drawing characters.
+ *
+ * This service focuses on producing the correct box-drawing characters. It is a
+ * low-level drawing primitive.
+ *
+ * To use a higher level service, check TreeFormatter.
+ *
+ * @see TreeFormatter
  */
 final class UnicodeTreeDiagramDrawer
 {

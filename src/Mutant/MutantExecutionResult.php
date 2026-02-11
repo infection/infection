@@ -37,7 +37,6 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
-use Infection\TestFramework\Coverage\Trace;
 use Later\Interfaces\Deferred;
 use RuntimeException;
 use function sprintf;
@@ -76,7 +75,6 @@ class MutantExecutionResult
         private readonly Deferred $mutatedCode,
         private readonly array $tests,
         private readonly float $processRuntime,
-        public readonly Trace $trace,
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
@@ -220,7 +218,6 @@ class MutantExecutionResult
             $mutant->getMutatedCode(),
             $mutant->getTests(),
             0.0,
-            $mutation->trace,
         );
     }
 }
