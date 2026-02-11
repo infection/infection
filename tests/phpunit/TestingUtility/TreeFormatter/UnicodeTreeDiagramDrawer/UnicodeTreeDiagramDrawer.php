@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\TreeFormatter\UnicodeTreeDiagramDrawer;
 
-use Infection\Tests\TestingUtility\TreeFormatter\TreeFormatter;
 use function array_key_exists;
 use function array_key_last;
 use function array_pop;
 use function end;
 use function implode;
+use Infection\Tests\TestingUtility\TreeFormatter\TreeFormatter;
 
 /**
  * Utility to print an ASCII tree diagram using the box-drawing characters.

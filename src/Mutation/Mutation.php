@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;

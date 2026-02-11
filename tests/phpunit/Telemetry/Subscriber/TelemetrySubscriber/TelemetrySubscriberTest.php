@@ -57,7 +57,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
-use Infection\Mutation\Mutation;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorInspector;
 use Infection\Telemetry\Metric\Memory\MemoryInspector;
@@ -66,8 +65,6 @@ use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Metric\Time\HRTime;
 use Infection\Telemetry\Metric\Time\Stopwatch;
 use Infection\Telemetry\Subscriber\TelemetrySubscriber;
-use Infection\Telemetry\Tracing\RootScope;
-use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -130,8 +127,42 @@ final class TelemetrySubscriberTest extends TestCase
         );
 
         $expected = <<<'TRACE'
+            ┌─ #:artefact_collection:5a4d213d50b3
+            │   ├─ #:artefact_collection:5a4d213d50b3:initial_tests:e8e6cb5f5ef0
+            │   └─ #:artefact_collection:5a4d213d50b3:initial_static_analysis:6f7d3d0d5ed1
+            ├─ #:mutation_analysis:7ef3e25172d2
+            │   ├─ #:mutation_analysis:7ef3e25172d2:mutation_generation:72639d4977c8
+            │   │   ├─ #:source_file:d91ae7a53fc2385d:ast_generation:d91ae7a53fc2385d
+            │   │   ├─ #:source_file:d91ae7a53fc2385d:mutation_generation:0a6c6da9214c
+            │   │   ├─ #:source_file:da389aeb091edcc5:ast_generation:da389aeb091edcc5
+            │   │   └─ #:source_file:da389aeb091edcc5:mutation_generation:11caed7747dd
+            │   ├─ #:mutation_analysis:7ef3e25172d2:mutation_evaluation:049cab050a30
+            │   ├─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-A
+            │   │   └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-A:mutation_heuristics:mutation1-A
+            │   ├─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-A
+            │   │   └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-A:mutation_heuristics:mutation1-A
+            │   ├─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-B
+            │   │   └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-B:mutation_heuristics:mutation1-B
+            │   ├─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-B
+            │   │   └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-B:mutation_heuristics:mutation1-B
+            │   ├─ #:source_file:da389aeb091edcc5:mutation_evaluation:mutation2-A
+            │   │   └─ #:source_file:da389aeb091edcc5:mutation_evaluation:mutation2-A:mutation_heuristics:mutation2-A
+            │   └─ #:source_file:da389aeb091edcc5:mutation_evaluation:mutation2-A
+            │       └─ #:source_file:da389aeb091edcc5:mutation_evaluation:mutation2-A:mutation_heuristics:mutation2-A
+            ├─ #:source_file:d91ae7a53fc2385d
+            │   ├─ #:source_file:d91ae7a53fc2385d:ast_generation:d91ae7a53fc2385d
+            │   ├─ #:source_file:d91ae7a53fc2385d:mutation_generation:0a6c6da9214c
+            │   ├─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-A
+            │   │   └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-A:mutation_heuristics:mutation1-A
+            │   └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-B
+            │       └─ #:source_file:d91ae7a53fc2385d:mutation_evaluation:mutation1-B:mutation_heuristics:mutation1-B
+            └─ #:source_file:da389aeb091edcc5
+                ├─ #:source_file:da389aeb091edcc5:ast_generation:da389aeb091edcc5
+                ├─ #:source_file:da389aeb091edcc5:mutation_generation:11caed7747dd
+                └─ #:source_file:da389aeb091edcc5:mutation_evaluation:mutation2-A
+                    └─ #:source_file:da389aeb091edcc5:mutation_evaluation:mutation2-A:mutation_heuristics:mutation2-A
 
-        TRACE;
+            TRACE;
 
         $trace = $this->tracer->getTrace();
 
@@ -168,8 +199,7 @@ final class TelemetrySubscriberTest extends TestCase
     private function runMutationAnalysis(
         SplFileInfo $sourceFile1,
         SplFileInfo $sourceFile2,
-    ): void
-    {
+    ): void {
         $trace1 = $this->createMock(Trace::class);
         $trace2 = $this->createMock(Trace::class);
 

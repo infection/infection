@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
+use function array_diff;
+use function array_fill_keys;
+use function array_key_exists;
+use function array_keys;
+use function count;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
@@ -73,7 +78,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
-use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\SpanBuilder;
@@ -82,7 +86,7 @@ use Infection\Telemetry\Tracing\Tracer;
 /**
  * @internal
  */
-final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, MutantProcessWasFinishedSubscriber
+final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     private SpanBuilder $artefactCollectionSpan;
 
@@ -110,6 +114,21 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
     /** @var array<int, SpanBuilder> */
     private array $mutationHeuristicsSpans = [];
+
+    /**
+     * @var array<string, array<string, true>>
+     */
+    private array $finishedMutationHashesBySourceFileId = [];
+
+    /**
+     * @var array<string, array<string, true>>
+     */
+    private array $remainingMutationHashesBySourceFileId = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private array $sourceFileIdByMutationHash = [];
 
     public function __construct(
         private readonly Tracer $tracer,
@@ -221,6 +240,13 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         $this->tracer->endSpan(
             $this->sourceFileMutationGenerationSpan[$event->sourceFileId],
         );
+
+        $this->registerMutationsForSourceFile(
+            $event->sourceFileId,
+            $event->mutationHashes,
+        );
+
+        $this->endFileSpanIfAllMutationsAreEvaluated($event->sourceFileId);
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
@@ -243,6 +269,8 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         $mutation = $event->mutation;
         $mutationId = $mutation->getHash();
 
+        $this->sourceFileIdByMutationHash[$mutationId] = $sourceFileId;
+
         $mutationAnalysisSpan = $this->tracer->startChildSpan(
             $this->sourceFileSpans[$sourceFileId],
             Scope::MUTATION_EVALUATION,
@@ -263,35 +291,79 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
     public function onMutationHeuristicsWasFinished(MutationHeuristicsWasFinished $event): void
     {
         $mutationId = $event->mutation->getHash();
+        $sourceFileId = $this->sourceFileIdByMutationHash[$mutationId];
 
         $spansToFinish = [$this->mutationHeuristicsSpans[$mutationId]];
 
         if (!$event->escaped) {
             $spansToFinish[] = $this->individualMutationAnalysisSpans[$mutationId];
+            $this->markMutationAsFinished($sourceFileId, $mutationId);
         }
 
         $this->tracer->endSpan(...$spansToFinish);
 
-        $this->endFileSpanIfAllMutationsAreEvaluated(
-            NodeIdFactory::create($event->mutation->getOriginalFilePath()),
-        );
+        $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
     }
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
         $mutationId = $event->executionResult->getMutantHash();
+        $sourceFileId = $this->sourceFileIdByMutationHash[$mutationId];
 
         $this->tracer->endSpan(
             $this->individualMutationAnalysisSpans[$mutationId],
         );
 
-        $this->endFileSpanIfAllMutationsAreEvaluated(
-            NodeIdFactory::create($event->executionResult->getOriginalFilePath()),
-        );
+        $this->markMutationAsFinished($sourceFileId, $mutationId);
+
+        $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
+    }
+
+    /**
+     * @param list<string> $mutationHashes
+     */
+    private function registerMutationsForSourceFile(
+        string $sourceFileId,
+        array $mutationHashes,
+    ): void {
+        $finishedMutationHashes = array_keys($this->finishedMutationHashesBySourceFileId[$sourceFileId] ?? []);
+        $remainingMutationHashes = array_diff($mutationHashes, $finishedMutationHashes);
+
+        $this->remainingMutationHashesBySourceFileId[$sourceFileId] = array_fill_keys($remainingMutationHashes, true);
+    }
+
+    private function markMutationAsFinished(string $sourceFileId, string $mutationHash): void
+    {
+        $this->finishedMutationHashesBySourceFileId[$sourceFileId][$mutationHash] = true;
+
+        if (array_key_exists($sourceFileId, $this->remainingMutationHashesBySourceFileId)) {
+            unset($this->remainingMutationHashesBySourceFileId[$sourceFileId][$mutationHash]);
+        }
     }
 
     private function endFileSpanIfAllMutationsAreEvaluated(string $sourceFileId): void
     {
-        // TODO
+        if (
+            !array_key_exists($sourceFileId, $this->sourceFileSpans)
+            || !array_key_exists($sourceFileId, $this->remainingMutationHashesBySourceFileId)
+        ) {
+            return;
+        }
+
+        if (count($this->remainingMutationHashesBySourceFileId[$sourceFileId]) === 0) {
+            $this->tracer->endSpan($this->sourceFileSpans[$sourceFileId]);
+
+            $mutationHashes = array_keys($this->finishedMutationHashesBySourceFileId[$sourceFileId] ?? []);
+
+            foreach ($mutationHashes as $mutationHash) {
+                unset($this->sourceFileIdByMutationHash[$mutationHash]);
+            }
+
+            unset(
+                $this->sourceFileSpans[$sourceFileId],
+                $this->remainingMutationHashesBySourceFileId[$sourceFileId],
+                $this->finishedMutationHashesBySourceFileId[$sourceFileId],
+            );
+        }
     }
 }

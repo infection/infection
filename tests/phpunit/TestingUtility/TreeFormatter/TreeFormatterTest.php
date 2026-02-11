@@ -36,11 +36,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\TreeFormatter;
 
+use function implode;
 use Infection\Tests\TestingUtility\TreeFormatter\UnicodeTreeDiagramDrawer\UnicodeTreeDiagramDrawer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function implode;
 use function Pipeline\take;
 use function sprintf;
 
@@ -48,7 +48,7 @@ use function sprintf;
 final class TreeFormatterTest extends TestCase
 {
     /**
-     * @param TestNode[]  $nodes
+     * @param TestNode[] $nodes
      */
     #[DataProvider('treeProvider')]
     public function test_it_can_format_tree_structures(
@@ -66,7 +66,7 @@ final class TreeFormatterTest extends TestCase
             take($formatter->render($nodes))->toList(),
         );
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function treeProvider(): iterable

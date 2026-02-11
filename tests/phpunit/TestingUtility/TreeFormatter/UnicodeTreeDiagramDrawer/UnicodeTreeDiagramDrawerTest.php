@@ -36,13 +36,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\TreeFormatter\UnicodeTreeDiagramDrawer;
 
+use function count;
+use function is_array;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function count;
-use function is_array;
 use function sprintf;
-use const PHP_EOL;
 
 #[CoversClass(UnicodeTreeDiagramDrawer::class)]
 final class UnicodeTreeDiagramDrawerTest extends TestCase
@@ -56,7 +56,7 @@ final class UnicodeTreeDiagramDrawerTest extends TestCase
 
         $actual = self::drawLines($drawer, $lines);
 
-        self::assertSame($expected, $actual, $actual);
+        $this->assertSame($expected, $actual, $actual);
     }
 
     public static function linesProvider(): iterable

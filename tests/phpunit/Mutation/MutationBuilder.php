@@ -290,7 +290,7 @@ final class MutationBuilder
             $this->originalFileContent,
         );
 
-        if (null !== $this->hash) {
+        if ($this->hash !== null) {
             $this->getMutationHashPropertyReflection()->setValue(
                 $mutation,
                 $this->hash,
