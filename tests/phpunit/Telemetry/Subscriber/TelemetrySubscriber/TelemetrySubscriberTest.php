@@ -34,7 +34,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Telemetry\Subscriber;
+namespace Infection\Tests\Telemetry\Subscriber\TelemetrySubscriber;
 
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
@@ -46,6 +46,7 @@ use Infection\Event\Events\Ast\AstGenerationWasFinished;
 use Infection\Event\Events\Ast\AstGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
@@ -54,6 +55,7 @@ use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGeneratio
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Runner\ProcessRunner;
@@ -66,17 +68,19 @@ use Infection\Telemetry\Metric\Time\Stopwatch;
 use Infection\Telemetry\Subscriber\TelemetrySubscriber;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
-use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
+use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Telemetry\Metric\SnapshotBuilder;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
 #[CoversClass(TelemetrySubscriber::class)]
-final class TracingSubscriberTest extends TestCase
+final class TelemetrySubscriberTest extends TestCase
 {
     private Stopwatch&MockObject $stopwatchMock;
 
@@ -107,11 +111,14 @@ final class TracingSubscriberTest extends TestCase
 
     public function test_it_traces_nominal_application_execution(): void
     {
-        $snapshots = self::createSnapshotsWithIncrementalTime(19);
+        $snapshots = self::createSnapshotsWithIncrementalTime(1000);
         $this->configureSnapshots(...$snapshots);
 
-        $filePath = '/path/to/source.php';
-        $sourceFileId = NodeIdFactory::create($filePath);
+        $sourceFile1 = new MockSplFileInfo(realPath: '/path/to/source1.php');
+        $sourceFile2 = new MockSplFileInfo(realPath: '/path/to/source2.php');
+
+        $sourceFileId1 = NodeIdFactory::create($sourceFilePath1);
+        $sourceFileId2 = NodeIdFactory::create($sourceFilePath2);
 
         $mutation = $this->createMock(Mutation::class);
         $mutation
@@ -119,95 +126,18 @@ final class TracingSubscriberTest extends TestCase
             ->willReturn('mutation-hash-456');
         $mutation
             ->method('getOriginalFilePath')
-            ->willReturn($filePath);
+            ->willReturn($sourceFilePath1);
 
         $sourceFile = $this->createMock(SplFileInfo::class);
         $sourceFile
             ->method('getRealPath')
-            ->willReturn($filePath);
+            ->willReturn($sourceFilePath1);
 
-        $trace = $this->createMock(Trace::class);
-        $processRunner = $this->createMock(ProcessRunner::class);
+        $this->gatherArtefacts();
 
-        // Phase 1: Artefact Collection
-        $this->subscriber->onArtefactCollectionWasStarted(
-            new ArtefactCollectionWasStarted(),
-        );
-
-        // Phase 2: Initial Test Suite
-        $this->subscriber->onInitialTestSuiteWasStarted(
-            new InitialTestSuiteWasStarted(),
-        );
-
-        $this->subscriber->onInitialTestSuiteWasFinished(
-            new InitialTestSuiteWasFinished('Test suite output'),
-        );
-
-        // Phase 3: Initial Static Analysis
-        $this->subscriber->onInitialStaticAnalysisRunWasStarted(
-            new InitialStaticAnalysisRunWasStarted(),
-        );
-
-        $this->subscriber->onInitialStaticAnalysisRunWasFinished(
-            new InitialStaticAnalysisRunWasFinished('Static analysis output'),
-        );
-
-        $this->subscriber->onArtefactCollectionWasFinished(
-            new ArtefactCollectionWasFinished(),
-        );
-
-        // Phase 4: Mutation Analysis
-        $this->subscriber->onMutationAnalysisWasStarted(
-            new MutationAnalysisWasStarted(),
-        );
-
-        // Phase 5: Mutation Generation
-        $this->subscriber->onMutationGenerationWasStarted(
-            new MutationGenerationWasStarted(1),
-        );
-
-        // Phase 6: AST Generation for source file
-        $this->subscriber->onAstGenerationWasStarted(
-            new AstGenerationWasStarted($sourceFileId),
-        );
-
-        $this->subscriber->onAstGenerationWasFinished(
-            new AstGenerationWasFinished($sourceFileId),
-        );
-
-        // Phase 7: Mutation Generation for source file
-        $this->subscriber->onMutationGenerationForFileWasStarted(
-            new MutationGenerationForFileWasStarted($sourceFile, $trace),
-        );
-
-        $this->subscriber->onMutationGenerationForFileWasFinished(
-            new MutationGenerationForFileWasFinished($filePath, []),
-        );
-
-        $this->subscriber->onMutationGenerationWasFinished(
-            new MutationGenerationWasFinished(),
-        );
-
-        // Phase 8: Mutation Testing
-        $this->subscriber->onMutationTestingWasStarted(
-            new MutationTestingWasStarted(1, $processRunner),
-        );
-
-        // Phase 9: Individual Mutation Heuristics
-        $this->subscriber->onMutationHeuristicsWasStarted(
-            new MutationHeuristicsWasStarted($mutation),
-        );
-
-        $this->subscriber->onMutationHeuristicsWasFinished(
-            new MutationHeuristicsWasFinished($mutation, false),
-        );
-
-        $this->subscriber->onMutationTestingWasFinished(
-            new MutationTestingWasFinished(),
-        );
-
-        $this->subscriber->onMutationAnalysisWasFinished(
-            new MutationAnalysisWasFinished(),
+        $this->runMutationAnalysis(
+            $sourceFile1,
+            $sourceFile2,
         );
 
         // Verify the trace structure
@@ -264,6 +194,154 @@ final class TracingSubscriberTest extends TestCase
         $this->assertSame($snapshots[13], $mutationEvaluationSpan->start);
         $this->assertSame($snapshots[17], $mutationEvaluationSpan->end);
         $this->assertEmpty($mutationEvaluationSpan->children);
+    }
+
+    private function gatherArtefacts(): void
+    {
+        $this->subscriber->onArtefactCollectionWasStarted(
+            new ArtefactCollectionWasStarted(),
+        );
+
+        $this->subscriber->onInitialTestSuiteWasStarted(
+            new InitialTestSuiteWasStarted(),
+        );
+        $this->subscriber->onInitialTestSuiteWasFinished(
+            new InitialTestSuiteWasFinished('Test suite output'),
+        );
+
+        $this->subscriber->onInitialStaticAnalysisRunWasStarted(
+            new InitialStaticAnalysisRunWasStarted(),
+        );
+        $this->subscriber->onInitialStaticAnalysisRunWasFinished(
+            new InitialStaticAnalysisRunWasFinished('Static analysis output'),
+        );
+
+        $this->subscriber->onArtefactCollectionWasFinished(
+            new ArtefactCollectionWasFinished(),
+        );
+    }
+
+    private function runMutationAnalysis(
+        SplFileInfo $sourceFile1,
+        SplFileInfo $sourceFile2,
+    ): void
+    {
+        $trace1 = $this->createMock(Trace::class);
+        $trace2 = $this->createMock(Trace::class);
+
+        $mutation1A = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation1-A')
+            ->build();
+        $mutation1B = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation1-B')
+            ->build();
+        $mutation2A = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation2-A')
+            ->build();
+
+        $this->subscriber->onMutationAnalysisWasStarted(
+            new MutationAnalysisWasStarted(),
+        );
+
+        $this->subscriber->onMutationGenerationWasStarted(
+            new MutationGenerationWasStarted(2),
+        );
+
+        $this->subscriber->onAstGenerationWasStarted(
+            new AstGenerationWasStarted($sourceFile1->getRealPath()),
+        );
+        $this->subscriber->onAstGenerationWasFinished(
+            new AstGenerationWasFinished($sourceFile2->getRealPath()),
+        );
+
+        $this->subscriber->onMutationGenerationForFileWasStarted(
+            new MutationGenerationForFileWasStarted(
+                $sourceFile1,
+                $trace1,
+            ),
+        );
+
+        $this->subscriber->onMutationTestingWasStarted(
+            new MutationTestingWasStarted(
+                IterableCounter::UNKNOWN_COUNT,
+                $this->createStub(ProcessRunner::class),
+            ),
+        );
+
+        $this->subscriber->onMutationHeuristicsWasStarted(
+            new MutationHeuristicsWasStarted($mutation1A),
+        );
+
+        $this->subscriber->onMutationHeuristicsWasFinished(
+            new MutationHeuristicsWasFinished($mutation1A, escaped: false),
+        );
+
+        $this->subscriber->onMutationHeuristicsWasStarted(
+            new MutationHeuristicsWasStarted($mutation1B),
+        );
+
+        $this->subscriber->onMutationHeuristicsWasFinished(
+            new MutationHeuristicsWasFinished($mutation1B, escaped: true),
+        );
+
+        $this->subscriber->onMutantProcessWasFinished(
+            new MutantProcessWasFinished(
+                MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withMutantHash($mutation1B->getHash())
+                    ->build(),
+            ),
+        );
+
+        $this->subscriber->onMutationGenerationForFileWasFinished(
+            new MutationGenerationForFileWasFinished(
+                $sourceFile1->getRealPath(),
+                [
+                    $mutation1A->getHash(),
+                    $mutation1B->getHash(),
+                ],
+            ),
+        );
+
+        $this->subscriber->onAstGenerationWasStarted(
+            new AstGenerationWasStarted($sourceFile2->getRealPath()),
+        );
+        $this->subscriber->onAstGenerationWasFinished(
+            new AstGenerationWasFinished($sourceFile2->getRealPath()),
+        );
+
+        $this->subscriber->onMutationGenerationForFileWasStarted(
+            new MutationGenerationForFileWasStarted(
+                $sourceFile2,
+                $trace2,
+            ),
+        );
+
+        $this->subscriber->onMutationHeuristicsWasStarted(
+            new MutationHeuristicsWasStarted($mutation2A),
+        );
+
+        $this->subscriber->onMutationHeuristicsWasFinished(
+            new MutationHeuristicsWasFinished($mutation2A, escaped: false),
+        );
+
+        $this->subscriber->onMutationTestingWasFinished(
+            new MutationTestingWasFinished(),
+        );
+
+        $this->subscriber->onMutationGenerationForFileWasFinished(
+            new MutationGenerationForFileWasFinished(
+                $sourceFile2->getRealPath(),
+                [$mutation2A->getHash()],
+            ),
+        );
+
+        $this->subscriber->onMutationGenerationWasFinished(
+            new MutationGenerationWasFinished(),
+        );
+
+        $this->subscriber->onMutationAnalysisWasFinished(
+            new MutationAnalysisWasFinished(),
+        );
     }
 
     private function configureSnapshots(Snapshot ...$snapshots): void

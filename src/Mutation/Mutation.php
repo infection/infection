@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\TestFramework\Tracing\Trace\Trace;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
-use Infection\TestFramework\Coverage\Trace;
 use function md5;
 use PhpParser\Node;
 use PhpParser\Token;
@@ -82,7 +82,6 @@ class Mutation
         private readonly array $tests,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
-        public readonly Trace $trace,   // Technically we only need the trace ID
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 

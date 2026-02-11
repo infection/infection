@@ -55,6 +55,8 @@ use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasStarted;
@@ -79,7 +81,7 @@ use Infection\Telemetry\Tracing\Tracer;
 /**
  * @internal
  */
-final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, MutantProcessWasFinishedSubscriber
 {
     private SpanBuilder $artefactCollectionSpan;
 
@@ -268,5 +270,10 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         }
 
         $this->tracer->endSpan(...$spansToFinish);
+    }
+
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        // TODO: Implement onMutantProcessWasFinished() method.
     }
 }

@@ -126,8 +126,7 @@ class FileMutationGenerator
     ): iterable {
         $this->eventDispatcher->dispatch(
             new MutationGenerationForFileWasFinished(
-                $sourceFile,
-                $trace,
+                $sourceFile->getRealPath(),
             ),
         );
 
