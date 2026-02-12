@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\PhpParser\LabelParser\LabelParser;
 use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AssignLabelsToNodesVisitor\AssignLabelsToNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
@@ -84,19 +86,51 @@ abstract class VisitorTestCase extends TestCase
     /**
      * @param Node[]|Node $nodeOrNodes
      *
-     * @return array<positive-int|0, Node>
+     * @return array<string, Node>
+     */
+    final protected function labelNodes(array|Node $nodeOrNodes): array
+    {
+        $nodes = (array) $nodeOrNodes;
+
+        $labelParser = new LabelParser();
+        $parsedLabels = $labelParser->parseLabelsFromNodes($nodes);
+
+        $visitor = new AssignLabelsToNodesVisitor($parsedLabels);
+        $nodeTraverser = new NodeTraverser($visitor);
+        $nodeTraverser->traverse($nodes);
+
+        return $visitor->getLabeledNodes();
+    }
+
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     *
+     * @return array<positive-int|0|string, Node>
      */
     final protected function addIdsToNodes(array|Node $nodeOrNodes): array
     {
         $nodes = (array) $nodeOrNodes;
-        $visitor = new AddIdToTraversedNodesVisitor();
 
-        $nodeTraverser = new NodeTraverser(
-            $visitor,
-        );
+        // Add numeric IDs
+        $idVisitor = new AddIdToTraversedNodesVisitor();
+        $nodeTraverser = new NodeTraverser($idVisitor);
+        $nodeTraverser->traverse($nodes);
+        $nodesById = $idVisitor->getNodesById();
+
+        // Parse and assign labels
+        $labelParser = new LabelParser();
+        $parsedLabels = $labelParser->parseLabelsFromNodes($nodes);
+
+        if ($parsedLabels->isEmpty()) {
+            return $nodesById;
+        }
+
+        $labelVisitor = new AssignLabelsToNodesVisitor($parsedLabels);
+        $nodeTraverser = new NodeTraverser($labelVisitor);
         $nodeTraverser->traverse($nodes);
 
-        return $visitor->getNodesById();
+        // Merge: labeled nodes appear under both numeric ID and label key
+        return array_merge($nodesById, $labelVisitor->getLabeledNodes());
     }
 
     /**
