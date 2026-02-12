@@ -47,16 +47,20 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriberFactory impl
         private bool $skipProgressBar,
         private bool $debug,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return $this->skipProgressBar
-            ? new CiInitialStaticAnalysisRunConsoleLoggerSubscriber($this->staticAnalysisToolAdapter, $output)
+            ? new CiInitialStaticAnalysisRunConsoleLoggerSubscriber(
+                $this->staticAnalysisToolAdapter,
+                $this->output,
+            )
             : new InitialStaticAnalysisRunConsoleLoggerSubscriber(
                 $this->staticAnalysisToolAdapter,
-                $output,
+                $this->output,
                 $this->debug,
             );
     }

@@ -38,7 +38,6 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\SubscriberRegisterer;
-use Infection\Tests\Fixtures\Console\FakeOutput;
 use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
 use Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -71,7 +70,7 @@ final class SubscriberRegistererTest extends TestCase
         // Sanity check
         $this->assertCount(0, $this->eventDispatcher->getSubscribers());
 
-        $registerer->registerSubscribers(new FakeOutput());
+        $registerer->registerSubscribers();
 
         $this->assertSame(
             [
@@ -93,7 +92,7 @@ final class SubscriberRegistererTest extends TestCase
         // Sanity check
         $this->assertCount(0, $this->eventDispatcher->getSubscribers());
 
-        $registerer->registerSubscribers(new FakeOutput());
+        $registerer->registerSubscribers();
 
         $this->assertCount(0, $this->eventDispatcher->getSubscribers());
     }

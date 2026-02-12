@@ -57,7 +57,7 @@ final class ProcessQueueTest extends TestCase
     public function test_queue_is_not_empty_after_enqueue(): void
     {
         $queue = new ProcessQueue();
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
 
         $queue->enqueue($container);
 
@@ -67,8 +67,8 @@ final class ProcessQueueTest extends TestCase
     public function test_dequeue_returns_enqueued_items_in_fifo_order(): void
     {
         $queue = new ProcessQueue();
-        $container1 = $this->createMock(MutantProcessContainer::class);
-        $container2 = $this->createMock(MutantProcessContainer::class);
+        $container1 = $this->createStub(MutantProcessContainer::class);
+        $container2 = $this->createStub(MutantProcessContainer::class);
 
         $queue->enqueue($container1);
         $queue->enqueue($container2);
@@ -100,7 +100,7 @@ final class ProcessQueueTest extends TestCase
     {
         $queue = new ProcessQueue();
 
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -123,8 +123,8 @@ final class ProcessQueueTest extends TestCase
         $queue = new ProcessQueue();
 
         // Fill queue to capacity
-        $queue->enqueue($this->createMock(MutantProcessContainer::class));
-        $queue->enqueue($this->createMock(MutantProcessContainer::class));
+        $queue->enqueue($this->createStub(MutantProcessContainer::class));
+        $queue->enqueue($this->createStub(MutantProcessContainer::class));
 
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->never())
@@ -142,9 +142,9 @@ final class ProcessQueueTest extends TestCase
         $queue = new ProcessQueue();
 
         // Fill queue beyond capacity
-        $queue->enqueue($this->createMock(MutantProcessContainer::class));
-        $queue->enqueue($this->createMock(MutantProcessContainer::class));
-        $queue->enqueue($this->createMock(MutantProcessContainer::class));
+        $queue->enqueue($this->createStub(MutantProcessContainer::class));
+        $queue->enqueue($this->createStub(MutantProcessContainer::class));
+        $queue->enqueue($this->createStub(MutantProcessContainer::class));
 
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->never())
@@ -162,9 +162,9 @@ final class ProcessQueueTest extends TestCase
         $queue = new ProcessQueue();
 
         // Add one item
-        $queue->enqueue($this->createMock(MutantProcessContainer::class));
+        $queue->enqueue($this->createStub(MutantProcessContainer::class));
 
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -185,7 +185,7 @@ final class ProcessQueueTest extends TestCase
         $clockMock = $this->createMock(TimeSpy::class);
         $queue = new ProcessQueue($clockMock);
 
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -216,7 +216,7 @@ final class ProcessQueueTest extends TestCase
         $clockMock = $this->createMock(TimeSpy::class);
         $queue = new ProcessQueue($clockMock);
 
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -242,7 +242,7 @@ final class ProcessQueueTest extends TestCase
     {
         $queue = new ProcessQueue();
 
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -260,7 +260,7 @@ final class ProcessQueueTest extends TestCase
     {
         $queue = new ProcessQueue();
 
-        $container = $this->createMock(MutantProcessContainer::class);
+        $container = $this->createStub(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')

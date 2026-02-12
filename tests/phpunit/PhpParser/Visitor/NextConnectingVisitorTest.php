@@ -39,6 +39,7 @@ use function array_map;
 use function explode;
 use function implode;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -699,6 +700,32 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 )
                 AST,
         ];
+    }
+
+    public function test_it_can_provide_the_next_node(): void
+    {
+        $nodes = $this->parse(
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                $b = 2;
+                PHP,
+        );
+
+        $this->addIdsToNodes($nodes);
+        (new NodeTraverser(
+            new NextConnectingVisitor(),
+        ))->traverse($nodes);
+
+        $expressionA = $nodes[0];
+        $this->assertInstanceOf(Expression::class, $expressionA);
+
+        $expressionB = $nodes[1];
+        $this->assertInstanceOf(Expression::class, $expressionB);
+
+        $this->assertTrue(NextConnectingVisitor::hasNextNode($expressionA));
+        $this->assertFalse(NextConnectingVisitor::hasNextNode($expressionB));
     }
 
     private function removePhpComments(string $code): string
