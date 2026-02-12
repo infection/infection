@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
