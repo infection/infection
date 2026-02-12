@@ -302,4 +302,50 @@ final class StrTest extends TestCase
 
         yield 'overlong encoding' => ["Test\xC0\x80", 'Test??'];
     }
+
+    #[DataProvider('indentProvider')]
+    public function test_it_can_indent_each_line_of_the_value(
+        string $value,
+        string $indent,
+        string $expected,
+    ): void {
+        $actual = Str::indent($value, $indent);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function indentProvider(): iterable
+    {
+        yield 'nominal' => [
+            <<<'EOF'
+                a
+                b
+                c
+                EOF,
+            '  ',
+            <<<'EOF'
+                  a
+                  b
+                  c
+                EOF,
+        ];
+
+        yield 'with blank lines' => [
+            <<<'EOF'
+                a
+
+                b
+
+                c
+                EOF,
+            '  ',
+            <<<'EOF'
+                  a
+
+                  b
+
+                  c
+                EOF,
+        ];
+    }
 }
