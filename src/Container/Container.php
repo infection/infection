@@ -114,6 +114,7 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Reporter\FederatedReporter;
+use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
@@ -431,15 +432,20 @@ final class Container extends DIContainer
                 ]),
             ),
             MutationTestingConsoleLoggerSubscriber::class => static function (self $container): MutationTestingConsoleLoggerSubscriber {
+                $output = $container->getOutput();
                 $config = $container->getConfiguration();
 
                 return new MutationTestingConsoleLoggerSubscriber(
-                    $container->getOutput(),
+                    $output,
                     $container->getMutationAnalysisLogger(),
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
-                    $container->getReporter(),
+                    new FileLocationReporter(
+                        $container->getReporter(),
+                        $output,
+                        $config->numberOfShownMutations,
+                    ),
                     $config->numberOfShownMutations,
                     !$config->mutateOnlyCoveredCode(),
                     $config->timeoutsAsEscaped,
