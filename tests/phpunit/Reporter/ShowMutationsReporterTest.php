@@ -453,7 +453,7 @@ final class ShowMutationsReporterTest extends TestCase
         $diffColorizerMock
             ->method('colorize')
             ->willReturnCallback(
-                static fn (string $diff) => sprintf(
+                static fn (string $diff): string => sprintf(
                     'colorized(%s%s%s)',
                     "\n",
                     Str::indent($diff, '    '),
