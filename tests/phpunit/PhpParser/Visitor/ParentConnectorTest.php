@@ -36,61 +36,214 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\ParentConnector;
-use InvalidArgumentException;
-use PhpParser\Node\Stmt\Nop;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
+use LogicException;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Stmt\Function_;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ParentConnector::class)]
-final class ParentConnectorTest extends TestCase
+final class ParentConnectorTest extends VisitorTestCase
 {
-    public function test_it_can_provide_the_node_parent(): void
-    {
-        $parent = new Nop();
+    use ExpectsThrowables;
 
-        $node = new Nop(['parent' => $parent]);
+    /**
+     * This test is to ensure the integration of ParentConnectingVisitor works as expected.
+     */
+    #[CoversNothing]
+    #[DataProvider('nodeProvider')]
+    public function test_it_annotates_the_parent_nodes(
+        string $code,
+        string $expected,
+    ): void {
+        $nodes = $this->parser->parse($code);
 
-        $this->assertSame($parent, ParentConnector::getParent($node));
-        $this->assertSame($parent, ParentConnector::findParent($node));
+        $this->addIdsToNodes($nodes);
+        (new NodeTraverser(
+            new ParentConnectingVisitor(),
+        ))->traverse($nodes);
+
+        $actual = $this->dumper->dump($nodes, onlyVisitedNodes: false);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_look_for_the_node_parent(): void
+    public static function nodeProvider(): iterable
     {
-        $parent = new Nop();
+        yield [
+            <<<'PHP'
+                <?php
 
-        $node1 = new Nop(['parent' => $parent]);
-        $node2 = new Nop(['parent' => null]);
-        $node3 = new Nop();
+                declare(strict_types=1);
 
-        $this->assertSame($parent, ParentConnector::findParent($node1));
-        $this->assertNull(ParentConnector::findParent($node2));
-        $this->assertNull(ParentConnector::findParent($node3));
+                namespace Infection\Tests\Virtual;
+
+                if ('mock' === $GLOBALS['mode']) {
+                    return;
+                }
+
+                class Greeter {
+                    function greet(): void {
+                        echo 'Hello world!';
+                    }
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                )
+                                value: Scalar_Int(
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                )
+                                nodeId: 1
+                                parent: nodeId(0)
+                            )
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 5
+                            parent: nodeId(4)
+                        )
+                        stmts: array(
+                            0: Stmt_If(
+                                cond: Expr_BinaryOp_Identical(
+                                    left: Scalar_String(
+                                        kind: KIND_SINGLE_QUOTED (1)
+                                        rawValue: 'mock'
+                                        nodeId: 8
+                                        parent: nodeId(7)
+                                    )
+                                    right: Expr_ArrayDimFetch(
+                                        var: Expr_Variable(
+                                            nodeId: 10
+                                            parent: nodeId(9)
+                                        )
+                                        dim: Scalar_String(
+                                            kind: KIND_SINGLE_QUOTED (1)
+                                            rawValue: 'mode'
+                                            nodeId: 11
+                                            parent: nodeId(9)
+                                        )
+                                        nodeId: 9
+                                        parent: nodeId(7)
+                                    )
+                                    nodeId: 7
+                                    parent: nodeId(6)
+                                )
+                                stmts: array(
+                                    0: Stmt_Return(
+                                        nodeId: 12
+                                        parent: nodeId(6)
+                                    )
+                                )
+                                nodeId: 6
+                                parent: nodeId(4)
+                            )
+                            1: Stmt_Class(
+                                name: Identifier(
+                                    nodeId: 14
+                                    parent: nodeId(13)
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 16
+                                            parent: nodeId(15)
+                                        )
+                                        returnType: Identifier(
+                                            nodeId: 17
+                                            parent: nodeId(15)
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Echo(
+                                                exprs: array(
+                                                    0: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'Hello world!'
+                                                        nodeId: 19
+                                                        parent: nodeId(18)
+                                                    )
+                                                )
+                                                nodeId: 18
+                                                parent: nodeId(15)
+                                            )
+                                        )
+                                        nodeId: 15
+                                        parent: nodeId(13)
+                                    )
+                                )
+                                nodeId: 13
+                                parent: nodeId(4)
+                            )
+                        )
+                        kind: 1
+                        nodeId: 4
+                    )
+                )
+                AST,
+        ];
     }
 
-    public function test_it_cannot_provide_the_node_parent_if_has_not_be_set_yet(): void
+    public function test_it_can_provide_the_parent_node(): void
     {
-        $node = new Nop();
+        $nodes = $this->parser->parse(
+            <<<'PHP'
+                <?php
 
-        $this->expectException(InvalidArgumentException::class);
+                function greet(): void {
+                    echo 'Hello world!';
+                }
 
-        // We are not interested in a more helpful message here since it would be the result of
-        // a misconfiguration on our part rather than a user one. Plus this would require some
-        // extra processing on a part which is quite a hot path.
+                PHP,
+        );
 
-        ParentConnector::getParent($node);
-    }
+        $this->addIdsToNodes($nodes);
+        (new NodeTraverser(
+            new ParentConnectingVisitor(),
+        ))->traverse($nodes);
 
-    public function test_it_can_set_a_node_parent(): void
-    {
-        $parent = new Nop();
-        $node = new Nop();
+        $functionNode = $nodes[0];
+        $this->assertInstanceOf(Function_::class, $functionNode);
 
-        ParentConnector::setParent($node, $parent);
+        $this->assertNull(
+            ParentConnector::findParent($functionNode),
+            'Expected a root node to not have any parent.',
+        );
 
-        $this->assertSame($parent, ParentConnector::getParent($node));
+        $failure = $this->expectToThrow(
+            static fn () => ParentConnector::getParent($functionNode),
+        );
+        $this->assertInstanceOf(LogicException::class, $failure);
+        $this->assertSame(
+            'Expected a value to be true. Got: false',
+            $failure->getMessage(),
+        );
 
-        ParentConnector::setParent($node, null);
+        $this->assertNull(
+            ParentConnector::findParent($functionNode),
+            'Expected a root node to not have any parent.',
+        );
 
-        $this->assertNull(ParentConnector::findParent($node));
+        $functionName = $functionNode->name;
+        $this->assertInstanceOf(Identifier::class, $functionName);
+
+        $this->assertSame($functionNode, ParentConnector::getParent($functionName));
+        $this->assertSame($functionNode, ParentConnector::findParent($functionName));
     }
 }
