@@ -55,6 +55,11 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
     /** @var list<Node|null> */
     private array $previousStack = [];
 
+    public static function hasNextNode(Node $node): bool
+    {
+        return $node->hasAttribute(self::NEXT_ATTRIBUTE);
+    }
+
     /**
      * {@inheritDoc}
      */

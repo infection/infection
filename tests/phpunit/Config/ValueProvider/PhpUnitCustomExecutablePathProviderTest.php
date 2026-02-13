@@ -64,7 +64,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 
         $this->provider = new PhpUnitCustomExecutablePathProvider(
             $this->finderMock,
-            $this->createMock(ConsoleHelper::class),
+            $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
         );
     }

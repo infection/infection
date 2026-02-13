@@ -64,7 +64,7 @@ final class SourceCollectorFactoryTest extends TestCase
         Exception|string $exceptionOrExpectedCollectorClassName,
     ): void {
         $factory = new SourceCollectorFactory(
-            $this->createMock(Git::class),
+            $this->createStub(Git::class),
         );
 
         if ($exceptionOrExpectedCollectorClassName instanceof Exception) {
