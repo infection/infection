@@ -90,7 +90,7 @@ final class ShowMutationsReporterTest extends TestCase
         );
         $reporter->report();
 
-        $actual = $this->output->fetch();
+        $actual = Str::toUnixLineEndings($this->output->fetch());
 
         $this->assertSame($expected, $actual);
     }
