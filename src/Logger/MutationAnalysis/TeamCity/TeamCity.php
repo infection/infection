@@ -130,8 +130,8 @@ final readonly class TeamCity
         if ($messageName !== MessageName::TEST_FINISHED) {
             unset($attributes['details']);
             [$from, $to] = $this->differ->diffToArray(
-                from: $executionResult->getMutatedCode(),
-                to: $executionResult->getOriginalCode(),
+                from: $executionResult->getOriginalCode(),
+                to: $executionResult->getMutatedCode(),
             );
 
             $attributes['type'] = 'comparisonFailure';
