@@ -357,6 +357,190 @@ final class ShowMutationsReporterTest extends TestCase
 
                 DISPLAY,
         ];
+
+        yield 'all mutations shown with unlimited budget (null)' => [
+            self::createResultForStatuses('/path/to/file1.php', 3),
+            null,
+            true,
+            true,
+            <<<'DISPLAY'
+
+                Escaped mutants:
+                ================
+
+
+                1) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation0
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                2) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation1
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                3) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation2
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                Not covered mutants:
+                ====================
+
+
+                1) /path/to/file1.php:10    [M] CustomMutator [ID] notCoveredMutation0
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                2) /path/to/file1.php:10    [M] CustomMutator [ID] notCoveredMutation1
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                3) /path/to/file1.php:10    [M] CustomMutator [ID] notCoveredMutation2
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                Timed out mutants:
+                ==================
+
+
+                1) /path/to/file1.php:10    [M] CustomMutator [ID] timedOutMutation0
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                2) /path/to/file1.php:10    [M] CustomMutator [ID] timedOutMutation1
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                3) /path/to/file1.php:10    [M] CustomMutator [ID] timedOutMutation2
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                DISPLAY,
+        ];
+
+        yield 'budget exhausted in second section' => [
+            self::createResultForStatuses('/path/to/file1.php', 2),
+            3,
+            true,
+            false,
+            <<<'DISPLAY'
+
+                Escaped mutants:
+                ================
+
+
+                1) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation0
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                2) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation1
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                Not covered mutants:
+                ====================
+
+
+                1) /path/to/file1.php:10    [M] CustomMutator [ID] notCoveredMutation0
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                ... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.
+
+                DISPLAY,
+        ];
+
+        yield 'correct omitted count with multiple mutations in single section' => [
+            self::createResultForStatuses('/path/to/file1.php', 5),
+            2,
+            false,
+            false,
+            <<<'DISPLAY'
+
+                Escaped mutants:
+                ================
+
+
+                1) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation0
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                2) /path/to/file1.php:10    [M] CustomMutator [ID] escapedMutation1
+                colorized(
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                )
+
+                ... and 3 more mutants were omitted. Use "--show-mutations=max" to see all of them.
+
+                DISPLAY,
+        ];
     }
 
     private function createReporter(
