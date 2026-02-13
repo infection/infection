@@ -38,6 +38,7 @@ namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 use Infection\Logger\MutationAnalysis\TeamCity\Test;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
+use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutation\MutationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -68,9 +69,10 @@ final class TestTest extends TestCase
             ),
             'a93f8006e20d02d1',
             new Test(
-                'fb9282c1c4fec68667212fb805238bc9',
-                'Infection\Mutator\Boolean\LogicalOr (fb9282c1c4fec68667212fb805238bc9)',
-                '2b4aa030e4a6eead',
+                '<mutationHash>',
+                'Infection\Mutator\Boolean\LogicalOr (<mutationHash>)',
+                'infection://path/to/project/src/Infrastructure/Http/Action/Greet.php::7-42',
+                '6e7c834e2067faa7',
                 'a93f8006e20d02d1',
             ),
         ];
@@ -83,7 +85,9 @@ final class TestTest extends TestCase
         return MutationBuilder::withMinimalTestData()
             ->withOriginalFilePath($sourceFilePath)
             ->withMutatorClass($mutatorClassName)
-            ->withMutatorName(MutatorName::getName($mutatorClassName))
+            ->withHash('<mutationHash>')
+            ->withAttribute('startFilePos', 7)
+            ->withAttribute('endFilePos', 42)
             ->build();
     }
 }

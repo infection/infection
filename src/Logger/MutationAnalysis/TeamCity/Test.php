@@ -52,6 +52,7 @@ final readonly class Test
     public function __construct(
         public string $id,
         public string $name,
+        public string $locationHint,
         public string $nodeId,
         public string $parentNodeId,
     ) {
@@ -64,6 +65,7 @@ final readonly class Test
         return new self(
             id: $mutation->getHash(),
             name: self::createName($mutation),
+            locationHint: self::createLocationHint($mutation),
             // The Mutation hash is too long to be suitable to be a nodeId.
             nodeId: NodeIdFactory::create($mutation->getHash()),
             parentNodeId: $parentNodeId,
@@ -100,6 +102,18 @@ final readonly class Test
             '%s (%s)',
             $mutation->getMutatorClass(),
             $mutation->getHash(),
+        );
+    }
+
+    private static function createLocationHint(Mutation $mutation): string
+    {
+        $attributes = $mutation->getAttributes();
+
+        return sprintf(
+        'infection://%s::%s-%s',
+            $mutation->getOriginalFilePath(),
+            $attributes['startFilePos'],
+            $attributes['endFilePos'],
         );
     }
 

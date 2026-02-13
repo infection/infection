@@ -113,6 +113,7 @@ final readonly class TeamCity
                 'metainfo' => json_encode([
                     'mutationId' => $test->id,
                 ]),
+                'locationHint' => $test->locationHint,
             ],
         );
     }
