@@ -161,10 +161,11 @@ final class TeamCityTest extends TestCase
     {
         yield [
             new Test(
-                '49a5dfcd2f4a0b33d4a02e662812af55',
-                'MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)',
-                'A1',
-                'A',
+                id: '49a5dfcd2f4a0b33d4a02e662812af55',
+                name: 'MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)',
+                locationHint: 'infection:///path/to/project/src/source.php:1-3',
+                nodeId: 'A1',
+                parentNodeId: 'A',
             ),
             "##teamcity[testStarted name='MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='A1' parentNodeId='A' metainfo='{\"mutationId\":\"49a5dfcd2f4a0b33d4a02e662812af55\"}']\n",
         ];
@@ -189,6 +190,7 @@ final class TeamCityTest extends TestCase
         $nominalTest = new Test(
             id: 'mutantHash',
             name: 'Infection\Mutator\Boolean\LogicalAnd (mutantHash)',
+            locationHint: 'infection:///path/to/project/src/source.php:1-3',
             nodeId: '1A',
             parentNodeId: 'A',
         );

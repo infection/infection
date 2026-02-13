@@ -43,9 +43,13 @@ use Infection\Testing\MutatorName;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Token;
+use ReflectionClass;
+use ReflectionProperty;
 
 final class MutationBuilder
 {
+    private ReflectionProperty $hashPropertyReflection;
+
     /**
      * @param Node[] $originalFileAst
      * @param array<string, string|int|float> $attributes
@@ -53,6 +57,7 @@ final class MutationBuilder
      * @param Token[] $originalFileTokens
      */
     private function __construct(
+        private ?string $hash,
         private string $originalFilePath,
         private array $originalFileAst,
         private string $mutatorClass,
@@ -70,6 +75,7 @@ final class MutationBuilder
     public static function from(Mutation $mutation): self
     {
         return new self(
+            $mutation->getHash(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalFileAst(),
             $mutation->getMutatorClass(),
@@ -87,6 +93,7 @@ final class MutationBuilder
     public static function withMinimalTestData(): self
     {
         return new self(
+            hash: null,
             originalFilePath: 'src/Foo.php',
             originalFileAst: [],
             mutatorClass: For_::class,
@@ -111,6 +118,7 @@ final class MutationBuilder
     public static function withCompleteTestData(): self
     {
         return new self(
+            hash: null,
             originalFilePath: '/path/to/src/Foo.php',
             originalFileAst: [new Nop()],
             mutatorClass: For_::class,
@@ -158,6 +166,14 @@ final class MutationBuilder
         );
     }
 
+    public function withHash(string $hash): self
+    {
+        $clone = clone $this;
+        $clone->hash = $hash;
+
+        return $clone;
+    }
+
     public function withOriginalFilePath(string $originalFilePath): self
     {
         $clone = clone $this;
@@ -200,6 +216,14 @@ final class MutationBuilder
     {
         $clone = clone $this;
         $clone->attributes = $attributes;
+
+        return $clone;
+    }
+
+    public function withAttribute(string $key, string|int|float $attribute): self
+    {
+        $clone = clone $this;
+        $clone->attributes[$key] = $attribute;
 
         return $clone;
     }
@@ -260,7 +284,7 @@ final class MutationBuilder
 
     public function build(): Mutation
     {
-        return new Mutation(
+        $mutation = new Mutation(
             $this->originalFilePath,
             $this->originalFileAst,
             $this->mutatorClass,
@@ -273,5 +297,21 @@ final class MutationBuilder
             $this->originalFileTokens,
             $this->originalFileContent,
         );
+
+        if ($this->hash !== null) {
+            $this->getMutationHashPropertyReflection()->setValue(
+                $mutation,
+                $this->hash,
+            );
+        }
+
+        return $mutation;
+    }
+
+    private function getMutationHashPropertyReflection(): ReflectionProperty
+    {
+        $classReflection = new ReflectionClass(Mutation::class);
+
+        return $classReflection->getProperty('hash');
     }
 }
