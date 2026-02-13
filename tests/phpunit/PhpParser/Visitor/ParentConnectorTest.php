@@ -61,7 +61,7 @@ final class ParentConnectorTest extends VisitorTestCase
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->parser->parse($code);
+        $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
         (new NodeTraverser(
@@ -202,7 +202,7 @@ final class ParentConnectorTest extends VisitorTestCase
 
     public function test_it_can_provide_the_parent_node(): void
     {
-        $nodes = $this->parser->parse(
+        $nodes = $this->parse(
             <<<'PHP'
                 <?php
 
