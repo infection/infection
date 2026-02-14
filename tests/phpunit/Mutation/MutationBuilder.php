@@ -48,7 +48,7 @@ use ReflectionProperty;
 
 final class MutationBuilder
 {
-    private ReflectionProperty $hashPropertyReflection;
+    private ?ReflectionProperty $hashPropertyReflection = null;
 
     /**
      * @param Node[] $originalFileAst
@@ -302,8 +302,12 @@ final class MutationBuilder
 
     private function getMutationHashPropertyReflection(): ReflectionProperty
     {
-        $classReflection = new ReflectionClass(Mutation::class);
+        if ($this->hashPropertyReflection === null) {
+            $classReflection = new ReflectionClass(Mutation::class);
 
-        return $classReflection->getProperty('hash');
+            $this->hashPropertyReflection = $classReflection->getProperty('hash');
+        }
+
+        return $this->hashPropertyReflection;
     }
 }
