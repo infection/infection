@@ -213,8 +213,6 @@ final class ReturnTypeHelperTest extends TestCase
         ];
     }
 
-    // Test removed: hasNextStmtNode() method no longer exists in ReturnTypeHelper
-
     public function test_it_handles_method_return_types(): void
     {
         // Test with a class method
