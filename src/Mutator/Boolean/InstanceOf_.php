@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
@@ -81,7 +81,7 @@ final class InstanceOf_ implements Mutator
 
         Assert::isInstanceOf($node, Node\Expr\Instanceof_::class);
 
-        $parentNode = ParentConnector::findParent($node);
+        $parentNode = NodeAnnotator::findParent($node);
 
         if ($parentNode instanceof Node\Arg) {
             yield new Node\Expr\ConstFetch(new Node\Name('true'));
@@ -109,13 +109,13 @@ final class InstanceOf_ implements Mutator
         }
 
         // prevent double negation, e.g. "!! $example instanceof Example"
-        return !(ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot);
+        return !(NodeAnnotator::findParent($node) instanceof Node\Expr\BooleanNot);
     }
 
     private function isArgumentOfAssertFunction(Node\Expr\Instanceof_ $node): bool
     {
-        $parentNode = ParentConnector::findParent($node);
-        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
+        $parentNode = NodeAnnotator::findParent($node);
+        $grandParentNode = $parentNode !== null ? NodeAnnotator::findParent($parentNode) : null;
 
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return false;

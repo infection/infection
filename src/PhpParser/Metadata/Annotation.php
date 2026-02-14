@@ -33,38 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
-
-use Infection\CannotBeInstantiated;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
+namespace Infection\PhpParser\Metadata;
 
 /**
+ * Enumeration of the attributes that can be set/found on the nodes.
+ *
  * @internal
  */
-final class ParentConnector
+enum Annotation: string
 {
-    use CannotBeInstantiated;
-
-    private const PARENT_ATTRIBUTE = 'parent';
-
-    public static function setParent(Node $node, ?Node $parent): void
-    {
-        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
-    }
-
-    /**
-     * @psalm-mutation-free
-     */
-    public static function getParent(Node $node): Node
-    {
-        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
-
-        return $node->getAttribute(self::PARENT_ATTRIBUTE);
-    }
-
-    public static function findParent(Node $node): ?Node
-    {
-        return $node->getAttribute(self::PARENT_ATTRIBUTE);
-    }
+    case IS_STRICT_TYPES = 'isStrictTypes';
+    case REFLECTION_CLASS = 'reflectionClass';
+    case IS_INSIDE_FUNCTION = 'isInsideFunction';
+    case IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
+    case FUNCTION_SCOPE = 'functionScope';
+    case FUNCTION_NAME = 'functionName';
+    case NEXT_NODE = 'next';
+    case PARENT_NODE = 'parent';
+    case RESOLVED_NAME = 'resolvedName';
+    case NAMESPACED_NAME = 'namespacedName';
 }

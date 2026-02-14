@@ -40,7 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeAttributes;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -90,7 +90,7 @@ final class Increment implements Mutator
             return false;
         }
 
-        $parentNode = ParentConnector::findParent($node);
+        $parentNode = NodeAnnotator::findParent($node);
 
         return !$parentNode instanceof Node\Stmt\For_;
     }

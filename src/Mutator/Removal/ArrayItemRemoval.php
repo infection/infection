@@ -42,7 +42,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use function min;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
@@ -134,7 +134,7 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
             return false;
         }
 
-        $parent = ParentConnector::findParent($node);
+        $parent = NodeAnnotator::findParent($node);
 
         if ($parent instanceof Node\Expr\Assign
             && $parent->var instanceof Node\Expr\List_
@@ -144,7 +144,7 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
         }
 
         if ($parent instanceof Node\Arg) {
-            $grandParent = ParentConnector::findParent($parent);
+            $grandParent = NodeAnnotator::findParent($parent);
 
             if ($grandParent instanceof Node\Attribute) {
                 return false;

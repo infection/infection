@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\NameResolver;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\Annotation;
 use Infection\Reflection\CoreClassReflection;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,7 +49,7 @@ final class NameResolverTest extends TestCase
     {
         $name = new Node\Name('self');
         $name->setAttribute(
-            ReflectionVisitor::REFLECTION_CLASS_KEY,
+            Annotation::REFLECTION_CLASS->value,
             CoreClassReflection::fromClassName(self::class),
         );
 

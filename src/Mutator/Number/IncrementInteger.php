@@ -39,7 +39,7 @@ use function array_key_exists;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use const PHP_INT_MAX;
 use PhpParser\Node;
 
@@ -76,7 +76,7 @@ final class IncrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node): iterable
     {
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         $value = $node->value + 1;
 
@@ -98,7 +98,7 @@ final class IncrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         // We cannot increment largest positive integer, but we can do that for a negative integer
         if ($node->value === PHP_INT_MAX && !$parentNode instanceof Node\Expr\UnaryMinus) {
@@ -129,19 +129,19 @@ final class IncrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         if (!$parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
 
-        $parentNode = ParentConnector::getParent($parentNode);
+        $parentNode = NodeAnnotator::getParent($parentNode);
 
         if (!$parentNode instanceof Node\Arg) {
             return false;
         }
 
-        $parentNode = ParentConnector::getParent($parentNode);
+        $parentNode = NodeAnnotator::getParent($parentNode);
 
         return $parentNode instanceof Node\Expr\FuncCall
             && $parentNode->name instanceof Node\Name
@@ -155,7 +155,7 @@ final class IncrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         if (!$parentNode instanceof Node\Expr\BinaryOp) {
             return true;
