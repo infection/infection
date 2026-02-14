@@ -1216,12 +1216,6 @@ parameters:
 			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
 			identifier: method.internal
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProviderTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 
 		-
@@ -1253,12 +1247,6 @@ parameters:
 			identifier: div.rightNonNumeric
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
@@ -1361,24 +1349,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestingUtility/Iterable/YieldOnceIteratorTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowablesTest.php
 
 		-
 			rawMessage: Variable property access on PhpParser\Node.
