@@ -61,4 +61,13 @@ final class MutationBuilderTest extends TestCase
             MutationBuilder::withCompleteTestData()->build(),
         ];
     }
+
+    public function test_it_can_build_a_mutation_with_a_specific_hash(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('MyHash!')
+            ->build();
+
+        $this->assertSame('MyHash!', $mutation->getHash());
+    }
 }
