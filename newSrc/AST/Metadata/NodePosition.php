@@ -33,18 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\Metadata;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\Node;
+
+final readonly class NodePosition
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function __construct(
+        public int $startLine,
+        public int $startTokenPosition,
+        public int $endLine,
+        public int $endTokenPosition,
+    ) {
+    }
+
+    public static function create(Node $node): self
     {
+        return new self(
+            $node->getStartLine(),
+            $node->getStartTokenPos(),
+            $node->getEndLine(),
+            $node->getEndTokenPos(),
+        );
     }
 }

@@ -33,18 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Engine;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\Mutagenesis\Mutation;
+use newSrc\MutationAnalyzer\MutantExecutionResult;
+use PhpParser\Node;
+use SplFileInfo;
+
+final class Envelope
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @param Node[]|null $ast
+     */
+    public function __construct(
+        public readonly SplFileInfo $file,
+        private ?array $ast = null,
+        private ?Mutation $mutation = null,
+        private ?MutantExecutionResult $executionResult = null,
+    ) {
+    }
+
+    public static function create(SplFileInfo $file): self
     {
+        return new self($file);
+    }
+
+    /**
+     * @param Node[] $ast
+     */
+    public function withAst(array $ast): self
+    {
+        $this->ast = $ast;
+
+        return $this;
+    }
+
+    public function forMutation(Mutation $mutation): self
+    {
+        $clone = clone $this;
+        $clone->mutation = $mutation;
+
+        return $clone;
+    }
+
+    public function withResult(MutantExecutionResult $executionResult): self
+    {
+        $this->executionResult = $executionResult;
+
+        return $this;
     }
 }
