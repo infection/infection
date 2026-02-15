@@ -118,6 +118,7 @@ use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
@@ -439,16 +440,20 @@ final class Container extends DIContainer
                     $output,
                     $container->getMutationAnalysisLogger(),
                     $container->getMetricsCalculator(),
-                    $container->getResultsCollector(),
-                    $container->getDiffColorizer(),
+                    new ShowMutationsReporter(
+                        $output,
+                        $container->getResultsCollector(),
+                        $container->getDiffColorizer(),
+                        $config->numberOfShownMutations,
+                        !$config->mutateOnlyCoveredCode(),
+                        $config->timeoutsAsEscaped,
+                    ),
                     new FileLocationReporter(
                         $container->getReporter(),
                         $output,
                         $config->numberOfShownMutations,
                     ),
-                    $config->numberOfShownMutations,
                     !$config->mutateOnlyCoveredCode(),
-                    $config->timeoutsAsEscaped,
                 );
             },
             PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
