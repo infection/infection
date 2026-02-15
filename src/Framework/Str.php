@@ -99,8 +99,8 @@ final class Str
     }
 
     /**
-     * Trims the whitespace from the end of all lines and removes the leading and trailing blank lines. Line
-     * endings are replaced by the unix line endings.
+     * Trims the whitespace from the end of all lines and removes the leading and trailing blank
+     * lines. Line endings are replaced by the unix line endings.
      */
     public static function cleanForDisplay(string $value): string
     {
@@ -133,6 +133,23 @@ final class Str
         $utf8String = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
 
         return $utf8String;
+    }
+
+    /**
+     * Adds the indent to each line of the value. It assumes the input has
+     * unix line endings.
+     */
+    public static function indent(string $value, string $indent): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                static fn (string $line): string => $line === ''
+                    ? ''
+                    : $indent . $line,
+                explode("\n", $value),
+            ),
+        );
     }
 
     /**

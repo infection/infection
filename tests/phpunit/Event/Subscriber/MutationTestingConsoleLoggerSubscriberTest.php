@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
@@ -43,7 +42,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Reporter\Reporter;
@@ -69,13 +67,10 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     private MockObject&MetricsCalculator $metricsCalculator;
 
-    private MockObject&ResultsCollector $resultsCollector;
-
     protected function setUp(): void
     {
         $this->logger = $this->createMock(MutationAnalysisLogger::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $this->resultsCollector = $this->createMock(ResultsCollector::class);
     }
 
     public function test_it_reacts_on_mutation_testing_started(): void
@@ -89,12 +84,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            0,
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $processRunner = $this->createStub(ProcessRunner::class);
@@ -117,12 +109,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            0,
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(
@@ -143,94 +132,18 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            0,
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
-    }
-
-    public function test_it_outputs_escaped_and_uncovered_mutants_when_mutation_testing_is_finished(): void
-    {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $escapedExecutionResult = $this->createMock(MutantExecutionResult::class);
-        $escapedExecutionResult->expects($this->once())
-            ->method('getOriginalFilePath')
-            ->willReturn('/original/filePath');
-
-        $escapedExecutionResult->expects($this->once())
-            ->method('getOriginalStartingLine')
-            ->willReturn(10);
-
-        $escapedExecutionResult->expects($this->once())
-            ->method('getMutatorName')
-            ->willReturn('Plus');
-
-        $escapedExecutionResult->expects($this->once())
-            ->method('getMutantHash')
-            ->willReturn('h4sh');
-
-        $this->resultsCollector->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([$escapedExecutionResult]);
-
-        $notCoveredExecutionResult = $this->createStub(MutantExecutionResult::class);
-
-        $this->resultsCollector->expects($this->once())
-            ->method('getNotCoveredExecutionResults')
-            ->willReturn([$notCoveredExecutionResult]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
-            new NullReporter(),
-            20,
-            withUncovered: true,
-            withTimeouts: false,
-        ));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $resultOutput = $this->getDisplay($output);
-
-        $this->assertStringContainsString(
-            "\nEscaped mutants:\n================\n",
-            $resultOutput,
-        );
-
-        $this->assertStringContainsString(
-            "\n\n\n1) /original/filePath:10    [M] Plus [ID] h4sh\n",
-            $resultOutput,
-        );
-
-        $this->assertStringContainsString(
-            "\n\n" . 'Please note that some mutants will inevitably be harmless (i.e. false positives).',
-            $resultOutput,
-        );
-
-        $this->assertStringContainsString(
-            "\nNot covered mutants:\n====================\n",
-            $resultOutput,
-        );
     }
 
     public function test_it_does_not_output_escaped_mutants_when_mutation_testing_is_finished_with_no_escaped_mutants(): void
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        // important metrics, always rendered
-        $this->resultsCollector->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([]);
         $this->metricsCalculator
             ->method('getKilledByTestsCount')
             ->willReturn(0);
@@ -265,12 +178,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $output,
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            20,
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -331,10 +241,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
         // important metrics, always rendered
-        $this->resultsCollector
-            ->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([]);
         $this->metricsCalculator
             ->method('getKilledByTestsCount')
             ->willReturn(2);
@@ -369,12 +275,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $output,
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            20,
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -429,6 +332,11 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_calls_the_reporter_when_the_mutation_testing_is_finished(): void
     {
+        $showMutationsReporterMock = $this->createMock(Reporter::class);
+        $showMutationsReporterMock
+            ->expects($this->once())
+            ->method('report');
+
         $reporterMock = $this->createMock(Reporter::class);
         $reporterMock
             ->expects($this->once())
@@ -438,129 +346,13 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             new NullOutput(),
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
+            $showMutationsReporterMock,
             $reporterMock,
-            0,
             withUncovered: true,
-            withTimeouts: false,
         );
 
         $subscriber->onMutationTestingWasFinished(
             new MutationTestingWasFinished(),
-        );
-    }
-
-    public function test_tip_is_not_displayed_when_show_mutations_option_is_used(): void
-    {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
-            new NullReporter(),
-            20,
-            withUncovered: true,
-            withTimeouts: false,
-        ));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $this->assertStringNotContainsString(
-            "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file reporters.',
-            $this->getDisplay($output),
-        );
-    }
-
-    public function test_mutations_shortened_renders_count_of_omitted(): void
-    {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $executionResult = $this->createMock(MutantExecutionResult::class);
-        $executionResult->expects($this->once())
-            ->method('getOriginalFilePath')
-            ->willReturn('/original/filePath');
-
-        $executionResult->expects($this->once())
-            ->method('getOriginalStartingLine')
-            ->willReturn(10);
-
-        $executionResult->expects($this->once())
-            ->method('getMutatorName')
-            ->willReturn('Plus');
-
-        $this->resultsCollector->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([$executionResult, $executionResult]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
-            new NullReporter(),
-            1,
-            withUncovered: true,
-            withTimeouts: false,
-        ));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $this->assertStringContainsString(
-            "\n\n\n" . '... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.',
-            $this->getDisplay($output),
-        );
-    }
-
-    public function test_without_mutations_limit(): void
-    {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $executionResult = $this->createMock(MutantExecutionResult::class);
-        $executionResult
-            ->expects($this->exactly(3))
-            ->method('getOriginalFilePath')
-            ->willReturn('/original/filePath');
-
-        $executionResult
-            ->expects($this->exactly(3))
-            ->method('getOriginalStartingLine')
-            ->willReturn(10);
-
-        $executionResult
-            ->expects($this->exactly(3))
-            ->method('getMutatorName')
-            ->willReturn('Plus');
-
-        $this->resultsCollector
-            ->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([$executionResult, $executionResult, $executionResult]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
-            new NullReporter(),
-            null,
-            withUncovered: true,
-            withTimeouts: false,
-        ));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $this->assertStringNotContainsString(
-            'mutants were omitted.',
-            $this->getDisplay($output),
         );
     }
 
@@ -575,12 +367,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->createStub(OutputInterface::class),
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            1,
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -591,7 +380,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
         // Setup all the necessary mocks similar to existing tests
-        $this->resultsCollector->method('getEscapedExecutionResults')->willReturn([]);
         $this->metricsCalculator->method('getTotalMutantsCount')->willReturn(10);
         $this->metricsCalculator->method('getKilledByTestsCount')->willReturn(8);
         $this->metricsCalculator->method('getMutationScoreIndicator')->willReturn(80.0);
@@ -611,12 +399,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $output,
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
+            new NullReporter(),
             withUncovered: true,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -633,7 +418,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
         // Setup all the necessary mocks similar to existing tests
-        $this->resultsCollector->method('getEscapedExecutionResults')->willReturn([]);
         $this->metricsCalculator->method('getTotalMutantsCount')->willReturn(10);
         $this->metricsCalculator->method('getKilledByTestsCount')->willReturn(8);
         $this->metricsCalculator->method('getMutationScoreIndicator')->willReturn(80.0);
@@ -653,12 +437,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $output,
             $this->logger,
             $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
             new NullReporter(),
-            20, // Use 20 to ensure getEscapedExecutionResults is called
+            new NullReporter(),
             withUncovered: false,
-            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -668,99 +449,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->assertStringNotContainsString('Mutation Score Indicator (MSI):', $displayOutput);
         $this->assertStringContainsString('Mutation Code Coverage: <high>100%</high>', $displayOutput);
         $this->assertStringContainsString('Covered Code MSI: <high>90%</high>', $displayOutput);
-    }
-
-    public function test_it_does_not_show_timed_out_mutants_by_default(): void
-    {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $this->resultsCollector
-            ->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([]);
-
-        // getTimedOutExecutionResults should NOT be called when withTimeouts is false
-        $this->resultsCollector
-            ->expects($this->never())
-            ->method('getTimedOutExecutionResults');
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
-            new NullReporter(),
-            20,
-            withUncovered: false,
-            withTimeouts: false,
-        ));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $displayOutput = $this->getDisplay($output);
-
-        $this->assertStringNotContainsString('Timed out mutants:', $displayOutput);
-    }
-
-    public function test_it_shows_timed_out_mutants_when_with_timeouts_is_true(): void
-    {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $timedOutExecutionResult = $this->createMock(MutantExecutionResult::class);
-        $timedOutExecutionResult
-            ->expects($this->once())
-            ->method('getOriginalFilePath')
-            ->willReturn('/original/timedout/filePath');
-        $timedOutExecutionResult
-            ->expects($this->once())
-            ->method('getOriginalStartingLine')
-            ->willReturn(42);
-        $timedOutExecutionResult
-            ->expects($this->once())
-            ->method('getMutatorName')
-            ->willReturn('Minus');
-        $timedOutExecutionResult
-            ->expects($this->once())
-            ->method('getMutantHash')
-            ->willReturn('t1m30ut');
-
-        $this->resultsCollector
-            ->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([]);
-
-        $this->resultsCollector
-            ->expects($this->once())
-            ->method('getTimedOutExecutionResults')
-            ->willReturn([$timedOutExecutionResult]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->logger,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->createStub(DiffColorizer::class),
-            new NullReporter(),
-            20,
-            withUncovered: false,
-            withTimeouts: true,
-        ));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $displayOutput = $this->getDisplay($output);
-
-        $this->assertStringContainsString(
-            "\nTimed out mutants:\n==================\n",
-            $displayOutput,
-        );
-        $this->assertStringContainsString(
-            '1) /original/timedout/filePath:42    [M] Minus [ID] t1m30ut',
-            $displayOutput,
-        );
     }
 
     private function getDisplay(StreamOutput $output): string
