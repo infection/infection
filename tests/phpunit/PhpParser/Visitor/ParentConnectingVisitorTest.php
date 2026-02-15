@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use LogicException;
@@ -47,8 +47,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(ParentConnector::class)]
-final class ParentConnectorTest extends VisitorTestCase
+#[CoversClass(NodeAnnotator::class)]
+final class ParentConnectingVisitorTest extends VisitorTestCase
 {
     use ExpectsThrowables;
 
@@ -222,28 +222,28 @@ final class ParentConnectorTest extends VisitorTestCase
         $this->assertInstanceOf(Function_::class, $functionNode);
 
         $this->assertNull(
-            ParentConnector::findParent($functionNode),
+            NodeAnnotator::findParent($functionNode),
             'Expected a root node to not have any parent.',
         );
 
         $failure = $this->expectToThrow(
-            static fn () => ParentConnector::getParent($functionNode),
+            static fn () => NodeAnnotator::getParent($functionNode),
         );
         $this->assertInstanceOf(LogicException::class, $failure);
         $this->assertSame(
-            'Expected a value to be true. Got: false',
+            'Expected to find the attribute "parent". Could not find it for the node: Node(Stmt_Function, 0)',
             $failure->getMessage(),
         );
 
         $this->assertNull(
-            ParentConnector::findParent($functionNode),
+            NodeAnnotator::findParent($functionNode),
             'Expected a root node to not have any parent.',
         );
 
         $functionName = $functionNode->name;
         $this->assertInstanceOf(Identifier::class, $functionName);
 
-        $this->assertSame($functionNode, ParentConnector::getParent($functionName));
-        $this->assertSame($functionNode, ParentConnector::findParent($functionName));
+        $this->assertSame($functionNode, NodeAnnotator::getParent($functionName));
+        $this->assertSame($functionNode, NodeAnnotator::findParent($functionName));
     }
 }

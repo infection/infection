@@ -40,7 +40,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\Annotation;
 use Infection\Reflection\CoreClassReflection;
 use Infection\Testing\MutatorName;
 use Infection\Tests\WithConsecutive;
@@ -107,7 +107,7 @@ final class IgnoreMutatorTest extends TestCase
         $this->nodeMock
             ->expects($this->once())
             ->method('getAttribute')
-            ->with(ReflectionVisitor::REFLECTION_CLASS_KEY)
+            ->with(Annotation::REFLECTION_CLASS->value)
             ->willReturn(null)
         ;
 
@@ -130,8 +130,8 @@ final class IgnoreMutatorTest extends TestCase
             ->method('getAttribute')
             ->with(
                 ...WithConsecutive::create(
-                    [ReflectionVisitor::REFLECTION_CLASS_KEY, null],
-                    [ReflectionVisitor::FUNCTION_NAME, ''],
+                    [Annotation::REFLECTION_CLASS->value, null],
+                    [Annotation::FUNCTION_NAME->value, ''],
                 ),
             )
             ->willReturnOnConsecutiveCalls(

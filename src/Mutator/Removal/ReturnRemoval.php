@@ -40,7 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\ReturnTypeHelper;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -90,12 +90,12 @@ final class ReturnRemoval implements Mutator
         // Check if there's a non-void return type defined
         if ($returnHelper->hasSpecificReturnType()) {
             // For functions with return types, we can remove it only if there's more after this return
-            return NextConnectingVisitor::hasNextNode($node);
+            return NodeAnnotator::hasNextNode($node);
         }
 
         // For functions without return types, we can only remove the return if:
         // 1. There's another statement after it, OR
-        if (NextConnectingVisitor::hasNextNode($node)) {
+        if (NodeAnnotator::hasNextNode($node)) {
             return true;
         }
 

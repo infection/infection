@@ -80,6 +80,8 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Reporter\Http\StrykerCurlClient;
@@ -129,6 +131,7 @@ final class ProjectCodeProvider
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         AdapterInstaller::class,
+        Annotation::class,
         Application::class,
         BaseMutatorTestCase::class,
         BaseOption::class,
@@ -184,6 +187,7 @@ final class ProjectCodeProvider
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
+        NodeAnnotator::class,
     ];
 
     /**

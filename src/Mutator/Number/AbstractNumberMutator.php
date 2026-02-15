@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Number;
 
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -49,14 +49,14 @@ abstract class AbstractNumberMutator implements Mutator
 {
     protected function isPartOfSizeComparison(Node $node): bool
     {
-        $parent = ParentConnector::findParent($node);
+        $parent = NodeAnnotator::findParent($node);
 
         return $this->isSizeComparison($parent);
     }
 
     protected function isPartOfComparison(Node $node): bool
     {
-        $parent = ParentConnector::getParent($node);
+        $parent = NodeAnnotator::getParent($node);
 
         return $this->isComparison($parent);
     }
@@ -68,7 +68,7 @@ abstract class AbstractNumberMutator implements Mutator
         }
 
         if ($node instanceof Node\Expr\UnaryMinus) {
-            return $this->isSizeComparison(ParentConnector::findParent($node));
+            return $this->isSizeComparison(NodeAnnotator::findParent($node));
         }
 
         return $this->isSizeNode($node);
@@ -90,7 +90,7 @@ abstract class AbstractNumberMutator implements Mutator
         }
 
         if ($node instanceof Node\Expr\UnaryMinus) {
-            return $this->isComparison(ParentConnector::findParent($node));
+            return $this->isComparison(NodeAnnotator::findParent($node));
         }
 
         return $node instanceof Node\Expr\BinaryOp\Identical

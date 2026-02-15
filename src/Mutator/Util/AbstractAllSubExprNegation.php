@@ -39,7 +39,7 @@ use function in_array;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeAttributes;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -74,7 +74,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return false;
         }
 
-        $parent = ParentConnector::findParent($node);
+        $parent = NodeAnnotator::findParent($node);
 
         // only grandparent
         if ($parent === null || $parent instanceof $supportedNodeClass) {

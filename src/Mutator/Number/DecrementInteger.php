@@ -39,7 +39,7 @@ use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use function is_string;
 use const PHP_INT_MAX;
 use PhpParser\Node;
@@ -92,7 +92,7 @@ final class DecrementInteger extends AbstractNumberMutator
      */
     public function mutate(Node $node): iterable
     {
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         $value = $node->value - 1;
 
@@ -117,7 +117,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         // We cannot increment PHP_INT_MAX as part of a negative number, leads to parser bugs.
         if ($node->value === PHP_INT_MAX && $parentNode instanceof Node\Expr\UnaryMinus) {
@@ -160,7 +160,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return true;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         /** @var Node\Expr\BinaryOp $parentNode */
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
@@ -226,7 +226,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        return ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch;
+        return NodeAnnotator::getParent($node) instanceof Node\Expr\ArrayDimFetch;
     }
 
     private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
@@ -235,21 +235,21 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        $parentNode = ParentConnector::getParent($node);
+        $parentNode = NodeAnnotator::getParent($node);
 
         if (!$parentNode instanceof Node\Arg) {
             if (!$parentNode instanceof Node\Expr\UnaryMinus) {
                 return false;
             }
 
-            $parentNode = ParentConnector::getParent($node);
+            $parentNode = NodeAnnotator::getParent($node);
 
             if (!$parentNode instanceof Node\Arg) {
                 return false;
             }
         }
 
-        $parentNode = ParentConnector::getParent($parentNode);
+        $parentNode = NodeAnnotator::getParent($parentNode);
 
         return $parentNode instanceof Node\Expr\FuncCall
             && $parentNode->name instanceof Node\Name

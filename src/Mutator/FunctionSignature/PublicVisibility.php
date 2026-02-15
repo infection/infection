@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\Reflection\Visibility;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
@@ -106,7 +106,7 @@ final class PublicVisibility implements Mutator
 
     private function hasSamePublicParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        $reflection = ReflectionVisitor::findReflectionClass($node);
+        $reflection = NodeAnnotator::findReflectionClass($node);
         Assert::notNull($reflection);
 
         return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asPublic());
