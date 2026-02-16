@@ -49,8 +49,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 #[Group('integration')]
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
@@ -71,8 +69,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
+            new NullReporter(),
             new NullReporter(),
             new NullReporter(),
             new NullReporter(),
@@ -91,8 +89,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
+            new NullReporter(),
             new NullReporter(),
             new NullReporter(),
             new NullReporter(),
@@ -113,8 +111,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
+            new NullReporter(),
             new NullReporter(),
             new NullReporter(),
             new NullReporter(),
@@ -140,12 +138,17 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('report');
 
+        $advisoryReporterMock = $this->createMock(Reporter::class);
+        $advisoryReporterMock
+            ->expects($this->once())
+            ->method('report');
+
         $subscriber = new MutationTestingConsoleLoggerSubscriber(
-            new NullOutput(),
             $this->logger,
             $showMutationsReporterMock,
             $showMetricsReporterMock,
             $reporterMock,
+            $advisoryReporterMock,
         );
 
         $subscriber->onMutationTestingWasFinished(
@@ -161,8 +164,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
+            new NullReporter(),
             new NullReporter(),
             new NullReporter(),
             new NullReporter(),

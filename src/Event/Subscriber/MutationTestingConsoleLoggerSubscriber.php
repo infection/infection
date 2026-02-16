@@ -49,7 +49,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Reporter\Reporter;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * TODO: should be renamed
@@ -63,11 +62,11 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     private int $mutationCount = 0;
 
     public function __construct(
-        private readonly OutputInterface $output,
         private readonly MutationAnalysisLogger $logger,
         private readonly Reporter $showMutationsReporter,
         private readonly Reporter $showMetricsReporter,
         private readonly Reporter $reporter,
+        private readonly Reporter $advisoryReporter,
     ) {
     }
 
@@ -107,7 +106,6 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
         $this->showMutationsReporter->report();
         $this->showMetricsReporter->report();
         $this->reporter->report();
-
-        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
+        $this->advisoryReporter->report();
     }
 }
