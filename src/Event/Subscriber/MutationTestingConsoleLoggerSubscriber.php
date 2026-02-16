@@ -63,11 +63,7 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     private int $mutationCount = 0;
 
     public function __construct(
-        private readonly OutputInterface $output,
         private readonly MutationAnalysisLogger $logger,
-        private readonly Reporter $showMutationsReporter,
-        private readonly Reporter $showMetricsReporter,
-        private readonly Reporter $reporter,
     ) {
     }
 
@@ -103,11 +99,5 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->logger->finishAnalysis();
-
-        $this->showMutationsReporter->report();
-        $this->showMetricsReporter->report();
-        $this->reporter->report();
-
-        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
 }

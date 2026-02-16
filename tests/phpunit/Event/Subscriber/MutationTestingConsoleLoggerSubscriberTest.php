@@ -71,11 +71,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
-            new NullReporter(),
-            new NullReporter(),
-            new NullReporter(),
         ));
 
         $processRunner = $this->createStub(ProcessRunner::class);
@@ -91,11 +87,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
-            new NullReporter(),
-            new NullReporter(),
-            new NullReporter(),
         ));
 
         $dispatcher->dispatch(
@@ -113,44 +105,10 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
-            new NullReporter(),
-            new NullReporter(),
-            new NullReporter(),
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
-    }
-
-    public function test_it_calls_the_reporter_when_the_mutation_testing_is_finished(): void
-    {
-        $showMutationsReporterMock = $this->createMock(Reporter::class);
-        $showMutationsReporterMock
-            ->expects($this->once())
-            ->method('report');
-
-        $showMetricsReporterMock = $this->createMock(Reporter::class);
-        $showMetricsReporterMock
-            ->expects($this->once())
-            ->method('report');
-
-        $reporterMock = $this->createMock(Reporter::class);
-        $reporterMock
-            ->expects($this->once())
-            ->method('report');
-
-        $subscriber = new MutationTestingConsoleLoggerSubscriber(
-            new NullOutput(),
-            $this->logger,
-            $showMutationsReporterMock,
-            $showMetricsReporterMock,
-            $reporterMock,
-        );
-
-        $subscriber->onMutationTestingWasFinished(
-            new MutationTestingWasFinished(),
-        );
     }
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
@@ -161,11 +119,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->createStub(OutputInterface::class),
             $this->logger,
-            new NullReporter(),
-            new NullReporter(),
-            new NullReporter(),
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());

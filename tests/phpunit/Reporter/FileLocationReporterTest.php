@@ -78,7 +78,7 @@ final class FileLocationReporterTest extends TestCase
     public static function reporterProvider(): iterable
     {
         yield 'no file reporter when all the mutations are shown' => [
-            new FakeReporter(),
+            new NullReporter(),
             null,
             <<<'EOF'
 
@@ -86,7 +86,7 @@ final class FileLocationReporterTest extends TestCase
         ];
 
         yield 'no file reporter when no mutations are shown' => [
-            new FakeReporter(),
+            new NullReporter(),
             0,
             <<<'EOF'
 
@@ -96,7 +96,7 @@ final class FileLocationReporterTest extends TestCase
         ];
 
         yield 'no file reporter when some mutations are shown' => [
-            new FakeReporter(),
+            new NullReporter(),
             10,
             <<<'EOF'
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use Infection\Reporter\AdvisoryReporter;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -433,33 +434,6 @@ final class Container extends DIContainer
                     ),
                 ]),
             ),
-            MutationTestingConsoleLoggerSubscriber::class => static function (self $container): MutationTestingConsoleLoggerSubscriber {
-                $output = $container->getOutput();
-                $config = $container->getConfiguration();
-
-                return new MutationTestingConsoleLoggerSubscriber(
-                    $output,
-                    $container->getMutationAnalysisLogger(),
-                    new ShowMutationsReporter(
-                        $output,
-                        $container->getResultsCollector(),
-                        $container->getDiffColorizer(),
-                        $config->numberOfShownMutations,
-                        !$config->mutateOnlyCoveredCode(),
-                        $config->timeoutsAsEscaped,
-                    ),
-                    new ShowMetricsReporter(
-                        $output,
-                        $container->getMetricsCalculator(),
-                        !$config->mutateOnlyCoveredCode(),
-                    ),
-                    new FileLocationReporter(
-                        $container->getReporter(),
-                        $output,
-                        $config->numberOfShownMutations,
-                    ),
-                );
-            },
             PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
@@ -491,14 +465,41 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
-                $container->getFileReporterFactory()->createFromConfiguration(
-                    $container->getConfiguration()->logs,
-                ),
-                $container->getStrykerLoggerFactory()->createFromLogEntries(
-                    $container->getConfiguration()->logs,
-                ),
-            ])),
+            Reporter::class => static function (self $container): Reporter {
+                $output = $container->getOutput();
+                $config = $container->getConfiguration();
+
+                $reporter = new FederatedReporter(
+                    ...array_filter([
+                        new ShowMutationsReporter(
+                            $output,
+                            $container->getResultsCollector(),
+                            $container->getDiffColorizer(),
+                            $config->numberOfShownMutations,
+                            !$config->mutateOnlyCoveredCode(),
+                            $config->timeoutsAsEscaped,
+                        ),
+                        new ShowMetricsReporter(
+                            $output,
+                            $container->getMetricsCalculator(),
+                            !$config->mutateOnlyCoveredCode(),
+                        ),
+                        new AdvisoryReporter($output),
+                        $container->getFileReporterFactory()->createFromConfiguration(
+                            $container->getConfiguration()->logs,
+                        ),
+                        $container->getStrykerLoggerFactory()->createFromLogEntries(
+                            $container->getConfiguration()->logs,
+                        ),
+                    ]),
+                );
+
+                return new FileLocationReporter(
+                    $reporter,
+                    $output,
+                    $config->numberOfShownMutations,
+                );
+            },
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 
