@@ -1,4 +1,5 @@
 {
+    "$schema": "../../../resources/schema.json",
     "timeout": 25,
     "source": {
         "directories": [
@@ -11,8 +12,10 @@
     "tmpDir": ".",
     "mutators": {
         "global-ignoreSourceCodeByRegex": [
-            ".*hello.*"
+            ".*hello.*",
+            "\\$this->logger->.*"
         ],
+        "ArrayItemRemoval": true,
         "PublicVisibility": {
             "ignore": [
                 "App\\*"
