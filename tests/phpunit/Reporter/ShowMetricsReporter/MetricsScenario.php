@@ -33,13 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Reporter\ShowMetricsReporter;
 
 final class MetricsScenario
 {
     public function __construct(
         public bool $withUncovered,
-        public bool $timeoutsAsEscaped,
         public int $killedByTestsCount,
         public int $killedByStaticAnalysisCount,
         public int $errorCount,
@@ -61,14 +60,6 @@ final class MetricsScenario
     {
         $clone = clone $this;
         $clone->withUncovered = $withUncovered;
-
-        return $clone;
-    }
-
-    public function withTimeoutsAsEscaped(bool $timeoutsAsEscaped): self
-    {
-        $clone = clone $this;
-        $clone->timeoutsAsEscaped = $timeoutsAsEscaped;
 
         return $clone;
     }
