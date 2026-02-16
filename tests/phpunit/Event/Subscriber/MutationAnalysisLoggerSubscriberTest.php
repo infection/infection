@@ -77,7 +77,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         $this->loggerMock
             ->expects($this->once())
             ->method('startAnalysis')
-            ->with($this->equalTo(1));
+            ->with(1);
 
         $this->dispatcher->dispatch(
             new MutationTestingWasStarted(
