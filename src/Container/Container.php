@@ -118,6 +118,7 @@ use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ShowMetricsReporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
@@ -439,7 +440,6 @@ final class Container extends DIContainer
                 return new MutationTestingConsoleLoggerSubscriber(
                     $output,
                     $container->getMutationAnalysisLogger(),
-                    $container->getMetricsCalculator(),
                     new ShowMutationsReporter(
                         $output,
                         $container->getResultsCollector(),
@@ -448,12 +448,16 @@ final class Container extends DIContainer
                         !$config->mutateOnlyCoveredCode(),
                         $config->timeoutsAsEscaped,
                     ),
+                    new ShowMetricsReporter(
+                        $output,
+                        $container->getMetricsCalculator(),
+                        !$config->mutateOnlyCoveredCode(),
+                    ),
                     new FileLocationReporter(
                         $container->getReporter(),
                         $output,
                         $config->numberOfShownMutations,
                     ),
-                    !$config->mutateOnlyCoveredCode(),
                 );
             },
             PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
