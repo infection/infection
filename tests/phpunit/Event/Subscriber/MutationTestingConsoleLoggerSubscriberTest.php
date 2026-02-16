@@ -43,14 +43,10 @@ use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Reporter\NullReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 #[Group('integration')]
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
-use Infection\Reporter\AdvisoryReporter;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -114,6 +113,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;

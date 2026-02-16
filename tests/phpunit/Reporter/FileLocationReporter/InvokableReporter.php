@@ -33,14 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Reporter;
+namespace Infection\Tests\Reporter\FileLocationReporter;
 
+use Closure;
 use Infection\Reporter\Reporter;
 
-final class NullReporter implements Reporter
+final readonly class InvokableReporter implements Reporter
 {
+    private Closure $report;
+
+    /**
+     * @param (Closure():void)|null $report
+     */
+    public function __construct(
+        ?Closure $report = null,
+    ) {
+        $this->report = $report ?? static fn () => null;
+    }
+
     public function report(): void
     {
-        // Do nothing
+        ($this->report)();
     }
 }

@@ -48,8 +48,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Reporter\Reporter;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * TODO: should be renamed
