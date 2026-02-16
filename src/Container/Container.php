@@ -113,6 +113,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
@@ -438,7 +439,6 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MutationTestingConsoleLoggerSubscriber(
-                    $output,
                     $container->getMutationAnalysisLogger(),
                     new ShowMutationsReporter(
                         $output,
@@ -458,6 +458,7 @@ final class Container extends DIContainer
                         $output,
                         $config->numberOfShownMutations,
                     ),
+                    new AdvisoryReporter($output),
                 );
             },
             PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
