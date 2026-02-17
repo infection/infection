@@ -25,7 +25,7 @@ Want your logo here? [Learn more »](https://infection.github.io/guide/github-sp
 
 #### Companies
 
-<a href="https://www.lambdatest.com/" target="_blank"><img src="https://www.lambdatest.com/blue-logo.png" style="vertical-align: middle;" width="250" height="45" /></a>
+<a href="https://www.testmuai.com/?utm_medium=sponsor&utm_source=infection" target="_blank"><img src="https://assets.testmu.ai/resources/images/logos/black-logo.png" style="vertical-align: middle;" width="91" height="45" /></a>
 <a href="https://github.com/wwwoda" target="_blank"><img src="https://avatars.githubusercontent.com/u/37436231?s=200&v=4" style="vertical-align: middle;" width="45" height="45" /></a>
 <a href="https://github.com/Enrise" target="_blank"><img src="https://github.com/enrise/.github/raw/master/images/logo.png?raw=true" style="vertical-align: middle;" width="90" height="45" /></a>
 <a href="https://jetbrains.com" target="_blank"><img title="JetBrains - free licenses for core developers" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.png" style="vertical-align: middle;" width="209" height="45" /></a>

@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function count;
-use function floor;
-use Infection\Differ\DiffColorizer;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
@@ -50,17 +48,7 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Reporter\Reporter;
-use LogicException;
-use function sprintf;
-use function str_pad;
-use const STR_PAD_LEFT;
-use function str_repeat;
-use function strlen;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * TODO: should be renamed
@@ -68,31 +56,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
-    private const PAD_LENGTH = 8;
-
-    private const LOW_QUALITY_THRESHOLD = 50;
-
-    private const MEDIUM_QUALITY_THRESHOLD = 90;
-
     /**
      * @var positive-int|IterableCounter::UNKNOWN_COUNT
      */
     private int $mutationCount = 0;
 
-    private ?int $numberOfMutationsBudget;
-
     public function __construct(
-        private readonly OutputInterface $output,
         private readonly MutationAnalysisLogger $logger,
-        private readonly MetricsCalculator $metricsCalculator,
-        private readonly ResultsCollector $resultsCollector,
-        private readonly DiffColorizer $diffColorizer,
+        private readonly Reporter $showMutationsReporter,
+        private readonly Reporter $showMetricsReporter,
         private readonly Reporter $reporter,
-        private readonly ?int $numberOfShownMutations,
-        private readonly bool $withUncovered,
-        private readonly bool $withTimeouts,
+        private readonly Reporter $advisoryReporter,
     ) {
-        $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
@@ -128,169 +103,9 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     {
         $this->logger->finishAnalysis();
 
-        if ($this->numberOfMutationsBudget !== 0) {
-            $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');
-
-            if ($this->withUncovered) {
-                $this->showMutations($this->resultsCollector->getNotCoveredExecutionResults(), 'Not covered');
-            }
-
-            if ($this->withTimeouts) {
-                $this->showMutations($this->resultsCollector->getTimedOutExecutionResults(), 'Timed out');
-            }
-        }
-
-        $this->showMetrics();
+        $this->showMutationsReporter->report();
+        $this->showMetricsReporter->report();
         $this->reporter->report();
-
-        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
-    }
-
-    /**
-     * @param MutantExecutionResult[] $executionResults
-     */
-    private function showMutations(array $executionResults, string $headlinePrefix): void
-    {
-        if ($executionResults === [] || $this->numberOfMutationsBudget === 0) {
-            return;
-        }
-
-        $headline = sprintf('%s mutants:', $headlinePrefix);
-
-        $this->output->writeln([
-            '',
-            $headline,
-            str_repeat('=', strlen($headline)),
-            '',
-        ]);
-
-        $shortened = false;
-
-        foreach ($executionResults as $index => $executionResult) {
-            if ($this->numberOfMutationsBudget === 0) {
-                $shortened = true;
-
-                break;
-            }
-
-            $this->output->writeln([
-                '',
-                sprintf(
-                    '%d) %s:%d    [M] %s [ID] %s',
-                    $index + 1,
-                    $executionResult->getOriginalFilePath(),
-                    $executionResult->getOriginalStartingLine(),
-                    $executionResult->getMutatorName(),
-                    $executionResult->getMutantHash(),
-                ),
-            ]);
-
-            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
-
-            if ($this->numberOfMutationsBudget !== null) {
-                --$this->numberOfMutationsBudget;
-            }
-        }
-
-        if ($shortened) {
-            if (!isset($index)) {
-                throw new LogicException('$index should be set when $shortened is true');
-            }
-
-            $this->output->writeln([
-                '',
-                sprintf(
-                    '... and %d more mutants were omitted. Use "--show-mutations=max" to see all of them.',
-                    count($executionResults) - $index,
-                ),
-            ]);
-        }
-    }
-
-    private function showMetrics(): void
-    {
-        $this->output->writeln(['', '']);
-        $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByTestsCount()) . '</options=bold> mutants were killed by Test Framework');
-
-        if ($this->metricsCalculator->getKilledByStaticAnalysisCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByStaticAnalysisCount()) . '</options=bold> mutants were caught by Static Analysis');
-        }
-
-        if ($this->metricsCalculator->getIgnoredCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getIgnoredCount()) . '</options=bold> mutants were configured to be ignored');
-        }
-
-        if ($this->metricsCalculator->getNotTestedCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
-        }
-
-        if ($this->metricsCalculator->getEscapedCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
-        }
-
-        if ($this->metricsCalculator->getErrorCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
-        }
-
-        if ($this->metricsCalculator->getSyntaxErrorCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSyntaxErrorCount()) . '</options=bold> syntax errors were encountered');
-        }
-
-        if ($this->metricsCalculator->getTimedOutCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
-        }
-
-        if ($this->metricsCalculator->getSkippedCount() > 0) {
-            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSkippedCount()) . '</options=bold> mutants required more time than configured');
-        }
-
-        $mutationScoreIndicator = floor($this->metricsCalculator->getMutationScoreIndicator());
-        $msiTag = $this->getPercentageTag($mutationScoreIndicator);
-
-        $coverageRate = floor($this->metricsCalculator->getCoverageRate());
-        $mutationCoverageTag = $this->getPercentageTag($coverageRate);
-
-        $coveredMsi = floor($this->metricsCalculator->getCoveredCodeMutationScoreIndicator());
-        $coveredMsiTag = $this->getPercentageTag($coveredMsi);
-
-        $this->output->writeln(['', 'Metrics:']);
-
-        if ($this->withUncovered) {
-            $this->output->writeln(
-                $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>"),
-            );
-        }
-
-        $this->output->writeln(
-            $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$coverageRate}%</{$mutationCoverageTag}>"),
-        );
-
-        $this->output->writeln(
-            $this->addIndentation("Covered Code MSI: <{$coveredMsiTag}>{$coveredMsi}%</{$coveredMsiTag}>"),
-        );
-    }
-
-    private function getPadded(int|string $subject, int $padLength = self::PAD_LENGTH): string
-    {
-        return str_pad((string) $subject, $padLength, ' ', STR_PAD_LEFT);
-    }
-
-    private function addIndentation(string $string): string
-    {
-        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
-    }
-
-    private function getPercentageTag(float $percentage): string
-    {
-        if ($percentage >= 0 && $percentage < self::LOW_QUALITY_THRESHOLD) {
-            return 'low';
-        }
-
-        if ($percentage >= self::LOW_QUALITY_THRESHOLD && $percentage < self::MEDIUM_QUALITY_THRESHOLD) {
-            return 'medium';
-        }
-
-        return 'high';
+        $this->advisoryReporter->report();
     }
 }

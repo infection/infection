@@ -113,11 +113,14 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ShowMetricsReporter;
+use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
@@ -436,19 +439,26 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MutationTestingConsoleLoggerSubscriber(
-                    $output,
                     $container->getMutationAnalysisLogger(),
-                    $container->getMetricsCalculator(),
-                    $container->getResultsCollector(),
-                    $container->getDiffColorizer(),
+                    new ShowMutationsReporter(
+                        $output,
+                        $container->getResultsCollector(),
+                        $container->getDiffColorizer(),
+                        $config->numberOfShownMutations,
+                        !$config->mutateOnlyCoveredCode(),
+                        $config->timeoutsAsEscaped,
+                    ),
+                    new ShowMetricsReporter(
+                        $output,
+                        $container->getMetricsCalculator(),
+                        !$config->mutateOnlyCoveredCode(),
+                    ),
                     new FileLocationReporter(
                         $container->getReporter(),
                         $output,
                         $config->numberOfShownMutations,
                     ),
-                    $config->numberOfShownMutations,
-                    !$config->mutateOnlyCoveredCode(),
-                    $config->timeoutsAsEscaped,
+                    new AdvisoryReporter($output),
                 );
             },
             PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
