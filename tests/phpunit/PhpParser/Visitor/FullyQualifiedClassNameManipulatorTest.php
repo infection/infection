@@ -35,180 +35,268 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function array_keys;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PhpParser\Node;
 use PhpParser\Node\Name\FullyQualified;
-use PhpParser\Node\Stmt\Nop;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use function sprintf;
 
 #[CoversClass(FullyQualifiedClassNameManipulator::class)]
 final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
 {
     /**
      * This test is to ensure the integration of NameResolver works as expected.
+     *
+     * @param array<int, FullyQualified>
      */
     #[CoversNothing]
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_resolved_node_names(
         string $code,
-        string $expected,
+        string $expectedDump,
+        array $expectedFqcns,
     ): void {
         $nodes = $this->parse($code);
 
-        $this->addIdsToNodes($nodes);
+        $nodesById = $this->addIdsToNodes($nodes);
         (new NodeTraverser(
             NameResolverFactory::create(),
         ))->traverse($nodes);
 
         $actual = $this->dumper->dump($nodes, onlyVisitedNodes: false);
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expectedDump, $actual);
+
+        $actualFqcns = $this->getFqcns(
+            array_keys($expectedFqcns),
+            $nodesById,
+        );
+
+        $this->assertEquals($expectedFqcns, $actualFqcns);
     }
 
     public static function nodeProvider(): iterable
     {
-        yield [
+        yield 'function declaration and call' => [
             <<<'PHP'
                 <?php
 
-                declare(strict_types=1);
-
-                namespace Infection\Tests\Virtual\A;
-
                 function calculate() {}
-
-                namespace Infection\Tests\Virtual\B;
-
-                use function Infection\Tests\Virtual\A\calculate;
-
-                class First {
-                    function __construct() {
-                        calculate();
-                        function_exists('ambiguousFunctionCall');
-                    }
-                }
+                calculate();
 
                 PHP,
             <<<'AST'
                 array(
-                    0: Stmt_Declare(
-                        declares: array(
-                            0: DeclareItem(
-                                key: Identifier(
-                                    nodeId: 2
-                                )
-                                value: Scalar_Int(
-                                    rawValue: 1
-                                    kind: KIND_DEC (10)
-                                    nodeId: 3
-                                )
-                                nodeId: 1
-                            )
+                    0: Stmt_Function(
+                        name: Identifier(
+                            nodeId: 1
                         )
                         nodeId: 0
                     )
-                    1: Stmt_Namespace(
+                    1: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Name(
+                                nodeId: 4
+                                resolvedName: nodeId(4)
+                            )
+                            nodeId: 3
+                        )
+                        nodeId: 2
+                    )
+                )
+                AST,
+            [
+                4 => new FullyQualified('calculate'),
+            ],
+        ];
+
+        yield 'namespaced function declaration and call' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                function calculate() {}
+                calculate();
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
                         name: Name(
-                            nodeId: 5
+                            nodeId: 1
                         )
                         stmts: array(
                             0: Stmt_Function(
                                 name: Identifier(
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_FuncCall(
+                                    name: Name(
+                                        nodeId: 6
+                                        namespacedName: nodeId(6)
+                                    )
+                                    nodeId: 5
+                                )
+                                nodeId: 4
+                            )
+                        )
+                        kind: 1
+                        nodeId: 0
+                    )
+                )
+                AST,
+            [
+                6 => new FullyQualified('Infection\Tests\Virtual\calculate'),
+            ],
+        ];
+
+        yield 'class declaration and call' => [
+            <<<'PHP'
+                <?php
+
+                class Calculator {
+                    static function calculate() {}
+                }
+                Calculator::calculate();
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Class(
+                        name: Identifier(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                            )
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_StaticCall(
+                            class: Name(
+                                nodeId: 6
+                                resolvedName: nodeId(6)
+                            )
+                            name: Identifier(
+                                nodeId: 7
+                            )
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                    )
+                )
+                AST,
+            [
+                6 => new FullyQualified('Calculator'),
+            ],
+        ];
+
+        yield 'namespaced class declaration and call' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                class Calculator {
+                    static function calculate() {}
+                }
+                Calculator::calculate();
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 5
+                                        )
+                                        nodeId: 4
+                                    )
+                                )
+                                nodeId: 2
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_StaticCall(
+                                    class: Name(
+                                        nodeId: 8
+                                        resolvedName: nodeId(8)
+                                    )
+                                    name: Identifier(
+                                        nodeId: 9
+                                    )
                                     nodeId: 7
                                 )
                                 nodeId: 6
                             )
                         )
                         kind: 1
-                        nodeId: 4
-                    )
-                    2: Stmt_Namespace(
-                        name: Name(
-                            nodeId: 9
-                        )
-                        stmts: array(
-                            0: Stmt_Use(
-                                uses: array(
-                                    0: UseItem(
-                                        name: Name(
-                                            nodeId: 12
-                                        )
-                                        nodeId: 11
-                                    )
-                                )
-                                nodeId: 10
-                            )
-                            1: Stmt_Class(
-                                name: Identifier(
-                                    nodeId: 14
-                                )
-                                stmts: array(
-                                    0: Stmt_ClassMethod(
-                                        name: Identifier(
-                                            nodeId: 16
-                                        )
-                                        stmts: array(
-                                            0: Stmt_Expression(
-                                                expr: Expr_FuncCall(
-                                                    name: Name(
-                                                        nodeId: 19
-                                                        resolvedName: nodeId(19)
-                                                    )
-                                                    nodeId: 18
-                                                )
-                                                nodeId: 17
-                                            )
-                                            1: Stmt_Expression(
-                                                expr: Expr_FuncCall(
-                                                    name: Name(
-                                                        nodeId: 22
-                                                        namespacedName: nodeId(22)
-                                                    )
-                                                    args: array(
-                                                        0: Arg(
-                                                            value: Scalar_String(
-                                                                kind: KIND_SINGLE_QUOTED (1)
-                                                                rawValue: 'ambiguousFunctionCall'
-                                                                nodeId: 24
-                                                            )
-                                                            nodeId: 23
-                                                        )
-                                                    )
-                                                    nodeId: 21
-                                                )
-                                                nodeId: 20
-                                            )
-                                        )
-                                        nodeId: 15
-                                    )
-                                )
-                                nodeId: 13
-                            )
-                        )
-                        kind: 1
-                        nodeId: 8
+                        nodeId: 0
                     )
                 )
                 AST,
+            [
+                8 => new FullyQualified('Infection\Tests\Virtual\Calculator'),
+            ],
         ];
     }
 
-    public function test_it_can_provide_the_node_fqcn(): void
+    /**
+     * @param int[] $nodeIds
+     * @param array<int, Node> $nodesById
+     *
+     * @return array<int, FullyQualified>
+     */
+    private function getFqcns(array $nodeIds, array $nodesById): array
     {
-        $fqcn = new FullyQualified('Acme\Foo');
-        $node = new Nop(['resolvedName' => $fqcn]);
+        $fqcns = [];
 
-        $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
+        foreach ($nodeIds as $nodeId) {
+            $this->assertArrayHasKey(
+                $nodeId,
+                $nodesById,
+                'No node with the node ID %s was found.',
+            );
 
-    public function test_it_can_provide_the_node_fqcn_for_an_anonymous_class(): void
-    {
-        $node = new Nop(['resolvedName' => null]);
+            $node = $nodesById[$nodeId];
+            $actual = FullyQualifiedClassNameManipulator::getFqcn($node);
+            $this->assertNotNull(
+                $actual,
+                sprintf(
+                    'Expected node to have a FQCN attribute, none found. Node:%s%s',
+                    "\n",
+                    $this->dumper->dump($node, onlyVisitedNodes: false),
+                ),
+            );
 
-        $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
+            $actual->setAttributes([]);
+
+            $fqcns[$nodeId] = $actual;
+        }
+
+        return $fqcns;
     }
 }
