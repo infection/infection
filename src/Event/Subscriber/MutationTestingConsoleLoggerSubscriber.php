@@ -48,7 +48,6 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Reporter\Reporter;
 
 /**
  * TODO: should be renamed
@@ -63,10 +62,6 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
 
     public function __construct(
         private readonly MutationAnalysisLogger $logger,
-        private readonly Reporter $showMutationsReporter,
-        private readonly Reporter $showMetricsReporter,
-        private readonly Reporter $reporter,
-        private readonly Reporter $advisoryReporter,
     ) {
     }
 
@@ -102,10 +97,5 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->logger->finishAnalysis();
-
-        $this->showMutationsReporter->report();
-        $this->showMetricsReporter->report();
-        $this->reporter->report();
-        $this->advisoryReporter->report();
     }
 }
