@@ -40,6 +40,7 @@ use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node;
+use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,7 +54,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
     /**
      * This test is to ensure the integration of NameResolver works as expected.
      *
-     * @param array<int, FullyQualified>
+     * @param array<int, FullyQualified> $expectedFqcns
      */
     #[CoversNothing]
     #[DataProvider('nodeProvider')]
@@ -268,7 +269,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
      * @param int[] $nodeIds
      * @param array<int, Node> $nodesById
      *
-     * @return array<int, FullyQualified>
+     * @return array<int, Name>
      */
     private function getFqcns(array $nodeIds, array $nodesById): array
     {
