@@ -60,7 +60,7 @@ final class NodeAnnotator
         Annotation $annotation,
         mixed $value = null,
     ): void {
-        $node?->setAttribute($annotation->value, $value ?? $annotation->value);
+        $node?->setAttribute($annotation->value, $value ?? true);
     }
 
     public static function getParent(Node $node): Node
