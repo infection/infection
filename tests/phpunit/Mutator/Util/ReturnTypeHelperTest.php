@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\ReturnTypeHelper;
 use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -48,8 +49,10 @@ final class ReturnTypeHelperTest extends TestCase
     public function test_it_detects_default_attributes(): void
     {
         $returnNode = new Node\Stmt\Return_();
-        $returnNode->setAttribute(
-            Annotation::FUNCTION_SCOPE->value,
+
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
             new Node\Stmt\Function_('hello'),
         );
 
@@ -64,7 +67,12 @@ final class ReturnTypeHelperTest extends TestCase
     public function test_it_detects_void_return_type(Node\FunctionLike $function, bool $expected): void
     {
         $returnNode = new Node\Stmt\Return_();
-        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $function);
+
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
+            $function,
+        );
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -106,7 +114,12 @@ final class ReturnTypeHelperTest extends TestCase
     public function test_it_detects_specific_return_type(Node\FunctionLike $function, bool $expected): void
     {
         $returnNode = new Node\Stmt\Return_();
-        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $function);
+
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
+            $function,
+        );
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -160,8 +173,9 @@ final class ReturnTypeHelperTest extends TestCase
     #[DataProvider('nullReturnProvider')]
     public function test_it_detects_null_return(Node\Stmt\Return_ $returnNode, bool $expected): void
     {
-        $returnNode->setAttribute(
-            Annotation::FUNCTION_SCOPE->value,
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
             new Node\Stmt\Function_('test'),
         );
 
@@ -221,7 +235,12 @@ final class ReturnTypeHelperTest extends TestCase
         ]);
 
         $returnNode = new Node\Stmt\Return_(new Node\Expr\Array_());
-        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $method);
+
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
+            $method,
+        );
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -238,7 +257,12 @@ final class ReturnTypeHelperTest extends TestCase
         ]);
 
         $returnNode = new Node\Stmt\Return_(new Node\Scalar\String_('test'));
-        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $closure);
+
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
+            $closure,
+        );
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 
@@ -256,7 +280,12 @@ final class ReturnTypeHelperTest extends TestCase
         ]);
 
         $returnNode = new Node\Stmt\Return_(new Node\Scalar\Int_(42));
-        $returnNode->setAttribute(Annotation::FUNCTION_SCOPE->value, $arrowFunction);
+
+        NodeAnnotator::annotate(
+            $returnNode,
+            Annotation::FUNCTION_SCOPE,
+            $arrowFunction,
+        );
 
         $returnTypeHelper = new ReturnTypeHelper($returnNode);
 

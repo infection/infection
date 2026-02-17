@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\NameResolver;
 use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\Reflection\CoreClassReflection;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,8 +49,10 @@ final class NameResolverTest extends TestCase
     public function test_it_resolves_self_name_to_fully_qualified_name(): void
     {
         $name = new Node\Name('self');
-        $name->setAttribute(
-            Annotation::REFLECTION_CLASS->value,
+
+        NodeAnnotator::annotate(
+            $name,
+            Annotation::REFLECTION_CLASS,
             CoreClassReflection::fromClassName(self::class),
         );
 

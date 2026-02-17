@@ -54,8 +54,6 @@ use Webmozart\Assert\Assert;
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
-    public const FUNCTION_NAME = 'functionName';
-
     /** @var array<int, Node> */
     private array $functionScopeStack = [];
 
