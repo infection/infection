@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser\Visitor;
 use function array_map;
 use function explode;
 use function implode;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node\Stmt\Expression;
@@ -725,8 +726,8 @@ final class NextConnectingVisitorTest extends VisitorTestCase
         $expressionB = $nodes[1];
         $this->assertInstanceOf(Expression::class, $expressionB);
 
-        $this->assertTrue(NextConnectingVisitor::hasNextNode($expressionA));
-        $this->assertFalse(NextConnectingVisitor::hasNextNode($expressionB));
+        $this->assertTrue(NodeAnnotator::hasNextNode($expressionA));
+        $this->assertFalse(NodeAnnotator::hasNextNode($expressionB));
     }
 
     private function removePhpComments(string $code): string

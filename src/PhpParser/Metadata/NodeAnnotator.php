@@ -82,6 +82,7 @@ final class NodeAnnotator
 
     public static function getFqcn(Node $node): ?Node\Name
     {
+        // @phpstan-ignore property.notFound
         return $node->namespacedName
             ?? $node->getAttribute(Annotation::RESOLVED_NAME->value)
             ?? $node->getAttribute(Annotation::NAMESPACED_NAME->value);
