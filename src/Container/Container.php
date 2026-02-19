@@ -62,8 +62,8 @@ use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFact
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
@@ -379,7 +379,7 @@ final class Container extends DIContainer
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
-                    $container->get(MutationTestingConsoleLoggerSubscriber::class),
+                    $container->get(MutationAnalysisLoggerSubscriber::class),
                     $container->get(MutationTestingResultsLoggerSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
