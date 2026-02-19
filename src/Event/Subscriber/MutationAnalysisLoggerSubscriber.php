@@ -46,35 +46,21 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
-use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Reporter\Reporter;
 
 /**
- * TODO: should be renamed
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
-    /**
-     * @var positive-int|IterableCounter::UNKNOWN_COUNT
-     */
-    private int $mutationCount = 0;
-
     public function __construct(
-        private readonly MutationAnalysisLogger $logger,
-        private readonly Reporter $showMutationsReporter,
-        private readonly Reporter $showMetricsReporter,
-        private readonly Reporter $reporter,
-        private readonly Reporter $advisoryReporter,
+        private MutationAnalysisLogger $logger,
     ) {
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
-        $this->mutationCount = $event->mutationCount;
-
-        $this->logger->startAnalysis($this->mutationCount);
+        $this->logger->startAnalysis($event->mutationCount);
     }
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
@@ -102,10 +88,5 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
         $this->logger->finishAnalysis();
-
-        $this->showMutationsReporter->report();
-        $this->showMetricsReporter->report();
-        $this->reporter->report();
-        $this->advisoryReporter->report();
     }
 }
