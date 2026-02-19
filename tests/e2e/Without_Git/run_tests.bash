@@ -28,7 +28,7 @@ sed -i "s/\"infection\/infection\": \"dev-master\"/\"infection\/infection\": \"d
 
 set -e pipefail
 
-rm -f composer.lock
+rm -rf composer.lock vendor
 
 # For local testing on forks, detect the fork's remote URL and add it as a repository
 # This allows Composer to find branches that exist on the fork but not on the main repo
