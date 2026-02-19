@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\PhpParser\Visitor;
 
 use function array_pop;
+use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -48,17 +50,10 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class NextConnectingVisitor extends NodeVisitorAbstract
 {
-    public const NEXT_ATTRIBUTE = 'next';
-
     private ?Node $previous = null;
 
     /** @var list<Node|null> */
     private array $previousStack = [];
-
-    public static function hasNextNode(Node $node): bool
-    {
-        return $node->hasAttribute(self::NEXT_ATTRIBUTE);
-    }
 
     /**
      * {@inheritDoc}
@@ -93,7 +88,11 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
+        NodeAnnotator::annotate(
+            $this->previous,
+            Annotation::NEXT_NODE,
+            $node,
+        );
         $this->previous = $node;
 
         return null;

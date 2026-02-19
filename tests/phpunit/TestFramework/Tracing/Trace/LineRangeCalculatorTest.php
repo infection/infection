@@ -35,7 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
@@ -168,7 +169,7 @@ final class LineRangeCalculatorTest extends TestCase
             public function leaveNode(Node $node)
             {
                 if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === 'findMe') {
-                    $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, true);
+                    NodeAnnotator::annotate($node, Annotation::IS_ON_FUNCTION_SIGNATURE);
 
                     $lineRange = new LineRangeCalculator();
                     $this->range = $lineRange->calculateRange($node)->range;

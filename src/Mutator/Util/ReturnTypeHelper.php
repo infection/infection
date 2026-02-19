@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\Node\ComplexType;
 use PhpParser\Node\Identifier;
@@ -56,7 +56,7 @@ final readonly class ReturnTypeHelper
         private Node\Stmt\Return_ $node,
     ) {
         // We do not expect to see a return statement outside a function-like node.
-        $this->returnType = ReflectionVisitor::getFunctionScope($this->node)->getReturnType();
+        $this->returnType = NodeAnnotator::getFunctionScope($this->node)->getReturnType();
     }
 
     public function hasVoidReturnType(): bool

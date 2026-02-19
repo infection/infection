@@ -37,6 +37,8 @@ namespace Infection\PhpParser\Visitor;
 
 use function array_pop;
 use function count;
+use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\Reflection\AnonymousClassReflection;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\CoreClassReflection;
@@ -52,18 +54,6 @@ use Webmozart\Assert\Assert;
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
-    public const STRICT_TYPES_KEY = 'isStrictTypes';
-
-    public const REFLECTION_CLASS_KEY = 'reflectionClass';
-
-    public const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
-
-    public const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
-
-    public const FUNCTION_SCOPE_KEY = 'functionScope';
-
-    public const FUNCTION_NAME = 'functionName';
-
     /** @var array<int, Node> */
     private array $functionScopeStack = [];
 
@@ -96,7 +86,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Stmt\Function_) {
-            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::IS_STRICT_TYPES,
+                $this->isDeclareStrictTypes,
+            );
         }
 
         if ($node instanceof Node\Stmt\ClassLike) {
@@ -115,25 +109,59 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $isInsideFunction = $this->isInsideFunction($node);
 
         if ($isInsideFunction) {
-            $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::IS_INSIDE_FUNCTION,
+            );
         } elseif ($node instanceof Node\Stmt\Function_) {
             return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
         if ($this->isPartOfFunctionSignature($node)) {
-            $node->setAttribute(self::IS_ON_FUNCTION_SIGNATURE, true);
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::IS_ON_FUNCTION_SIGNATURE,
+            );
         }
 
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
-            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
-            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::IS_STRICT_TYPES,
+                $this->isDeclareStrictTypes,
+            );
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::REFLECTION_CLASS,
+                $this->classScopeStack[count($this->classScopeStack) - 1],
+            );
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::FUNCTION_NAME,
+                $this->methodName,
+            );
         } elseif ($isInsideFunction) {
-            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
-            $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[count($this->functionScopeStack) - 1]);
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
-            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::IS_STRICT_TYPES,
+                $this->isDeclareStrictTypes,
+            );
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::FUNCTION_SCOPE,
+                $this->functionScopeStack[count($this->functionScopeStack) - 1],
+            );
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::REFLECTION_CLASS,
+                $this->classScopeStack[count($this->classScopeStack) - 1],
+            );
+            NodeAnnotator::annotate(
+                $node,
+                Annotation::FUNCTION_NAME,
+                $this->methodName,
+            );
         }
 
         return null;
@@ -152,35 +180,6 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public static function findReflectionClass(Node $node): ?ClassReflection
-    {
-        $reflection = $node->getAttribute(self::REFLECTION_CLASS_KEY);
-        Assert::nullOrIsInstanceOf($reflection, ClassReflection::class);
-
-        return $reflection;
-    }
-
-    public static function findFunctionScope(Node $node): ?Node\FunctionLike
-    {
-        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
-        Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);
-
-        return $functionScope;
-    }
-
-    public static function getFunctionScope(Node $node): Node\FunctionLike
-    {
-        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
-        Assert::isInstanceOf($functionScope, Node\FunctionLike::class);
-
-        return $functionScope;
-    }
-
-    public static function isStrictTypesEnabled(Node\FunctionLike $node): ?bool
-    {
-        return $node->getAttribute(self::STRICT_TYPES_KEY);
-    }
-
     /**
      * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
      * signature.
@@ -196,7 +195,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         do {
-            $node = ParentConnector::findParent($node);
+            $node = NodeAnnotator::findParent($node);
         } while ($node !== null && !$node instanceof Node\Param);
 
         return $node !== null;
@@ -207,13 +206,13 @@ final class ReflectionVisitor extends NodeVisitorAbstract
      */
     private function isInsideFunction(Node $node): bool
     {
-        $parent = ParentConnector::findParent($node);
+        $parent = NodeAnnotator::findParent($node);
 
         if ($parent === null) {
             return false;
         }
 
-        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY) !== null) {
+        if (NodeAnnotator::isInsideFunction($parent)) {
             return true;
         }
 
@@ -235,7 +234,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private function getClassReflectionForNode(Node\Stmt\ClassLike $node): ClassReflection
     {
-        $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
+        $fqn = NodeAnnotator::getFqcn($node);
 
         if ($fqn !== null) {
             try {
@@ -250,8 +249,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $extends = $node->extends;
 
         if ($extends !== null) {
-            $name = $extends->getAttribute('resolvedName');
-            Assert::isInstanceOf($name, Node\Name::class);
+            $name = NodeAnnotator::getResolvedName($extends);
 
             return AnonymousClassReflection::fromClassName($name->toString());
         }

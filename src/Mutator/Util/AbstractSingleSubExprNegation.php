@@ -38,7 +38,7 @@ namespace Infection\Mutator\Util;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\SimpleExpression;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -71,7 +71,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
             return false;
         }
 
-        $parent = ParentConnector::findParent($node);
+        $parent = NodeAnnotator::findParent($node);
 
         return $parent !== null && !$this->isSupportedNode($parent); // only grandparent
     }

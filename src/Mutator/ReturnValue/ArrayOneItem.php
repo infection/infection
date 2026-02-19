@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use function is_string;
 use PhpParser\Node;
 
@@ -125,7 +125,7 @@ final class ArrayOneItem implements Mutator
 
     private function returnTypeIsArray(Node $node): bool
     {
-        $functionScope = ReflectionVisitor::findFunctionScope($node);
+        $functionScope = NodeAnnotator::findFunctionScope($node);
 
         if ($functionScope === null) {
             return false;

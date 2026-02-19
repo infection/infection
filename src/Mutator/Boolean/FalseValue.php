@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -84,7 +84,7 @@ final class FalseValue implements Mutator
             return false;
         }
 
-        $parentNode = ParentConnector::findParent($node);
+        $parentNode = NodeAnnotator::findParent($node);
 
         if ($parentNode instanceof Node\Expr\Match_) {
             return false;
@@ -94,7 +94,7 @@ final class FalseValue implements Mutator
             return false;
         }
 
-        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
+        $grandParentNode = $parentNode !== null ? NodeAnnotator::findParent($parentNode) : null;
 
         if ($grandParentNode instanceof Node\Expr\Ternary) {
             return false;

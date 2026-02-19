@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
@@ -47,7 +47,7 @@ final class NameResolver
     public static function resolveName(Node\Name $name): Node\Name\FullyQualified
     {
         if ($name->toString() === 'self') {
-            $reflectionClass = ReflectionVisitor::findReflectionClass($name);
+            $reflectionClass = NodeAnnotator::findReflectionClass($name);
             Assert::notNull($reflectionClass);
 
             return new Node\Name\FullyQualified($reflectionClass->getName());

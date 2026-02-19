@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node\Name\FullyQualified;
@@ -45,8 +45,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(FullyQualifiedClassNameManipulator::class)]
-final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
+#[CoversClass(NodeAnnotator::class)]
+final class NameResolverTest extends VisitorTestCase
 {
     /**
      * This test is to ensure the integration of NameResolver works as expected.
@@ -202,13 +202,13 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
         $fqcn = new FullyQualified('Acme\Foo');
         $node = new Nop(['resolvedName' => $fqcn]);
 
-        $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
+        $this->assertSame($fqcn, NodeAnnotator::getFqcn($node));
     }
 
     public function test_it_can_provide_the_node_fqcn_for_an_anonymous_class(): void
     {
         $node = new Nop(['resolvedName' => null]);
 
-        $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
+        $this->assertNull(NodeAnnotator::getFqcn($node));
     }
 }

@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use function is_numeric;
 use PhpParser\Node;
 
@@ -88,7 +88,7 @@ final class Spaceship implements Mutator
 
     private function isCompareWithZero(Node\Expr\BinaryOp\Spaceship $node): bool
     {
-        $parentAttribute = ParentConnector::findParent($node);
+        $parentAttribute = NodeAnnotator::findParent($node);
 
         if ($parentAttribute instanceof Node\Expr\BinaryOp\Identical) {
             return $this->isIntegerScalarEqualToZero($parentAttribute);

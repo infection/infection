@@ -36,9 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
 use Exception;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\ParentConnector;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\Annotation;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use function is_string;
@@ -411,8 +410,9 @@ final class NodeDumperTest extends TestCase
                 ),
             );
 
-            $node1->setAttribute(
-                NextConnectingVisitor::NEXT_ATTRIBUTE,
+            NodeAnnotator::annotate(
+                $node1,
+                Annotation::NEXT_NODE,
                 $node2,
             );
 
@@ -425,7 +425,7 @@ final class NodeDumperTest extends TestCase
                 ->withDumpOtherAttributes()
                 ->withExpected(
                     PotentialCircularDependencyDetected::forAttribute(
-                        NextConnectingVisitor::NEXT_ATTRIBUTE,
+                        Annotation::NEXT_NODE->value,
                         $node2,
                     ),
                 )
@@ -446,8 +446,9 @@ final class NodeDumperTest extends TestCase
                 ),
             );
 
-            $node1->setAttribute(
-                NextConnectingVisitor::NEXT_ATTRIBUTE,
+            NodeAnnotator::annotate(
+                $node1,
+                Annotation::NEXT_NODE,
                 $node2,
             );
             $node2->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
@@ -504,7 +505,11 @@ final class NodeDumperTest extends TestCase
                 ),
             );
 
-            ParentConnector::setParent($child, $parent);
+            NodeAnnotator::annotate(
+                $child,
+                Annotation::PARENT_NODE,
+                $parent,
+            );
 
             return NodeDumperScenario::forNode([
                 $parent,
@@ -534,7 +539,11 @@ final class NodeDumperTest extends TestCase
             );
 
             $parent->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
-            ParentConnector::setParent($child, $parent);
+            NodeAnnotator::annotate(
+                $child,
+                Annotation::PARENT_NODE,
+                $parent,
+            );
 
             return NodeDumperScenario::forNode([
                 $parent,
@@ -583,7 +592,7 @@ final class NodeDumperTest extends TestCase
             );
 
             $node->setAttribute(
-                ReflectionVisitor::FUNCTION_SCOPE_KEY,
+                Annotation::FUNCTION_SCOPE->value,
                 $node,
             );
 
@@ -593,7 +602,7 @@ final class NodeDumperTest extends TestCase
                 ->withDumpOtherAttributes()
                 ->withExpected(
                     PotentialCircularDependencyDetected::forAttribute(
-                        ReflectionVisitor::FUNCTION_SCOPE_KEY,
+                        Annotation::FUNCTION_SCOPE->value,
                         $node,
                     ),
                 )
@@ -613,7 +622,7 @@ final class NodeDumperTest extends TestCase
                 10,
             );
             $node->setAttribute(
-                ReflectionVisitor::FUNCTION_SCOPE_KEY,
+                Annotation::FUNCTION_SCOPE->value,
                 $node,
             );
 

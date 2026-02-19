@@ -256,12 +256,6 @@ parameters:
 			path: ../src/Mutator/Util/AbstractSingleSubExprNegation.php
 
 		-
-			rawMessage: Access to an undefined property PhpParser\Node::$namespacedName.
-			identifier: property.notFound
-			count: 1
-			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
-
-		-
 			rawMessage: 'Method Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
 			identifier: return.unusedType
 			count: 1

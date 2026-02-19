@@ -40,7 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeAttributes;
-use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 
 /**
@@ -79,7 +79,7 @@ final class Identical implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        $parentNode = ParentConnector::findParent($node);
+        $parentNode = NodeAnnotator::findParent($node);
 
         if ($parentNode instanceof Node\Expr\Ternary) {
             return false;

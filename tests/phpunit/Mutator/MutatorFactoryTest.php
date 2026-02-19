@@ -45,7 +45,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Sort\Spaceship;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\Annotation;
 use Infection\Reflection\ClassReflection;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
@@ -179,8 +179,8 @@ final class MutatorFactoryTest extends TestCase
         return new Node\Expr\ConstFetch(
             new Node\Name($boolean),
             [
-                ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
-                ReflectionVisitor::FUNCTION_NAME => $functionName,
+                Annotation::REFLECTION_CLASS->value => $reflectionMock,
+                Annotation::FUNCTION_NAME->value => $functionName,
             ],
         );
     }

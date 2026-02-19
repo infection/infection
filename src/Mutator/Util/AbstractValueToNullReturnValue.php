@@ -37,7 +37,7 @@ namespace Infection\Mutator\Util;
 
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use function is_string;
 use PhpParser\Node;
 
@@ -53,7 +53,7 @@ abstract class AbstractValueToNullReturnValue implements Mutator
 
     protected function isNullReturnValueAllowed(Node $node): bool
     {
-        $functionScope = ReflectionVisitor::findFunctionScope($node);
+        $functionScope = NodeAnnotator::findFunctionScope($node);
 
         if ($functionScope === null) {
             return true;
