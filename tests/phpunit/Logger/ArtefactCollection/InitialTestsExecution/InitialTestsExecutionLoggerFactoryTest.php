@@ -33,67 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\ArtefactCollection\InitialTestsExecution;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
-use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialTestsConsoleLoggerSubscriberFactory::class)]
-final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
+#[CoversClass(InitialTestsExecutionLoggerFactory::class)]
+final class InitialTestsExecutionLoggerFactoryTest extends TestCase
 {
-    private MockObject&TestFrameworkAdapter $testFrameworkAdapterMock;
+    private TestFrameworkAdapter&MockObject $testFrameworkAdapterMock;
+
+    private OutputInterface&MockObject $outputMock;
 
     protected function setUp(): void
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
         $this->testFrameworkAdapterMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
+
+        $this->outputMock = $this->createMock(OutputInterface::class);
+        // We don't explicitly rely on this; this is only necessary for the
+        // ProgressBar used internally.
+        $this->outputMock
+            ->method('isDecorated')
+            ->willReturn(false);
     }
 
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialTestsConsoleLoggerSubscriberFactory(
-            true,
-            $this->testFrameworkAdapterMock,
-            $debug,
-            new FakeOutput(),
+        $factory = $this->createFactory(
+            skipProgressBar: true,
+            debug: $debug,
         );
 
-        $subscriber = $factory->create();
+        $logger = $factory->create();
 
-        $this->assertInstanceOf(CiInitialTestsConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(ConsoleNoProgressLogger::class, $logger);
     }
 
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
     {
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
-            ->method('isDecorated')
-            ->willReturn(false)
-        ;
-
-        $factory = new InitialTestsConsoleLoggerSubscriberFactory(
-            false,
-            $this->testFrameworkAdapterMock,
-            $debug,
-            $outputMock,
+        $factory = $this->createFactory(
+            skipProgressBar: false,
+            debug: $debug,
         );
 
-        $subscriber = $factory->create();
+        $logger = $factory->create();
 
-        $this->assertInstanceOf(InitialTestsConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(ConsoleProgressBarLogger::class, $logger);
     }
 
     public static function debugProvider(): iterable
@@ -101,5 +98,17 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         yield 'debug enabled' => [true];
 
         yield 'debug disabled' => [false];
+    }
+
+    private function createFactory(
+        bool $skipProgressBar,
+        bool $debug,
+    ): InitialTestsExecutionLoggerFactory {
+        return new InitialTestsExecutionLoggerFactory(
+            $skipProgressBar,
+            $this->testFrameworkAdapterMock,
+            $debug,
+            $this->outputMock,
+        );
     }
 }

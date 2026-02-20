@@ -33,42 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\ArtefactCollection\InitialTestsExecution;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialTestsConsoleLoggerSubscriber::class)]
-final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
+#[CoversClass(ConsoleProgressBarLogger::class)]
+final class ConsoleProgressBarLoggerTest extends TestCase
 {
-    public function test_it_reacts_on_initial_test_suite_run(): void
+    private OutputInterface&MockObject $outputMock;
+
+    private TestFrameworkAdapter&MockObject $testFrameworkMock;
+
+    protected function setUp(): void
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
-
-        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $testFramework->expects($this->once())
-            ->method('getVersion');
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
-
-        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
+        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->testFrameworkMock = $this->createMock(TestFrameworkAdapter::class);
     }
 
-    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception(): void
+    public function test_it_logs_the_start(): void
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())
+        $this->outputMock
+            ->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+
+        $this->testFrameworkMock
+            ->expects($this->once())
+            ->method('getVersion');
+
+        $this->createLogger(debug: false)->start();
+    }
+
+    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception_on_start(): void
+    {
+        $this->outputMock
+            ->expects($this->once())
             ->method('writeln')
             ->with([
                 '',
@@ -77,38 +83,58 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
                 'PHPUnit version: unknown',
                 '',
             ]);
-        $output->method('getVerbosity')
+        $this->outputMock
+            ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
-        $testFramework->expects($this->once())
+        $this->testFrameworkMock
+            ->expects($this->once())
             ->method('getName')
             ->willReturn('PHPUnit');
-        $testFramework->method('getVersion')
+        $this->testFrameworkMock
+            ->method('getVersion')
             ->willThrowException(new InvalidArgumentException());
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));
-
-        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
+        $this->createLogger(debug: false)->start();
     }
 
-    public function test_it_outputs_the_initial_process_text_if_in_debug_mode(): void
+    public function test_it_does_not_output_the_initial_process_text_if_in_debug_mode_on_finish(): void
     {
-        $processText = 'PHPUnit Test suite ...';
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())
-            ->method('writeln')
-            ->with(PHP_EOL . $processText);
+        $testOutput = 'PHPUnit Test suite ...';
 
-        $output->method('getVerbosity')
+        $this->outputMock
+            ->expects($this->never())
+            ->method('writeln');
+
+        $this->outputMock
+            ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $testFramework = $this->createStub(AbstractTestFrameworkAdapter::class);
+        $this->createLogger(debug: false)->finish($testOutput);
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));
+    public function test_it_outputs_the_initial_process_text_if_in_debug_mode_on_finish(): void
+    {
+        $testOutput = 'PHPUnit Test suite ...';
 
-        $dispatcher->dispatch(new InitialTestSuiteWasFinished($processText));
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with(PHP_EOL . $testOutput);
+
+        $this->outputMock
+            ->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+
+        $this->createLogger(debug: true)->finish($testOutput);
+    }
+
+    private function createLogger(bool $debug): InitialTestsExecutionLogger
+    {
+        return new ConsoleProgressBarLogger(
+            $this->outputMock,
+            $this->testFrameworkMock,
+            $debug,
+        );
     }
 }

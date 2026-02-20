@@ -79,18 +79,6 @@ parameters:
 			path: ../src/Environment/BuildContextResolver.php
 
 		-
-			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
-			identifier: catch.neverThrown
-			count: 1
-			path: ../src/Event/Subscriber/CiInitialTestsConsoleLoggerSubscriber.php
-
-		-
-			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
-			identifier: catch.neverThrown
-			count: 1
-			path: ../src/Event/Subscriber/InitialTestsConsoleLoggerSubscriber.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -107,6 +95,18 @@ parameters:
 			identifier: arrayFilter.strict
 			count: 1
 			path: ../src/Git/CommandLineGit.php
+
+		-
+			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
+			identifier: catch.neverThrown
+			count: 1
+			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleNoProgressLogger.php
+
+		-
+			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
+			identifier: catch.neverThrown
+			count: 1
+			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleProgressBarLogger.php
 
 		-
 			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'

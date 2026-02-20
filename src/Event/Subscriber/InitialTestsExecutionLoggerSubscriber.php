@@ -35,68 +35,36 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompletedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use InvalidArgumentException;
-use const PHP_EOL;
-use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 
 /**
  * @internal
  */
-final readonly class InitialTestsConsoleLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
+final readonly class InitialTestsExecutionLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-        private bool $debug,
+        private InitialTestsExecutionLogger $logger,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-            '',
-        ]);
-        $this->progressBar->start();
-    }
-
-    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
-    {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->outputText);
-        }
+        $this->logger->start();
     }
 
     public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
     {
-        $this->progressBar->advance();
+        $this->logger->advance();
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }
