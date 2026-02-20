@@ -33,26 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
 /**
+ * Logger for the initial test execution.
+ *
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
+interface InitialTestExecutionLogger
 {
-    public function __construct(
-        private bool $skipProgressBar,
-        private OutputInterface $output,
-    ) {
-    }
+    public function start(): void;
 
-    public function create(): EventSubscriber
-    {
-        return $this->skipProgressBar
-            ? new CiMutationGeneratingConsoleLoggerSubscriber($this->output)
-            : new MutationGeneratingConsoleLoggerSubscriber($this->output)
-        ;
-    }
+    public function advance(): void;
+
+    public function finish(string $executionOutput): void;
 }

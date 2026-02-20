@@ -33,44 +33,77 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
+use function count;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
+use Infection\Reporter\Reporter;
 
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
-        private OutputInterface $output,
+        private MutationAnalysisLogger $logger,
+        private Reporter $reporter,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
-        $this->progressBar->start($event->mutableFilesCount);
+        $this->logger->startMutationGeneration($event->mutableFilesCount);
     }
 
     public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
     {
-        $this->progressBar->advance();
+        if (count($event->mutationHashes) > 0) {
+            $this->logger->finishMutationGenerationForFile(
+                $event->sourceFilePath,
+                $event->mutationHashes,
+            );
+        }
     }
 
     public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
     {
-        $this->progressBar->finish();
+        $this->logger->finishMutationGeneration();
+    }
+
+    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    {
+        $this->logger->startAnalysis($event->mutationCount);
+    }
+
+    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
+    {
+        $this->logger->startEvaluation($event->mutation);
+    }
+
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        $executionResult = $event->executionResult;
+
+        $this->logger->finishEvaluation($executionResult);
+    }
+
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    {
+        $this->logger->finishAnalysis();
+
+        $this->reporter->report();
     }
 }

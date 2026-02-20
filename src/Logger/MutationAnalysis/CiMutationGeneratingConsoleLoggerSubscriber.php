@@ -33,35 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
+ * OK, we need to figure out what to do with this one.
+ *
+ * Indeed, currently it is used when "noProgress". If we move it as part of the MutationAnalysisLogger, it will
+ * then be the formatter name, not the progress, that will define it.
+ *
+ * So the question is, what do we expect when we have no progress + formatter/logger = progress?
+ *
  * @internal
  */
-final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
 {
     public function __construct(
-        private bool $skipProgressBar,
-        private bool $debug,
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
     ) {
     }
 
-    public function create(): EventSubscriber
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        return $this->skipProgressBar
-            ? new CiInitialStaticAnalysisRunConsoleLoggerSubscriber(
-                $this->staticAnalysisToolAdapter,
-                $this->output,
-            )
-            : new InitialStaticAnalysisRunConsoleLoggerSubscriber(
-                $this->staticAnalysisToolAdapter,
-                $this->output,
-                $this->debug,
-            );
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+            'Processing source code files...',
+        ]);
     }
 }

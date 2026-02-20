@@ -33,24 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Infection\Reporter\Reporter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
+final readonly class InitialTestExecutionLoggerFactory
 {
     public function __construct(
-        private Reporter $reporter,
+        private bool $skipProgressBar,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+        private bool $debug,
+        private OutputInterface $output,
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function create(): EventSubscriber
     {
-        $this->reporter->report();
+        return $this->skipProgressBar
+            ? new ConsoleNoProgressLogger(
+                $this->output,
+                $this->testFrameworkAdapter,
+            )
+            : new ConsoleProgressBarLogger(
+                $this->output,
+                $this->testFrameworkAdapter,
+                $this->debug,
+            )
+        ;
     }
 }

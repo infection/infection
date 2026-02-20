@@ -33,51 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Listener;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
-use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
-use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
-use Infection\Event\Events\Application\ApplicationExecutionWasStartedSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use function memory_get_peak_usage;
-use function sprintf;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class PerformanceLoggerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber
+final readonly class InitialStaticAnalysisExecutionLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private Stopwatch $stopwatch,
-        private TimeFormatter $timeFormatter,
-        private MemoryFormatter $memoryFormatter,
-        private int $threadCount,
-        private OutputInterface $output,
+        private InitialStaticAnalysisExecutionLoggerFactory $loggerFactory,
     ) {
     }
 
-    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
+    public function create(OutputInterface $output): EventSubscriber
     {
-        $this->stopwatch->start();
-    }
-
-    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
-    {
-        $time = $this->stopwatch->stop();
-
-        // TODO: to move to a reporter too.
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s. Threads: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true)),
-                $this->threadCount,
-            ),
-        ]);
+        return new InitialStaticAnalysisExecutionLoggerSubscriber(
+            $this->loggerFactory->create($output),
+        );
     }
 }

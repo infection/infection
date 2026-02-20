@@ -33,43 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use InvalidArgumentException;
-use function sprintf;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class CiInitialTestsConsoleLoggerSubscriber implements InitialTestSuiteWasStartedSubscriber
+final readonly class InitialTestExecutionLoggerSubscriberFactory implements SubscriberFactory
 {
     public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        private InitialTestExecutionLoggerFactory $loggerFactory,
     ) {
     }
 
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    public function create(OutputInterface $output): EventSubscriber
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-        ]);
+        return new InitialTestExecutionLoggerSubscriber(
+            $this->loggerFactory->create($output),
+        );
     }
 }
