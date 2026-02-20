@@ -14,6 +14,7 @@
         }
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "allow-plugins": {
             "infection/extension-installer": true
