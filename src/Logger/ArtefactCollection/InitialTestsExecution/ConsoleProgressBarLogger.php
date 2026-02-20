@@ -33,27 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 use InvalidArgumentException;
+use const PHP_EOL;
 use function sprintf;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class CiInitialTestsConsoleLoggerSubscriber implements InitialTestSuiteWasStartedSubscriber
+final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLogger
 {
+    private ProgressBar $progressBar;
+
     public function __construct(
         private OutputInterface $output,
         private TestFrameworkAdapter $testFrameworkAdapter,
+        private bool $debug,
     ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('verbose');
     }
 
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    public function start(): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
@@ -70,6 +75,23 @@ final readonly class CiInitialTestsConsoleLoggerSubscriber implements InitialTes
                 $this->testFrameworkAdapter->getName(),
                 $version,
             ),
+            '',
         ]);
+
+        $this->progressBar->start();
+    }
+
+    public function advance(): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function finish(string $executionOutput): void
+    {
+        $this->progressBar->finish();
+
+        if ($this->debug) {
+            $this->output->writeln(PHP_EOL . $executionOutput);
+        }
     }
 }
