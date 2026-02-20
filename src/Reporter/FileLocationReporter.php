@@ -43,7 +43,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Decorator that generates a list of generated report file locations to the console.
- * It does NOT execute the decorated report.
  *
  * @internal
  */

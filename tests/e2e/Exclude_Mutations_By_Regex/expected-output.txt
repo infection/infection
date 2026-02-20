@@ -1,4 +1,4 @@
-Total: 4
+Total: 7
 
 Killed by Test Framework: 0
 Killed by Static Analysis: 0
@@ -7,5 +7,5 @@ Syntax Errors: 0
 Escaped: 0
 Timed Out: 0
 Skipped: 0
-Ignored: 4
-Not Covered: 0
+Ignored: 6
+Not Covered: 1

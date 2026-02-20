@@ -67,9 +67,10 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
             true,
             $this->testFrameworkAdapterMock,
             $debug,
+            new FakeOutput(),
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(CiInitialTestsConsoleLoggerSubscriber::class, $subscriber);
     }
@@ -77,19 +78,20 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialTestsConsoleLoggerSubscriberFactory(
-            false,
-            $this->testFrameworkAdapterMock,
-            $debug,
-        );
-
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
             ->method('isDecorated')
             ->willReturn(false)
         ;
 
-        $subscriber = $factory->create($outputMock);
+        $factory = new InitialTestsConsoleLoggerSubscriberFactory(
+            false,
+            $this->testFrameworkAdapterMock,
+            $debug,
+            $outputMock,
+        );
+
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(InitialTestExecutionLoggerSubscriber::class, $subscriber);
     }

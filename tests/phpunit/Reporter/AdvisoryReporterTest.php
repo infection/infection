@@ -33,25 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
-use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Framework\Str;
+use Infection\Reporter\AdvisoryReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-#[CoversClass(DispatchPcntlSignalSubscriberFactory::class)]
-final class DispatchPcntlSignalSubscriberFactoryTest extends TestCase
+#[CoversClass(AdvisoryReporter::class)]
+final class AdvisoryReporterTest extends TestCase
 {
-    public function test_it_creates_a_subscriber(): void
+    public function test_it_shows_an_advisory_message(): void
     {
-        $outputMock = $this->createMock(OutputInterface::class);
+        $output = new BufferedOutput();
 
-        $subscriber = (new DispatchPcntlSignalSubscriberFactory())->create($outputMock);
+        $expected = <<<'DISPLAY'
 
-        $this->assertInstanceOf(DispatchPcntlSignalSubscriber::class, $subscriber);
-        $this->assertInstanceOf(EventSubscriber::class, $subscriber);
+            Please note that some mutants will inevitably be harmless (i.e. false positives).
+
+            DISPLAY;
+
+        $reporter = new AdvisoryReporter($output);
+        $reporter->report();
+
+        $actual = Str::toUnixLineEndings($output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 }

@@ -33,28 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+<<<<<<<< HEAD:src/Logger/MutationAnalysis/MutationAnalysisLoggerSubscriberFactory.php
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
 use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+========
+namespace Infection\Reporter;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriberFactory::class)]
-final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
+>>>>>>>> upstream/master:src/Reporter/AdvisoryReporter.php
+use Symfony\Component\Console\Output\OutputInterface;
+
+/**
+ * @internal
+ */
+<<<<<<<< HEAD:src/Logger/MutationAnalysis/MutationAnalysisLoggerSubscriberFactory.php
+final readonly class MutationAnalysisLoggerSubscriberFactory implements SubscriberFactory
 {
-    public function test_it_can_create_a_subscriber(): void
+    public function __construct(
+        private Reporter $reporter,
+        private MutationAnalysisLogger $logger,
+========
+final readonly class AdvisoryReporter implements Reporter
+{
+    public function __construct(
+        private OutputInterface $output,
+>>>>>>>> upstream/master:src/Reporter/AdvisoryReporter.php
+    ) {
+    }
+
+    public function report(): void
     {
-        $logger = $this->createMock(Reporter::class);
-
-        $factory = new MutationTestingResultsLoggerSubscriberFactory(
-            $logger,
+<<<<<<<< HEAD:src/Logger/MutationAnalysis/MutationAnalysisLoggerSubscriberFactory.php
+        return new MutationAnalysisLoggerSubscriber(
+            $this->logger,
+            $this->reporter,
         );
-
-        $subscriber = $factory->create(new FakeOutput());
-
-        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
+========
+        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
+>>>>>>>> upstream/master:src/Reporter/AdvisoryReporter.php
     }
 }

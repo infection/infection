@@ -51,7 +51,7 @@ final class ChainSubscriberFactoryTest extends TestCase
     {
         $factory = new ChainSubscriberFactory();
 
-        $subscribers = $factory->create(new FakeOutput());
+        $subscribers = $factory->create();
 
         $this->assertCount(
             0,
@@ -71,11 +71,11 @@ final class ChainSubscriberFactoryTest extends TestCase
 
         $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber1),
-            new DummySubscriberFactory($subscriber2),
+            $subscriber2,
             new DummySubscriberFactory($subscriber3),
         );
 
-        $subscribers = $factory->create($output);
+        $subscribers = $factory->create();
 
         if ($subscribers instanceof Traversable) {
             $subscribers = iterator_to_array($subscribers, false);

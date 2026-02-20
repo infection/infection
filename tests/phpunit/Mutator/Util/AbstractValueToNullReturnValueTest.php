@@ -42,6 +42,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Function_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use stdClass;
@@ -49,11 +50,11 @@ use stdClass;
 #[CoversClass(AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    private MockObject&AbstractValueToNullReturnValue $testSubject;
+    private Stub&AbstractValueToNullReturnValue $testSubjectStub;
 
     protected function setUp(): void
     {
-        $this->testSubject = $this->createMock(AbstractValueToNullReturnValue::class);
+        $this->testSubjectStub = $this->createStub(AbstractValueToNullReturnValue::class);
     }
 
     public function test_attribute_not_found(): void
@@ -91,7 +92,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Node\NullableType::class),
+                        $this->createStub(Node\NullableType::class),
                     ),
                 ),
             ),
@@ -117,7 +118,7 @@ final class AbstractValueToNullReturnValueTest extends TestCase
             $this->invokeMethod(
                 $this->mockNode(
                     $this->mockFunction(
-                        $this->createMock(Name::class),
+                        $this->createStub(Name::class),
                     ),
                 ),
             ),
@@ -151,6 +152,6 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $reflectionMethod = new ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
 
-        return $reflectionMethod->invoke($this->testSubject, $mockNode);
+        return $reflectionMethod->invoke($this->testSubjectStub, $mockNode);
     }
 }

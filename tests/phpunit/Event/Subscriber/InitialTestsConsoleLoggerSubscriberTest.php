@@ -104,7 +104,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $output->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $testFramework = $this->createStub(AbstractTestFrameworkAdapter::class);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestExecutionLoggerSubscriber($output, $testFramework, true));

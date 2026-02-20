@@ -49,6 +49,11 @@ final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 {
     public const NODE_ID_ATTRIBUTE = 'nodeId';
 
+    /**
+     * @var array<positive-int|0, Node>
+     */
+    private array $nodesById = [];
+
     public function __construct(
         private readonly Sequence $sequence = new Sequence(),
     ) {
@@ -64,14 +69,18 @@ final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        $this->addId($node);
+        $nodeId = $this->sequence->next();
+
+        $node->setAttribute(self::NODE_ID_ATTRIBUTE, $nodeId);
+
+        $this->nodesById[$nodeId] = $node;
     }
 
-    private function addId(Node $node): void
+    /**
+     * @return array<positive-int|0, Node>
+     */
+    public function getNodesById(): array
     {
-        $node->setAttribute(
-            self::NODE_ID_ATTRIBUTE,
-            $this->sequence->next(),
-        );
+        return $this->nodesById;
     }
 }

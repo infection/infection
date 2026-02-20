@@ -47,18 +47,19 @@ final readonly class InitialStaticAnalysisExecutionLoggerFactory
         private bool $skipProgressBar,
         private bool $debug,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): InitialTestExecutionLogger
+    public function create(): InitialTestExecutionLogger
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger(
-                $output,
+                $this->output,
                 $this->staticAnalysisToolAdapter,
             )
             : new ConsoleProgressBarLogger(
-                $output,
+                $this->output,
                 $this->staticAnalysisToolAdapter,
                 $this->debug,
             );

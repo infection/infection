@@ -739,60 +739,6 @@ parameters:
 			path: ../tests/phpunit/Environment/StrykerApiKeyResolverTest.php
 
 		-
-			rawMessage: 'Parameter #1 $output of class Infection\Tests\Fixtures\Event\IONullSubscriber constructor expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 3
-			path: ../tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\ChainSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/InitialTestsConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationGeneratingConsoleLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/MutationTestingResultsLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory::create() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/PerformanceLoggerSubscriberFactoryTest.php
-
-		-
-			rawMessage: 'Parameter #1 $output of method Infection\Event\Subscriber\SubscriberRegisterer::registerSubscribers() expects Symfony\Component\Console\Output\OutputInterface, Infection\Tests\Fixtures\Console\FakeOutput given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php
-
-		-
 			rawMessage: 'Call to an undefined method object::setFilter().'
 			identifier: method.notFound
 			count: 1
@@ -1135,7 +1081,7 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
 
 		-
-			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubject with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
+			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubjectStub with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
@@ -1270,12 +1216,6 @@ parameters:
 			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
 			identifier: method.internal
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProviderTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 
 		-
@@ -1307,12 +1247,6 @@ parameters:
 			identifier: div.rightNonNumeric
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
@@ -1415,24 +1349,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestingUtility/Iterable/YieldOnceIteratorTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowablesTest.php
 
 		-
 			rawMessage: Variable property access on PhpParser\Node.

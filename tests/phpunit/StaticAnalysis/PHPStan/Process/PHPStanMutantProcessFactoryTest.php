@@ -97,7 +97,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -194,7 +194,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -292,7 +292,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())

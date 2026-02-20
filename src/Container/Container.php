@@ -63,6 +63,14 @@ use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
+use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
@@ -114,14 +122,17 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\MetricsReporter;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ShowMetricsReporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
+use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -376,12 +387,14 @@ final class Container extends DIContainer
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
-                    $container->getMutationTestingResultsCollectorSubscriberFactory(),
-                    $container->getMutationTestingConsoleLoggerSubscriberFactory(),
-                    $container->getPerformanceLoggerSubscriberFactory(),
+                    $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->get(MutationTestingResultsCollectorSubscriber::class),
+                    $container->get(MutationAnalysisLoggerSubscriber::class),
+                    $container->get(MutationTestingResultsLoggerSubscriber::class),
+                    $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
-                    $container->getStopInfectionOnSigintSignalSubscriberFactory(),
-                    $container->getDispatchPcntlSignalSubscriberFactory(),
+                    $container->get(StopInfectionOnSigintSignalSubscriber::class),
+                    $container->get(DispatchPcntlSignalSubscriber::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
@@ -406,6 +419,7 @@ final class Container extends DIContainer
                     $config->noProgress,
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled,
+                    $container->getOutput(),
                 );
             },
             InitialStaticAnalysisExecutionLoggerFactory::class => static function (self $container): InitialStaticAnalysisExecutionLoggerFactory {
@@ -415,9 +429,14 @@ final class Container extends DIContainer
                     $config->noProgress,
                     $config->isDebugEnabled,
                     $container->getStaticAnalysisToolAdapter(),
+                    $container->getOutput(),
                 );
             },
-            MutationTestingResultsCollectorSubscriberFactory::class => static fn (self $container): MutationTestingResultsCollectorSubscriberFactory => new MutationTestingResultsCollectorSubscriberFactory(
+            MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
+                $container->getConfiguration()->noProgress,
+                $container->getOutput(),
+            ),
+            MutationTestingResultsCollectorSubscriber::class => static fn (self $container): MutationTestingResultsCollectorSubscriber => new MutationTestingResultsCollectorSubscriber(
                 ...array_filter([
                     $container->getMetricsCalculator(),
                     $container->getFilteringResultsCollectorFactory()->create(
@@ -425,15 +444,12 @@ final class Container extends DIContainer
                     ),
                 ]),
             ),
-            MutationAnalysisLoggerSubscriberFactory::class => static fn (self $container): MutationAnalysisLoggerSubscriberFactory => new MutationAnalysisLoggerSubscriberFactory(
-                $container->getReporter(),
-                $container->getMutationAnalysisLogger(),
-            ),
-            PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
+            PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
+                $container->getOutput(),
             ),
             FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
                 $container->getFileParser(),
@@ -476,9 +492,27 @@ final class Container extends DIContainer
                 $container->getMetricsCalculator(),
                 !$container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
-            Reporter::class => static fn (self $container): Reporter => new FileLocationReporter(
+            Reporter::class => static function (self $container): Reporter {
+                $output = $container->getOutput();
+                $config = $container->getConfiguration();
+
+                $reporter = new FileLocationReporter(
                 new FederatedReporter(...array_filter([
-                    $container->get(ShowMutationsReporter::class),
+                    new ShowMutationsReporter(
+                            $output,
+                            $container->getResultsCollector(),
+                            $container->getDiffColorizer(),
+                            $config->numberOfShownMutations,
+                            !$config->mutateOnlyCoveredCode(),
+                            $config->timeoutsAsEscaped,
+                        ),
+                        new ShowMetricsReporter(
+                            $output,
+                            $container->getMetricsCalculator(),
+                            !$config->mutateOnlyCoveredCode(),
+                        ),
+                        new AdvisoryReporter($output),
+                        $container->get(ShowMutationsReporter::class),
                     $container->get(MetricsReporter::class),
                     $container->getFileReporterFactory()->createFromConfiguration(
                         $container->getConfiguration()->logs,
@@ -486,7 +520,15 @@ final class Container extends DIContainer
                     $container->getStrykerLoggerFactory()->createFromLogEntries(
                         $container->getConfiguration()->logs,
                     ),
-                ])),
+                ]),
+                );
+
+                return new FileLocationReporter(
+                    $reporter,
+                    $output,
+                    $config->numberOfShownMutations,
+                );
+            },
                 $container->getOutput(),
                 $container->getConfiguration()->numberOfShownMutations,
             ),
@@ -815,16 +857,6 @@ final class Container extends DIContainer
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
     }
 
-    public function getStopInfectionOnSigintSignalSubscriberFactory(): StopInfectionOnSigintSignalSubscriberFactory
-    {
-        return $this->get(StopInfectionOnSigintSignalSubscriberFactory::class);
-    }
-
-    public function getDispatchPcntlSignalSubscriberFactory(): DispatchPcntlSignalSubscriberFactory
-    {
-        return $this->get(DispatchPcntlSignalSubscriberFactory::class);
-    }
-
     public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestExecutionLoggerSubscriberFactory
     {
         return $this->get(InitialTestExecutionLoggerSubscriberFactory::class);
@@ -833,21 +865,6 @@ final class Container extends DIContainer
     public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisExecutionLoggerSubscriberFactory
     {
         return $this->get(InitialStaticAnalysisExecutionLoggerSubscriberFactory::class);
-    }
-
-    public function getMutationTestingResultsCollectorSubscriberFactory(): MutationTestingResultsCollectorSubscriberFactory
-    {
-        return $this->get(MutationTestingResultsCollectorSubscriberFactory::class);
-    }
-
-    public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationAnalysisLoggerSubscriberFactory
-    {
-        return $this->get(MutationAnalysisLoggerSubscriberFactory::class);
-    }
-
-    public function getPerformanceLoggerSubscriberFactory(): PerformanceLoggerSubscriberFactory
-    {
-        return $this->get(PerformanceLoggerSubscriberFactory::class);
     }
 
     public function getSourceCollector(): SourceCollector

@@ -33,31 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 
-use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
-use Infection\Resource\Listener\PerformanceLoggerSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
 
-#[CoversClass(PerformanceLoggerSubscriberFactory::class)]
-final class PerformanceLoggerSubscriberFactoryTest extends TestCase
+final class ConcreteVisitorTestCase extends VisitorTestCase
 {
-    public function test_it_can_create_a_subscriber(): void
+    /**
+     * @return Node\Stmt[]
+     */
+    public function parseCode(string $code): array
     {
-        $factory = new PerformanceLoggerSubscriberFactory(
-            new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            1,
-        );
+        return $this->parse($code);
+    }
 
-        $subscriber = $factory->create(new FakeOutput());
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     *
+     * @return array<positive-int|0, Node>
+     */
+    public function addIdsToNodesPublic(array|Node $nodeOrNodes): array
+    {
+        return $this->addIdsToNodes($nodeOrNodes);
+    }
 
-        $this->assertInstanceOf(PerformanceLoggerSubscriber::class, $subscriber);
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     */
+    public function keepOnlyDesiredAttributesPublic(
+        array|Node $nodeOrNodes,
+        string ...$attributes,
+    ): void {
+        $this->keepOnlyDesiredAttributes($nodeOrNodes, ...$attributes);
     }
 }

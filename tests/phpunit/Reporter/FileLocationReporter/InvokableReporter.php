@@ -33,6 +33,7 @@
 
 declare(strict_types=1);
 
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerSubscriber.php
 namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
 
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
@@ -46,12 +47,31 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
  * @internal
  */
 final readonly class InitialTestExecutionLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
+========
+namespace Infection\Tests\Reporter\FileLocationReporter;
+
+use Closure;
+use Infection\Reporter\Reporter;
+
+final readonly class InvokableReporter implements Reporter
+>>>>>>>> upstream/master:tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
 {
+    private Closure $report;
+
+    /**
+     * @param (Closure():void)|null $report
+     */
     public function __construct(
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerSubscriber.php
         private InitialTestExecutionLogger $logger,
+========
+        ?Closure $report = null,
+>>>>>>>> upstream/master:tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
     ) {
+        $this->report = $report ?? static fn () => null;
     }
 
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerSubscriber.php
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         $this->logger->start();
@@ -65,5 +85,10 @@ final readonly class InitialTestExecutionLoggerSubscriber implements InitialTest
     public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
     {
         $this->logger->finish($event->outputText);
+========
+    public function report(): void
+    {
+        ($this->report)();
+>>>>>>>> upstream/master:tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
     }
 }

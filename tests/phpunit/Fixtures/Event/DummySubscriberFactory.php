@@ -14,7 +14,7 @@ final readonly class DummySubscriberFactory implements SubscriberFactory
     {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return $this->subscriber;
     }

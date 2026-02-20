@@ -67,9 +67,10 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
             true,
             $debug,
             $this->staticAnalysisToolAdapter,
+            new FakeOutput(),
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(CiInitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
     }
@@ -89,7 +90,14 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
             ->willReturn(false)
         ;
 
-        $subscriber = $factory->create($outputMock);
+        $factory = new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+            false,
+            $debug,
+            $this->staticAnalysisToolAdapter,
+            $outputMock,
+        );
+
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(InitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
     }

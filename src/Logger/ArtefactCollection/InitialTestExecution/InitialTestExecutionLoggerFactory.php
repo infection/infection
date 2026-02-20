@@ -47,18 +47,19 @@ final readonly class InitialTestExecutionLoggerFactory
         private bool $skipProgressBar,
         private TestFrameworkAdapter $testFrameworkAdapter,
         private bool $debug,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): InitialTestExecutionLogger
+    public function create(): EventSubscriber
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger(
-                $output,
+                $this->output,
                 $this->testFrameworkAdapter,
             )
             : new ConsoleProgressBarLogger(
-                $output,
+                $this->output,
                 $this->testFrameworkAdapter,
                 $this->debug,
             )

@@ -105,7 +105,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
         $output->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, true));

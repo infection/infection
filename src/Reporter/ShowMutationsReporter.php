@@ -45,23 +45,24 @@ use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final readonly class ShowMutationsReporter implements Reporter
+/**
+ * @internal
+ */
+final class ShowMutationsReporter implements Reporter
 {
     private ?int $numberOfMutationsBudget;
 
     public function __construct(
-        private OutputInterface $output,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private ?int $numberOfShownMutations,
-        private bool $withUncovered,
-        private bool $withTimeouts,
+        private readonly OutputInterface $output,
+        private readonly ResultsCollector $resultsCollector,
+        private readonly DiffColorizer $diffColorizer,
+        private readonly ?int $numberOfShownMutations,
+        private readonly bool $withUncovered,
+        private readonly bool $withTimeouts,
     ) {
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
 
-    // Was previously MutationTestingConsoleLoggerSubscriber::onMutationTestingWasFinished()
-    // ::showMutations() calls
     public function report(): void
     {
         if ($this->numberOfMutationsBudget !== 0) {

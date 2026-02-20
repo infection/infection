@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
@@ -83,15 +83,20 @@ abstract class VisitorTestCase extends TestCase
 
     /**
      * @param Node[]|Node $nodeOrNodes
+     *
+     * @return array<positive-int|0, Node>
      */
-    final protected function addIdsToNodes(array|Node $nodeOrNodes): void
+    final protected function addIdsToNodes(array|Node $nodeOrNodes): array
     {
         $nodes = (array) $nodeOrNodes;
+        $visitor = new AddIdToTraversedNodesVisitor();
 
         $nodeTraverser = new NodeTraverser(
-            new AddIdToTraversedNodesVisitor(),
+            $visitor,
         );
         $nodeTraverser->traverse($nodes);
+
+        return $visitor->getNodesById();
     }
 
     /**

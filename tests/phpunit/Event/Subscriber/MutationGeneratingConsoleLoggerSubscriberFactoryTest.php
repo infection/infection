@@ -48,24 +48,30 @@ final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCas
 {
     public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(): void
     {
-        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(true);
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
+            true,
+            new FakeOutput(),
+        );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(CiMutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }
 
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(): void
     {
-        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(false);
-
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
             ->method('isDecorated')
             ->willReturn(false)
         ;
 
-        $subscriber = $factory->create($outputMock);
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
+            false,
+            $outputMock,
+        );
+
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(MutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }

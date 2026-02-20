@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
 use function array_map;
 use DOMDocument;
+use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
@@ -558,7 +559,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         );
 
         $files = array_map(
-            static fn (DOMNode $file): string => $file->nodeValue,
+            static fn (DOMNode|DOMNameSpaceNode $file): string => $file->nodeValue,
             iterator_to_array(
                 $this->queryXpath($xml, '/phpunit/testsuites/testsuite/file'),
                 false,
