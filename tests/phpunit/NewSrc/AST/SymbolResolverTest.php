@@ -33,18 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\NewSrc\AST;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\AST\SymbolResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(SymbolResolver::class)]
+final class SymbolResolverTest extends TestCase
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function test_it_can_resolve_a_symbol(): void
     {
+    }
+
+    public static function symbolProvider(): iterable
+    {
+        // We only provide minimal tests here. A more complete suite is provided with its
+        // corresponding visitor.
+        yield [];
     }
 }

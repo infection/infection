@@ -33,18 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Framework;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use function is_dir;
+use function is_file;
+use function is_readable;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Finder\Finder;
+
+final class Filesystem extends SymfonyFilesystem
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function isReadableFile(string $path): bool
     {
+        return is_file($path) && is_readable($path);
+    }
+
+    public function isReadableDirectory(string $path): bool
+    {
+        return is_dir($path) && is_readable($path);
+    }
+
+    public function createFinder(): Finder
+    {
+        return Finder::create();
     }
 }

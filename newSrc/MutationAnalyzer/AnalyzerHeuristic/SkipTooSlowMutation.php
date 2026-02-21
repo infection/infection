@@ -33,18 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer\AnalyzerHeuristic;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+final class SkipTooSlowMutation implements AnalyzerHeuristic
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
 }

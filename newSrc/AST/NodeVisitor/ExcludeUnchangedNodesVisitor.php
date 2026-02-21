@@ -33,18 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+// Excludes nodes that do not belong to changed code from the git diff.
+final class ExcludeUnchangedNodesVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function enterNode(Node $node): ?int
     {
+        if ($this->isPartOfTheDiff($node)) {
+            NodeAnnotator::annotate($node, Annotation::NOT_PART_OF_THE_GIT_DIFF);
+
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
+    }
+
+    private function isPartOfTheDiff(Node $node): bool
+    {
+        return true;    // TODO
     }
 }

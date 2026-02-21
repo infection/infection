@@ -33,18 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\Mutagenesis\Mutation;
+
+final class MutantFactory
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function create(Mutation $mutant): Mutant
     {
+        // TODO
     }
 }

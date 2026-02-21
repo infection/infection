@@ -33,18 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\PhpParser\Visitor;
+
+use Infection\Mutation\Mutation;
+use Infection\Mutator\NodeMutationGenerator;
+use Infection\Source\Exception\NoSourceFound;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
  * @internal
  */
-trait CannotBeInstantiated
+final class MutagenesisVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @var array<iterable<Mutation>>
+     */
+    private array $mutationChunks = [];
+
+    public function __construct(
+        private readonly NodeMutationGenerator $mutationGenerator,
+    ) {
+    }
+
+    public function beforeTraverse(array $nodes): ?array
     {
+        $this->mutationChunks = [];
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws NoSourceFound
+     */
+    public function leaveNode(Node $node): ?Node
+    {
+        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
+
+        return null;
+    }
+
+    /**
+     * @return iterable<Mutation>
+     */
+    public function getMutations(): iterable
+    {
+        foreach ($this->mutationChunks as $mutations) {
+            yield from $mutations;
+        }
     }
 }
