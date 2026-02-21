@@ -1,83 +1,96 @@
-# yamllint disable rule:line-length
-# yamllint disable rule:braces
-
 name: Annotations
 
 on:
-    pull_request:
+  pull_request:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-    tests:
-        runs-on: ubuntu-latest
-        timeout-minutes: 30
+  tests:
 
-        strategy:
-            matrix:
-                php-version: ['8.2']
+    runs-on: ubuntu-latest
 
-        name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-              with:
-                  fetch-depth: 0
-            - name: Setup PHP
-              uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
-              with:
-                  php-version: ${{ matrix.php-version }}
-                  tools: composer:v2.1
-                  coverage: pcov
-              env:
-                # This is necessary when installing a tool with a specific version
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 30
 
-            - name: Get composer cache directory
-              id: composer-cache
-              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+    strategy:
+      matrix:
+        php-version: ['8.2', '8.3', '8.4', '8.5']
 
-            - name: Cache dependencies
-              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
-              with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
-                  restore-keys: |
-                      composer-${{ runner.os }}-${{ matrix.php-version }}-
-                      composer-${{ runner.os }}-
-                      composer-
+    name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
 
-            - name: Install dependencies
-              run: |
-                  composer install --no-interaction --prefer-dist --no-progress
 
-            - name: Run Infection for changed lines only
-              run: |
-                  git fetch origin $GITHUB_BASE_REF
-                  php bin/infection \
-                    --git-diff-lines \
-                    --git-diff-base=origin/$GITHUB_BASE_REF \
-                    --ignore-msi-with-no-mutations \
-                    --max-timeouts=0 \
-                    --min-msi=100 \
-                    --min-covered-msi=100
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
 
-    # This is a meta job to avoid to have to constantly change the protection rules
-    # whenever we touch the matrix.
-    tests-status:
-        name: Annotations Status
-        runs-on: ubuntu-latest
-        timeout-minutes: 30
-        needs: tests
-        if: always()
-        steps:
-            - name: Successful run
-              if: ${{ !(contains(needs.*.result, 'failure')) }}
-              run: exit 0
 
-            - name: Failing run
-              if: ${{ contains(needs.*.result, 'failure') }}
-              run: exit 1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2.1
+          coverage: pcov
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+
+      - name: Cache dependencies
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+            composer-
+
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+
+
+      - name: Run Infection for changed lines only
+        run: |
+          git fetch origin $GITHUB_BASE_REF
+          php bin/infection \
+            --git-diff-lines \
+            --git-diff-base=origin/$GITHUB_BASE_REF \
+            --ignore-msi-with-no-mutations \
+            --max-timeouts=0 \
+            --min-msi=100 \
+            --min-covered-msi=100
+
+  tests-status:
+
+    name: Annotations Status
+
+    runs-on: ubuntu-latest
+
+
+    timeout-minutes: 30
+
+    needs: tests
+
+    if: always()
+
+
+    steps:
+      - name: Successful run
+        if: "${{ !(contains(needs.*.result, 'failure')) }}"
+        run: exit 0
+
+
+      - name: Failing run
+        if: "${{ contains(needs.*.result, 'failure') }}"
+        run: exit 1
