@@ -72,13 +72,10 @@ class FileSystem extends SymfonyFilesystem
         try {
             return realpath($filename);
         } catch (FilesystemException $exception) {
-            throw new IOException(
-                sprintf(
-                    'Could not resolve the path "%s".',
-                    $filename,
-                ),
-                previous: $exception,
-            );
+            throw new IOException(sprintf(
+                'Could not resolve the path "%s".',
+                $filename,
+            ), $exception->getCode(), previous: $exception);
         }
     }
 
