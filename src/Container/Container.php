@@ -62,8 +62,8 @@ use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFact
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
@@ -113,11 +113,13 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ShowMetricsReporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
@@ -377,7 +379,7 @@ final class Container extends DIContainer
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
-                    $container->get(MutationTestingConsoleLoggerSubscriber::class),
+                    $container->get(MutationAnalysisLoggerSubscriber::class),
                     $container->get(MutationTestingResultsLoggerSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
@@ -432,30 +434,6 @@ final class Container extends DIContainer
                     ),
                 ]),
             ),
-            MutationTestingConsoleLoggerSubscriber::class => static function (self $container): MutationTestingConsoleLoggerSubscriber {
-                $output = $container->getOutput();
-                $config = $container->getConfiguration();
-
-                return new MutationTestingConsoleLoggerSubscriber(
-                    $output,
-                    $container->getMutationAnalysisLogger(),
-                    $container->getMetricsCalculator(),
-                    new ShowMutationsReporter(
-                        $output,
-                        $container->getResultsCollector(),
-                        $container->getDiffColorizer(),
-                        $config->numberOfShownMutations,
-                        !$config->mutateOnlyCoveredCode(),
-                        $config->timeoutsAsEscaped,
-                    ),
-                    new FileLocationReporter(
-                        $container->getReporter(),
-                        $output,
-                        $config->numberOfShownMutations,
-                    ),
-                    !$config->mutateOnlyCoveredCode(),
-                );
-            },
             PerformanceLoggerSubscriber::class => static fn (self $container): PerformanceLoggerSubscriber => new PerformanceLoggerSubscriber(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
@@ -487,14 +465,41 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
-                $container->getFileReporterFactory()->createFromConfiguration(
-                    $container->getConfiguration()->logs,
-                ),
-                $container->getStrykerLoggerFactory()->createFromLogEntries(
-                    $container->getConfiguration()->logs,
-                ),
-            ])),
+            Reporter::class => static function (self $container): Reporter {
+                $output = $container->getOutput();
+                $config = $container->getConfiguration();
+
+                $reporter = new FederatedReporter(
+                    ...array_filter([
+                        new ShowMutationsReporter(
+                            $output,
+                            $container->getResultsCollector(),
+                            $container->getDiffColorizer(),
+                            $config->numberOfShownMutations,
+                            !$config->mutateOnlyCoveredCode(),
+                            $config->timeoutsAsEscaped,
+                        ),
+                        new ShowMetricsReporter(
+                            $output,
+                            $container->getMetricsCalculator(),
+                            !$config->mutateOnlyCoveredCode(),
+                        ),
+                        new AdvisoryReporter($output),
+                        $container->getFileReporterFactory()->createFromConfiguration(
+                            $container->getConfiguration()->logs,
+                        ),
+                        $container->getStrykerLoggerFactory()->createFromLogEntries(
+                            $container->getConfiguration()->logs,
+                        ),
+                    ]),
+                );
+
+                return new FileLocationReporter(
+                    $reporter,
+                    $output,
+                    $config->numberOfShownMutations,
+                );
+            },
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 

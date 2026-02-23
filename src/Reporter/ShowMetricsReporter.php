@@ -33,34 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Reporter;
 
-use function count;
 use function floor;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
-use Infection\Framework\Iterable\IterableCounter;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Reporter\Reporter;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * TODO: should be renamed
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final readonly class ShowMetricsReporter implements Reporter
 {
     private const PAD_LENGTH = 8;
 
@@ -68,63 +53,14 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
 
     private const MEDIUM_QUALITY_THRESHOLD = 90;
 
-    /**
-     * @var positive-int|IterableCounter::UNKNOWN_COUNT
-     */
-    private int $mutationCount = 0;
-
     public function __construct(
-        private readonly OutputInterface $output,
-        private readonly MutationAnalysisLogger $logger,
-        private readonly MetricsCalculator $metricsCalculator,
-        private readonly Reporter $showMutationsReporter,
-        private readonly Reporter $reporter,
-        private readonly bool $withUncovered,
+        private OutputInterface $output,
+        private MetricsCalculator $metricsCalculator,
+        private bool $withUncovered,
     ) {
     }
 
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
-    {
-        $this->mutationCount = $event->mutationCount;
-
-        $this->logger->startAnalysis($this->mutationCount);
-    }
-
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
-    {
-        $this->logger->startEvaluation($event->mutation);
-    }
-
-    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
-    {
-        if (count($event->mutationHashes) > 0) {
-            $this->logger->finishMutationGenerationForFile(
-                $event->sourceFilePath,
-                $event->mutationHashes,
-            );
-        }
-    }
-
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
-    {
-        $executionResult = $event->executionResult;
-
-        $this->logger->finishEvaluation($executionResult);
-    }
-
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
-    {
-        $this->logger->finishAnalysis();
-
-        $this->showMutationsReporter->report();
-
-        $this->showMetrics();
-        $this->reporter->report();
-
-        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
-    }
-
-    private function showMetrics(): void
+    public function report(): void
     {
         $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');

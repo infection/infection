@@ -205,6 +205,10 @@ final class LogicalOr implements Mutator
                 return true;
             }
 
+            if ($leftSigil[0] === $rightSigil[0]) {
+                return false;
+            }
+
             return (match ("{$leftSigil}::{$rightSigil}") {
                 '<::>' => static fn () => $valueRight < $valueLeft, // a<5 && a>7; 7<a<5; 7<5;
                 '<::>=' => static fn () => $valueRight < $valueLeft, // a<5 && a>=7; 7<=a<5; 7<5;
@@ -214,7 +218,7 @@ final class LogicalOr implements Mutator
                 '>::<=' => static fn () => $valueRight > $valueLeft, // a>5 && a<=7; 7>=a>5; 7>5;
                 '>=::<=' => static fn () => $valueRight >= $valueLeft, // a>=5 && a<=7; 7>=a>=5; 7>=5;
                 '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
-                default => throw new LogicException('This is an unreachable statement.'),
+                default => throw new LogicException("This is an unreachable statement, sigils found: {$leftSigil}::{$rightSigil}"),
             })();
         }
 

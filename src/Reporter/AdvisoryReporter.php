@@ -35,70 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
-use Generator;
-use function sprintf;
-use function str_repeat;
-use function str_starts_with;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Decorator that generates a list of generated report file locations to the console.
- *
  * @internal
  */
-final readonly class FileLocationReporter implements Reporter
+final readonly class AdvisoryReporter implements Reporter
 {
-    private const PAD_LENGTH = 8;
-
     public function __construct(
-        private Reporter $decoratedReporter,
         private OutputInterface $output,
-        private ?int $numberOfShownMutations,
     ) {
     }
 
     public function report(): void
     {
-        $this->decoratedReporter->report();
-
-        $hasReporters = false;
-
-        foreach ($this->getFileReporters($this->decoratedReporter) as $fileReporter) {
-            if (!$hasReporters) {
-                $this->output->writeln(['', 'Generated Reports:']);
-            }
-            $this->output->writeln(
-                $this->addIndentation(sprintf('- %s', $fileReporter->getFilePath())),
-            );
-            $hasReporters = true;
-        }
-
-        if ($hasReporters) {
-            return;
-        }
-
-        // for the case when no file reporters are configured and `--show-mutations` is not used
-        if ($this->numberOfShownMutations === 0) {
-            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file reporters.']);
-        }
-    }
-
-    /**
-     * @return Generator<FileReporter>
-     */
-    private function getFileReporters(Reporter ...$reporters): Generator
-    {
-        foreach ($reporters as $reporter) {
-            if ($reporter instanceof FederatedReporter) {
-                yield from $this->getFileReporters(...$reporter->reporters);
-            } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
-                yield $reporter;
-            }
-        }
-    }
-
-    private function addIndentation(string $string): string
-    {
-        return str_repeat(' ', self::PAD_LENGTH + 1) . $string;
+        $this->output->writeln(['', 'Please note that some mutants will inevitably be harmless (i.e. false positives).']);
     }
 }
