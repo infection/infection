@@ -138,11 +138,8 @@ final readonly class TeamCity
             $attributes['expected'] = $to;
         }
 
-        return $this->write(
-            /** @psalm-suppress InvalidArgument */
-            $messageName,
-            $attributes,
-        );
+        /** @psalm-suppress InvalidArgument */
+        return $this->write($messageName, $attributes);
     }
 
     /**
