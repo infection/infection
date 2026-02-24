@@ -37,18 +37,18 @@ namespace Infection\Tests\Logger\MutationGeneration;
 
 use Infection\Logger\MutationGeneration\ConsoleNoProgressLogger;
 use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
-use Infection\Logger\MutationGeneration\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(MutationGeneratingConsoleLoggerSubscriberFactory::class)]
-final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCase
+#[CoversClass(MutationGenerationLoggerFactory::class)]
+final class MutationGenerationLoggerFactoryTest extends TestCase
 {
     public function test_it_creates_a_no_progress_logger_if_skips_the_progress_bar(): void
     {
-        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
+        $factory = new MutationGenerationLoggerFactory(
             true,
             new FakeOutput(),
         );
@@ -66,7 +66,7 @@ final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCas
             ->willReturn(false)
         ;
 
-        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
+        $factory = new MutationGenerationLoggerFactory(
             false,
             $outputMock,
         );

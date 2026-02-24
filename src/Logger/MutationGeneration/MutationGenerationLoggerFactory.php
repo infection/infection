@@ -40,7 +40,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriberFactory
+final readonly class MutationGenerationLoggerFactory
 {
     public function __construct(
         private bool $skipProgressBar,

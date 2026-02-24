@@ -91,7 +91,8 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
-use Infection\Logger\MutationGeneration\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Logger\MutationGeneration\MutationGenerationLogger;
+use Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -429,7 +430,8 @@ final class Container extends DIContainer
                 );
             },
             InitialStaticAnalysisExecutionLogger::class => static fn (self $container): InitialStaticAnalysisExecutionLogger => $container->get(InitialStaticAnalysisExecutionLoggerFactory::class)->create(),
-            MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
+            MutationGenerationLogger::class => static fn (self $container): MutationGenerationLogger => $container->get(MutationGenerationLoggerFactory::class)->create(),
+            MutationGenerationLoggerFactory::class => static fn (self $container): MutationGenerationLoggerFactory => new MutationGenerationLoggerFactory(
                 $container->getConfiguration()->noProgress,
                 $container->getOutput(),
             ),
