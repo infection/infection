@@ -33,61 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
+namespace Infection\Logger\ArtefactCollection;
 
-use Infection\Framework\Str;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleNoProgressLogger;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use InvalidArgumentException;
+use function sprintf;
+use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(ConsoleNoProgressLogger::class)]
-final class ConsoleNoProgressLoggerTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
 {
-    private BufferedOutput $output;
-
-    private MockObject&StaticAnalysisToolAdapter $staticAnalysisAdapterMock;
-
-    private InitialStaticAnalysisExecutionLogger $logger;
-
-    protected function setUp(): void
-    {
-        $this->output = new BufferedOutput();
-        $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
-
-        $this->logger = new ConsoleNoProgressLogger(
-            $this->staticAnalysisAdapterMock,
-            $this->output,
-        );
+    public function __construct(
+        private TestFrameworkAdapter|StaticAnalysisToolAdapter $testFramework,
+        private OutputInterface $output,
+    ) {
     }
 
-    public function test_it_logs_on_start(): void
+    public function start(): void
     {
-        $this->staticAnalysisAdapterMock
-            ->expects($this->once())
-            ->method('getVersion')
-            ->willReturn('6.5.4');
+        try {
+            $version = $this->testFramework->getVersion();
+        } catch (InvalidArgumentException) {
+            $version = 'unknown';
+        }
 
-        $this->staticAnalysisAdapterMock
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPStan');
+        $this->output->writeln([
+            '',
+            sprintf(
+                'Initial execution of %s version: %s',
+                $this->testFramework->getName(),
+                $version,
+            ),
+        ]);
+    }
 
-        $expected = <<<'EOF'
+    public function advance(): void
+    {
+        // Do nothing.
+    }
 
-            Running initial Static Analysis...
-
-            PHPStan version: 6.5.4
-
-            EOF;
-
-        $this->logger->start();
-
-        $actual = Str::toUnixLineEndings($this->output->fetch());
-
-        $this->assertSame($expected, $actual);
+    public function finish(string $executionOutput): void
+    {
+        // Do nothing.
     }
 }

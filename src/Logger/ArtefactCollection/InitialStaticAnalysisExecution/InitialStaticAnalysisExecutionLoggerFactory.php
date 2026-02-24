@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -59,8 +61,8 @@ final readonly class InitialStaticAnalysisExecutionLoggerFactory
                 $this->output,
             )
             : new ConsoleProgressBarLogger(
-                $this->staticAnalysisToolAdapter,
                 $this->output,
+                $this->staticAnalysisToolAdapter,
                 $this->debug,
             );
     }

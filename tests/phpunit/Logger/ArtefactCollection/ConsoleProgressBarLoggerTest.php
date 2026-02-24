@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\ArtefactCollection\InitialTestsExecution;
+namespace Infection\Tests\Logger\ArtefactCollection;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Logger\ArtefactCollection\InitialTestsExecution\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use InvalidArgumentException;
 use const PHP_EOL;
@@ -78,10 +78,7 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ->method('writeln')
             ->with([
                 '',
-                'Running initial test suite...',
-                '',
-                'PHPUnit version: unknown',
-                '',
+                'Initial execution of PHPUnit version: unknown',
             ]);
         $this->outputMock
             ->method('getVerbosity')

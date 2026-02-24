@@ -33,65 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
+namespace Infection\Tests\Logger\ArtefactCollection;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use InvalidArgumentException;
-use const PHP_EOL;
-use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Framework\Str;
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-/**
- * @internal
- */
-final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLogger
+#[CoversClass(ConsoleNoProgressLogger::class)]
+final class ConsoleNoProgressLoggerTest extends TestCase
 {
-    private ProgressBar $progressBar;
+    private BufferedOutput $output;
 
-    public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-        private bool $debug,
-    ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
+    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
+
+    private InitialTestsExecutionLogger $logger;
+
+    protected function setUp(): void
+    {
+        $this->output = new BufferedOutput();
+        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
+
+        $this->logger = new ConsoleNoProgressLogger(
+            $this->testFrameworkMock,
+            $this->output,
+        );
     }
 
-    public function start(): void
+    public function test_it_logs_on_start(): void
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
+        $this->testFrameworkMock
+            ->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('6.5.4');
 
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-            '',
-        ]);
+        $this->testFrameworkMock
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('PHPUnit');
 
-        $this->progressBar->start();
-    }
+        $expected = <<<'EOF'
 
-    public function advance(): void
-    {
-        $this->progressBar->advance();
-    }
+            Initial execution of PHPUnit version: 6.5.4
 
-    public function finish(string $executionOutput): void
-    {
-        $this->progressBar->finish();
+            EOF;
 
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $executionOutput);
-        }
+        $this->logger->start();
+
+        $actual = Str::toUnixLineEndings($this->output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 }
