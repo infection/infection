@@ -65,7 +65,7 @@ use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
@@ -87,14 +87,14 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerSubscriberFactory;
-use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialTestExecutionLoggerSubscriberFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerSubscriberFactory;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
@@ -386,7 +386,7 @@ final class Container extends DIContainer
             ),
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
-                    $container->getInitialTestsConsoleLoggerSubscriberFactory(),
+                    $container->get(InitialTestsExecutionLoggerSubscriber::class),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
                     $container->get(MutationAnalysisLoggerSubscriber::class),
@@ -412,17 +412,18 @@ final class Container extends DIContainer
                     $config->tmpDir,
                 );
             },
-            InitialTestExecutionLoggerFactory::class => static function (self $container): InitialTestExecutionLoggerFactory {
+            InitialTestsExecutionLoggerFactory::class => static function (self $container): InitialTestsExecutionLoggerFactory {
                 $config = $container->getConfiguration();
 
-                return new InitialTestExecutionLoggerFactory(
+                return new InitialTestsExecutionLoggerFactory(
                     $config->noProgress,
                     $container->getTestFrameworkAdapter(),
                     $config->isDebugEnabled,
                     $container->getOutput(),
                 );
             },
-            InitialStaticAnalysisExecutionLoggerFactory::class => static function (self $container): InitialStaticAnalysisExecutionLoggerFactory {
+            InitialTestsExecutionLogger::class => static fn (self $container): InitialTestsExecutionLogger => $container->get(InitialTestsExecutionLoggerFactory::class)->create(),
+            InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
                 return new InitialStaticAnalysisExecutionLoggerFactory(
@@ -652,6 +653,7 @@ final class Container extends DIContainer
             ),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
+                $container->getDiffer(),
             ),
             MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
                 $container->getOutput(),
@@ -857,12 +859,7 @@ final class Container extends DIContainer
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
     }
 
-    public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestExecutionLoggerSubscriberFactory
-    {
-        return $this->get(InitialTestExecutionLoggerSubscriberFactory::class);
-    }
-
-    public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisExecutionLoggerSubscriberFactory
+    public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory
     {
         return $this->get(InitialStaticAnalysisExecutionLoggerSubscriberFactory::class);
     }

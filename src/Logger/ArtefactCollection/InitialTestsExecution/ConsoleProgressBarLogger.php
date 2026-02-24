@@ -33,11 +33,18 @@
 
 declare(strict_types=1);
 
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleProgressBarLogger.php
 namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
+========
+namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleProgressBarLogger.php
 
 use Infection\AbstractTestFramework\InvalidVersion;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleProgressBarLogger.php
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+========
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleProgressBarLogger.php
 use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -46,7 +53,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleProgressBarLogger.php
 final readonly class ConsoleProgressBarLogger implements InitialTestExecutionLogger
+========
+final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLogger
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleProgressBarLogger.php
 {
     private ProgressBar $progressBar;
 
@@ -90,8 +101,12 @@ final readonly class ConsoleProgressBarLogger implements InitialTestExecutionLog
         $this->progressBar->finish();
 
         if ($this->debug) {
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleProgressBarLogger.php
             $this->output->writeln('');
             $this->output->writeln($executionOutput);
+========
+            $this->output->writeln(PHP_EOL . $executionOutput);
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleProgressBarLogger.php
         }
     }
 }

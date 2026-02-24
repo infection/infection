@@ -33,36 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompletedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 
 /**
- * OK, we need to figure out what to do with this one.
- *
- * Indeed, currently it is used when "noProgress". If we move it as part of the MutationAnalysisLogger, it will
- * then be the formatter name, not the progress, that will define it.
- *
- * So the question is, what do we expect when we have no progress + formatter/logger = progress?
- *
  * @internal
  */
-final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
+final readonly class InitialTestsExecutionLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
 {
     public function __construct(
-        private OutputInterface $output,
+        private InitialTestsExecutionLogger $logger,
     ) {
     }
 
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        $this->output->writeln([
-            '',
-            'Generate mutants...',
-            '',
-            'Processing source code files...',
-        ]);
+        $this->logger->start();
+    }
+
+    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
+    {
+        $this->logger->advance();
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }

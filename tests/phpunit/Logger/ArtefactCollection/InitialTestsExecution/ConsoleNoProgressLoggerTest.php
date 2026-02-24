@@ -33,54 +33,61 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\ArtefactCollection\InitialTestsExecution;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Logger\ArtefactCollection\InitialTestExecution\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Framework\Str;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-#[CoversClass(CiInitialTestsConsoleLoggerSubscriber::class)]
-final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
+#[CoversClass(ConsoleNoProgressLogger::class)]
+final class ConsoleNoProgressLoggerTest extends TestCase
 {
-    private MockObject&OutputInterface $output;
+    private BufferedOutput $output;
 
-    private MockObject&AbstractTestFrameworkAdapter $testFramework;
+    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
+
+    private InitialTestsExecutionLogger $logger;
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $this->output = new BufferedOutput();
+        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
 
-        $this->output = $this->createMock(OutputInterface::class);
-        $this->testFramework = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $this->logger = new ConsoleNoProgressLogger(
+            $this->output,
+            $this->testFrameworkMock,
+        );
     }
 
-    public function test_it_reacts_on_mutants_creating_event(): void
+    public function test_it_logs_on_start(): void
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Running initial test suite...',
-                '',
-                'PHPUnit version: 6.5.4',
-            ]);
-
-        $this->testFramework->expects($this->once())
+        $this->testFrameworkMock
+            ->expects($this->once())
             ->method('getVersion')
             ->willReturn('6.5.4');
 
-        $this->testFramework->expects($this->once())
+        $this->testFrameworkMock
+            ->expects($this->once())
             ->method('getName')
             ->willReturn('PHPUnit');
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
+        $expected = <<<'EOF'
 
-        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
+            Running initial test suite...
+
+            PHPUnit version: 6.5.4
+
+            EOF;
+
+        $this->logger->start();
+
+        $actual = Str::toUnixLineEndings($this->output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 }

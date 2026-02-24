@@ -33,7 +33,11 @@
 
 declare(strict_types=1);
 
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerFactory.php
 namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
+========
+namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactory.php
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,7 +45,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerFactory.php
 final readonly class InitialTestExecutionLoggerFactory
+========
+final readonly class InitialTestsExecutionLoggerFactory
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactory.php
 {
     public function __construct(
         private bool $skipProgressBar,
@@ -51,7 +59,7 @@ final readonly class InitialTestExecutionLoggerFactory
     ) {
     }
 
-    public function create(): EventSubscriber
+    public function create(): InitialTestsExecutionLogger
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger(
