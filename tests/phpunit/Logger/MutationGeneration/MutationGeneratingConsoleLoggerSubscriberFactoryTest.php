@@ -33,42 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\MutationGeneration;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Logger\MutationGeneration\ConsoleNoProgressLogger;
+use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
+use Infection\Logger\MutationGeneration\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriber::class)]
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+#[CoversClass(MutationGeneratingConsoleLoggerSubscriberFactory::class)]
+final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
-    private MockObject&OutputInterface $output;
-
-    protected function setUp(): void
+    public function test_it_creates_a_no_progress_logger_if_skips_the_progress_bar(): void
     {
-        parent::setUp();
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
+            true,
+            new FakeOutput(),
+        );
 
-        $this->output = $this->createMock(OutputInterface::class);
+        $logger = $factory->create();
+
+        $this->assertInstanceOf(ConsoleNoProgressLogger::class, $logger);
     }
 
-    public function test_it_reacts_on_mutation_generating_started_event(): void
+    public function test_it_creates_a_progress_bar_logger_if_does_not_skip_the_progress_bar(): void
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Generate mutants...',
-                '',
-                'Processing source code files...',
-            ]);
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
+        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
+            false,
+            $outputMock,
+        );
 
-        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
+        $logger = $factory->create();
+
+        $this->assertInstanceOf(ConsoleProgressBarLogger::class, $logger);
     }
 }

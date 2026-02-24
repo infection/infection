@@ -33,18 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Logger\MutationGeneration;
+
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class MutationGenerationWasStarted
+final readonly class ConsoleNoProgressLogger implements MutationGenerationLogger
 {
-    /**
-     * @param positive-int|0 $mutableFilesCount
-     */
     public function __construct(
-        public int $mutableFilesCount,
+        private OutputInterface $output,
     ) {
+    }
+
+    public function start(int $sourceFilesCount): void
+    {
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+            'Processing source code files...',
+        ]);
+    }
+
+    public function advance(): void
+    {
+        // Do nothing.
+    }
+
+    public function finish(): void
+    {
+        // Do nothing.
     }
 }

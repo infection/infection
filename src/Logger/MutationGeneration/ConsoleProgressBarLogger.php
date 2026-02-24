@@ -33,26 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationGeneration;
 
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class ConsoleProgressBarLogger implements MutationGenerationLogger
 {
+    private ProgressBar $progressBar;
+
     public function __construct(
-        private bool $skipProgressBar,
         private OutputInterface $output,
     ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
-    public function create(): EventSubscriber
+    public function start(int $sourceFilesCount): void
     {
-        return $this->skipProgressBar
-            ? new CiMutationGeneratingConsoleLoggerSubscriber($this->output)
-            : new MutationGeneratingConsoleLoggerSubscriber($this->output)
-        ;
+        $this->output->writeln([
+            '',
+            '',
+            'Generate mutants...',
+            '',
+        ]);
+
+        $this->progressBar->start($sourceFilesCount);
+    }
+
+    public function advance(): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function finish(): void
+    {
+        $this->progressBar->finish();
     }
 }

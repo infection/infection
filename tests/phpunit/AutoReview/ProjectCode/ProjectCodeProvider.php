@@ -61,7 +61,6 @@ use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
@@ -160,7 +159,6 @@ final class ProjectCodeProvider
         MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
         MutationEvaluationWasStarted::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
         MutatorName::class,
         NameResolverFactory::class,
         NodeMutationGenerator::class,
