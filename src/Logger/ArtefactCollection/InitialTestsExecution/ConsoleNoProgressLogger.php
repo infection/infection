@@ -33,52 +33,41 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Logger/MutationAnalysis/CiMutationGeneratingConsoleLoggerSubscriber.php
-namespace Infection\Logger\MutationAnalysis;
-
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-========
 namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use InvalidArgumentException;
 use function sprintf;
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleNoProgressLogger.php
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * OK, we need to figure out what to do with this one.
- *
- * Indeed, currently it is used when "noProgress". If we move it as part of the MutationAnalysisLogger, it will
- * then be the formatter name, not the progress, that will define it.
- *
- * So the question is, what do we expect when we have no progress + formatter/logger = progress?
- *
  * @internal
  */
-<<<<<<<< HEAD:src/Logger/MutationAnalysis/CiMutationGeneratingConsoleLoggerSubscriber.php
-final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
-========
 final readonly class ConsoleNoProgressLogger implements InitialTestsExecutionLogger
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleNoProgressLogger.php
 {
     public function __construct(
         private OutputInterface $output,
+        private TestFrameworkAdapter $testFrameworkAdapter,
     ) {
     }
 
-<<<<<<<< HEAD:src/Logger/MutationAnalysis/CiMutationGeneratingConsoleLoggerSubscriber.php
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
-========
     public function start(): void
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleNoProgressLogger.php
     {
+        try {
+            $version = $this->testFrameworkAdapter->getVersion();
+        } catch (InvalidArgumentException) {
+            $version = 'unknown';
+        }
+
         $this->output->writeln([
             '',
-            'Generate mutants...',
+            'Running initial test suite...',
             '',
-            'Processing source code files...',
+            sprintf(
+                '%s version: %s',
+                $this->testFrameworkAdapter->getName(),
+                $version,
+            ),
         ]);
     }
 

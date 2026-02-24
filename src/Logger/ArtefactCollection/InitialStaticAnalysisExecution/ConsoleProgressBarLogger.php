@@ -33,16 +33,6 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerSubscriber.php
-namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
-
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompletedSubscriber;
-========
 namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -51,38 +41,25 @@ use const PHP_EOL;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleProgressBarLogger.php
 
 /**
  * @internal
  */
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerSubscriber.php
-final readonly class InitialStaticAnalysisExecutionLoggerSubscriber implements InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber
-========
 final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisExecutionLogger
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleProgressBarLogger.php
 {
+    private ProgressBar $progressBar;
+
     public function __construct(
-        private InitialTestExecutionLogger $logger,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private OutputInterface $output,
+        private bool $debug,
     ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('verbose');
     }
 
     public function start(): void
     {
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerSubscriber.php
-        $this->logger->start();
-    }
-
-    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
-    {
-        $this->logger->advance();
-    }
-
-    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
-    {
-        $this->logger->finish($event->outputText);
-    }
-========
         try {
             $version = $this->staticAnalysisToolAdapter->getVersion();
         } catch (InvalidArgumentException) {
@@ -118,5 +95,4 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
             $this->output->writeln(PHP_EOL . $executionOutput);
         }
     }
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleProgressBarLogger.php
 }

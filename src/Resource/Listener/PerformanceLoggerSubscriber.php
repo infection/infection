@@ -69,7 +69,6 @@ final readonly class PerformanceLoggerSubscriber implements ApplicationExecution
     {
         $time = $this->stopwatch->stop();
 
-        // TODO: to move to a reporter too.
         $this->output->writeln([
             '',
             sprintf(

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
-use Infection\Logger\MutationAnalysis\CiMutationGeneratingConsoleLoggerSubscriber;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

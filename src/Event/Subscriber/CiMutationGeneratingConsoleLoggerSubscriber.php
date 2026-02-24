@@ -33,39 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Event\Subscriber;
 
-use Infection\Mutant\MutantExecutionResult;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
+final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
 {
     public function __construct(
-        private readonly ProgressBar $progressBar,
+        private OutputInterface $output,
     ) {
     }
 
-    public function startAnalysis(int $mutationCount): void
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        parent::startAnalysis($mutationCount);
-
-        $this->progressBar->start($mutationCount);
-    }
-
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
-    {
-        parent::finishEvaluation($executionResult);
-
-        $this->progressBar->advance();
-    }
-
-    public function finishAnalysis(): void
-    {
-        parent::finishAnalysis();
-
-        $this->progressBar->finish();
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+            'Processing source code files...',
+        ]);
     }
 }

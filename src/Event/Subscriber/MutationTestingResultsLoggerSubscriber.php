@@ -33,39 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Event\Subscriber;
 
-use Infection\Mutant\MutantExecutionResult;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Reporter\Reporter;
 
 /**
  * @internal
  */
-final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
+final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
 {
     public function __construct(
-        private readonly ProgressBar $progressBar,
+        private Reporter $reporter,
     ) {
     }
 
-    public function startAnalysis(int $mutationCount): void
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        parent::startAnalysis($mutationCount);
-
-        $this->progressBar->start($mutationCount);
-    }
-
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
-    {
-        parent::finishEvaluation($executionResult);
-
-        $this->progressBar->advance();
-    }
-
-    public function finishAnalysis(): void
-    {
-        parent::finishAnalysis();
-
-        $this->progressBar->finish();
+        $this->reporter->report();
     }
 }

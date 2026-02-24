@@ -33,11 +33,7 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerFactory.php
-namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
-========
 namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactory.php
 
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -55,28 +51,16 @@ final readonly class InitialStaticAnalysisExecutionLoggerFactory
     ) {
     }
 
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerFactory.php
-    public function create(): InitialTestExecutionLogger
-    {
-        return $this->skipProgressBar
-            ? new ConsoleNoProgressLogger(
-========
     public function create(): InitialStaticAnalysisExecutionLogger
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger(
                 $this->staticAnalysisToolAdapter,
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactory.php
                 $this->output,
-                $this->staticAnalysisToolAdapter,
             )
             : new ConsoleProgressBarLogger(
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerFactory.php
-========
                 $this->staticAnalysisToolAdapter,
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactory.php
                 $this->output,
-                $this->staticAnalysisToolAdapter,
                 $this->debug,
             );
     }

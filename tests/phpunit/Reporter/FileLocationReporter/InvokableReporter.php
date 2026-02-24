@@ -33,28 +33,12 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerSubscriber.php
-namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
-
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompletedSubscriber;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-
-/**
- * @internal
- */
-final readonly class InitialTestExecutionLoggerSubscriber implements InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber
-========
 namespace Infection\Tests\Reporter\FileLocationReporter;
 
 use Closure;
 use Infection\Reporter\Reporter;
 
 final readonly class InvokableReporter implements Reporter
->>>>>>>> upstream/master:tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
 {
     private Closure $report;
 
@@ -62,33 +46,13 @@ final readonly class InvokableReporter implements Reporter
      * @param (Closure():void)|null $report
      */
     public function __construct(
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerSubscriber.php
-        private InitialTestExecutionLogger $logger,
-========
         ?Closure $report = null,
->>>>>>>> upstream/master:tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
     ) {
         $this->report = $report ?? static fn () => null;
     }
 
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialTestExecutionLoggerSubscriber.php
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
-    {
-        $this->logger->start();
-    }
-
-    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
-    {
-        $this->logger->advance();
-    }
-
-    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
-    {
-        $this->logger->finish($event->outputText);
-========
     public function report(): void
     {
         ($this->report)();
->>>>>>>> upstream/master:tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
     }
 }

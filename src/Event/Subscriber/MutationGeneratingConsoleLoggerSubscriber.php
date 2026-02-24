@@ -33,39 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Event\Subscriber;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
+final readonly class MutationGeneratingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
 {
+    private ProgressBar $progressBar;
+
     public function __construct(
-        private readonly ProgressBar $progressBar,
+        private OutputInterface $output,
     ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
-    public function startAnalysis(int $mutationCount): void
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        parent::startAnalysis($mutationCount);
-
-        $this->progressBar->start($mutationCount);
+        $this->output->writeln(['', '', 'Generate mutants...', '']);
+        $this->progressBar->start($event->mutableFilesCount);
     }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
     {
-        parent::finishEvaluation($executionResult);
-
         $this->progressBar->advance();
     }
 
-    public function finishAnalysis(): void
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
     {
-        parent::finishAnalysis();
-
         $this->progressBar->finish();
     }
 }

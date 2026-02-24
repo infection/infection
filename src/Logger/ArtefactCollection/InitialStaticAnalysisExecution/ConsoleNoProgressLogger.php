@@ -33,74 +33,51 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleNoProgressLogger.php
-namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
-
-use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-========
 namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleNoProgressLogger.php
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleNoProgressLogger.php
-final readonly class ConsoleNoProgressLogger implements InitialTestExecutionLogger
-========
 final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExecutionLogger
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleNoProgressLogger.php
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
-        private TestFrameworkAdapter|StaticAnalysisToolAdapter $testFramework,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
     public function start(): void
     {
         try {
-            $version = $this->testFramework->getVersion();
-        } catch (InvalidVersion|InvalidArgumentException) {
+            $version = $this->staticAnalysisToolAdapter->getVersion();
+        } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
 
         $this->output->writeln([
             '',
+            'Running initial Static Analysis...',
+            '',
             sprintf(
-                'Initial execution of %s version: %s',
-                $this->testFramework->getName(),
+                '%s version: %s',
+                $this->staticAnalysisToolAdapter->getName(),
                 $version,
             ),
-            '',
         ]);
     }
 
     public function advance(): void
     {
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleNoProgressLogger.php
-========
         // Do nothing.
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleNoProgressLogger.php
     }
 
     public function finish(string $executionOutput): void
     {
-<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/ConsoleNoProgressLogger.php
-        // TODO: currently we do not log anything... But I don't think that's good.
-        //   for example we could at least log metrics... or still if debug mode is enabled.
-========
         // Do nothing.
->>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/ConsoleNoProgressLogger.php
     }
 }

@@ -45,13 +45,6 @@ use Infection\Mutation\Mutation;
 interface MutationAnalysisLogger
 {
     /**
-     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutableFilesCount
-     */
-    public function startMutationGeneration(int $mutableFilesCount): void;
-
-    public function finishMutationGeneration(): void;
-
-    /**
      * Records the start of the process.
      *
      * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
