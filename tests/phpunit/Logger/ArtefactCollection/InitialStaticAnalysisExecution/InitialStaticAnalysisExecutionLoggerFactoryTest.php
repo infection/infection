@@ -33,73 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
-use Infection\Logger\ArtefactCollection\InitialTestExecution\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
-use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisExecutionLoggerSubscriberFactory;
-use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisRunConsoleLoggerSubscriber;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialStaticAnalysisExecutionLoggerSubscriberFactory::class)]
-final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends TestCase
+#[CoversClass(InitialStaticAnalysisExecutionLoggerFactory::class)]
+final class InitialStaticAnalysisExecutionLoggerFactoryTest extends TestCase
 {
-    private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
+    private StaticAnalysisToolAdapter&MockObject $staticAnalysisAdapterMock;
+
+    private OutputInterface&MockObject $outputMock;
 
     protected function setUp(): void
     {
-        $this->staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
-        $this->staticAnalysisToolAdapter
+        $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
+        $this->staticAnalysisAdapterMock
             ->expects($this->never())
-            ->method($this->anything())
-        ;
+            ->method($this->anything());
+
+        $this->outputMock = $this->createMock(OutputInterface::class);
+        // We don't explicitly rely on this; this is only necessary for the
+        // ProgressBar used internally.
+        $this->outputMock
+            ->method('isDecorated')
+            ->willReturn(false);
     }
 
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialStaticAnalysisExecutionLoggerSubscriberFactory(
-            true,
-            $debug,
-            $this->staticAnalysisToolAdapter,
-            new FakeOutput(),
+        $factory = $this->createFactory(
+            skipProgressBar: true,
+            debug: $debug,
         );
 
-        $subscriber = $factory->create();
+        $logger = $factory->create();
 
-        $this->assertInstanceOf(CiInitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(ConsoleNoProgressLogger::class, $logger);
     }
 
     #[DataProvider('debugProvider')]
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
     {
-        $factory = new InitialStaticAnalysisExecutionLoggerSubscriberFactory(
-            false,
-            $debug,
-            $this->staticAnalysisToolAdapter,
+        $factory = $this->createFactory(
+            skipProgressBar: false,
+            debug: $debug,
         );
 
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
-            ->method('isDecorated')
-            ->willReturn(false)
-        ;
+        $logger = $factory->create();
 
-        $factory = new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
-            false,
-            $debug,
-            $this->staticAnalysisToolAdapter,
-            $outputMock,
-        );
-
-        $subscriber = $factory->create();
-
-        $this->assertInstanceOf(InitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(ConsoleProgressBarLogger::class, $logger);
     }
 
     public static function debugProvider(): iterable
@@ -107,5 +98,17 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
         yield 'debug enabled' => [true];
 
         yield 'debug disabled' => [false];
+    }
+
+    private function createFactory(
+        bool $skipProgressBar,
+        bool $debug,
+    ): InitialStaticAnalysisExecutionLoggerFactory {
+        return new InitialStaticAnalysisExecutionLoggerFactory(
+            $skipProgressBar,
+            $debug,
+            $this->staticAnalysisAdapterMock,
+            $this->outputMock,
+        );
     }
 }

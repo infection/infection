@@ -33,26 +33,51 @@
 
 declare(strict_types=1);
 
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerFactory.php
 namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
+========
+namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactory.php
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisExecutionLoggerSubscriberFactory implements SubscriberFactory
+final readonly class InitialStaticAnalysisExecutionLoggerFactory
 {
     public function __construct(
-        private InitialStaticAnalysisExecutionLoggerFactory $loggerFactory,
+        private bool $skipProgressBar,
+        private bool $debug,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerFactory.php
+    public function create(): InitialTestExecutionLogger
     {
-        return new InitialStaticAnalysisExecutionLoggerSubscriber(
-            $this->loggerFactory->create($output),
-        );
+        return $this->skipProgressBar
+            ? new ConsoleNoProgressLogger(
+========
+    public function create(): InitialStaticAnalysisExecutionLogger
+    {
+        return $this->skipProgressBar
+            ? new ConsoleNoProgressLogger(
+                $this->staticAnalysisToolAdapter,
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactory.php
+                $this->output,
+                $this->staticAnalysisToolAdapter,
+            )
+            : new ConsoleProgressBarLogger(
+<<<<<<<< HEAD:src/Logger/ArtefactCollection/InitialTestExecution/InitialStaticAnalysisExecutionLoggerFactory.php
+========
+                $this->staticAnalysisToolAdapter,
+>>>>>>>> upstream/master:src/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactory.php
+                $this->output,
+                $this->staticAnalysisToolAdapter,
+                $this->debug,
+            );
     }
 }

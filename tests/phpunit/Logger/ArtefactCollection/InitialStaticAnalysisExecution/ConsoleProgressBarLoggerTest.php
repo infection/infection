@@ -33,42 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Logger\ArtefactCollection\InitialTestExecution\InitialStaticAnalysisRunConsoleLoggerSubscriber;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialStaticAnalysisRunConsoleLoggerSubscriber::class)]
-final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
+#[CoversClass(ConsoleProgressBarLogger::class)]
+final class ConsoleProgressBarLoggerTest extends TestCase
 {
-    public function test_it_reacts_on_initial_run(): void
+    private OutputInterface&MockObject $outputMock;
+
+    private StaticAnalysisToolAdapter&MockObject $staticAnalysisAdapterMock;
+
+    protected function setUp(): void
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->method('getVerbosity')
-            ->willReturn(OutputInterface::VERBOSITY_QUIET);
-
-        $staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
-        $staticAnalysisToolAdapter->expects($this->once())
-            ->method('getVersion');
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
-
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $this->outputMock = $this->createMock(OutputInterface::class);
+        $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
     }
 
-    public function test_it_sets_static_analysis_tool_version_as_unknown_in_case_of_exception(): void
+    public function test_it_logs_the_start(): void
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())
+        $this->outputMock
+            ->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+
+        $this->staticAnalysisAdapterMock
+            ->expects($this->once())
+            ->method('getVersion');
+
+        $this->createLogger(debug: false)->start();
+    }
+
+    public function test_it_sets_static_analysis_adapter_version_as_unknown_in_case_of_exception_on_start(): void
+    {
+        $this->outputMock
+            ->expects($this->once())
             ->method('writeln')
             ->with([
                 '',
@@ -78,38 +84,58 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
                 'PHPStan version: unknown',
                 '',
             ]);
-        $output->method('getVerbosity')
+        $this->outputMock
+            ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
-        $staticAnalysisToolAdapter->expects($this->once())
+        $this->staticAnalysisAdapterMock
+            ->expects($this->once())
             ->method('getName')
             ->willReturn('PHPStan');
-        $staticAnalysisToolAdapter->method('getVersion')
+        $this->staticAnalysisAdapterMock
+            ->method('getVersion')
             ->willThrowException(new InvalidArgumentException());
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
-
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $this->createLogger(debug: false)->start();
     }
 
-    public function test_it_outputs_the_initial_process_text_if_in_debug_mode(): void
+    public function test_it_does_not_output_the_initial_process_text_if_in_debug_mode_on_finish(): void
     {
-        $processText = 'PHPStan output ...';
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())
-            ->method('writeln')
-            ->with(PHP_EOL . $processText);
+        $testOutput = 'PHPUnit Test suite ...';
 
-        $output->method('getVerbosity')
+        $this->outputMock
+            ->expects($this->never())
+            ->method('writeln');
+
+        $this->outputMock
+            ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+        $this->createLogger(debug: false)->finish($testOutput);
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, true));
+    public function test_it_outputs_the_initial_process_text_if_in_debug_mode_on_finish(): void
+    {
+        $testOutput = 'PHPUnit Test suite ...';
 
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($processText));
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with(PHP_EOL . $testOutput);
+
+        $this->outputMock
+            ->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+
+        $this->createLogger(debug: true)->finish($testOutput);
+    }
+
+    private function createLogger(bool $debug): InitialStaticAnalysisExecutionLogger
+    {
+        return new ConsoleProgressBarLogger(
+            $this->staticAnalysisAdapterMock,
+            $this->outputMock,
+            $debug,
+        );
     }
 }

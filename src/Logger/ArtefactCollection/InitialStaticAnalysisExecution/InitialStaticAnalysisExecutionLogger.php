@@ -33,57 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
-
-use Infection\AbstractTestFramework\InvalidVersion;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use InvalidArgumentException;
-use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
 /**
  * @internal
  */
-final readonly class ConsoleNoProgressLogger implements InitialTestExecutionLogger
+interface InitialStaticAnalysisExecutionLogger
 {
-    private ProgressBar $progressBar;
+    public function start(): void;
 
-    public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter|StaticAnalysisToolAdapter $testFramework,
-    ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
-    }
+    public function advance(): void;
 
-    public function start(): void
-    {
-        try {
-            $version = $this->testFramework->getVersion();
-        } catch (InvalidVersion|InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Initial execution of %s version: %s',
-                $this->testFramework->getName(),
-                $version,
-            ),
-            '',
-        ]);
-    }
-
-    public function advance(): void
-    {
-    }
-
-    public function finish(string $executionOutput): void
-    {
-        // TODO: currently we do not log anything... But I don't think that's good.
-        //   for example we could at least log metrics... or still if debug mode is enabled.
-    }
+    public function finish(string $executionOutput): void;
 }

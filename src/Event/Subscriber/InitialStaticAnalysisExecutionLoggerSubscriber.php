@@ -33,26 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\ArtefactCollection\InitialTestExecution;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompletedSubscriber;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 
 /**
  * @internal
  */
-final readonly class InitialTestExecutionLoggerSubscriberFactory implements SubscriberFactory
+final readonly class InitialStaticAnalysisExecutionLoggerSubscriber implements InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber
 {
     public function __construct(
-        private InitialTestExecutionLoggerFactory $loggerFactory,
+        private InitialStaticAnalysisExecutionLogger $logger,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        return new InitialTestExecutionLoggerSubscriber(
-            $this->loggerFactory->create($output),
-        );
+        $this->logger->start();
+    }
+
+    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
+    {
+        $this->logger->advance();
+    }
+
+    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }
