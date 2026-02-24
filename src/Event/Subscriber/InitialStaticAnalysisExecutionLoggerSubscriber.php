@@ -41,63 +41,30 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompletedSubscriber;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use InvalidArgumentException;
-use const PHP_EOL;
-use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber
+final readonly class InitialStaticAnalysisExecutionLoggerSubscriber implements InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
-        private OutputInterface $output,
-        private bool $debug,
+        private InitialStaticAnalysisExecutionLogger $logger,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
     public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        try {
-            $version = $this->staticAnalysisToolAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            '',
-            'Running initial Static Analysis...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->staticAnalysisToolAdapter->getName(),
-                $version,
-            ),
-            '',
-        ]);
-        $this->progressBar->start();
-    }
-
-    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
-    {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->outputText);
-        }
+        $this->logger->start();
     }
 
     public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
     {
-        $this->progressBar->advance();
+        $this->logger->advance();
+    }
+
+    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    {
+        $this->logger->finish($event->outputText);
     }
 }

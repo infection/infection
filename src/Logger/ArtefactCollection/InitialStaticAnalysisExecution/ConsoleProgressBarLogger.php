@@ -33,35 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use InvalidArgumentException;
+use const PHP_EOL;
+use function sprintf;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisExecutionLogger
 {
+    private ProgressBar $progressBar;
+
     public function __construct(
-        private bool $skipProgressBar,
-        private bool $debug,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
+        private bool $debug,
     ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('verbose');
     }
 
-    public function create(): EventSubscriber
+    public function start(): void
     {
-        return $this->skipProgressBar
-            ? new CiInitialStaticAnalysisRunConsoleLoggerSubscriber(
-                $this->staticAnalysisToolAdapter,
-                $this->output,
-            )
-            : new InitialStaticAnalysisRunConsoleLoggerSubscriber(
-                $this->staticAnalysisToolAdapter,
-                $this->output,
-                $this->debug,
-            );
+        try {
+            $version = $this->staticAnalysisToolAdapter->getVersion();
+        } catch (InvalidArgumentException) {
+            $version = 'unknown';
+        }
+
+        $this->output->writeln([
+            '',
+            '',
+            'Running initial Static Analysis...',
+            '',
+            sprintf(
+                '%s version: %s',
+                $this->staticAnalysisToolAdapter->getName(),
+                $version,
+            ),
+            '',
+        ]);
+
+        $this->progressBar->start();
+    }
+
+    public function advance(): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function finish(string $executionOutput): void
+    {
+        $this->progressBar->finish();
+
+        if ($this->debug) {
+            $this->output->writeln(PHP_EOL . $executionOutput);
+        }
     }
 }
