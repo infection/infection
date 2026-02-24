@@ -40,6 +40,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use function serialize;
+use function unserialize;
 
 #[CoversClass(MarkTraversedNodesAsVisitedVisitor::class)]
 final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
