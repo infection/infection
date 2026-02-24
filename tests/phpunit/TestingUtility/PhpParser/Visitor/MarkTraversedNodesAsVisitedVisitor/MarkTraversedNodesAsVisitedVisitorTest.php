@@ -40,7 +40,6 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use function serialize;
-use function unserialize;
 
 #[CoversClass(MarkTraversedNodesAsVisitedVisitor::class)]
 final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
@@ -189,6 +188,9 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
      */
     private static function cloneNodes(?array $nodes): array
     {
+        // To remove and use the Safe alternative once thecodingmachine/safe 3.4.0
+        // as the minimum version.
+        // @phpstan-ignore theCodingMachineSafe.function
         return unserialize(serialize($nodes));
     }
 }
