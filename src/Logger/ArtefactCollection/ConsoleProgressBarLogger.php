@@ -40,7 +40,6 @@ use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialSt
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
-use const PHP_EOL;
 use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -89,9 +88,13 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
     public function finish(string $executionOutput): void
     {
         $this->progressBar->finish();
+        $this->output->writeln('');
 
         if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $executionOutput);
+            $this->output->writeln([
+                '',
+                $executionOutput,
+            ]);
         }
     }
 }
