@@ -623,6 +623,7 @@ final class Container extends DIContainer
             ),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
+                $container->getDiffer(),
             ),
             MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
                 $container->getOutput(),
