@@ -40,8 +40,8 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasF
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
@@ -51,7 +51,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 /**
  * @internal
  */
-final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     public function __construct(
         private MutationAnalysisLogger $logger,
@@ -65,10 +65,12 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
     {
+        // TODO: what if the mutation was killed by an heuristic?
+        //  mutation ≠ mutant; currently this event is used as if MutantEvaluationWasStarted
         $this->logger->startEvaluation($event->mutation);
     }
 
-    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    public function onMutationGenerationForFileWasFinished(MutationGenerationForFileWasFinished $event): void
     {
         if (count($event->mutationHashes) > 0) {
             $this->logger->finishMutationGenerationForFile(

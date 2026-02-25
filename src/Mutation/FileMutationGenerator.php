@@ -39,6 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Ast\AstGenerationWasFinished;
 use Infection\Event\Events\Ast\AstGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Mutator\Mutator;
@@ -117,23 +118,24 @@ class FileMutationGenerator
      *
      * @return iterable<Mutation>
      */
-    private function generateMutations(array $mutators,
+    private function generateMutations(
+        array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
         Trace $trace,
         bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
+        $sourceRealPath = $sourceFile->getRealPath();
+
         $this->eventDispatcher->dispatch(
-            new MutationGenerationForFileWasFinished(
-                $sourceFile->getRealPath(),
-            ),
+            new MutationGenerationForFileWasStarted($sourceRealPath),
         );
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $sourceFile->getRealPath(),
+                filePath: $sourceRealPath,
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
@@ -147,7 +149,20 @@ class FileMutationGenerator
         $traverser = $this->traverserFactory->create($mutationCollectorVisitor);
         $traverser->traverse($initialStatements);
 
-        yield from $mutationCollectorVisitor->getMutations();
+        $sourceFileMutationIds = [];
+
+        foreach ($mutationCollectorVisitor->getMutations() as $mutation) {
+            $sourceFileMutationIds[] = $mutation->getHash();
+
+            yield $mutation;
+        }
+
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationForFileWasFinished(
+                $sourceRealPath,
+                $sourceFileMutationIds,
+            ),
+        );
     }
 
     /**

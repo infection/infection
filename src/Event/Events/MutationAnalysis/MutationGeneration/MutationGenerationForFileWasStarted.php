@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
 use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use SplFileInfo;
 
 /**
  * @internal
@@ -47,9 +45,8 @@ final readonly class MutationGenerationForFileWasStarted
     public string $sourceFileId;
 
     public function __construct(
-        public SplFileInfo $sourceFile,
-        public Trace $trace,
+        public string $sourceRealPath,
     ) {
-        $this->sourceFileId = NodeIdFactory::create($sourceFile->getRealPath());
+        $this->sourceFileId = NodeIdFactory::create($sourceRealPath);
     }
 }

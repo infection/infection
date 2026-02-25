@@ -33,24 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Resource\Listener;
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
-use Psr\Log\LoggerInterface;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasStartedSubscriber;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\Stopwatch;
+use Infection\Resource\Time\TimeFormatter;
+use function memory_get_peak_usage;
+use function sprintf;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class DebugEventsSubscriberFactory implements SubscriberFactory
+final readonly class PerformanceLoggerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber
 {
     public function __construct(
-        private LoggerInterface $logger,
+        private Stopwatch $stopwatch,
+        private TimeFormatter $timeFormatter,
+        private MemoryFormatter $memoryFormatter,
+        private int $threadCount,
+        private OutputInterface $output,
     ) {
     }
 
-    public function create(): EventSubscriber
+    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
     {
-        return new DebugEventsSubscriber($this->logger);
+        $this->stopwatch->start();
+    }
+
+    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
+    {
+        $time = $this->stopwatch->stop();
+
+        $this->output->writeln([
+            '',
+            sprintf(
+                'Time: %s. Memory: %s. Threads: %s',
+                $this->timeFormatter->toHumanReadableString($time),
+                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true)),
+                $this->threadCount,
+            ),
+        ]);
     }
 }

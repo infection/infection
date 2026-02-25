@@ -37,6 +37,7 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\Entry\TelemetryEntry;
 
 final class LogsBuilder
 {
@@ -51,6 +52,7 @@ final class LogsBuilder
         private bool $useGitHubAnnotationsLogger,
         private ?StrykerConfig $strykerConfig,
         private ?string $summaryJsonLogFilePath,
+        private ?TelemetryEntry $telemetryEntry,
     ) {
     }
 
@@ -67,6 +69,7 @@ final class LogsBuilder
             $logs->getUseGitHubAnnotationsLogger(),
             $logs->getStrykerConfig(),
             $logs->getSummaryJsonLogFilePath(),
+            $logs->telemetryEntry,
         );
     }
 
@@ -83,6 +86,7 @@ final class LogsBuilder
             useGitHubAnnotationsLogger: false,
             strykerConfig: null,
             summaryJsonLogFilePath: null,
+            telemetryEntry: null,
         );
     }
 
@@ -99,6 +103,9 @@ final class LogsBuilder
             useGitHubAnnotationsLogger: true,
             strykerConfig: StrykerConfig::forFullReport('master'),
             summaryJsonLogFilePath: '/var/log/infection/summary.json',
+            telemetryEntry: new TelemetryEntry(
+                serializedFilePath: 'trace.serialized.php',
+            ),
         );
     }
 
@@ -182,6 +189,14 @@ final class LogsBuilder
         return $clone;
     }
 
+    public function withTelemetryEntry(?TelemetryEntry $telemetryEntry): self
+    {
+        $clone = clone $this;
+        $clone->telemetryEntry = $telemetryEntry;
+
+        return $clone;
+    }
+
     public function build(): Logs
     {
         return new Logs(
@@ -195,6 +210,7 @@ final class LogsBuilder
             $this->useGitHubAnnotationsLogger,
             $this->strykerConfig,
             $this->summaryJsonLogFilePath,
+            $this->telemetryEntry,
         );
     }
 }

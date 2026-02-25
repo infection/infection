@@ -22,7 +22,6 @@
             "serializedFile": "var/telemetry/trace.serialized.php"
         }
     },
-    "staticAnalysisTool": "phpstan",
     "phpStan": {
         "configDir": "devTools"
     },
