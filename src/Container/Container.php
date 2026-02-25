@@ -65,7 +65,7 @@ use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
-use Infection\Event\Subscriber\ReporterSubscriber;
+use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
@@ -384,7 +384,7 @@ final class Container extends DIContainer
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
                     $container->get(MutationAnalysisLoggerSubscriber::class),
-                    $container->get(ReporterSubscriber::class),
+                    $container->get(ReportAfterMutationTestingFinishedSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->get(StopInfectionOnSigintSignalSubscriber::class),
