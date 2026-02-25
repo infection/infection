@@ -62,8 +62,6 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\Telemetry\Reporter\TracerDumper;
-use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -71,7 +69,6 @@ use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -414,18 +411,6 @@ final class RunCommand extends BaseCommand
             );
 
             $engine->execute();
-
-            // TODO: adjust
-            $trace = $container->get(Tracer::class)->getTrace();
-            $testDir = __DIR__ . '/../../build/trace';
-            $filesystem = $container->get(Filesystem::class);
-            $filesystem->mkdir($testDir);
-
-            $reporter = new TracerDumper(
-                $filesystem,
-                $testDir,
-            );
-            $reporter->report($trace);
 
             return true;
         } catch (NoSourceFound $noSourceFoundException) {

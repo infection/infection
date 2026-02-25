@@ -119,6 +119,7 @@ use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
 use Infection\Reporter\StrykerReporterFactory;
+use Infection\Reporter\Telemetry\SerializedTraceReporter;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -143,7 +144,9 @@ use Infection\Telemetry\Metric\ResourceInspector;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
 use Infection\Telemetry\Metric\Time\SystemStopwatch;
+use Infection\Telemetry\Reporter\TraceProvider as TelemetryTraceProvider;
 use Infection\Telemetry\Subscriber\TelemetrySubscriber;
+use Infection\Telemetry\Tracing\Tracer as TelemetryTracer;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -164,6 +167,7 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
+use Infection\Tests\Reporter\NullReporter;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -490,6 +494,15 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
+            SerializedTraceReporter::class => static function (self $container): Reporter {
+                return $container->getConfiguration()->logs->telemetryEntry === null
+                    ? new NullReporter()    // TODO: needs to be moved to the src
+                    : new SerializedTraceReporter(
+                        $container->getFileSystem(),
+                        $container->get(TelemetryTraceProvider::class),
+                        $container->getConfiguration()->logs->telemetryEntry->serializedFilePath,
+                    );
+            },
             Reporter::class => static fn (self $container): Reporter => new FederatedReporter(...array_filter([
                 $container->getFileReporterFactory()->createFromConfiguration(
                     $container->getConfiguration()->logs,
@@ -497,7 +510,12 @@ final class Container extends DIContainer
                 $container->getStrykerLoggerFactory()->createFromLogEntries(
                     $container->getConfiguration()->logs,
                 ),
+                $container->get(SerializedTraceReporter::class),
             ])),
+            TelemetryTraceProvider::class => static fn (self $container): TelemetryTraceProvider => $container->get(TelemetryTracer::class),
+            MutationTestingResultsLoggerSubscriber::class => static fn (self $container): MutationTestingResultsLoggerSubscriber => new MutationTestingResultsLoggerSubscriber(
+                $container->getReporter(),
+            ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 

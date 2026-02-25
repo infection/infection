@@ -43,6 +43,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\Entry\TelemetryEntry;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use stdClass;
@@ -147,6 +148,7 @@ class SchemaConfigurationFactory
             $logs->github ?? false,
             self::createStrykerConfig($logs->stryker ?? null),
             self::normalizeString($logs->summaryJson ?? null),
+            self::createTelemetryConfig($logs->telemetry ?? null),
         );
     }
 
@@ -167,6 +169,21 @@ class SchemaConfigurationFactory
         }
 
         return StrykerConfig::forFullReport($branch);
+    }
+
+    private static function createTelemetryConfig(?stdClass $telemetry): ?TelemetryEntry
+    {
+        if ($telemetry === null) {
+            return null;
+        }
+
+        $serializedFilePath = self::normalizeString($telemetry->serializedFile ?? null);
+
+        return $serializedFilePath === null
+            ? null
+            : new TelemetryEntry(
+                $serializedFilePath,
+            );
     }
 
     private static function createPhpUnit(stdClass $phpUnit): PhpUnit
