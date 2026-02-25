@@ -78,9 +78,7 @@ final class ConsoleNoProgressLoggerTest extends TestCase
 
         $expected = <<<'EOF'
 
-            Running initial test suite...
-
-            PHPUnit version: 6.5.4
+            Running initial tests with PHPUnit version 6.5.4
 
             EOF;
 

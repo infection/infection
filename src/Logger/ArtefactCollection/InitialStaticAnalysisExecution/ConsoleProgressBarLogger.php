@@ -68,11 +68,8 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
 
         $this->output->writeln([
             '',
-            '',
-            'Running initial Static Analysis...',
-            '',
             sprintf(
-                '%s version: %s',
+                'Running initial tests with %s version %s',
                 $this->staticAnalysisToolAdapter->getName(),
                 $version,
             ),
@@ -90,6 +87,7 @@ final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisEx
     public function finish(string $executionOutput): void
     {
         $this->progressBar->finish();
+        $this->output->writeln('');
 
         if ($this->debug) {
             $this->output->writeln(PHP_EOL . $executionOutput);

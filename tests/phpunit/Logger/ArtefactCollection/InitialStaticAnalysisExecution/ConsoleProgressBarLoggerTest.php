@@ -39,7 +39,6 @@ use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsolePr
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -78,10 +77,7 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ->method('writeln')
             ->with([
                 '',
-                '',
-                'Running initial Static Analysis...',
-                '',
-                'PHPStan version: unknown',
+                'Running initial tests with PHPStan version unknown',
                 '',
             ]);
         $this->outputMock
@@ -104,8 +100,9 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $testOutput = 'PHPUnit Test suite ...';
 
         $this->outputMock
-            ->expects($this->never())
-            ->method('writeln');
+            ->expects($this->once())
+            ->method('writeln')
+            ->with('');
 
         $this->outputMock
             ->method('getVerbosity')
@@ -119,9 +116,8 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $testOutput = 'PHPUnit Test suite ...';
 
         $this->outputMock
-            ->expects($this->once())
-            ->method('writeln')
-            ->with(PHP_EOL . $testOutput);
+            ->expects($this->exactly(2))
+            ->method('writeln');
 
         $this->outputMock
             ->method('getVerbosity')

@@ -78,9 +78,7 @@ final class ConsoleNoProgressLoggerTest extends TestCase
 
         $expected = <<<'EOF'
 
-            Running initial Static Analysis...
-
-            PHPStan version: 6.5.4
+            Running initial tests with PHPStan version 6.5.4
 
             EOF;
 

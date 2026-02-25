@@ -68,10 +68,8 @@ final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLo
 
         $this->output->writeln([
             '',
-            'Running initial test suite...',
-            '',
             sprintf(
-                '%s version: %s',
+                'Running initial tests with %s version %s',
                 $this->testFrameworkAdapter->getName(),
                 $version,
             ),
@@ -89,6 +87,7 @@ final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLo
     public function finish(string $executionOutput): void
     {
         $this->progressBar->finish();
+        $this->output->writeln('');
 
         if ($this->debug) {
             $this->output->writeln(PHP_EOL . $executionOutput);
