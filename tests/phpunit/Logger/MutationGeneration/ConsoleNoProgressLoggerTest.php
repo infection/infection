@@ -33,29 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Logger\MutationGeneration;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Framework\Str;
+use Infection\Logger\MutationGeneration\ConsoleNoProgressLogger;
+use Infection\Logger\MutationGeneration\MutationGenerationLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-/**
- * @internal
- */
-final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationWasStartedSubscriber
+#[CoversClass(ConsoleNoProgressLogger::class)]
+final class ConsoleNoProgressLoggerTest extends TestCase
 {
-    public function __construct(
-        private OutputInterface $output,
-    ) {
+    private BufferedOutput $output;
+
+    private MutationGenerationLogger $logger;
+
+    protected function setUp(): void
+    {
+        $this->output = new BufferedOutput();
+
+        $this->logger = new ConsoleNoProgressLogger($this->output);
     }
 
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    public function test_it_logs_on_start(): void
     {
-        $this->output->writeln([
-            '',
-            'Generate mutants...',
-            '',
-            'Processing source code files...',
-        ]);
+        $expected = <<<'EOF'
+
+            Generate mutants...
+
+            Processing source code files...
+
+            EOF;
+
+        $this->logger->start(10);
+
+        $actual = Str::toUnixLineEndings($this->output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 }

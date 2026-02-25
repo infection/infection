@@ -33,26 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Logger\MutationGeneration;
 
+use Infection\Logger\MutationGeneration\ConsoleNoProgressLogger;
+use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
+use Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory;
+use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- */
-final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
+#[CoversClass(MutationGenerationLoggerFactory::class)]
+final class MutationGenerationLoggerFactoryTest extends TestCase
 {
-    public function __construct(
-        private bool $skipProgressBar,
-        private OutputInterface $output,
-    ) {
+    public function test_it_creates_a_no_progress_logger_if_skips_the_progress_bar(): void
+    {
+        $factory = new MutationGenerationLoggerFactory(
+            true,
+            new FakeOutput(),
+        );
+
+        $logger = $factory->create();
+
+        $this->assertInstanceOf(ConsoleNoProgressLogger::class, $logger);
     }
 
-    public function create(): EventSubscriber
+    public function test_it_creates_a_progress_bar_logger_if_does_not_skip_the_progress_bar(): void
     {
-        return $this->skipProgressBar
-            ? new CiMutationGeneratingConsoleLoggerSubscriber($this->output)
-            : new MutationGeneratingConsoleLoggerSubscriber($this->output)
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
         ;
+
+        $factory = new MutationGenerationLoggerFactory(
+            false,
+            $outputMock,
+        );
+
+        $logger = $factory->create();
+
+        $this->assertInstanceOf(ConsoleProgressBarLogger::class, $logger);
     }
 }
