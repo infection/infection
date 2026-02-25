@@ -39,6 +39,7 @@ use function array_map;
 use function explode;
 use function implode;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;

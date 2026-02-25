@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\VisitorCollectorIntegration;
 
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
