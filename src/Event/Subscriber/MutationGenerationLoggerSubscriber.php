@@ -33,18 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Event\Subscriber;
+
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Infection\Logger\MutationGeneration\MutationGenerationLogger;
 
 /**
  * @internal
  */
-final readonly class MutationGenerationWasStarted
+final readonly class MutationGenerationLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
 {
-    /**
-     * @param positive-int|0 $mutableFilesCount
-     */
     public function __construct(
-        public int $mutableFilesCount,
+        private MutationGenerationLogger $logger,
     ) {
+    }
+
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    {
+        $this->logger->start($event->mutableFilesCount);
+    }
+
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    {
+        $this->logger->advance();
+    }
+
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
+    {
+        $this->logger->finish();
     }
 }
