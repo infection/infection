@@ -33,45 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Telemetry\Subscriber;
 
-use function implode;
-use Infection\Framework\UniqueId;
-use Stringable;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
+use Infection\Reporter\Reporter;
 
 /**
  * @internal
  */
-final readonly class SpanId implements Stringable
+final readonly class ReportTelemetryAfterApplicationFinishedSubscriber implements ApplicationExecutionWasFinishedSubscriber
 {
-    private function __construct(
-        public RootScope|Scope $scope,
-        public string $scopeId,
-        public ?self $parentId,
+    public function __construct(
+        private Reporter $reporter,
     ) {
-        $x = '';
     }
 
-    public function __toString(): string
+    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
     {
-        $values = [
-            $this->parentId ?? '#',
-            $this->scope->value,
-            $this->scopeId,
-        ];
-
-        return implode(':', $values);
-    }
-
-    public static function create(
-        RootScope|Scope $scope,
-        ?string $id,
-        ?self $parentId = null,
-    ): self {
-        return new self(
-            $scope,
-            $id ?? UniqueId::generate(),
-            $parentId,
-        );
+        $this->reporter->report();
     }
 }

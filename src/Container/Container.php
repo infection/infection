@@ -156,6 +156,7 @@ use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
 use Infection\Telemetry\Metric\Time\SystemStopwatch;
 use Infection\Telemetry\Reporter\TraceProvider as TelemetryTraceProvider;
+use Infection\Telemetry\Subscriber\ReportTelemetryAfterApplicationFinishedSubscriber;
 use Infection\Telemetry\Subscriber\TelemetrySubscriber;
 use Infection\Telemetry\Tracing\Tracer as TelemetryTracer;
 use Infection\TestFramework\AdapterInstallationDecider;
@@ -403,6 +404,7 @@ final class Container extends DIContainer
                     $container->get(MutationTestingResultsLoggerSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->get(TelemetrySubscriber::class),
+                    $container->get(ReportTelemetryAfterApplicationFinishedSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->get(StopInfectionOnSigintSignalSubscriber::class),
                     $container->get(DispatchPcntlSignalSubscriber::class),
@@ -472,14 +474,6 @@ final class Container extends DIContainer
                 $container->getConfiguration()->threadCount,
                 $container->getOutput(),
             ),
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
-                $container->getSourceLineMatcher(),
-                $container->getTracer(),
-                $container->getFileStore(),
-            ),
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
                 return new FileMutationGenerator(
                     $container->getFileParser(),
@@ -541,7 +535,6 @@ final class Container extends DIContainer
                         $container->getStrykerLoggerFactory()->createFromLogEntries(
                             $container->getConfiguration()->logs,
                         ),
-                        $container->get(SerializedTraceReporter::class),
                     ]),
                 );
 
@@ -551,6 +544,9 @@ final class Container extends DIContainer
                     $config->numberOfShownMutations,
                 );
             },
+            ReportTelemetryAfterApplicationFinishedSubscriber::class => static fn (self $container): ReportTelemetryAfterApplicationFinishedSubscriber => new ReportTelemetryAfterApplicationFinishedSubscriber(
+                $container->get(SerializedTraceReporter::class),
+            ),
             SerializedTraceReporter::class => static function (self $container): Reporter {
                 return $container->getConfiguration()->logs->telemetryEntry === null
                     ? new NullReporter()    // TODO: needs to be moved to the src

@@ -92,11 +92,12 @@ final class ConsoleReporter
         );
         $this->io->newLine();
 
-        $filteredTrace = self::filterSpans(
-            $trace,
-            $rootScopes,
-            $spanId,
-        );
+        //        $filteredTrace = self::filterSpans(
+        //            $trace,
+        //            $rootScopes,
+        //            $spanId,
+        //        );
+        $filteredTrace = $trace;
 
         $spansCount = count($filteredTrace->spans);
 

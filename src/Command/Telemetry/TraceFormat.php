@@ -37,6 +37,7 @@ namespace Infection\Command\Telemetry;
 
 enum TraceFormat: string
 {
+    case HTML = 'html';
     case TEXT = 'text';
     case CSV = 'csv';
 }
