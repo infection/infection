@@ -65,7 +65,7 @@ final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExe
         $this->output->writeln([
             '',
             sprintf(
-                'Initial execution of %s version: %s',
+                'Running initial tests with %s version %s',
                 $this->testFramework->getName(),
                 $version,
             ),

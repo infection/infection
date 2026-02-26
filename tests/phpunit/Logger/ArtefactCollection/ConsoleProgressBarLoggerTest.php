@@ -77,7 +77,8 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ->method('writeln')
             ->with([
                 '',
-                'Initial execution of PHPUnit version: unknown',
+                'Running initial tests with PHPUnit version unknown',
+                '',
             ]);
         $this->outputMock
             ->method('getVerbosity')
