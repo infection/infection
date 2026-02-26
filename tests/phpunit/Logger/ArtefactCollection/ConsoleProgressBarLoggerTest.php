@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
+namespace Infection\Tests\Logger\ArtefactCollection;
 
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleProgressBarLogger;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -49,12 +49,12 @@ final class ConsoleProgressBarLoggerTest extends TestCase
 {
     private OutputInterface&MockObject $outputMock;
 
-    private StaticAnalysisToolAdapter&MockObject $staticAnalysisAdapterMock;
+    private TestFrameworkAdapter&MockObject $testFrameworkMock;
 
     protected function setUp(): void
     {
         $this->outputMock = $this->createMock(OutputInterface::class);
-        $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
+        $this->testFrameworkMock = $this->createMock(TestFrameworkAdapter::class);
     }
 
     public function test_it_logs_the_start(): void
@@ -63,32 +63,32 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $this->staticAnalysisAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('getVersion');
 
         $this->createLogger(debug: false)->start();
     }
 
-    public function test_it_sets_static_analysis_adapter_version_as_unknown_in_case_of_exception_on_start(): void
+    public function test_it_sets_test_framework_version_as_unknown_in_case_of_exception_on_start(): void
     {
         $this->outputMock
             ->expects($this->once())
             ->method('writeln')
             ->with([
                 '',
-                'Running initial tests with PHPStan version unknown',
+                'Running initial tests with PHPUnit version unknown',
                 '',
             ]);
         $this->outputMock
             ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 
-        $this->staticAnalysisAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('PHPStan');
-        $this->staticAnalysisAdapterMock
+            ->willReturn('PHPUnit');
+        $this->testFrameworkMock
             ->method('getVersion')
             ->willThrowException(new InvalidArgumentException());
 
@@ -126,11 +126,11 @@ final class ConsoleProgressBarLoggerTest extends TestCase
         $this->createLogger(debug: true)->finish($testOutput);
     }
 
-    private function createLogger(bool $debug): InitialStaticAnalysisExecutionLogger
+    private function createLogger(bool $debug): InitialTestsExecutionLogger
     {
         return new ConsoleProgressBarLogger(
-            $this->staticAnalysisAdapterMock,
             $this->outputMock,
+            $this->testFrameworkMock,
             $debug,
         );
     }

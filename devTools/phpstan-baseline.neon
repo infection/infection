@@ -100,13 +100,13 @@ parameters:
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
 			identifier: catch.neverThrown
 			count: 1
-			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleNoProgressLogger.php
+			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
 
 		-
 			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
 			identifier: catch.neverThrown
 			count: 1
-			path: ../src/Logger/ArtefactCollection/InitialTestsExecution/ConsoleProgressBarLogger.php
+			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
 
 		-
 			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'

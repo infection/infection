@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
+namespace Infection\Tests\Logger\ArtefactCollection;
 
 use Infection\Framework\Str;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleNoProgressLogger;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -49,36 +49,36 @@ final class ConsoleNoProgressLoggerTest extends TestCase
 {
     private BufferedOutput $output;
 
-    private MockObject&StaticAnalysisToolAdapter $staticAnalysisAdapterMock;
+    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
 
-    private InitialStaticAnalysisExecutionLogger $logger;
+    private InitialTestsExecutionLogger $logger;
 
     protected function setUp(): void
     {
         $this->output = new BufferedOutput();
-        $this->staticAnalysisAdapterMock = $this->createMock(StaticAnalysisToolAdapter::class);
+        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
 
         $this->logger = new ConsoleNoProgressLogger(
-            $this->staticAnalysisAdapterMock,
+            $this->testFrameworkMock,
             $this->output,
         );
     }
 
     public function test_it_logs_on_start(): void
     {
-        $this->staticAnalysisAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('getVersion')
             ->willReturn('6.5.4');
 
-        $this->staticAnalysisAdapterMock
+        $this->testFrameworkMock
             ->expects($this->once())
             ->method('getName')
-            ->willReturn('PHPStan');
+            ->willReturn('PHPUnit');
 
         $expected = <<<'EOF'
 
-            Running initial tests with PHPStan version 6.5.4
+            Running initial tests with PHPUnit version 6.5.4
 
             EOF;
 
