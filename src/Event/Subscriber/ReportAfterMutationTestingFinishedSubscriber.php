@@ -42,7 +42,7 @@ use Infection\Reporter\Reporter;
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
+final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
 {
     public function __construct(
         private Reporter $reporter,

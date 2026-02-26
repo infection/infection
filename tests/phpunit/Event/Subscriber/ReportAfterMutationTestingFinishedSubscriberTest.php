@@ -37,22 +37,23 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
 use Infection\Reporter\Reporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriber::class)]
-final class MutationTestingResultsLoggerSubscriberTest extends TestCase
+#[CoversClass(ReportAfterMutationTestingFinishedSubscriber::class)]
+final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_testing_finished(): void
     {
+        $reporter = $this->createMock(Reporter::class);
+        $reporter
+            ->expects($this->once())
+            ->method('report');
+
         $dispatcher = new SyncEventDispatcher();
-
-        $logger = $this->createMock(Reporter::class);
-        $logger->expects($this->once())->method('report');
-
-        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber($logger));
+        $dispatcher->addSubscriber(new ReportAfterMutationTestingFinishedSubscriber($reporter));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
     }
