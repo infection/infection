@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -55,8 +57,8 @@ final readonly class InitialTestsExecutionLoggerFactory
     {
         return $this->skipProgressBar
             ? new ConsoleNoProgressLogger(
-                $this->output,
                 $this->testFrameworkAdapter,
+                $this->output,
             )
             : new ConsoleProgressBarLogger(
                 $this->output,

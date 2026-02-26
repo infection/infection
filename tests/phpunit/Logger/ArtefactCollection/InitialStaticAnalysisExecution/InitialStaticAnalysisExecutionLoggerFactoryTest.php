@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
 
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleNoProgressLogger;
-use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\ConsoleProgressBarLogger;
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -68,7 +68,7 @@ final class InitialStaticAnalysisExecutionLoggerFactoryTest extends TestCase
     }
 
     #[DataProvider('debugProvider')]
-    public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(bool $debug): void
+    public function test_it_creates_a_no_progress_logger_if_skips_the_progress_bar(bool $debug): void
     {
         $factory = $this->createFactory(
             skipProgressBar: true,
@@ -81,7 +81,7 @@ final class InitialStaticAnalysisExecutionLoggerFactoryTest extends TestCase
     }
 
     #[DataProvider('debugProvider')]
-    public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
+    public function test_it_creates_a_progress_bar_logger_if_does_not_skip_the_progress_bar(bool $debug): void
     {
         $factory = $this->createFactory(
             skipProgressBar: false,

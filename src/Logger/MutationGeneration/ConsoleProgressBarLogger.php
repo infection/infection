@@ -56,7 +56,6 @@ final readonly class ConsoleProgressBarLogger implements MutationGenerationLogge
     {
         $this->output->writeln([
             '',
-            '',
             'Generate mutants...',
             '',
         ]);

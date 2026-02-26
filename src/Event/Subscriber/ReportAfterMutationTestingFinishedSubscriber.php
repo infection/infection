@@ -33,66 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution;
+namespace Infection\Event\Subscriber;
 
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use InvalidArgumentException;
-use const PHP_EOL;
-use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Reporter\Reporter;
 
 /**
  * @internal
  */
-final readonly class ConsoleProgressBarLogger implements InitialStaticAnalysisExecutionLogger
+final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
-        private OutputInterface $output,
-        private bool $debug,
+        private Reporter $reporter,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
-    public function start(): void
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        try {
-            $version = $this->staticAnalysisToolAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            '',
-            'Running initial Static Analysis...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->staticAnalysisToolAdapter->getName(),
-                $version,
-            ),
-            '',
-        ]);
-
-        $this->progressBar->start();
-    }
-
-    public function advance(): void
-    {
-        $this->progressBar->advance();
-    }
-
-    public function finish(string $executionOutput): void
-    {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $executionOutput);
-        }
+        $this->reporter->report();
     }
 }

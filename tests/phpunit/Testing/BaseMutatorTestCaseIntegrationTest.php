@@ -33,61 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\ArtefactCollection\InitialTestsExecution;
+namespace Infection\Tests\Testing;
 
-use Infection\Framework\Str;
-use Infection\Logger\ArtefactCollection\InitialTestsExecution\ConsoleNoProgressLogger;
-use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Fixtures\Mutator\CustomNameMutator;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use PHPUnit\Framework\Attributes\Group;
 
-#[CoversClass(ConsoleNoProgressLogger::class)]
-final class ConsoleNoProgressLoggerTest extends TestCase
+#[Group('integration')]
+#[CoversClass(BaseMutatorTestCase::class)]
+final class BaseMutatorTestCaseIntegrationTest extends BaseMutatorTestCase
 {
-    private BufferedOutput $output;
-
-    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
-
-    private InitialTestsExecutionLogger $logger;
-
-    protected function setUp(): void
+    public function test_it_can_create_mutator_with_custom_name(): void
     {
-        $this->output = new BufferedOutput();
-        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
+        $mutator = $this->createMutator();
 
-        $this->logger = new ConsoleNoProgressLogger(
-            $this->output,
-            $this->testFrameworkMock,
-        );
+        $this->assertInstanceOf(CustomNameMutator::class, $mutator);
+        $this->assertSame('CustomNameMutator', $mutator->getName());
     }
 
-    public function test_it_logs_on_start(): void
+    protected function getTestedMutatorClassName(): string
     {
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getVersion')
-            ->willReturn('6.5.4');
-
-        $this->testFrameworkMock
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn('PHPUnit');
-
-        $expected = <<<'EOF'
-
-            Running initial test suite...
-
-            PHPUnit version: 6.5.4
-
-            EOF;
-
-        $this->logger->start();
-
-        $actual = Str::toUnixLineEndings($this->output->fetch());
-
-        $this->assertSame($expected, $actual);
+        return CustomNameMutator::class;
     }
 }

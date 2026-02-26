@@ -33,27 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\ArtefactCollection;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Reporter\Reporter;
+use Infection\Framework\Str;
+use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriber::class)]
-final class MutationTestingResultsLoggerSubscriberTest extends TestCase
+#[CoversClass(ConsoleNoProgressLogger::class)]
+final class ConsoleNoProgressLoggerTest extends TestCase
 {
-    public function test_it_reacts_on_mutation_testing_finished(): void
+    private BufferedOutput $output;
+
+    private MockObject&AbstractTestFrameworkAdapter $testFrameworkMock;
+
+    private InitialTestsExecutionLogger $logger;
+
+    protected function setUp(): void
     {
-        $dispatcher = new SyncEventDispatcher();
+        $this->output = new BufferedOutput();
+        $this->testFrameworkMock = $this->createMock(AbstractTestFrameworkAdapter::class);
 
-        $logger = $this->createMock(Reporter::class);
-        $logger->expects($this->once())->method('report');
+        $this->logger = new ConsoleNoProgressLogger(
+            $this->testFrameworkMock,
+            $this->output,
+        );
+    }
 
-        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber($logger));
+    public function test_it_logs_on_start(): void
+    {
+        $this->testFrameworkMock
+            ->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('6.5.4');
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $this->testFrameworkMock
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('PHPUnit');
+
+        $expected = <<<'EOF'
+
+            Running initial tests with PHPUnit version 6.5.4
+
+            EOF;
+
+        $this->logger->start();
+
+        $actual = Str::toUnixLineEndings($this->output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 }

@@ -67,7 +67,6 @@ final class ConsoleProgressBarLoggerTest extends TestCase
             ->method('writeln')
             ->with([
                 '',
-                '',
                 'Generate mutants...',
                 '',
             ]);

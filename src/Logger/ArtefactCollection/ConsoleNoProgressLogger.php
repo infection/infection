@@ -33,65 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\ArtefactCollection\InitialTestsExecution;
+namespace Infection\Logger\ArtefactCollection;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
+use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
-use const PHP_EOL;
 use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class ConsoleProgressBarLogger implements InitialTestsExecutionLogger
+final readonly class ConsoleNoProgressLogger implements InitialStaticAnalysisExecutionLogger, InitialTestsExecutionLogger
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
+        private TestFrameworkAdapter|StaticAnalysisToolAdapter $testFramework,
         private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-        private bool $debug,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
     public function start(): void
     {
         try {
-            $version = $this->testFrameworkAdapter->getVersion();
+            $version = $this->testFramework->getVersion();
         } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
 
         $this->output->writeln([
             '',
-            'Running initial test suite...',
-            '',
             sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
+                'Running initial tests with %s version %s',
+                $this->testFramework->getName(),
                 $version,
             ),
-            '',
         ]);
-
-        $this->progressBar->start();
     }
 
     public function advance(): void
     {
-        $this->progressBar->advance();
+        // Do nothing.
     }
 
     public function finish(string $executionOutput): void
     {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $executionOutput);
-        }
+        // Do nothing.
     }
 }
