@@ -61,10 +61,8 @@ final readonly class ConsoleNoProgressLogger implements InitialTestsExecutionLog
 
         $this->output->writeln([
             '',
-            'Running initial test suite...',
-            '',
             sprintf(
-                '%s version: %s',
+                'Running initial tests with %s version %s',
                 $this->testFrameworkAdapter->getName(),
                 $version,
             ),
