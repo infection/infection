@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
+use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use function array_flip;
 use function array_key_exists;
 use function array_map;
@@ -253,11 +255,18 @@ abstract class BaseMutatorTestCase extends TestCase
             ),
         );
 
+        (new NodeTraverser(
+            new AddIdToTraversedNodesVisitor()
+        ))->traverse($nodes);
+
         $factory = new NodeTraverserFactory();
 
         $factory
             ->createPreTraverser()
             ->traverse($nodes);
+
+        $ast = (new NodeDumper())->dump($nodes, onlyVisitedNodes: false);
+
         $factory
             ->create($mutationsCollectorVisitor)
             ->traverse($nodes);

@@ -39,6 +39,8 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
@@ -55,7 +57,7 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
-    public function create(NodeVisitor $mutationVisitor): NodeTraverserInterface
+    public function createPreTraverser(): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
 
@@ -65,23 +67,22 @@ class NodeTraverserFactory
             new AbstractMethodIgnorer(),
         ];
 
-        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(NameResolverFactory::create());
-        $traverser->addVisitor(new ParentConnectingVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
+        return new NodeTraverser(
+            new NextConnectingVisitor(),
+            new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
+            new NonMutableNodesIgnorerVisitor($nodeIgnorers),
+            NameResolverFactory::create(),
+            new ParentConnectingVisitor(),
+            new ReflectionVisitor(),
+            new LabelNodesAsEligibleVisitor(),
+        );
     }
 
-    public function createPreTraverser(): NodeTraverserInterface
+    public function create(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NextConnectingVisitor());
-
-        return $traverser;
+        return new NodeTraverser(
+            new NodeVisitor\CloningVisitor(),
+            $mutationVisitor,
+        );
     }
 }
