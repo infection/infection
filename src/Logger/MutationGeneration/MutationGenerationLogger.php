@@ -33,24 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Infection\Reporter\Reporter;
+namespace Infection\Logger\MutationGeneration;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriber implements MutationTestingWasFinishedSubscriber
+interface MutationGenerationLogger
 {
-    public function __construct(
-        private Reporter $reporter,
-    ) {
-    }
+    /**
+     * @param positive-int|0 $sourceFilesCount
+     */
+    public function start(int $sourceFilesCount): void;
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
-    {
-        $this->reporter->report();
-    }
+    public function advance(): void;
+
+    public function finish(): void;
 }

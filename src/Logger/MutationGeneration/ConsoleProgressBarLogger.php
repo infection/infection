@@ -33,42 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Logger\MutationGeneration;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriber::class)]
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class ConsoleProgressBarLogger implements MutationGenerationLogger
 {
-    private MockObject&OutputInterface $output;
+    private ProgressBar $progressBar;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
+    public function __construct(
+        private OutputInterface $output,
+    ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
-    public function test_it_reacts_on_mutation_generating_started_event(): void
+    public function start(int $sourceFilesCount): void
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Generate mutants...',
-                '',
-                'Processing source code files...',
-            ]);
+        $this->output->writeln([
+            '',
+            'Generate mutants...',
+            '',
+        ]);
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriber($this->output));
+        $this->progressBar->start($sourceFilesCount);
+    }
 
-        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
+    public function advance(): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function finish(): void
+    {
+        $this->progressBar->finish();
     }
 }

@@ -33,18 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Tests\Event\Subscriber;
 
-/**
- * @internal
- */
-final readonly class MutationGenerationWasStarted
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
+use Infection\Reporter\Reporter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(ReportAfterMutationTestingFinishedSubscriber::class)]
+final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
 {
-    /**
-     * @param positive-int|0 $mutableFilesCount
-     */
-    public function __construct(
-        public int $mutableFilesCount,
-    ) {
+    public function test_it_reacts_on_mutation_testing_finished(): void
+    {
+        $reporter = $this->createMock(Reporter::class);
+        $reporter
+            ->expects($this->once())
+            ->method('report');
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new ReportAfterMutationTestingFinishedSubscriber($reporter));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
     }
 }

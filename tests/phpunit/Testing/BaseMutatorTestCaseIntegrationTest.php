@@ -33,27 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Testing;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
-use Infection\Reporter\Reporter;
+use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Fixtures\Mutator\CustomNameMutator;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
-#[CoversClass(MutationTestingResultsLoggerSubscriber::class)]
-final class MutationTestingResultsLoggerSubscriberTest extends TestCase
+#[Group('integration')]
+#[CoversClass(BaseMutatorTestCase::class)]
+final class BaseMutatorTestCaseIntegrationTest extends BaseMutatorTestCase
 {
-    public function test_it_reacts_on_mutation_testing_finished(): void
+    public function test_it_can_create_mutator_with_custom_name(): void
     {
-        $dispatcher = new SyncEventDispatcher();
+        $mutator = $this->createMutator();
 
-        $logger = $this->createMock(Reporter::class);
-        $logger->expects($this->once())->method('report');
+        $this->assertInstanceOf(CustomNameMutator::class, $mutator);
+        $this->assertSame('CustomNameMutator', $mutator->getName());
+    }
 
-        $dispatcher->addSubscriber(new MutationTestingResultsLoggerSubscriber($logger));
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+    protected function getTestedMutatorClassName(): string
+    {
+        return CustomNameMutator::class;
     }
 }

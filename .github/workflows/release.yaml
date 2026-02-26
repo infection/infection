@@ -53,7 +53,7 @@ jobs:
               dist/infection.phar
 
       - name: Upload PHAR to release
-        uses: svenstaro/upload-release-action@6b7fa9f267e90b50a19fef07b3596790bb941741 # latest
+        uses: svenstaro/upload-release-action@b98a3b12e86552593f3e4e577ca8a62aa2f3f22b # latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dist/infection.phar*

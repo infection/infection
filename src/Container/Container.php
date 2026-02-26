@@ -63,9 +63,9 @@ use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\InitialStaticAnalysisExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationGenerationLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
-use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
+use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
@@ -91,6 +91,8 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
+use Infection\Logger\MutationGeneration\MutationGenerationLogger;
+use Infection\Logger\MutationGeneration\MutationGenerationLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -381,10 +383,10 @@ final class Container extends DIContainer
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->get(InitialTestsExecutionLoggerSubscriber::class),
-                    $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->get(MutationGenerationLoggerSubscriber::class),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
                     $container->get(MutationAnalysisLoggerSubscriber::class),
-                    $container->get(MutationTestingResultsLoggerSubscriber::class),
+                    $container->get(ReportAfterMutationTestingFinishedSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->get(StopInfectionOnSigintSignalSubscriber::class),
@@ -428,7 +430,8 @@ final class Container extends DIContainer
                 );
             },
             InitialStaticAnalysisExecutionLogger::class => static fn (self $container): InitialStaticAnalysisExecutionLogger => $container->get(InitialStaticAnalysisExecutionLoggerFactory::class)->create(),
-            MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
+            MutationGenerationLogger::class => static fn (self $container): MutationGenerationLogger => $container->get(MutationGenerationLoggerFactory::class)->create(),
+            MutationGenerationLoggerFactory::class => static fn (self $container): MutationGenerationLoggerFactory => new MutationGenerationLoggerFactory(
                 $container->getConfiguration()->noProgress,
                 $container->getOutput(),
             ),
@@ -830,11 +833,6 @@ final class Container extends DIContainer
     public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory
     {
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
-    }
-
-    public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory
-    {
-        return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
     }
 
     public function getSourceCollector(): SourceCollector

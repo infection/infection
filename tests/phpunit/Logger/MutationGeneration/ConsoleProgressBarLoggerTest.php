@@ -33,46 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Logger\MutationGeneration;
 
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
-use Infection\Tests\Fixtures\Console\FakeOutput;
+use Infection\Logger\MutationGeneration\ConsoleProgressBarLogger;
+use Infection\Logger\MutationGeneration\MutationGenerationLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(MutationGeneratingConsoleLoggerSubscriberFactory::class)]
-final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCase
+#[CoversClass(ConsoleProgressBarLogger::class)]
+final class ConsoleProgressBarLoggerTest extends TestCase
 {
-    public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(): void
+    private OutputInterface&MockObject $outputMock;
+
+    private MutationGenerationLogger $logger;
+
+    protected function setUp(): void
     {
-        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
-            true,
-            new FakeOutput(),
-        );
+        $this->outputMock = $this->createMock(OutputInterface::class);
 
-        $subscriber = $factory->create();
-
-        $this->assertInstanceOf(CiMutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
+        $this->logger = new ConsoleProgressBarLogger($this->outputMock);
     }
 
-    public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(): void
+    public function test_it_logs_the_start(): void
     {
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
-            ->method('isDecorated')
-            ->willReturn(false)
-        ;
+        $this->outputMock
+            ->expects($this->once())
+            ->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_QUIET);
+        $this->outputMock
+            ->expects($this->once())
+            ->method('writeln')
+            ->with([
+                '',
+                'Generate mutants...',
+                '',
+            ]);
 
-        $factory = new MutationGeneratingConsoleLoggerSubscriberFactory(
-            false,
-            $outputMock,
-        );
-
-        $subscriber = $factory->create();
-
-        $this->assertInstanceOf(MutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
+        $this->logger->start(10);
     }
 }
