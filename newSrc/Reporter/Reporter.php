@@ -33,18 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Reporter;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\Engine\Envelope;
+use newSrc\MutationAnalyzer\MutantExecutionResult;
+
+interface Reporter
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function collect(MutantExecutionResult $result, Envelope $envelope): void;
+
+    public function report(): void;
 }

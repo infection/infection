@@ -33,18 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
+
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
+ * Mark all node as eligible. This visitor should be registered as last, so if
+ * a node is code that should be ignored because not covered by tests, for example,
+ * then this visitor should not traverse that node at all.
  */
-trait CannotBeInstantiated
+final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function enterNode(Node $node): ?int
     {
+        NodeAnnotator::annotate($node, Annotation::ELIGIBLE);
+
+        return null;
     }
 }

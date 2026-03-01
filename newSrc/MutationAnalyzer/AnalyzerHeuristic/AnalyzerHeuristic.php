@@ -33,18 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer\AnalyzerHeuristic;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\Mutagenesis\Mutation;
+use newSrc\MutationAnalyzer\MutantExecutionResult;
+
+interface AnalyzerHeuristic
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function analyze(Mutation $mutation): ?MutantExecutionResult;
 }

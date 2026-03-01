@@ -33,18 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\Metadata;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use function array_values;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use PhpParser\Node;
+
+final class SymbolAnnotator
 {
-    // TODO: should be leverage in the new code
     private function __construct()
     {
+    }
+
+    /**
+     * @param Symbol[] $symbols
+     */
+    public static function annotate(
+        Node $node,
+        array $symbols,
+    ): void {
+        $node->setAttribute(
+            Annotation::SYMBOL->name,
+            array_values($symbols),
+        );
+    }
+
+    /**
+     * @return list<Symbol>
+     */
+    public static function getSymbols(Node $node): array
+    {
+        return $node->getAttribute(Annotation::SYMBOL->name);
     }
 }

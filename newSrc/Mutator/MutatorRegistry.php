@@ -33,18 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutator;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\Mutagenesis\Mutation;
+use newSrc\Mutator\FirstOrder\ConditionalNegotiation\Equal;
+use PhpParser\Node;
+
+final class MutatorRegistry
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @param Mutator[] $mutators
+     */
+    public function __construct(
+        public readonly array $mutators = [],   // TODO: inject
+    ) {
+        $this->mutators = [
+            new Equal(),
+        ];
+    }
+
+    /**
+     * @return iterable<Mutation>
+     */
+    public function mutate(Node $node): iterable
     {
+        foreach ($this->mutators as $mutator) {
+            yield $mutator->mutate($node);
+        }
     }
 }

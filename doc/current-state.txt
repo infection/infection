@@ -1,0 +1,22 @@
+Engine::execute()
+    ::runInitialTestSuite()
+    ::runInitialStaticAnalysis()
+    -- TODO: above should be one step
+    ::runMutationAnalysis()
+        - get traces <- we make the traces the source, "selection", rather than the source code
+        - for each trace
+            generate mutation
+                - parse file into AST
+                - traverse AST with MutationCollectorVisitor + NodeMutationGenerator
+                    - generate mutations on leaveNode
+    ::checkMetrics()    // TODO: could be "checkResults" or smth instead
+
+
+TODOs:
+
+- check at what point a AST second pass is necessary to generate mutations
+- the source is currently the trace: should that really be the case? Investigate.
+First thought: When getting an entire codebase, this avoids parsing unnecessary files.
+Depending of the selector and/or covered/uncovered, not clear how it behaves
+
+- define what API integrated tools should offer to greatly improve perfs

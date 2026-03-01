@@ -33,18 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Coverage\Locator;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use RuntimeException;
+
+final class NoReportFound extends RuntimeException
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
 }

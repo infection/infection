@@ -33,18 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\NewSrc\AST;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use function array_map;
+use Infection\Tests\NewSrc\AST\NodeDumper\NodeDumper;
+use function is_array;
+use PhpParser\Node;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+use PHPUnit\Framework\TestCase;
+
+abstract class AstTestCase extends TestCase
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    protected Parser $parser;
+    protected NodeDumper $dumper;
+
+    protected function setUp(): void
     {
+        $this->parser = $this->createParser();
+        $this->dumper = $this->createDumper();
+    }
+
+    protected function createParser(): Parser
+    {
+        return (new ParserFactory())->createForNewestSupportedVersion();
+    }
+
+    protected function createDumper(): NodeDumper
+    {
+        return new NodeDumper();
+    }
+
+    /**
+     * @param array<string, list<mixed>> $records
+     * @return array<string, list<string|list<string>>>
+     */
+    final protected function dumpRecordNodes(array $records): array
+    {
+        return array_map(
+            fn (array $record) => [
+                $record[0],
+                $this->dumpRecursively($record[1]),
+            ],
+            $records,
+        );
+    }
+
+    /**
+     * @return array<string, list<string|list<string>>>
+     */
+    private function dumpRecursively(mixed $potentialNodes): array|string
+    {
+        if (is_array($potentialNodes)) {
+            return array_map(
+                $this->dumpRecursively(...),
+                $potentialNodes,
+            );
+        }
+
+        $this->assertInstanceOf(Node::class, $potentialNodes);
+
+        return $this->dumper->dump($potentialNodes);
     }
 }

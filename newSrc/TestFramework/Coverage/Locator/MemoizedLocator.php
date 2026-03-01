@@ -33,18 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Coverage\Locator;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+final class MemoizedLocator implements ReportLocator
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    private string $location;
+
+    public function __construct(
+        private readonly ReportLocator $decoratedLocator,
+    ) {
+    }
+
+    public function locate(): string
     {
+        if (!isset($this->location)) {
+            $this->location = $this->decoratedLocator->locate();
+        }
+
+        return $this->location;
     }
 }

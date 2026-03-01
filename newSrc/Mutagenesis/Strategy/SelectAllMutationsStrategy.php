@@ -33,18 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutagenesis\Strategy;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use SplObjectStorage;
+
+final class SelectAllMutationsStrategy implements Strategy
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function apply(SplObjectStorage $potentialMutations): iterable
     {
+        foreach ($potentialMutations as $node) {
+            $createMutation = $potentialMutations[$node];
+
+            yield from $createMutation($node);
+        }
     }
 }

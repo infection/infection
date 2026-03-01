@@ -33,18 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public const VISITED_ATTRIBUTE = 'visited';
+
+    public static function wasVisited(Node $node): bool
     {
+        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
+    }
+
+    /**
+     * @template T extends Node
+     *
+     * @param T $node
+     * @return T
+     */
+    public static function markAsVisited(Node $node): Node
+    {
+        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
+
+        return $node;
+    }
+
+    public function leaveNode(Node $node): void
+    {
+        self::markAsVisited($node);
     }
 }

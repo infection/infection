@@ -33,18 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutagenesis\Strategy;
+
+use newSrc\Mutagenesis\Mutation;
+use newSrc\Mutation\NodeVisitor\MutationCollectorVisitor;
+use PhpParser\Node;
+use SplObjectStorage;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
+ * @phpstan-import-type MutationFactory from MutationCollectorVisitor
  */
-trait CannotBeInstantiated
+interface Strategy
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    /**
+     * @param SplObjectStorage<Node, MutationFactory> $potentialMutations
+     *
+     * @return iterable<Mutation>
+     */
+    public function apply(SplObjectStorage $potentialMutations): iterable;
 }

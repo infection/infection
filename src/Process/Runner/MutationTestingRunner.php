@@ -85,6 +85,7 @@ class MutationTestingRunner
 
         $processContainers = take($mutations)
             ->stream()
+            // Start of heuristics
             ->filter($this->ignoredByMutantId(...))
             // Emitting the start of the event must be done _after_ checking the mutant ID
             // as the latter does not dispatch any finished event.
@@ -93,6 +94,7 @@ class MutationTestingRunner
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
+            // End of heuristics
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 

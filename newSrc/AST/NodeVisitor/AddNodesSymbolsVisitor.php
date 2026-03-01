@@ -33,18 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\AST\Metadata\SymbolAnnotator;
+use newSrc\AST\SymbolResolver;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use function spl_object_id;
+
+final class AddNodesSymbolsVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @var array<string, Symbol>
+     */
+    private array $symbols = [];
+
+    public function __construct(
+        private readonly SymbolResolver $resolver,
+    ) {
+    }
+
+    public function enterNode(Node $node): ?int
     {
+        $symbol = $this->resolver->tryToResolve($node);
+
+        if ($symbol !== null) {
+            $this->symbols[spl_object_id($node)] = $symbol;
+        }
+
+        SymbolAnnotator::annotate(
+            $node,
+            $this->symbols,
+        );
+
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        unset($this->symbols[spl_object_id($node)]);
+
+        return null;
     }
 }

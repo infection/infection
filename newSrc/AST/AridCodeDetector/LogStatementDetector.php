@@ -33,18 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\AridCodeDetector;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\Node;
+
+final class LogStatementDetector implements AridCodeDetector
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    private const PHP_NATIVE_LOG_FUNCTION = 'error_log';
+
+    public function isArid(Node $node): bool
     {
+        // TODO: this is not all implemented!
+        return match (true) {
+            $node instanceof Node\Expr\FuncCall => $this->isLogLikeFunctionCall($node),
+            $node instanceof Node\Expr\MethodCall => $this->isLogLikeMethodCall($node),
+            default => false,
+        };
+    }
+
+    private function isLogLikeFunctionCall(Node\Expr\FuncCall $node): bool
+    {
+        $name = $node->name;
+
+        return $name instanceof Node\Name
+            && $name->toLowerString() === self::PHP_NATIVE_LOG_FUNCTION;
+    }
+
+    private function isLogLikeMethodCall(Node\Expr\MethodCall $node): bool
+    {
+        $var = $node->var;
+        $name = $node->name;
+
+        return
+            $var instanceof Node\Expr\PropertyFetch
+            && $var->name instanceof Node\Identifier
+            && $var->name->toLowerString() === 'logger';
     }
 }

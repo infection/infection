@@ -33,18 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Mutagenesis;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+interface Mutation
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
 }

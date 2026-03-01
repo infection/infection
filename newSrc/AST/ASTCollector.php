@@ -33,18 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use Infection\PhpParser\FileParser;
+use PhpParser\Node;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
+
+// Parses the sources and provide a rich annotated AST.
+final readonly class ASTCollector
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function __construct(
+        private FileParser $parser,
+        private NodeTraverserFactory $traverserFactory,
+    ) {
+    }
+
+    /**
+     * @return iterable<Node[]>
+     */
+    public function collect(SplFileInfo $sourceFile): iterable
     {
+        $statements = $this->parser->parse($sourceFile);
+
+        yield $this->traverserFactory
+            ->create(Path::canonicalize($sourceFile->getPathname()))
+            ->traverse($statements);
     }
 }
