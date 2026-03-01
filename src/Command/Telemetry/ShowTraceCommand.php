@@ -43,6 +43,7 @@ use Infection\Console\IO;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Reporter\ConsoleReporter;
+use Infection\Telemetry\Reporter\Html\HtmlReporter;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Trace;
 use const PHP_INT_MAX;
@@ -64,6 +65,8 @@ final class ShowTraceCommand extends BaseCommand
     private const SPAN_ID_ARGUMENT = 'span-id';
 
     private const FORMAT_OPTION = 'format';
+
+    private const OUTPUT_OPTION = 'output';
 
     private const MAX_DEPTH_OPTION = 'max-depth';
 
@@ -140,6 +143,12 @@ final class ShowTraceCommand extends BaseCommand
                 'Minimum time (in %, int<0,100>) threshold to reach for a span to be displayed.',
                 10,
             )
+            ->addOption(
+                self::OUTPUT_OPTION,
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Output HTML file path. Defaults to trace path with .html extension.',
+            )
         ;
     }
 
@@ -155,7 +164,7 @@ final class ShowTraceCommand extends BaseCommand
         $trace = Trace::unserialize(
             $this->filesystem->readFile($tracePathname),
         );
-        $reporter = $this->getConsoleReporter($io);
+        $reporter = $this->getReporter($io, $format, $tracePathname);
 
         $reporter->report(
             $trace,
@@ -237,14 +246,34 @@ final class ShowTraceCommand extends BaseCommand
         return $io->getInput()->getArgument(self::SPAN_ID_ARGUMENT);
     }
 
-    private function getConsoleReporter(IO $io): ConsoleReporter
+    private static function getOutputPath(IO $io, string $tracePathname): string
+    {
+        $option = $io->getInput()->getOption(self::OUTPUT_OPTION);
+
+        if ($option !== null) {
+            return Path::canonicalize($option);
+        }
+
+        return Path::changeExtension($tracePathname, 'html');
+    }
+
+    private function getReporter(IO $io, TraceFormat $format, string $tracePathname): ConsoleReporter|HtmlReporter
     {
         $container = $this->getApplication()->getContainer();
 
-        return new ConsoleReporter(
-            $container->get(DurationFormatter::class),
-            $container->get(MemoryFormatter::class),
-            $io,
-        );
+        return match ($format) {
+            TraceFormat::HTML => new HtmlReporter(
+                $container->get(DurationFormatter::class),
+                $container->get(MemoryFormatter::class),
+                $io,
+                $container->getFileSystem(),
+                self::getOutputPath($io, $tracePathname),
+            ),
+            default => new ConsoleReporter(
+                $container->get(DurationFormatter::class),
+                $container->get(MemoryFormatter::class),
+                $io,
+            ),
+        };
     }
 }

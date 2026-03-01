@@ -44,12 +44,15 @@ use Infection\Telemetry\Metric\Time\Duration;
  *
  * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
  *
+ * @phpstan-import-type SpanAttribute from SpanBuilder
+ *
  * @internal
  */
-final readonly class Span
+final class Span
 {
     /**
      * @param list<Span> $children
+     * @param array<string, SpanAttribute>
      */
     public function __construct(
         public SpanId $id,
@@ -58,6 +61,7 @@ final readonly class Span
         public Snapshot $start,
         public Snapshot $end,
         public array $children,
+        public array $attributes,
     ) {
     }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
@@ -51,6 +52,7 @@ class InitialTestsRunner
     public function __construct(
         private readonly InitialTestsRunProcessFactory $processBuilder,
         private readonly EventDispatcher $eventDispatcher,
+        private readonly TestFrameworkAdapter $testFrameworkAdapter,
     ) {
     }
 
@@ -68,7 +70,12 @@ class InitialTestsRunner
             $skipCoverage,
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
+        $this->eventDispatcher->dispatch(
+            new InitialTestSuiteWasStarted(
+                $this->testFrameworkAdapter->getName(),
+                $this->testFrameworkAdapter->getVersion(),
+            ),
+        );
 
         $process->run(function (string $type) use ($process): void {
             if ($type === Process::ERR) {

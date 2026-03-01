@@ -557,7 +557,7 @@ final class Container extends DIContainer
                     );
             },
             TelemetryTraceProvider::class => static fn (self $container): TelemetryTraceProvider => $container->get(TelemetryTracer::class),
-            MutationTestingResultsLoggerSubscriber::class => static fn (self $container): MutationTestingResultsLoggerSubscriber => new MutationTestingResultsLoggerSubscriber(
+            ReportAfterMutationTestingFinishedSubscriber::class => static fn (self $container): ReportAfterMutationTestingFinishedSubscriber => new ReportAfterMutationTestingFinishedSubscriber(
                 $container->getReporter(),
             ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {

@@ -47,6 +47,8 @@ use Infection\Telemetry\Tracing\Throwable\AlreadyStartedSpan;
  *
  * @see https://opentelemetry.io/docs/specs/otel/trace/api/#tracer
  *
+ * @phpstan-import-type SpanAttribute from \Infection\Tests\Telemetry\Tracing\SpanBuilder
+ *
  * @internal
  */
 final class Tracer implements TraceProvider
@@ -87,16 +89,21 @@ final class Tracer implements TraceProvider
         return $span;
     }
 
+    /**
+     * @param array<string, SpanAttribute> $attributes
+     */
     public function startChildSpan(
         SpanBuilder $parent,
         Scope $scope,
         ?string $id = null,
+        array $attributes = [],
     ): SpanBuilder {
         $spanId = SpanId::create($scope, $id, $parent->id);
 
         $span = new SpanBuilder(
             $spanId,
             $this->inspector->snapshot(),
+            $attributes,
         );
 
         if (array_key_exists((string) $spanId, $this->allSpans)) {

@@ -150,6 +150,10 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         $this->initialTestSuiteSpan = $this->tracer->startChildSpan(
             $this->artefactCollectionSpan,
             Scope::INITIAL_TESTS,
+            attributes: [
+                'testFrameworkName' => $event->testFrameworkName,
+                'testFrameworkVersion' => $event->testFrameworkVersion,
+            ],
         );
     }
 
@@ -203,6 +207,8 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
             $sourceFileId,
         );
         $this->sourceFileSpans[$sourceFileId] = $sourceFileSpan;
+
+        $sourceFileSpan->setAttribute('sourceFile', $event->sourceFilePath);
 
         $astGenerationSpan = $this->tracer->startChildSpan(
             $sourceFileSpan,

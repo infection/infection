@@ -33,16 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
+namespace Infection\Telemetry\Reporter\Html;
 
-/**
- * @internal
- */
-final readonly class InitialTestSuiteWasStarted
+use Infection\CannotBeInstantiated;
+use Infection\Telemetry\Tracing\RootScope;
+use Infection\Telemetry\Tracing\Scope;
+
+final readonly class ScopeName
 {
-    public function __construct(
-        public string $testFrameworkName,
-        public string $testFrameworkVersion,
-    ) {
+    use CannotBeInstantiated;
+
+    public static function getName(RootScope|Scope $scope): string
+    {
+        return match ($scope) {
+            RootScope::ARTEFACT_COLLECTION => 'Artefact Collection',
+            RootScope::MUTATION_ANALYSIS => 'Mutation Analysis',
+            RootScope::SOURCE_FILE => 'Source file',
+            Scope::INITIAL_TESTS => 'Initial Tests',
+            Scope::INITIAL_STATIC_ANALYSIS => 'Initial Static Analysis',
+            Scope::AST_GENERATION => 'AST Generation',
+            Scope::MUTATION_GENERATION => 'Mutation Generation',
+            Scope::MUTATION_EVALUATION => 'Mutation Evaluation',
+            Scope::MUTATION_HEURISTICS => 'Mutation Heuristics',
+            Scope::MUTANT_EVALUATION => 'Mutant Evaluation',
+        };
     }
 }

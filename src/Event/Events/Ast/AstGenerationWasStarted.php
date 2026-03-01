@@ -42,6 +42,7 @@ final readonly class AstGenerationWasStarted
 {
     public function __construct(
         public string $sourceFileId,
+        public string $sourceFilePath,
     ) {
     }
 }

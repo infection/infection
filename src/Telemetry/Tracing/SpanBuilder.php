@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Tracing;
 
 use function array_map;
+use DateTimeInterface;
 use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Tracing\Throwable\AlreadyEndedSpan;
 use Infection\Telemetry\Tracing\Throwable\UnendedSpan;
+use Throwable;
 
 /**
  * A span is a single unit of work. This builder is used to open a span. Once
@@ -49,6 +51,8 @@ use Infection\Telemetry\Tracing\Throwable\UnendedSpan;
  * @see Span
  * @see Tracer
  * @see https://opentelemetry.io/docs/specs/otel/overview/#spans
+ *
+ * @phpstan-type SpanAttribute = string|int|float|bool|DateTimeInterface|Throwable|array $value
  *
  * @internal
  */
@@ -61,10 +65,19 @@ final class SpanBuilder
      */
     private array $children = [];
 
+    /**
+     * @param array<string, SpanAttribute> $attributes
+     */
     public function __construct(
         public readonly SpanId $id,
         private readonly Snapshot $start,
+        private array $attributes = [],
     ) {
+    }
+
+    public function setAttribute(string $key, string|int|float|bool|DateTimeInterface|Throwable|array $value): void
+    {
+        $this->attributes[$key] = $value;
     }
 
     /** @internal Should only be used by the Tracer */
@@ -95,6 +108,7 @@ final class SpanBuilder
                 static fn (SpanBuilder $child) => $child->build(),
                 $this->children,
             ),
+            $this->attributes,
         );
     }
 

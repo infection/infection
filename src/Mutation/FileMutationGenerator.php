@@ -176,7 +176,10 @@ class FileMutationGenerator
         $sourceFileId = NodeIdFactory::create($sourceFile->getRealPath());
 
         $this->eventDispatcher->dispatch(
-            new AstGenerationWasStarted($sourceFileId),
+            new AstGenerationWasStarted(
+                $sourceFileId,
+                $sourceFile->getRealPath(),
+            ),
         );
 
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);

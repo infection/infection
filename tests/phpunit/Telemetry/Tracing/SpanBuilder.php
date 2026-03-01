@@ -36,23 +36,31 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Tracing;
 
+use DateTimeInterface;
 use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\Span;
+use Infection\Telemetry\Tracing\SpanBuilder as SourceSpanBuilder;
 use Infection\Telemetry\Tracing\SpanId;
 use Infection\Tests\Telemetry\Metric\SnapshotBuilder;
+use Throwable;
 
+/**
+ * @phpstan-import-type SpanAttribute from SourceSpanBuilder
+ */
 final class SpanBuilder
 {
     /**
      * @param list<Span> $children
+     * @param array<string, SpanAttribute> $attributes
      */
     private function __construct(
         private SpanId $id,
         private Snapshot $start,
         private Snapshot $end,
         private array $children,
+        private array $attributes,
     ) {
     }
 
@@ -63,6 +71,7 @@ final class SpanBuilder
             $span->start,
             $span->end,
             $span->children,
+            $span->attributes,
         );
     }
 
@@ -79,6 +88,10 @@ final class SpanBuilder
                 self::withChildTestData()->build(),
                 self::withChildTestData()->build(),
             ],
+            attributes: [
+                'attribute1' => 'value1',
+                'attribute2' => 'value2',
+            ],
         );
     }
 
@@ -92,6 +105,7 @@ final class SpanBuilder
             start: SnapshotBuilder::withTestData()->build(),
             end: SnapshotBuilder::withTestData()->build(),
             children: [],
+            attributes: [],
         );
     }
 
@@ -127,6 +141,22 @@ final class SpanBuilder
         return $clone;
     }
 
+    public function withAttributes(array ...$attributes): self
+    {
+        $clone = clone $this;
+        $clone->attributes = $attributes;
+
+        return $clone;
+    }
+
+    public function withAttribute(string $key, string|int|float|bool|DateTimeInterface|Throwable|array $value): self
+    {
+        $clone = clone $this;
+        $clone->attributes[$key] = $value;
+
+        return $clone;
+    }
+
     public function build(): Span
     {
         return new Span(
@@ -136,6 +166,7 @@ final class SpanBuilder
             $this->start,
             $this->end,
             $this->children,
+            $this->attributes,
         );
     }
 }
