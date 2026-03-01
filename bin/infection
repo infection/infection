@@ -38,6 +38,7 @@ declare(strict_types=1);
 
 use Infection\Console\Application;
 use Infection\Container\Container;
+use Infection\Container\DebugOutput;
 use function Safe\getcwd;
 
 if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
@@ -90,5 +91,7 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
         include_once $autoload;
     }
 })();
+
+DebugOutput::reset();
 
 (new Application(Container::create()))->run();

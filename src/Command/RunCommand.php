@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Container\DebugOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use function extension_loaded;
 use function implode;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
