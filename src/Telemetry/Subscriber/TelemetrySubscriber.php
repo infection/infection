@@ -1,0 +1,369 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Telemetry\Subscriber;
+
+use function array_diff;
+use function array_fill_keys;
+use function array_key_exists;
+use function array_keys;
+use function count;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstGenerationWasFinished;
+use Infection\Event\Events\Ast\AstGenerationWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstGenerationWasStarted;
+use Infection\Event\Events\Ast\AstGenerationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
+use Infection\Telemetry\Tracing\RootScope;
+use Infection\Telemetry\Tracing\Scope;
+use Infection\Telemetry\Tracing\SpanBuilder;
+use Infection\Telemetry\Tracing\Tracer;
+
+/**
+ * @internal
+ */
+final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+{
+    private SpanBuilder $artefactCollectionSpan;
+
+    private SpanBuilder $initialTestSuiteSpan;
+
+    private SpanBuilder $initialStaticAnalysisRunSpan;
+
+    private SpanBuilder $mutationGenerationSpan;
+
+    private SpanBuilder $mutationAnalysisSpan;
+
+    private SpanBuilder $mutationEvaluationSpan;
+
+    /** @var array<int, SpanBuilder> */
+    private array $sourceFileSpans = [];
+
+    /** @var array<int, SpanBuilder> */
+    private array $astGenerationSpans = [];
+
+    /** @var array<int, SpanBuilder> */
+    private array $sourceFileMutationGenerationSpan = [];
+
+    /** @var array<int, SpanBuilder> */
+    private array $individualMutationAnalysisSpans = [];
+
+    /** @var array<int, SpanBuilder> */
+    private array $mutationHeuristicsSpans = [];
+
+    /**
+     * @var array<string, array<string, true>>
+     */
+    private array $finishedMutationHashesBySourceFileId = [];
+
+    /**
+     * @var array<string, array<string, true>>
+     */
+    private array $remainingMutationHashesBySourceFileId = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private array $sourceFileIdByMutationHash = [];
+
+    public function __construct(
+        private readonly Tracer $tracer,
+    ) {
+    }
+
+    public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
+    {
+        $this->artefactCollectionSpan = $this->tracer->startSpan(RootScope::ARTEFACT_COLLECTION);
+    }
+
+    public function onArtefactCollectionWasFinished(ArtefactCollectionWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->artefactCollectionSpan);
+    }
+
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    {
+        $this->initialTestSuiteSpan = $this->tracer->startChildSpan(
+            $this->artefactCollectionSpan,
+            Scope::INITIAL_TESTS,
+        );
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->initialTestSuiteSpan);
+    }
+
+    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
+    {
+        $this->initialStaticAnalysisRunSpan = $this->tracer->startChildSpan(
+            $this->artefactCollectionSpan,
+            Scope::INITIAL_STATIC_ANALYSIS,
+        );
+    }
+
+    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->initialStaticAnalysisRunSpan);
+    }
+
+    public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
+    {
+        $this->mutationAnalysisSpan = $this->tracer->startSpan(RootScope::MUTATION_ANALYSIS);
+    }
+
+    public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->mutationAnalysisSpan);
+    }
+
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    {
+        $this->mutationGenerationSpan = $this->tracer->startChildSpan(
+            $this->mutationAnalysisSpan,
+            Scope::MUTATION_GENERATION,
+        );
+    }
+
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->mutationGenerationSpan);
+    }
+
+    public function onAstGenerationWasStarted(AstGenerationWasStarted $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+
+        $sourceFileSpan = $this->tracer->startSpan(
+            RootScope::SOURCE_FILE,
+            $sourceFileId,
+        );
+        $this->sourceFileSpans[$sourceFileId] = $sourceFileSpan;
+
+        $astGenerationSpan = $this->tracer->startChildSpan(
+            $sourceFileSpan,
+            Scope::AST_GENERATION,
+            $sourceFileId,
+        );
+
+        $this->astGenerationSpans[$sourceFileId] = $astGenerationSpan;
+        $this->mutationGenerationSpan->addChild($astGenerationSpan);
+    }
+
+    public function onAstGenerationWasFinished(AstGenerationWasFinished $event): void
+    {
+        $this->tracer->endSpan(
+            $this->astGenerationSpans[$event->sourceFileId],
+        );
+    }
+
+    public function onMutationGenerationForFileWasStarted(MutationGenerationForFileWasStarted $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+        $sourceFileSpan = $this->sourceFileSpans[$sourceFileId];
+
+        $sourceFileMutationGenerationSpan = $this->tracer->startChildSpan(
+            $sourceFileSpan,
+            Scope::MUTATION_GENERATION,
+        );
+
+        $this->sourceFileMutationGenerationSpan[$sourceFileId] = $sourceFileMutationGenerationSpan;
+        $this->mutationGenerationSpan->addChild($sourceFileMutationGenerationSpan);
+    }
+
+    public function onMutationGenerationForFileWasFinished(MutationGenerationForFileWasFinished $event): void
+    {
+        $this->tracer->endSpan(
+            $this->sourceFileMutationGenerationSpan[$event->sourceFileId],
+        );
+
+        $this->registerMutationsForSourceFile(
+            $event->sourceFileId,
+            $event->mutationHashes,
+        );
+
+        $this->endFileSpanIfAllMutationsAreEvaluated($event->sourceFileId);
+    }
+
+    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    {
+        $this->mutationEvaluationSpan = $this->tracer->startChildSpan(
+            $this->mutationAnalysisSpan,
+            Scope::MUTATION_EVALUATION,
+        );
+    }
+
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->mutationEvaluationSpan);
+    }
+
+    public function onMutationHeuristicsWasStarted(MutationHeuristicsWasStarted $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+
+        $mutation = $event->mutation;
+        $mutationId = $mutation->getHash();
+
+        $this->sourceFileIdByMutationHash[$mutationId] = $sourceFileId;
+
+        $mutationAnalysisSpan = $this->tracer->startChildSpan(
+            $this->sourceFileSpans[$sourceFileId],
+            Scope::MUTATION_EVALUATION,
+            $mutationId,
+        );
+        $this->mutationAnalysisSpan->addChild($mutationAnalysisSpan);
+        $this->individualMutationAnalysisSpans[$mutationId] = $mutationAnalysisSpan;
+
+        $heuristicsSpan = $this->tracer->startChildSpan(
+            $mutationAnalysisSpan,
+            Scope::MUTATION_HEURISTICS,
+            $mutationId,
+        );
+        $this->mutationHeuristicsSpans[$mutationId] = $heuristicsSpan;
+        $this->mutationAnalysisSpan->addChild($mutationAnalysisSpan);
+    }
+
+    public function onMutationHeuristicsWasFinished(MutationHeuristicsWasFinished $event): void
+    {
+        $mutationId = $event->mutation->getHash();
+        $sourceFileId = $this->sourceFileIdByMutationHash[$mutationId];
+
+        $spansToFinish = [$this->mutationHeuristicsSpans[$mutationId]];
+
+        if (!$event->escaped) {
+            $spansToFinish[] = $this->individualMutationAnalysisSpans[$mutationId];
+            $this->markMutationAsFinished($sourceFileId, $mutationId);
+        }
+
+        $this->tracer->endSpan(...$spansToFinish);
+
+        $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
+    }
+
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        $mutationId = $event->executionResult->getMutantHash();
+        $sourceFileId = $this->sourceFileIdByMutationHash[$mutationId];
+
+        $this->tracer->endSpan(
+            $this->individualMutationAnalysisSpans[$mutationId],
+        );
+
+        $this->markMutationAsFinished($sourceFileId, $mutationId);
+
+        $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
+    }
+
+    /**
+     * @param list<string> $mutationHashes
+     */
+    private function registerMutationsForSourceFile(
+        string $sourceFileId,
+        array $mutationHashes,
+    ): void {
+        $finishedMutationHashes = array_keys($this->finishedMutationHashesBySourceFileId[$sourceFileId] ?? []);
+        $remainingMutationHashes = array_diff($mutationHashes, $finishedMutationHashes);
+
+        $this->remainingMutationHashesBySourceFileId[$sourceFileId] = array_fill_keys($remainingMutationHashes, true);
+    }
+
+    private function markMutationAsFinished(string $sourceFileId, string $mutationHash): void
+    {
+        $this->finishedMutationHashesBySourceFileId[$sourceFileId][$mutationHash] = true;
+
+        if (array_key_exists($sourceFileId, $this->remainingMutationHashesBySourceFileId)) {
+            unset($this->remainingMutationHashesBySourceFileId[$sourceFileId][$mutationHash]);
+        }
+    }
+
+    private function endFileSpanIfAllMutationsAreEvaluated(string $sourceFileId): void
+    {
+        if (
+            !array_key_exists($sourceFileId, $this->sourceFileSpans)
+            || !array_key_exists($sourceFileId, $this->remainingMutationHashesBySourceFileId)
+        ) {
+            return;
+        }
+
+        if (count($this->remainingMutationHashesBySourceFileId[$sourceFileId]) === 0) {
+            $this->tracer->endSpan($this->sourceFileSpans[$sourceFileId]);
+
+            $mutationHashes = array_keys($this->finishedMutationHashesBySourceFileId[$sourceFileId] ?? []);
+
+            foreach ($mutationHashes as $mutationHash) {
+                unset($this->sourceFileIdByMutationHash[$mutationHash]);
+            }
+
+            unset(
+                $this->sourceFileSpans[$sourceFileId],
+                $this->remainingMutationHashesBySourceFileId[$sourceFileId],
+                $this->finishedMutationHashesBySourceFileId[$sourceFileId],
+            );
+        }
+    }
+}

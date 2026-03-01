@@ -104,6 +104,14 @@
                         }
                     ]
                 },
+                "telemetry": {
+                    "properties": {
+                        "serializedFile": {
+                            "type": "string",
+                            "description": "Path (relative to the config file) where the serialized telemetry trace will be dumped to."
+                        }
+                    }
+                },
                 "github": {
                     "type": "boolean",
                     "description": "GitHub Annotations for escaped Mutants in the added/modifies files"

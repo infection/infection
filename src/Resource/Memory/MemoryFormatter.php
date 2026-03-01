@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Memory;
 
+use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use function log;
 use function number_format;
 use function round;
@@ -63,8 +64,16 @@ class MemoryFormatter
         'YB',
     ];
 
-    public function toHumanReadableString(float $bytes): string
+    public function toHumanReadableString(float|MemoryUsage $bytes): string
     {
+        if ($bytes instanceof MemoryUsage) {
+            $bytes = $bytes->bytes;
+        }
+
+        if ($bytes < 0) {
+            return '-' . $this->toHumanReadableString(-$bytes);
+        }
+
         Assert::greaterThanEq(
             $bytes,
             0.,

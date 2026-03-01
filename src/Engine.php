@@ -41,6 +41,10 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -105,8 +109,12 @@ final readonly class Engine
      */
     public function execute(): void
     {
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasStarted());
+
         $initialTestSuiteOutput = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
+
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasFinished());
 
         /*
          * Limit the memory used for the mutation processes based on the memory
@@ -217,6 +225,8 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
+        $this->eventDispatcher->dispatch(new MutationAnalysisWasStarted());
+
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
         );
@@ -225,6 +235,8 @@ final readonly class Engine
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
         );
+
+        $this->eventDispatcher->dispatch(new MutationAnalysisWasFinished());
     }
 
     private function getFilteredExtraOptionsForMutant(): string

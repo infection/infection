@@ -1,0 +1,132 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Telemetry\Tracing;
+
+use function array_key_exists;
+use function array_map;
+use Infection\Framework\UniqueId;
+use Infection\Telemetry\Metric\ResourceInspector;
+use Infection\Telemetry\Reporter\TraceProvider;
+use Infection\Telemetry\Tracing\Throwable\AlreadyStartedSpan;
+
+/**
+ * Service responsible for creating spans.
+ *
+ * @see https://opentelemetry.io/docs/specs/otel/trace/api/#tracer
+ *
+ * @internal
+ */
+final class Tracer implements TraceProvider
+{
+    /**
+     * @var list<SpanBuilder>
+     */
+    private array $spans = [];
+
+    /**
+     * @var array<string, list<SpanBuilder>>
+     */
+    private array $allSpans = [];
+
+    public function __construct(
+        private readonly ResourceInspector $inspector,
+    ) {
+    }
+
+    public function startSpan(
+        RootScope $scope,
+        ?string $id = null,
+    ): SpanBuilder {
+        $spanId = SpanId::create($scope, $id);
+
+        $span = new SpanBuilder(
+            $spanId,
+            $this->inspector->snapshot(),
+        );
+
+        if (array_key_exists((string) $spanId, $this->allSpans)) {
+            throw AlreadyStartedSpan::create($spanId);
+        }
+
+        $this->spans[] = $span;
+        $this->allSpans[(string) $spanId][] = $span;
+
+        return $span;
+    }
+
+    public function startChildSpan(
+        SpanBuilder $parent,
+        Scope $scope,
+        ?string $id = null,
+    ): SpanBuilder {
+        $spanId = SpanId::create($scope, $id, $parent->id);
+
+        $span = new SpanBuilder(
+            $spanId,
+            $this->inspector->snapshot(),
+        );
+
+        if (array_key_exists((string) $spanId, $this->allSpans)) {
+            throw AlreadyStartedSpan::create($spanId);
+        }
+
+        $this->allSpans[(string) $spanId][] = $span;
+
+        $parent->addChild($span);
+
+        return $span;
+    }
+
+    public function endSpan(SpanBuilder ...$spans): void
+    {
+        $end = $this->inspector->snapshot();
+
+        foreach ($spans as $span) {
+            $span->end($end);
+        }
+    }
+
+    public function getTrace(): Trace
+    {
+        return new Trace(
+            UniqueId::generate(),
+            array_map(
+                static fn (SpanBuilder $spanBuilder) => $spanBuilder->build(),
+                $this->spans,
+            ),
+        );
+    }
+}

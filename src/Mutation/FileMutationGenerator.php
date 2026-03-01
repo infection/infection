@@ -35,7 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstGenerationWasFinished;
+use Infection\Event\Events\Ast\AstGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasStarted;
 use Infection\FileSystem\FileStore;
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -68,6 +74,7 @@ class FileMutationGenerator
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -111,17 +118,24 @@ class FileMutationGenerator
      *
      * @return iterable<Mutation>
      */
-    private function generateMutations(array $mutators,
+    private function generateMutations(
+        array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
         Trace $trace,
         bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
+        $sourceRealPath = $sourceFile->getRealPath();
+
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationForFileWasStarted($sourceRealPath),
+        );
+
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $sourceFile->getRealPath(),
+                filePath: $sourceRealPath,
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
@@ -135,7 +149,20 @@ class FileMutationGenerator
         $traverser = $this->traverserFactory->create($mutationCollectorVisitor);
         $traverser->traverse($initialStatements);
 
-        yield from $mutationCollectorVisitor->getMutations();
+        $sourceFileMutationIds = [];
+
+        foreach ($mutationCollectorVisitor->getMutations() as $mutation) {
+            $sourceFileMutationIds[] = $mutation->getHash();
+
+            yield $mutation;
+        }
+
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationForFileWasFinished(
+                $sourceRealPath,
+                $sourceFileMutationIds,
+            ),
+        );
     }
 
     /**
@@ -145,11 +172,22 @@ class FileMutationGenerator
      */
     private function createAst(SplFileInfo $sourceFile): array
     {
+        // TODO: move NodeIdFactory and rename it if we stick with it
+        $sourceFileId = NodeIdFactory::create($sourceFile->getRealPath());
+
+        $this->eventDispatcher->dispatch(
+            new AstGenerationWasStarted($sourceFileId),
+        );
+
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
         $preTraverser->traverse($initialStatements);
+
+        $this->eventDispatcher->dispatch(
+            new AstGenerationWasFinished($sourceFileId),
+        );
 
         return [$initialStatements, $originalFileTokens];
     }

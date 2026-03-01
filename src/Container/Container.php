@@ -87,6 +87,7 @@ use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialSt
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLoggerFactory;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory;
+use Infection\Logger\DebugEventsSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
@@ -128,6 +129,7 @@ use Infection\Reporter\Reporter;
 use Infection\Reporter\ShowMetricsReporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
+use Infection\Reporter\Telemetry\SerializedTraceReporter;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
@@ -145,6 +147,18 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorInspector;
+use Infection\Telemetry\Metric\GarbageCollection\SystemGarbageCollectorInspector;
+use Infection\Telemetry\Metric\Memory\MemoryInspector;
+use Infection\Telemetry\Metric\Memory\SystemMemoryInspector;
+use Infection\Telemetry\Metric\ResourceInspector;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
+use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
+use Infection\Telemetry\Metric\Time\SystemStopwatch;
+use Infection\Telemetry\Reporter\TraceProvider as TelemetryTraceProvider;
+use Infection\Telemetry\Subscriber\ReportTelemetryAfterApplicationFinishedSubscriber;
+use Infection\Telemetry\Subscriber\TelemetrySubscriber;
+use Infection\Telemetry\Tracing\Tracer as TelemetryTracer;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -165,6 +179,7 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
+use Infection\Tests\Reporter\NullReporter;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -388,10 +403,16 @@ final class Container extends DIContainer
                     $container->get(MutationAnalysisLoggerSubscriber::class),
                     $container->get(ReportAfterMutationTestingFinishedSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
+                    $container->get(TelemetrySubscriber::class),
+                    $container->get(ReportTelemetryAfterApplicationFinishedSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->get(StopInfectionOnSigintSignalSubscriber::class),
                     $container->get(DispatchPcntlSignalSubscriber::class),
                 ];
+
+                if ($container->getConfiguration()->isDebugEnabled) {
+                    $subscriberFactories[] = $container->get(DebugEventsSubscriber::class);
+                }
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
                     $subscriberFactories[] = $container->get(InitialStaticAnalysisExecutionLoggerSubscriber::class);
@@ -399,6 +420,9 @@ final class Container extends DIContainer
 
                 return new ChainSubscriberFactory(...$subscriberFactories);
             },
+            DebugEventsSubscriber::class => static fn (self $container): DebugEventsSubscriber => new DebugEventsSubscriber(
+                $container->getLogger(),
+            ),
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
 
@@ -450,14 +474,17 @@ final class Container extends DIContainer
                 $container->getConfiguration()->threadCount,
                 $container->getOutput(),
             ),
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
-                $container->getSourceLineMatcher(),
-                $container->getTracer(),
-                $container->getFileStore(),
-            ),
+            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                return new FileMutationGenerator(
+                    $container->getFileParser(),
+                    $container->getNodeTraverserFactory(),
+                    $container->getLineRangeCalculator(),
+                    $container->getSourceLineMatcher(),
+                    $container->getTracer(),
+                    $container->getFileStore(),
+                    $container->getEventDispatcher(),
+                );
+            },
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
 
@@ -474,6 +501,14 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
+            GarbageCollectorInspector::class => static fn (): GarbageCollectorInspector => SystemGarbageCollectorInspector::create(),
+            MemoryInspector::class => static fn (): MemoryInspector => new SystemMemoryInspector(),
+            TelemetryStopwatch::class => static fn (): TelemetryStopwatch => new SystemStopwatch(),
+            ResourceInspector::class => static fn (self $container): ResourceInspector => new ResourceInspector(
+                $container->get(TelemetryStopwatch::class),
+                $container->get(MemoryInspector::class),
+                $container->get(GarbageCollectorInspector::class),
+            ),
             Reporter::class => static function (self $container): Reporter {
                 $output = $container->getOutput();
                 $config = $container->getConfiguration();
@@ -509,6 +544,22 @@ final class Container extends DIContainer
                     $config->numberOfShownMutations,
                 );
             },
+            ReportTelemetryAfterApplicationFinishedSubscriber::class => static fn (self $container): ReportTelemetryAfterApplicationFinishedSubscriber => new ReportTelemetryAfterApplicationFinishedSubscriber(
+                $container->get(SerializedTraceReporter::class),
+            ),
+            SerializedTraceReporter::class => static function (self $container): Reporter {
+                return $container->getConfiguration()->logs->telemetryEntry === null
+                    ? new NullReporter()    // TODO: needs to be moved to the src
+                    : new SerializedTraceReporter(
+                        $container->getFileSystem(),
+                        $container->get(TelemetryTraceProvider::class),
+                        $container->getConfiguration()->logs->telemetryEntry->serializedFilePath,
+                    );
+            },
+            TelemetryTraceProvider::class => static fn (self $container): TelemetryTraceProvider => $container->get(TelemetryTracer::class),
+            MutationTestingResultsLoggerSubscriber::class => static fn (self $container): MutationTestingResultsLoggerSubscriber => new MutationTestingResultsLoggerSubscriber(
+                $container->getReporter(),
+            ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 
@@ -1097,6 +1148,11 @@ final class Container extends DIContainer
     private function getTimeFormatter(): TimeFormatter
     {
         return $this->get(TimeFormatter::class);
+    }
+
+    private function getDurationFormatter(): DurationFormatter
+    {
+        return $this->get(DurationFormatter::class);
     }
 
     private function getMemoryFormatter(): MemoryFormatter

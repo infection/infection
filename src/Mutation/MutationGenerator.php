@@ -37,7 +37,6 @@ namespace Infection\Mutation;
 
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
@@ -95,25 +94,10 @@ class MutationGenerator
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
         foreach ($sources as $source) {
-            $sourceFileMutationIds = [];
-
-            $sourceMutations = $this->fileMutationGenerator->generate(
+            yield from $this->fileMutationGenerator->generate(
                 $source,
                 $onlyCovered,
                 $this->mutators,
-            );
-
-            foreach ($sourceMutations as $mutation) {
-                $sourceFileMutationIds[] = $mutation->getHash();
-
-                yield $mutation;
-            }
-
-            $this->eventDispatcher->dispatch(
-                new MutableFileWasProcessed(
-                    $source->getRealPath(),
-                    $sourceFileMutationIds,
-                ),
             );
         }
 
