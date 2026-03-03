@@ -37,6 +37,7 @@ namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
 use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Mutation\Mutation;
+use Infection\Process\Runner\HeuristicId;
 
 /**
  * @internal
@@ -46,6 +47,7 @@ final readonly class MutationHeuristicsWasStarted
     public string $sourceFileId;
 
     public function __construct(
+        public HeuristicId $heuristicId,
         public Mutation $mutation,
     ) {
         $this->sourceFileId = NodeIdFactory::create($this->mutation->getOriginalFilePath());

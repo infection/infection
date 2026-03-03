@@ -3,6 +3,8 @@
 - The `Reporter` events can be extracted.
 - `Events\Ast` should be moved to the appropriate phase; probably the case of more events.
 - to rename "for file" to "for source file"
+- to rename "MutationTesting" events to "Mutation Evaluation"
+- to be more conscious about cleaning up unnecessary state (e.g. unsetting tracked spans if they no longer need to be tracked)
 
 ###
 

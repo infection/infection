@@ -39,6 +39,9 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation\MutantEvaluationWasStarted;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
 use function max;
@@ -73,6 +76,7 @@ class ParallelProcessRunner implements ProcessRunner
      */
     public function __construct(
         private readonly int $threadCount,
+        private readonly EventDispatcher $eventDispatcher,
         private readonly int $poll = self::POLL_WAIT_IN_MS,
         private readonly DuoClock $clock = new DuoClock(),
         private readonly ProcessQueue $queue = new ProcessQueue(),
@@ -190,6 +194,9 @@ class ParallelProcessRunner implements ProcessRunner
             }
 
             $mutantProcess->markAsFinished();
+            $this->eventDispatcher->dispatch(
+                new MutantEvaluationWasFinished($mutantProcessContainer),
+            );
 
             $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
 
@@ -197,6 +204,10 @@ class ParallelProcessRunner implements ProcessRunner
             unset($this->runningProcessContainers[$index]);
 
             if ($mutantProcessContainer->hasNext()) {
+                $this->eventDispatcher->dispatch(
+                    new MutantEvaluationWasFinished($mutantProcessContainer),
+                );
+
                 $mutantProcessContainer->createNext();
 
                 // Enqueue the needed static analysis run
@@ -212,6 +223,10 @@ class ParallelProcessRunner implements ProcessRunner
 
     private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
+        $this->eventDispatcher->dispatch(
+            new MutantEvaluationWasStarted($mutantProcessContainer),
+        );
+
         $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,

@@ -860,7 +860,7 @@ final class TracerTest extends TestCase
         );
         $secondRootChild2ChildA = $this->tracer->startChildSpan(
             $secondRootChild2,
-            Scope::MUTATION_HEURISTICS,
+            Scope::HEURISTIC_SUPPRESSION,
             'secondRoot-child2-childA',
         );
         $this->tracer->endSpan($secondRootChild2ChildA);
@@ -927,12 +927,12 @@ final class TracerTest extends TestCase
         );
         $secondRootChild2ChildASpan = new Span(
             SpanId::create(
-                Scope::MUTATION_HEURISTICS,
+                Scope::HEURISTIC_SUPPRESSION,
                 'secondRoot-child2-childA',
                 $secondRootChild2->id,
             ),
             'secondRoot-child2-childA',
-            Scope::MUTATION_HEURISTICS,
+            Scope::HEURISTIC_SUPPRESSION,
             $snapshots[9],
             $snapshots[10],
             [],

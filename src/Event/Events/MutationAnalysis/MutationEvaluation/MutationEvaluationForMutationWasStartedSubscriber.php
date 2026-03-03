@@ -40,7 +40,7 @@ use Infection\Event\Subscriber\EventSubscriber;
 /**
  * @internal
  */
-interface MutationEvaluationWasStartedSubscriber extends EventSubscriber
+interface MutationEvaluationForMutationWasStartedSubscriber extends EventSubscriber
 {
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void;
+    public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void;
 }

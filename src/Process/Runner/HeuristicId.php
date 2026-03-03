@@ -33,65 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Process\Runner;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
-use function microtime;
-use Symfony\Component\Process\Process;
-
-/**
- * @internal
- * @final
- */
-class MutantProcess
+enum HeuristicId: string
 {
-    private bool $timedOut = false;
-
-    private float $finishedAt = 0.0;
-
-    public function __construct(
-        public readonly string $testFrameworkName,
-        private readonly Process $process,
-        private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
-    ) {
-    }
-
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
-    }
-
-    public function markAsFinished(): void
-    {
-        $this->finishedAt = microtime(true);
-    }
-
-    public function getFinishedAt(): float
-    {
-        return $this->finishedAt;
-    }
-
-    public function getMutantExecutionResult(): MutantExecutionResult
-    {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
-    }
+    case IGNORED_BY_MUTATION_ID = 'Ignored by Mutation ID';
+    case IGNORED_BY_REGEX = 'Ignored by Regex';
+    case UNCOVERED_BY_TESTS = 'Uncovered by Tests';
+    case TAKING_TOO_LONG = 'Taking too long';
 }

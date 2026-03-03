@@ -71,6 +71,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             background: #fff;
+            padding-right: 2em;
         }
 
         .panel-header {

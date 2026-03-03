@@ -108,7 +108,7 @@ final class TestTraceDumperTest extends TestCase
                         SpanBuilder::withChildTestData()
                             ->withId(
                                 SpanId::create(
-                                    Scope::MUTATION_HEURISTICS,
+                                    Scope::HEURISTIC_SUPPRESSION,
                                     'secondRoot-child2-childA',
                                     $secondRootChild1Id,
                                 ),

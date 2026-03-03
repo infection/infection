@@ -68,8 +68,18 @@ use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation\MutantEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation\MutantEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisation\MutantMaterialisationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisation\MutantMaterialisationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisation\MutantMaterialisationWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationHeuristicsWasStarted;
@@ -98,11 +108,12 @@ use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\SpanBuilder;
 use Infection\Telemetry\Tracing\Tracer;
+use function spl_object_id;
 
 /**
  * @internal
  */
-final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private SpanBuilder $sourceCollectionSpan;
 
@@ -120,26 +131,32 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
     private SpanBuilder $reportingSpan;
 
-    /** @var array<string, SpanBuilder> */
+    /** @var array<string, SpanBuilder> key=sourceFileId */
     private array $sourceFileSpans = [];
 
-    /** @var array<string, SpanBuilder> */
+    /** @var array<string, SpanBuilder> key=sourceFileId */
     private array $astProcessingSpans = [];
 
-    /** @var array<string, SpanBuilder> */
+    /** @var array<string, SpanBuilder> key=sourceFileId */
     private array $astParsingSpans = [];
 
-    /** @var array<string, SpanBuilder> */
+    /** @var array<string, SpanBuilder> key=sourceFileId */
     private array $astEnrichmentSpans = [];
 
-    /** @var array<string, SpanBuilder> */
+    /** @var array<string, SpanBuilder> key=sourceFileId */
     private array $sourceFileMutationGenerationSpan = [];
 
-    /** @var array<string, SpanBuilder> */
-    private array $individualMutationAnalysisSpans = [];
+    /** @var array<string, SpanBuilder> key=mutationId */
+    private array $individualMutationEvaluationSpans = [];
 
-    /** @var array<string, SpanBuilder> */
+    /** @var array<string, SpanBuilder> key=spanId */
+    private array $individualMutantEvaluationSpans = [];
+
+    /** @var array<string, array<string, SpanBuilder>> key1=mutationId, key2=heuristicIdName */
     private array $mutationHeuristicsSpans = [];
+
+    /** @var array<string, SpanBuilder> key=mutationId */
+    private array $mutationMaterialisationSpans = [];
 
     /**
      * @var array<string, array<string, true>>
@@ -356,7 +373,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         $this->tracer->endSpan($this->mutationEvaluationSpan);
     }
 
-    public function onMutationHeuristicsWasStarted(MutationHeuristicsWasStarted $event): void
+    public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void
     {
         $sourceFileId = $event->sourceFileId;
 
@@ -367,7 +384,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
         $mutationEvaluationSpan = $this->tracer->startChildSpan(
             $this->sourceFileSpans[$sourceFileId],
-            Scope::MUTATION_EVALUATION,
+            Scope::MUTATION_EVALUATION_FOR_MUTATION,
             $mutationId,
             attributes: [
                 'mutationId' => $event->mutation->getHash(),
@@ -375,16 +392,29 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
                 'mutatorName' => $event->mutation->getMutatorName(),
             ],
         );
-        $this->mutationAnalysisSpan->addChild($mutationEvaluationSpan);
-        $this->individualMutationAnalysisSpans[$mutationId] = $mutationEvaluationSpan;
+        $this->mutationEvaluationSpan->addChild($mutationEvaluationSpan);
+        $this->individualMutationEvaluationSpans[$mutationId] = $mutationEvaluationSpan;
+    }
+
+    public function onMutationHeuristicsWasStarted(MutationHeuristicsWasStarted $event): void
+    {
+        $mutation = $event->mutation;
+        $mutationId = $mutation->getHash();
+        $heuristicId = $event->heuristicId;
+
+        $mutationEvaluationSpan = $this->individualMutationEvaluationSpans[$mutationId];
 
         $heuristicsSpan = $this->tracer->startChildSpan(
             $mutationEvaluationSpan,
-            Scope::MUTATION_HEURISTICS,
-            $mutationId,
+            Scope::HEURISTIC_SUPPRESSION,
+            $mutationId . $heuristicId->name,
+            attributes: [
+                'heuristicKey' => $heuristicId->name,
+                'heuristic' => $heuristicId->value,
+            ],
         );
-        $this->mutationHeuristicsSpans[$mutationId] = $heuristicsSpan;
-        $this->mutationAnalysisSpan->addChild($mutationEvaluationSpan);
+
+        $this->mutationHeuristicsSpans[$mutationId][$heuristicId->name] = $heuristicsSpan;
     }
 
     public function onMutationHeuristicsWasFinished(MutationHeuristicsWasFinished $event): void
@@ -392,10 +422,10 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         $mutationId = $event->mutation->getHash();
         $sourceFileId = $this->sourceFileIdByMutationHash[$mutationId];
 
-        $spansToFinish = [$this->mutationHeuristicsSpans[$mutationId]];
+        $spansToFinish = [$this->mutationHeuristicsSpans[$mutationId][$event->heuristicId->name]];
 
         if (!$event->escaped) {
-            $spansToFinish[] = $this->individualMutationAnalysisSpans[$mutationId];
+            $spansToFinish[] = $this->individualMutationEvaluationSpans[$mutationId];
             $this->markMutationAsFinished($sourceFileId, $mutationId);
         }
 
@@ -404,13 +434,74 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
         $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
     }
 
+    public function onMutantMaterialisationWasStarted(MutantMaterialisationWasStarted $event): void
+    {
+        $mutation = $event->mutant->getMutation();
+        $mutationId = $mutation->getHash();
+
+        $mutationEvaluationSpan = $this->individualMutationEvaluationSpans[$mutationId];
+
+        $materialisationSpan = $this->tracer->startChildSpan(
+            $mutationEvaluationSpan,
+            Scope::MUTATION_MATERIALISATION,
+            $mutationId,
+        );
+
+        $this->mutationMaterialisationSpans[$mutationId] = $materialisationSpan;
+    }
+
+    public function onMutantMaterialisationWasFinished(MutantMaterialisationWasFinished $event): void
+    {
+        $mutation = $event->mutant->getMutation();
+        $mutationId = $mutation->getHash();
+
+        $materialisationSpan = $this->mutationMaterialisationSpans[$mutationId];
+
+        $this->tracer->endSpan($materialisationSpan);
+        unset($this->mutationMaterialisationSpans[$mutationId]);
+    }
+
+    public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void
+    {
+        $mutantProcess = $event->mutantProcessContainer->getCurrent();
+        $mutation = $mutantProcess->getMutant()->getMutation();
+        $mutationId = $mutation->getHash();
+        $spanId = $mutationId . spl_object_id($mutantProcess);
+
+        $mutationEvaluationSpan = $this->individualMutationEvaluationSpans[$mutationId];
+
+        $mutantEvaluationSpan = $this->tracer->startChildSpan(
+            $mutationEvaluationSpan,
+            Scope::MUTANT_EVALUATION,
+            $spanId,    // should have an ID for this process instead...
+            attributes: [
+                'testFrameworkName' => $mutantProcess->testFrameworkName,
+                'commandLine' => $mutantProcess->getProcess()->getCommandLine(),
+            ],
+        );
+
+        $this->individualMutantEvaluationSpans[$spanId] = $mutantEvaluationSpan;
+    }
+
+    // Currently, this event is only dispatched if the mutant evaluation process continues
+    public function onMutantEvaluationWasFinished(MutantEvaluationWasFinished $event): void
+    {
+        $mutantProcess = $event->mutantProcessContainer->getCurrent();
+        $spanId = $mutantProcess->getMutant()->getMutation()->getHash() . spl_object_id($mutantProcess);
+
+        $mutantEvaluationSpan = $this->individualMutantEvaluationSpans[$spanId];
+
+        $this->tracer->endSpan($mutantEvaluationSpan);
+        unset($this->individualMutantEvaluationSpans[$spanId]);
+    }
+
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
         $mutationId = $event->executionResult->getMutantHash();
         $sourceFileId = $this->sourceFileIdByMutationHash[$mutationId];
 
         $this->tracer->endSpan(
-            $this->individualMutationAnalysisSpans[$mutationId],
+            $this->individualMutationEvaluationSpans[$mutationId],
             attributes: [
                 'diff' => $event->executionResult->getMutantDiff(),
                 'result' => $event->executionResult->getDetectionStatus(),

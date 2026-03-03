@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
 use Infection\Mutation\Mutation;
+use Infection\Process\Runner\HeuristicId;
 
 /**
  * @internal
@@ -43,6 +44,7 @@ use Infection\Mutation\Mutation;
 final readonly class MutationHeuristicsWasFinished
 {
     public function __construct(
+        public HeuristicId $heuristicId,
         public Mutation $mutation,
         public bool $escaped,
     ) {

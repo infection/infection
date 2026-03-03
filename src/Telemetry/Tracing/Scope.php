@@ -49,6 +49,8 @@ enum Scope: string
     case MUTATION_GENERATION = 'mutation_generation';
     case MUTATION_GENERATION_FOR_FILE = 'mutation_generation_for_source_file';
     case MUTATION_EVALUATION = 'mutation_evaluation';
-    case MUTATION_HEURISTICS = 'mutation_heuristics';
+    case MUTATION_EVALUATION_FOR_MUTATION = 'mutation_evaluation_for_mutation';
+    case HEURISTIC_SUPPRESSION = 'heuristic_suppression';
+    case MUTATION_MATERIALISATION = 'mutation_materialisation';
     case MUTANT_EVALUATION = 'mutant_evaluation';
 }

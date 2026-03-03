@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\MutantProcessContainer;
 
 /**
  * @internal
@@ -44,6 +45,7 @@ final readonly class MutantProcessWasFinished
 {
     public function __construct(
         public MutantExecutionResult $executionResult,
+        public ?MutantProcessContainer $mutantProcessContainer = null,
     ) {
     }
 }

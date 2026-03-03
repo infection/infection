@@ -35,15 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
+use Infection\Logger\MutationAnalysis\TeamCity\NodeIdFactory;
 use Infection\Mutation\Mutation;
 
 /**
  * @internal
  */
-final readonly class MutationEvaluationWasStarted
+final readonly class MutationEvaluationForMutationWasStarted
 {
+    public string $sourceFileId;
+
     public function __construct(
         public Mutation $mutation,
     ) {
+        $this->sourceFileId = NodeIdFactory::create($this->mutation->getOriginalFilePath());
     }
 }

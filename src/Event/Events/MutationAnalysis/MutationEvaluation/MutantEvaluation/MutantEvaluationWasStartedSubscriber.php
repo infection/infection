@@ -33,65 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluation;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
-use function microtime;
-use Symfony\Component\Process\Process;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
- * @final
  */
-class MutantProcess
+interface MutantEvaluationWasStartedSubscriber extends EventSubscriber
 {
-    private bool $timedOut = false;
-
-    private float $finishedAt = 0.0;
-
-    public function __construct(
-        public readonly string $testFrameworkName,
-        private readonly Process $process,
-        private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
-    ) {
-    }
-
-    public function getProcess(): Process
-    {
-        return $this->process;
-    }
-
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
-    }
-
-    public function markAsFinished(): void
-    {
-        $this->finishedAt = microtime(true);
-    }
-
-    public function getFinishedAt(): float
-    {
-        return $this->finishedAt;
-    }
-
-    public function getMutantExecutionResult(): MutantExecutionResult
-    {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
-    }
+    public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void;
 }
