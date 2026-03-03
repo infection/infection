@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
-use Infection\Reporter\EventDispatchingReporter;
-use Infection\Source\Collector\EventDispatchingSourceCollector;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -123,6 +121,7 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Reporter\AdvisoryReporter;
+use Infection\Reporter\EventDispatchingReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
@@ -139,6 +138,7 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\CachedSourceCollector;
+use Infection\Source\Collector\EventDispatchingSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;

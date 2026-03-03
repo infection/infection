@@ -35,22 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
-use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
-use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinishedSubscriber;
-use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
-use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStartedSubscriber;
-use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
-use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinishedSubscriber;
-use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
-use Infection\Event\Events\Ast\AstParsing\AstParsingWasStartedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Event\Events\Reporting\ReportingWasStartedSubscriber;
-use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
-use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
-use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
-use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
 use function array_diff;
 use function array_fill_keys;
 use function array_key_exists;
@@ -68,6 +52,14 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStartedSubscriber;
 use Infection\Event\Events\Ast\AstProcessingWasFinished;
 use Infection\Event\Events\Ast\AstProcessingWasFinishedSubscriber;
 use Infection\Event\Events\Ast\AstProcessingWasStarted;
@@ -94,6 +86,14 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\Reporting\ReportingWasStartedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
 use Infection\Telemetry\Tracing\RootScope;
 use Infection\Telemetry\Tracing\Scope;
 use Infection\Telemetry\Tracing\SpanBuilder;
@@ -102,7 +102,7 @@ use Infection\Telemetry\Tracing\Tracer;
 /**
  * @internal
  */
-final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, AstParsingWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, ReportingWasStartedSubscriber, ReportingWasFinishedSubscriber
+final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private SpanBuilder $sourceCollectionSpan;
 
@@ -414,6 +414,16 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
         $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
     }
 
+    public function onReportingWasStarted(ReportingWasStarted $event): void
+    {
+        $this->reportingSpan = $this->tracer->startSpan(RootScope::REPORTING);
+    }
+
+    public function onReportingWasFinished(ReportingWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->reportingSpan);
+    }
+
     /**
      * @param list<string> $mutationHashes
      */
@@ -460,15 +470,5 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
                 $this->finishedMutationHashesBySourceFileId[$sourceFileId],
             );
         }
-    }
-
-    public function onReportingWasStarted(ReportingWasStarted $event): void
-    {
-        $this->reportingSpan = $this->tracer->startSpan(RootScope::REPORTING);
-    }
-
-    public function onReportingWasFinished(ReportingWasFinished $event): void
-    {
-        $this->tracer->endSpan($this->reportingSpan);
     }
 }

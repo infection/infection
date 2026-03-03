@@ -3,7 +3,7 @@ config:
   layout: elk
 ---
 flowchart TB
-    %% Blocks   
+    %% Blocks
     SourceCollection["Source Collection"]
     ArtefactCollection["Artefact Collection"]
 
@@ -14,7 +14,7 @@ flowchart TB
     HeuristicSuppression["Heuristic Suppression"]
     MutantMaterialisation["Mutant Materialisation"]
     MutantEvaluation["Mutant Evaluation"]
-    
+
     Reporting["Reporting"]
 
     %% Flow
@@ -39,7 +39,7 @@ flowchart TB
         AstParsing
         AstEnrichment
     end
-    
+
     subgraph MutantAnalysis["Mutant Analysis"]
         MutantMaterialisation
         MutantEvaluation

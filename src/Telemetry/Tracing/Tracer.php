@@ -120,13 +120,12 @@ final class Tracer implements TraceProvider
 
     /**
      * @param SpanBuilder|SpanBuilder[] $spans
-     * @param array<string, SpanAttribute>             $attributes
+     * @param array<string, SpanAttribute> $attributes
      */
     public function endSpan(
         SpanBuilder|array $spans,
         array $attributes = [],
-    ): void
-    {
+    ): void {
         $spans = is_array($spans) ? $spans : [$spans];
         $end = $this->inspector->snapshot();
 
