@@ -140,7 +140,7 @@ final class SpanTest extends TestCase
         yield 'different nested scope variant' => [
             'span-id-5',
             'scope-id-5',
-            Scope::MUTATION_GENERATION,
+            Scope::MUTATION_GENERATION_FOR_FILE,
             $snapshot1,
             $snapshot2,
             ['child-1'],

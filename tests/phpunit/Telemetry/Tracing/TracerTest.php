@@ -522,7 +522,7 @@ final class TracerTest extends TestCase
 
         $grandchildSpan = $this->tracer->startChildSpan(
             $childSpan,
-            Scope::MUTATION_GENERATION,
+            Scope::MUTATION_GENERATION_FOR_FILE,
             'grandchild',
         );
         $this->tracer->endSpan($grandchildSpan);
@@ -531,12 +531,12 @@ final class TracerTest extends TestCase
 
         $grandchildSpanBuilt = new Span(
             SpanId::create(
-                Scope::MUTATION_GENERATION,
+                Scope::MUTATION_GENERATION_FOR_FILE,
                 'grandchild',
                 $childSpan->id,
             ),
             'grandchild',
-            Scope::MUTATION_GENERATION,
+            Scope::MUTATION_GENERATION_FOR_FILE,
             $snapshots[2],
             $snapshots[3],
             [],

@@ -47,6 +47,7 @@ enum Scope: string
     case AST_PARSING = 'ast_parsing';
     case AST_ENRICHMENT = 'ast_enrichment';
     case MUTATION_GENERATION = 'mutation_generation';
+    case MUTATION_GENERATION_FOR_FILE = 'mutation_generation_for_source_file';
     case MUTATION_EVALUATION = 'mutation_evaluation';
     case MUTATION_HEURISTICS = 'mutation_heuristics';
     case MUTANT_EVALUATION = 'mutant_evaluation';

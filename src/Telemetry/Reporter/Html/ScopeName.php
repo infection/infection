@@ -57,6 +57,7 @@ final readonly class ScopeName
             Scope::AST_PARSING => 'AST Parsing',
             Scope::AST_ENRICHMENT => 'AST Enrichment',
             Scope::MUTATION_GENERATION => 'Mutation Generation',
+            Scope::MUTATION_GENERATION_FOR_FILE => 'Mutation Generation For SourceFile',
             Scope::MUTATION_EVALUATION => 'Mutation Evaluation',
             Scope::MUTATION_HEURISTICS => 'Mutation Heuristics',
             Scope::MUTANT_EVALUATION => 'Mutant Evaluation',

@@ -253,6 +253,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
             $sourceFileSpan,
             Scope::AST_PROCESSING,
             $sourceFileId,
+            attributes: ['sourceFile' => $event->sourceFilePath],
         );
 
         $this->astProcessingSpans[$sourceFileId] = $astProcessingSpan;
@@ -268,6 +269,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
             $astProcessingSpan,
             Scope::AST_PARSING,
             $sourceFileId,
+            attributes: ['sourceFile' => $event->sourceFilePath],
         );
     }
 
@@ -288,6 +290,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
             $astProcessingSpan,
             Scope::AST_ENRICHMENT,
             $sourceFileId,
+            attributes: ['sourceFile' => $event->sourceFilePath],
         );
     }
 
@@ -314,7 +317,8 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
         $sourceFileMutationGenerationSpan = $this->tracer->startChildSpan(
             $sourceFileSpan,
-            Scope::MUTATION_GENERATION,
+            Scope::MUTATION_GENERATION_FOR_FILE,
+            attributes: ['sourceFile' => $event->sourceRealPath],
         );
 
         $this->sourceFileMutationGenerationSpan[$sourceFileId] = $sourceFileMutationGenerationSpan;
@@ -325,6 +329,10 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
     {
         $this->tracer->endSpan(
             $this->sourceFileMutationGenerationSpan[$event->sourceFileId],
+            attributes: [
+                'mutationIds' => $event->mutationHashes,
+                'mutationCount' => count($event->mutationHashes),
+            ],
         );
 
         $this->registerMutationsForSourceFile(
