@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
 use function array_diff;
 use function array_fill_keys;
 use function array_key_exists;
@@ -86,8 +90,10 @@ use Infection\Telemetry\Tracing\Tracer;
 /**
  * @internal
  */
-final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
+    private SpanBuilder $sourceCollectionSpan;
+
     private SpanBuilder $artefactCollectionSpan;
 
     private SpanBuilder $initialTestSuiteSpan;
@@ -133,6 +139,19 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
     public function __construct(
         private readonly Tracer $tracer,
     ) {
+    }
+
+    public function onSourceCollectionWasStarted(SourceCollectionWasStarted $event): void
+    {
+        $this->sourceCollectionSpan = $this->tracer->startSpan(RootScope::SOURCE_COLLECTION);
+    }
+
+    public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
+    {
+        $this->tracer->endSpan(
+            $this->sourceCollectionSpan,
+            attributes: ['sourcesCount' => $event->sourcesCount],
+        );
     }
 
     public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
@@ -277,21 +296,26 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
         $this->sourceFileIdByMutationHash[$mutationId] = $sourceFileId;
 
-        $mutationAnalysisSpan = $this->tracer->startChildSpan(
+        $mutationEvaluationSpan = $this->tracer->startChildSpan(
             $this->sourceFileSpans[$sourceFileId],
             Scope::MUTATION_EVALUATION,
             $mutationId,
+            attributes: [
+                'mutationId' => $event->mutation->getHash(),
+                'mutatorClass' => $event->mutation->getMutatorClass(),
+                'mutatorName' => $event->mutation->getMutatorName(),
+            ],
         );
-        $this->mutationAnalysisSpan->addChild($mutationAnalysisSpan);
-        $this->individualMutationAnalysisSpans[$mutationId] = $mutationAnalysisSpan;
+        $this->mutationAnalysisSpan->addChild($mutationEvaluationSpan);
+        $this->individualMutationAnalysisSpans[$mutationId] = $mutationEvaluationSpan;
 
         $heuristicsSpan = $this->tracer->startChildSpan(
-            $mutationAnalysisSpan,
+            $mutationEvaluationSpan,
             Scope::MUTATION_HEURISTICS,
             $mutationId,
         );
         $this->mutationHeuristicsSpans[$mutationId] = $heuristicsSpan;
-        $this->mutationAnalysisSpan->addChild($mutationAnalysisSpan);
+        $this->mutationAnalysisSpan->addChild($mutationEvaluationSpan);
     }
 
     public function onMutationHeuristicsWasFinished(MutationHeuristicsWasFinished $event): void
@@ -306,7 +330,7 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
             $this->markMutationAsFinished($sourceFileId, $mutationId);
         }
 
-        $this->tracer->endSpan(...$spansToFinish);
+        $this->tracer->endSpan($spansToFinish);
 
         $this->endFileSpanIfAllMutationsAreEvaluated($sourceFileId);
     }
@@ -318,6 +342,10 @@ final class TelemetrySubscriber implements ArtefactCollectionWasFinishedSubscrib
 
         $this->tracer->endSpan(
             $this->individualMutationAnalysisSpans[$mutationId],
+            attributes: [
+                'diff' => $event->executionResult->getMutantDiff(),
+                'result' => $event->executionResult->getDetectionStatus(),
+            ],
         );
 
         $this->markMutationAsFinished($sourceFileId, $mutationId);

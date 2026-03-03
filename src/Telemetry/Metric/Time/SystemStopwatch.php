@@ -44,6 +44,13 @@ final class SystemStopwatch implements Stopwatch
 {
     public function current(): HRTime
     {
-        return HRTime::fromSecondsAndNanoseconds(...hrtime());
+        $realTime = HRTime::fromSecondsAndNanoseconds(...hrtime());
+
+        $debugTime = HRTime::fromSecondsAndNanoseconds(
+            $realTime->seconds + 30,
+            $realTime->nanoseconds,
+        );
+
+        return $debugTime;
     }
 }

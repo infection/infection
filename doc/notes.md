@@ -1,0 +1,3 @@
+- Currently, the source collection is happening in `MutationGenerator`, this should be moved out.
+- The `SourceCollection` events can be extracted.
+- 

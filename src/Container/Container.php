@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use Infection\Source\Collector\EventDispatchingSourceCollector;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -670,10 +671,13 @@ final class Container extends DIContainer
                     $configuration = $container->getConfiguration();
 
                     return new CachedSourceCollector(
-                        $container->get(SourceCollectorFactory::class)->create(
-                            $configuration->configurationPathname,
-                            $configuration->source,
-                            $configuration->sourceFilter,
+                        new EventDispatchingSourceCollector(
+                            $container->get(SourceCollectorFactory::class)->create(
+                                $configuration->configurationPathname,
+                                $configuration->source,
+                                $configuration->sourceFilter,
+                            ),
+                            $container->getEventDispatcher(),
                         ),
                     );
                 },

@@ -1,0 +1,62 @@
+---
+config:
+  layout: elk
+---
+flowchart TB
+    %% Blocks   
+    SourceCollection["Source Collection"]
+    ArtefactCollection["Artefact Collection"]
+
+    AstParsing["AST Parsing"]
+    AstEnrichment["AST Enrichment"]
+
+    MutationGeneration["Mutation Generation"]
+    HeuristicSuppression["Heuristic Suppression"]
+    MutantMaterialisation["Mutant Materialisation"]
+    MutantEvaluation["Mutant Evaluation"]
+    
+    Reporting["Reporting"]
+
+    %% Flow
+    SourceCollection --> ArtefactCollection
+    ArtefactCollection --> AstParsing
+    AstParsing --> AstEnrichment
+    AstEnrichment --> MutationGeneration
+    MutationGeneration --> HeuristicSuppression
+    HeuristicSuppression --> MutantMaterialisation
+    MutantMaterialisation --> MutantEvaluation
+    MutantEvaluation --> Reporting
+
+    %% Groups
+    subgraph MutationAnalysis["Mutation Analysis"]
+        AstProcessing
+        MutationGeneration
+        HeuristicSuppression
+        MutantAnalysis
+    end
+
+    subgraph AstProcessing["AST Processing"]
+        AstParsing
+        AstEnrichment
+    end
+    
+    subgraph MutantAnalysis["Mutant Analysis"]
+        MutantMaterialisation
+        MutantEvaluation
+    end
+
+    %% Styling
+    style SourceCollection fill:#e8f4fd,stroke:#1e88e5
+    style ArtefactCollection fill:#e8f4fd,stroke:#1e88e5
+    style Reporting fill:#e8f4fd,stroke:#1e88e5
+
+    style AstProcessing fill:#fff3e0,stroke:#f57c00
+    style AstParsing fill:#ffe0b2,stroke:#f57c00
+    style AstEnrichment fill:#ffe0b2,stroke:#f57c00
+
+    style MutationGeneration fill:#c8e6c9,stroke:#43a047
+    style HeuristicSuppression fill:#c8e6c9,stroke:#43a047
+
+    style MutantAnalysis fill:#f3e5f5,stroke:#8e24aa
+    style MutantMaterialisation fill:#e1bee7,stroke:#8e24aa
+    style MutantEvaluation fill:#e1bee7,stroke:#8e24aa

@@ -33,16 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Event\Events\SourceCollection;
 
-use Infection\Framework\Enum\ImplodableEnum;
-
-enum RootScope: string
+/**
+ * @internal
+ */
+final readonly class SourceCollectionWasFinished
 {
-    use ImplodableEnum;
-
-    case SOURCE_COLLECTION = 'source_collection';
-    case ARTEFACT_COLLECTION = 'artefact_collection';
-    case MUTATION_ANALYSIS = 'mutation_analysis';
-    case SOURCE_FILE = 'source_file';
+    /**
+     * @param positive-int|0 $sourcesCount
+     */
+    public function __construct(
+        public int $sourcesCount,
+    ) {
+    }
 }

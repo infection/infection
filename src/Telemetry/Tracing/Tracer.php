@@ -41,6 +41,7 @@ use Infection\Framework\UniqueId;
 use Infection\Telemetry\Metric\ResourceInspector;
 use Infection\Telemetry\Reporter\TraceProvider;
 use Infection\Telemetry\Tracing\Throwable\AlreadyStartedSpan;
+use function is_array;
 
 /**
  * Service responsible for creating spans.
@@ -117,12 +118,20 @@ final class Tracer implements TraceProvider
         return $span;
     }
 
-    public function endSpan(SpanBuilder ...$spans): void
+    /**
+     * @param SpanBuilder|SpanBuilder[] $spans
+     * @param array<string, SpanAttribute>             $attributes
+     */
+    public function endSpan(
+        SpanBuilder|array $spans,
+        array $attributes = [],
+    ): void
     {
+        $spans = is_array($spans) ? $spans : [$spans];
         $end = $this->inspector->snapshot();
 
         foreach ($spans as $span) {
-            $span->end($end);
+            $span->end($end, $attributes);
         }
     }
 

@@ -33,16 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Tracing;
+namespace Infection\Event\Events\SourceCollection;
 
-use Infection\Framework\Enum\ImplodableEnum;
+use Infection\Event\Subscriber\EventSubscriber;
 
-enum RootScope: string
+/**
+ * @internal
+ */
+interface SourceCollectionWasStartedSubscriber extends EventSubscriber
 {
-    use ImplodableEnum;
-
-    case SOURCE_COLLECTION = 'source_collection';
-    case ARTEFACT_COLLECTION = 'artefact_collection';
-    case MUTATION_ANALYSIS = 'mutation_analysis';
-    case SOURCE_FILE = 'source_file';
+    public function onSourceCollectionWasStarted(SourceCollectionWasStarted $event): void;
 }

@@ -80,13 +80,21 @@ final class SpanBuilder
         $this->attributes[$key] = $value;
     }
 
-    /** @internal Should only be used by the Tracer */
-    public function end(Snapshot $end): void
+    /**
+     * @param array<string, SpanAttribute> $attributes
+     *
+     *@internal Should only be used by the Tracer
+     */
+    public function end(Snapshot $end, array $attributes = []): void
     {
         $this->assertSpanWasNotEnded();
         $this->assertAllChildrenSpansWereEnded();
 
         $this->end = $end;
+
+        foreach ($attributes as $key => $attribute) {
+            $this->attributes[$key] = $attribute;
+        }
     }
 
     public function addChild(self $span): void

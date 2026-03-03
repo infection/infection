@@ -46,6 +46,7 @@ final readonly class ScopeName
     public static function getName(RootScope|Scope $scope): string
     {
         return match ($scope) {
+            RootScope::SOURCE_COLLECTION => 'Source Collection',
             RootScope::ARTEFACT_COLLECTION => 'Artefact Collection',
             RootScope::MUTATION_ANALYSIS => 'Mutation Analysis',
             RootScope::SOURCE_FILE => 'Source file',
