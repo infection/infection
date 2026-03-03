@@ -43,7 +43,9 @@ enum Scope: string
 
     case INITIAL_TESTS = 'initial_tests';
     case INITIAL_STATIC_ANALYSIS = 'initial_static_analysis';
-    case AST_GENERATION = 'ast_generation';
+    case AST_PROCESSING = 'ast_processing';
+    case AST_PARSING = 'ast_parsing';
+    case AST_ENRICHMENT = 'ast_enrichment';
     case MUTATION_GENERATION = 'mutation_generation';
     case MUTATION_EVALUATION = 'mutation_evaluation';
     case MUTATION_HEURISTICS = 'mutation_heuristics';

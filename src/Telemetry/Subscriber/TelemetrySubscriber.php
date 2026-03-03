@@ -35,6 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStartedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
@@ -56,10 +64,10 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use Infection\Event\Events\Ast\AstGenerationWasFinished;
-use Infection\Event\Events\Ast\AstGenerationWasFinishedSubscriber;
-use Infection\Event\Events\Ast\AstGenerationWasStarted;
-use Infection\Event\Events\Ast\AstGenerationWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
@@ -90,7 +98,7 @@ use Infection\Telemetry\Tracing\Tracer;
 /**
  * @internal
  */
-final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, AstParsingWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber
 {
     private SpanBuilder $sourceCollectionSpan;
 
@@ -106,19 +114,25 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
 
     private SpanBuilder $mutationEvaluationSpan;
 
-    /** @var array<int, SpanBuilder> */
+    /** @var array<string, SpanBuilder> */
     private array $sourceFileSpans = [];
 
-    /** @var array<int, SpanBuilder> */
-    private array $astGenerationSpans = [];
+    /** @var array<string, SpanBuilder> */
+    private array $astProcessingSpans = [];
 
-    /** @var array<int, SpanBuilder> */
+    /** @var array<string, SpanBuilder> */
+    private array $astParsingSpans = [];
+
+    /** @var array<string, SpanBuilder> */
+    private array $astEnrichmentSpans = [];
+
+    /** @var array<string, SpanBuilder> */
     private array $sourceFileMutationGenerationSpan = [];
 
-    /** @var array<int, SpanBuilder> */
+    /** @var array<string, SpanBuilder> */
     private array $individualMutationAnalysisSpans = [];
 
-    /** @var array<int, SpanBuilder> */
+    /** @var array<string, SpanBuilder> */
     private array $mutationHeuristicsSpans = [];
 
     /**
@@ -217,7 +231,7 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
         $this->tracer->endSpan($this->mutationGenerationSpan);
     }
 
-    public function onAstGenerationWasStarted(AstGenerationWasStarted $event): void
+    public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
     {
         $sourceFileId = $event->sourceFileId;
 
@@ -229,21 +243,62 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
 
         $sourceFileSpan->setAttribute('sourceFile', $event->sourceFilePath);
 
-        $astGenerationSpan = $this->tracer->startChildSpan(
+        $astProcessingSpan = $this->tracer->startChildSpan(
             $sourceFileSpan,
-            Scope::AST_GENERATION,
+            Scope::AST_PROCESSING,
             $sourceFileId,
         );
 
-        $this->astGenerationSpans[$sourceFileId] = $astGenerationSpan;
-        $this->mutationGenerationSpan->addChild($astGenerationSpan);
+        $this->astProcessingSpans[$sourceFileId] = $astProcessingSpan;
+        $this->mutationGenerationSpan->addChild($astProcessingSpan);
     }
 
-    public function onAstGenerationWasFinished(AstGenerationWasFinished $event): void
+    public function onAstParsingWasStarted(AstParsingWasStarted $event): void
     {
-        $this->tracer->endSpan(
-            $this->astGenerationSpans[$event->sourceFileId],
+        $sourceFileId = $event->sourceFileId;
+        $astProcessingSpan = $this->astProcessingSpans[$sourceFileId];
+
+        $this->astParsingSpans[$sourceFileId] = $this->tracer->startChildSpan(
+            $astProcessingSpan,
+            Scope::AST_PARSING,
+            $sourceFileId,
         );
+    }
+
+    public function onAstParsingWasFinished(AstParsingWasFinished $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+
+        $this->tracer->endSpan($this->astParsingSpans[$sourceFileId]);
+        unset($this->astParsingSpans[$sourceFileId]);
+    }
+
+    public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+        $astProcessingSpan = $this->astProcessingSpans[$sourceFileId];
+
+        $this->astEnrichmentSpans[$sourceFileId] = $this->tracer->startChildSpan(
+            $astProcessingSpan,
+            Scope::AST_ENRICHMENT,
+            $sourceFileId,
+        );
+    }
+
+    public function onAstEnrichmentWasFinished(AstEnrichmentWasFinished $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+
+        $this->tracer->endSpan($this->astEnrichmentSpans[$sourceFileId]);
+        unset($this->astEnrichmentSpans[$sourceFileId]);
+    }
+
+    public function onAstProcessingWasFinished(AstProcessingWasFinished $event): void
+    {
+        $sourceFileId = $event->sourceFileId;
+
+        $this->tracer->endSpan($this->astProcessingSpans[$sourceFileId]);
+        unset($this->astProcessingSpans[$sourceFileId]);
     }
 
     public function onMutationGenerationForFileWasStarted(MutationGenerationForFileWasStarted $event): void

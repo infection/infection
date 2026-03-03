@@ -99,7 +99,7 @@ final class SpanBuilder
     {
         return new self(
             id: SpanId::create(
-                Scope::AST_GENERATION,
+                Scope::AST_PROCESSING,
                 'testId(abc)',
             ),
             start: SnapshotBuilder::withTestData()->build(),

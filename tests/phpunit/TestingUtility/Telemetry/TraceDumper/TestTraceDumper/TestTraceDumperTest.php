@@ -95,7 +95,7 @@ final class TestTraceDumperTest extends TestCase
             ->build();
 
         $secondRootChild1Id = SpanId::create(
-            Scope::AST_GENERATION,
+            Scope::AST_PROCESSING,
             'secondRoot-child1',
             $secondRootId,
         );

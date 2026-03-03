@@ -55,10 +55,10 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
-use Infection\Event\Events\Ast\AstGenerationWasFinished;
-use Infection\Event\Events\Ast\AstGenerationWasFinishedSubscriber;
-use Infection\Event\Events\Ast\AstGenerationWasStarted;
-use Infection\Event\Events\Ast\AstGenerationWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
@@ -85,7 +85,7 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Psr\Log\LoggerInterface;
 
-final readonly class DebugEventsSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstGenerationWasFinishedSubscriber, AstGenerationWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber, InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final readonly class DebugEventsSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialStaticAnalysisSubStepWasCompletedSubscriber, InitialTestCaseWasCompletedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     public function __construct(
         private LoggerInterface $logger,
@@ -107,12 +107,12 @@ final readonly class DebugEventsSubscriber implements ApplicationExecutionWasFin
         $this->logEvent($event);
     }
 
-    public function onAstGenerationWasFinished(AstGenerationWasFinished $event): void
+    public function onAstProcessingWasFinished(AstProcessingWasFinished $event): void
     {
         $this->logEvent($event);
     }
 
-    public function onAstGenerationWasStarted(AstGenerationWasStarted $event): void
+    public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
     {
         $this->logEvent($event);
     }

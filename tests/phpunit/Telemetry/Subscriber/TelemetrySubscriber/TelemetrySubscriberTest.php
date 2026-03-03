@@ -42,8 +42,8 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Events\Ast\AstGenerationWasFinished;
-use Infection\Event\Events\Ast\AstGenerationWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
@@ -224,13 +224,13 @@ final class TelemetrySubscriberTest extends TestCase
             new MutationGenerationWasStarted(2),
         );
 
-        $this->subscriber->onAstGenerationWasStarted(
-            new AstGenerationWasStarted(
+        $this->subscriber->onAstProcessingWasStarted(
+            new AstProcessingWasStarted(
                 NodeIdFactory::create($sourceFile1->getRealPath()),
             ),
         );
-        $this->subscriber->onAstGenerationWasFinished(
-            new AstGenerationWasFinished(
+        $this->subscriber->onAstProcessingWasFinished(
+            new AstProcessingWasFinished(
                 NodeIdFactory::create($sourceFile1->getRealPath()),
             ),
         );
@@ -283,13 +283,13 @@ final class TelemetrySubscriberTest extends TestCase
             ),
         );
 
-        $this->subscriber->onAstGenerationWasStarted(
-            new AstGenerationWasStarted(
+        $this->subscriber->onAstProcessingWasStarted(
+            new AstProcessingWasStarted(
                 NodeIdFactory::create($sourceFile2->getRealPath()),
             ),
         );
-        $this->subscriber->onAstGenerationWasFinished(
-            new AstGenerationWasFinished(
+        $this->subscriber->onAstProcessingWasFinished(
+            new AstProcessingWasFinished(
                 NodeIdFactory::create($sourceFile2->getRealPath()),
             ),
         );

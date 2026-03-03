@@ -849,7 +849,7 @@ final class TracerTest extends TestCase
 
         $secondRootChild1 = $this->tracer->startChildSpan(
             $secondRoot,
-            Scope::AST_GENERATION,
+            Scope::AST_PROCESSING,
             'secondRoot-child1',
         );
         $this->tracer->endSpan($secondRootChild1);
@@ -915,12 +915,12 @@ final class TracerTest extends TestCase
 
         $secondRootChild1Span = new Span(
             SpanId::create(
-                Scope::AST_GENERATION,
+                Scope::AST_PROCESSING,
                 'secondRoot-child1',
                 $secondRoot->id,
             ),
             'secondRoot-child1',
-            Scope::AST_GENERATION,
+            Scope::AST_PROCESSING,
             $snapshots[6],
             $snapshots[7],
             [],

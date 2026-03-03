@@ -36,8 +36,12 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\Ast\AstGenerationWasFinished;
-use Infection\Event\Events\Ast\AstGenerationWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasStarted;
 use Infection\FileSystem\FileStore;
@@ -172,24 +176,50 @@ class FileMutationGenerator
      */
     private function createAst(SplFileInfo $sourceFile): array
     {
+        // TODO: should be moved to its own service
         // TODO: move NodeIdFactory and rename it if we stick with it
-        $sourceFileId = NodeIdFactory::create($sourceFile->getRealPath());
+        $sourceFilePath = $sourceFile->getRealPath();
+        $sourceFileId = NodeIdFactory::create($sourceFilePath);
 
         $this->eventDispatcher->dispatch(
-            new AstGenerationWasStarted(
+            new AstProcessingWasStarted(
                 $sourceFileId,
-                $sourceFile->getRealPath(),
+                $sourceFilePath,
+            ),
+        );
+
+        // Those should be hidden within the PhpParser
+        $this->eventDispatcher->dispatch(
+            new AstParsingWasStarted(
+                $sourceFileId,
+                $sourceFilePath,
             ),
         );
 
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
+
+        $this->eventDispatcher->dispatch(
+            new AstParsingWasFinished($sourceFileId),
+        );
+
+        // Those should be hidden within the Traverser
+        $this->eventDispatcher->dispatch(
+            new AstEnrichmentWasStarted(
+                $sourceFileId,
+                $sourceFilePath,
+            ),
+        );
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
         $preTraverser->traverse($initialStatements);
 
         $this->eventDispatcher->dispatch(
-            new AstGenerationWasFinished($sourceFileId),
+            new AstEnrichmentWasFinished($sourceFileId),
+        );
+
+        $this->eventDispatcher->dispatch(
+            new AstProcessingWasFinished($sourceFileId),
         );
 
         return [$initialStatements, $originalFileTokens];

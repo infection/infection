@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Event\Events\Ast;
 
-use Infection\Event\Subscriber\EventSubscriber;
-
 /**
  * @internal
  */
-interface AstGenerationWasFinishedSubscriber extends EventSubscriber
+final readonly class AstProcessingWasStarted
 {
-    public function onAstGenerationWasFinished(AstGenerationWasFinished $event): void;
+    public function __construct(
+        public string $sourceFileId,
+        public string $sourceFilePath,
+    ) {
+    }
 }

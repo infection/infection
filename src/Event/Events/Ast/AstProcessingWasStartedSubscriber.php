@@ -40,7 +40,7 @@ use Infection\Event\Subscriber\EventSubscriber;
 /**
  * @internal
  */
-interface AstGenerationWasStartedSubscriber extends EventSubscriber
+interface AstProcessingWasStartedSubscriber extends EventSubscriber
 {
-    public function onAstGenerationWasStarted(AstGenerationWasStarted $event): void;
+    public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void;
 }

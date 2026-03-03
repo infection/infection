@@ -33,15 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\Ast;
+namespace Infection\Event\Events\Ast\AstParsing;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class AstGenerationWasFinished
+interface AstParsingWasFinishedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        public string $sourceFileId,
-    ) {
-    }
+    public function onAstParsingWasFinished(AstParsingWasFinished $event): void;
 }

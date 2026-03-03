@@ -33,16 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\Ast;
+namespace Infection\Event\Events\Ast\AstEnrichment;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class AstGenerationWasStarted
+interface AstEnrichmentWasStartedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        public string $sourceFileId,
-        public string $sourceFilePath,
-    ) {
-    }
+    public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void;
 }
