@@ -45,4 +45,5 @@ enum RootScope: string
     case ARTEFACT_COLLECTION = 'artefact_collection';
     case MUTATION_ANALYSIS = 'mutation_analysis';
     case SOURCE_FILE = 'source_file';
+    case REPORTING = 'reporting';
 }

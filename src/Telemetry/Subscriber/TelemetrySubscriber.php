@@ -43,6 +43,10 @@ use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
 use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinishedSubscriber;
 use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
 use Infection\Event\Events\Ast\AstParsing\AstParsingWasStartedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\Reporting\ReportingWasStartedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
@@ -98,7 +102,7 @@ use Infection\Telemetry\Tracing\Tracer;
 /**
  * @internal
  */
-final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, AstParsingWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber
+final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationGenerationForFileWasFinishedSubscriber, MutationGenerationForFileWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationHeuristicsWasFinishedSubscriber, MutationHeuristicsWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, AstParsingWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, ReportingWasStartedSubscriber, ReportingWasFinishedSubscriber
 {
     private SpanBuilder $sourceCollectionSpan;
 
@@ -113,6 +117,8 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
     private SpanBuilder $mutationAnalysisSpan;
 
     private SpanBuilder $mutationEvaluationSpan;
+
+    private SpanBuilder $reportingSpan;
 
     /** @var array<string, SpanBuilder> */
     private array $sourceFileSpans = [];
@@ -454,5 +460,15 @@ final class TelemetrySubscriber implements SourceCollectionWasStartedSubscriber,
                 $this->finishedMutationHashesBySourceFileId[$sourceFileId],
             );
         }
+    }
+
+    public function onReportingWasStarted(ReportingWasStarted $event): void
+    {
+        $this->reportingSpan = $this->tracer->startSpan(RootScope::REPORTING);
+    }
+
+    public function onReportingWasFinished(ReportingWasFinished $event): void
+    {
+        $this->tracer->endSpan($this->reportingSpan);
     }
 }

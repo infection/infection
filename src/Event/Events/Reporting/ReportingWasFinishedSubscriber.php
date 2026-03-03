@@ -33,33 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Reporter\Html;
+namespace Infection\Event\Events\Reporting;
 
-use Infection\CannotBeInstantiated;
-use Infection\Telemetry\Tracing\RootScope;
-use Infection\Telemetry\Tracing\Scope;
+use Infection\Event\Subscriber\EventSubscriber;
 
-final readonly class ScopeName
+/**
+ * @internal
+ */
+interface ReportingWasFinishedSubscriber extends EventSubscriber
 {
-    use CannotBeInstantiated;
-
-    public static function getName(RootScope|Scope $scope): string
-    {
-        return match ($scope) {
-            RootScope::SOURCE_COLLECTION => 'Source Collection',
-            RootScope::ARTEFACT_COLLECTION => 'Artefact Collection',
-            RootScope::MUTATION_ANALYSIS => 'Mutation Analysis',
-            RootScope::SOURCE_FILE => 'Source file',
-            RootScope::REPORTING => 'Reporting',
-            Scope::INITIAL_TESTS => 'Initial Tests',
-            Scope::INITIAL_STATIC_ANALYSIS => 'Initial Static Analysis',
-            Scope::AST_PROCESSING => 'AST Processing',
-            Scope::AST_PARSING => 'AST Parsing',
-            Scope::AST_ENRICHMENT => 'AST Enrichment',
-            Scope::MUTATION_GENERATION => 'Mutation Generation',
-            Scope::MUTATION_EVALUATION => 'Mutation Evaluation',
-            Scope::MUTATION_HEURISTICS => 'Mutation Heuristics',
-            Scope::MUTANT_EVALUATION => 'Mutant Evaluation',
-        };
-    }
+    public function onReportingWasFinished(ReportingWasFinished $event): void;
 }

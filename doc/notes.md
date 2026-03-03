@@ -1,3 +1,4 @@
 - Currently, the source collection is happening in `MutationGenerator`, this should be moved out.
 - The `SourceCollection` events can be extracted.
-- 
+- The `Reporter` events can be extracted.
+- `Events\Ast` should be moved to the appropriate phase; probably the case of more events 

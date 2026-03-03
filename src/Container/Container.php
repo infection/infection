@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use Infection\Reporter\EventDispatchingReporter;
 use Infection\Source\Collector\EventDispatchingSourceCollector;
 use function array_filter;
 use Closure;
@@ -539,10 +540,13 @@ final class Container extends DIContainer
                     ]),
                 );
 
-                return new FileLocationReporter(
-                    $reporter,
-                    $output,
-                    $config->numberOfShownMutations,
+                return new EventDispatchingReporter(
+                    new FileLocationReporter(
+                        $reporter,
+                        $output,
+                        $config->numberOfShownMutations,
+                    ),
+                    $container->getEventDispatcher(),
                 );
             },
             ReportTelemetryAfterApplicationFinishedSubscriber::class => static fn (self $container): ReportTelemetryAfterApplicationFinishedSubscriber => new ReportTelemetryAfterApplicationFinishedSubscriber(
