@@ -109,6 +109,11 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
 
+        # Test enum fixtures have cases that exist as test data, not all are used
+        -
+            identifier: shipmonk.deadEnumCase
+            path: ../tests/*
+
         # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
             identifier: argument.type
