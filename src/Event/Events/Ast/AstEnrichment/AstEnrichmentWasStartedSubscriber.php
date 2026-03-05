@@ -33,17 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\Ast\AstEnrichment;
 
-use Infection\Mutation\Mutation;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationEvaluationWasStarted
+interface AstEnrichmentWasStartedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        public Mutation $mutation,
-    ) {
-    }
+    public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void;
 }

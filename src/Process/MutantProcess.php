@@ -52,6 +52,7 @@ class MutantProcess
     private float $finishedAt = 0.0;
 
     public function __construct(
+        public readonly string $testFrameworkName,
         private readonly Process $process,
         private readonly Mutant $mutant,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,

@@ -44,6 +44,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\Entry\TelemetryEntry;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\IgnoreConfig;
@@ -211,6 +212,9 @@ final class ConfigurationBuilder
                 useGitHubAnnotationsLogger: true,
                 strykerConfig: StrykerConfig::forBadge('master'),
                 summaryJsonLogFilePath: 'summary.json',
+                telemetryEntry: new TelemetryEntry(
+                    serializedFilePath: 'trace.serialized.php',
+                ),
             ),
             logVerbosity: 'default',
             tmpDir: '/tmp/infection-test',

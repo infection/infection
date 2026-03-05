@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trace: $escapedTraceId</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+            font-size: 12px;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: #001529;
+            color: #fff;
+            height: 49px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 24px;
+        }
+
+        #header h1 {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .header-stat {
+            color: #aaa;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .header-stat span {
+            color: #40a9ff;
+            font-weight: 600;
+        }
+
+        #body {
+            display: flex;
+            margin-top: 49px;
+            height: calc(100vh - 49px);
+            overflow: hidden;
+        }
+
+        #labels-panel {
+            width: 360px;
+            min-width: 360px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #fff;
+            border-right: 1px solid #d9d9d9;
+        }
+
+        #chart-panel {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #fff;
+            padding-right: 2em;
+        }
+
+        .panel-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #fafafa;
+            border-bottom: 1px solid #d9d9d9;
+            padding: 6px 10px;
+            font-weight: 600;
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        #ruler {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            height: 32px;
+            background: #fafafa;
+            border-bottom: 1px solid #d9d9d9;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .tick {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tick-label {
+            font-size: 10px;
+            color: #999;
+            padding-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .tick-line {
+            width: 1px;
+            height: 6px;
+            background: #d9d9d9;
+        }
+
+        .row {
+            display: flex;
+            height: 28px;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .row:hover {
+            background: #e6f7ff;
+        }
+
+        .label-cell {
+            width: 360px;
+            min-width: 360px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            padding-right: 8px;
+            cursor: pointer;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .label-indent {
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .toggle-icon {
+            flex-shrink: 0;
+            width: 14px;
+            text-align: center;
+            color: #999;
+            font-size: 10px;
+        }
+
+        .label-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+        }
+
+        .label-duration {
+            flex-shrink: 0;
+            margin-left: 6px;
+            color: #999;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .bar-cell {
+            flex: 1;
+            height: 28px;
+            position: relative;
+        }
+
+        .bar {
+            position: absolute;
+            top: 6px;
+            height: 16px;
+            border-radius: 2px;
+            min-width: 2px;
+            cursor: pointer;
+            opacity: 0.85;
+            transition: opacity 0.1s;
+        }
+
+        .bar:hover {
+            opacity: 1;
+        }
+
+        #tooltip {
+            position: fixed;
+            z-index: 999;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            max-width: 320px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        #tooltip.visible {
+            display: block;
+        }
+
+        #tooltip strong {
+            color: #40a9ff;
+        }
+
+        .scope-source_file {
+            background: #1890ff;
+        }
+
+        .scope-artefact_collection {
+            background: #52c41a;
+        }
+
+        .scope-mutation_analysis {
+            background: #fa8c16;
+        }
+
+        .scope-initial_tests {
+            background: #722ed1;
+        }
+
+        .scope-initial_static_analysis {
+            background: #13c2c2;
+        }
+
+        .scope-ast_generation {
+            background: #eb2f96;
+        }
+
+        .scope-mutation_generation {
+            background: #f5222d;
+        }
+
+        .scope-mutation_evaluation {
+            background: #d4b106;
+        }
+
+        .scope-mutation_heuristics {
+            background: #a0d911;
+        }
+
+        .scope-mutant_evaluation {
+            background: #2f54eb;
+        }
+
+        .scope-default {
+            background: #8c8c8c;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <h1>Trace</h1>
+    <div class="header-stat">ID: <span id="trace-id" >$escapedTraceId</span></div>
+    <div class="header-stat">Duration: <span id="duration-label" >$totalDurationLabel</span></div>
+    <div class="header-stat">Spans: <span id="span-count" >$spanCount</span></div>
+</div>
+
+<div id="body">
+    <div id="labels-panel">
+        <div class="panel-header">Service / Operation</div>
+        <div id="labels-rows"></div>
+    </div>
+    <div id="chart-panel">
+        <div id="ruler"></div>
+        <div id="chart-rows"></div>
+    </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+    const RULER_TICKS = 8;
+    const traceData = __TRACE_DATA_JSON__;
+    let collapsed = {};
+
+    function escHtml(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function camelCaseToWords(value) {
+        const words = value
+            .trim()
+            .match(/([A-Z]?[^A-Z]*)/g)
+            .map(element => element.trim().toLowerCase())
+            .filter(element => element);
+
+        if (words.length > 1) {
+            words[0] = words[0][0].toUpperCase() + words[0].substring(1);
+        }
+
+        return words.join(' ');
+    }
+
+    function scopeClass(scope) {
+        var known = [
+            'source_file', 'artefact_collection', 'mutation_analysis',
+            'initial_tests', 'initial_static_analysis', 'ast_generation',
+            'mutation_generation', 'mutation_evaluation', 'mutation_heuristics',
+            'mutant_evaluation'
+        ];
+
+        for (var i = 0; i < known.length; i++) {
+            if (known[i] === scope) {
+                return 'scope-' + scope;
+            }
+        }
+
+        return 'scope-default';
+    }
+
+    function flattenSpans(spans, depth, result) {
+        for (var index = 0; index < spans.length; index++) {
+            var span = spans[index];
+            result.push({ span: span, depth: depth });
+            if (!collapsed[span.id] && span.children && span.children.length > 0) {
+                flattenSpans(span.children, depth + 1, result);
+            }
+        }
+    }
+
+    function ruleTimeToHumeanReadableName(timeInSeconds) {
+        if (timeInSeconds < 1) {
+            return Math.round(timeInSeconds * 1000) + 'ms';
+        }
+
+        if (timeInSeconds < 60) {
+            return timeInSeconds.toFixed(1) + 's';
+        }
+
+        return (timeInSeconds / 60).toFixed(1) + 'min';
+    }
+
+    function renderRulerPoint(totalSeconds, pointIndex, ruler) {
+        const pointPercentage = (pointIndex / RULER_TICKS) * 100;
+        const pointTimeInSeconds = (totalSeconds * pointIndex / RULER_TICKS);
+        const label = ruleTimeToHumeanReadableName(pointTimeInSeconds);
+
+        var tick = document.createElement('div');
+        tick.className = 'tick';
+        tick.style.left = pointPercentage + '%';
+        tick.innerHTML = '<span class="tick-label">' + escHtml(label) + '</span><div class="tick-line"></div>';
+
+        ruler.appendChild(tick);
+    }
+
+    function renderRuler(totalSeconds) {
+        const ruler = document.getElementById('ruler');
+
+        for (let index = 0; index <= RULER_TICKS; index++) {
+            renderRulerPoint(totalSeconds, index, ruler);
+        }
+    }
+
+    function renderTraceHeader() {
+        document.getElementById('trace-id').innerHTML = traceData['id'];
+        document.getElementById('duration-label').innerHTML = traceData['duration'];
+        document.getElementById('span-count').innerHTML = traceData['spanCount'];
+    }
+
+    function spanLabel(span) {
+        if (span.scopeKey === 'source_file') {
+            return span.attributes.sourceFile;
+        }
+
+        const idParts = span.id.split(':');
+
+        return `${span.scope} ${idParts[idParts.length - 1]}`;
+    }
+
+    function render() {
+        renderTraceHeader();
+
+        var flat = [];
+        flattenSpans(traceData['spans'], 0, flat);
+
+        renderRuler(traceData['durationInSeconds']);
+
+        var labelsContainer = document.getElementById('labels-rows');
+        var chartContainer = document.getElementById('chart-rows');
+        labelsContainer.innerHTML = '';
+        chartContainer.innerHTML = '';
+
+        for (var r = 0; r < flat.length; r++) {
+            var item = flat[r];
+            var s = item.span;
+            var depth = item.depth;
+            var hasChildren = s.children && s.children.length > 0;
+
+            var labelRow = document.createElement('div');
+            labelRow.className = 'row';
+
+            var labelCell = document.createElement('div');
+            labelCell.className = 'label-cell';
+            labelCell.style.paddingLeft = (8 + depth * 14) + 'px';
+
+            var toggleIcon = document.createElement('span');
+            toggleIcon.className = 'toggle-icon';
+            if (hasChildren) {
+                toggleIcon.textContent = collapsed[s.id] ? '\u25B6' : '\u25BC';
+            }
+
+            var labelText = document.createElement('span');
+            labelText.className = 'label-text';
+            labelText.textContent = spanLabel(s);
+            labelText.title = s.id;
+
+            var labelDuration = document.createElement('span');
+            labelDuration.className = 'label-duration';
+            labelDuration.textContent = s.durationLabel;
+
+            labelCell.appendChild(toggleIcon);
+            labelCell.appendChild(labelText);
+            labelCell.appendChild(labelDuration);
+            labelRow.appendChild(labelCell);
+
+            (function (spanId) {
+                labelRow.addEventListener('click', function () {
+                    if (collapsed[spanId]) {
+                        delete collapsed[spanId];
+                    } else {
+                        collapsed[spanId] = true;
+                    }
+                    render();
+                });
+            })(s.id);
+
+            labelsContainer.appendChild(labelRow);
+
+            var chartRow = document.createElement('div');
+            chartRow.className = 'row';
+
+            var barCell = document.createElement('div');
+            barCell.className = 'bar-cell';
+
+            var bar = document.createElement('div');
+            bar.className = 'bar ' + scopeClass(s.scopeKey);
+            bar.style.left = s.startPercentage + '%';
+            bar.style.width = (s.widthPercentage < 0.1 ? 0.1 : s.widthPercentage) + '%';
+
+            (function (span) {
+                bar.addEventListener('mousemove', function (e) {
+                    var tip = document.getElementById('tooltip');
+
+                    const data = [
+                        `<strong>${ escHtml(span.id) }</strong>`,
+                        `Scope: ${ escHtml(span.scope) }`,
+                        `Duration: ${ escHtml(span.durationLabel) } (${ span.durationPercentage }%)`,
+                        `Peak memory: ${ escHtml(span.peakMemory) }`,
+                        `Memory \u0394: ${ escHtml(span.memoryDelta) }`,
+                    ];
+
+                    Object.entries(span['attributes']).forEach(
+                        ([key, value]) => data.push(`${escHtml(camelCaseToWords(key))}: ${escHtml(value)}`),
+                    );
+
+                    tip.innerHTML = data.join('<br/>');
+                    tip.className = 'visible';
+                    tip.style.left = (e.clientX + 14) + 'px';
+                    tip.style.top = (e.clientY + 14) + 'px';
+                });
+                bar.addEventListener('mouseleave', function () {
+                    document.getElementById('tooltip').className = '';
+                });
+            })(s);
+
+            barCell.appendChild(bar);
+            chartRow.appendChild(barCell);
+            chartContainer.appendChild(chartRow);
+        }
+    }
+
+    (function () {
+        var syncing = false;
+        var labels = document.getElementById('labels-panel');
+        var chart = document.getElementById('chart-panel');
+
+        labels.addEventListener('scroll', function () {
+            if (syncing) {
+                return;
+            }
+            syncing = true;
+            requestAnimationFrame(function () {
+                chart.scrollTop = labels.scrollTop;
+                syncing = false;
+            });
+        });
+
+        chart.addEventListener('scroll', function () {
+            if (syncing) {
+                return;
+            }
+            syncing = true;
+            requestAnimationFrame(function () {
+                labels.scrollTop = chart.scrollTop;
+                syncing = false;
+            });
+        });
+    })();
+
+    render();
+</script>
+</body>
+</html>

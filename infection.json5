@@ -17,6 +17,9 @@
     "logs": {
         "stryker": {
             "report": "master"
+        },
+        "telemetry": {
+            "serializedFile": "var/telemetry/trace.serialized.php"
         }
     },
     "phpStan": {

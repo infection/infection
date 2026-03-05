@@ -33,19 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+namespace Infection\Telemetry\Reporter;
 
-/**
- * @internal
- */
-final readonly class MutableFileWasProcessed
+use Infection\Telemetry\Tracing\Trace;
+
+interface TraceProvider
 {
-    /**
-     * @param list<string> $mutationHashes
-     */
-    public function __construct(
-        public string $sourceFilePath,
-        public array $mutationHashes,
-    ) {
-    }
+    public function getTrace(): Trace;
 }

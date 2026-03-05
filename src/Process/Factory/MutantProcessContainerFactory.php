@@ -89,6 +89,7 @@ class MutantProcessContainerFactory
 
         return new MutantProcessContainer(
             new MutantProcess(
+                $this->testFrameworkAdapter->getName(),
                 $process,
                 $mutant,
                 $this->mutantExecutionResultFactory,

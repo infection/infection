@@ -52,6 +52,7 @@ class Logs
         private bool $useGitHubAnnotationsLogger,
         private readonly ?StrykerConfig $strykerConfig,
         private ?string $summaryJsonLogFilePath,
+        public readonly ?TelemetryEntry $telemetryEntry,
     ) {
     }
 
@@ -66,6 +67,7 @@ class Logs
             null,
             null,
             false,
+            null,
             null,
             null,
         );

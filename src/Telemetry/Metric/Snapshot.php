@@ -32,15 +32,31 @@
  */
 
 declare(strict_types=1);
+/*
+ * This file is part of PHPUnit.
+ *
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Telemetry\Metric;
 
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorStatus;
+use Infection\Telemetry\Metric\Memory\MemoryUsage;
+use Infection\Telemetry\Metric\Time\HRTime;
 
 /**
- * @internal
+ * Captures a point-in-time measurement of runtime resource consumption.
  */
-interface MutationEvaluationWasStartedSubscriber extends EventSubscriber
+final readonly class Snapshot
 {
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void;
+    public function __construct(
+        public HRTime $time,
+        public MemoryUsage $memoryUsage,
+        public MemoryUsage $peakMemoryUsage,
+        public GarbageCollectorStatus $garbageCollectorStatus,
+    ) {
+    }
 }

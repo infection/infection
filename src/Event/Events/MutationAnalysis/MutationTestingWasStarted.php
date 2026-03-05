@@ -39,6 +39,8 @@ use Infection\Framework\Iterable\IterableCounter;
 use Infection\Process\Runner\ProcessRunner;
 
 /**
+ * TODO: to rename to MutationEvaluationWasStarted?
+ *
  * @internal
  */
 final readonly class MutationTestingWasStarted

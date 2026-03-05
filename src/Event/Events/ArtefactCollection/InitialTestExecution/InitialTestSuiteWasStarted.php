@@ -40,4 +40,9 @@ namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
  */
 final readonly class InitialTestSuiteWasStarted
 {
+    public function __construct(
+        public string $testFrameworkName,
+        public string $testFrameworkVersion,
+    ) {
+    }
 }

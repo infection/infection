@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Events\MutationAnalysis\MutationGeneration;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForFileWasFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutableFileWasProcessed::class)]
+#[CoversClass(MutationGenerationForFileWasFinished::class)]
 final class MutableFileWasProcessedTest extends TestCase
 {
     /**
@@ -47,11 +47,11 @@ final class MutableFileWasProcessedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new MutableFileWasProcessed(
+        $class = new MutationGenerationForFileWasFinished(
             '/path/to/fileA.php',
             ['mutationHash1', 'mutationHash2'],
         );
 
-        $this->assertInstanceOf(MutableFileWasProcessed::class, $class);
+        $this->assertInstanceOf(MutationGenerationForFileWasFinished::class, $class);
     }
 }
