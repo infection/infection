@@ -65,23 +65,21 @@ class NodeTraverserFactory
             new AbstractMethodIgnorer(),
         ];
 
-        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(NameResolverFactory::create());
-        $traverser->addVisitor(new ParentConnectingVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
+        return new NodeTraverser(
+            new NodeVisitor\CloningVisitor(),
+            new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
+            new NonMutableNodesIgnorerVisitor($nodeIgnorers),
+            NameResolverFactory::create(),
+            new ParentConnectingVisitor(),
+            new ReflectionVisitor(),
+            $mutationVisitor,
+        );
     }
 
     public function createPreTraverser(): NodeTraverserInterface
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NextConnectingVisitor());
-
-        return $traverser;
+        return new NodeTraverser(
+            new NextConnectingVisitor(),
+        );
     }
 }
