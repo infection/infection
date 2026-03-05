@@ -43,6 +43,7 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use function ksort;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -62,22 +63,24 @@ final class MutatorRobustnessTest extends TestCase
 
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
-     * whether or not the code is actually mutated, only if it does not error.
+     * whether the code is actually mutated, only if it does not error.
      */
     #[DataProvider('mutatorWithCodeCaseProvider')]
-    public function test_the_mutator_does_not_crash_during_parsing(string $fileName, string $code, Mutator $mutator): void
+    public function test_the_mutator_does_not_crash(string $fileName, string $code, Mutator $mutator): void
     {
+        $this->expectNotToPerformAssertions();
+
         try {
             $this->mutatesCode($code, $mutator);
-
-            $this->addToAssertionCount(1);
         } catch (Throwable $throwable) {
-            $this->fail(sprintf(
-                'The mutator "%s" could not parse the file "%s": %s.',
-                $mutator->getName(),
-                $fileName,
-                $throwable->getMessage(),
-            ));
+            throw new AssertionFailedError(
+                sprintf(
+                    'The mutator "%s" could not parse the file "%s".',
+                    $mutator->getName(),
+                    $fileName,
+                ),
+                previous: $throwable,
+            );
         }
     }
 
@@ -85,12 +88,12 @@ final class MutatorRobustnessTest extends TestCase
     {
         $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
 
-        foreach (self::provideCodeSamples() as [$fileName, $fileContents]) {
+        foreach (self::provideCodeSamples() as [$realPath, $fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
                 $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
 
                 yield $title => [
-                    $fileName,
+                    $realPath,
                     $fileContents,
                     $mutatorFactory->create([$mutatorClassName => []], false)[MutatorName::getName($mutatorClassName)],
                 ];
@@ -117,6 +120,7 @@ final class MutatorRobustnessTest extends TestCase
         foreach ($finder as $fileInfo) {
             /* @var SplFileInfo $fileInfo */
             $files[$fileInfo->getFilename()] = [
+                $fileInfo->getRealPath(),
                 $fileInfo->getFilename(),
                 $fileInfo->getContents(),
             ];
