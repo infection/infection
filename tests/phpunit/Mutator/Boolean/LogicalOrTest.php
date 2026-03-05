@@ -84,6 +84,8 @@ final class LogicalOrTest extends BaseMutatorTestCase
         yield from self::smallerAndGreaterMatrixWithSameValueMutationsProvider();
 
         yield from self::instanceOfMutationsProvider();
+
+        yield from self::bug2975Provider();
     }
 
     private static function equalityMutationsProvider(): iterable
@@ -727,6 +729,134 @@ final class LogicalOrTest extends BaseMutatorTestCase
             self::wrapCodeInMethod(
                 <<<'PHP'
                     $var = $i > 5 && $node instanceof \Countable;
+                    PHP,
+            ),
+        ];
+    }
+
+    private static function bug2975Provider(): iterable
+    {
+        yield 'It does mutate the full test case of bug #2975' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                     if (
+                        $a < 0 ||
+                        23 < $a ||
+                        $b < 0 ||
+                        59 < $b
+                    ) {
+                        throw new \Exception('Wrong');
+                    }
+                    PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                         if (
+                            $a < 0 ||
+                            23 < $a && $b < 0 ||
+                            59 < $b
+                        ) {
+                            throw new \Exception('Wrong');
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                         if (
+                            $a < 0 ||
+                            23 < $a ||
+                            $b < 0 && 59 < $b
+                        ) {
+                            throw new \Exception('Wrong');
+                        }
+                        PHP,
+                ),
+            ],
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "Smaller" and "Greater" (equivalent of Smaller and Smaller)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a < 0 || $a > 23;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "Smaller" and "Smaller' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a < 0 || 23 < $a;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "SmallerOrEqual" and "SmallerOrEqual' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a <= 0 || 23 <= $a;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "Smaller" and "SmallerOrEqual' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a < 0 || 23 <= $a;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "SmallerOrEqual" and "Smaller' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a <= 0 || 23 < $a;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "Greater" and "Greater" (equivalent of Smaller and Smaller)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0 > $a || $a > 23;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "GreaterOrEqual" and "GreaterOrEqual" (equivalent of Smaller and Smaller)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0 >= $a || $a >= 23;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "GreaterOrEqual" and "Greater" (equivalent of Smaller and Smaller)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0 >= $a || $a > 23;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate when the same variable is tested against "Greater" and "GreaterOrEqual" (equivalent of Smaller and Smaller)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    0 > $a || $a >= 23;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does mutate different variables are tested against "Smaller" and "Smaller' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a < 0 || 23 < $b;
+                    PHP,
+            ),
+
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a < 0 && 23 < $b;
                     PHP,
             ),
         ];

@@ -191,7 +191,6 @@ final class TracerIntegrationTest extends TestCase
             new SyntheticTrace(
                 sourceFileInfo: MockSplFileInfo::create(self::FIXTURE_DIR . '/src/DemoCounterService.php'),
                 realPath: realpath($canonicalDemoCounterServicePathname),
-                relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
                 tests: new TestLocations(
                     [
@@ -488,7 +487,6 @@ final class TracerIntegrationTest extends TestCase
             new SyntheticTrace(
                 sourceFileInfo: MockSplFileInfo::create(self::FIXTURE_DIR . '/src/DemoCounterService.php'),
                 realPath: realpath($canonicalDemoCounterServicePathname),
-                relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
                 tests: new TestLocations(
                     [

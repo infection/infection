@@ -135,6 +135,8 @@ final class GeneratorFactoryTest extends TestCase
 
     /**
      * @param Traversable<string, string> $traversable
+     *
+     * @return IteratorAggregate<string, string>
      */
     private static function createIteratorAggregate(Traversable $traversable): IteratorAggregate
     {

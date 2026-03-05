@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;

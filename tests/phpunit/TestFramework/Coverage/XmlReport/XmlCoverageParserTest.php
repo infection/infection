@@ -153,8 +153,8 @@ final class XmlCoverageParserTest extends TestCase
             new TestLocations(),
         ];
 
-        // @phpstan-ignore argument.templateType
         yield from take(XmlCoverageFixtures::provideAllFixtures())
+            // @phpstan-ignore argument.templateType
             ->map(self::createScenarioFromFixture(...))
             ->stream();
     }

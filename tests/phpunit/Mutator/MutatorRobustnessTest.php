@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use PHPUnit\Framework\AssertionFailedError;
 use function array_values;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -44,6 +43,7 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\NullMutationVisitor;
 use function ksort;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

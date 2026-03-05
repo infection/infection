@@ -35,10 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
-use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use function array_flip;
-use function array_key_exists;
 use function array_map;
 use function array_shift;
 use function count;
@@ -49,7 +45,6 @@ use Infection\Framework\Str;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
@@ -57,6 +52,8 @@ use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
@@ -154,15 +151,16 @@ abstract class BaseMutatorTestCase extends TestCase
     {
         $mutatorClassName = $this->getTestedMutatorClassName();
 
-        $isBuiltinMutator = array_key_exists($mutatorClassName, array_flip(ProfileList::ALL_MUTATORS));
-        $mutatorName = $isBuiltinMutator ? MutatorName::getName($mutatorClassName) : $mutatorClassName;
-
-        return SingletonContainer::getContainer()
+        $mutators = SingletonContainer::getContainer()
             ->getMutatorFactory()
             ->create([
                 $mutatorClassName => ['settings' => $settings],
-            ], false)[$mutatorName]
-        ;
+            ], false);
+
+        $mutator = array_shift($mutators);
+        Assert::isInstanceOf($mutator, Mutator::class);
+
+        return $mutator;
     }
 
     protected function getTestedMutatorClassName(): string
@@ -256,7 +254,7 @@ abstract class BaseMutatorTestCase extends TestCase
         );
 
         (new NodeTraverser(
-            new AddIdToTraversedNodesVisitor()
+            new AddIdToTraversedNodesVisitor(),
         ))->traverse($nodes);
 
         $factory = new NodeTraverserFactory();

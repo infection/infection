@@ -583,7 +583,7 @@ final class RunCommand extends BaseCommand
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
 
-        $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
+        $container->getSubscriberRegisterer()->registerSubscribers();
 
         $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }

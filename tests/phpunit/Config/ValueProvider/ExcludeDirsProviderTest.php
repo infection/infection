@@ -66,7 +66,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $this->fileSystem = new Filesystem();
 
         $this->provider = new ExcludeDirsProvider(
-            $this->createMock(ConsoleHelper::class),
+            $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
             $this->fileSystem,
         );

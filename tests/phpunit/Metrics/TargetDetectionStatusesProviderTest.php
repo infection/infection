@@ -133,7 +133,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
     public function test_it_provides_not_covered_when_with_uncovered_option_is_used(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
         $provider = new TargetDetectionStatusesProvider(
             $logs,
@@ -152,7 +152,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
     public function test_it_includes_escaped_when_requested(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 20);
 
@@ -163,7 +163,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
     public function test_it_provides_nothing_when_logging_verbosity_is_none(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
         $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 

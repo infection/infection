@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -48,9 +52,7 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->parser->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
 
@@ -139,5 +141,98 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
                 )
                 AST,
         ];
+    }
+
+    public function test_it_provides_a_map_of_the_nodes_by_their_id(): void
+    {
+        $visitor = new AddIdToTraversedNodesVisitor();
+
+        // Sanity check
+        $this->assertCount(0, $visitor->getNodesById());
+
+        $nodes = $this->parse(
+            <<<'PHP'
+                <?php
+
+                $a = 'a';
+                $b = 'b';
+                PHP,
+        );
+
+        (new NodeTraverser($visitor))->traverse($nodes);
+
+        // This assertion is not for the test itself but to provide a visible representation of
+        // the nodes traversed to the reader.
+        $this->assertSame(
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_String(
+                                kind: KIND_SINGLE_QUOTED (1)
+                                rawValue: 'a'
+                                nodeId: 3
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 6
+                            )
+                            expr: Scalar_String(
+                                kind: KIND_SINGLE_QUOTED (1)
+                                rawValue: 'b'
+                                nodeId: 7
+                            )
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                    )
+                )
+                AST,
+            $this->dumper->dump($nodes, onlyVisitedNodes: false),
+        );
+
+        $this->assertCount(2, $nodes);
+
+        $expr1 = $nodes[0];
+        $this->assertInstanceOf(Expression::class, $expr1);
+        $assign1 = $expr1->expr;
+        $this->assertInstanceOf(Assign::class, $assign1);
+        $var1 = $assign1->var;
+        $this->assertInstanceOf(Variable::class, $var1);
+        $aString = $assign1->expr;
+        $this->assertInstanceOf(String_::class, $aString);
+
+        $expr2 = $nodes[1];
+        $this->assertInstanceOf(Expression::class, $expr2);
+        $assign2 = $expr2->expr;
+        $this->assertInstanceOf(Assign::class, $assign2);
+        $var2 = $assign2->var;
+        $this->assertInstanceOf(Variable::class, $var2);
+        $bString = $assign2->expr;
+        $this->assertInstanceOf(String_::class, $bString);
+
+        $expected = [
+            0 => $expr1,
+            1 => $assign1,
+            2 => $var1,
+            3 => $aString,
+            4 => $expr2,
+            5 => $assign2,
+            6 => $var2,
+            7 => $bString,
+        ];
+
+        $actual = $visitor->getNodesById();
+
+        // @phpstan-ignore method.impossibleType
+        $this->assertSame($expected, $actual);
     }
 }
