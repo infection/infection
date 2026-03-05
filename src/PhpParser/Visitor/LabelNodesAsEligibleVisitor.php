@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\PhpParser\Metadata\Annotation;
-use Infection\PhpParser\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -47,9 +45,21 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 {
+    private const ELIGIBLE = 'eligible';
+
+    public static function markAsEligible(Node $node): bool
+    {
+        $node->setAttribute(self::ELIGIBLE, true);
+    }
+
+    public static function isEligible(Node $node): bool
+    {
+        $node->hasAttribute(self::ELIGIBLE);
+    }
+
     public function enterNode(Node $node): ?int
     {
-        NodeAnnotator::annotate($node, Annotation::ELIGIBLE);
+        self::markAsEligible($node);
 
         return null;
     }
