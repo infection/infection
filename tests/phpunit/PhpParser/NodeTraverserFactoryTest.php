@@ -58,9 +58,9 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
-    public function test_it_can_create_a_traverser(): void
+    public function test_it_can_create_a_traverser_for_generating_mutations(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor());
+        $traverser = (new NodeTraverserFactory())->createMutationTraverser(new FakeVisitor());
 
         $this->assertSame(
             [
@@ -71,9 +71,9 @@ final class NodeTraverserFactoryTest extends TestCase
         );
     }
 
-    public function test_it_can_create_a_pre_traverser(): void
+    public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
     {
-        $traverser = (new NodeTraverserFactory())->createPreTraverser();
+        $traverser = (new NodeTraverserFactory())->createEnrichmentTraverser();
 
         $this->assertSame(
             [

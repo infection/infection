@@ -33,36 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\SkipNodesVisitor;
 
+use function in_array;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Mark all node as eligible. This visitor should be registered as last, so if
- * a node is code that should be ignored because not covered by tests, for example,
- * then this visitor should not traverse that node at all.
- *
- * @internal
+ * Utility visitor which allows stopping the traverse when one of the specified nodes is encountered.
  */
-final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
+final class SkipNodesVisitor extends NodeVisitorAbstract
 {
-    private const ELIGIBLE = 'eligible';
+    public const DEFAULT_STOP_TRAVERSE_TYPE = self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
 
-    public static function markAsEligible(Node $node): void
-    {
-        $node->setAttribute(self::ELIGIBLE, true);
-    }
-
-    public static function isEligible(Node $node): bool
-    {
-        return $node->hasAttribute(self::ELIGIBLE);
+    /**
+     * @param list<int> $nodeIds
+     * @param NodeVisitor::DONT_TRAVERSE_CHILDREN|NodeVisitor::STOP_TRAVERSAL|NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN $stopTraverseType
+     */
+    public function __construct(
+        private readonly array $nodeIds,
+        private readonly int $stopTraverseType = self::DEFAULT_STOP_TRAVERSE_TYPE,
+    ) {
     }
 
     public function enterNode(Node $node): ?int
     {
-        self::markAsEligible($node);
+        return $this->isSkippedNode($node)
+            ? $this->stopTraverseType
+            : null;
+    }
 
-        return null;
+    private function isSkippedNode(Node $node): bool
+    {
+        $id = AddIdToTraversedNodesVisitor::getNodeId($node);
+
+        return in_array($id, $this->nodeIds, true);
     }
 }

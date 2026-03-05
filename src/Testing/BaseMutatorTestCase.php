@@ -260,13 +260,13 @@ abstract class BaseMutatorTestCase extends TestCase
         $factory = new NodeTraverserFactory();
 
         $factory
-            ->createPreTraverser()
+            ->createEnrichmentTraverser()
             ->traverse($nodes);
 
         $ast = (new NodeDumper())->dump($nodes, onlyVisitedNodes: false);
 
         $factory
-            ->create($mutationsCollectorVisitor)
+            ->createMutationTraverser($mutationsCollectorVisitor)
             ->traverse($nodes);
 
         return take($mutationsCollectorVisitor->getMutations())->toList();

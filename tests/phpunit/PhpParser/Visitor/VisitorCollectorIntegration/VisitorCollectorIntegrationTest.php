@@ -62,9 +62,9 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
         $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
-        $traverserFactory->createPreTraverser([])->traverse($nodes);
+        $traverserFactory->createEnrichmentTraverser([])->traverse($nodes);
         $traversedNodes = $traverserFactory
-            ->create(
+            ->createMutationTraverser(
                 new MarkTraversedNodesAsVisitedVisitor(),
             )
         ->traverse($nodes);
@@ -86,7 +86,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    ELIGIBLE: -1
+                                    eligible: true
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -94,17 +94,17 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    ELIGIBLE: -1
+                                    eligible: true
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                ELIGIBLE: -1
+                                eligible: true
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        ELIGIBLE: -1
+                        eligible: true
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -112,7 +112,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            ELIGIBLE: -1
+                            eligible: true
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -120,7 +120,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    ELIGIBLE: -1
+                                    eligible: true
                                     origNode: nodeId(7)
                                 )
                                 stmts: array(
@@ -133,7 +133,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(8)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: first
-                                            ELIGIBLE: -1
+                                            eligible: true
                                             origNode: nodeId(9)
                                         )
                                         returnType: Identifier(
@@ -144,7 +144,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(8)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: first
-                                            ELIGIBLE: -1
+                                            eligible: true
                                             origNode: nodeId(10)
                                         )
                                         stmts: array(
@@ -160,7 +160,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                         functionScope: nodeId(8)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: first
-                                                        ELIGIBLE: -1
+                                                        eligible: true
                                                         origNode: nodeId(13)
                                                     )
                                                     right: Scalar_Int(
@@ -173,7 +173,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                         functionScope: nodeId(8)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: first
-                                                        ELIGIBLE: -1
+                                                        eligible: true
                                                         origNode: nodeId(14)
                                                     )
                                                     nodeId: 12
@@ -183,7 +183,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                     functionScope: nodeId(8)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: first
-                                                    ELIGIBLE: -1
+                                                    eligible: true
                                                     origNode: nodeId(12)
                                                 )
                                                 nodeId: 11
@@ -193,7 +193,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                 functionScope: nodeId(8)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: first
-                                                ELIGIBLE: -1
+                                                eligible: true
                                                 origNode: nodeId(11)
                                             )
                                         )
@@ -203,7 +203,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: first
-                                        ELIGIBLE: -1
+                                        eligible: true
                                         origNode: nodeId(8)
                                     )
                                     1: Stmt_ClassMethod(
@@ -215,7 +215,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(15)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: second
-                                            ELIGIBLE: -1
+                                            eligible: true
                                             origNode: nodeId(16)
                                         )
                                         returnType: Identifier(
@@ -226,7 +226,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(15)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: second
-                                            ELIGIBLE: -1
+                                            eligible: true
                                             origNode: nodeId(17)
                                         )
                                         stmts: array(
@@ -242,7 +242,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                         functionScope: nodeId(15)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: second
-                                                        ELIGIBLE: -1
+                                                        eligible: true
                                                         origNode: nodeId(20)
                                                     )
                                                     right: Scalar_Int(
@@ -255,7 +255,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                         functionScope: nodeId(15)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: second
-                                                        ELIGIBLE: -1
+                                                        eligible: true
                                                         origNode: nodeId(21)
                                                     )
                                                     nodeId: 19
@@ -265,7 +265,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                     functionScope: nodeId(15)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: second
-                                                    ELIGIBLE: -1
+                                                    eligible: true
                                                     origNode: nodeId(19)
                                                 )
                                                 nodeId: 18
@@ -275,7 +275,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                 functionScope: nodeId(15)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: second
-                                                ELIGIBLE: -1
+                                                eligible: true
                                                 origNode: nodeId(18)
                                             )
                                         )
@@ -285,19 +285,19 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: second
-                                        ELIGIBLE: -1
+                                        eligible: true
                                         origNode: nodeId(15)
                                     )
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                ELIGIBLE: -1
+                                eligible: true
                                 origNode: nodeId(6)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        ELIGIBLE: -1
+                        eligible: true
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )

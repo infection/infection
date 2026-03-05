@@ -56,7 +56,10 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
-    public function createPreTraverser(): NodeTraverserInterface
+    /**
+     * @see /doc/nomenclature.md#ast-enrichment
+     */
+    public function createEnrichmentTraverser(): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
 
@@ -77,7 +80,7 @@ class NodeTraverserFactory
         );
     }
 
-    public function create(NodeVisitor $mutationVisitor): NodeTraverserInterface
+    public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
         return new NodeTraverser(
             new NodeVisitor\CloningVisitor(),

@@ -140,7 +140,7 @@ final class MutatorRobustnessTest extends TestCase
         $initialStatements = SingletonContainer::getContainer()->getParser()->parse($code);
 
         (new NodeTraverserFactory())
-            ->create(new NullMutationVisitor($mutator))
+            ->createMutationTraverser(new NullMutationVisitor($mutator))
             ->traverse($initialStatements)
         ;
     }
