@@ -62,12 +62,12 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
         $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
-        $traverserFactory->createEnrichmentTraverser([])->traverse($nodes);
+        $traverserFactory->createEnrichmentTraverser()->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
                 new MarkTraversedNodesAsVisitedVisitor(),
             )
-        ->traverse($nodes);
+            ->traverse($nodes);
 
         $actual = $this->dumper->dump($traversedNodes);
 

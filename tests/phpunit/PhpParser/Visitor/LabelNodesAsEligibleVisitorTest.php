@@ -46,6 +46,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(LabelNodesAsEligibleVisitor::class)]
 final class LabelNodesAsEligibleVisitorTest extends VisitorTestCase
 {
+    /**
+     * @param list<int> $skippedNodeIds
+     */
     #[DataProvider('nodeProvider')]
     public function test_it_labels_visited_nodes_as_eligible(
         string $code,

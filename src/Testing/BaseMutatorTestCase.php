@@ -52,8 +52,6 @@ use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
-use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
