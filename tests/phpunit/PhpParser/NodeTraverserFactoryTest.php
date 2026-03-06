@@ -43,6 +43,8 @@ use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
@@ -56,16 +58,19 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
+    private NodeTraverserFactory $factory;
+
+    protected function setUp(): void
+    {
+        $this->factory = new NodeTraverserFactory();
+    }
+
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor());
+        $traverser = $this->factory->create(new FakeVisitor());
 
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
-
-        $this->assertSame(
+        $this->assertTraverserVisitorsAre(
+            $traverser,
             [
                 CloningVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
@@ -75,23 +80,47 @@ final class NodeTraverserFactoryTest extends TestCase
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitors,
         );
     }
 
     public function test_it_can_create_a_pre_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->createPreTraverser();
+        $traverser = $this->factory->createPreTraverser();
 
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
-
-        $this->assertSame(
+        $this->assertTraverserVisitorsAre(
+            $traverser,
             [
                 NextConnectingVisitor::class,
             ],
+        );
+    }
+
+    /**
+     * @param list<class-string<NodeVisitor>> $expected
+     */
+    private function assertTraverserVisitorsAre(
+        NodeTraverserInterface $traverser,
+        array $expected,
+    ): void {
+        // Sanity check. This is not a hard constraint, but if that changes in the future, then we need
+        // to adapt the code here to retrieve the visitors a different way.
+        $this->assertInstanceOf(NodeTraverser::class, $traverser);
+
+        $actual = self::getVisitorClassNames($traverser);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return list<class-string<NodeVisitor>>
+     */
+    private static function getVisitorClassNames(NodeTraverser $traverser): array
+    {
+        /** @var list<NodeVisitor> $visitors */
+        $visitors = self::getVisitorReflection()->getValue($traverser);
+
+        return array_map(
+            get_class(...),
             $visitors,
         );
     }
