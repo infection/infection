@@ -1367,21 +1367,3 @@ parameters:
 			identifier: property.dynamicName
 			count: 1
 			path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $stopTraverseType contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: ../tests/phpunit/TestingUtility/PhpParser/Visitor/SkipNodesVisitor/SkipNodesVisitor.php
-
-		-
-			rawMessage: PHPDoc type for property Infection\Tests\TestingUtility\PhpParser\Visitor\SkipNodesVisitor\SkipNodesVisitor::$stopTraverseType contains unresolvable type.
-			identifier: property.unresolvableType
-			count: 1
-			path: ../tests/phpunit/TestingUtility/PhpParser/Visitor/SkipNodesVisitor/SkipNodesVisitor.php
-
-		-
-			rawMessage: PHPDoc type for property Infection\Tests\TestingUtility\PhpParser\Visitor\SkipNodesVisitor\SkipNodesVisitor::$stopTraverseType with type mixed is not subtype of native type int.
-			identifier: property.phpDocType
-			count: 1
-			path: ../tests/phpunit/TestingUtility/PhpParser/Visitor/SkipNodesVisitor/SkipNodesVisitor.php

@@ -38,6 +38,7 @@ namespace Infection\Tests\TestingUtility\PhpParser\Visitor\SkipNodesVisitor;
 use function in_array;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
 /**
