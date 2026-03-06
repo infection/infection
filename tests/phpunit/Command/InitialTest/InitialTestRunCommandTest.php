@@ -40,6 +40,7 @@ use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\Framework\Str;
+use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -93,27 +94,15 @@ final class InitialTestRunCommandTest extends TestCase
             $expectedSkipCoverage,
         );
 
-        $tester->execute(
-            $arguments,
-            [
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-                'capture_stderr_separately' => true,
-            ],
-        );
+        [
+            $actualStdout,
+            $actualStderr,
+            $actualDisplay,
+        ] = $this->executeCommand($tester, $arguments);
 
-        $tester->assertCommandIsSuccessful();
-        $this->assertSame($expectedStdout, Str::rTrimLines($tester->getDisplay(normalize: true)));
-        $this->assertSame($expectedStderr, Str::rTrimLines($tester->getErrorOutput(normalize: true)));
-
-        $tester->execute(
-            $arguments,
-            [
-                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            ],
-        );
-
-        $tester->assertCommandIsSuccessful();
-        $this->assertSame($expectedDisplay, Str::rTrimLines($tester->getDisplay(normalize: true)));
+        $this->assertSame($expectedStdout, $actualStdout);
+        $this->assertSame($expectedStderr, $actualStderr);
+        $this->assertSame($expectedDisplay, $actualDisplay);
     }
 
     public static function successfulCommandExecutionProvider(): iterable
@@ -209,6 +198,11 @@ final class InitialTestRunCommandTest extends TestCase
         array $expectedInitialTestsPhpOptions,
         bool $expectedSkipCoverage,
     ): CommandTester {
+        $gitMock = $this->createMock(Git::class);
+        $gitMock
+            ->method('getBaseReference')
+            ->willReturn('<refinedGitReference>');
+
         $testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
         $testFrameworkAdapterMock
             ->method('getName')
@@ -243,6 +237,7 @@ final class InitialTestRunCommandTest extends TestCase
 
         $container = Container::create();
         // Cannot use cloneWithService here: https://github.com/sanmai/di-container/issues/53
+        $container->set(Git::class, static fn () => $gitMock);
         $container->set(TestFrameworkAdapter::class, static fn () => $testFrameworkAdapterMock);
         $container->set(InitialTestsRunner::class, static fn () => $initialTestsRunnerMock);
 
@@ -252,5 +247,42 @@ final class InitialTestRunCommandTest extends TestCase
         $command->setApplication($application);
 
         return new CommandTester($command);
+    }
+
+    /**
+     * @param array<string, string> $arguments
+     *
+     * @return array{string, string, string}
+     */
+    private function executeCommand(
+        CommandTester $commandTester,
+        array $arguments,
+    ): array {
+        $commandTester->execute(
+            $arguments,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                'capture_stderr_separately' => true,
+            ],
+        );
+
+        $stdout = Str::rTrimLines($commandTester->getDisplay(normalize: true));
+        $stderr = Str::rTrimLines($commandTester->getErrorOutput(normalize: true));
+
+        $commandTester->execute(
+            $arguments,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ],
+        );
+
+        $commandTester->assertCommandIsSuccessful();
+        $display = Str::rTrimLines($commandTester->getDisplay(normalize: true));
+
+        return [
+            $stdout,
+            $stderr,
+            $display,
+        ];
     }
 }
