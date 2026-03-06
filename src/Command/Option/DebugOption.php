@@ -37,6 +37,7 @@ namespace Infection\Command\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
+use Infection\Container\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -54,12 +55,14 @@ final class DebugOption implements CommandOption
      */
     public static function addOption(
         Command $command,
+        bool $default = Container::DEFAULT_DEBUG,
     ): Command {
         return $command->addOption(
             self::NAME,
             null,
-            InputOption::VALUE_NONE,
+            InputOption::VALUE_NEGATABLE,
             'Will not clean up utility files from Infection temporary folder. Adds command lines to the logs and prints Initial Tests output to stdout.',
+            $default,
         );
     }
 
