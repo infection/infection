@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -67,30 +68,33 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
     {
-        $traverser = $this->factory->createMutationTraverser(new FakeVisitor());
-
-        $this->assertTraverserVisitorsAre(
-            $traverser,
-            [
-                CloningVisitor::class,
-                IgnoreAllMutationsAnnotationReaderVisitor::class,
-                NonMutableNodesIgnorerVisitor::class,
-                NameResolver::class,
-                ParentConnectingVisitor::class,
-                ReflectionVisitor::class,
-                FakeVisitor::class,
-            ],
-        );
-    }
-
-    public function test_it_can_create_a_traverser_for_generating_mutations(): void
-    {
         $traverser = $this->factory->createEnrichmentTraverser();
 
         $this->assertTraverserVisitorsAre(
             $traverser,
             [
                 NextConnectingVisitor::class,
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
+                NonMutableNodesIgnorerVisitor::class,
+                NameResolver::class,
+                ParentConnectingVisitor::class,
+                ReflectionVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+            ],
+        );
+    }
+
+    public function test_it_can_create_a_traverser_for_generating_mutations(): void
+    {
+        $traverser = $this->factory->createMutationTraverser(
+            new FakeVisitor(),
+        );
+
+        $this->assertTraverserVisitorsAre(
+            $traverser,
+            [
+                CloningVisitor::class,
+                FakeVisitor::class,
             ],
         );
     }
