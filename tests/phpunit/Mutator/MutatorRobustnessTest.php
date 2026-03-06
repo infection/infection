@@ -45,6 +45,7 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;
 use function ksort;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -58,6 +59,8 @@ use Throwable;
 #[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-code-samples';
+
     /**
      * @var array<string, SplFileInfo>|null
      */
@@ -75,24 +78,27 @@ final class MutatorRobustnessTest extends TestCase
 
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
-     * whether or not the code is actually mutated, only if it does not error.
+     * whether the code is actually mutated, only if it does not error.
      */
     #[DataProvider('mutatorWithCodeCaseProvider')]
-    public function test_the_mutator_does_not_crash_during_parsing(
-        SplFileInfo $filePath,
+    public function test_the_mutator_does_not_crash(
+        SplFileInfo $fileInfo,
         Mutator $mutator,
     ): void {
-        try {
-            $this->mutatesCode($filePath, $mutator);
+        $this->expectNotToPerformAssertions();
 
-            $this->addToAssertionCount(1);
+        try {
+            $this->mutatesCode($fileInfo, $mutator);
         } catch (Throwable $throwable) {
-            $this->fail(sprintf(
-                'The mutator "%s" could not parse the file "%s": %s.',
-                $mutator->getName(),
-                $filePath,
-                $throwable->getMessage(),
-            ));
+            throw new AssertionFailedError(
+                sprintf(
+                    'The mutator "%s" could not parse the file "%s".',
+                    $mutator->getName(),
+                    $fileInfo->getRealPath(),
+                ),
+                code: $throwable->getCode(),
+                previous: $throwable,
+            );
         }
     }
 
@@ -124,7 +130,7 @@ final class MutatorRobustnessTest extends TestCase
         }
 
         $finder = Finder::create()
-            ->in(__DIR__ . '/../../autoloaded/mutator-code-samples')
+            ->in(self::FIXTURES_DIR)
             ->name('*.php')
             ->files()
         ;

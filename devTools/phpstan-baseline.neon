@@ -1027,8 +1027,26 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
 
 		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
+			rawMessage: 'Call to method __construct() of internal class PHPUnit\Framework\Exception from outside its root namespace PHPUnit.'
+			identifier: method.internalClass
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Class PHPUnit\Framework\AssertionFailedError constructor invoked with named argument $code, but it''s not allowed because of @no-named-arguments.'
+			identifier: argument.named
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Class PHPUnit\Framework\AssertionFailedError constructor invoked with named argument $previous, but it''s not allowed because of @no-named-arguments.'
+			identifier: argument.named
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: Instantiation of internal class PHPUnit\Framework\AssertionFailedError.
+			identifier: new.internalClass
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
@@ -1039,7 +1057,7 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Mutator\MutatorRobustnessTest::test_the_mutator_does_not_crash_during_parsing() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			rawMessage: 'Method Infection\Tests\Mutator\MutatorRobustnessTest::test_the_mutator_does_not_crash() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
