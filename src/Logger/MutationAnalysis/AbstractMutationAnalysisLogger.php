@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 
 /**
  * @internal
@@ -46,17 +47,29 @@ abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
 {
     protected int $callsCount = 0;
 
-    public function start(int $mutationCount): void
+    public function startAnalysis(int $mutationCount): void
     {
         $this->callsCount = 0;
     }
 
-    public function advance(MutantExecutionResult $executionResult): void
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void {
+        // Do nothing.
+    }
+
+    public function startEvaluation(Mutation $mutation): void
+    {
+        // Do nothing.
+    }
+
+    public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
         ++$this->callsCount;
     }
 
-    public function finish(): void
+    public function finishAnalysis(): void
     {
     }
 }

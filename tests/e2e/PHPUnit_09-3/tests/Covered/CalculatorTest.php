@@ -3,10 +3,11 @@
 namespace Infection\E2ETests\PHPUnit_09_3\Tests\Covered;
 
 use Infection\E2ETests\PHPUnit_09_3\Covered\Calculator;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Calculator::class)]
+/**
+ * @covers Infection\E2ETests\PHPUnit_09_3\Covered\Calculator
+ */
 class CalculatorTest extends TestCase
 {
     private Calculator $calculator;

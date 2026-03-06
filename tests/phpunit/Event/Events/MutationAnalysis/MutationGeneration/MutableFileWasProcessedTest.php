@@ -47,7 +47,10 @@ final class MutableFileWasProcessedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new MutableFileWasProcessed();
+        $class = new MutableFileWasProcessed(
+            '/path/to/fileA.php',
+            ['mutationHash1', 'mutationHash2'],
+        );
 
         $this->assertInstanceOf(MutableFileWasProcessed::class, $class);
     }

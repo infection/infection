@@ -38,12 +38,11 @@ namespace Infection\Tests\AutoReview\IntegrationGroup;
 use function array_keys;
 use function file_exists;
 use Infection\CannotBeInstantiated;
-use const PHP_MAJOR_VERSION;
-use const PHP_MINOR_VERSION;
 use function Safe\file_get_contents;
 use function Safe\preg_match_all;
 use function sprintf;
 use function str_contains;
+use Symfony\Component\Finder\Finder;
 
 final class IoCodeDetector
 {
@@ -186,11 +185,17 @@ final class IoCodeDetector
     private static function retrieveSafeFileSystemFunctions(): array
     {
         $functionNames = [];
+        $safeFilesystemFiles = [];
 
-        $safeFilesystemFiles = [
-            sprintf(__DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/%s.%s/filesystem.php', PHP_MAJOR_VERSION, PHP_MINOR_VERSION),
-            sprintf(__DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/%s.%s/dir.php', PHP_MAJOR_VERSION, PHP_MINOR_VERSION),
-        ];
+        $phpDirectories = Finder::create()
+            ->directories()
+            ->in(__DIR__ . '/../../../../vendor/thecodingmachine/safe/generated')
+            ->depth(0);
+
+        foreach ($phpDirectories as $phpDirectory) {
+            $safeFilesystemFiles[] = sprintf('%s/filesystem.php', $phpDirectory->getPathname());
+            $safeFilesystemFiles[] = sprintf('%s/dir.php', $phpDirectory->getPathname());
+        }
 
         foreach ($safeFilesystemFiles as $filePath) {
             if (!file_exists($filePath)) {

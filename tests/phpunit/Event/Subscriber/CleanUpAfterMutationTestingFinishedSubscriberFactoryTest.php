@@ -38,7 +38,6 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -68,7 +67,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
             '/path/to/tmp',
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(CleanUpAfterMutationTestingFinishedSubscriber::class, $subscriber);
     }
@@ -81,7 +80,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
             '/path/to/tmp',
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(NullSubscriber::class, $subscriber);
     }

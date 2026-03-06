@@ -26,9 +26,7 @@ Create your test class by extending `VisitorTestCase`:
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use YourNamespace\YourVisitor;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;use PHPUnit\Framework\Attributes\CoversClass;use PHPUnit\Framework\Attributes\DataProvider;use YourNamespace\YourVisitor;
 
 #[CoversClass(YourVisitor::class)]
 final class YourVisitorTest extends VisitorTestCase

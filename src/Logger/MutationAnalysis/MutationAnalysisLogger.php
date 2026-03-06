@@ -37,6 +37,7 @@ namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 
 /**
  * Logger for the mutation analysis phase (mutation generation + heuristics + evaluation).
@@ -48,15 +49,25 @@ interface MutationAnalysisLogger
      *
      * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
-    public function start(int $mutationCount): void;
+    public function startAnalysis(int $mutationCount): void;
 
     /**
-     * Triggered each time mutation process is finished for one Mutant
+     * @param list<string> $mutationIds
      */
-    public function advance(MutantExecutionResult $executionResult): void;
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void;
+
+    public function startEvaluation(Mutation $mutation): void;
 
     /**
-     * Triggered when mutation testing is finished
+     * Records the result of the evaluation of a mutation.
      */
-    public function finish(): void;
+    public function finishEvaluation(MutantExecutionResult $executionResult): void;
+
+    /**
+     * Records the end of the mutation evaluation process.
+     */
+    public function finishAnalysis(): void;
 }

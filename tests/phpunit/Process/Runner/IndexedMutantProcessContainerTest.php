@@ -45,7 +45,7 @@ final class IndexedMutantProcessContainerTest extends TestCase
 {
     public function test_it_creates_object(): void
     {
-        $processBearer = $this->createMock(MutantProcessContainer::class);
+        $processBearer = $this->createStub(MutantProcessContainer::class);
 
         $indexedProcessBearer = new IndexedMutantProcessContainer(
             3,

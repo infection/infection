@@ -59,7 +59,7 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
         $this->sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
 
         $this->provider = new SourceDirsProvider(
-            $this->createMock(ConsoleHelper::class),
+            $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
             $this->sourceDirGuesser,
         );

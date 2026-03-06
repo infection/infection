@@ -40,11 +40,16 @@ use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
+use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[Group('integration')]
 #[CoversClass(MutationAnalysisLoggerFactory::class)]
 final class MutationAnalysisLoggerFactoryTest extends TestCase
 {
@@ -59,7 +64,16 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
             ->willReturn(false)
         ;
 
-        $logger = (new MutationAnalysisLoggerFactory($outputMock))->create($name);
+        $factory = new MutationAnalysisLoggerFactory(
+            $outputMock,
+            new TeamCity(
+                timeoutsAsEscaped: false,
+                differ: SingletonContainer::getContainer()->getDiffer(),
+            ),
+            '/path/to/project/infection.json5',
+        );
+
+        $logger = $factory->create($name);
 
         $this->assertInstanceOf($expectedFormatterClassName, $logger);
     }
@@ -76,6 +90,11 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
         yield [
             $bucket->take(MutationAnalysisLoggerName::PROGRESS),
             ConsoleProgressBarLogger::class,
+        ];
+
+        yield [
+            $bucket->take(MutationAnalysisLoggerName::TEAMCITY),
+            TeamCityLogger::class,
         ];
 
         $bucket->assertIsEmpty();

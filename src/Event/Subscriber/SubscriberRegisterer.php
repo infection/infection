@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -49,9 +48,9 @@ final readonly class SubscriberRegisterer
     ) {
     }
 
-    public function registerSubscribers(OutputInterface $output): void
+    public function registerSubscribers(): void
     {
-        foreach ($this->subscriberRegistry->create($output) as $subscriber) {
+        foreach ($this->subscriberRegistry->create() as $subscriber) {
             $this->eventDispatcher->addSubscriber($subscriber);
         }
     }

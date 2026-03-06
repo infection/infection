@@ -58,7 +58,7 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
 
         file_put_contents($indexPath, $indexContents);
 
-        $sourceFileInfoProviderMock = $this->createMock(SourceFileInfoProvider::class);
+        $sourceFileInfoProviderMock = $this->createStub(SourceFileInfoProvider::class);
 
         $indexXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $indexXmlParserMock

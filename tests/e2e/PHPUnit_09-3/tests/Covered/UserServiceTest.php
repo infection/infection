@@ -4,13 +4,12 @@ namespace Infection\E2ETests\PHPUnit_09_3\Tests\Covered;
 
 use Infection\E2ETests\PHPUnit_09_3\Covered\LoggerTrait;
 use Infection\E2ETests\PHPUnit_09_3\Covered\UserService;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversTrait;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversTrait(LoggerTrait::class)]
-#[CoversClass(UserService::class)]
+/**
+ * @covers Infection\E2ETests\PHPUnit_09_3\Covered\LoggerTrait
+ * @covers Infection\E2ETests\PHPUnit_09_3\Covered\UserService
+ */
 class UserServiceTest extends TestCase
 {
     private UserService $service;

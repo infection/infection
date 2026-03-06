@@ -58,8 +58,9 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\XdebugHandler;
+use Infection\Differ\Tokens;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
@@ -69,11 +70,10 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Logger\Http\StrykerCurlClient;
-use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
@@ -82,6 +82,8 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
+use Infection\Reporter\Http\StrykerCurlClient;
+use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
@@ -153,9 +155,10 @@ final class ProjectCodeProvider
         LoggerFactory::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MessageName::class,
         MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
+        MutationEvaluationWasStarted::class,
         MutatorName::class,
         NameResolverFactory::class,
         NodeMutationGenerator::class,
@@ -169,6 +172,7 @@ final class ProjectCodeProvider
         Source::class,
         StopInfectionOnSigintSignalSubscriber::class,
         StrykerCurlClient::class,
+        Tokens::class,
         TooManyReportsFound::class,
         XdebugHandler::class,
     ];

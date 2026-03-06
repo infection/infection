@@ -128,6 +128,7 @@ return RectorConfig::configure()
         ],
     )
     ->withSkip([
+        'Rector\PHPUnit\CodeQuality\Rector\ClassMethod\BareCreateMockAssignToDirectUseRector',
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
         AddInstanceofAssertForNullableInstanceRector::class,

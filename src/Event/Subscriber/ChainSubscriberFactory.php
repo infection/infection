@@ -35,30 +35,33 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 /**
  * @internal
  */
 final readonly class ChainSubscriberFactory
 {
     /**
-     * @var SubscriberFactory[]
+     * @var array<SubscriberFactory|EventSubscriber>
      */
-    private array $factories;
+    private array $subscribersAndFactories;
 
-    public function __construct(SubscriberFactory ...$factories)
-    {
-        $this->factories = $factories;
+    public function __construct(
+        SubscriberFactory|EventSubscriber ...$factories,
+    ) {
+        $this->subscribersAndFactories = $factories;
     }
 
     /**
      * @return iterable<EventSubscriber>
      */
-    public function create(OutputInterface $output): iterable
+    public function create(): iterable
     {
-        foreach ($this->factories as $factory) {
-            yield $factory->create($output);
+        foreach ($this->subscribersAndFactories as $subscriberOrFactory) {
+            if ($subscriberOrFactory instanceof EventSubscriber) {
+                yield $subscriberOrFactory;
+            } else {
+                yield $subscriberOrFactory->create();
+            }
         }
     }
 }

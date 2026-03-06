@@ -39,7 +39,7 @@ use function array_map;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
 use function Safe\getcwd;
 use function sort;

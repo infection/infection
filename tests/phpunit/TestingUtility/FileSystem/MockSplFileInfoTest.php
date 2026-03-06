@@ -82,4 +82,12 @@ final class MockSplFileInfoTest extends TestCase
         $this->assertSame('file.txt', $anotherFileInfo->getPathname());
         $this->assertSame('file', $anotherFileInfo->getRealPath());
     }
+
+    public function test_it_can_be_created_with_a_defined_pathname_and_realpath(): void
+    {
+        $fileInfo = MockSplFileInfo::create('/path/to/../file');
+
+        $this->assertSame('/path/to/../file', $fileInfo->getPathname());
+        $this->assertSame('/path/to/../file', $fileInfo->getRealPath());
+    }
 }

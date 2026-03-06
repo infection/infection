@@ -200,8 +200,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // Set up runningProcessContainers with exactly 2 items
         $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
         $runningProcessContainers->setValue($runner, [
-            0 => new IndexedMutantProcessContainer(1, $this->createMock(MutantProcessContainer::class)),
-            1 => new IndexedMutantProcessContainer(2, $this->createMock(MutantProcessContainer::class)),
+            0 => new IndexedMutantProcessContainer(1, $this->createStub(MutantProcessContainer::class)),
+            1 => new IndexedMutantProcessContainer(2, $this->createStub(MutantProcessContainer::class)),
         ]);
 
         $method = $reflection->getMethod('hasProcessesThatCouldBeFreed');
@@ -211,16 +211,16 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // When count > threadCount, both >= and > return true
         $runningProcessContainers->setValue($runner, [
-            0 => new IndexedMutantProcessContainer(1, $this->createMock(MutantProcessContainer::class)),
-            1 => new IndexedMutantProcessContainer(2, $this->createMock(MutantProcessContainer::class)),
-            2 => new IndexedMutantProcessContainer(3, $this->createMock(MutantProcessContainer::class)),
+            0 => new IndexedMutantProcessContainer(1, $this->createStub(MutantProcessContainer::class)),
+            1 => new IndexedMutantProcessContainer(2, $this->createStub(MutantProcessContainer::class)),
+            2 => new IndexedMutantProcessContainer(3, $this->createStub(MutantProcessContainer::class)),
         ]);
 
         $this->assertTrue($method->invokeArgs($runner, [2]), 'Should return true when count > threadCount');
 
         // When count < threadCount, both >= and > return false
         $runningProcessContainers->setValue($runner, [
-            0 => new IndexedMutantProcessContainer(1, $this->createMock(MutantProcessContainer::class)),
+            0 => new IndexedMutantProcessContainer(1, $this->createStub(MutantProcessContainer::class)),
         ]);
 
         $this->assertFalse($method->invokeArgs($runner, [2]), 'Should return false when count < threadCount');
@@ -443,7 +443,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
 
@@ -504,7 +504,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
 
@@ -565,7 +565,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             ),
             [],
@@ -631,7 +631,7 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             ),
             [
-                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new class($this->createStub(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
                         private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
                         private readonly Process $nextProcessMock,
@@ -673,7 +673,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
                 true,
             ),
             [],
