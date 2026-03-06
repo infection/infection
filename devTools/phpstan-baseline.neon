@@ -1033,6 +1033,12 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
+			rawMessage: 'Class PHPUnit\Framework\AssertionFailedError constructor invoked with named argument $code, but it''s not allowed because of @no-named-arguments.'
+			identifier: argument.named
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
 			rawMessage: 'Class PHPUnit\Framework\AssertionFailedError constructor invoked with named argument $previous, but it''s not allowed because of @no-named-arguments.'
 			identifier: argument.named
 			count: 1

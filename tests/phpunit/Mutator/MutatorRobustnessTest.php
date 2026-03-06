@@ -59,6 +59,8 @@ use Throwable;
 #[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-code-samples';
+
     /**
      * @var array<string, SplFileInfo>|null
      */
@@ -80,19 +82,21 @@ final class MutatorRobustnessTest extends TestCase
      */
     #[DataProvider('mutatorWithCodeCaseProvider')]
     public function test_the_mutator_does_not_crash(
-        SplFileInfo $filePath,
+        SplFileInfo $fileInfo,
         Mutator $mutator,
     ): void {
         $this->expectNotToPerformAssertions();
+
         try {
-            $this->mutatesCode($filePath, $mutator);
+            $this->mutatesCode($fileInfo, $mutator);
         } catch (Throwable $throwable) {
             throw new AssertionFailedError(
                 sprintf(
                     'The mutator "%s" could not parse the file "%s".',
                     $mutator->getName(),
-                    $filePath,
+                    $fileInfo->getRealPath(),
                 ),
+                code: $throwable->getCode(),
                 previous: $throwable,
             );
         }
@@ -126,7 +130,7 @@ final class MutatorRobustnessTest extends TestCase
         }
 
         $finder = Finder::create()
-            ->in(__DIR__ . '/../../autoloaded/mutator-code-samples')
+            ->in(self::FIXTURES_DIR)
             ->name('*.php')
             ->files()
         ;
