@@ -33,55 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Command;
+namespace Infection\Command\Option;
 
-use Exception;
-use Infection\Command\Option\CommandOption;
+use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use Infection\Tests\TestingUtility\Console\Command\TestOptionCommand;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 
-abstract class CommandOptionTestCase extends TestCase
+/**
+ * @internal
+ */
+final class DebugOption implements CommandOption
 {
-    #[DataProvider('optionProvider')]
-    public function test_it_maps_the_option(
-        InputInterface $input,
-        bool|string|Exception|null $expected,
-    ): void {
-        $commandOptionClassName = $this->getOptionClassName();
-        $io = new IO(
-            $input,
-            new NullOutput(),
+    use CannotBeInstantiated;
+
+    public const NAME = 'debug';
+
+    /**
+     * @template T of Command
+     */
+    public static function addOption(
+        Command $command,
+    ): Command {
+        return $command->addOption(
+            self::NAME,
+            null,
+            InputOption::VALUE_NONE,
+            'Will not clean up utility files from Infection temporary folder. Adds command lines to the logs and prints Initial Tests output to stdout.',
         );
-
-        TestOptionCommand::bind(
-            $commandOptionClassName,
-            $io,
-        );
-
-        if ($expected instanceof Exception) {
-            $this->expectExceptionObject($expected);
-        }
-
-        $io->getInput()->validate();
-
-        $actual = $commandOptionClassName::get($io);
-
-        if (!($expected instanceof Exception)) {
-            $this->assertSame($expected, $actual);
-        }
     }
 
-    /**
-     * @return iterable<string, array{InputInterface, mixed}>
-     */
-    abstract public static function optionProvider(): iterable;
-
-    /**
-     * @return class-string<CommandOption>
-     */
-    abstract protected function getOptionClassName(): string;
+    public static function get(IO $io): bool
+    {
+        return $io->getInput()->getOption(self::NAME);
+    }
 }
