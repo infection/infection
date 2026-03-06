@@ -47,7 +47,7 @@ use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
 
 /**
@@ -93,7 +93,7 @@ final class InitialTestRunCommand extends BaseCommand
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );
 
-        $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
+        $container->getSubscriberRegisterer()->registerSubscribers();
 
         $configuration = $container->getConfiguration();
         $initialTestsPhpOptions = self::getInitialTestsPhpOptions($configuration);

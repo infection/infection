@@ -43,6 +43,7 @@ use Infection\Command\ConfigureCommand;
 use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
+use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Config\ConsoleHelper;
@@ -151,6 +152,7 @@ final class ProjectCodeProvider
         GitDiffFilter::class,
         GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
+        InitialTestRunCommand::class,
         InvalidReportSource::class,
         LoggerFactory::class,
         Logs::class,

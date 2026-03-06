@@ -359,11 +359,11 @@ final class RunCommand extends BaseCommand
             InputOption::VALUE_NONE,
             'Runs mutation testing and does not run killer processes.',
         )->addOption(
-                self::OPTION_TEAMCITY,
-                null,
-                InputOption::VALUE_NONE,
-                'Changes the progress output to Teamcity.',
-            )
+            self::OPTION_TEAMCITY,
+            null,
+            InputOption::VALUE_NONE,
+            'Changes the progress output to Teamcity.',
+        )
         ;
     }
 
