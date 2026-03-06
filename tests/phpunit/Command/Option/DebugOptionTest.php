@@ -54,6 +54,11 @@ final class DebugOptionTest extends CommandOptionTestCase
             new StringInput('--debug'),
             true,
         ];
+
+        yield 'negative option passed' => [
+            new StringInput('--no-debug'),
+            false,
+        ];
     }
 
     protected function getOptionClassName(): string
