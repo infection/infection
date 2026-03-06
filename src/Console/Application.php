@@ -45,6 +45,7 @@ use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Command\Git\GitChangedLinesCommand;
 use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
@@ -121,6 +122,7 @@ final class Application extends BaseApplication
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
+                new InitialTestRunCommand(),
             ],
         );
     }
