@@ -33,55 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Command;
+namespace Infection\Tests\Command\Option;
 
-use Exception;
-use Infection\Command\Option\CommandOption;
-use Infection\Console\IO;
-use Infection\Tests\TestingUtility\Console\Command\TestOptionCommand;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
+use Infection\Command\Option\DebugOption;
+use Infection\Tests\Command\CommandOptionTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Component\Console\Input\StringInput;
 
-abstract class CommandOptionTestCase extends TestCase
+#[CoversClass(DebugOption::class)]
+final class DebugOptionTest extends CommandOptionTestCase
 {
-    #[DataProvider('optionProvider')]
-    public function test_it_maps_the_option(
-        InputInterface $input,
-        bool|string|Exception|null $expected,
-    ): void {
-        $commandOptionClassName = $this->getOptionClassName();
-        $io = new IO(
-            $input,
-            new NullOutput(),
-        );
+    public static function optionProvider(): iterable
+    {
+        yield 'no option' => [
+            new StringInput(''),
+            false,
+        ];
 
-        TestOptionCommand::bind(
-            $commandOptionClassName,
-            $io,
-        );
-
-        if ($expected instanceof Exception) {
-            $this->expectExceptionObject($expected);
-        }
-
-        $io->getInput()->validate();
-
-        $actual = $commandOptionClassName::get($io);
-
-        if (!($expected instanceof Exception)) {
-            $this->assertSame($expected, $actual);
-        }
+        yield 'option passed' => [
+            new StringInput('--debug'),
+            true,
+        ];
     }
 
-    /**
-     * @return iterable<string, array{InputInterface, mixed}>
-     */
-    abstract public static function optionProvider(): iterable;
-
-    /**
-     * @return class-string<CommandOption>
-     */
-    abstract protected function getOptionClassName(): string;
+    protected function getOptionClassName(): string
+    {
+        return DebugOption::class;
+    }
 }
