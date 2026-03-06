@@ -137,6 +137,10 @@ final class InitialTestRunCommand extends BaseCommand
      */
     private static function getInitialTestsPhpOptions(Configuration $configuration): array
     {
+        // Copied from Engine::getInitialTestsPhpOptionsArray
+        // The implementation looks a bit weird (will return [''] for an empty string),
+        // and the engine may not be the place where this should be done either...
+        // But to address at a later stage.
         return explode(' ', (string) $configuration->initialTestsPhpOptions);
     }
 }
