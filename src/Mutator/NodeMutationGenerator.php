@@ -39,6 +39,7 @@ use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
@@ -93,6 +94,10 @@ class NodeMutationGenerator
      */
     public function generate(Node $node): iterable
     {
+        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
+            return;
+        }
+
         $this->currentNode = $node;
         $this->testsMemoized = null;
 

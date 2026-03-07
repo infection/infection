@@ -233,7 +233,7 @@ final class FileMutationGeneratorTest extends TestCase
                 ->willReturn($originalFileTokens);
 
             $this->traverserFactoryMock
-                ->method('createPreTraverser')
+                ->method('createEnrichmentTraverser')
                 ->willReturn($traverserStub);
         } else {
             $this->phpParserMock
@@ -242,7 +242,7 @@ final class FileMutationGeneratorTest extends TestCase
 
             $this->traverserFactoryMock
                 ->expects($this->never())
-                ->method('createPreTraverser')
+                ->method('createEnrichmentTraverser')
                 ->willReturn($traverserStub);
         }
 

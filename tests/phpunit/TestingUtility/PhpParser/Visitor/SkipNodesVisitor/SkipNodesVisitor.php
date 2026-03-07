@@ -33,58 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\SkipNodesVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
-use Infection\PhpParser\Visitor\NameResolverFactory;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
+use function in_array;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use SplObjectStorage;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * @internal
- * @final
+ * Utility visitor which allows stopping the traverse when one of the specified nodes is encountered.
  */
-class NodeTraverserFactory
+final class SkipNodesVisitor extends NodeVisitorAbstract
 {
+    public const DEFAULT_STOP_TRAVERSE_TYPE = self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+
     /**
-     * @see /doc/nomenclature.md#ast-enrichment
+     * @param list<int> $nodeIds
+     * @param NodeVisitor::DONT_TRAVERSE_CHILDREN|NodeVisitor::STOP_TRAVERSAL|NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN $stopTraverseType
      */
-    public function createEnrichmentTraverser(): NodeTraverserInterface
-    {
-        $changingIgnorer = new ChangingIgnorer();
-
-        $nodeIgnorers = [
-            $changingIgnorer,
-            new InterfaceIgnorer(),
-            new AbstractMethodIgnorer(),
-        ];
-
-        return new NodeTraverser(
-            new NextConnectingVisitor(),
-            new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
-            new NonMutableNodesIgnorerVisitor($nodeIgnorers),
-            NameResolverFactory::create(),
-            new ParentConnectingVisitor(),
-            new ReflectionVisitor(),
-            new LabelNodesAsEligibleVisitor(),
-        );
+    public function __construct(
+        private readonly array $nodeIds,
+        private readonly int $stopTraverseType = self::DEFAULT_STOP_TRAVERSE_TYPE,
+    ) {
     }
 
-    public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
+    public function enterNode(Node $node): ?int
     {
-        return new NodeTraverser(
-            new NodeVisitor\CloningVisitor(),
-            $mutationVisitor,
-        );
+        return $this->isSkippedNode($node)
+            ? $this->stopTraverseType
+            : null;
+    }
+
+    private function isSkippedNode(Node $node): bool
+    {
+        $id = AddIdToTraversedNodesVisitor::getNodeId($node);
+
+        return in_array($id, $this->nodeIds, true);
     }
 }
