@@ -33,9 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\Tests\PhpParser\NodeDumper\NodeDumper;
 
 use Exception;
+use Infection\PhpParser\NodeDumper\NodeDumper;
+use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
