@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\VisitorCollectorIntegration;
+namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
@@ -48,7 +48,7 @@ use function Safe\file_get_contents;
  */
 #[Group('integration')]
 #[CoversNothing]
-final class VisitorCollectorIntegrationTest extends VisitorTestCase
+final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
