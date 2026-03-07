@@ -33,32 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-use PhpParser\Node\Expr\Variable;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use function spl_object_id;
-use function sprintf;
-
-#[CoversClass(PotentialCircularDependencyDetected::class)]
-final class PotentialCircularDependencyDetectedTest extends TestCase
+function equals(mixed $left, mixed $right): bool
 {
-    public function test_it_can_create_an_instance_for_an_attribute(): void
-    {
-        $node = new Variable('x');
+    return $left === $right;
+}
 
-        $exception = PotentialCircularDependencyDetected::forAttribute(
-            'next',
-            $node,
-        );
-
-        $this->assertSame(
-            sprintf(
-                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
-                spl_object_id($node),
-            ),
-            $exception->getMessage(),
-        );
-    }
+function identical(mixed $left, mixed $right): bool
+{
+    return $left === $right;
 }
