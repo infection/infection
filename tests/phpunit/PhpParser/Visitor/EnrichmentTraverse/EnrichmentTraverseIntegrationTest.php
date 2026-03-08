@@ -80,7 +80,34 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
             file_get_contents(self::FIXTURES_DIR . '/TwoAdditions.php'),
             <<<'AST'
                 array(
-                    0: <skipped>
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(2)
+                                )
+                                value: Scalar_Int(
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(3)
+                                )
+                                nodeId: 1
+                                parent: nodeId(0)
+                                eligible: true
+                                origNode: nodeId(1)
+                            )
+                        )
+                        nodeId: 0
+                        eligible: true
+                        next: nodeId(4)
+                        origNode: nodeId(0)
+                    )
                     1: Stmt_Namespace(
                         name: Name(
                             nodeId: 5
@@ -617,10 +644,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\NullReflection
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(19)
+                                            mutationCandidate: true
                                         )
                                         params: array(
                                             0: Param(
@@ -631,10 +659,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(21)
+                                                    mutationCandidate: true
                                                 )
                                                 var: Expr_Variable(
                                                     nodeId: 22
@@ -643,10 +672,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(22)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 20
                                                 parent: nodeId(18)
@@ -654,10 +684,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
                                                 functionScope: nodeId(18)
-                                                reflectionClass: Infection\Reflection\NullReflection
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: concreteMethod
                                                 eligible: true
                                                 origNode: nodeId(20)
+                                                mutationCandidate: true
                                             )
                                         )
                                         returnType: Identifier(
@@ -666,19 +697,21 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\NullReflection
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(23)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 18
                                         parent: nodeId(6)
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\NullReflection
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: concreteMethod
                                         eligible: true
                                         origNode: nodeId(18)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 6
@@ -905,6 +938,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(15)
+                                            mutationCandidate: true
                                         )
                                         params: array(
                                             0: Param(
@@ -919,6 +953,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(17)
+                                                    mutationCandidate: true
                                                 )
                                                 var: Expr_Variable(
                                                     nodeId: 18
@@ -931,6 +966,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(18)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 16
                                                 parent: nodeId(14)
@@ -942,6 +978,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 functionName: concreteMethod
                                                 eligible: true
                                                 origNode: nodeId(16)
+                                                mutationCandidate: true
                                             )
                                         )
                                         returnType: Identifier(
@@ -954,6 +991,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(19)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 14
                                         parent: nodeId(8)
@@ -963,6 +1001,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: concreteMethod
                                         eligible: true
                                         origNode: nodeId(14)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 8
@@ -1108,6 +1147,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(21)
+                                            mutationCandidate: true
                                         )
                                         params: array(
                                             0: Param(
@@ -1122,6 +1162,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(23)
+                                                    mutationCandidate: true
                                                 )
                                                 var: Expr_Variable(
                                                     nodeId: 24
@@ -1134,6 +1175,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(24)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 22
                                                 parent: nodeId(20)
@@ -1145,6 +1187,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 functionName: concreteMethod
                                                 eligible: true
                                                 origNode: nodeId(22)
+                                                mutationCandidate: true
                                             )
                                         )
                                         returnType: Identifier(
@@ -1157,6 +1200,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(25)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 20
                                         parent: nodeId(8)
@@ -1166,6 +1210,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: concreteMethod
                                         eligible: true
                                         origNode: nodeId(20)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 8

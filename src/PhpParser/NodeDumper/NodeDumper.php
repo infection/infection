@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\NodeDumper;
 
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use function get_debug_type;
 use function implode;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;

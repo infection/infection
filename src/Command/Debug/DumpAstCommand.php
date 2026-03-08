@@ -46,14 +46,13 @@ use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use SplFileObject;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\InputOption;
 use function sprintf;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use function trim;
 use Webmozart\Assert\Assert;
-use function var_dump;
 
 /**
  * @internal
