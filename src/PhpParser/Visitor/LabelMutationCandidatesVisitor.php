@@ -75,9 +75,14 @@ final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    private static function markAsAMutationCandidate(Node $node): void
+    public static function markAsAMutationCandidate(Node $node): void
     {
         $node->setAttribute(self::MUTATION_CANDIDATE, true);
+    }
+
+    public static function isAMutationCandidate(Node $node): bool
+    {
+        return $node->hasAttribute(self::MUTATION_CANDIDATE);
     }
 
     private function isOnFunctionSignature(Node $node): bool
