@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
-use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -65,7 +65,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $traverserFactory->createEnrichmentTraverser()->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
-                new MarkTraversedNodesAsVisitedVisitor(),
+                new LabelMutationCandidatesVisitor(),
             )
             ->traverse($nodes);
 
@@ -135,6 +135,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: first
                                             eligible: true
                                             origNode: nodeId(9)
+                                            mutationCandidate: true
                                         )
                                         returnType: Identifier(
                                             nodeId: 10
@@ -146,6 +147,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: first
                                             eligible: true
                                             origNode: nodeId(10)
+                                            mutationCandidate: true
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -162,6 +164,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: first
                                                         eligible: true
                                                         origNode: nodeId(13)
+                                                        mutationCandidate: true
                                                     )
                                                     right: Scalar_Int(
                                                         rawValue: 2
@@ -175,6 +178,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: first
                                                         eligible: true
                                                         origNode: nodeId(14)
+                                                        mutationCandidate: true
                                                     )
                                                     nodeId: 12
                                                     parent: nodeId(11)
@@ -185,6 +189,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: first
                                                     eligible: true
                                                     origNode: nodeId(12)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 11
                                                 parent: nodeId(8)
@@ -195,6 +200,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 functionName: first
                                                 eligible: true
                                                 origNode: nodeId(11)
+                                                mutationCandidate: true
                                             )
                                         )
                                         nodeId: 8
@@ -205,6 +211,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: first
                                         eligible: true
                                         origNode: nodeId(8)
+                                        mutationCandidate: true
                                     )
                                     1: Stmt_ClassMethod(
                                         name: Identifier(
@@ -217,6 +224,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: second
                                             eligible: true
                                             origNode: nodeId(16)
+                                            mutationCandidate: true
                                         )
                                         returnType: Identifier(
                                             nodeId: 17
@@ -228,6 +236,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: second
                                             eligible: true
                                             origNode: nodeId(17)
+                                            mutationCandidate: true
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -244,6 +253,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: second
                                                         eligible: true
                                                         origNode: nodeId(20)
+                                                        mutationCandidate: true
                                                     )
                                                     right: Scalar_Int(
                                                         rawValue: 2
@@ -257,6 +267,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: second
                                                         eligible: true
                                                         origNode: nodeId(21)
+                                                        mutationCandidate: true
                                                     )
                                                     nodeId: 19
                                                     parent: nodeId(18)
@@ -267,6 +278,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: second
                                                     eligible: true
                                                     origNode: nodeId(19)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 18
                                                 parent: nodeId(15)
@@ -277,6 +289,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 functionName: second
                                                 eligible: true
                                                 origNode: nodeId(18)
+                                                mutationCandidate: true
                                             )
                                         )
                                         nodeId: 15
@@ -287,6 +300,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: second
                                         eligible: true
                                         origNode: nodeId(15)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 6
