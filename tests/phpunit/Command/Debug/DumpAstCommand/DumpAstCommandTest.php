@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Command\Debug\DumpAstCommand;
 
 use Infection\Command\Debug\DumpAstCommand;
-use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
 use Infection\Container\Container;
-use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -166,11 +164,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
     private function createCommandTester(): CommandTester
     {
-        $container = Container::create()
-            ->cloneWithService(
-                SchemaConfiguration::class,
-                SchemaConfigurationBuilder::withMinimalTestData()->build(),
-            );
+        $container = Container::create();
 
         $application = new Application($container);
 
