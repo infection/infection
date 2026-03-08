@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\PhpParser\NodeDumper;
 
 use function get_debug_type;
 use function implode;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;
 use function is_float;
@@ -67,6 +67,8 @@ use function substr;
 use Webmozart\Assert\Assert;
 
 /**
+ * @internal
+ *
  * This NodeDumper is taken after the PhpParser one. It has been copied and adapted to our needs. But unless
  * we reach the point where we have so much more custom code that it's better to rewrite it our way, it is better
  * to keep it as close to the original as possible.

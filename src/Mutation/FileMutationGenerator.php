@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Command\Debug\DumpAstCommand;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -139,6 +140,10 @@ class FileMutationGenerator
     }
 
     /**
+     * Copy/pasted to DumpAstCommand.
+     *
+     * @see DumpAstCommand
+     *
      * @throws UnparsableFile
      *
      * @return array{Stmt[], Token[]}

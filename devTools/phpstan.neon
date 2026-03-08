@@ -175,10 +175,18 @@ parameters:
         # This class is copy/pasted from PhpParser so we don't want to change it too much
         -
             identifier: if.condNotBoolean
-            path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
         -
             identifier: booleanAnd.rightNotBoolean
-            path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
+        -
+            rawMessage: Variable property access on PhpParser\Node.
+            identifier: property.dynamicName
+            count: 1
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
+        -
+            rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
 
         # False-positives
         -
@@ -197,6 +205,7 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
         - ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
