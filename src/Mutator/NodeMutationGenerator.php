@@ -101,12 +101,6 @@ class NodeMutationGenerator
         $this->currentNode = $node;
         $this->testsMemoized = null;
 
-        if (!$this->isOnFunctionSignature()
-            && !$this->isInsideFunction()
-        ) {
-            return;
-        }
-
         /** @psalm-suppress InvalidArgument */
         if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return;
@@ -166,11 +160,6 @@ class NodeMutationGenerator
     private function isOnFunctionSignature(): bool
     {
         return $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-    }
-
-    private function isInsideFunction(): bool
-    {
-        return $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 
     /**

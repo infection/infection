@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\PhpParser\Visitor\ExcludeNonMutableCode;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -76,6 +77,7 @@ class NodeTraverserFactory
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
+            new ExcludeNonMutableCode(),
             new LabelNodesAsEligibleVisitor(),
         );
     }

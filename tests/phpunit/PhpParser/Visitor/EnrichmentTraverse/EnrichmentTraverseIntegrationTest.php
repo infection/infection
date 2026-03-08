@@ -86,7 +86,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -94,17 +94,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -112,7 +112,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -120,7 +120,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(7)
                                 )
                                 stmts: array(
@@ -305,13 +305,13 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(6)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )
@@ -329,7 +329,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -337,17 +337,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -355,7 +355,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -363,7 +363,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(7)
                                 )
                                 params: array(
@@ -371,43 +371,43 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         type: Identifier(
                                             nodeId: 9
                                             parent: nodeId(8)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(9)
                                         )
                                         var: Expr_Variable(
                                             nodeId: 10
                                             parent: nodeId(8)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(10)
                                         )
                                         nodeId: 8
                                         parent: nodeId(6)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(8)
                                     )
                                     1: Param(
                                         type: Identifier(
                                             nodeId: 12
                                             parent: nodeId(11)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(12)
                                         )
                                         var: Expr_Variable(
                                             nodeId: 13
                                             parent: nodeId(11)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(13)
                                         )
                                         nodeId: 11
                                         parent: nodeId(6)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(11)
                                     )
                                 )
                                 returnType: Identifier(
                                     nodeId: 14
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(14)
                                 )
                                 stmts: array(
@@ -416,37 +416,37 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             left: Expr_Variable(
                                                 nodeId: 17
                                                 parent: nodeId(16)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(17)
                                             )
                                             right: Expr_Variable(
                                                 nodeId: 18
                                                 parent: nodeId(16)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(18)
                                             )
                                             nodeId: 16
                                             parent: nodeId(15)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(16)
                                         )
                                         nodeId: 15
                                         parent: nodeId(6)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(15)
                                     )
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
                                 isStrictTypes: true
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(6)
                             )
                             1: Stmt_Function(
                                 name: Identifier(
                                     nodeId: 20
                                     parent: nodeId(19)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(20)
                                 )
                                 params: array(
@@ -454,43 +454,43 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         type: Identifier(
                                             nodeId: 22
                                             parent: nodeId(21)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(22)
                                         )
                                         var: Expr_Variable(
                                             nodeId: 23
                                             parent: nodeId(21)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(23)
                                         )
                                         nodeId: 21
                                         parent: nodeId(19)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(21)
                                     )
                                     1: Param(
                                         type: Identifier(
                                             nodeId: 25
                                             parent: nodeId(24)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(25)
                                         )
                                         var: Expr_Variable(
                                             nodeId: 26
                                             parent: nodeId(24)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(26)
                                         )
                                         nodeId: 24
                                         parent: nodeId(19)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(24)
                                     )
                                 )
                                 returnType: Identifier(
                                     nodeId: 27
                                     parent: nodeId(19)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(27)
                                 )
                                 stmts: array(
@@ -499,36 +499,36 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             left: Expr_Variable(
                                                 nodeId: 30
                                                 parent: nodeId(29)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(30)
                                             )
                                             right: Expr_Variable(
                                                 nodeId: 31
                                                 parent: nodeId(29)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(31)
                                             )
                                             nodeId: 29
                                             parent: nodeId(28)
-                                            eligible: true
+                                            eligible: false
                                             origNode: nodeId(29)
                                         )
                                         nodeId: 28
                                         parent: nodeId(19)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(28)
                                     )
                                 )
                                 nodeId: 19
                                 parent: nodeId(4)
                                 isStrictTypes: true
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(19)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         origNode: nodeId(4)
                     )
                 )
@@ -545,7 +545,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -553,17 +553,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -571,7 +571,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -579,7 +579,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(7)
                                 )
                                 stmts: array(
@@ -589,7 +589,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 name: Identifier(
                                                     nodeId: 10
                                                     parent: nodeId(9)
-                                                    eligible: true
+                                                    eligible: false
                                                     origNode: nodeId(10)
                                                 )
                                                 value: Scalar_String(
@@ -597,18 +597,18 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     rawValue: ''
                                                     nodeId: 11
                                                     parent: nodeId(9)
-                                                    eligible: true
+                                                    eligible: false
                                                     origNode: nodeId(11)
                                                 )
                                                 nodeId: 9
                                                 parent: nodeId(8)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(9)
                                             )
                                         )
                                         nodeId: 8
                                         parent: nodeId(6)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(8)
                                     )
                                     1: Stmt_ClassMethod(
@@ -644,7 +644,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            reflectionClass: Infection\Reflection\NullReflection
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(19)
@@ -659,7 +659,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    reflectionClass: Infection\Reflection\NullReflection
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(21)
@@ -672,7 +672,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    reflectionClass: Infection\Reflection\NullReflection
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(22)
@@ -684,7 +684,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
                                                 functionScope: nodeId(18)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                reflectionClass: Infection\Reflection\NullReflection
                                                 functionName: concreteMethod
                                                 eligible: true
                                                 origNode: nodeId(20)
@@ -697,7 +697,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            reflectionClass: Infection\Reflection\NullReflection
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(23)
@@ -707,7 +707,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         parent: nodeId(6)
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        reflectionClass: Infection\Reflection\NullReflection
                                         functionName: concreteMethod
                                         eligible: true
                                         origNode: nodeId(18)
@@ -716,14 +716,14 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 next: nodeId(8)
                                 origNode: nodeId(6)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )
@@ -741,7 +741,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -749,17 +749,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -767,7 +767,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -830,7 +830,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )
@@ -848,7 +848,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -856,17 +856,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -874,7 +874,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -882,12 +882,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(7)
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 next: nodeId(8)
                                 origNode: nodeId(6)
                             )
@@ -895,7 +895,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 9
                                     parent: nodeId(8)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(9)
                                 )
                                 stmts: array(
@@ -905,7 +905,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 name: Identifier(
                                                     nodeId: 12
                                                     parent: nodeId(11)
-                                                    eligible: true
+                                                    eligible: false
                                                     origNode: nodeId(12)
                                                 )
                                                 value: Scalar_String(
@@ -913,18 +913,18 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     rawValue: ''
                                                     nodeId: 13
                                                     parent: nodeId(11)
-                                                    eligible: true
+                                                    eligible: false
                                                     origNode: nodeId(13)
                                                 )
                                                 nodeId: 11
                                                 parent: nodeId(10)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(11)
                                             )
                                         )
                                         nodeId: 10
                                         parent: nodeId(8)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(10)
                                     )
                                     1: Stmt_ClassMethod(
@@ -1006,14 +1006,14 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 nodeId: 8
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 next: nodeId(10)
                                 origNode: nodeId(8)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )
@@ -1031,7 +1031,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -1039,17 +1039,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -1057,7 +1057,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -1065,12 +1065,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(7)
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 next: nodeId(8)
                                 origNode: nodeId(6)
                             )
@@ -1078,7 +1078,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 name: Identifier(
                                     nodeId: 9
                                     parent: nodeId(8)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(9)
                                 )
                                 stmts: array(
@@ -1088,7 +1088,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 name: Identifier(
                                                     nodeId: 12
                                                     parent: nodeId(11)
-                                                    eligible: true
+                                                    eligible: false
                                                     origNode: nodeId(12)
                                                 )
                                                 value: Scalar_String(
@@ -1096,18 +1096,18 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     rawValue: ''
                                                     nodeId: 13
                                                     parent: nodeId(11)
-                                                    eligible: true
+                                                    eligible: false
                                                     origNode: nodeId(13)
                                                 )
                                                 nodeId: 11
                                                 parent: nodeId(10)
-                                                eligible: true
+                                                eligible: false
                                                 origNode: nodeId(11)
                                             )
                                         )
                                         nodeId: 10
                                         parent: nodeId(8)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(10)
                                     )
                                     1: Stmt_ClassMethod(
@@ -1215,14 +1215,14 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 nodeId: 8
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 next: nodeId(10)
                                 origNode: nodeId(8)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )
