@@ -66,7 +66,6 @@ class FileMutationGenerator
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
     ) {
@@ -127,7 +126,6 @@ class FileMutationGenerator
                 trace: $trace,
                 onlyCovered: $onlyCovered,
                 lineRangeCalculator: $this->lineRangeCalculator,
-                sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $this->fileStore->getContents($sourceFile),
             ),
@@ -152,7 +150,7 @@ class FileMutationGenerator
     {
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        $traverser = $this->traverserFactory->createEnrichmentTraverser();
+        $traverser = $this->traverserFactory->createEnrichmentTraverser($sourceFile);
         $traverser->traverse($initialStatements);
 
         return [$initialStatements, $originalFileTokens];

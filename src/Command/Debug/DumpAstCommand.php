@@ -36,7 +36,10 @@ declare(strict_types=1);
 namespace Infection\Command\Debug;
 
 use Infection\Command\BaseCommand;
+use Infection\Command\Git\Option\BaseOption;
+use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\FileSystem\FileSystem;
@@ -94,6 +97,8 @@ final class DumpAstCommand extends BaseCommand
         );
 
         ConfigurationOption::addOption($this);
+        SourceFilterOptions::addOption($this);
+        BaseOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool
@@ -110,10 +115,15 @@ final class DumpAstCommand extends BaseCommand
                 logger: $logger,
                 output: $io->getOutput(),
                 configFile: $configFile,
+                sourceFilter: SourceFilterOptions::get($io),
             );
 
         $nodes = $this->createAst($container, $file);
 
+        $io->getFormatter()->setStyle(
+            'eligible',
+            new OutputFormatterStyle(background: 'green'),
+        );
         $io->getFormatter()->setStyle(
             'mutation-candidate',
             new OutputFormatterStyle(background: 'red'),
@@ -147,7 +157,7 @@ final class DumpAstCommand extends BaseCommand
         self::addIdsToNodes($initialStatements);
 
         $traverserFactory
-            ->createEnrichmentTraverser()
+            ->createEnrichmentTraverser($file)
             ->traverse($initialStatements);
 
         return $traverserFactory

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
@@ -68,7 +69,9 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
     {
-        $traverser = $this->factory->createEnrichmentTraverser();
+        $traverser = $this->factory->createEnrichmentTraverser(
+            new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
+        );
 
         $this->assertTraverserVisitorsAre(
             $traverser,

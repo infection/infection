@@ -245,16 +245,17 @@ abstract class BaseMutatorTestCase extends TestCase
                 ),
                 onlyCovered: false,
                 lineRangeCalculator: new LineRangeCalculator(),
-                sourceLineMatcher: new NullSourceLineMatcher(),
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $code,
             ),
         );
 
-        $factory = new NodeTraverserFactory();
+        $factory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
         $factory
-            ->createEnrichmentTraverser()
+            ->createEnrichmentTraverser(
+                new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
+            )
             ->traverse($nodes);
 
         $factory

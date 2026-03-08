@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\NodeDumper;
 
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use function get_debug_type;
 use function implode;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
@@ -308,6 +309,7 @@ final class NodeDumper
                 return;
             }
 
+            $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
             $isMutationCandidate = LabelMutationCandidatesVisitor::isAMutationCandidate($node);
 
             $result .= $isMutationCandidate && $this->highlightMutationCandidates

@@ -92,7 +92,6 @@ final class FileMutationGeneratorTest extends TestCase
             ),
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
-            $this->createStub(SourceLineMatcher::class),
             $this->tracerMock,
             new FileStore($fileSystemStub),
         );
