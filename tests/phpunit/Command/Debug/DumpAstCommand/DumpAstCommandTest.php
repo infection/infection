@@ -85,26 +85,41 @@ final class DumpAstCommandTest extends FileSystemTestCase
                     next: nodeId(4)
                     origNode: nodeId(0)
                 )
-                1: Stmt_Interface(
-                    name: Identifier(
+                1: Stmt_Namespace(
+                    name: Name(
                         nodeId: 5
+                        parent: nodeId(4)
+                        eligible: true
                         origNode: nodeId(5)
                     )
                     stmts: array(
-                        0: Stmt_ClassMethod(
+                        0: Stmt_Interface(
                             name: Identifier(
                                 nodeId: 7
                                 origNode: nodeId(7)
                             )
-                            returnType: Identifier(
-                                nodeId: 8
-                                origNode: nodeId(8)
+                            stmts: array(
+                                0: Stmt_ClassMethod(
+                                    name: Identifier(
+                                        nodeId: 9
+                                        origNode: nodeId(9)
+                                    )
+                                    returnType: Identifier(
+                                        nodeId: 10
+                                        origNode: nodeId(10)
+                                    )
+                                    nodeId: 8
+                                    origNode: nodeId(8)
+                                )
                             )
                             nodeId: 6
                             origNode: nodeId(6)
                         )
                     )
+                    kind: 1
                     nodeId: 4
+                    eligible: true
+                    next: nodeId(6)
                     origNode: nodeId(4)
                 )
             )
