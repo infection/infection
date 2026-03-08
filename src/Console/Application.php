@@ -115,7 +115,7 @@ final class Application extends BaseApplication
             [
                 new ConfigureCommand(),
                 new MockTeamCityCommand($fileSystem),
-                new DumpAstCommand($fileSystem),
+                new DumpAstCommand(),
                 new GitBaseReferenceCommand(),
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),

@@ -246,6 +246,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         }
 
         // TODO: check against interfaces
+        // TODO: handle the trait case properly
+        if ($node instanceof Node\Stmt\Trait_) {
+            return new NullReflection();
+        }
+
         Assert::isInstanceOf($node, Node\Stmt\Class_::class);
         $extends = $node->extends;
 
