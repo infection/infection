@@ -8,7 +8,7 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-final class ExcludeUnchangedLines extends NodeVisitorAbstract
+final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
 {
     public function __construct(
         private readonly SourceLineMatcher $sourceLineMatcher,

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
-use Infection\PhpParser\Visitor\ExcludeNonMutableCode;
-use Infection\PhpParser\Visitor\ExcludeUnchangedLines;
+use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -85,8 +85,8 @@ class NodeTraverserFactory
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
-            new ExcludeNonMutableCode(),
-            new ExcludeUnchangedLines(
+            new ExcludeNonMutableCodeVisitor(),
+            new ExcludeUnchangedLinesVisitor(
                 $this->sourceLineMatcher,
                 $sourceFile->getRealPath(),
             ),

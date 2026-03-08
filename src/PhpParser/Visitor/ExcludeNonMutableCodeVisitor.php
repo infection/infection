@@ -7,7 +7,7 @@ namespace Infection\PhpParser\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-final class ExcludeNonMutableCode extends NodeVisitorAbstract
+final class ExcludeNonMutableCodeVisitor extends NodeVisitorAbstract
 {
     public function enterNode(Node $node): null
     {
