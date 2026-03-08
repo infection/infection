@@ -80,34 +80,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
             file_get_contents(self::FIXTURES_DIR . '/TwoAdditions.php'),
             <<<'AST'
                 array(
-                    0: Stmt_Declare(
-                        declares: array(
-                            0: DeclareItem(
-                                key: Identifier(
-                                    nodeId: 2
-                                    parent: nodeId(1)
-                                    eligible: true
-                                    origNode: nodeId(2)
-                                )
-                                value: Scalar_Int(
-                                    rawValue: 1
-                                    kind: KIND_DEC (10)
-                                    nodeId: 3
-                                    parent: nodeId(1)
-                                    eligible: true
-                                    origNode: nodeId(3)
-                                )
-                                nodeId: 1
-                                parent: nodeId(0)
-                                eligible: true
-                                origNode: nodeId(1)
-                            )
-                        )
-                        nodeId: 0
-                        eligible: true
-                        next: nodeId(4)
-                        origNode: nodeId(0)
-                    )
+                    0: <skipped>
                     1: Stmt_Namespace(
                         name: Name(
                             nodeId: 5

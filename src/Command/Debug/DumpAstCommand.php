@@ -40,12 +40,14 @@ use Infection\Command\Option\ConfigurationOption;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Logger\Console\ConsoleLogger;
+use Infection\PhpParser\Visitor\FakeMutationGeneratorVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use SplFileObject;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -56,6 +58,7 @@ use Webmozart\Assert\Assert;
 final class DumpAstCommand extends BaseCommand
 {
     private const FILE_PATH_ARGUMENT = 'file';
+    private const SHOW_SKIPPED_NODES_OPTION = 'show-skipped';
 
     public function __construct()
     {
@@ -101,22 +104,10 @@ final class DumpAstCommand extends BaseCommand
         $nodes = $this->createAst($container, $file);
 
         $io->writeln(
-            $container->getNodeDumper()->dump($nodes),
+            $container->getNodeDumper()->dump($nodes, onlyVisitedNodes: false),
         );
 
         return true;
-    }
-
-    /**
-     * @return Node[]
-     */
-    private function parse(
-        Container $container,
-        SplFileObject $file,
-    ): array {
-        [$initialStatements] = $container->getFileParser()->parse($file);
-
-        return $initialStatements;
     }
 
     /**
