@@ -134,4 +134,13 @@ interface Git
      * @return non-empty-string
      */
     public function getBaseReference(string $base): string;
+
+    /**
+     * Gets the absolute path to the root directory of the current git repository.
+     *
+     * For example, if your repo is at `/home/user/projects/my-app` and you
+     * execute this method from the working directory `/home/user/projects/my-app/src/components`,
+     * it will output `/home/user/projects/my-app`.
+     */
+    public function getProjectDirectory(): string;
 }

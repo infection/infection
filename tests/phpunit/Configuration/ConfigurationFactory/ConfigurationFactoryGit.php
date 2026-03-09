@@ -37,6 +37,7 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use DomainException;
 use Infection\Git\Git;
+use Infection\Tests\UnsupportedMethod;
 use function sprintf;
 
 final readonly class ConfigurationFactoryGit implements Git
@@ -73,5 +74,10 @@ final readonly class ConfigurationFactoryGit implements Git
     public function getBaseReference(string $base): string
     {
         return sprintf('reference(%s)', $base);
+    }
+
+    public function getProjectDirectory(): string
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

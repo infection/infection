@@ -149,6 +149,22 @@ final readonly class CommandLineGit implements Git
         return $base;
     }
 
+    public function getProjectDirectory(): string
+    {
+        // An error here should really not happen, so we are fine to let it
+        // bubble up instead of throwing a dedicated exception or providing a
+        // fallback.
+        $directory = $this->shellCommandLineExecutor->execute([
+            'git',
+            'rev-parse',
+            '--show-toplevel',
+        ]);
+
+        Assert::stringNotEmpty($directory);
+
+        return $directory;
+    }
+
     /**
      * @param string[] $lines
      *

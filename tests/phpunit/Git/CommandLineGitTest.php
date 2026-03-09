@@ -666,4 +666,18 @@ final class CommandLineGitTest extends TestCase
             Git::FALLBACK_BASE,
         ];
     }
+
+    public function test_it_gets_the_project_directory(): void
+    {
+        $expected = '/path/to/project';
+
+        $this->commandLineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($expected);
+
+        $actual = $this->git->getProjectDirectory();
+
+        $this->assertSame($expected, $actual);
+    }
 }
