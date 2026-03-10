@@ -470,7 +470,7 @@ final class Container extends DIContainer
                     $config->mutateOnlyCoveredCode(),
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
-                    $config->loggerProjectRootDirectory,
+                    $config->projectDirectory,
                     $config->processTimeout,
                 );
             },
@@ -646,7 +646,7 @@ final class Container extends DIContainer
 
     /**
      * @param non-empty-string|null $configFile
-     * @param non-empty-string|null $loggerProjectRootDirectory Absolute path.
+     * @param non-empty-string|null $projectDirectory Absolute path.
      */
     public function withValues(
         LoggerInterface $logger,
@@ -683,7 +683,7 @@ final class Container extends DIContainer
         bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
         bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-        ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
+        ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
     ): self {
@@ -762,7 +762,7 @@ final class Container extends DIContainer
                 useNoopMutators: $useNoopMutators,
                 executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
                 mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-                loggerProjectRootDirectory: $loggerProjectRootDirectory,
+                projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
             ),

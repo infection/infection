@@ -42,7 +42,7 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 final class ConfigurationFactoryInputBuilder
 {
     /**
-     * @param non-empty-string|null $loggerProjectRootDirectory
+     * @param non-empty-string|null $projectDirectory
      */
     public function __construct(
         private ?string $existingCoveragePath,
@@ -74,7 +74,7 @@ final class ConfigurationFactoryInputBuilder
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
-        private ?string $loggerProjectRootDirectory,
+        private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
     ) {
@@ -313,12 +313,12 @@ final class ConfigurationFactoryInputBuilder
     }
 
     /**
-     * @param non-empty-string|null $loggerProjectRootDirectory
+     * @param non-empty-string|null $projectDirectory
      */
-    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    public function withProjectDirectory(?string $projectDirectory): self
     {
         $clone = clone $this;
-        $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;
+        $clone->projectDirectory = $projectDirectory;
 
         return $clone;
     }
@@ -409,7 +409,7 @@ final class ConfigurationFactoryInputBuilder
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,
-            $this->loggerProjectRootDirectory,
+            $this->projectDirectory,
             $this->staticAnalysisTool,
             $this->mutantId,
         ];

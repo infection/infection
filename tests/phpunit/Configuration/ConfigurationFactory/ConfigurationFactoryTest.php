@@ -179,7 +179,7 @@ final class ConfigurationFactoryTest extends TestCase
                 useNoopMutators: false,
                 executeOnlyCoveringTestCases: false,
                 mapSourceClassToTestStrategy: null,
-                loggerProjectRootDirectory: null,
+                projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
             )
@@ -246,7 +246,7 @@ final class ConfigurationFactoryTest extends TestCase
             useNoopMutators: false,
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: null,
+            projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
         );
@@ -284,7 +284,7 @@ final class ConfigurationFactoryTest extends TestCase
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: self::CI_PROJECT_DIRECTORY,
+            projectDirectory: self::CI_PROJECT_DIRECTORY,
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
@@ -1256,7 +1256,7 @@ final class ConfigurationFactoryTest extends TestCase
                     useNoopMutators: false,
                     executeOnlyCoveringTestCases: false,
                     mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-                    loggerProjectRootDirectory: '/path/to/project',
+                    projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
                 ),
@@ -1312,7 +1312,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withIgnoreSourceCodeMutatorsMap([])
                     ->withExecuteOnlyCoveringTestCases(false)
                     ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
-                    ->withLoggerProjectRootDirectory('/path/to/project')
+                    ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
                     ->withConfigPathname('/path/to/infection.json')

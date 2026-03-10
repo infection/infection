@@ -641,12 +641,12 @@ final class ConfigurationFactoryScenario
         return $this
             ->withInput(
                 $this->inputBuilder
-                    ->withLoggerProjectRootDirectory($projectDirectoryInput),
+                    ->withProjectDirectory($projectDirectoryInput),
             )
             ->withCiProjectDirectory($ciProjectDirectory)
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
-                    ->withLoggerProjectRootDirectory($expected)
+                    ->withProjectDirectory($expected)
                     ->build(),
             );
     }

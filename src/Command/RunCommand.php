@@ -131,6 +131,7 @@ final class RunCommand extends BaseCommand
     /** @var string */
     private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
 
+    // TODO: to rename to projectDirectory?
     private const OPTION_LOGGER_PROJECT_ROOT_DIRECTORY = 'logger-project-root-directory';
 
     private const OPTION_LOGGER_HTML = 'logger-html';
@@ -501,7 +502,7 @@ final class RunCommand extends BaseCommand
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
-            loggerProjectRootDirectory: $this->getLoggerProjectRootDirectory($io),
+            projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
@@ -630,7 +631,7 @@ final class RunCommand extends BaseCommand
     /**
      * @return non-empty-string|null Absolute path.
      */
-    private function getLoggerProjectRootDirectory(IO $io): ?string
+    private function getProjectDirectory(IO $io): ?string
     {
         $directory = trim((string) $io->getInput()->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY));
 

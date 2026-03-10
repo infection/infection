@@ -48,7 +48,7 @@ final readonly class GitLabCodeQualityReporter implements LineMutationTestingRes
 {
     public function __construct(
         private ResultsCollector $resultsCollector,
-        private string $loggerProjectRootDirectory,
+        private string $projectDirectory,
     ) {
     }
 
@@ -67,7 +67,7 @@ final readonly class GitLabCodeQualityReporter implements LineMutationTestingRes
                 ),
                 'categories' => ['Escaped Mutant'],
                 'location' => [
-                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
+                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->projectDirectory),
                     'lines' => [
                         'begin' => $escapedExecutionResult->getOriginalStartingLine(),
                     ],

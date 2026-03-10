@@ -96,7 +96,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @param non-empty-string|null $loggerProjectRootDirectory Absolute path.
+     * @param non-empty-string|null $projectDirectory Absolute path.
      *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
@@ -132,7 +132,7 @@ class ConfigurationFactory
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
-        ?string $loggerProjectRootDirectory,
+        ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
@@ -193,7 +193,7 @@ class ConfigurationFactory
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $this->retrieveProjectDirectory($loggerProjectRootDirectory),
+            projectDirectory: $this->retrieveProjectDirectory($projectDirectory),
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
             configurationPathname: $schema->pathname,

@@ -48,7 +48,7 @@ final readonly class GitHubAnnotationsReporter implements LineMutationTestingRes
 
     public function __construct(
         private ResultsCollector $resultsCollector,
-        private string $loggerProjectRootDirectory,
+        private string $projectDirectory,
     ) {
     }
 
@@ -67,7 +67,7 @@ final readonly class GitHubAnnotationsReporter implements LineMutationTestingRes
             ];
 
             $lines[] = $this->buildAnnotation(
-                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
+                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->projectDirectory),
                 $error,
             );
         }
