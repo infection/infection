@@ -33,57 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reporter;
+namespace Infection\Configuration;
 
-use Infection\Metrics\ResultsCollector;
-use function str_replace;
-use Symfony\Component\Filesystem\Path;
+use function getenv;
+use Infection\FileSystem\FileSystem;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
+ * @final
  * @internal
  */
-final readonly class GitHubAnnotationsReporter implements LineMutationTestingResultsReporter
+readonly class CiProjectDirectoryProvider
 {
-    public const DEFAULT_OUTPUT = 'php://stdout';
-
     public function __construct(
-        private ResultsCollector $resultsCollector,
-        private string $loggerProjectRootDirectory,
+        private FileSystem $fileSystem,
     ) {
     }
 
-    public function getLines(): array
+    /**
+     * @return non-empty-string|null Absolute path.
+     */
+    public function provide(): ?string
     {
-        $lines = [];
+        $directory = getenv('CI_PROJECT_DIR');
 
-        foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
-            $error = [
-                'line' => $escapedExecutionResult->getOriginalStartingLine(),
-                'message' => <<<"TEXT"
-                    Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
-
-                    {$escapedExecutionResult->getMutantDiff()}
-                    TEXT,
-            ];
-
-            $lines[] = $this->buildAnnotation(
-                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
-                $error,
-            );
+        if ($directory === false) {
+            return null;
         }
 
-        return $lines;
-    }
+        Assert::true(
+            $this->fileSystem->isAbsolutePath($directory),
+            sprintf(
+                'Expected the path "%s" to be an absolute path.',
+                $directory,
+            ),
+        );
+        Assert::true(
+            $this->fileSystem->isReadableDirectory($directory),
+            sprintf(
+                'Expected the path "%s" to point to a readable directory.',
+                $directory,
+            ),
+        );
+        Assert::stringNotEmpty($directory);
 
-    /**
-     * @param array{line: int, message: string} $error
-     */
-    private function buildAnnotation(string $filePath, array $error): string
-    {
-        // new lines need to be encoded
-        // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
-        $message = str_replace("\n", '%0A', $error['message']);
-
-        return "::warning file={$filePath},line={$error['line']}::{$message}\n";
+        return $directory;
     }
 }

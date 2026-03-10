@@ -61,6 +61,7 @@ final class ConfigurationBuilder
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string $configPathname
+     * @param non-empty-string $loggerProjectRootDirectory
      */
     private function __construct(
         private float $timeout,
@@ -95,7 +96,7 @@ final class ConfigurationBuilder
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
-        private ?string $loggerProjectRootDirectory,
+        private string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
@@ -181,7 +182,7 @@ final class ConfigurationBuilder
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
             mapSourceClassToTestStrategy: null,
-            loggerProjectRootDirectory: null,
+            loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
@@ -544,7 +545,10 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    /**
+     * @param non-empty-string $loggerProjectRootDirectory
+     */
+    public function withLoggerProjectRootDirectory(string $loggerProjectRootDirectory): self
     {
         $clone = clone $this;
         $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;

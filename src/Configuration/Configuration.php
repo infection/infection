@@ -65,6 +65,7 @@ readonly class Configuration
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string $configurationPathname
+     * @param non-empty-string $loggerProjectRootDirectory Absolute path.
      */
     public function __construct(
         public float $processTimeout,
@@ -99,7 +100,7 @@ readonly class Configuration
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
         public ?string $mapSourceClassToTestStrategy,
-        public ?string $loggerProjectRootDirectory,
+        public string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
         public string $configurationPathname,

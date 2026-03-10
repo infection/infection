@@ -646,6 +646,7 @@ final class Container extends DIContainer
 
     /**
      * @param non-empty-string|null $configFile
+     * @param non-empty-string|null $loggerProjectRootDirectory Absolute path.
      */
     public function withValues(
         LoggerInterface $logger,

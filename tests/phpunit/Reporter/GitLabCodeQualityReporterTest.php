@@ -79,7 +79,10 @@ final class GitLabCodeQualityReporterTest extends TestCase
         ResultsCollector $resultsCollector,
         array $expectedContents,
     ): void {
-        $reporter = new GitLabCodeQualityReporter($resultsCollector, null);
+        $reporter = new GitLabCodeQualityReporter(
+            $resultsCollector,
+            '/path/to/project',
+        );
 
         $this->assertReportedContentIs($expectedContents, $reporter);
     }
@@ -155,21 +158,8 @@ final class GitLabCodeQualityReporterTest extends TestCase
         ];
     }
 
-    public function test_it_reports_correctly_with_ci_project_dir(): void
-    {
-        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
-        self::setOriginalFilePrefix('/my/project/dir/');
-
-        $resultsCollector = self::createCompleteResultsCollector();
-
-        $reporter = new GitLabCodeQualityReporter($resultsCollector, null);
-
-        $this->assertStringContainsString('"path":"foo\/bar"', $reporter->getLines()[0]);
-    }
-
     public function test_it_reports_correctly_with_custom_project_dir(): void
     {
-        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
         self::setOriginalFilePrefix('/custom/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();

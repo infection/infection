@@ -141,6 +141,8 @@ interface Git
      * For example, if your repo is at `/home/user/projects/my-app` and you
      * execute this method from the working directory `/home/user/projects/my-app/src/components`,
      * it will output `/home/user/projects/my-app`.
+     *
+     * @return non-empty-string
      */
     public function getProjectDirectory(): string;
 }

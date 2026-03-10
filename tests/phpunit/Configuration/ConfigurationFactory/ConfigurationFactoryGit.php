@@ -37,16 +37,17 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use DomainException;
 use Infection\Git\Git;
-use Infection\Tests\UnsupportedMethod;
 use function sprintf;
 
 final readonly class ConfigurationFactoryGit implements Git
 {
     /**
      * @param non-empty-string $defaultBaseBranch
+     * @param non-empty-string $defaultProjectDirectory
      */
     public function __construct(
         private string $defaultBaseBranch,
+        private string $defaultProjectDirectory,
     ) {
     }
 
@@ -78,6 +79,6 @@ final readonly class ConfigurationFactoryGit implements Git
 
     public function getProjectDirectory(): string
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        return $this->defaultProjectDirectory;
     }
 }

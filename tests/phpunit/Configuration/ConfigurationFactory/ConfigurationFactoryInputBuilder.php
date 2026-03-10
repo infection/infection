@@ -41,6 +41,9 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 
 final class ConfigurationFactoryInputBuilder
 {
+    /**
+     * @param non-empty-string|null $loggerProjectRootDirectory
+     */
     public function __construct(
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
@@ -309,6 +312,9 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $loggerProjectRootDirectory
+     */
     public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
     {
         $clone = clone $this;
@@ -365,7 +371,7 @@ final class ConfigurationFactoryInputBuilder
      *     27: bool,
      *     28: bool,
      *     29: string|null,
-     *     30: string|null,
+     *     30: non-empty-string|null,
      *     31: string|null,
      *     32: string|null
      * }

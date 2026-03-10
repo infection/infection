@@ -59,7 +59,7 @@ class FileReporterFactory
         private readonly bool $onlyCoveredCode,
         private readonly LoggerInterface $logger,
         private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
-        private readonly ?string $loggerProjectRootDirectory,
+        private readonly string $loggerProjectRootDirectory,
         private readonly float $processTimeout,
     ) {
     }
