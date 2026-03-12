@@ -39,6 +39,7 @@ use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Debug\DumpAstCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\Git\GitBaseReferenceCommand;
@@ -114,6 +115,7 @@ final class Application extends BaseApplication
             [
                 new ConfigureCommand(),
                 new MockTeamCityCommand($fileSystem),
+                new DumpAstCommand($fileSystem),
                 new GitBaseReferenceCommand(),
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),

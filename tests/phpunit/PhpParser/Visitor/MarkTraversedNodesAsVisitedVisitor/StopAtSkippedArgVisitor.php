@@ -33,32 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use PhpParser\Node\Expr\Variable;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use function spl_object_id;
-use function sprintf;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-#[CoversClass(PotentialCircularDependencyDetected::class)]
-final class PotentialCircularDependencyDetectedTest extends TestCase
+final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    public function test_it_can_create_an_instance_for_an_attribute(): void
+    public const SKIP_ATTRIBUTE = 'skip';
+
+    public static function markNodeAsSkipped(Node $node): Node
     {
-        $node = new Variable('x');
+        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
 
-        $exception = PotentialCircularDependencyDetected::forAttribute(
-            'next',
-            $node,
-        );
+        return $node;
+    }
 
-        $this->assertSame(
-            sprintf(
-                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
-                spl_object_id($node),
-            ),
-            $exception->getMessage(),
-        );
+    public static function isNodeMarkedAsSkipped(Node $node): bool
+    {
+        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+    }
+
+    public function enterNode(Node $node): ?int
+    {
+        if (self::isNodeMarkedAsSkipped($node)) {
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
     }
 }

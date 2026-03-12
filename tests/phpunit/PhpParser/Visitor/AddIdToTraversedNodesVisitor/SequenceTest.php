@@ -33,54 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
+namespace Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\Sequence;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Utility visitor which adds an ID to each node as a sequence. This allows easily identifying a
- * node and more predictably than with `spl_object_id()`.
- *
- * The node dumper will also leverage this property to render nodes that are found in attributes
- * to both reduce noise and avoid circular dependencies.
- */
-final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
+#[CoversClass(Sequence::class)]
+final class SequenceTest extends TestCase
 {
-    public const NODE_ID_ATTRIBUTE = 'nodeId';
-
-    /**
-     * @var array<positive-int|0, Node>
-     */
-    private array $nodesById = [];
-
-    public function __construct(
-        private readonly Sequence $sequence = new Sequence(),
-    ) {
-    }
-
-    /**
-     * @return positive-int|0|null
-     */
-    public static function getNodeId(Node $node): ?int
+    public function test_it_gives_a_sequence(): void
     {
-        return $node->getAttribute(self::NODE_ID_ATTRIBUTE);
-    }
+        $sequence = new Sequence();
 
-    public function enterNode(Node $node): void
-    {
-        $nodeId = $this->sequence->next();
+        for ($i = 0; $i < 10; ++$i) {
+            $value = $sequence->next();
 
-        $node->setAttribute(self::NODE_ID_ATTRIBUTE, $nodeId);
-
-        $this->nodesById[$nodeId] = $node;
-    }
-
-    /**
-     * @return array<positive-int|0, Node>
-     */
-    public function getNodesById(): array
-    {
-        return $this->nodesById;
+            $this->assertSame($i, $value);
+        }
     }
 }

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 
 use function in_array;
+use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
 
 final readonly class IdNodeIgnorer implements NodeIgnorer
