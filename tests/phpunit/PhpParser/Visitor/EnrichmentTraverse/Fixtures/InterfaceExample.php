@@ -33,26 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-use PhpParser\Node;
-use function spl_object_id;
-use function sprintf;
-use UnexpectedValueException;
-
-final class PotentialCircularDependencyDetected extends UnexpectedValueException
+interface InterfaceExample
 {
-    public static function forAttribute(
-        string $key,
-        Node $value,
-    ): self {
-        return new self(
-            sprintf(
-                'The attribute "%s" found a node instance "%s" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
-                $key,
-                $value::class,
-                spl_object_id($value),
-            ),
-        );
-    }
+    public const CONSTANT_EXAMPLE = '';
+
+    public function abstractMethod(mixed $param): void;
 }

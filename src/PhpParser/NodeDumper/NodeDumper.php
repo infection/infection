@@ -33,10 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\PhpParser\NodeDumper;
 
 use function get_debug_type;
 use function implode;
+use Infection\Tests\TestingUtility\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
@@ -140,7 +141,7 @@ final class NodeDumper
      *                          the dumpPositions option is enabled, and the dumping of node offsets
      *                          is desired.
      *
-     * @throws PotentialCircularDependencyDetected
+     * @throws \Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected
      */
     public function dump(
         array|Node $node,
@@ -261,7 +262,7 @@ final class NodeDumper
     }
 
     /**
-     * @throws PotentialCircularDependencyDetected
+     * @throws \Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected
      */
     private function dumpRecursive(
         mixed $node,
