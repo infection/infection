@@ -32,7 +32,7 @@ jobs:
           ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
 
       - name: Install dependencies
-        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # 3.1.1
+        uses: ramsey/composer-install@a35c6ebd3d08125aaf8852dff361e686a1a67947 # 3.2.0
 
       - name: Run tests
         shell: bash
@@ -55,7 +55,7 @@ jobs:
                 ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
 
           - name: Install dependencies
-            uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # 3.1.1
+            uses: ramsey/composer-install@a35c6ebd3d08125aaf8852dff361e686a1a67947 # 3.2.0
 
           - name: Run benchmarks
             shell: bash
