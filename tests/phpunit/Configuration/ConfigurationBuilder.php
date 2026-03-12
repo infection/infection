@@ -61,6 +61,7 @@ final class ConfigurationBuilder
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string $configPathname
+     * @param non-empty-string $projectDirectory
      */
     private function __construct(
         private float $timeout,
@@ -95,7 +96,7 @@ final class ConfigurationBuilder
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
-        private ?string $loggerProjectRootDirectory,
+        private string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
@@ -139,7 +140,7 @@ final class ConfigurationBuilder
             ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $configuration->loggerProjectRootDirectory,
+            projectDirectory: $configuration->projectDirectory,
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
             configPathname: $configuration->configurationPathname,
@@ -181,7 +182,7 @@ final class ConfigurationBuilder
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
             mapSourceClassToTestStrategy: null,
-            loggerProjectRootDirectory: null,
+            projectDirectory: '/var/www/project',
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
@@ -247,7 +248,7 @@ final class ConfigurationBuilder
             ],
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: '/var/www/project',
+            projectDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
             configPathname: '/path/to/project/infection.json5',
@@ -544,10 +545,13 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    /**
+     * @param non-empty-string $projectDirectory
+     */
+    public function withProjectDirectory(string $projectDirectory): self
     {
         $clone = clone $this;
-        $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;
+        $clone->projectDirectory = $projectDirectory;
 
         return $clone;
     }
@@ -614,7 +618,7 @@ final class ConfigurationBuilder
             ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $this->loggerProjectRootDirectory,
+            projectDirectory: $this->projectDirectory,
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
             configurationPathname: $this->configPathname,

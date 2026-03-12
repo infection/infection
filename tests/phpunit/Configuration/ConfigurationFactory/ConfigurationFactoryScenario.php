@@ -52,18 +52,26 @@ use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 
 final class ConfigurationFactoryScenario
 {
+    /**
+     * @param non-empty-string|null $ciProjectDirectory
+     */
     public function __construct(
         public bool $ciDetected,
         public bool $githubActionsDetected,
+        public ?string $ciProjectDirectory,
         public SchemaConfigurationBuilder $schemaBuilder,
         public ConfigurationFactoryInputBuilder $inputBuilder,
         public Configuration $expected,
     ) {
     }
 
+    /**
+     * @param non-empty-string|null $ciProjectDirectory
+     */
     public static function create(
         bool $ciDetected,
         bool $githubActionsDetected,
+        ?string $ciProjectDirectory,
         SchemaConfigurationBuilder $schemaBuilder,
         ConfigurationFactoryInputBuilder $inputBuilder,
         Configuration $expected,
@@ -71,6 +79,7 @@ final class ConfigurationFactoryScenario
         return new self(
             $ciDetected,
             $githubActionsDetected,
+            $ciProjectDirectory,
             $schemaBuilder,
             $inputBuilder,
             $expected,
@@ -89,6 +98,17 @@ final class ConfigurationFactoryScenario
     {
         $clone = clone $this;
         $clone->githubActionsDetected = $githubActionsDetected;
+
+        return $clone;
+    }
+
+    /**
+     * @param non-empty-string|null $ciProjectDirectory
+     */
+    public function withCiProjectDirectory(?string $ciProjectDirectory): self
+    {
+        $clone = clone $this;
+        $clone->ciProjectDirectory = $ciProjectDirectory;
 
         return $clone;
     }
@@ -604,6 +624,29 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withSourceFilter($expectedSourceFilter)
+                    ->build(),
+            );
+    }
+
+    /**
+     * @param non-empty-string|null $projectDirectoryInput
+     * @param non-empty-string|null $ciProjectDirectory
+     * @param non-empty-string $expected
+     */
+    public function forProjectDirectory(
+        ?string $projectDirectoryInput,
+        ?string $ciProjectDirectory,
+        string $expected,
+    ): self {
+        return $this
+            ->withInput(
+                $this->inputBuilder
+                    ->withProjectDirectory($projectDirectoryInput),
+            )
+            ->withCiProjectDirectory($ciProjectDirectory)
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withProjectDirectory($expected)
                     ->build(),
             );
     }

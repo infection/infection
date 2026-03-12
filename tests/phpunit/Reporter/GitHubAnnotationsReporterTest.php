@@ -73,7 +73,10 @@ final class GitHubAnnotationsReporterTest extends TestCase
         ResultsCollector $resultsCollector,
         array $expectedLines,
     ): void {
-        $reporter = new GitHubAnnotationsReporter($resultsCollector, null);
+        $reporter = new GitHubAnnotationsReporter(
+            $resultsCollector,
+            '/path/to/project',
+        );
 
         $this->assertSame($expectedLines, $reporter->getLines());
     }
@@ -94,21 +97,8 @@ final class GitHubAnnotationsReporterTest extends TestCase
         ];
     }
 
-    public function test_it_reports_correctly_with_ci_github_workspace(): void
-    {
-        \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
-        self::setOriginalFilePrefix('/my/project/dir/');
-
-        $resultsCollector = self::createCompleteResultsCollector();
-
-        $reporter = new GitHubAnnotationsReporter($resultsCollector, null);
-
-        $this->assertStringContainsString('warning file=foo/bar', $reporter->getLines()[0]);
-    }
-
     public function test_it_reports_correctly_with_custom_github_workspace(): void
     {
-        \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
         self::setOriginalFilePrefix('/custom/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();

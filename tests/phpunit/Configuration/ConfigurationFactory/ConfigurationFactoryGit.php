@@ -43,9 +43,11 @@ final readonly class ConfigurationFactoryGit implements Git
 {
     /**
      * @param non-empty-string $defaultBaseBranch
+     * @param non-empty-string $defaultProjectDirectory
      */
     public function __construct(
         private string $defaultBaseBranch,
+        private string $defaultProjectDirectory,
     ) {
     }
 
@@ -73,5 +75,10 @@ final readonly class ConfigurationFactoryGit implements Git
     public function getBaseReference(string $base): string
     {
         return sprintf('reference(%s)', $base);
+    }
+
+    public function getProjectDirectory(): string
+    {
+        return $this->defaultProjectDirectory;
     }
 }

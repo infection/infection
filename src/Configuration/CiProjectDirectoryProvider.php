@@ -33,49 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reporter;
+namespace Infection\Configuration;
 
-use Infection\Framework\Str;
-use Infection\Metrics\ResultsCollector;
-use function json_encode;
-use const JSON_THROW_ON_ERROR;
-use Symfony\Component\Filesystem\Path;
+use function getenv;
+use Infection\FileSystem\FileSystem;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
+ * @final
  * @internal
  */
-final readonly class GitLabCodeQualityReporter implements LineMutationTestingResultsReporter
+readonly class CiProjectDirectoryProvider
 {
     public function __construct(
-        private ResultsCollector $resultsCollector,
-        private string $projectDirectory,
+        private FileSystem $fileSystem,
     ) {
     }
 
-    public function getLines(): array
+    /**
+     * @return non-empty-string|null Absolute path.
+     */
+    public function provide(): ?string
     {
-        $lines = [];
+        $directory = getenv('CI_PROJECT_DIR');
 
-        foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
-            $lines[] = [
-                'type' => 'issue',
-                'fingerprint' => $escapedExecutionResult->getMutantHash(),
-                'check_name' => $escapedExecutionResult->getMutatorName(),
-                'description' => 'Escaped Mutant for Mutator ' . $escapedExecutionResult->getMutatorName(),
-                'content' => Str::convertToUtf8(
-                    Str::cleanForDisplay($escapedExecutionResult->getMutantDiff()),
-                ),
-                'categories' => ['Escaped Mutant'],
-                'location' => [
-                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->projectDirectory),
-                    'lines' => [
-                        'begin' => $escapedExecutionResult->getOriginalStartingLine(),
-                    ],
-                ],
-                'severity' => 'major',
-            ];
+        if ($directory === false) {
+            return null;
         }
 
-        return [json_encode($lines, JSON_THROW_ON_ERROR)];
+        Assert::true(
+            $this->fileSystem->isAbsolutePath($directory),
+            sprintf(
+                'Expected the path "%s" to be an absolute path.',
+                $directory,
+            ),
+        );
+        Assert::true(
+            $this->fileSystem->isReadableDirectory($directory),
+            sprintf(
+                'Expected the path "%s" to point to a readable directory.',
+                $directory,
+            ),
+        );
+        Assert::stringNotEmpty($directory);
+
+        return $directory;
     }
 }

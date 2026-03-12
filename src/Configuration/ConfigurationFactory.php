@@ -91,10 +91,13 @@ class ConfigurationFactory
         private readonly MutatorParser $mutatorParser,
         private readonly CiDetectorInterface $ciDetector,
         private readonly Git $git,
+        private readonly CiProjectDirectoryProvider $ciProjectDirectoryProvider,
     ) {
     }
 
     /**
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
      */
@@ -129,7 +132,7 @@ class ConfigurationFactory
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
-        ?string $loggerProjectRootDirectory,
+        ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
@@ -190,7 +193,7 @@ class ConfigurationFactory
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $loggerProjectRootDirectory,
+            projectDirectory: $this->retrieveProjectDirectory($projectDirectory),
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
             configurationPathname: $schema->pathname,
@@ -484,5 +487,21 @@ class ConfigurationFactory
         // To prevent this, we try to find the best common ancestor, here C.
         // As a result, we would do `git diff C HEAD` which would give (D,E).
         return $this->git->getBaseReference($base ?? $this->git->getDefaultBase());
+    }
+
+    /**
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     *
+     * @return non-empty-string Absolute path.
+     */
+    private function retrieveProjectDirectory(?string $projectDirectory): string
+    {
+        if ($projectDirectory !== null) {
+            return $projectDirectory;
+        }
+
+        $ciProjectDirectory = $this->ciProjectDirectoryProvider->provide();
+
+        return $ciProjectDirectory ?? $this->git->getProjectDirectory();
     }
 }
