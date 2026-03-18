@@ -33,22 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
+namespace Infection\PhpParser\Visitor;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-#[CoversClass(Sequence::class)]
-final class SequenceTest extends TestCase
+/**
+ * Utility that adds an attribute to each node it visits. Unless configured to show all nodes,
+ * the node dumper will render nodes that do not have this attribute as `<skipped>`, allowing
+ * to easily identify that some nodes have not been visited.
+ *
+ * @internal
+ */
+final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    public function test_it_gives_a_sequence(): void
+    public const VISITED_ATTRIBUTE = 'visited';
+
+    public static function wasVisited(Node $node): bool
     {
-        $sequence = new Sequence();
+        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
+    }
 
-        for ($i = 0; $i < 10; ++$i) {
-            $value = $sequence->next();
+    /**
+     * @template T of Node
+     *
+     * @param T $node
+     * @return T
+     */
+    public static function markAsVisited(Node $node): Node
+    {
+        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
 
-            $this->assertSame($i, $value);
-        }
+        return $node;
+    }
+
+    public function enterNode(Node $node): null
+    {
+        self::markAsVisited($node);
+
+        return null;
     }
 }

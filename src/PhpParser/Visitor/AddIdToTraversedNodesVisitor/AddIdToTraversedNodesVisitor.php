@@ -33,94 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
+namespace Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use Exception;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-final class NodeDumperScenario
+/**
+ * Utility visitor which adds an ID to each node as a sequence. This allows easily identifying a
+ * node and more predictably than with `spl_object_id()`.
+ *
+ * The node dumper will also leverage this property to render nodes that are found in attributes
+ * to both reduce noise and avoid circular dependencies.
+ *
+ * @internal
+ */
+final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 {
+    public const NODE_ID_ATTRIBUTE = 'nodeId';
+
     /**
-     * @param list<Node>|Node $node
+     * @var array<positive-int|0, Node>
      */
+    private array $nodesById = [];
+
     public function __construct(
-        public array|Node|string $node,
-        public string|Exception $expected = '',
-        // It should have the same defaults as NodeDumper
-        public bool $dumpProperties = false,
-        public bool $dumpComments = false,
-        public bool $dumpPositions = false,
-        public bool $dumpOtherAttributes = false,
-        public bool $onlyVisitedNodes = true,
+        private readonly Sequence $sequence = new Sequence(),
     ) {
     }
 
     /**
-     * @param list<Node>|Node $node
+     * @return positive-int|0|null
      */
-    public static function forNode(array|Node $node): self
+    public static function getNodeId(Node $node): ?int
     {
-        return new self($node);
+        return $node->getAttribute(self::NODE_ID_ATTRIBUTE);
     }
 
-    public static function forCode(string $code): self
+    public function enterNode(Node $node): null
     {
-        return new self($code);
-    }
+        $nodeId = $this->sequence->next();
 
-    public function withDumpProperties(): self
-    {
-        $clone = clone $this;
-        $clone->dumpProperties = true;
+        $node->setAttribute(self::NODE_ID_ATTRIBUTE, $nodeId);
 
-        return $clone;
-    }
+        $this->nodesById[$nodeId] = $node;
 
-    public function withDumpComments(): self
-    {
-        $clone = clone $this;
-        $clone->dumpComments = true;
-
-        return $clone;
-    }
-
-    public function withDumpPositions(): self
-    {
-        $clone = clone $this;
-        $clone->dumpPositions = true;
-
-        return $clone;
-    }
-
-    public function withDumpOtherAttributes(): self
-    {
-        $clone = clone $this;
-        $clone->dumpOtherAttributes = true;
-
-        return $clone;
-    }
-
-    public function withShowAllNodes(): self
-    {
-        $clone = clone $this;
-        $clone->onlyVisitedNodes = false;
-
-        return $clone;
-    }
-
-    public function withExpected(string|Exception $expected): self
-    {
-        $clone = clone $this;
-        $clone->expected = $expected;
-
-        return $clone;
+        return null;
     }
 
     /**
-     * @return array{NodeDumperScenario}
+     * @return array<positive-int|0, Node>
      */
-    public function build(): array
+    public function getNodesById(): array
     {
-        return [$this];
+        return $this->nodesById;
     }
 }

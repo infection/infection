@@ -1362,8 +1362,3 @@ parameters:
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
-		-
-			rawMessage: Variable property access on PhpParser\Node.
-			identifier: property.dynamicName
-			count: 1
-			path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
