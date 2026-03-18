@@ -103,7 +103,7 @@ final class DumpAstCommand extends BaseCommand
 
         $nodes = $this->createAst($container, $file);
 
-        $io->writeln(
+        $io->write(
             $container->getNodeDumper()->dump($nodes),
         );
 
