@@ -68,10 +68,10 @@ final class TestTest extends TestCase
             ),
             'a93f8006e20d02d1',
             new Test(
-                '<mutationHash>',
-                'Infection\Mutator\Boolean\LogicalOr (<mutationHash>)',
-                'infection://path/to/project/src/Infrastructure/Http/Action/Greet.php::7-42',
-                '6e7c834e2067faa7',
+                'fb9282c1c4fec68667212fb805238bc9',
+                'Infection\Mutator\Boolean\LogicalOr (fb9282c1c4fec68667212fb805238bc9)',
+                'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php::7-42',
+                '2b4aa030e4a6eead',
                 'a93f8006e20d02d1',
             ),
         ];

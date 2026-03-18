@@ -171,7 +171,7 @@ final class TeamCityTest extends TestCase
                 nodeId: 'A1',
                 parentNodeId: 'A',
             ),
-            "##teamcity[testStarted name='MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='A1' parentNodeId='A' metainfo='{\"mutationId\":\"49a5dfcd2f4a0b33d4a02e662812af55\"}']\n",
+            "##teamcity[testStarted name='MutatorName (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='A1' parentNodeId='A' metainfo='{\"mutationId\":\"49a5dfcd2f4a0b33d4a02e662812af55\"}' locationHint='infection:///path/to/project/src/source.php:1-3']\n",
         ];
     }
 
