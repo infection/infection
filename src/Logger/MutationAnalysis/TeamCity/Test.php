@@ -117,7 +117,7 @@ final readonly class Test
         $attributes = $mutation->getAttributes();
 
         return sprintf(
-        'infection://%s::%s-%s',
+            'infection://%s::%s-%s',
             $mutation->getOriginalFilePath(),
             $attributes['startFilePos'],
             $attributes['endFilePos'],
