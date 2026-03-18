@@ -109,6 +109,11 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
 
+        # Test enum fixtures have cases that exist as test data, not all are used
+        -
+            identifier: shipmonk.deadEnumCase
+            path: ../tests/*
+
         # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
             identifier: argument.type
@@ -193,7 +198,7 @@ parameters:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
-        - ../tests/phpunit/PhpParser/Visitor/VisitorCollectorIntegration/Fixtures/TwoAdditions.php
+        - ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
         - ../tests/benchmark/MutationGenerator/sources (?)

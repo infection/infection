@@ -38,11 +38,14 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
@@ -56,42 +59,72 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
-    public function test_it_can_create_a_traverser(): void
+    private NodeTraverserFactory $factory;
+
+    protected function setUp(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor());
+        $this->factory = new NodeTraverserFactory();
+    }
 
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
+    public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
+    {
+        $traverser = $this->factory->createEnrichmentTraverser();
 
-        $this->assertSame(
+        $this->assertTraverserVisitorsAre(
+            $traverser,
             [
-                CloningVisitor::class,
+                NextConnectingVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
-                FakeVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
             ],
-            $visitors,
         );
     }
 
-    public function test_it_can_create_a_pre_traverser(): void
+    public function test_it_can_create_a_traverser_for_generating_mutations(): void
     {
-        $traverser = (new NodeTraverserFactory())->createPreTraverser();
-
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
+        $traverser = $this->factory->createMutationTraverser(
+            new FakeVisitor(),
         );
 
-        $this->assertSame(
+        $this->assertTraverserVisitorsAre(
+            $traverser,
             [
-                NextConnectingVisitor::class,
+                CloningVisitor::class,
+                FakeVisitor::class,
             ],
+        );
+    }
+
+    /**
+     * @param list<class-string<NodeVisitor>> $expected
+     */
+    private function assertTraverserVisitorsAre(
+        NodeTraverserInterface $traverser,
+        array $expected,
+    ): void {
+        // Sanity check. This is not a hard constraint, but if that changes in the future, then we need
+        // to adapt the code here to retrieve the visitors a different way.
+        $this->assertInstanceOf(NodeTraverser::class, $traverser);
+
+        $actual = self::getVisitorClassNames($traverser);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return list<class-string<NodeVisitor>>
+     */
+    private static function getVisitorClassNames(NodeTraverser $traverser): array
+    {
+        /** @var list<NodeVisitor> $visitors */
+        $visitors = self::getVisitorReflection()->getValue($traverser);
+
+        return array_map(
+            get_class(...),
             $visitors,
         );
     }

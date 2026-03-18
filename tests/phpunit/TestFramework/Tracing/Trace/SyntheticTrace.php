@@ -51,7 +51,6 @@ final readonly class SyntheticTrace implements Trace
     public function __construct(
         public SplFileInfo $sourceFileInfo,
         public string $realPath,
-        public string $relativePathname,
         public bool $hasTest,
         public TestLocations $tests,
     ) {
