@@ -33,40 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+namespace Infection\Tests\PhpParser\NodeDumper;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
+use PhpParser\Node\Expr\Variable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function spl_object_id;
+use function sprintf;
 
-/**
- * Utility that adds an attribute to each node it visits. Unless configured to show all nodes,
- * the node dumper will render nodes that do not have this attribute as `<skipped>`, allowing
- * to easily identify that some nodes have not been visited.
- */
-final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
+#[CoversClass(PotentialCircularDependencyDetected::class)]
+final class PotentialCircularDependencyDetectedTest extends TestCase
 {
-    public const VISITED_ATTRIBUTE = 'visited';
-
-    public static function wasVisited(Node $node): bool
+    public function test_it_can_create_an_instance_for_an_attribute(): void
     {
-        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
-    }
+        $node = new Variable('x');
 
-    /**
-     * @template T of Node
-     *
-     * @param T $node
-     * @return T
-     */
-    public static function markAsVisited(Node $node): Node
-    {
-        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
+        $exception = PotentialCircularDependencyDetected::forAttribute(
+            'next',
+            $node,
+        );
 
-        return $node;
-    }
-
-    public function enterNode(Node $node): void
-    {
-        self::markAsVisited($node);
+        $this->assertSame(
+            sprintf(
+                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
+                spl_object_id($node),
+            ),
+            $exception->getMessage(),
+        );
     }
 }

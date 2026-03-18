@@ -112,6 +112,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
+use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
@@ -640,6 +641,7 @@ final class Container extends DIContainer
                 $container->get(TeamCity::class),
                 $container->getConfiguration()->configurationPathname,
             ),
+            NodeDumper::class => static fn (self $container): NodeDumper => new NodeDumper(),
             ProjectDirectoryProvider::class => static fn (self $container): ProjectDirectoryProvider => new ChainProjectDirectoryProvider(
                 new EnvironmentVariableBasedProjectDirectoryProvider(
                     $container->getFileSystem(),
@@ -1105,6 +1107,11 @@ final class Container extends DIContainer
         }
 
         return $clone;
+    }
+
+    public function getNodeDumper(): NodeDumper
+    {
+        return $this->get(NodeDumper::class);
     }
 
     private function getMutatedCodePrinter(): MutantCodePrinter

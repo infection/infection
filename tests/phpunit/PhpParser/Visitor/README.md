@@ -79,8 +79,7 @@ $this->addIdsToNodes($nodes);
 Use a `NodeTraverser` to apply your visitor (and any dependencies) to the nodes:
 
 ```php
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use PhpParser\NodeTraverser;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;use PhpParser\NodeTraverser;
 
 (new NodeTraverser(
     new ParentConnectingVisitor(),              // If your visitor needs parent references
