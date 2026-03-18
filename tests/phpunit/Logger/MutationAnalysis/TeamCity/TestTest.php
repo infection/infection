@@ -38,7 +38,6 @@ namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 use Infection\Logger\MutationAnalysis\TeamCity\Test;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
-use Infection\Testing\MutatorName;
 use Infection\Tests\Mutation\MutationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -65,6 +64,7 @@ final class TestTest extends TestCase
             self::createMutation(
                 '/path/to/project/src/Infrastructure/Http/Action/Greet.php',
                 LogicalOrMutator::class,
+                'fb9282c1c4fec68667212fb805238bc9',
             ),
             'a93f8006e20d02d1',
             new Test(
@@ -79,11 +79,12 @@ final class TestTest extends TestCase
     private static function createMutation(
         string $sourceFilePath,
         string $mutatorClassName,
+        string $hash,
     ): Mutation {
         return MutationBuilder::withMinimalTestData()
             ->withOriginalFilePath($sourceFilePath)
             ->withMutatorClass($mutatorClassName)
-            ->withMutatorName(MutatorName::getName($mutatorClassName))
+            ->withHash($hash)
             ->build();
     }
 }
