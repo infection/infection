@@ -45,6 +45,7 @@ use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -91,7 +92,7 @@ class ConfigurationFactory
         private readonly MutatorParser $mutatorParser,
         private readonly CiDetectorInterface $ciDetector,
         private readonly Git $git,
-        private readonly CiProjectDirectoryProvider $ciProjectDirectoryProvider,
+        private readonly ProjectDirectoryProvider $projectDirectoryProvider,
     ) {
     }
 
@@ -496,12 +497,13 @@ class ConfigurationFactory
      */
     private function retrieveProjectDirectory(?string $projectDirectory): string
     {
-        if ($projectDirectory !== null) {
-            return $projectDirectory;
-        }
+        $resolvedProjectDirectory = $projectDirectory ?? $this->projectDirectoryProvider->provide();
 
-        $ciProjectDirectory = $this->ciProjectDirectoryProvider->provide();
+        Assert::notNull(
+            $resolvedProjectDirectory,
+            'Could not resolve the project directory.',
+        );
 
-        return $ciProjectDirectory ?? $this->git->getProjectDirectory();
+        return $resolvedProjectDirectory;
     }
 }

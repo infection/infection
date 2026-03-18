@@ -33,51 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration;
+namespace Infection\Tests\Configuration\ProjectDirectoryProvider;
 
-use function getenv;
-use Infection\FileSystem\FileSystem;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 
-/**
- * @final
- * @internal
- */
-readonly class CiProjectDirectoryProvider
+final readonly class FixedProjectDirectoryProvider implements ProjectDirectoryProvider
 {
+    /**
+     * @param non-empty-string|null $projectDirectory
+     */
     public function __construct(
-        private FileSystem $fileSystem,
+        public ?string $projectDirectory,
     ) {
     }
 
-    /**
-     * @return non-empty-string|null Absolute path.
-     */
     public function provide(): ?string
     {
-        $directory = getenv('CI_PROJECT_DIR');
-
-        if ($directory === false) {
-            return null;
-        }
-
-        Assert::true(
-            $this->fileSystem->isAbsolutePath($directory),
-            sprintf(
-                'Expected the path "%s" to be an absolute path.',
-                $directory,
-            ),
-        );
-        Assert::true(
-            $this->fileSystem->isReadableDirectory($directory),
-            sprintf(
-                'Expected the path "%s" to point to a readable directory.',
-                $directory,
-            ),
-        );
-        Assert::stringNotEmpty($directory);
-
-        return $directory;
+        return $this->projectDirectory;
     }
 }

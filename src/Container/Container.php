@@ -43,6 +43,10 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -635,6 +639,19 @@ final class Container extends DIContainer
                 $container->getOutput(),
                 $container->get(TeamCity::class),
                 $container->getConfiguration()->configurationPathname,
+            ),
+            ProjectDirectoryProvider::class => static fn (self $container): ProjectDirectoryProvider => new ChainProjectDirectoryProvider(
+                new EnvironmentVariableBasedProjectDirectoryProvider(
+                    $container->getFileSystem(),
+                    // See https://docs.github.com/en/actions/reference/workflows-and-actions/variables
+                    'GITHUB_WORKSPACE',
+                ),
+                new EnvironmentVariableBasedProjectDirectoryProvider(
+                    $container->getFileSystem(),
+                    // See https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables
+                    'CI_PROJECT_DIR',
+                ),
+                new GitProjectDirectoryProvider($container->getGit()),
             ),
         ]);
 

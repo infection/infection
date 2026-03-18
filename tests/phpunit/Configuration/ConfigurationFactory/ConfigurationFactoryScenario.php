@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
@@ -49,37 +50,38 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
 {
     /**
-     * @param non-empty-string|null $ciProjectDirectory
+     * @param non-empty-string|null $resolvedProjectDirectory
      */
     public function __construct(
         public bool $ciDetected,
         public bool $githubActionsDetected,
-        public ?string $ciProjectDirectory,
+        public ?string $resolvedProjectDirectory,
         public SchemaConfigurationBuilder $schemaBuilder,
         public ConfigurationFactoryInputBuilder $inputBuilder,
-        public Configuration $expected,
+        public Configuration|Exception $expected,
     ) {
     }
 
     /**
-     * @param non-empty-string|null $ciProjectDirectory
+     * @param non-empty-string|null $projectDirectory
      */
     public static function create(
         bool $ciDetected,
         bool $githubActionsDetected,
-        ?string $ciProjectDirectory,
+        ?string $projectDirectory,
         SchemaConfigurationBuilder $schemaBuilder,
         ConfigurationFactoryInputBuilder $inputBuilder,
-        Configuration $expected,
+        Configuration|Exception $expected,
     ): self {
         return new self(
             $ciDetected,
             $githubActionsDetected,
-            $ciProjectDirectory,
+            $projectDirectory,
             $schemaBuilder,
             $inputBuilder,
             $expected,
@@ -108,7 +110,7 @@ final class ConfigurationFactoryScenario
     public function withCiProjectDirectory(?string $ciProjectDirectory): self
     {
         $clone = clone $this;
-        $clone->ciProjectDirectory = $ciProjectDirectory;
+        $clone->resolvedProjectDirectory = $ciProjectDirectory;
 
         return $clone;
     }
@@ -129,7 +131,7 @@ final class ConfigurationFactoryScenario
         return $clone;
     }
 
-    public function withExpected(Configuration $expected): self
+    public function withExpected(Configuration|Exception $expected): self
     {
         $clone = clone $this;
         $clone->expected = $expected;
@@ -142,6 +144,9 @@ final class ConfigurationFactoryScenario
         ?string $textFileLogPathFromCliOption,
         ?string $expectedTextFileLogPath,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -156,9 +161,9 @@ final class ConfigurationFactoryScenario
                     ->withTextLogFilePath($textFileLogPathFromCliOption),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->logs)
+                        LogsBuilder::from($previousExpected->logs)
                             ->withTextLogFilePath($expectedTextFileLogPath)
                             ->build(),
                     )
@@ -171,6 +176,9 @@ final class ConfigurationFactoryScenario
         ?string $htmlFileLogPathFromCliOption,
         ?string $expectedHtmlFileLogPath,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -185,9 +193,9 @@ final class ConfigurationFactoryScenario
                     ->withHtmlLogFilePath($htmlFileLogPathFromCliOption),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->logs)
+                        LogsBuilder::from($previousExpected->logs)
                             ->withHtmlLogFilePath($expectedHtmlFileLogPath)
                             ->build(),
                     )
@@ -200,6 +208,9 @@ final class ConfigurationFactoryScenario
         ?string $gitlabFileLogPathFromCliOption,
         ?string $expectedGitlabFileLogPath,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -214,9 +225,9 @@ final class ConfigurationFactoryScenario
                     ->withGitlabLogFilePath($gitlabFileLogPathFromCliOption),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->logs)
+                        LogsBuilder::from($previousExpected->logs)
                             ->withGitlabLogFilePath($expectedGitlabFileLogPath)
                             ->build(),
                     )
@@ -228,13 +239,16 @@ final class ConfigurationFactoryScenario
         ?float $schemaTimeout,
         float $expectedTimeout,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
                     ->withTimeout($schemaTimeout),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withTimeout($expectedTimeout)
                     ->build(),
             );
@@ -244,13 +258,16 @@ final class ConfigurationFactoryScenario
         ?string $configTmpDir,
         string $expectedTmpDir,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
                     ->withTmpDir($configTmpDir),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withTmpDir($expectedTmpDir)
                     ->withCoveragePath($expectedTmpDir)
                     ->build(),
@@ -262,13 +279,16 @@ final class ConfigurationFactoryScenario
         bool $expectedSkipCoverage,
         string $expectedCoveragePath,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withInput(
                 $this->inputBuilder
                     ->withExistingCoveragePath($existingCoveragePath),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withCoveragePath($expectedCoveragePath)
                     ->withSkipCoverage($expectedSkipCoverage)
                     ->build(),
@@ -279,13 +299,16 @@ final class ConfigurationFactoryScenario
         ?string $phpUnitConfigDir,
         ?string $expectedPhpUnitConfigDir,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
                     ->withPhpUnit(new PhpUnit($phpUnitConfigDir, null)),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withPhpUnit(new PhpUnit($expectedPhpUnitConfigDir, null))
                     ->build(),
             );
@@ -296,6 +319,9 @@ final class ConfigurationFactoryScenario
         bool $noProgress,
         bool $expectedNoProgress,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withCiDetected($ciDetected)
             ->withInput(
@@ -303,7 +329,7 @@ final class ConfigurationFactoryScenario
                     ->withNoProgress($noProgress),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withNoProgress($expectedNoProgress)
                     ->build(),
             );
@@ -314,6 +340,9 @@ final class ConfigurationFactoryScenario
         bool $githubActionsDetected,
         bool $useGitHubAnnotationsLogger,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withGithubActionsDetected($githubActionsDetected)
             ->withSchema(
@@ -325,9 +354,9 @@ final class ConfigurationFactoryScenario
                     ->withUseGitHubLogger($inputUseGitHubAnnotationsLogger),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->logs)
+                        LogsBuilder::from($previousExpected->logs)
                             ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)
                             ->build(),
                     )
@@ -340,6 +369,9 @@ final class ConfigurationFactoryScenario
         ?bool $ignoreMsiWithNoMutationsFromInput,
         bool $expectedIgnoreMsiWithNoMutations,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -352,7 +384,7 @@ final class ConfigurationFactoryScenario
                     ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromInput),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withPhpUnit(new PhpUnit('/path/to', null))
                     ->withPhpStan(new PhpStan('/path/to', null))
                     ->withIgnoreMsiWithNoMutations($expectedIgnoreMsiWithNoMutations)
@@ -365,6 +397,9 @@ final class ConfigurationFactoryScenario
         ?float $minMsiFromInput,
         ?float $expectedMinMsi,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -377,7 +412,7 @@ final class ConfigurationFactoryScenario
                     ->withMinMsi($minMsiFromInput),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withPhpUnit(new PhpUnit('/path/to', null))
                     ->withPhpStan(new PhpStan('/path/to', null))
                     ->withMinMsi($expectedMinMsi)
@@ -390,6 +425,9 @@ final class ConfigurationFactoryScenario
         ?float $minCoveredMsiFromInput,
         ?float $expectedMinCoveredMsi,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -402,7 +440,7 @@ final class ConfigurationFactoryScenario
                     ->withMinCoveredMsi($minCoveredMsiFromInput),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withPhpUnit(new PhpUnit('/path/to', null))
                     ->withPhpStan(new PhpStan('/path/to', null))
                     ->withMinCoveredMsi($expectedMinCoveredMsi)
@@ -421,6 +459,9 @@ final class ConfigurationFactoryScenario
         string $expectedTestFramework,
         string $expectedTestFrameworkExtraOptions,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -431,7 +472,7 @@ final class ConfigurationFactoryScenario
                     ->withTestFramework($inputTestFramework),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withTestFramework($expectedTestFramework)
                     ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
                     ->build(),
@@ -448,6 +489,9 @@ final class ConfigurationFactoryScenario
         ?string $inputStaticAnalysisTool,
         ?string $expectedStaticAnalysisTool,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -459,7 +503,7 @@ final class ConfigurationFactoryScenario
                     ->withStaticAnalysisTool($inputStaticAnalysisTool),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withStaticAnalysisTool($expectedStaticAnalysisTool)
                     ->build(),
             );
@@ -470,6 +514,9 @@ final class ConfigurationFactoryScenario
         ?string $inputInitialTestsPhpOptions,
         ?string $expectedInitialTestPhpOptions,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -480,7 +527,7 @@ final class ConfigurationFactoryScenario
                     ->withInitialTestsPhpOptions($inputInitialTestsPhpOptions),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withInitialTestsPhpOptions($expectedInitialTestPhpOptions)
                     ->build(),
             );
@@ -495,6 +542,9 @@ final class ConfigurationFactoryScenario
         ?string $inputTestFrameworkExtraOptions,
         string $expectedTestFrameworkExtraOptions,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -506,7 +556,7 @@ final class ConfigurationFactoryScenario
                     ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withTestFramework($configTestFramework)
                     ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
                     ->build(),
@@ -518,6 +568,9 @@ final class ConfigurationFactoryScenario
         ?string $inputStaticAnalysisToolOptions,
         ?string $expectedStaticAnalysisToolOptions,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -528,7 +581,7 @@ final class ConfigurationFactoryScenario
                     ->withStaticAnalysisToolOptions($inputStaticAnalysisToolOptions),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withStaticAnalysisToolOptions($expectedStaticAnalysisToolOptions)
                     ->build(),
             );
@@ -542,6 +595,9 @@ final class ConfigurationFactoryScenario
         string $inputTestFrameworkExtraOptions,
         string $expectedTestFrameworkExtraOptions,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -552,7 +608,7 @@ final class ConfigurationFactoryScenario
                     ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withTestFramework($configTestFramework)
                     ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
                     ->build(),
@@ -571,6 +627,9 @@ final class ConfigurationFactoryScenario
         array $expectedMutators,
         array $expectedIgnoreSourceCodeMutatorsMap = [],
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -582,7 +641,7 @@ final class ConfigurationFactoryScenario
                     ->withUseNoopMutators($useNoopMutators),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withMutators($expectedMutators)
                     ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
                     ->build(),
@@ -597,13 +656,16 @@ final class ConfigurationFactoryScenario
         array $configMutators,
         array $expectedIgnoreSourceCodeMutatorsMap,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
                     ->withMutators($configMutators),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withMutators([
                         'MethodCallRemoval' => new MethodCallRemoval(),
                     ])
@@ -616,13 +678,16 @@ final class ConfigurationFactoryScenario
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?SourceFilter $expectedSourceFilter,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withInput(
                 $this->inputBuilder
                 ->withSourceFilter($sourceFilter),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withSourceFilter($expectedSourceFilter)
                     ->build(),
             );
@@ -630,25 +695,32 @@ final class ConfigurationFactoryScenario
 
     /**
      * @param non-empty-string|null $projectDirectoryInput
-     * @param non-empty-string|null $ciProjectDirectory
+     * @param non-empty-string|null $resolvedProjectDirectory
      * @param non-empty-string $expected
      */
     public function forProjectDirectory(
         ?string $projectDirectoryInput,
-        ?string $ciProjectDirectory,
-        string $expected,
+        ?string $resolvedProjectDirectory,
+        string|Exception $expected,
     ): self {
-        return $this
+        $scenario = $this
             ->withInput(
                 $this->inputBuilder
                     ->withProjectDirectory($projectDirectoryInput),
             )
-            ->withCiProjectDirectory($ciProjectDirectory)
-            ->withExpected(
-                ConfigurationBuilder::from($this->expected)
-                    ->withProjectDirectory($expected)
-                    ->build(),
-            );
+            ->withCiProjectDirectory($resolvedProjectDirectory);
+
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
+        return $expected instanceof Exception
+            ? $scenario->withExpected($expected)
+            : $scenario
+                ->withExpected(
+                    ConfigurationBuilder::from($previousExpected)
+                        ->withProjectDirectory($expected)
+                        ->build(),
+                );
     }
 
     public function forValueForTimeoutsAsEscaped(
@@ -656,6 +728,9 @@ final class ConfigurationFactoryScenario
         bool $timeoutsAsEscapedFromInput,
         bool $expectedTimeoutsAsEscaped,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -666,7 +741,7 @@ final class ConfigurationFactoryScenario
                     ->withTimeoutsAsEscaped($timeoutsAsEscapedFromInput),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withTimeoutsAsEscaped($expectedTimeoutsAsEscaped)
                     ->build(),
             );
@@ -677,6 +752,9 @@ final class ConfigurationFactoryScenario
         ?int $maxTimeoutsFromInput,
         ?int $expectedMaxTimeouts,
     ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -687,7 +765,7 @@ final class ConfigurationFactoryScenario
                     ->withMaxTimeouts($maxTimeoutsFromInput),
             )
             ->withExpected(
-                ConfigurationBuilder::from($this->expected)
+                ConfigurationBuilder::from($previousExpected)
                     ->withMaxTimeouts($expectedMaxTimeouts)
                     ->build(),
             );

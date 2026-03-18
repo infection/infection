@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
-use Infection\Configuration\CiProjectDirectoryProvider;
+use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -43,6 +43,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -68,6 +69,7 @@ use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -80,9 +82,7 @@ final class ConfigurationFactoryTest extends TestCase
 {
     private const GIT_DEFAULT_BASE = 'test/default';
 
-    private const CI_PROJECT_DIRECTORY = '/ci/path/to/project';
-
-    private const GIT_DEFAULT_PROJECT_DIRECTORY = '/default/absolute/path/to/project';
+    private const DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
 
     /**
      * @var array<string, Mutator>|null
@@ -99,20 +99,24 @@ final class ConfigurationFactoryTest extends TestCase
         ConfigurationFactoryScenario $scenario,
     ): void {
         $schema = $scenario->schemaBuilder->build();
-
-        $actual = $this
-            ->createConfigurationFactory(
-                $scenario->ciDetected,
-                $scenario->githubActionsDetected,
-                $scenario->ciProjectDirectory,
-            )
-            ->create(...$scenario->inputBuilder->build($schema))
-        ;
-
-        $this->assertEquals(
-            $scenario->expected,
-            $actual,
+        $factory = $this->createConfigurationFactory(
+            $scenario->ciDetected,
+            $scenario->githubActionsDetected,
+            $scenario->resolvedProjectDirectory,
         );
+
+        if ($scenario->expected instanceof Exception) {
+            $this->expectExceptionObject($scenario->expected);
+        }
+
+        $actual = $factory->create(...$scenario->inputBuilder->build($schema));
+
+        if (!$scenario->expected instanceof Exception) {
+            $this->assertEquals(
+                $scenario->expected,
+                $actual,
+            );
+        }
     }
 
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
@@ -146,7 +150,7 @@ final class ConfigurationFactoryTest extends TestCase
             ->createConfigurationFactory(
                 ciDetected: false,
                 githubActionsDetected: false,
-                ciProjectDirectory: null,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             )
             ->create(
                 schema: $schema,
@@ -284,7 +288,7 @@ final class ConfigurationFactoryTest extends TestCase
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            projectDirectory: self::CI_PROJECT_DIRECTORY,
+            projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
@@ -294,7 +298,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultScenario = ConfigurationFactoryScenario::create(
             ciDetected: false,
             githubActionsDetected: false,
-            ciProjectDirectory: self::CI_PROJECT_DIRECTORY,
+            projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             schemaBuilder: $defaultSchemaBuilder,
             inputBuilder: $defaultInputBuilder,
             expected: $defaultConfiguration,
@@ -1161,31 +1165,33 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'with project directory input' => [
             $defaultScenario->forProjectDirectory(
                 projectDirectoryInput: '/path/to/project',
-                ciProjectDirectory: null,
+                resolvedProjectDirectory: null,
                 expected: '/path/to/project',
             ),
         ];
 
-        yield 'without project directory input and with  CI project directory' => [
+        yield 'without project directory input and with a resolved project directory' => [
             $defaultScenario->forProjectDirectory(
                 projectDirectoryInput: null,
-                ciProjectDirectory: self::CI_PROJECT_DIRECTORY,
-                expected: self::CI_PROJECT_DIRECTORY,
+                resolvedProjectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                expected: self::DEFAULT_PROJECT_DIRECTORY,
             ),
         ];
 
-        yield 'without project directory input nor CI project directory' => [
+        yield 'without project directory input nor resolved project directory' => [
             $defaultScenario->forProjectDirectory(
                 projectDirectoryInput: null,
-                ciProjectDirectory: null,
-                expected: self::GIT_DEFAULT_PROJECT_DIRECTORY,
+                resolvedProjectDirectory: null,
+                expected: new InvalidArgumentException(
+                    'Could not resolve the project directory.',
+                ),
             ),
         ];
 
-        yield 'with project directory input & CI project directory' => [
+        yield 'with project directory input & resolved project directory' => [
             $defaultScenario->forProjectDirectory(
                 projectDirectoryInput: '/path/to/project',
-                ciProjectDirectory: self::CI_PROJECT_DIRECTORY,
+                resolvedProjectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
                 expected: '/path/to/project',
             ),
         ];
@@ -1194,7 +1200,7 @@ final class ConfigurationFactoryTest extends TestCase
             ConfigurationFactoryScenario::create(
                 ciDetected: false,
                 githubActionsDetected: false,
-                ciProjectDirectory: self::CI_PROJECT_DIRECTORY,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
                 schemaBuilder: SchemaConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10.0)
                     ->withSource(new Source(['src/'], ['vendor/']))
@@ -1366,17 +1372,17 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @param non-empty-string|null $ciProjectDirectory
+     * @param non-empty-string|null $projectDirectory
      */
     private function createConfigurationFactory(
         bool $ciDetected,
         bool $githubActionsDetected,
-        ?string $ciProjectDirectory,
+        ?string $projectDirectory,
     ): ConfigurationFactory {
-        $ciProjectDirectoryProvider = $this->createMock(CiProjectDirectoryProvider::class);
-        $ciProjectDirectoryProvider
+        $projectDirectoryProviderMock = $this->createMock(ProjectDirectoryProvider::class);
+        $projectDirectoryProviderMock
             ->method('provide')
-            ->willReturn($ciProjectDirectory);
+            ->willReturn($projectDirectory);
 
         return new ConfigurationFactory(
             new TmpDirProvider(),
@@ -1386,9 +1392,8 @@ final class ConfigurationFactoryTest extends TestCase
             new DummyCiDetector($ciDetected, $githubActionsDetected),
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
-                self::GIT_DEFAULT_PROJECT_DIRECTORY,
             ),
-            $ciProjectDirectoryProvider,
+            $projectDirectoryProviderMock,
         );
     }
 }

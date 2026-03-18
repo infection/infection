@@ -33,50 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Tests\Configuration\ProjectDirectoryProvider;
 
-use DomainException;
+use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
 use Infection\Git\Git;
-use function sprintf;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final readonly class ConfigurationFactoryGit implements Git
+#[CoversClass(GitProjectDirectoryProvider::class)]
+final class GitProjectDirectoryProviderTest extends TestCase
 {
-    /**
-     * @param non-empty-string $defaultBaseBranch
-     */
-    public function __construct(
-        private string $defaultBaseBranch,
-    ) {
-    }
-
-    public function getDefaultBase(): string
+    public function test_it_provides_the_project_directory(): void
     {
-        return $this->defaultBaseBranch;
-    }
+        $expected = '/path/to/project/directory';
 
-    public function getChangedFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): string {
-        throw new DomainException('Not implemented.');
-    }
+        $gitMock = $this->createMock(Git::class);
+        $gitMock
+            ->expects($this->once())
+            ->method('getProjectDirectory')
+            ->willReturn($expected);
 
-    public function getChangedLinesRangesByFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): never {
-        throw new DomainException('Not implemented.');
-    }
+        $provider = new GitProjectDirectoryProvider($gitMock);
 
-    public function getBaseReference(string $base): string
-    {
-        return sprintf('reference(%s)', $base);
-    }
+        $actual = $provider->provide();
 
-    public function getProjectDirectory(): string
-    {
-        throw new DomainException('Not implemented.');
+        $this->assertSame($expected, $actual);
     }
 }

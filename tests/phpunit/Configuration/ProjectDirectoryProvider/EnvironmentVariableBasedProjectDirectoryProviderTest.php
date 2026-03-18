@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration;
+namespace Infection\Tests\Configuration\ProjectDirectoryProvider;
 
 use Exception;
-use Infection\Configuration\CiProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
 use Infection\FileSystem\FileSystem;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use InvalidArgumentException;
@@ -45,8 +45,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
 
-#[CoversClass(CiProjectDirectoryProvider::class)]
-final class CiProjectDirectoryProviderTest extends TestCase
+#[CoversClass(EnvironmentVariableBasedProjectDirectoryProvider::class)]
+final class EnvironmentVariableBasedProjectDirectoryProviderTest extends TestCase
 {
     use BacksUpEnvironmentVariables;
 
@@ -68,9 +68,9 @@ final class CiProjectDirectoryProviderTest extends TestCase
         string|Exception|null $expected,
     ): void {
         if ($directory === false) {
-            putenv('CI_PROJECT_DIR');
+            putenv('INFECTION_TEST_PROJECT_DIR');
         } else {
-            putenv('CI_PROJECT_DIR=' . $directory);
+            putenv('INFECTION_TEST_PROJECT_DIR=' . $directory);
         }
 
         $fileSystemMock = $this->createMock(FileSystem::class);
@@ -81,7 +81,10 @@ final class CiProjectDirectoryProviderTest extends TestCase
             ->method('isReadableDirectory')
             ->willReturn($readableDirectory);
 
-        $provider = new CiProjectDirectoryProvider($fileSystemMock);
+        $provider = new EnvironmentVariableBasedProjectDirectoryProvider(
+            $fileSystemMock,
+            'INFECTION_TEST_PROJECT_DIR',
+        );
 
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);
