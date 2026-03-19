@@ -37,7 +37,6 @@ namespace Infection\Command\Debug;
 
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
-use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
@@ -129,7 +128,7 @@ final class DumpAstCommand extends BaseCommand
             new OutputFormatterStyle(background: 'red'),
         );
 
-        $io->writeln(
+        $io->write(
             $container->getNodeDumper()->dump(
                 $nodes,
                 dumpOtherAttributes: $shouldShowAttributes,

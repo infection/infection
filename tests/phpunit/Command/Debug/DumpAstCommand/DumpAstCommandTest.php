@@ -121,7 +121,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                     origNode: nodeId(4)
                 )
             )
-
             AST;
 
         $tester->execute([
