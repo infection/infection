@@ -649,7 +649,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\NullReflection
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(19)
@@ -664,7 +664,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(21)
@@ -677,7 +677,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: concreteMethod
                                                     eligible: true
                                                     origNode: nodeId(22)
@@ -689,7 +689,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
                                                 functionScope: nodeId(18)
-                                                reflectionClass: Infection\Reflection\NullReflection
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: concreteMethod
                                                 eligible: true
                                                 origNode: nodeId(20)
@@ -702,7 +702,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\NullReflection
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: concreteMethod
                                             eligible: true
                                             origNode: nodeId(23)
@@ -712,7 +712,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         parent: nodeId(6)
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\NullReflection
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: concreteMethod
                                         eligible: true
                                         origNode: nodeId(18)
