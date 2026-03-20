@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Container\DebugOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -55,6 +56,11 @@ final class IO extends SymfonyStyle
         parent::__construct($input, $output);
 
         $this->input = $input;
+
+        if (!$output instanceof NullOutput) {
+            $output = new DebugOutput($output);
+        }
+
         $this->output = $output;
     }
 
