@@ -33,50 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Configuration\ProjectDirectoryProvider;
 
-use DomainException;
-use Infection\Git\Git;
+use function getenv;
+use Infection\FileSystem\FileSystem;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
-final readonly class ConfigurationFactoryGit implements Git
+/**
+ * @internal
+ */
+final readonly class EnvironmentVariableBasedProjectDirectoryProvider implements ProjectDirectoryProvider
 {
-    /**
-     * @param non-empty-string $defaultBaseBranch
-     */
     public function __construct(
-        private string $defaultBaseBranch,
+        private FileSystem $fileSystem,
+        private string $environmentVariableName,
     ) {
     }
 
-    public function getDefaultBase(): string
+    public function provide(): ?string
     {
-        return $this->defaultBaseBranch;
-    }
+        $directory = getenv($this->environmentVariableName);
 
-    public function getChangedFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): string {
-        throw new DomainException('Not implemented.');
-    }
+        if ($directory === false) {
+            return null;
+        }
 
-    public function getChangedLinesRangesByFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): never {
-        throw new DomainException('Not implemented.');
-    }
+        Assert::true(
+            $this->fileSystem->isAbsolutePath($directory),
+            sprintf(
+                'Expected the path "%s" to be an absolute path.',
+                $directory,
+            ),
+        );
+        Assert::true(
+            $this->fileSystem->isReadableDirectory($directory),
+            sprintf(
+                'Expected the path "%s" to point to a readable directory.',
+                $directory,
+            ),
+        );
+        Assert::stringNotEmpty($directory);
 
-    public function getBaseReference(string $base): string
-    {
-        return sprintf('reference(%s)', $base);
-    }
-
-    public function getProjectDirectory(): string
-    {
-        throw new DomainException('Not implemented.');
+        return $directory;
     }
 }

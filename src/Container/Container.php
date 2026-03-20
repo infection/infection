@@ -43,6 +43,10 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -471,7 +475,7 @@ final class Container extends DIContainer
                     $config->mutateOnlyCoveredCode(),
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
-                    $config->loggerProjectRootDirectory,
+                    $config->projectDirectory,
                     $config->processTimeout,
                 );
             },
@@ -638,6 +642,19 @@ final class Container extends DIContainer
                 $container->getConfiguration()->configurationPathname,
             ),
             NodeDumper::class => static fn (self $container): NodeDumper => new NodeDumper(),
+            ProjectDirectoryProvider::class => static fn (self $container): ProjectDirectoryProvider => new ChainProjectDirectoryProvider(
+                new EnvironmentVariableBasedProjectDirectoryProvider(
+                    $container->getFileSystem(),
+                    // See https://docs.github.com/en/actions/reference/workflows-and-actions/variables
+                    'GITHUB_WORKSPACE',
+                ),
+                new EnvironmentVariableBasedProjectDirectoryProvider(
+                    $container->getFileSystem(),
+                    // See https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables
+                    'CI_PROJECT_DIR',
+                ),
+                new GitProjectDirectoryProvider($container->getGit()),
+            ),
         ]);
 
         return $container->withValues(
@@ -648,6 +665,7 @@ final class Container extends DIContainer
 
     /**
      * @param non-empty-string|null $configFile
+     * @param non-empty-string|null $projectDirectory Absolute path.
      */
     public function withValues(
         LoggerInterface $logger,
@@ -684,7 +702,7 @@ final class Container extends DIContainer
         bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
         bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-        ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
+        ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
     ): self {
@@ -763,7 +781,7 @@ final class Container extends DIContainer
                 useNoopMutators: $useNoopMutators,
                 executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
                 mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-                loggerProjectRootDirectory: $loggerProjectRootDirectory,
+                projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
             ),
