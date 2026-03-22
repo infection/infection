@@ -61,7 +61,7 @@ final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    private static function markAsEligible(Node $node): void
+    public static function markAsEligible(Node $node): void
     {
         $node->setAttribute(self::ELIGIBLE, true);
     }

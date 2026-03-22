@@ -38,6 +38,7 @@ namespace Infection\PhpParser\NodeDumper;
 use function get_debug_type;
 use function implode;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;
@@ -131,6 +132,7 @@ final class NodeDumper
         private bool $dumpOtherAttributes = true,
         // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
+        private bool $decorateNodes = false,
     ) {
     }
 
@@ -151,6 +153,7 @@ final class NodeDumper
         ?bool $dumpOtherAttributes = null,
         // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
+        ?bool $decorateNodes = null,
     ): string {
         $result = '';
         $newLine = "\n";
@@ -163,6 +166,11 @@ final class NodeDumper
         if ($onlyVisitedNodes !== null) {
             $originalOnlyVisitedNodes = $this->onlyVisitedNodes;
             $this->onlyVisitedNodes = $onlyVisitedNodes;
+        }
+
+        if ($decorateNodes !== null) {
+            $originalHighlightMutationCandidates = $this->decorateNodes;
+            $this->decorateNodes = $decorateNodes;
         }
 
         if ($dumpPositions !== null) {
@@ -182,6 +190,10 @@ final class NodeDumper
 
         if ($dumpOtherAttributes !== null) {
             $this->dumpOtherAttributes = $originalDumpOtherAttributes;
+        }
+
+        if ($decorateNodes !== null) {
+            $this->decorateNodes = $originalHighlightMutationCandidates;
         }
 
         if ($onlyVisitedNodes !== null) {
@@ -296,7 +308,14 @@ final class NodeDumper
                 return;
             }
 
-            $result .= $node->getType();
+            $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
+
+            $result .= $isEligible && $this->decorateNodes
+                ? sprintf(
+                    '<eligible>%s</eligible>',
+                    $node->getType(),
+                )
+                : $node->getType();
 
             if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
                 $result .= $p;

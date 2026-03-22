@@ -47,6 +47,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use SplFileObject;
 use function sprintf;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
@@ -101,6 +102,7 @@ final class DumpAstCommand extends BaseCommand
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
+        self::configureFormatter($io);
 
         $container = $this
             ->getApplication()
@@ -117,6 +119,7 @@ final class DumpAstCommand extends BaseCommand
             $container->getNodeDumper()->dump(
                 $nodes,
                 dumpOtherAttributes: $shouldShowAttributes,
+                decorateNodes: $io->isDecorated(),
             ),
         );
 
@@ -186,5 +189,15 @@ final class DumpAstCommand extends BaseCommand
     private static function addIdsToNodes(array $nodes): void
     {
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
+    }
+
+    private static function configureFormatter(IO $io): void
+    {
+        $formatter = $io->getFormatter();
+
+        $formatter->setStyle(
+            'eligible',
+            new OutputFormatterStyle(background: 'green'),
+        );
     }
 }

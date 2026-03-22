@@ -39,6 +39,7 @@ use Exception;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
@@ -63,6 +64,7 @@ use PHPUnit\Framework\TestCase;
 final class NodeDumperTest extends TestCase
 {
     #[DataProvider('codeWithDefaultConfigurationProvider')]
+    #[DataProvider('decoratedNodesProvider')]
     #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
@@ -83,6 +85,7 @@ final class NodeDumperTest extends TestCase
             $scenario->dumpPositions,
             $scenario->dumpOtherAttributes,
             $scenario->onlyVisitedNodes,
+            $scenario->decorateNodes,
         );
 
         if ($expected instanceof Exception) {
@@ -395,6 +398,63 @@ final class NodeDumperTest extends TestCase
                     AST,
             )
             ->build();
+    }
+
+    public static function decoratedNodesProvider(): iterable
+    {
+        yield 'eligible nodes are not decorated by default' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            LabelNodesAsEligibleVisitor::markAsEligible($node);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'eligible nodes can be decorated' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            $eligibleNode = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+
+            LabelNodesAsEligibleVisitor::markAsEligible($eligibleNode);
+
+            return NodeDumperScenario::forNode([$node, $eligibleNode])
+                ->withShowAllNodes()
+                ->withDecorateNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                            1: <eligible>Expr_Assign</eligible>(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
     }
 
     public static function nodesWithAttributesWhichMayCauseCircularDependenciesProvider(): iterable
