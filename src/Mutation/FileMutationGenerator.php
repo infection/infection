@@ -152,7 +152,7 @@ class FileMutationGenerator
     {
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        $traverser = $this->traverserFactory->createEnrichmentTraverser($sourceFile);
+        $traverser = $this->traverserFactory->createEnrichmentTraverser();
         $traverser->traverse($initialStatements);
 
         return [$initialStatements, $originalFileTokens];

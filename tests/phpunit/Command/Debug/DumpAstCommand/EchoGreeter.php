@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Debug\DumpAstCommand;
 
-class EchoGreeter implements Greeter
+final class EchoGreeter implements Greeter
 {
     public function greet(): string
     {
