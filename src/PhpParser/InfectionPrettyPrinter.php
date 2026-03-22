@@ -33,48 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\PhpParser;
 
-use Infection\Container\Container;
-use Infection\Mutant\MutantCodePrinter;
-use Infection\PhpParser\InfectionPrettyPrinter;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
-use PhpParser\NodeDumper;
+use PhpParser\PrettyPrinter\Standard;
+use function Safe\preg_replace;
 
 /**
- * Singleton for the container and a few services (used for tests). The goal is to avoid
- * instantiating multiple times stateless services across the tests to reduce the memory footprint
- * and remove some redundant code.
- *
  * @internal
  */
-final class SingletonContainer
+final class InfectionPrettyPrinter extends Standard
 {
-    private static ?Container $container = null;
-
-    private static ?NodeDumper $dumper = null;
-
-    private static ?MutantCodePrinter $printer = null;
-
-    private static ?PHPDocParser $phpDocParser = null;
-
-    public static function getContainer(): Container
+    /**
+     * Prints a single-quoted string using minimal escaping.
+     *
+     * PHP-Parser's default regex also escapes a backslash when it is preceded by
+     * another backslash (the (?<=\\)\\ alternative), to avoid producing odd-looking
+     * three-backslash sequences. That extra rule changes non-canonical but valid
+     * source like '\\\|' (3 backslashes) to '\\\\|' (4 backslashes), making mutation
+     * diffs noisier than necessary. Dropping that rule keeps the original encoding.
+     */
+    protected function pSingleQuotedString(string $string): string
     {
-        return self::$container ??= Container::create();
-    }
-
-    public static function getNodeDumper(): NodeDumper
-    {
-        return self::$dumper ??= new NodeDumper();
-    }
-
-    public static function getPrinter(): MutantCodePrinter
-    {
-        return self::$printer ??= new MutantCodePrinter(new InfectionPrettyPrinter());
-    }
-
-    public static function getPHPDocParser(): PHPDocParser
-    {
-        return self::$phpDocParser ??= new PHPDocParser();
+        return '\'' . preg_replace('/\'|\\\\(?=[\'\\\\]|$)/', '\\\\$0', $string) . '\'';
     }
 }
