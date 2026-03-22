@@ -128,7 +128,7 @@ final class NodeDumper
         private readonly bool $dumpProperties = false,
         private readonly bool $dumpComments = false,
         private bool $dumpPositions = false,
-        private readonly bool $dumpOtherAttributes = true,
+        private bool $dumpOtherAttributes = true,
         // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
     ) {
@@ -148,11 +148,17 @@ final class NodeDumper
         array|Node $node,
         ?string $code = null,
         ?bool $dumpPositions = null,
+        ?bool $dumpOtherAttributes = null,
         // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
     ): string {
         $result = '';
         $newLine = "\n";
+
+        if ($dumpOtherAttributes !== null) {
+            $originalDumpOtherAttributes = $this->dumpOtherAttributes;
+            $this->dumpOtherAttributes = $dumpOtherAttributes;
+        }
 
         if ($onlyVisitedNodes !== null) {
             $originalOnlyVisitedNodes = $this->onlyVisitedNodes;
@@ -173,6 +179,10 @@ final class NodeDumper
             $newLine,
             indent: false,
         );
+
+        if ($dumpOtherAttributes !== null) {
+            $this->dumpOtherAttributes = $originalDumpOtherAttributes;
+        }
 
         if ($onlyVisitedNodes !== null) {
             $this->onlyVisitedNodes = $originalOnlyVisitedNodes;

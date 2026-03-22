@@ -48,6 +48,7 @@ use PhpParser\NodeTraverser;
 use SplFileObject;
 use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -58,6 +59,8 @@ use Webmozart\Assert\Assert;
 final class DumpAstCommand extends BaseCommand
 {
     private const FILE_PATH_ARGUMENT = 'file';
+
+    private const SHOW_ATTRIBUTES = 'show-attributes';
 
     public function __construct(
         private readonly FileSystem $fileSystem,
@@ -82,6 +85,12 @@ final class DumpAstCommand extends BaseCommand
             InputArgument::REQUIRED,
             'Path to the file to parse.',
         );
+        $this->addOption(
+            self::SHOW_ATTRIBUTES,
+            null,
+            InputOption::VALUE_NONE,
+            'Show all the attributes',
+        );
 
         ConfigurationOption::addOption($this);
     }
@@ -89,6 +98,7 @@ final class DumpAstCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $file = $this->getFile($io);
+        $shouldShowAttributes = self::shouldShowAttributes($io);
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
 
@@ -104,7 +114,10 @@ final class DumpAstCommand extends BaseCommand
         $nodes = $this->createAst($container, $file);
 
         $io->write(
-            $container->getNodeDumper()->dump($nodes),
+            $container->getNodeDumper()->dump(
+                $nodes,
+                dumpOtherAttributes: $shouldShowAttributes,
+            ),
         );
 
         return true;
@@ -160,6 +173,11 @@ final class DumpAstCommand extends BaseCommand
         );
 
         return new SplFileObject($canonicalPath);
+    }
+
+    private static function shouldShowAttributes(IO $io): bool
+    {
+        return (bool) $io->getInput()->getOption(self::SHOW_ATTRIBUTES);
     }
 
     /**
