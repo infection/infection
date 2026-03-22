@@ -40,6 +40,7 @@ use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -91,6 +92,7 @@ final class FileMutationGeneratorTest extends TestCase
             ),
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
+            $this->createStub(SourceLineMatcher::class),
             $this->tracerMock,
             new FileStore($fileSystemStub),
         );

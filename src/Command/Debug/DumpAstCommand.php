@@ -106,6 +106,7 @@ final class DumpAstCommand extends BaseCommand
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
+        DumpAstCommand::configureFormatter($io);
 
         $container = $this
             ->getApplication()
@@ -118,15 +119,6 @@ final class DumpAstCommand extends BaseCommand
             );
 
         $nodes = $this->createAst($container, $file);
-
-        $io->getFormatter()->setStyle(
-            'eligible',
-            new OutputFormatterStyle(background: 'green'),
-        );
-        $io->getFormatter()->setStyle(
-            'mutation-candidate',
-            new OutputFormatterStyle(background: 'red'),
-        );
 
         $io->write(
             $container->getNodeDumper()->dump(
@@ -202,5 +194,19 @@ final class DumpAstCommand extends BaseCommand
     private static function addIdsToNodes(array $nodes): void
     {
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
+    }
+
+    private static function configureFormatter(IO $io): void
+    {
+        $formatter = $io->getFormatter();
+
+        $formatter->setStyle(
+            'eligible',
+            new OutputFormatterStyle(background: 'green'),
+        );
+        $formatter->setStyle(
+            'mutation-candidate',
+            new OutputFormatterStyle(background: 'red'),
+        );
     }
 }

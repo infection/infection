@@ -52,6 +52,7 @@ final class NodeDumperScenario
         public bool $dumpPositions = false,
         public bool $dumpOtherAttributes = false,
         public bool $onlyVisitedNodes = true,
+        public bool $highlightMutationCandidates = false,
     ) {
     }
 
@@ -104,6 +105,14 @@ final class NodeDumperScenario
     {
         $clone = clone $this;
         $clone->onlyVisitedNodes = false;
+
+        return $clone;
+    }
+
+    public function withHighlightMutationCandidates(): self
+    {
+        $clone = clone $this;
+        $clone->highlightMutationCandidates = true;
 
         return $clone;
     }

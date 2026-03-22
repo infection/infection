@@ -43,7 +43,6 @@ use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
@@ -69,9 +68,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
     {
-        $traverser = $this->factory->createEnrichmentTraverser(
-            new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
-        );
+        $traverser = $this->factory->createEnrichmentTraverser();
 
         $this->assertTraverserVisitorsAre(
             $traverser,

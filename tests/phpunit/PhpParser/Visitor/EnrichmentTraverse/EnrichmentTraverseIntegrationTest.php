@@ -38,7 +38,6 @@ namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -63,11 +62,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
-        $traverserFactory
-            ->createEnrichmentTraverser(
-                new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
-            )
-            ->traverse($nodes);
+        $traverserFactory->createEnrichmentTraverser()->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
                 new LabelMutationCandidatesVisitor(),

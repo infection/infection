@@ -118,7 +118,6 @@ final class MockTeamCityCommand extends BaseCommand
             'Time to wait in-between each log, in milliseconds (ms).',
             self::DEFAULT_TIME_IN_MILLISECONDS,
         );
-
         // This is not used; this is purely to allow the function to be executed by the plugin which
         // always appends the configuration.
         ConfigurationOption::addOption($this);

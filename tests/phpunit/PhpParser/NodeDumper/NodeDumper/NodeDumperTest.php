@@ -39,6 +39,7 @@ use Exception;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
@@ -63,6 +64,7 @@ use PHPUnit\Framework\TestCase;
 final class NodeDumperTest extends TestCase
 {
     #[DataProvider('codeWithDefaultConfigurationProvider')]
+    #[DataProvider('highlightMutationCandidatesProvider')]
     #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
@@ -83,6 +85,7 @@ final class NodeDumperTest extends TestCase
             $scenario->dumpPositions,
             $scenario->dumpOtherAttributes,
             $scenario->onlyVisitedNodes,
+            $scenario->highlightMutationCandidates,
         );
 
         if ($expected instanceof Exception) {
@@ -94,6 +97,95 @@ final class NodeDumperTest extends TestCase
         if (!($expected instanceof Exception)) {
             $this->assertSame($expected, $actual);
         }
+    }
+
+    public function test_dump_can_override_dump_other_attributes(): void
+    {
+        $node = new Assign(
+            new Variable('x'),
+            new String_(
+                'Hello World!',
+                ['unspecifiedAttribute' => 'Hi'],
+            ),
+        );
+
+        $dumper = new NodeDumper(
+            dumpProperties: true,
+            dumpOtherAttributes: false,
+            onlyVisitedNodes: false,
+        );
+
+        $withAttributes = $dumper->dump($node, dumpOtherAttributes: true);
+
+        self::assertSame(
+            <<<'AST'
+                Expr_Assign(
+                    var: Expr_Variable(
+                        name: x
+                    )
+                    expr: Scalar_String(
+                        value: Hello World!
+                        unspecifiedAttribute: Hi
+                    )
+                )
+                AST,
+            $withAttributes,
+        );
+
+        $withoutAttributes = $dumper->dump($node);
+
+        self::assertSame(
+            <<<'AST'
+                Expr_Assign(
+                    var: Expr_Variable(
+                        name: x
+                    )
+                    expr: Scalar_String(
+                        value: Hello World!
+                    )
+                )
+                AST,
+            $withoutAttributes,
+        );
+    }
+
+    public function test_dump_can_override_highlight_mutation_candidates(): void
+    {
+        $node = new Assign(
+            new Variable('x'),
+            new String_('value'),
+        );
+        LabelMutationCandidatesVisitor::markAsAMutationCandidate($node);
+
+        $dumper = new NodeDumper(
+            dumpOtherAttributes: false,
+            onlyVisitedNodes: false,
+            highlightMutationCandidates: false,
+        );
+
+        $highlighted = $dumper->dump($node, highlightMutationCandidates: true);
+
+        self::assertSame(
+            <<<'AST'
+                <mutation-candidate>Expr_Assign</mutation-candidate>(
+                    var: Expr_Variable
+                    expr: Scalar_String
+                )
+                AST,
+            $highlighted,
+        );
+
+        $notHighlighted = $dumper->dump($node);
+
+        self::assertSame(
+            <<<'AST'
+                Expr_Assign(
+                    var: Expr_Variable
+                    expr: Scalar_String
+                )
+                AST,
+            $notHighlighted,
+        );
     }
 
     public static function codeWithDefaultConfigurationProvider(): iterable
@@ -391,6 +483,76 @@ final class NodeDumperTest extends TestCase
                 <<<'AST'
                     Stmt_ClassMethod(
                         name: Identifier
+                    )
+                    AST,
+            )
+            ->build();
+    }
+
+    public static function highlightMutationCandidatesProvider(): iterable
+    {
+        yield 'mutation candidate not highlighted by default' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            LabelMutationCandidatesVisitor::markAsAMutationCandidate($node);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'mutation candidate highlighted' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            LabelMutationCandidatesVisitor::markAsAMutationCandidate($node);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withHighlightMutationCandidates()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: <mutation-candidate>Expr_Assign</mutation-candidate>(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'non-mutation candidate not highlighted even when enabled' => NodeDumperScenario::forNode(
+            [
+                new Assign(
+                    new Variable('x'),
+                    new String_('value'),
+                ),
+            ],
+        )
+            ->withShowAllNodes()
+            ->withHighlightMutationCandidates()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Expr_Assign(
+                            var: Expr_Variable
+                            expr: Scalar_String
+                        )
                     )
                     AST,
             )

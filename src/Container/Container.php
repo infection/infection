@@ -455,6 +455,7 @@ final class Container extends DIContainer
                 $container->getFileParser(),
                 $container->getNodeTraverserFactory(),
                 $container->getLineRangeCalculator(),
+                $container->getSourceLineMatcher(),
                 $container->getTracer(),
                 $container->getFileStore(),
             ),

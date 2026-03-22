@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
-use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
-use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -46,12 +44,10 @@ use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Source\Matcher\SourceLineMatcher;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use SplFileInfo;
 use SplObjectStorage;
 
 /**
@@ -60,15 +56,10 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
-    public function __construct(
-        private readonly SourceLineMatcher $sourceLineMatcher,
-    ) {
-    }
-
     /**
      * @see /doc/nomenclature.md#ast-enrichment
      */
-    public function createEnrichmentTraverser(SplFileInfo $sourceFile): NodeTraverserInterface
+    public function createEnrichmentTraverser(): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
 
@@ -85,11 +76,6 @@ class NodeTraverserFactory
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
-            new ExcludeNonMutableCodeVisitor(),
-            new ExcludeUnchangedLinesVisitor(
-                $this->sourceLineMatcher,
-                $sourceFile->getRealPath(),
-            ),
             new LabelNodesAsEligibleVisitor(),
         );
     }
