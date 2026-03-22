@@ -60,11 +60,9 @@ final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
     {
         MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
 
-        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
-            return null;
+        if (LabelNodesAsEligibleVisitor::isEligible($node)) {
+            self::markAsAMutationCandidate($node);
         }
-
-        self::markAsAMutationCandidate($node);
 
         return null;
     }
