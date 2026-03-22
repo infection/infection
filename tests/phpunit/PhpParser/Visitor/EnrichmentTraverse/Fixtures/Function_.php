@@ -35,11 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-function equals(mixed $left, mixed $right): bool
-{
-    return $left === $right;
-}
-
 function identical(mixed $left, mixed $right): bool
 {
     return $left === $right;

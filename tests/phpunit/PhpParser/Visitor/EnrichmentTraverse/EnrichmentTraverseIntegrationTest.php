@@ -412,7 +412,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 stmts: array(
                                     0: Stmt_Return(
-                                        expr: Expr_BinaryOp_Equal(
+                                        expr: Expr_BinaryOp_Identical(
                                             left: Expr_Variable(
                                                 nodeId: 17
                                                 parent: nodeId(16)
@@ -441,89 +441,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 isStrictTypes: true
                                 eligible: true
                                 origNode: nodeId(6)
-                            )
-                            1: Stmt_Function(
-                                name: Identifier(
-                                    nodeId: 20
-                                    parent: nodeId(19)
-                                    eligible: true
-                                    origNode: nodeId(20)
-                                )
-                                params: array(
-                                    0: Param(
-                                        type: Identifier(
-                                            nodeId: 22
-                                            parent: nodeId(21)
-                                            eligible: true
-                                            origNode: nodeId(22)
-                                        )
-                                        var: Expr_Variable(
-                                            nodeId: 23
-                                            parent: nodeId(21)
-                                            eligible: true
-                                            origNode: nodeId(23)
-                                        )
-                                        nodeId: 21
-                                        parent: nodeId(19)
-                                        eligible: true
-                                        origNode: nodeId(21)
-                                    )
-                                    1: Param(
-                                        type: Identifier(
-                                            nodeId: 25
-                                            parent: nodeId(24)
-                                            eligible: true
-                                            origNode: nodeId(25)
-                                        )
-                                        var: Expr_Variable(
-                                            nodeId: 26
-                                            parent: nodeId(24)
-                                            eligible: true
-                                            origNode: nodeId(26)
-                                        )
-                                        nodeId: 24
-                                        parent: nodeId(19)
-                                        eligible: true
-                                        origNode: nodeId(24)
-                                    )
-                                )
-                                returnType: Identifier(
-                                    nodeId: 27
-                                    parent: nodeId(19)
-                                    eligible: true
-                                    origNode: nodeId(27)
-                                )
-                                stmts: array(
-                                    0: Stmt_Return(
-                                        expr: Expr_BinaryOp_Identical(
-                                            left: Expr_Variable(
-                                                nodeId: 30
-                                                parent: nodeId(29)
-                                                eligible: true
-                                                origNode: nodeId(30)
-                                            )
-                                            right: Expr_Variable(
-                                                nodeId: 31
-                                                parent: nodeId(29)
-                                                eligible: true
-                                                origNode: nodeId(31)
-                                            )
-                                            nodeId: 29
-                                            parent: nodeId(28)
-                                            eligible: true
-                                            origNode: nodeId(29)
-                                        )
-                                        nodeId: 28
-                                        parent: nodeId(19)
-                                        eligible: true
-                                        origNode: nodeId(28)
-                                    )
-                                )
-                                nodeId: 19
-                                parent: nodeId(4)
-                                isStrictTypes: true
-                                eligible: true
-                                origNode: nodeId(19)
                             )
                         )
                         kind: 1
