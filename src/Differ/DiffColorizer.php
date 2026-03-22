@@ -60,6 +60,12 @@ class DiffColorizer
 {
     public function colorize(string $diff): string
     {
+        // escape backslashes to prevent them from accidentally escaping our inserted style tags below;
+        // Symfony Console uses \0 (null byte) as a placeholder that strtr converts back to \ at the end
+        // of Symfony\Component\Console\Formatter\OutputFormatter::formatAndWrap, so \ in diff content
+        // won't be misinterpreted as a tag escape
+        $diff = str_replace('\\', "\0", $diff);
+
         // escape symfony console style like tags, so they don't mix up infections own output styles
         // see https://symfony.com/doc/current/console/coloring.html
         $diff = str_replace('<', '\<', $diff);

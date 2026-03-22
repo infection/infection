@@ -235,6 +235,16 @@ final class DiffColorizerTest extends TestCase
                 CODE,
         ];
 
+        // https://github.com/infection/infection/issues/2977
+        yield 'backslash directly before inline diff tag must not break symfony console output' => [
+            <<<'CODE'
+                 context line
+                -    return 'a\bcd';
+                +    return 'a\xyz';
+                CODE,
+            "<code>\n context line\n<diff-del>-    return 'a\0<diff-del-inline>bcd</diff-del-inline>';</diff-del>\n<diff-add>+    return 'a\0<diff-add-inline>xyz</diff-add-inline>';</diff-add></code>",
+        ];
+
         yield 'multibyte characters partial-deletion' => [
             <<<'CODE'
                      function ($a) {
