@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Command\Debug;
 
 use Infection\Command\BaseCommand;
-use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
@@ -96,8 +95,6 @@ final class DumpAstCommand extends BaseCommand
         );
 
         ConfigurationOption::addOption($this);
-        SourceFilterOptions::addOption($this);
-        BaseOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool
@@ -124,7 +121,7 @@ final class DumpAstCommand extends BaseCommand
             $container->getNodeDumper()->dump(
                 $nodes,
                 dumpOtherAttributes: $shouldShowAttributes,
-                highlightMutationCandidates: $io->isDecorated(),
+                decorateNodes: $io->isDecorated(),
             ),
         );
 

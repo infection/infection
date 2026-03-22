@@ -40,6 +40,7 @@ use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
@@ -64,7 +65,7 @@ use PHPUnit\Framework\TestCase;
 final class NodeDumperTest extends TestCase
 {
     #[DataProvider('codeWithDefaultConfigurationProvider')]
-    #[DataProvider('highlightMutationCandidatesProvider')]
+    #[DataProvider('decoratedNodesProvider')]
     #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
@@ -85,7 +86,7 @@ final class NodeDumperTest extends TestCase
             $scenario->dumpPositions,
             $scenario->dumpOtherAttributes,
             $scenario->onlyVisitedNodes,
-            $scenario->highlightMutationCandidates,
+            $scenario->decorateNodes,
         );
 
         if ($expected instanceof Exception) {
@@ -400,14 +401,14 @@ final class NodeDumperTest extends TestCase
             ->build();
     }
 
-    public static function highlightMutationCandidatesProvider(): iterable
+    public static function decoratedNodesProvider(): iterable
     {
-        yield 'mutation candidate not highlighted by default' => (static function () {
+        yield 'eligible nodes are not decorated by default' => (static function () {
             $node = new Assign(
                 new Variable('x'),
                 new String_('value'),
             );
-            LabelMutationCandidatesVisitor::markAsAMutationCandidate($node);
+            LabelNodesAsEligibleVisitor::markAsEligible($node);
 
             return NodeDumperScenario::forNode([$node])
                 ->withShowAllNodes()
@@ -424,20 +425,29 @@ final class NodeDumperTest extends TestCase
                 ->build();
         })();
 
-        yield 'mutation candidate highlighted' => (static function () {
+        yield 'eligible nodes can be decorated' => (static function () {
             $node = new Assign(
                 new Variable('x'),
                 new String_('value'),
             );
-            LabelMutationCandidatesVisitor::markAsAMutationCandidate($node);
+            $eligibleNode = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
 
-            return NodeDumperScenario::forNode([$node])
+            LabelNodesAsEligibleVisitor::markAsEligible($eligibleNode);
+
+            return NodeDumperScenario::forNode([$node, $eligibleNode])
                 ->withShowAllNodes()
-                ->withHighlightMutationCandidates()
+                ->withDecorateNodes()
                 ->withExpected(
                     <<<'AST'
                         array(
-                            0: <mutation-candidate>Expr_Assign</mutation-candidate>(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                            1: <eligible>Expr_Assign</eligible>(
                                 var: Expr_Variable
                                 expr: Scalar_String
                             )
@@ -447,27 +457,71 @@ final class NodeDumperTest extends TestCase
                 ->build();
         })();
 
-        yield 'non-mutation candidate not highlighted even when enabled' => NodeDumperScenario::forNode(
-            [
-                new Assign(
-                    new Variable('x'),
-                    new String_('value'),
-                ),
-            ],
-        )
-            ->withShowAllNodes()
-            ->withHighlightMutationCandidates()
-            ->withExpected(
-                <<<'AST'
-                    array(
-                        0: Expr_Assign(
-                            var: Expr_Variable
-                            expr: Scalar_String
+        yield 'mutation candidate nodes can be decorated' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            $mutationCandidateNode = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+
+            LabelMutationCandidatesVisitor::markAsAMutationCandidate($mutationCandidateNode);
+
+            return NodeDumperScenario::forNode([$node, $mutationCandidateNode])
+                ->withShowAllNodes()
+                ->withDecorateNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                            1: <mutation-candidate>Expr_Assign</mutation-candidate>(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
                         )
-                    )
-                    AST,
-            )
-            ->build();
+                        AST,
+                )
+                ->build();
+        })();
+
+        // This is because a mutation candidate is necessarily an eligible node in practice.
+        yield 'mutation candidate trumps over eligible' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            $mutationCandidateNode = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+
+            LabelNodesAsEligibleVisitor::markAsEligible($mutationCandidateNode);
+            LabelMutationCandidatesVisitor::markAsAMutationCandidate($mutationCandidateNode);
+
+            return NodeDumperScenario::forNode([$node, $mutationCandidateNode])
+                ->withShowAllNodes()
+                ->withDecorateNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                            1: <mutation-candidate>Expr_Assign</mutation-candidate>(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
     }
 
     public static function nodesWithAttributesWhichMayCauseCircularDependenciesProvider(): iterable
