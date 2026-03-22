@@ -117,7 +117,7 @@ final class NodeDumperTest extends TestCase
 
         $withAttributes = $dumper->dump($node, dumpOtherAttributes: true);
 
-        self::assertSame(
+        $this->assertSame(
             <<<'AST'
                 Expr_Assign(
                     var: Expr_Variable(
@@ -134,7 +134,7 @@ final class NodeDumperTest extends TestCase
 
         $withoutAttributes = $dumper->dump($node);
 
-        self::assertSame(
+        $this->assertSame(
             <<<'AST'
                 Expr_Assign(
                     var: Expr_Variable(
@@ -165,7 +165,7 @@ final class NodeDumperTest extends TestCase
 
         $highlighted = $dumper->dump($node, highlightMutationCandidates: true);
 
-        self::assertSame(
+        $this->assertSame(
             <<<'AST'
                 <mutation-candidate>Expr_Assign</mutation-candidate>(
                     var: Expr_Variable
@@ -177,7 +177,7 @@ final class NodeDumperTest extends TestCase
 
         $notHighlighted = $dumper->dump($node);
 
-        self::assertSame(
+        $this->assertSame(
             <<<'AST'
                 Expr_Assign(
                     var: Expr_Variable

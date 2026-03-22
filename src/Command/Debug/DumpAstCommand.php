@@ -106,7 +106,7 @@ final class DumpAstCommand extends BaseCommand
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
-        DumpAstCommand::configureFormatter($io);
+        self::configureFormatter($io);
 
         $container = $this
             ->getApplication()
