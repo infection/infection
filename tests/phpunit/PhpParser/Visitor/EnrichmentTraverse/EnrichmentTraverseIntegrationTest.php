@@ -412,7 +412,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 stmts: array(
                                     0: Stmt_Return(
-                                        expr: Expr_BinaryOp_Identical(
+                                        expr: Expr_BinaryOp_Equal(
                                             left: Expr_Variable(
                                                 nodeId: 17
                                                 parent: nodeId(16)
