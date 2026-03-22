@@ -54,15 +54,23 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
 {
-    private const MUTATION_CANDIDATE = 'mutationCandidate';
+    public const MUTATION_CANDIDATE = 'mutationCandidate';
 
     public function enterNode(Node $node): null
     {
         MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
 
-        if (LabelNodesAsEligibleVisitor::isEligible($node)) {
-            self::markAsAMutationCandidate($node);
+        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
+            return null;
         }
+
+        if (!$this->isOnFunctionSignature($node)
+            && !$this->isInsideFunction($node)
+        ) {
+            return null;
+        }
+
+        self::markAsAMutationCandidate($node);
 
         return null;
     }
@@ -75,5 +83,15 @@ final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
     public static function isAMutationCandidate(Node $node): bool
     {
         return $node->hasAttribute(self::MUTATION_CANDIDATE);
+    }
+
+    private function isOnFunctionSignature(Node $node): bool
+    {
+        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+    }
+
+    private function isInsideFunction(Node $node): bool
+    {
+        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 }

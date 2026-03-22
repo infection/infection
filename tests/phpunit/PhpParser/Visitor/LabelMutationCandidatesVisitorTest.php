@@ -37,9 +37,13 @@ namespace Infection\Tests\PhpParser\Visitor;
 
 use function array_flip;
 use function array_intersect_key;
+use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -64,7 +68,17 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
         self::markNodeAsEligible($nodesById, $eligibleNodeIds);
 
         $traverser = new NodeTraverser(
+            new ReflectionVisitor(),
             new LabelMutationCandidatesVisitor(),
+            new KeepOnlyDesiredAttributesVisitor(
+                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+                LabelNodesAsEligibleVisitor::ELIGIBLE,
+                LabelMutationCandidatesVisitor::MUTATION_CANDIDATE,
+                AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE,
+                'expr',
+                'kind',
+                'rawValue',
+            ),
         );
         $traverser->traverse($nodes);
 
@@ -81,11 +95,15 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
 
                 namespace Infection\Tests\Virtual;
 
-                $engine = new Engine(
-                    static fn () => 'first',
-                    static fn () => 'second',
-                    static fn () => 'third',
-                );
+                class Engine {
+                    function create() {
+                        return new Engine(
+                            static fn () => 'first',
+                            static fn () => 'second',
+                            static fn () => 'third',
+                        );
+                    }
+                }
 
                 PHP,
             [],
@@ -96,53 +114,63 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                             nodeId: 1
                         )
                         stmts: array(
-                            0: Stmt_Expression(
-                                expr: Expr_Assign(
-                                    var: Expr_Variable(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 5
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_New(
+                                                    class: Name(
+                                                        nodeId: 8
+                                                    )
+                                                    args: array(
+                                                        0: Arg(
+                                                            value: Expr_ArrowFunction(
+                                                                expr: Scalar_String(
+                                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                                    rawValue: 'first'
+                                                                    nodeId: 11
+                                                                )
+                                                                nodeId: 10
+                                                            )
+                                                            nodeId: 9
+                                                        )
+                                                        1: Arg(
+                                                            value: Expr_ArrowFunction(
+                                                                expr: Scalar_String(
+                                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                                    rawValue: 'second'
+                                                                    nodeId: 14
+                                                                )
+                                                                nodeId: 13
+                                                            )
+                                                            nodeId: 12
+                                                        )
+                                                        2: Arg(
+                                                            value: Expr_ArrowFunction(
+                                                                expr: Scalar_String(
+                                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                                    rawValue: 'third'
+                                                                    nodeId: 17
+                                                                )
+                                                                nodeId: 16
+                                                            )
+                                                            nodeId: 15
+                                                        )
+                                                    )
+                                                    nodeId: 7
+                                                )
+                                                nodeId: 6
+                                            )
+                                        )
                                         nodeId: 4
                                     )
-                                    expr: Expr_New(
-                                        class: Name(
-                                            nodeId: 6
-                                        )
-                                        args: array(
-                                            0: Arg(
-                                                value: Expr_ArrowFunction(
-                                                    expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'first'
-                                                        nodeId: 9
-                                                    )
-                                                    nodeId: 8
-                                                )
-                                                nodeId: 7
-                                            )
-                                            1: Arg(
-                                                value: Expr_ArrowFunction(
-                                                    expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'second'
-                                                        nodeId: 12
-                                                    )
-                                                    nodeId: 11
-                                                )
-                                                nodeId: 10
-                                            )
-                                            2: Arg(
-                                                value: Expr_ArrowFunction(
-                                                    expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'third'
-                                                        nodeId: 15
-                                                    )
-                                                    nodeId: 14
-                                                )
-                                                nodeId: 13
-                                            )
-                                        )
-                                        nodeId: 5
-                                    )
-                                    nodeId: 3
                                 )
                                 nodeId: 2
                             )
@@ -154,20 +182,24 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'some eligible nodes' => [
+        yield 'some eligible nodes, not all mutable' => [
             <<<'PHP'
                 <?php
 
                 namespace Infection\Tests\Virtual;
 
-                $engine = new Engine(
-                    static fn () => 'first',
-                    static fn () => 'second',
-                    static fn () => 'third',
-                );
+                class Engine {
+                    function create() {
+                        return new Engine(
+                            static fn () => 'first',
+                            static fn () => 'second',
+                            static fn () => 'third',
+                        );
+                    }
+                }
 
                 PHP,
-            [7, 11, 15],
+            [3, 4],
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -175,59 +207,66 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                             nodeId: 1
                         )
                         stmts: array(
-                            0: Stmt_Expression(
-                                expr: Expr_Assign(
-                                    var: Expr_Variable(
-                                        nodeId: 4
-                                    )
-                                    expr: Expr_New(
-                                        class: Name(
-                                            nodeId: 6
-                                        )
-                                        args: array(
-                                            0: Arg(
-                                                value: Expr_ArrowFunction(
-                                                    expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'first'
-                                                        nodeId: 9
-                                                    )
-                                                    nodeId: 8
-                                                )
-                                                nodeId: 7
-                                                eligible: true
-                                                mutationCandidate: true
-                                            )
-                                            1: Arg(
-                                                value: Expr_ArrowFunction(
-                                                    expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'second'
-                                                        nodeId: 12
-                                                    )
-                                                    nodeId: 11
-                                                    eligible: true
-                                                    mutationCandidate: true
-                                                )
-                                                nodeId: 10
-                                            )
-                                            2: Arg(
-                                                value: Expr_ArrowFunction(
-                                                    expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'third'
-                                                        nodeId: 15
-                                                        eligible: true
-                                                        mutationCandidate: true
-                                                    )
-                                                    nodeId: 14
-                                                )
-                                                nodeId: 13
-                                            )
-                                        )
-                                        nodeId: 5
-                                    )
+                            0: Stmt_Class(
+                                name: Identifier(
                                     nodeId: 3
+                                    eligible: true
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 5
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_New(
+                                                    class: Name(
+                                                        nodeId: 8
+                                                    )
+                                                    args: array(
+                                                        0: Arg(
+                                                            value: Expr_ArrowFunction(
+                                                                expr: Scalar_String(
+                                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                                    rawValue: 'first'
+                                                                    nodeId: 11
+                                                                )
+                                                                nodeId: 10
+                                                            )
+                                                            nodeId: 9
+                                                        )
+                                                        1: Arg(
+                                                            value: Expr_ArrowFunction(
+                                                                expr: Scalar_String(
+                                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                                    rawValue: 'second'
+                                                                    nodeId: 14
+                                                                )
+                                                                nodeId: 13
+                                                            )
+                                                            nodeId: 12
+                                                        )
+                                                        2: Arg(
+                                                            value: Expr_ArrowFunction(
+                                                                expr: Scalar_String(
+                                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                                    rawValue: 'third'
+                                                                    nodeId: 17
+                                                                )
+                                                                nodeId: 16
+                                                            )
+                                                            nodeId: 15
+                                                        )
+                                                    )
+                                                    nodeId: 7
+                                                )
+                                                nodeId: 6
+                                            )
+                                        )
+                                        nodeId: 4
+                                        eligible: true
+                                        mutationCandidate: true
+                                    )
                                 )
                                 nodeId: 2
                             )
