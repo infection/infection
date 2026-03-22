@@ -158,7 +158,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                     parent: nodeId(1)
                                     eligible: true
                                     origNode: nodeId(2)
-                                    mutationCandidate: true
                                 )
                                 value: Scalar_Int(
                                     rawValue: 1
@@ -167,20 +166,17 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                     parent: nodeId(1)
                                     eligible: true
                                     origNode: nodeId(3)
-                                    mutationCandidate: true
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
                                 eligible: true
                                 origNode: nodeId(1)
-                                mutationCandidate: true
                             )
                         )
                         nodeId: 0
                         eligible: true
                         next: nodeId(4)
                         origNode: nodeId(0)
-                        mutationCandidate: true
                     )
                     1: Stmt_Namespace(
                         name: Name(
@@ -188,7 +184,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                             parent: nodeId(4)
                             eligible: true
                             origNode: nodeId(5)
-                            mutationCandidate: true
                         )
                         stmts: array(
                             0: Stmt_Class(
@@ -197,7 +192,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                     parent: nodeId(6)
                                     eligible: true
                                     origNode: nodeId(7)
-                                    mutationCandidate: true
                                 )
                                 implements: array(
                                     0: Name(
@@ -206,7 +200,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                         parent: nodeId(6)
                                         eligible: true
                                         origNode: nodeId(8)
-                                        mutationCandidate: true
                                     )
                                 )
                                 stmts: array(
@@ -280,7 +273,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 parent: nodeId(4)
                                 eligible: true
                                 origNode: nodeId(6)
-                                mutationCandidate: true
                             )
                         )
                         kind: 1
@@ -288,7 +280,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         eligible: true
                         next: nodeId(6)
                         origNode: nodeId(4)
-                        mutationCandidate: true
                     )
                 )
                 AST,
