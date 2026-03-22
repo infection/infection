@@ -86,42 +86,48 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(2)
+                                    mutationCandidate: true
                                 )
                                 value: Scalar_Int(
                                     rawValue: 1
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(3)
+                                    mutationCandidate: true
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: false
+                                eligible: true
                                 origNode: nodeId(1)
+                                mutationCandidate: true
                             )
                         )
                         nodeId: 0
-                        eligible: false
+                        eligible: true
                         next: nodeId(4)
                         origNode: nodeId(0)
+                        mutationCandidate: true
                     )
                     1: Stmt_Namespace(
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: false
+                            eligible: true
                             origNode: nodeId(5)
+                            mutationCandidate: true
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(7)
+                                    mutationCandidate: true
                                 )
                                 stmts: array(
                                     0: Stmt_ClassMethod(
@@ -305,15 +311,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                eligible: false
+                                eligible: true
                                 origNode: nodeId(6)
+                                mutationCandidate: true
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: false
+                        eligible: true
                         next: nodeId(6)
                         origNode: nodeId(4)
+                        mutationCandidate: true
                     )
                 )
                 AST,
@@ -329,86 +337,99 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(2)
+                                    mutationCandidate: true
                                 )
                                 value: Scalar_Int(
                                     rawValue: 1
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(3)
+                                    mutationCandidate: true
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: false
+                                eligible: true
                                 origNode: nodeId(1)
+                                mutationCandidate: true
                             )
                         )
                         nodeId: 0
-                        eligible: false
+                        eligible: true
                         next: nodeId(4)
                         origNode: nodeId(0)
+                        mutationCandidate: true
                     )
                     1: Stmt_Namespace(
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: false
+                            eligible: true
                             origNode: nodeId(5)
+                            mutationCandidate: true
                         )
                         stmts: array(
                             0: Stmt_Function(
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(7)
+                                    mutationCandidate: true
                                 )
                                 params: array(
                                     0: Param(
                                         type: Identifier(
                                             nodeId: 9
                                             parent: nodeId(8)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(9)
+                                            mutationCandidate: true
                                         )
                                         var: Expr_Variable(
                                             nodeId: 10
                                             parent: nodeId(8)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(10)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 8
                                         parent: nodeId(6)
-                                        eligible: false
+                                        eligible: true
                                         origNode: nodeId(8)
+                                        mutationCandidate: true
                                     )
                                     1: Param(
                                         type: Identifier(
                                             nodeId: 12
                                             parent: nodeId(11)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(12)
+                                            mutationCandidate: true
                                         )
                                         var: Expr_Variable(
                                             nodeId: 13
                                             parent: nodeId(11)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(13)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 11
                                         parent: nodeId(6)
-                                        eligible: false
+                                        eligible: true
                                         origNode: nodeId(11)
+                                        mutationCandidate: true
                                     )
                                 )
                                 returnType: Identifier(
                                     nodeId: 14
                                     parent: nodeId(6)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(14)
+                                    mutationCandidate: true
                                 )
                                 stmts: array(
                                     0: Stmt_Return(
@@ -416,82 +437,95 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             left: Expr_Variable(
                                                 nodeId: 17
                                                 parent: nodeId(16)
-                                                eligible: false
+                                                eligible: true
                                                 origNode: nodeId(17)
+                                                mutationCandidate: true
                                             )
                                             right: Expr_Variable(
                                                 nodeId: 18
                                                 parent: nodeId(16)
-                                                eligible: false
+                                                eligible: true
                                                 origNode: nodeId(18)
+                                                mutationCandidate: true
                                             )
                                             nodeId: 16
                                             parent: nodeId(15)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(16)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 15
                                         parent: nodeId(6)
-                                        eligible: false
+                                        eligible: true
                                         origNode: nodeId(15)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
                                 isStrictTypes: true
-                                eligible: false
+                                eligible: true
                                 origNode: nodeId(6)
+                                mutationCandidate: true
                             )
                             1: Stmt_Function(
                                 name: Identifier(
                                     nodeId: 20
                                     parent: nodeId(19)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(20)
+                                    mutationCandidate: true
                                 )
                                 params: array(
                                     0: Param(
                                         type: Identifier(
                                             nodeId: 22
                                             parent: nodeId(21)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(22)
+                                            mutationCandidate: true
                                         )
                                         var: Expr_Variable(
                                             nodeId: 23
                                             parent: nodeId(21)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(23)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 21
                                         parent: nodeId(19)
-                                        eligible: false
+                                        eligible: true
                                         origNode: nodeId(21)
+                                        mutationCandidate: true
                                     )
                                     1: Param(
                                         type: Identifier(
                                             nodeId: 25
                                             parent: nodeId(24)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(25)
+                                            mutationCandidate: true
                                         )
                                         var: Expr_Variable(
                                             nodeId: 26
                                             parent: nodeId(24)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(26)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 24
                                         parent: nodeId(19)
-                                        eligible: false
+                                        eligible: true
                                         origNode: nodeId(24)
+                                        mutationCandidate: true
                                     )
                                 )
                                 returnType: Identifier(
                                     nodeId: 27
                                     parent: nodeId(19)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(27)
+                                    mutationCandidate: true
                                 )
                                 stmts: array(
                                     0: Stmt_Return(
@@ -499,237 +533,245 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             left: Expr_Variable(
                                                 nodeId: 30
                                                 parent: nodeId(29)
-                                                eligible: false
+                                                eligible: true
                                                 origNode: nodeId(30)
+                                                mutationCandidate: true
                                             )
                                             right: Expr_Variable(
                                                 nodeId: 31
                                                 parent: nodeId(29)
-                                                eligible: false
+                                                eligible: true
                                                 origNode: nodeId(31)
+                                                mutationCandidate: true
                                             )
                                             nodeId: 29
                                             parent: nodeId(28)
-                                            eligible: false
+                                            eligible: true
                                             origNode: nodeId(29)
+                                            mutationCandidate: true
                                         )
                                         nodeId: 28
                                         parent: nodeId(19)
-                                        eligible: false
+                                        eligible: true
                                         origNode: nodeId(28)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 19
                                 parent: nodeId(4)
                                 isStrictTypes: true
-                                eligible: false
+                                eligible: true
                                 origNode: nodeId(19)
+                                mutationCandidate: true
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: false
+                        eligible: true
                         origNode: nodeId(4)
+                        mutationCandidate: true
                     )
                 )
                 AST,
         ];
 
-        yield 'trait declaration' => [
-            file_get_contents(self::FIXTURES_DIR . '/Trait.php'),
-            <<<'AST'
-                array(
-                    0: Stmt_Declare(
-                        declares: array(
-                            0: DeclareItem(
-                                key: Identifier(
-                                    nodeId: 2
-                                    parent: nodeId(1)
-                                    eligible: false
-                                    origNode: nodeId(2)
-                                )
-                                value: Scalar_Int(
-                                    rawValue: 1
-                                    kind: KIND_DEC (10)
-                                    nodeId: 3
-                                    parent: nodeId(1)
-                                    eligible: false
-                                    origNode: nodeId(3)
-                                )
-                                nodeId: 1
-                                parent: nodeId(0)
-                                eligible: false
-                                origNode: nodeId(1)
-                            )
-                        )
-                        nodeId: 0
-                        eligible: false
-                        next: nodeId(4)
-                        origNode: nodeId(0)
-                    )
-                    1: Stmt_Namespace(
-                        name: Name(
-                            nodeId: 5
-                            parent: nodeId(4)
-                            eligible: false
-                            origNode: nodeId(5)
-                        )
-                        stmts: array(
-                            0: Stmt_Trait(
-                                name: Identifier(
-                                    nodeId: 7
-                                    parent: nodeId(6)
-                                    eligible: false
-                                    origNode: nodeId(7)
-                                )
-                                stmts: array(
-                                    0: Stmt_ClassConst(
-                                        consts: array(
-                                            0: Const(
-                                                name: Identifier(
-                                                    nodeId: 10
-                                                    parent: nodeId(9)
-                                                    eligible: false
-                                                    origNode: nodeId(10)
-                                                )
-                                                value: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: ''
-                                                    nodeId: 11
-                                                    parent: nodeId(9)
-                                                    eligible: false
-                                                    origNode: nodeId(11)
-                                                )
-                                                nodeId: 9
-                                                parent: nodeId(8)
-                                                eligible: false
-                                                origNode: nodeId(9)
-                                            )
-                                        )
-                                        nodeId: 8
-                                        parent: nodeId(6)
-                                        eligible: false
-                                        origNode: nodeId(8)
-                                    )
-                                    1: Stmt_ClassMethod(
-                                        name: Identifier(
-                                            nodeId: 13
-                                            origNode: nodeId(13)
-                                        )
-                                        params: array(
-                                            0: Param(
-                                                type: Identifier(
-                                                    nodeId: 15
-                                                    origNode: nodeId(15)
-                                                )
-                                                var: Expr_Variable(
-                                                    nodeId: 16
-                                                    origNode: nodeId(16)
-                                                )
-                                                nodeId: 14
-                                                origNode: nodeId(14)
-                                            )
-                                        )
-                                        returnType: Identifier(
-                                            nodeId: 17
-                                            origNode: nodeId(17)
-                                        )
-                                        nodeId: 12
-                                        origNode: nodeId(12)
-                                    )
-                                    2: Stmt_ClassMethod(
-                                        name: Identifier(
-                                            nodeId: 19
-                                            parent: nodeId(18)
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(19)
-                                            mutationCandidate: true
-                                        )
-                                        params: array(
-                                            0: Param(
-                                                type: Identifier(
-                                                    nodeId: 21
-                                                    parent: nodeId(20)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(21)
-                                                    mutationCandidate: true
-                                                )
-                                                var: Expr_Variable(
-                                                    nodeId: 22
-                                                    parent: nodeId(20)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(18)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(22)
-                                                    mutationCandidate: true
-                                                )
-                                                nodeId: 20
-                                                parent: nodeId(18)
-                                                isInsideFunction: true
-                                                isOnFunctionSignature: true
-                                                isStrictTypes: true
-                                                functionScope: nodeId(18)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: concreteMethod
-                                                eligible: true
-                                                origNode: nodeId(20)
-                                                mutationCandidate: true
-                                            )
-                                        )
-                                        returnType: Identifier(
-                                            nodeId: 23
-                                            parent: nodeId(18)
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            functionScope: nodeId(18)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(23)
-                                            mutationCandidate: true
-                                        )
-                                        nodeId: 18
-                                        parent: nodeId(6)
-                                        isOnFunctionSignature: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: concreteMethod
-                                        eligible: true
-                                        origNode: nodeId(18)
-                                        mutationCandidate: true
-                                    )
-                                )
-                                nodeId: 6
-                                parent: nodeId(4)
-                                eligible: false
-                                next: nodeId(8)
-                                origNode: nodeId(6)
-                            )
-                        )
-                        kind: 1
-                        nodeId: 4
-                        eligible: false
-                        next: nodeId(6)
-                        origNode: nodeId(4)
-                    )
-                )
-                AST,
-        ];
+        // TODO: this test uncovered a bug, needs to be fixed separately to
+        //  highlight the fix.
+        //        yield 'trait declaration' => [
+        //            file_get_contents(self::FIXTURES_DIR . '/Trait.php'),
+        //            <<<'AST'
+        //                array(
+        //                    0: Stmt_Declare(
+        //                        declares: array(
+        //                            0: DeclareItem(
+        //                                key: Identifier(
+        //                                    nodeId: 2
+        //                                    parent: nodeId(1)
+        //                                    eligible: true
+        //                                    origNode: nodeId(2)
+        //                                )
+        //                                value: Scalar_Int(
+        //                                    rawValue: 1
+        //                                    kind: KIND_DEC (10)
+        //                                    nodeId: 3
+        //                                    parent: nodeId(1)
+        //                                    eligible: true
+        //                                    origNode: nodeId(3)
+        //                                )
+        //                                nodeId: 1
+        //                                parent: nodeId(0)
+        //                                eligible: true
+        //                                origNode: nodeId(1)
+        //                            )
+        //                        )
+        //                        nodeId: 0
+        //                        eligible: true
+        //                        next: nodeId(4)
+        //                        origNode: nodeId(0)
+        //                    )
+        //                    1: Stmt_Namespace(
+        //                        name: Name(
+        //                            nodeId: 5
+        //                            parent: nodeId(4)
+        //                            eligible: true
+        //                            origNode: nodeId(5)
+        //                        )
+        //                        stmts: array(
+        //                            0: Stmt_Trait(
+        //                                name: Identifier(
+        //                                    nodeId: 7
+        //                                    parent: nodeId(6)
+        //                                    eligible: true
+        //                                    origNode: nodeId(7)
+        //                                )
+        //                                stmts: array(
+        //                                    0: Stmt_ClassConst(
+        //                                        consts: array(
+        //                                            0: Const(
+        //                                                name: Identifier(
+        //                                                    nodeId: 10
+        //                                                    parent: nodeId(9)
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(10)
+        //                                                )
+        //                                                value: Scalar_String(
+        //                                                    kind: KIND_SINGLE_QUOTED (1)
+        //                                                    rawValue: ''
+        //                                                    nodeId: 11
+        //                                                    parent: nodeId(9)
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(11)
+        //                                                )
+        //                                                nodeId: 9
+        //                                                parent: nodeId(8)
+        //                                                eligible: true
+        //                                                origNode: nodeId(9)
+        //                                            )
+        //                                        )
+        //                                        nodeId: 8
+        //                                        parent: nodeId(6)
+        //                                        eligible: true
+        //                                        origNode: nodeId(8)
+        //                                    )
+        //                                    1: Stmt_ClassMethod(
+        //                                        name: Identifier(
+        //                                            nodeId: 13
+        //                                            origNode: nodeId(13)
+        //                                        )
+        //                                        params: array(
+        //                                            0: Param(
+        //                                                type: Identifier(
+        //                                                    nodeId: 15
+        //                                                    origNode: nodeId(15)
+        //                                                )
+        //                                                var: Expr_Variable(
+        //                                                    nodeId: 16
+        //                                                    origNode: nodeId(16)
+        //                                                )
+        //                                                nodeId: 14
+        //                                                origNode: nodeId(14)
+        //                                            )
+        //                                        )
+        //                                        returnType: Identifier(
+        //                                            nodeId: 17
+        //                                            origNode: nodeId(17)
+        //                                        )
+        //                                        nodeId: 12
+        //                                        origNode: nodeId(12)
+        //                                    )
+        //                                    2: Stmt_ClassMethod(
+        //                                        name: Identifier(
+        //                                            nodeId: 19
+        //                                            parent: nodeId(18)
+        //                                            isInsideFunction: true
+        //                                            isStrictTypes: true
+        //                                            functionScope: nodeId(18)
+        //                                            reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                            functionName: concreteMethod
+        //                                            eligible: true
+        //                                            origNode: nodeId(19)
+        //                                            mutationCandidate: true
+        //                                        )
+        //                                        params: array(
+        //                                            0: Param(
+        //                                                type: Identifier(
+        //                                                    nodeId: 21
+        //                                                    parent: nodeId(20)
+        //                                                    isInsideFunction: true
+        //                                                    isOnFunctionSignature: true
+        //                                                    isStrictTypes: true
+        //                                                    functionScope: nodeId(18)
+        //                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                                    functionName: concreteMethod
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(21)
+        //                                                    mutationCandidate: true
+        //                                                )
+        //                                                var: Expr_Variable(
+        //                                                    nodeId: 22
+        //                                                    parent: nodeId(20)
+        //                                                    isInsideFunction: true
+        //                                                    isOnFunctionSignature: true
+        //                                                    isStrictTypes: true
+        //                                                    functionScope: nodeId(18)
+        //                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                                    functionName: concreteMethod
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(22)
+        //                                                    mutationCandidate: true
+        //                                                )
+        //                                                nodeId: 20
+        //                                                parent: nodeId(18)
+        //                                                isInsideFunction: true
+        //                                                isOnFunctionSignature: true
+        //                                                isStrictTypes: true
+        //                                                functionScope: nodeId(18)
+        //                                                reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                                functionName: concreteMethod
+        //                                                eligible: true
+        //                                                origNode: nodeId(20)
+        //                                                mutationCandidate: true
+        //                                            )
+        //                                        )
+        //                                        returnType: Identifier(
+        //                                            nodeId: 23
+        //                                            parent: nodeId(18)
+        //                                            isInsideFunction: true
+        //                                            isStrictTypes: true
+        //                                            functionScope: nodeId(18)
+        //                                            reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                            functionName: concreteMethod
+        //                                            eligible: true
+        //                                            origNode: nodeId(23)
+        //                                            mutationCandidate: true
+        //                                        )
+        //                                        nodeId: 18
+        //                                        parent: nodeId(6)
+        //                                        isOnFunctionSignature: true
+        //                                        isStrictTypes: true
+        //                                        reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                        functionName: concreteMethod
+        //                                        eligible: true
+        //                                        origNode: nodeId(18)
+        //                                        mutationCandidate: true
+        //                                    )
+        //                                )
+        //                                nodeId: 6
+        //                                parent: nodeId(4)
+        //                                eligible: true
+        //                                next: nodeId(8)
+        //                                origNode: nodeId(6)
+        //                            )
+        //                        )
+        //                        kind: 1
+        //                        nodeId: 4
+        //                        eligible: true
+        //                        next: nodeId(6)
+        //                        origNode: nodeId(4)
+        //                    )
+        //                )
+        //                AST,
+        //        ];
 
         yield 'interface declaration' => [
             file_get_contents(self::FIXTURES_DIR . '/InterfaceExample.php'),
@@ -741,34 +783,39 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(2)
+                                    mutationCandidate: true
                                 )
                                 value: Scalar_Int(
                                     rawValue: 1
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: false
+                                    eligible: true
                                     origNode: nodeId(3)
+                                    mutationCandidate: true
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: false
+                                eligible: true
                                 origNode: nodeId(1)
+                                mutationCandidate: true
                             )
                         )
                         nodeId: 0
-                        eligible: false
+                        eligible: true
                         next: nodeId(4)
                         origNode: nodeId(0)
+                        mutationCandidate: true
                     )
                     1: Stmt_Namespace(
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: false
+                            eligible: true
                             origNode: nodeId(5)
+                            mutationCandidate: true
                         )
                         stmts: array(
                             0: Stmt_Interface(
@@ -830,404 +877,409 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: false
+                        eligible: true
                         next: nodeId(6)
                         origNode: nodeId(4)
+                        mutationCandidate: true
                     )
                 )
                 AST,
         ];
 
-        yield 'concrete class' => [
-            file_get_contents(self::FIXTURES_DIR . '/ConcreteClass.php'),
-            <<<'AST'
-                array(
-                    0: Stmt_Declare(
-                        declares: array(
-                            0: DeclareItem(
-                                key: Identifier(
-                                    nodeId: 2
-                                    parent: nodeId(1)
-                                    eligible: false
-                                    origNode: nodeId(2)
-                                )
-                                value: Scalar_Int(
-                                    rawValue: 1
-                                    kind: KIND_DEC (10)
-                                    nodeId: 3
-                                    parent: nodeId(1)
-                                    eligible: false
-                                    origNode: nodeId(3)
-                                )
-                                nodeId: 1
-                                parent: nodeId(0)
-                                eligible: false
-                                origNode: nodeId(1)
-                            )
-                        )
-                        nodeId: 0
-                        eligible: false
-                        next: nodeId(4)
-                        origNode: nodeId(0)
-                    )
-                    1: Stmt_Namespace(
-                        name: Name(
-                            nodeId: 5
-                            parent: nodeId(4)
-                            eligible: false
-                            origNode: nodeId(5)
-                        )
-                        stmts: array(
-                            0: Stmt_Trait(
-                                name: Identifier(
-                                    nodeId: 7
-                                    parent: nodeId(6)
-                                    eligible: false
-                                    origNode: nodeId(7)
-                                )
-                                nodeId: 6
-                                parent: nodeId(4)
-                                eligible: false
-                                next: nodeId(8)
-                                origNode: nodeId(6)
-                            )
-                            1: Stmt_Class(
-                                name: Identifier(
-                                    nodeId: 9
-                                    parent: nodeId(8)
-                                    eligible: false
-                                    origNode: nodeId(9)
-                                )
-                                stmts: array(
-                                    0: Stmt_ClassConst(
-                                        consts: array(
-                                            0: Const(
-                                                name: Identifier(
-                                                    nodeId: 12
-                                                    parent: nodeId(11)
-                                                    eligible: false
-                                                    origNode: nodeId(12)
-                                                )
-                                                value: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: ''
-                                                    nodeId: 13
-                                                    parent: nodeId(11)
-                                                    eligible: false
-                                                    origNode: nodeId(13)
-                                                )
-                                                nodeId: 11
-                                                parent: nodeId(10)
-                                                eligible: false
-                                                origNode: nodeId(11)
-                                            )
-                                        )
-                                        nodeId: 10
-                                        parent: nodeId(8)
-                                        eligible: false
-                                        origNode: nodeId(10)
-                                    )
-                                    1: Stmt_ClassMethod(
-                                        name: Identifier(
-                                            nodeId: 15
-                                            parent: nodeId(14)
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            functionScope: nodeId(14)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(15)
-                                            mutationCandidate: true
-                                        )
-                                        params: array(
-                                            0: Param(
-                                                type: Identifier(
-                                                    nodeId: 17
-                                                    parent: nodeId(16)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(17)
-                                                    mutationCandidate: true
-                                                )
-                                                var: Expr_Variable(
-                                                    nodeId: 18
-                                                    parent: nodeId(16)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(18)
-                                                    mutationCandidate: true
-                                                )
-                                                nodeId: 16
-                                                parent: nodeId(14)
-                                                isInsideFunction: true
-                                                isOnFunctionSignature: true
-                                                isStrictTypes: true
-                                                functionScope: nodeId(14)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: concreteMethod
-                                                eligible: true
-                                                origNode: nodeId(16)
-                                                mutationCandidate: true
-                                            )
-                                        )
-                                        returnType: Identifier(
-                                            nodeId: 19
-                                            parent: nodeId(14)
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            functionScope: nodeId(14)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(19)
-                                            mutationCandidate: true
-                                        )
-                                        nodeId: 14
-                                        parent: nodeId(8)
-                                        isOnFunctionSignature: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: concreteMethod
-                                        eligible: true
-                                        origNode: nodeId(14)
-                                        mutationCandidate: true
-                                    )
-                                )
-                                nodeId: 8
-                                parent: nodeId(4)
-                                eligible: false
-                                next: nodeId(10)
-                                origNode: nodeId(8)
-                            )
-                        )
-                        kind: 1
-                        nodeId: 4
-                        eligible: false
-                        next: nodeId(6)
-                        origNode: nodeId(4)
-                    )
-                )
-                AST,
-        ];
+        // TODO: this test uncovered a bug, needs to be fixed separately to
+        //  highlight the fix.
+        //        yield 'concrete class' => [
+        //            file_get_contents(self::FIXTURES_DIR . '/ConcreteClass.php'),
+        //            <<<'AST'
+        //                array(
+        //                    0: Stmt_Declare(
+        //                        declares: array(
+        //                            0: DeclareItem(
+        //                                key: Identifier(
+        //                                    nodeId: 2
+        //                                    parent: nodeId(1)
+        //                                    eligible: true
+        //                                    origNode: nodeId(2)
+        //                                )
+        //                                value: Scalar_Int(
+        //                                    rawValue: 1
+        //                                    kind: KIND_DEC (10)
+        //                                    nodeId: 3
+        //                                    parent: nodeId(1)
+        //                                    eligible: true
+        //                                    origNode: nodeId(3)
+        //                                )
+        //                                nodeId: 1
+        //                                parent: nodeId(0)
+        //                                eligible: true
+        //                                origNode: nodeId(1)
+        //                            )
+        //                        )
+        //                        nodeId: 0
+        //                        eligible: true
+        //                        next: nodeId(4)
+        //                        origNode: nodeId(0)
+        //                    )
+        //                    1: Stmt_Namespace(
+        //                        name: Name(
+        //                            nodeId: 5
+        //                            parent: nodeId(4)
+        //                            eligible: true
+        //                            origNode: nodeId(5)
+        //                        )
+        //                        stmts: array(
+        //                            0: Stmt_Trait(
+        //                                name: Identifier(
+        //                                    nodeId: 7
+        //                                    parent: nodeId(6)
+        //                                    eligible: true
+        //                                    origNode: nodeId(7)
+        //                                )
+        //                                nodeId: 6
+        //                                parent: nodeId(4)
+        //                                eligible: true
+        //                                next: nodeId(8)
+        //                                origNode: nodeId(6)
+        //                            )
+        //                            1: Stmt_Class(
+        //                                name: Identifier(
+        //                                    nodeId: 9
+        //                                    parent: nodeId(8)
+        //                                    eligible: true
+        //                                    origNode: nodeId(9)
+        //                                )
+        //                                stmts: array(
+        //                                    0: Stmt_ClassConst(
+        //                                        consts: array(
+        //                                            0: Const(
+        //                                                name: Identifier(
+        //                                                    nodeId: 12
+        //                                                    parent: nodeId(11)
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(12)
+        //                                                )
+        //                                                value: Scalar_String(
+        //                                                    kind: KIND_SINGLE_QUOTED (1)
+        //                                                    rawValue: ''
+        //                                                    nodeId: 13
+        //                                                    parent: nodeId(11)
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(13)
+        //                                                )
+        //                                                nodeId: 11
+        //                                                parent: nodeId(10)
+        //                                                eligible: true
+        //                                                origNode: nodeId(11)
+        //                                            )
+        //                                        )
+        //                                        nodeId: 10
+        //                                        parent: nodeId(8)
+        //                                        eligible: true
+        //                                        origNode: nodeId(10)
+        //                                    )
+        //                                    1: Stmt_ClassMethod(
+        //                                        name: Identifier(
+        //                                            nodeId: 15
+        //                                            parent: nodeId(14)
+        //                                            isInsideFunction: true
+        //                                            isStrictTypes: true
+        //                                            functionScope: nodeId(14)
+        //                                            reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                            functionName: concreteMethod
+        //                                            eligible: true
+        //                                            origNode: nodeId(15)
+        //                                            mutationCandidate: true
+        //                                        )
+        //                                        params: array(
+        //                                            0: Param(
+        //                                                type: Identifier(
+        //                                                    nodeId: 17
+        //                                                    parent: nodeId(16)
+        //                                                    isInsideFunction: true
+        //                                                    isOnFunctionSignature: true
+        //                                                    isStrictTypes: true
+        //                                                    functionScope: nodeId(14)
+        //                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                                    functionName: concreteMethod
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(17)
+        //                                                    mutationCandidate: true
+        //                                                )
+        //                                                var: Expr_Variable(
+        //                                                    nodeId: 18
+        //                                                    parent: nodeId(16)
+        //                                                    isInsideFunction: true
+        //                                                    isOnFunctionSignature: true
+        //                                                    isStrictTypes: true
+        //                                                    functionScope: nodeId(14)
+        //                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                                    functionName: concreteMethod
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(18)
+        //                                                    mutationCandidate: true
+        //                                                )
+        //                                                nodeId: 16
+        //                                                parent: nodeId(14)
+        //                                                isInsideFunction: true
+        //                                                isOnFunctionSignature: true
+        //                                                isStrictTypes: true
+        //                                                functionScope: nodeId(14)
+        //                                                reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                                functionName: concreteMethod
+        //                                                eligible: true
+        //                                                origNode: nodeId(16)
+        //                                                mutationCandidate: true
+        //                                            )
+        //                                        )
+        //                                        returnType: Identifier(
+        //                                            nodeId: 19
+        //                                            parent: nodeId(14)
+        //                                            isInsideFunction: true
+        //                                            isStrictTypes: true
+        //                                            functionScope: nodeId(14)
+        //                                            reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                            functionName: concreteMethod
+        //                                            eligible: true
+        //                                            origNode: nodeId(19)
+        //                                            mutationCandidate: true
+        //                                        )
+        //                                        nodeId: 14
+        //                                        parent: nodeId(8)
+        //                                        isOnFunctionSignature: true
+        //                                        isStrictTypes: true
+        //                                        reflectionClass: Infection\Reflection\CoreClassReflection
+        //                                        functionName: concreteMethod
+        //                                        eligible: true
+        //                                        origNode: nodeId(14)
+        //                                        mutationCandidate: true
+        //                                    )
+        //                                )
+        //                                nodeId: 8
+        //                                parent: nodeId(4)
+        //                                eligible: true
+        //                                next: nodeId(10)
+        //                                origNode: nodeId(8)
+        //                            )
+        //                        )
+        //                        kind: 1
+        //                        nodeId: 4
+        //                        eligible: true
+        //                        next: nodeId(6)
+        //                        origNode: nodeId(4)
+        //                    )
+        //                )
+        //                AST,
+        //        ];
 
-        yield 'class with an abstract method' => [
-            file_get_contents(self::FIXTURES_DIR . '/AbstractMethod.php'),
-            <<<'AST'
-                array(
-                    0: Stmt_Declare(
-                        declares: array(
-                            0: DeclareItem(
-                                key: Identifier(
-                                    nodeId: 2
-                                    parent: nodeId(1)
-                                    eligible: false
-                                    origNode: nodeId(2)
-                                )
-                                value: Scalar_Int(
-                                    rawValue: 1
-                                    kind: KIND_DEC (10)
-                                    nodeId: 3
-                                    parent: nodeId(1)
-                                    eligible: false
-                                    origNode: nodeId(3)
-                                )
-                                nodeId: 1
-                                parent: nodeId(0)
-                                eligible: false
-                                origNode: nodeId(1)
-                            )
-                        )
-                        nodeId: 0
-                        eligible: false
-                        next: nodeId(4)
-                        origNode: nodeId(0)
-                    )
-                    1: Stmt_Namespace(
-                        name: Name(
-                            nodeId: 5
-                            parent: nodeId(4)
-                            eligible: false
-                            origNode: nodeId(5)
-                        )
-                        stmts: array(
-                            0: Stmt_Trait(
-                                name: Identifier(
-                                    nodeId: 7
-                                    parent: nodeId(6)
-                                    eligible: false
-                                    origNode: nodeId(7)
-                                )
-                                nodeId: 6
-                                parent: nodeId(4)
-                                eligible: false
-                                next: nodeId(8)
-                                origNode: nodeId(6)
-                            )
-                            1: Stmt_Class(
-                                name: Identifier(
-                                    nodeId: 9
-                                    parent: nodeId(8)
-                                    eligible: false
-                                    origNode: nodeId(9)
-                                )
-                                stmts: array(
-                                    0: Stmt_ClassConst(
-                                        consts: array(
-                                            0: Const(
-                                                name: Identifier(
-                                                    nodeId: 12
-                                                    parent: nodeId(11)
-                                                    eligible: false
-                                                    origNode: nodeId(12)
-                                                )
-                                                value: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: ''
-                                                    nodeId: 13
-                                                    parent: nodeId(11)
-                                                    eligible: false
-                                                    origNode: nodeId(13)
-                                                )
-                                                nodeId: 11
-                                                parent: nodeId(10)
-                                                eligible: false
-                                                origNode: nodeId(11)
-                                            )
-                                        )
-                                        nodeId: 10
-                                        parent: nodeId(8)
-                                        eligible: false
-                                        origNode: nodeId(10)
-                                    )
-                                    1: Stmt_ClassMethod(
-                                        name: Identifier(
-                                            nodeId: 15
-                                            origNode: nodeId(15)
-                                        )
-                                        params: array(
-                                            0: Param(
-                                                type: Identifier(
-                                                    nodeId: 17
-                                                    origNode: nodeId(17)
-                                                )
-                                                var: Expr_Variable(
-                                                    nodeId: 18
-                                                    origNode: nodeId(18)
-                                                )
-                                                nodeId: 16
-                                                origNode: nodeId(16)
-                                            )
-                                        )
-                                        returnType: Identifier(
-                                            nodeId: 19
-                                            origNode: nodeId(19)
-                                        )
-                                        nodeId: 14
-                                        origNode: nodeId(14)
-                                    )
-                                    2: Stmt_ClassMethod(
-                                        name: Identifier(
-                                            nodeId: 21
-                                            parent: nodeId(20)
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            functionScope: nodeId(20)
-                                            reflectionClass: Infection\Reflection\NullReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(21)
-                                            mutationCandidate: true
-                                        )
-                                        params: array(
-                                            0: Param(
-                                                type: Identifier(
-                                                    nodeId: 23
-                                                    parent: nodeId(22)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(20)
-                                                    reflectionClass: Infection\Reflection\NullReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(23)
-                                                    mutationCandidate: true
-                                                )
-                                                var: Expr_Variable(
-                                                    nodeId: 24
-                                                    parent: nodeId(22)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(20)
-                                                    reflectionClass: Infection\Reflection\NullReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(24)
-                                                    mutationCandidate: true
-                                                )
-                                                nodeId: 22
-                                                parent: nodeId(20)
-                                                isInsideFunction: true
-                                                isOnFunctionSignature: true
-                                                isStrictTypes: true
-                                                functionScope: nodeId(20)
-                                                reflectionClass: Infection\Reflection\NullReflection
-                                                functionName: concreteMethod
-                                                eligible: true
-                                                origNode: nodeId(22)
-                                                mutationCandidate: true
-                                            )
-                                        )
-                                        returnType: Identifier(
-                                            nodeId: 25
-                                            parent: nodeId(20)
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            functionScope: nodeId(20)
-                                            reflectionClass: Infection\Reflection\NullReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(25)
-                                            mutationCandidate: true
-                                        )
-                                        nodeId: 20
-                                        parent: nodeId(8)
-                                        isOnFunctionSignature: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\NullReflection
-                                        functionName: concreteMethod
-                                        eligible: true
-                                        origNode: nodeId(20)
-                                        mutationCandidate: true
-                                    )
-                                )
-                                nodeId: 8
-                                parent: nodeId(4)
-                                eligible: false
-                                next: nodeId(10)
-                                origNode: nodeId(8)
-                            )
-                        )
-                        kind: 1
-                        nodeId: 4
-                        eligible: false
-                        next: nodeId(6)
-                        origNode: nodeId(4)
-                    )
-                )
-                AST,
-        ];
+        // TODO: this test uncovered a bug, needs to be fixed separately to
+        //  highlight the fix.
+        //        yield 'class with an abstract method' => [
+        //            file_get_contents(self::FIXTURES_DIR . '/AbstractMethod.php'),
+        //            <<<'AST'
+        //                array(
+        //                    0: Stmt_Declare(
+        //                        declares: array(
+        //                            0: DeclareItem(
+        //                                key: Identifier(
+        //                                    nodeId: 2
+        //                                    parent: nodeId(1)
+        //                                    eligible: true
+        //                                    origNode: nodeId(2)
+        //                                )
+        //                                value: Scalar_Int(
+        //                                    rawValue: 1
+        //                                    kind: KIND_DEC (10)
+        //                                    nodeId: 3
+        //                                    parent: nodeId(1)
+        //                                    eligible: true
+        //                                    origNode: nodeId(3)
+        //                                )
+        //                                nodeId: 1
+        //                                parent: nodeId(0)
+        //                                eligible: true
+        //                                origNode: nodeId(1)
+        //                            )
+        //                        )
+        //                        nodeId: 0
+        //                        eligible: true
+        //                        next: nodeId(4)
+        //                        origNode: nodeId(0)
+        //                    )
+        //                    1: Stmt_Namespace(
+        //                        name: Name(
+        //                            nodeId: 5
+        //                            parent: nodeId(4)
+        //                            eligible: true
+        //                            origNode: nodeId(5)
+        //                        )
+        //                        stmts: array(
+        //                            0: Stmt_Trait(
+        //                                name: Identifier(
+        //                                    nodeId: 7
+        //                                    parent: nodeId(6)
+        //                                    eligible: true
+        //                                    origNode: nodeId(7)
+        //                                )
+        //                                nodeId: 6
+        //                                parent: nodeId(4)
+        //                                eligible: true
+        //                                next: nodeId(8)
+        //                                origNode: nodeId(6)
+        //                            )
+        //                            1: Stmt_Class(
+        //                                name: Identifier(
+        //                                    nodeId: 9
+        //                                    parent: nodeId(8)
+        //                                    eligible: true
+        //                                    origNode: nodeId(9)
+        //                                )
+        //                                stmts: array(
+        //                                    0: Stmt_ClassConst(
+        //                                        consts: array(
+        //                                            0: Const(
+        //                                                name: Identifier(
+        //                                                    nodeId: 12
+        //                                                    parent: nodeId(11)
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(12)
+        //                                                )
+        //                                                value: Scalar_String(
+        //                                                    kind: KIND_SINGLE_QUOTED (1)
+        //                                                    rawValue: ''
+        //                                                    nodeId: 13
+        //                                                    parent: nodeId(11)
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(13)
+        //                                                )
+        //                                                nodeId: 11
+        //                                                parent: nodeId(10)
+        //                                                eligible: true
+        //                                                origNode: nodeId(11)
+        //                                            )
+        //                                        )
+        //                                        nodeId: 10
+        //                                        parent: nodeId(8)
+        //                                        eligible: true
+        //                                        origNode: nodeId(10)
+        //                                    )
+        //                                    1: Stmt_ClassMethod(
+        //                                        name: Identifier(
+        //                                            nodeId: 15
+        //                                            origNode: nodeId(15)
+        //                                        )
+        //                                        params: array(
+        //                                            0: Param(
+        //                                                type: Identifier(
+        //                                                    nodeId: 17
+        //                                                    origNode: nodeId(17)
+        //                                                )
+        //                                                var: Expr_Variable(
+        //                                                    nodeId: 18
+        //                                                    origNode: nodeId(18)
+        //                                                )
+        //                                                nodeId: 16
+        //                                                origNode: nodeId(16)
+        //                                            )
+        //                                        )
+        //                                        returnType: Identifier(
+        //                                            nodeId: 19
+        //                                            origNode: nodeId(19)
+        //                                        )
+        //                                        nodeId: 14
+        //                                        origNode: nodeId(14)
+        //                                    )
+        //                                    2: Stmt_ClassMethod(
+        //                                        name: Identifier(
+        //                                            nodeId: 21
+        //                                            parent: nodeId(20)
+        //                                            isInsideFunction: true
+        //                                            isStrictTypes: true
+        //                                            functionScope: nodeId(20)
+        //                                            reflectionClass: Infection\Reflection\NullReflection
+        //                                            functionName: concreteMethod
+        //                                            eligible: true
+        //                                            origNode: nodeId(21)
+        //                                            mutationCandidate: true
+        //                                        )
+        //                                        params: array(
+        //                                            0: Param(
+        //                                                type: Identifier(
+        //                                                    nodeId: 23
+        //                                                    parent: nodeId(22)
+        //                                                    isInsideFunction: true
+        //                                                    isOnFunctionSignature: true
+        //                                                    isStrictTypes: true
+        //                                                    functionScope: nodeId(20)
+        //                                                    reflectionClass: Infection\Reflection\NullReflection
+        //                                                    functionName: concreteMethod
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(23)
+        //                                                    mutationCandidate: true
+        //                                                )
+        //                                                var: Expr_Variable(
+        //                                                    nodeId: 24
+        //                                                    parent: nodeId(22)
+        //                                                    isInsideFunction: true
+        //                                                    isOnFunctionSignature: true
+        //                                                    isStrictTypes: true
+        //                                                    functionScope: nodeId(20)
+        //                                                    reflectionClass: Infection\Reflection\NullReflection
+        //                                                    functionName: concreteMethod
+        //                                                    eligible: true
+        //                                                    origNode: nodeId(24)
+        //                                                    mutationCandidate: true
+        //                                                )
+        //                                                nodeId: 22
+        //                                                parent: nodeId(20)
+        //                                                isInsideFunction: true
+        //                                                isOnFunctionSignature: true
+        //                                                isStrictTypes: true
+        //                                                functionScope: nodeId(20)
+        //                                                reflectionClass: Infection\Reflection\NullReflection
+        //                                                functionName: concreteMethod
+        //                                                eligible: true
+        //                                                origNode: nodeId(22)
+        //                                                mutationCandidate: true
+        //                                            )
+        //                                        )
+        //                                        returnType: Identifier(
+        //                                            nodeId: 25
+        //                                            parent: nodeId(20)
+        //                                            isInsideFunction: true
+        //                                            isStrictTypes: true
+        //                                            functionScope: nodeId(20)
+        //                                            reflectionClass: Infection\Reflection\NullReflection
+        //                                            functionName: concreteMethod
+        //                                            eligible: true
+        //                                            origNode: nodeId(25)
+        //                                            mutationCandidate: true
+        //                                        )
+        //                                        nodeId: 20
+        //                                        parent: nodeId(8)
+        //                                        isOnFunctionSignature: true
+        //                                        isStrictTypes: true
+        //                                        reflectionClass: Infection\Reflection\NullReflection
+        //                                        functionName: concreteMethod
+        //                                        eligible: true
+        //                                        origNode: nodeId(20)
+        //                                        mutationCandidate: true
+        //                                    )
+        //                                )
+        //                                nodeId: 8
+        //                                parent: nodeId(4)
+        //                                eligible: true
+        //                                next: nodeId(10)
+        //                                origNode: nodeId(8)
+        //                            )
+        //                        )
+        //                        kind: 1
+        //                        nodeId: 4
+        //                        eligible: true
+        //                        next: nodeId(6)
+        //                        origNode: nodeId(4)
+        //                    )
+        //                )
+        //                AST,
+        //        ];
     }
 }

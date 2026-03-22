@@ -37,7 +37,6 @@ namespace Infection\Command\Debug;
 
 use Infection\Command\BaseCommand;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\FileSystem\FileSystem;
@@ -112,7 +111,6 @@ final class DumpAstCommand extends BaseCommand
                 logger: $logger,
                 output: $io->getOutput(),
                 configFile: $configFile,
-                sourceFilter: SourceFilterOptions::get($io),
             );
 
         $nodes = $this->createAst($container, $file);
