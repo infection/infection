@@ -36,9 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command\Debug;
 
 use Infection\Command\BaseCommand;
-use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\FileSystem\FileSystem;
@@ -96,8 +94,6 @@ final class DumpAstCommand extends BaseCommand
         );
 
         ConfigurationOption::addOption($this);
-        SourceFilterOptions::addOption($this);
-        BaseOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool
@@ -106,6 +102,7 @@ final class DumpAstCommand extends BaseCommand
         $shouldShowAttributes = self::shouldShowAttributes($io);
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
+        self::configureFormatter($io);
 
         $container = $this
             ->getApplication()
@@ -114,25 +111,15 @@ final class DumpAstCommand extends BaseCommand
                 logger: $logger,
                 output: $io->getOutput(),
                 configFile: $configFile,
-                sourceFilter: SourceFilterOptions::get($io),
             );
 
         $nodes = $this->createAst($container, $file);
-
-        $io->getFormatter()->setStyle(
-            'eligible',
-            new OutputFormatterStyle(background: 'green'),
-        );
-        $io->getFormatter()->setStyle(
-            'mutation-candidate',
-            new OutputFormatterStyle(background: 'red'),
-        );
 
         $io->write(
             $container->getNodeDumper()->dump(
                 $nodes,
                 dumpOtherAttributes: $shouldShowAttributes,
-                highlightMutationCandidates: $io->isDecorated(),
+                decorateNodes: $io->isDecorated(),
             ),
         );
 
@@ -156,7 +143,7 @@ final class DumpAstCommand extends BaseCommand
         self::addIdsToNodes($initialStatements);
 
         $traverserFactory
-            ->createEnrichmentTraverser($file)
+            ->createEnrichmentTraverser()
             ->traverse($initialStatements);
 
         return $traverserFactory
@@ -202,5 +189,19 @@ final class DumpAstCommand extends BaseCommand
     private static function addIdsToNodes(array $nodes): void
     {
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
+    }
+
+    private static function configureFormatter(IO $io): void
+    {
+        $formatter = $io->getFormatter();
+
+        $formatter->setStyle(
+            'eligible',
+            new OutputFormatterStyle(background: 'green'),
+        );
+        $formatter->setStyle(
+            'mutation-candidate',
+            new OutputFormatterStyle(background: 'red'),
+        );
     }
 }

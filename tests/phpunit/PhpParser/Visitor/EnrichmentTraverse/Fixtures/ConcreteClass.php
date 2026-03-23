@@ -35,17 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-trait TraitExample
-{
-}
-
 class ConcreteClass
 {
-    // use TraitExample;
+    use TraitExample;
 
     public const CONSTANT_EXAMPLE = '';
 
     public function concreteMethod(mixed $param): void
+    {
+    }
+
+    public function abstractMethod(mixed $param): void
     {
     }
 }

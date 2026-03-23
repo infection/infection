@@ -35,13 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-trait TraitExample
-{
-}
-
 abstract class ClassWithAbstractMethod
 {
-    // use TraitExample;
+    use TraitExample;
 
     public const CONSTANT_EXAMPLE = '';
 

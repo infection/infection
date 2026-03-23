@@ -133,7 +133,7 @@ final class NodeDumper
         private bool $dumpOtherAttributes = true,
         // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
-        private bool $highlightMutationCandidates = false,
+        private bool $decorateNodes = false,
     ) {
     }
 
@@ -154,7 +154,7 @@ final class NodeDumper
         ?bool $dumpOtherAttributes = null,
         // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
-        ?bool $highlightMutationCandidates = null,
+        ?bool $decorateNodes = null,
     ): string {
         $result = '';
         $newLine = "\n";
@@ -169,9 +169,9 @@ final class NodeDumper
             $this->onlyVisitedNodes = $onlyVisitedNodes;
         }
 
-        if ($highlightMutationCandidates !== null) {
-            $originalHighlightMutationCandidates = $this->highlightMutationCandidates;
-            $this->highlightMutationCandidates = $highlightMutationCandidates;
+        if ($decorateNodes !== null) {
+            $originalHighlightMutationCandidates = $this->decorateNodes;
+            $this->decorateNodes = $decorateNodes;
         }
 
         if ($dumpPositions !== null) {
@@ -193,8 +193,8 @@ final class NodeDumper
             $this->dumpOtherAttributes = $originalDumpOtherAttributes;
         }
 
-        if ($highlightMutationCandidates !== null) {
-            $this->highlightMutationCandidates = $originalHighlightMutationCandidates;
+        if ($decorateNodes !== null) {
+            $this->decorateNodes = $originalHighlightMutationCandidates;
         }
 
         if ($onlyVisitedNodes !== null) {
@@ -309,15 +309,26 @@ final class NodeDumper
                 return;
             }
 
-            $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
-            $isMutationCandidate = LabelMutationCandidatesVisitor::isAMutationCandidate($node);
+            if ($this->decorateNodes) {
+                $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
+                $isMutationCandidate = LabelMutationCandidatesVisitor::isAMutationCandidate($node);
 
-            $result .= $isMutationCandidate && $this->highlightMutationCandidates
-                ? sprintf(
-                    '<mutation-candidate>%s</mutation-candidate>',
-                    $node->getType(),
-                )
-                : $node->getType();
+                if ($isMutationCandidate) {
+                    $result .= sprintf(
+                        '<mutation-candidate>%s</mutation-candidate>',
+                        $node->getType(),
+                    );
+                } elseif ($isEligible) {
+                    $result .= sprintf(
+                        '<eligible>%s</eligible>',
+                        $node->getType(),
+                    );
+                } else {
+                    $result .= $node->getType();
+                }
+            } else {
+                $result .= $node->getType();
+            }
 
             if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
                 $result .= $p;

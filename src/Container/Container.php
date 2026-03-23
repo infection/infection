@@ -108,6 +108,7 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
+use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
@@ -170,7 +171,6 @@ use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -332,7 +332,7 @@ final class Container extends DIContainer
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
             ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
-            PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
+            PrettyPrinterAbstract::class => static fn (): InfectionPrettyPrinter => new InfectionPrettyPrinter(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
                 $container->getConfiguration()->msiPrecision,
                 $container->getConfiguration()->timeoutsAsEscaped,

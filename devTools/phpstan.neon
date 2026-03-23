@@ -206,6 +206,7 @@ parameters:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
+        - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
         - ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)

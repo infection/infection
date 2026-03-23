@@ -80,6 +80,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Reporter\Http\StrykerCurlClient;
@@ -175,6 +176,7 @@ final class ProjectCodeProvider
         Tokens::class,
         TooManyReportsFound::class,
         XdebugHandler::class,
+        InfectionPrettyPrinter::class,
     ];
 
     /**

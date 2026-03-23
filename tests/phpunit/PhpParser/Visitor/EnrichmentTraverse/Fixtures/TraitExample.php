@@ -33,48 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-use Infection\Container\Container;
-use Infection\Mutant\MutantCodePrinter;
-use Infection\PhpParser\InfectionPrettyPrinter;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
-use PhpParser\NodeDumper;
-
-/**
- * Singleton for the container and a few services (used for tests). The goal is to avoid
- * instantiating multiple times stateless services across the tests to reduce the memory footprint
- * and remove some redundant code.
- *
- * @internal
- */
-final class SingletonContainer
+trait TraitExample
 {
-    private static ?Container $container = null;
+    public const CONSTANT_EXAMPLE = '';
 
-    private static ?NodeDumper $dumper = null;
+    abstract public function abstractMethod(mixed $param): void;
 
-    private static ?MutantCodePrinter $printer = null;
-
-    private static ?PHPDocParser $phpDocParser = null;
-
-    public static function getContainer(): Container
+    public function concreteMethod(mixed $param): void
     {
-        return self::$container ??= Container::create();
-    }
-
-    public static function getNodeDumper(): NodeDumper
-    {
-        return self::$dumper ??= new NodeDumper();
-    }
-
-    public static function getPrinter(): MutantCodePrinter
-    {
-        return self::$printer ??= new MutantCodePrinter(new InfectionPrettyPrinter());
-    }
-
-    public static function getPHPDocParser(): PHPDocParser
-    {
-        return self::$phpDocParser ??= new PHPDocParser();
     }
 }

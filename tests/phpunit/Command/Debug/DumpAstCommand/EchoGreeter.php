@@ -33,48 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\Tests\Command\Debug\DumpAstCommand;
 
-use Infection\Container\Container;
-use Infection\Mutant\MutantCodePrinter;
-use Infection\PhpParser\InfectionPrettyPrinter;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
-use PhpParser\NodeDumper;
-
-/**
- * Singleton for the container and a few services (used for tests). The goal is to avoid
- * instantiating multiple times stateless services across the tests to reduce the memory footprint
- * and remove some redundant code.
- *
- * @internal
- */
-final class SingletonContainer
+final class EchoGreeter implements Greeter
 {
-    private static ?Container $container = null;
-
-    private static ?NodeDumper $dumper = null;
-
-    private static ?MutantCodePrinter $printer = null;
-
-    private static ?PHPDocParser $phpDocParser = null;
-
-    public static function getContainer(): Container
+    public function greet(): string
     {
-        return self::$container ??= Container::create();
-    }
-
-    public static function getNodeDumper(): NodeDumper
-    {
-        return self::$dumper ??= new NodeDumper();
-    }
-
-    public static function getPrinter(): MutantCodePrinter
-    {
-        return self::$printer ??= new MutantCodePrinter(new InfectionPrettyPrinter());
-    }
-
-    public static function getPHPDocParser(): PHPDocParser
-    {
-        return self::$phpDocParser ??= new PHPDocParser();
+        echo 'Hello world!';
     }
 }

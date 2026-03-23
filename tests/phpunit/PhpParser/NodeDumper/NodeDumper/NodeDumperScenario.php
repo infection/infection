@@ -52,6 +52,7 @@ final class NodeDumperScenario
         public bool $dumpPositions = false,
         public bool $dumpOtherAttributes = false,
         public bool $onlyVisitedNodes = true,
+        public bool $decorateNodes = false,
     ) {
     }
 
@@ -104,6 +105,14 @@ final class NodeDumperScenario
     {
         $clone = clone $this;
         $clone->onlyVisitedNodes = false;
+
+        return $clone;
+    }
+
+    public function withDecorateNodes(): self
+    {
+        $clone = clone $this;
+        $clone->decorateNodes = true;
 
         return $clone;
     }
