@@ -152,9 +152,8 @@ class FileMutationGenerator
     {
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        // Pre-traverse the nodes to connect them
-        $preTraverser = $this->traverserFactory->createEnrichmentTraverser();
-        $preTraverser->traverse($initialStatements);
+        $traverser = $this->traverserFactory->createEnrichmentTraverser();
+        $traverser->traverse($initialStatements);
 
         return [$initialStatements, $originalFileTokens];
     }

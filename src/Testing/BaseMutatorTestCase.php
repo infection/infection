@@ -45,7 +45,6 @@ use Infection\Framework\Str;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Source\Matcher\NullSourceLineMatcher;
@@ -251,7 +250,7 @@ abstract class BaseMutatorTestCase extends TestCase
             ),
         );
 
-        $factory = new NodeTraverserFactory();
+        $factory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
         $factory
             ->createEnrichmentTraverser()

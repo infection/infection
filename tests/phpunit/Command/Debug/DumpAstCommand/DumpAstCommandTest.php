@@ -214,6 +214,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             functionName: greet
                                             eligible: true
                                             origNode: nodeId(10)
+                                            mutationCandidate: true
                                         )
                                         returnType: Identifier(
                                             nodeId: 11
@@ -225,6 +226,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             functionName: greet
                                             eligible: true
                                             origNode: nodeId(11)
+                                            mutationCandidate: true
                                         )
                                         stmts: array(
                                             0: Stmt_Echo(
@@ -241,6 +243,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                         functionName: greet
                                                         eligible: true
                                                         origNode: nodeId(13)
+                                                        mutationCandidate: true
                                                     )
                                                 )
                                                 nodeId: 12
@@ -252,6 +255,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                 functionName: greet
                                                 eligible: true
                                                 origNode: nodeId(12)
+                                                mutationCandidate: true
                                             )
                                         )
                                         nodeId: 9
@@ -262,6 +266,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                         functionName: greet
                                         eligible: true
                                         origNode: nodeId(9)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 6

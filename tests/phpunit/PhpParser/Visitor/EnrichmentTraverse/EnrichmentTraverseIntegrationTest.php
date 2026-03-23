@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
-use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -65,7 +65,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $traverserFactory->createEnrichmentTraverser()->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
-                new MarkTraversedNodesAsVisitedVisitor(),
+                new LabelMutationCandidatesVisitor(),
             )
             ->traverse($nodes);
 
@@ -135,6 +135,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: first
                                             eligible: true
                                             origNode: nodeId(9)
+                                            mutationCandidate: true
                                         )
                                         returnType: Identifier(
                                             nodeId: 10
@@ -146,6 +147,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: first
                                             eligible: true
                                             origNode: nodeId(10)
+                                            mutationCandidate: true
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -162,6 +164,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: first
                                                         eligible: true
                                                         origNode: nodeId(13)
+                                                        mutationCandidate: true
                                                     )
                                                     right: Scalar_Int(
                                                         rawValue: 2
@@ -175,6 +178,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: first
                                                         eligible: true
                                                         origNode: nodeId(14)
+                                                        mutationCandidate: true
                                                     )
                                                     nodeId: 12
                                                     parent: nodeId(11)
@@ -185,6 +189,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: first
                                                     eligible: true
                                                     origNode: nodeId(12)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 11
                                                 parent: nodeId(8)
@@ -195,6 +200,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 functionName: first
                                                 eligible: true
                                                 origNode: nodeId(11)
+                                                mutationCandidate: true
                                             )
                                         )
                                         nodeId: 8
@@ -205,6 +211,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: first
                                         eligible: true
                                         origNode: nodeId(8)
+                                        mutationCandidate: true
                                     )
                                     1: Stmt_ClassMethod(
                                         name: Identifier(
@@ -217,6 +224,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: second
                                             eligible: true
                                             origNode: nodeId(16)
+                                            mutationCandidate: true
                                         )
                                         returnType: Identifier(
                                             nodeId: 17
@@ -228,6 +236,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionName: second
                                             eligible: true
                                             origNode: nodeId(17)
+                                            mutationCandidate: true
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -244,6 +253,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: second
                                                         eligible: true
                                                         origNode: nodeId(20)
+                                                        mutationCandidate: true
                                                     )
                                                     right: Scalar_Int(
                                                         rawValue: 2
@@ -257,6 +267,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionName: second
                                                         eligible: true
                                                         origNode: nodeId(21)
+                                                        mutationCandidate: true
                                                     )
                                                     nodeId: 19
                                                     parent: nodeId(18)
@@ -267,6 +278,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionName: second
                                                     eligible: true
                                                     origNode: nodeId(19)
+                                                    mutationCandidate: true
                                                 )
                                                 nodeId: 18
                                                 parent: nodeId(15)
@@ -277,6 +289,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 functionName: second
                                                 eligible: true
                                                 origNode: nodeId(18)
+                                                mutationCandidate: true
                                             )
                                         )
                                         nodeId: 15
@@ -287,11 +300,252 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: second
                                         eligible: true
                                         origNode: nodeId(15)
+                                        mutationCandidate: true
                                     )
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
                                 eligible: true
+                                origNode: nodeId(6)
+                            )
+                        )
+                        kind: 1
+                        nodeId: 4
+                        eligible: true
+                        next: nodeId(6)
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
+
+        yield 'function declaration' => [
+            file_get_contents(self::FIXTURES_DIR . '/Function_.php'),
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(2)
+                                )
+                                value: Scalar_Int(
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(3)
+                                )
+                                nodeId: 1
+                                parent: nodeId(0)
+                                eligible: true
+                                origNode: nodeId(1)
+                            )
+                        )
+                        nodeId: 0
+                        eligible: true
+                        next: nodeId(4)
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 5
+                            parent: nodeId(4)
+                            eligible: true
+                            origNode: nodeId(5)
+                        )
+                        stmts: array(
+                            0: Stmt_Function(
+                                name: Identifier(
+                                    nodeId: 7
+                                    parent: nodeId(6)
+                                    eligible: true
+                                    origNode: nodeId(7)
+                                )
+                                params: array(
+                                    0: Param(
+                                        type: Identifier(
+                                            nodeId: 9
+                                            parent: nodeId(8)
+                                            eligible: true
+                                            origNode: nodeId(9)
+                                        )
+                                        var: Expr_Variable(
+                                            nodeId: 10
+                                            parent: nodeId(8)
+                                            eligible: true
+                                            origNode: nodeId(10)
+                                        )
+                                        nodeId: 8
+                                        parent: nodeId(6)
+                                        eligible: true
+                                        origNode: nodeId(8)
+                                    )
+                                    1: Param(
+                                        type: Identifier(
+                                            nodeId: 12
+                                            parent: nodeId(11)
+                                            eligible: true
+                                            origNode: nodeId(12)
+                                        )
+                                        var: Expr_Variable(
+                                            nodeId: 13
+                                            parent: nodeId(11)
+                                            eligible: true
+                                            origNode: nodeId(13)
+                                        )
+                                        nodeId: 11
+                                        parent: nodeId(6)
+                                        eligible: true
+                                        origNode: nodeId(11)
+                                    )
+                                )
+                                returnType: Identifier(
+                                    nodeId: 14
+                                    parent: nodeId(6)
+                                    eligible: true
+                                    origNode: nodeId(14)
+                                )
+                                stmts: array(
+                                    0: Stmt_Return(
+                                        expr: Expr_BinaryOp_Identical(
+                                            left: Expr_Variable(
+                                                nodeId: 17
+                                                parent: nodeId(16)
+                                                eligible: true
+                                                origNode: nodeId(17)
+                                            )
+                                            right: Expr_Variable(
+                                                nodeId: 18
+                                                parent: nodeId(16)
+                                                eligible: true
+                                                origNode: nodeId(18)
+                                            )
+                                            nodeId: 16
+                                            parent: nodeId(15)
+                                            eligible: true
+                                            origNode: nodeId(16)
+                                        )
+                                        nodeId: 15
+                                        parent: nodeId(6)
+                                        eligible: true
+                                        origNode: nodeId(15)
+                                    )
+                                )
+                                nodeId: 6
+                                parent: nodeId(4)
+                                isStrictTypes: true
+                                eligible: true
+                                origNode: nodeId(6)
+                            )
+                        )
+                        kind: 1
+                        nodeId: 4
+                        eligible: true
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
+
+        yield 'interface declaration' => [
+            file_get_contents(self::FIXTURES_DIR . '/InterfaceExample.php'),
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(2)
+                                )
+                                value: Scalar_Int(
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(3)
+                                )
+                                nodeId: 1
+                                parent: nodeId(0)
+                                eligible: true
+                                origNode: nodeId(1)
+                            )
+                        )
+                        nodeId: 0
+                        eligible: true
+                        next: nodeId(4)
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 5
+                            parent: nodeId(4)
+                            eligible: true
+                            origNode: nodeId(5)
+                        )
+                        stmts: array(
+                            0: Stmt_Interface(
+                                name: Identifier(
+                                    nodeId: 7
+                                    origNode: nodeId(7)
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassConst(
+                                        consts: array(
+                                            0: Const(
+                                                name: Identifier(
+                                                    nodeId: 10
+                                                    origNode: nodeId(10)
+                                                )
+                                                value: Scalar_String(
+                                                    kind: KIND_SINGLE_QUOTED (1)
+                                                    rawValue: ''
+                                                    nodeId: 11
+                                                    origNode: nodeId(11)
+                                                )
+                                                nodeId: 9
+                                                origNode: nodeId(9)
+                                            )
+                                        )
+                                        nodeId: 8
+                                        origNode: nodeId(8)
+                                    )
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 13
+                                            origNode: nodeId(13)
+                                        )
+                                        params: array(
+                                            0: Param(
+                                                type: Identifier(
+                                                    nodeId: 15
+                                                    origNode: nodeId(15)
+                                                )
+                                                var: Expr_Variable(
+                                                    nodeId: 16
+                                                    origNode: nodeId(16)
+                                                )
+                                                nodeId: 14
+                                                origNode: nodeId(14)
+                                            )
+                                        )
+                                        returnType: Identifier(
+                                            nodeId: 17
+                                            origNode: nodeId(17)
+                                        )
+                                        nodeId: 12
+                                        origNode: nodeId(12)
+                                    )
+                                )
+                                nodeId: 6
                                 origNode: nodeId(6)
                             )
                         )

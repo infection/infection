@@ -33,36 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-
-/**
- * Mark all node as eligible. This visitor should be registered as last, so if
- * a node is code that should be ignored because not covered by tests, for example,
- * then this visitor should not traverse that node at all.
- *
- * @internal
- */
-final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
+interface InterfaceExample
 {
-    public const ELIGIBLE = 'eligible';
+    public const CONSTANT_EXAMPLE = '';
 
-    public static function isEligible(Node $node): bool
-    {
-        return $node->hasAttribute(self::ELIGIBLE);
-    }
-
-    public function enterNode(Node $node): ?int
-    {
-        self::markAsEligible($node);
-
-        return null;
-    }
-
-    public static function markAsEligible(Node $node): void
-    {
-        $node->setAttribute(self::ELIGIBLE, true);
-    }
+    public function abstractMethod(mixed $param): void;
 }

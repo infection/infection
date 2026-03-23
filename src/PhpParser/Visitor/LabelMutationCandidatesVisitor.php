@@ -39,30 +39,59 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Mark all node as eligible. This visitor should be registered as last, so if
- * a node is code that should be ignored because not covered by tests, for example,
- * then this visitor should not traverse that node at all.
+ * This mutator aims at reflecting the behaviour of NodeMutationGenerator to
+ * give a visual of the nodes it is look at.
+ *
+ * This is different from "visited" and "eligible". Indeed, at the time of
+ * writing a node may be:
+ * - Visited without being eligible or a mutation candidate (e.g. a namespace statement).
+ * - Eligible without being a mutation candidate (as NodeMutationGenerator
+ *   currently has additional checks on top of the eligibility).
+ *
+ * @see NodeMutationGenerator
  *
  * @internal
  */
-final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
+final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
 {
-    public const ELIGIBLE = 'eligible';
+    public const MUTATION_CANDIDATE = 'mutationCandidate';
 
-    public static function isEligible(Node $node): bool
+    public function enterNode(Node $node): null
     {
-        return $node->hasAttribute(self::ELIGIBLE);
-    }
+        MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
 
-    public function enterNode(Node $node): ?int
-    {
-        self::markAsEligible($node);
+        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
+            return null;
+        }
+
+        if (!$this->isOnFunctionSignature($node)
+            && !$this->isInsideFunction($node)
+        ) {
+            return null;
+        }
+
+        self::markAsAMutationCandidate($node);
 
         return null;
     }
 
-    public static function markAsEligible(Node $node): void
+    public static function markAsAMutationCandidate(Node $node): void
     {
-        $node->setAttribute(self::ELIGIBLE, true);
+        $node->setAttribute(self::MUTATION_CANDIDATE, true);
+    }
+
+    public static function isAMutationCandidate(Node $node): bool
+    {
+        return $node->hasAttribute(self::MUTATION_CANDIDATE);
+    }
+
+    private function isOnFunctionSignature(Node $node): bool
+    {
+        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+    }
+
+    private function isInsideFunction(Node $node): bool
+    {
+        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 }

@@ -38,6 +38,7 @@ namespace Infection\PhpParser\NodeDumper;
 use function get_debug_type;
 use function implode;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
@@ -308,14 +309,26 @@ final class NodeDumper
                 return;
             }
 
-            $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
+            if ($this->decorateNodes) {
+                $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
+                $isMutationCandidate = LabelMutationCandidatesVisitor::isAMutationCandidate($node);
 
-            $result .= $isEligible && $this->decorateNodes
-                ? sprintf(
-                    '<eligible>%s</eligible>',
-                    $node->getType(),
-                )
-                : $node->getType();
+                if ($isMutationCandidate) {
+                    $result .= sprintf(
+                        '<mutation-candidate>%s</mutation-candidate>',
+                        $node->getType(),
+                    );
+                } elseif ($isEligible) {
+                    $result .= sprintf(
+                        '<eligible>%s</eligible>',
+                        $node->getType(),
+                    );
+                } else {
+                    $result .= $node->getType();
+                }
+            } else {
+                $result .= $node->getType();
+            }
 
             if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
                 $result .= $p;
