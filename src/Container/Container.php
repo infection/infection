@@ -454,7 +454,6 @@ final class Container extends DIContainer
             FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
                 $container->getFileParser(),
                 $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
                 $container->getTracer(),
                 $container->getFileStore(),
             ),

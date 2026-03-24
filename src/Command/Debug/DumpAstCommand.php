@@ -143,7 +143,7 @@ final class DumpAstCommand extends BaseCommand
         self::addIdsToNodes($initialStatements);
 
         $traverserFactory
-            ->createEnrichmentTraverser()
+            ->createEnrichmentTraverser($file)
             ->traverse($initialStatements);
 
         return $traverserFactory

@@ -47,8 +47,6 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
@@ -238,11 +236,7 @@ abstract class BaseMutatorTestCase extends TestCase
                 mutators: [$this->createMutator($settings)],
                 filePath: '/path/to/test-file.php',
                 fileNodes: $nodes,
-                trace: new EmptyTrace(
-                    new MockSplFileInfo('/path/to/test-file.php'),
-                ),
                 onlyCovered: false,
-                lineRangeCalculator: new LineRangeCalculator(),
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $code,
             ),

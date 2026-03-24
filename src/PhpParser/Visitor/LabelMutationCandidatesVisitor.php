@@ -54,7 +54,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
 {
-    private const MUTATION_CANDIDATE = 'mutationCandidate';
+    public const MUTATION_CANDIDATE = 'mutationCandidate';
 
     public function enterNode(Node $node): null
     {

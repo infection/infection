@@ -75,9 +75,19 @@ final class AddTestsVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node): null
     {
         $node->setAttribute(
+            self::TESTS,
+            $this->getAllTestsForNode($node),
         );
 
         return null;
+    }
+
+    /**
+     * @return TestLocation[]
+     */
+    public static function getTests(Node $node): array
+    {
+        return $node->getAttribute(self::TESTS, default: []);
     }
 
     /**

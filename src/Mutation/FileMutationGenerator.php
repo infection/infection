@@ -46,7 +46,6 @@ use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
@@ -64,7 +63,6 @@ class FileMutationGenerator
     public function __construct(
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
-        private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
     ) {
@@ -122,9 +120,7 @@ class FileMutationGenerator
                 mutators: $mutators,
                 filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
-                trace: $trace,
                 onlyCovered: $onlyCovered,
-                lineRangeCalculator: $this->lineRangeCalculator,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $this->fileStore->getContents($sourceFile),
             ),

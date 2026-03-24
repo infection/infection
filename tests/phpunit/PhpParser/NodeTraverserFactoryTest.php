@@ -42,6 +42,7 @@ use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PhpParser\NodeTraverser;
@@ -64,7 +65,9 @@ final class NodeTraverserFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->factory = new NodeTraverserFactory();
+        $this->factory = new NodeTraverserFactory(
+            new NullSourceLineMatcher(),
+        );
     }
 
     public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
