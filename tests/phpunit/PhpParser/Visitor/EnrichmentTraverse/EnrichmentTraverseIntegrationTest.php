@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
@@ -58,6 +59,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         string $code,
         string $expected,
     ): void {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+
         $traverserFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
         $nodes = $this->parse($code);
@@ -65,7 +68,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $this->addIdsToNodes($nodes);
         $traverserFactory
             ->createEnrichmentTraverser(
-                new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
+                $sourceFile,
+                new EmptyTrace($sourceFile),
             )
             ->traverse($nodes);
         $traversedNodes = $traverserFactory

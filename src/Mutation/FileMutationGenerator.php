@@ -89,7 +89,10 @@ class FileMutationGenerator
             return;
         }
 
-        [$initialStatements, $originalFileTokens] = $this->createAst($sourceFile);
+        [$initialStatements, $originalFileTokens] = $this->createAst(
+            $sourceFile,
+            $trace,
+        );
 
         yield from $this->generateMutations(
             $mutators,
@@ -108,7 +111,8 @@ class FileMutationGenerator
      *
      * @return iterable<Mutation>
      */
-    private function generateMutations(array $mutators,
+    private function generateMutations(
+        array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
         Trace $trace,
@@ -141,12 +145,15 @@ class FileMutationGenerator
      *
      * @return array{Stmt[], Token[]}
      */
-    private function createAst(SplFileInfo $sourceFile): array
-    {
+    private function createAst(
+        SplFileInfo $sourceFile,
+        Trace $trace,
+    ): array {
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        $traverser = $this->traverserFactory->createEnrichmentTraverser($sourceFile);
-        $traverser->traverse($initialStatements);
+        $this->traverserFactory
+            ->createEnrichmentTraverser($sourceFile, $trace)
+            ->traverse($initialStatements);
 
         return [$initialStatements, $originalFileTokens];
     }

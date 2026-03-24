@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\PhpParser\Visitor\SkipIngoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -65,7 +65,7 @@ final class ChangingIgnorerTest extends VisitorTestCase
                 $ignoredNodeIds,
                 $changingIgnorer,
             ),
-            new NonMutableNodesIgnorerVisitor([$changingIgnorer]),
+            new SkipIngoredNodesVisitor([$changingIgnorer]),
             new MarkTraversedNodesAsVisitedVisitor(),
         ))->traverse($nodes);
 

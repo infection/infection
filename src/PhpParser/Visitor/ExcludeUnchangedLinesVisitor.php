@@ -49,16 +49,14 @@ final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): null
     {
-        $eligibility = LabelNodesAsEligibleVisitor::getEligibility($node);
-
-        if ($eligibility !== false) {
-            $this->labelUntouchedNodeAsIneligible($node);
+        if (LabelNodesAsEligibleVisitor::isEligible($node)) {
+            $this->excludeUntouchedNodes($node);
         }
 
         return null;
     }
 
-    private function labelUntouchedNodeAsIneligible(Node $node): void
+    private function excludeUntouchedNodes(Node $node): void
     {
         /** @psalm-suppress InvalidArgument */
         $touches = $this->sourceLineMatcher->touches(

@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\PhpParser\Visitor\SkipIngoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(NonMutableNodesIgnorerVisitor::class)]
+#[CoversClass(SkipIngoredNodesVisitor::class)]
 final class NonMutableNodesIgnorerVisitorTest extends VisitorTestCase
 {
     /**
@@ -58,7 +58,7 @@ final class NonMutableNodesIgnorerVisitorTest extends VisitorTestCase
 
         $this->addIdsToNodes($nodes);
         (new NodeTraverser(
-            new NonMutableNodesIgnorerVisitor([
+            new SkipIngoredNodesVisitor([
                 new IdNodeIgnorer($ignoredNodeIds),
             ]),
             new MarkTraversedNodesAsVisitedVisitor(),

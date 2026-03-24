@@ -61,9 +61,7 @@ final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): ?int
     {
-        if (!$node->hasAttribute(self::ELIGIBLE)) {
-            self::markAsEligible($node);
-        }
+        self::markAsEligible($node);
 
         return null;
     }
