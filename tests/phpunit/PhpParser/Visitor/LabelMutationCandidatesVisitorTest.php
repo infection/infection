@@ -42,6 +42,7 @@ use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use PhpParser\Node;
@@ -69,7 +70,10 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
 
         $traverser = new NodeTraverser(
             new ReflectionVisitor(),
-            new LabelMutationCandidatesVisitor(),
+            new LabelMutationCandidatesVisitor(
+                '/path/to/source.php',
+                new NullSourceLineMatcher(),
+            ),
             new KeepOnlyDesiredAttributesVisitor(
                 MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
                 LabelNodesAsEligibleVisitor::ELIGIBLE,

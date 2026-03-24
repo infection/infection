@@ -62,6 +62,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
         $tester->execute([
             'file' => $file,
+            '--configuration' => __DIR__ . '/infection.json5',
             ...$options,
         ]);
 
@@ -284,12 +285,351 @@ final class DumpAstCommandTest extends FileSystemTestCase
                 )
                 AST,
         ];
+
+        yield 'with explicit no changed lines' => [
+            __DIR__ . '/EchoGreeter.php',
+            [
+                '--changed-lines-ranges' => null,
+            ],
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    startLine: 34
+                                    endLine: 34
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(2)
+                                )
+                                value: Scalar_Int(
+                                    startLine: 34
+                                    endLine: 34
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(3)
+                                )
+                                startLine: 34
+                                endLine: 34
+                                nodeId: 1
+                                parent: nodeId(0)
+                                eligible: true
+                                origNode: nodeId(1)
+                            )
+                        )
+                        startLine: 34
+                        endLine: 34
+                        nodeId: 0
+                        eligible: true
+                        next: nodeId(4)
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            startLine: 36
+                            endLine: 36
+                            nodeId: 5
+                            parent: nodeId(4)
+                            eligible: true
+                            origNode: nodeId(5)
+                        )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    startLine: 38
+                                    endLine: 38
+                                    nodeId: 7
+                                    parent: nodeId(6)
+                                    eligible: true
+                                    origNode: nodeId(7)
+                                )
+                                implements: array(
+                                    0: Name(
+                                        startLine: 38
+                                        endLine: 38
+                                        nodeId: 8
+                                        resolvedName: nodeId(8)
+                                        parent: nodeId(6)
+                                        eligible: true
+                                        origNode: nodeId(8)
+                                    )
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            startLine: 40
+                                            endLine: 40
+                                            nodeId: 10
+                                            parent: nodeId(9)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            functionScope: nodeId(9)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: greet
+                                            eligible: true
+                                            origNode: nodeId(10)
+                                        )
+                                        returnType: Identifier(
+                                            startLine: 40
+                                            endLine: 40
+                                            nodeId: 11
+                                            parent: nodeId(9)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            functionScope: nodeId(9)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: greet
+                                            eligible: true
+                                            origNode: nodeId(11)
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Echo(
+                                                exprs: array(
+                                                    0: Scalar_String(
+                                                        startLine: 42
+                                                        endLine: 42
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'Hello world!'
+                                                        nodeId: 13
+                                                        parent: nodeId(12)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        functionScope: nodeId(9)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        functionName: greet
+                                                        eligible: true
+                                                        origNode: nodeId(13)
+                                                    )
+                                                )
+                                                startLine: 42
+                                                endLine: 42
+                                                nodeId: 12
+                                                parent: nodeId(9)
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                functionScope: nodeId(9)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: greet
+                                                eligible: true
+                                                origNode: nodeId(12)
+                                            )
+                                        )
+                                        startLine: 40
+                                        endLine: 43
+                                        nodeId: 9
+                                        parent: nodeId(6)
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: greet
+                                        eligible: true
+                                        origNode: nodeId(9)
+                                    )
+                                )
+                                startLine: 38
+                                endLine: 44
+                                nodeId: 6
+                                parent: nodeId(4)
+                                eligible: true
+                                origNode: nodeId(6)
+                            )
+                        )
+                        startLine: 36
+                        endLine: 44
+                        kind: 1
+                        nodeId: 4
+                        eligible: true
+                        next: nodeId(6)
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
+
+        yield 'with explicit a changed line touching a mutation candidate' => [
+            __DIR__ . '/EchoGreeter.php',
+            [
+                '--changed-lines-ranges' => '42:42,40:42',
+            ],
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    startLine: 34
+                                    endLine: 34
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(2)
+                                )
+                                value: Scalar_Int(
+                                    startLine: 34
+                                    endLine: 34
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(3)
+                                )
+                                startLine: 34
+                                endLine: 34
+                                nodeId: 1
+                                parent: nodeId(0)
+                                eligible: true
+                                origNode: nodeId(1)
+                            )
+                        )
+                        startLine: 34
+                        endLine: 34
+                        nodeId: 0
+                        eligible: true
+                        next: nodeId(4)
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            startLine: 36
+                            endLine: 36
+                            nodeId: 5
+                            parent: nodeId(4)
+                            eligible: true
+                            origNode: nodeId(5)
+                        )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    startLine: 38
+                                    endLine: 38
+                                    nodeId: 7
+                                    parent: nodeId(6)
+                                    eligible: true
+                                    origNode: nodeId(7)
+                                )
+                                implements: array(
+                                    0: Name(
+                                        startLine: 38
+                                        endLine: 38
+                                        nodeId: 8
+                                        resolvedName: nodeId(8)
+                                        parent: nodeId(6)
+                                        eligible: true
+                                        origNode: nodeId(8)
+                                    )
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            startLine: 40
+                                            endLine: 40
+                                            nodeId: 10
+                                            parent: nodeId(9)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            functionScope: nodeId(9)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: greet
+                                            eligible: true
+                                            origNode: nodeId(10)
+                                            mutationCandidate: true
+                                        )
+                                        returnType: Identifier(
+                                            startLine: 40
+                                            endLine: 40
+                                            nodeId: 11
+                                            parent: nodeId(9)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            functionScope: nodeId(9)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: greet
+                                            eligible: true
+                                            origNode: nodeId(11)
+                                            mutationCandidate: true
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Echo(
+                                                exprs: array(
+                                                    0: Scalar_String(
+                                                        startLine: 42
+                                                        endLine: 42
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'Hello world!'
+                                                        nodeId: 13
+                                                        parent: nodeId(12)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        functionScope: nodeId(9)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        functionName: greet
+                                                        eligible: true
+                                                        origNode: nodeId(13)
+                                                        mutationCandidate: true
+                                                    )
+                                                )
+                                                startLine: 42
+                                                endLine: 42
+                                                nodeId: 12
+                                                parent: nodeId(9)
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                functionScope: nodeId(9)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: greet
+                                                eligible: true
+                                                origNode: nodeId(12)
+                                                mutationCandidate: true
+                                            )
+                                        )
+                                        startLine: 40
+                                        endLine: 43
+                                        nodeId: 9
+                                        parent: nodeId(6)
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: greet
+                                        eligible: true
+                                        origNode: nodeId(9)
+                                        mutationCandidate: true
+                                    )
+                                )
+                                startLine: 38
+                                endLine: 44
+                                nodeId: 6
+                                parent: nodeId(4)
+                                eligible: true
+                                origNode: nodeId(6)
+                            )
+                        )
+                        startLine: 36
+                        endLine: 44
+                        kind: 1
+                        nodeId: 4
+                        eligible: true
+                        next: nodeId(6)
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
     }
 
+    /**
+     * @param array<string, string|null> $options
+     */
     #[DataProvider('invalidFileProvider')]
     public function test_it_rejects_invalid_files(
         string $file,
         string $expectedMessage,
+        array $options = [],
     ): void {
         $tester = $this->createCommandTester();
 
@@ -298,6 +638,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
         $tester->execute([
             'file' => $file,
+            ...$options,
         ]);
     }
 
@@ -311,6 +652,24 @@ final class DumpAstCommandTest extends FileSystemTestCase
         yield 'non-existent file' => [
             'file' => 'non-existent-file',
             'expectedMessage' => 'Expected "non-existent-file" to be a readable file path.',
+        ];
+
+        yield 'invalid changed-lines-ranges format (invalid count)' => [
+            'file' => __DIR__ . '/EchoGreeter.php',
+            'expectedMessage' => 'Expected a range to follow the pattern "<startLineNumber>:<endLineNumber>". Got "invalid".',
+            'options' => [
+                '--configuration' => __DIR__ . '/infection.json5',
+                '--changed-lines-ranges' => 'invalid',
+            ],
+        ];
+
+        yield 'invalid changed-lines-ranges format (not integerish)' => [
+            'file' => __DIR__ . '/EchoGreeter.php',
+            'expectedMessage' => 'Invalid line numbers. Failed for the range "12:3.2".',
+            'options' => [
+                '--configuration' => __DIR__ . '/infection.json5',
+                '--changed-lines-ranges' => '12:3.2',
+            ],
         ];
     }
 
