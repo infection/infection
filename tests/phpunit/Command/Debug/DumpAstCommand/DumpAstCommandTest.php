@@ -62,6 +62,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
         $tester->execute([
             'file' => $file,
+            '--configuration' => __DIR__ . '/infection.json5',
             ...$options,
         ]);
 
@@ -156,7 +157,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 key: Identifier(
                                     nodeId: 2
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
@@ -164,17 +165,17 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(3)
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
@@ -182,7 +183,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         name: Name(
                             nodeId: 5
                             parent: nodeId(4)
-                            eligible: true
+                            eligible: false
                             origNode: nodeId(5)
                         )
                         stmts: array(
@@ -190,7 +191,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 name: Identifier(
                                     nodeId: 7
                                     parent: nodeId(6)
-                                    eligible: true
+                                    eligible: false
                                     origNode: nodeId(7)
                                 )
                                 implements: array(
@@ -198,7 +199,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                         nodeId: 8
                                         resolvedName: nodeId(8)
                                         parent: nodeId(6)
-                                        eligible: true
+                                        eligible: false
                                         origNode: nodeId(8)
                                     )
                                 )
@@ -213,6 +214,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: greet
                                             eligible: true
+                                            tests: Closure
                                             origNode: nodeId(10)
                                             mutationCandidate: true
                                         )
@@ -225,6 +227,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: greet
                                             eligible: true
+                                            tests: Closure
                                             origNode: nodeId(11)
                                             mutationCandidate: true
                                         )
@@ -242,6 +245,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: greet
                                                         eligible: true
+                                                        tests: Closure
                                                         origNode: nodeId(13)
                                                         mutationCandidate: true
                                                     )
@@ -254,6 +258,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: greet
                                                 eligible: true
+                                                tests: Closure
                                                 origNode: nodeId(12)
                                                 mutationCandidate: true
                                             )
@@ -265,19 +270,20 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: greet
                                         eligible: true
+                                        tests: Closure
                                         origNode: nodeId(9)
                                         mutationCandidate: true
                                     )
                                 )
                                 nodeId: 6
                                 parent: nodeId(4)
-                                eligible: true
+                                eligible: false
                                 origNode: nodeId(6)
                             )
                         )
                         kind: 1
                         nodeId: 4
-                        eligible: true
+                        eligible: false
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )

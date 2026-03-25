@@ -43,6 +43,7 @@ use Infection\FileSystem\FileSystem;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use SplFileObject;
@@ -143,7 +144,10 @@ final class DumpAstCommand extends BaseCommand
         self::addIdsToNodes($initialStatements);
 
         $traverserFactory
-            ->createEnrichmentTraverser($file)
+            ->createEnrichmentTraverser(
+                $file,
+                new EmptyTrace($file),
+            )
             ->traverse($initialStatements);
 
         return $traverserFactory

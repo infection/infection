@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @internal
  */
-final class SkipIngoredNodesVisitor extends NodeVisitorAbstract
+final class SkipIgnoredNodesVisitor extends NodeVisitorAbstract
 {
     /**
      * @param NodeIgnorer[] $nodeIgnorers
@@ -53,10 +53,11 @@ final class SkipIngoredNodesVisitor extends NodeVisitorAbstract
     ) {
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): ?int
     {
         foreach ($this->nodeIgnorers as $nodeIgnorer) {
             if ($nodeIgnorer->ignores($node)) {
+                // TODO: check if that can't mess up the name resolution in some cases...
                 return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
             }
         }

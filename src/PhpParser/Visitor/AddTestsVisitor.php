@@ -58,7 +58,7 @@ final class AddTestsVisitor extends NodeVisitorAbstract
         if (LabelNodesAsEligibleVisitor::isEligible($node)) {
             $node->setAttribute(
                 self::TESTS,
-                $this->getAllTestsForNodeCl($node),
+                $this->createAllTestsForNodeLocator($node),
             );
         }
 
@@ -66,19 +66,25 @@ final class AddTestsVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @return TestLocation[]
+     * @return list<TestLocation>
      */
     public static function getTests(Node $node): array
     {
-        return $node->getAttribute(self::TESTS, default: [])();
+        /** @var Closure():list<TestLocation> $locator */
+        $locator = $node->getAttribute(
+            self::TESTS,
+            default: static fn () => [],
+        );
+
+        return $locator();
     }
 
     /**
-     * @return Closure():TestLocation[]
+     * @return Closure():list<TestLocation>
      */
-    private function getAllTestsForNodeCl(Node $node): Closure
+    private function createAllTestsForNodeLocator(Node $node): Closure
     {
-        return function (Node $node) {
+        return function () use ($node) {
             static $tests;
 
             if (!isset($tests)) {

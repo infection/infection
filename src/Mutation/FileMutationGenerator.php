@@ -98,7 +98,6 @@ class FileMutationGenerator
             $mutators,
             $sourceFile,
             $initialStatements,
-            $trace,
             $onlyCovered,
             $originalFileTokens,
         );
@@ -115,7 +114,6 @@ class FileMutationGenerator
         array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
-        Trace $trace,
         bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {

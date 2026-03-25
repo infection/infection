@@ -37,12 +37,17 @@ namespace Infection\Tests\PhpParser;
 
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\PhpParser\Visitor\SkipIngoredNodesVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PhpParser\NodeTraverser;
@@ -67,13 +72,17 @@ final class NodeTraverserFactoryTest extends TestCase
     {
         $this->factory = new NodeTraverserFactory(
             new NullSourceLineMatcher(),
+            new LineRangeCalculator(),
         );
     }
 
     public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
     {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+
         $traverser = $this->factory->createEnrichmentTraverser(
-            new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
+            $sourceFile,
+            new EmptyTrace($sourceFile),
         );
 
         $this->assertTraverserVisitorsAre(
@@ -81,11 +90,14 @@ final class NodeTraverserFactoryTest extends TestCase
             [
                 NextConnectingVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
-                SkipIngoredNodesVisitor::class,
+                SkipIgnoredNodesVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
                 LabelNodesAsEligibleVisitor::class,
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
+                AddTestsVisitor::class,
             ],
         );
     }

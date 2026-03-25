@@ -33,82 +33,96 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use function array_keys;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(AbstractMethodIgnorer::class)]
-final class AbstractMethodIgnorerTest extends VisitorTestCase
+#[CoversClass(ExcludeUnchangedLinesVisitor::class)]
+final class ExcludeUnchangedLinesVisitorTest extends VisitorTestCase
 {
+    /**
+     * @param list<int>|null $eligibleNodeIds
+     */
     #[DataProvider('nodeProvider')]
-    public function test_it_ignores_abstract_methods(
+    public function test_it_marks_nodes_belonging_to_unchanged_lines_as_ineligible(
         string $code,
+        ?array $eligibleNodeIds,
         string $expected,
     ): void {
         $nodes = $this->parse($code);
 
+        $nodesById = $this->addIdsToNodes($nodes);
+        $this->markNodesAsEligible(
+            $nodesById,
+            $eligibleNodeIds ?? array_keys($nodesById),
+        );
+
+        $sourceFile = '/path/to/virtual-test-file.php';
+
+        $sourceLineMatcherMock = $this->createStub(SourceLineMatcher::class);
+
         $traverser = new NodeTraverser(
-            new SkipIgnoredNodesVisitor([new AbstractMethodIgnorer()]),
+            new LabelNodesAsEligibleVisitor(),
+            new ExcludeUnchangedLinesVisitor(
+                $sourceLineMatcherMock,
+                $sourceFile,
+            ),
             new MarkTraversedNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);
 
-        $actual = $this->dumper->dump($nodes);
+        $actual = $this->dumper->dump(
+            $nodes,
+            dumpPositions: true,
+            // TODO: use https://github.com/infection/infection/pull/3028
+            dumpOtherAttributes: true,
+        );
 
         $this->assertSame($expected, $actual);
     }
 
     public static function nodeProvider(): iterable
     {
-        yield [
+        yield 'no eligible nodes' => [
             <<<'PHP'
                 <?php
 
-                abstract class Service
-                {
-                    public function firstMethod(string $counted)
-                    {
-                    }
+                namespace Infection\Tests\Virtual;
 
-                    abstract public function shouldBeIgnored($ignored);
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
 
-                    public function secondMethod(string $counted)
-                    {
-                    }
+                    function excludedMethod() {}
                 }
 
                 PHP,
+            [],
             <<<'AST'
                 array(
-                    0: Stmt_Class(
-                        name: Identifier
+                    0: Stmt_Namespace(
+                        name: Name
                         stmts: array(
-                            0: Stmt_ClassMethod(
+                            0: Stmt_Class(
                                 name: Identifier
-                                params: array(
-                                    0: Param(
-                                        type: Identifier
-                                        var: Expr_Variable
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
                                     )
-                                )
-                            )
-                            1: <skipped>
-                            2: Stmt_ClassMethod(
-                                name: Identifier
-                                params: array(
-                                    0: Param(
-                                        type: Identifier
-                                        var: Expr_Variable
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier
                                     )
                                 )
                             )
                         )
+                        kind: 1
                     )
                 )
                 AST,

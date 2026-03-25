@@ -53,11 +53,11 @@ final class ExcludeNonMutableCodeVisitor extends NodeVisitorAbstract
 
     private function isOnFunctionSignature(Node $node): bool
     {
-        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, default: false);
     }
 
     private function isInsideFunction(Node $node): bool
     {
-        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
+        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, default: false);
     }
 }

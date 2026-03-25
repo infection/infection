@@ -46,7 +46,7 @@ use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\PhpParser\Visitor\SkipIngoredNodesVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -87,7 +87,7 @@ class NodeTraverserFactory
         return new NodeTraverser(
             new NextConnectingVisitor(),
             new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
-            new SkipIngoredNodesVisitor($nodeIgnorers),
+            new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),

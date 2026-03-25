@@ -61,7 +61,9 @@ final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
         /** @psalm-suppress InvalidArgument */
         $touches = $this->sourceLineMatcher->touches(
             $this->filePath,
+            /** @phpstan-ignore argument.type */
             $node->getStartLine(),
+            /** @phpstan-ignore argument.type */
             $node->getEndLine(),
         );
 

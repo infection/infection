@@ -262,18 +262,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
 
 		-
-			rawMessage: 'Method Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
-
-		-
-			rawMessage: 'Method Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor::enterNode() never returns array<PhpParser\Node> so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
-
-		-
 			rawMessage: 'Method Infection\PhpParser\Visitor\ReflectionVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
 			identifier: return.unusedType
 			count: 1

@@ -47,6 +47,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
@@ -244,9 +245,12 @@ abstract class BaseMutatorTestCase extends TestCase
 
         $factory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
+
         $factory
             ->createEnrichmentTraverser(
-                new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php'),
+                $sourceFile,
+                new EmptyTrace($sourceFile),
             )
             ->traverse($nodes);
 

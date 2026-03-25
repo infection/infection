@@ -49,11 +49,6 @@ final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 {
     public const ELIGIBLE = 'eligible';
 
-    public static function getEligibility(Node $node): ?bool
-    {
-        return $node->getAttribute(self::ELIGIBLE);
-    }
-
     public static function isEligible(Node $node): bool
     {
         return $node->getAttribute(self::ELIGIBLE, default: false);
