@@ -49,7 +49,7 @@ abstract class CommandOptionTestCase extends TestCase
     #[DataProvider('optionProvider')]
     public function test_it_maps_the_option(
         InputInterface $input,
-        string|Exception|null $expected,
+        bool|string|Exception|null $expected,
     ): void {
         $commandOptionClassName = $this->getOptionClassName();
         $io = new IO(

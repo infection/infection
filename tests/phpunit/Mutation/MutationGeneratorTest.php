@@ -68,12 +68,12 @@ final class MutationGeneratorTest extends TestCase
         );
 
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
-        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
+        $eventDispatcherMock = $this->createStub(EventDispatcher::class);
         $onlyCovered = true;
 
-        $mutation0 = $this->createMock(Mutation::class);
-        $mutation1 = $this->createMock(Mutation::class);
-        $mutation2 = $this->createMock(Mutation::class);
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation2 = $this->createStub(Mutation::class);
 
         $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
         $fileMutationGenerator

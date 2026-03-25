@@ -35,17 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
-use function array_values;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use Infection\PhpParser\NodeTraverserFactory;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Tracer;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\Fixtures\NullMutationVisitor;
+use Infection\Tests\TestFramework\Tracing\DummyTracer;
 use function ksort;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use const SORT_STRING;
 use SplFileInfo;
 use function sprintf;
@@ -55,29 +59,46 @@ use Throwable;
 #[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-code-samples';
+
     /**
-     * @var string[][]|null
+     * @var array<string, SplFileInfo>|null
      */
     private static ?array $files = null;
 
+    private FileMutationGenerator $fileMutationGenerator;
+
+    protected function setUp(): void
+    {
+        $this->fileMutationGenerator = SingletonContainer::getContainer()
+            ->cloneWithService(SourceLineMatcher::class, new NullSourceLineMatcher())
+            ->cloneWithService(Tracer::class, new DummyTracer())
+            ->getFileMutationGenerator();
+    }
+
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
-     * whether or not the code is actually mutated, only if it does not error.
+     * whether the code is actually mutated, only if it does not error.
      */
     #[DataProvider('mutatorWithCodeCaseProvider')]
-    public function test_the_mutator_does_not_crash_during_parsing(string $fileName, string $code, Mutator $mutator): void
-    {
-        try {
-            $this->mutatesCode($code, $mutator);
+    public function test_the_mutator_does_not_crash(
+        SplFileInfo $fileInfo,
+        Mutator $mutator,
+    ): void {
+        $this->expectNotToPerformAssertions();
 
-            $this->addToAssertionCount(1);
+        try {
+            $this->mutatesCode($fileInfo, $mutator);
         } catch (Throwable $throwable) {
-            $this->fail(sprintf(
-                'The mutator "%s" could not parse the file "%s": %s.',
-                $mutator->getName(),
-                $fileName,
-                $throwable->getMessage(),
-            ));
+            throw new AssertionFailedError(
+                sprintf(
+                    'The mutator "%s" could not parse the file "%s".',
+                    $mutator->getName(),
+                    $fileInfo->getRealPath(),
+                ),
+                code: $throwable->getCode(),
+                previous: $throwable,
+            );
         }
     }
 
@@ -85,19 +106,21 @@ final class MutatorRobustnessTest extends TestCase
     {
         $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
 
-        foreach (self::provideCodeSamples() as [$fileName, $fileContents]) {
+        foreach (self::provideCodeSamples() as $fileInfo) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
-                $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
+                $title = sprintf('[%s] %s', $mutatorClassName, $fileInfo->getFilename());
 
                 yield $title => [
-                    $fileName,
-                    $fileContents,
+                    $fileInfo,
                     $mutatorFactory->create([$mutatorClassName => []], false)[MutatorName::getName($mutatorClassName)],
                 ];
             }
         }
     }
 
+    /**
+     * @return iterable<string, SplFileInfo>
+     */
     private static function provideCodeSamples(): iterable
     {
         if (self::$files !== null) {
@@ -107,35 +130,27 @@ final class MutatorRobustnessTest extends TestCase
         }
 
         $finder = Finder::create()
-            ->in(__DIR__ . '/../../autoloaded/mutator-code-samples')
+            ->in(self::FIXTURES_DIR)
             ->name('*.php')
             ->files()
         ;
 
-        $files = [];
-
-        foreach ($finder as $fileInfo) {
-            /* @var SplFileInfo $fileInfo */
-            $files[$fileInfo->getFilename()] = [
-                $fileInfo->getFilename(),
-                $fileInfo->getContents(),
-            ];
-        }
-
+        $files = take($finder)->toAssoc();
         ksort($files, SORT_STRING);
 
-        self::$files = array_values($files);
+        self::$files = $files;
 
         yield from self::$files;
     }
 
-    private function mutatesCode(string $code, Mutator $mutator): void
+    private function mutatesCode(SplFileInfo $fileInfo, Mutator $mutator): void
     {
-        $initialStatements = SingletonContainer::getContainer()->getParser()->parse($code);
+        $mutations = $this->fileMutationGenerator->generate(
+            sourceFile: $fileInfo,
+            onlyCovered: false,
+            mutators: [$mutator],
+        );
 
-        (new NodeTraverserFactory())
-            ->create(new NullMutationVisitor($mutator))
-            ->traverse($initialStatements)
-        ;
+        take($mutations)->toList();
     }
 }

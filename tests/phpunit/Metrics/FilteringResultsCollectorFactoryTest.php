@@ -58,7 +58,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
-        $targetCollector = $this->createMock(Collector::class);
+        $targetCollector = $this->createStub(Collector::class);
 
         $filteringCollector = $factory->create($targetCollector);
 
@@ -76,7 +76,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
-        $targetCollector = $this->createMock(Collector::class);
+        $targetCollector = $this->createStub(Collector::class);
 
         $filteringCollector = $factory->create($targetCollector);
 

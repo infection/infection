@@ -46,7 +46,7 @@ final class InitialStaticAnalysisProcessFactoryTest extends TestCase
     public function test_it_creates_initial_process_without_timeout(): void
     {
         $factory = new InitialStaticAnalysisProcessFactory(
-            $this->createMock(StaticAnalysisToolAdapter::class),
+            $this->createStub(StaticAnalysisToolAdapter::class),
         );
 
         $process = $factory->createProcess();

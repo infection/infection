@@ -57,19 +57,13 @@ final class PHPStanAdapterTest extends TestCase
 
     private commandLineBuilder&MockObject $commandLineBuilder;
 
-    private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
-
-    private Filesystem&MockObject $fileSystem;
-
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
-        $this->mutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
-        $this->fileSystem = $this->createMock(Filesystem::class);
 
         $this->adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -105,8 +99,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -138,8 +132,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -173,8 +167,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -224,8 +218,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_accepts_valid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
@@ -246,8 +240,8 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
-            $this->fileSystem,
-            $this->mutantExecutionResultFactory,
+            $this->createStub(Filesystem::class),
+            $this->createStub(PHPStanMutantExecutionResultFactory::class),
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,

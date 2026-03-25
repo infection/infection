@@ -35,8 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;

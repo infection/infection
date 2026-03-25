@@ -110,9 +110,9 @@ abstract class BaseReportLocator implements ReportLocator
             throw $this->createInvalidReportSource($this->sourceDirectory);
         }
 
-        // TODO: address this... eventually
-        // @phpstan-ignore argument.templateType
         $reportPathnames = take($this->createIndexFinder($this->sourceDirectory))
+            // TODO: address this... eventually
+            // @phpstan-ignore argument.templateType
             ->map(static fn (SplFileInfo $fileInfo) => Path::canonicalize($fileInfo->getPathname()))
             ->toList();
 

@@ -54,7 +54,7 @@ use Infection\Mutator\Boolean\LogicalAnd as LogicalAndMutator;
 use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
 use Infection\Mutator\Boolean\TrueValue as TrueValueMutator;
 use Infection\Mutator\Operator\Continue_;
-use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -79,7 +79,10 @@ final class TeamCityLoggerTest extends TestCase
         $this->testLogger = new TestLogger();
 
         $this->teamCityLogger = new TeamCityLogger(
-            new TeamCity(timeoutsAsEscaped: false),
+            new TeamCity(
+                timeoutsAsEscaped: false,
+                differ: SingletonContainer::getContainer()->getDiffer(),
+            ),
             new TeamCityLoggerState(),
             $this->testLogger,
             '/path/to/project',
@@ -114,6 +117,7 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult = self::createExecutionResult($mutation);
 
@@ -146,6 +150,7 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult = self::createExecutionResult($mutation);
 
@@ -179,6 +184,7 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult = self::createExecutionResult($mutation);
 
@@ -212,6 +218,7 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult = self::createExecutionResult($mutation);
 
@@ -246,12 +253,14 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation1 = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = self::createMutation(
                     $sourceFilePath,
                     LogicalAndMutator::class,
+                    'aa35bf87f287aa4e383112a632fde848',
                 );
                 $executionResult2 = self::createExecutionResult($mutation2);
 
@@ -300,18 +309,21 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation1 = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = self::createMutation(
                     $sourceFilePath,
                     LogicalAndMutator::class,
+                    'aa35bf87f287aa4e383112a632fde848',
                 );
                 $executionResult2 = self::createExecutionResult($mutation2);
 
                 $mutation3 = self::createMutation(
                     $sourceFilePath,
                     Continue_::class,
+                    '9272ac9a2aff44767733cf23a4acb7c6',
                 );
                 $executionResult3 = self::createExecutionResult($mutation3);
 
@@ -366,12 +378,14 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation1 = self::createMutation(
                     $sourceFilePath,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = self::createMutation(
                     $sourceFilePath,
                     LogicalAndMutator::class,
+                    'aa35bf87f287aa4e383112a632fde848',
                 );
                 $executionResult2 = self::createExecutionResult($mutation2);
 
@@ -419,12 +433,14 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation1 = self::createMutation(
                     $sourceFilePath1,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = self::createMutation(
                     $sourceFilePath2,
                     LogicalAndMutator::class,
+                    '0a451675763250c03e95b626f7bcfb7d',
                 );
                 $executionResult2 = self::createExecutionResult($mutation2);
 
@@ -475,12 +491,14 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation1 = self::createMutation(
                     $sourceFilePath1,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = self::createMutation(
                     $sourceFilePath2,
                     LogicalAndMutator::class,
+                    '0a451675763250c03e95b626f7bcfb7d',
                 );
                 $executionResult2 = self::createExecutionResult($mutation2);
 
@@ -531,18 +549,21 @@ final class TeamCityLoggerTest extends TestCase
                 $mutation1A = self::createMutation(
                     $sourceFilePath1,
                     LogicalOrMutator::class,
+                    '49a5dfcd2f4a0b33d4a02e662812af55',
                 );
                 $executionResult1A = self::createExecutionResult($mutation1A);
 
                 $mutation1B = self::createMutation(
                     $sourceFilePath1,
                     LogicalAndMutator::class,
+                    'aa35bf87f287aa4e383112a632fde848',
                 );
                 $executionResult1B = self::createExecutionResult($mutation1B);
 
                 $mutation2 = self::createMutation(
                     $sourceFilePath2,
                     TrueValueMutator::class,
+                    'e3730421e94b49783edb72f8c94e02dc',
                 );
                 $executionResult2 = self::createExecutionResult($mutation2);
 
@@ -604,6 +625,7 @@ final class TeamCityLoggerTest extends TestCase
         $mutation = self::createMutation(
             $sourceFilePath,
             LogicalOrMutator::class,
+            '49a5dfcd2f4a0b33d4a02e662812af55',
         );
 
         $this->teamCityLogger->startEvaluation($mutation);
@@ -618,11 +640,12 @@ final class TeamCityLoggerTest extends TestCase
     private static function createMutation(
         string $sourceFilePath,
         string $mutatorClassName,
+        string $hash,
     ): Mutation {
         return MutationBuilder::withMinimalTestData()
             ->withOriginalFilePath($sourceFilePath)
             ->withMutatorClass($mutatorClassName)
-            ->withMutatorName(MutatorName::getName($mutatorClassName))
+            ->withHash($hash)
             ->build();
     }
 
