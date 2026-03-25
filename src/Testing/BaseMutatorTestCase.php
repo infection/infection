@@ -237,7 +237,6 @@ abstract class BaseMutatorTestCase extends TestCase
                 mutators: [$this->createMutator($settings)],
                 filePath: '/path/to/test-file.php',
                 fileNodes: $nodes,
-                onlyCovered: false,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $code,
             ),

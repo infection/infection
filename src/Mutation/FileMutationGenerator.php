@@ -98,7 +98,6 @@ class FileMutationGenerator
             $mutators,
             $sourceFile,
             $initialStatements,
-            $onlyCovered,
             $originalFileTokens,
         );
     }
@@ -114,7 +113,6 @@ class FileMutationGenerator
         array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
-        bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
         $mutationCollectorVisitor = new MutationCollectorVisitor(
@@ -122,7 +120,6 @@ class FileMutationGenerator
                 mutators: $mutators,
                 filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
-                onlyCovered: $onlyCovered,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $this->fileStore->getContents($sourceFile),
             ),

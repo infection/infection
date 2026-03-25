@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+namespace Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;

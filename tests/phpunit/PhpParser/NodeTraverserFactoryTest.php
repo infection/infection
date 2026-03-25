@@ -40,6 +40,7 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
@@ -57,6 +58,7 @@ use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -66,27 +68,30 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
-    private NodeTraverserFactory $factory;
-
-    protected function setUp(): void
-    {
-        $this->factory = new NodeTraverserFactory(
-            new NullSourceLineMatcher(),
-            new LineRangeCalculator(),
-        );
-    }
-
-    public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
-    {
+    /**
+     * @param list<class-string<NodeVisitor>> $expected
+     */
+    #[DataProvider('visitorProvider')]
+    public function test_it_can_create_a_traverser_for_enriching_the_ast(
+        bool $onlyCovered,
+        array $expected,
+    ): void {
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
-        $traverser = $this->factory->createEnrichmentTraverser(
+        $factory = self::createTraverserFactory($onlyCovered);
+
+        $traverser = $factory->createEnrichmentTraverser(
             $sourceFile,
             new EmptyTrace($sourceFile),
         );
 
-        $this->assertTraverserVisitorsAre(
-            $traverser,
+        $this->assertTraverserVisitorsAre($traverser, $expected);
+    }
+
+    public static function visitorProvider(): iterable
+    {
+        yield 'without only covered' => [
+            false,
             [
                 NextConnectingVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
@@ -99,12 +104,29 @@ final class NodeTraverserFactoryTest extends TestCase
                 ExcludeUnchangedLinesVisitor::class,
                 AddTestsVisitor::class,
             ],
-        );
+        ];
+
+        yield 'with only covered' => [
+            true,
+            [
+                NextConnectingVisitor::class,
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
+                SkipIgnoredNodesVisitor::class,
+                NameResolver::class,
+                ParentConnectingVisitor::class,
+                ReflectionVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeNonMutableCodeVisitor::class,
+                ExcludeUnchangedLinesVisitor::class,
+                AddTestsVisitor::class,
+                ExcludeUntestedNodesVisitor::class,
+            ],
+        ];
     }
 
     public function test_it_can_create_a_traverser_for_generating_mutations(): void
     {
-        $traverser = $this->factory->createMutationTraverser(
+        $traverser = self::createTraverserFactory(true)->createMutationTraverser(
             new FakeVisitor(),
         );
 
@@ -150,5 +172,14 @@ final class NodeTraverserFactoryTest extends TestCase
     private static function getVisitorReflection(): ReflectionProperty
     {
         return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
+    }
+
+    private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
+    {
+        return new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: $onlyCovered,
+        );
     }
 }

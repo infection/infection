@@ -35,38 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\Source\Matcher\SourceLineMatcher;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
+/**
+ * @internal
+ */
+final class ExcludeUntestedNodesVisitor extends NodeVisitorAbstract
 {
-    public function __construct(
-        private readonly SourceLineMatcher $sourceLineMatcher,
-        private readonly string $filePath,
-    ) {
-    }
-
     public function enterNode(Node $node): null
     {
-        if (LabelNodesAsEligibleVisitor::isEligible($node)) {
-            $this->excludeUntouchedNodes($node);
+        if (
+            LabelNodesAsEligibleVisitor::isEligible($node)
+            && !AddTestsVisitor::hasTests($node)
+        ) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
         }
 
         return null;
-    }
-
-    private function excludeUntouchedNodes(Node $node): void
-    {
-        /** @psalm-suppress InvalidArgument */
-        $touches = $this->sourceLineMatcher->touches(
-            $this->filePath,
-            $node->getStartLine(),
-            $node->getEndLine(),
-        );
-
-        if (!$touches) {
-            LabelNodesAsEligibleVisitor::markAsIneligible($node);
-        }
     }
 }

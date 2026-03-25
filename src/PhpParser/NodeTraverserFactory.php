@@ -38,6 +38,7 @@ namespace Infection\PhpParser;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -61,11 +62,12 @@ use SplObjectStorage;
  * @internal
  * @final
  */
-class NodeTraverserFactory
+readonly class NodeTraverserFactory
 {
     public function __construct(
-        private readonly SourceLineMatcher $sourceLineMatcher,
-        private readonly LineRangeCalculator $lineRangeCalculator,
+        private SourceLineMatcher $sourceLineMatcher,
+        private LineRangeCalculator $lineRangeCalculator,
+        private bool $onlyCovered,
     ) {
     }
 
@@ -84,7 +86,7 @@ class NodeTraverserFactory
             new AbstractMethodIgnorer(),
         ];
 
-        return new NodeTraverser(
+        $visitors = [
             new NextConnectingVisitor(),
             new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
             new SkipIgnoredNodesVisitor($nodeIgnorers),
@@ -101,7 +103,13 @@ class NodeTraverserFactory
                 $trace,
                 $this->lineRangeCalculator,
             ),
-        );
+        ];
+
+        if ($this->onlyCovered) {
+            $visitors[] = new ExcludeUntestedNodesVisitor();
+        }
+
+        return new NodeTraverser(...$visitors);
     }
 
     public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface

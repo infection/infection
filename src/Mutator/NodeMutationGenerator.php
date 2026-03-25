@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function count;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
@@ -64,7 +63,6 @@ class NodeMutationGenerator
         array $mutators,
         private readonly string $filePath,
         private readonly array $fileNodes,
-        private readonly bool $onlyCovered,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
@@ -108,12 +106,6 @@ class NodeMutationGenerator
             );
         }
 
-        $tests = AddTestsVisitor::getTests($node);
-
-        if ($this->onlyCovered && count($tests) === 0) {
-            return;
-        }
-
         $mutationByMutatorIndex = 0;
 
         foreach ($mutator->mutate($node) as $mutatedNode) {
@@ -126,7 +118,7 @@ class NodeMutationGenerator
                 $node::class,
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
-                $tests,
+                AddTestsVisitor::getTests($node),
                 $this->originalFileTokens,
                 $this->originalFileContent,
             );
