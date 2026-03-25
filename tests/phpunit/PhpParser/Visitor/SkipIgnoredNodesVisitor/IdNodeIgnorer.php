@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+namespace Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 
 use function in_array;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
