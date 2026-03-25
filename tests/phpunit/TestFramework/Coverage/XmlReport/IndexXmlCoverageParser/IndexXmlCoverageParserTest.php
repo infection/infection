@@ -44,6 +44,7 @@ use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -59,6 +60,10 @@ use Symfony\Component\Filesystem\Path;
 final class IndexXmlCoverageParserTest extends TestCase
 {
     use ExpectsThrowables;
+
+    private const GENERAL_FIXTURES_DIR = __DIR__ . '/../../Fixtures';
+
+    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     private string $generatedIndexXmlPath;
 
@@ -140,28 +145,218 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     public static function indexProvider(): iterable
     {
-        $nominalPhpUnitIndexPath = Path::canonicalize(__DIR__ . '/index.xml');
+        $phpunit9IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-09/coverage-xml/index.xml');
 
-        $createNominalSourceFileInfo = static fn (
+        $createPhpUnit9SourceFileInfo = static fn (
             string $relativeCoverageFilePath,
         ) => new SourceFileInfoProvider(
-            coverageIndexPath: $nominalPhpUnitIndexPath,
-            coverageDir: dirname($nominalPhpUnitIndexPath),
+            coverageIndexPath: $phpunit9IndexPath,
+            coverageDir: dirname($phpunit9IndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
-            projectSource: '/path/to/src',
+            projectSource: '/path/to/infection/tests/e2e/PHPUnit_09-3/src',
             fileSystem: new FakeFileSystem(),
         );
 
-        yield 'nominal' => [
-            $nominalPhpUnitIndexPath,
-            dirname($nominalPhpUnitIndexPath),
+        yield 'PHPUnit 9' => [
+            $phpunit9IndexPath,
+            dirname($phpunit9IndexPath),
             [
-                $createNominalSourceFileInfo('FirstLevel/firstLevel.php.xml'),
-                $createNominalSourceFileInfo('FirstLevel/SecondLevel/secondLevel.php.xml'),
-                $createNominalSourceFileInfo('FirstLevel/SecondLevel/secondLevelTrait.php.xml'),
-                $createNominalSourceFileInfo('zeroLevel.php.xml'),
-                $createNominalSourceFileInfo('noPercentage.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/functions.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/functions.php.xml'),
             ],
+        ];
+
+        $phpunit10IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-10/coverage-xml/index.xml');
+
+        $createPhpUnit10SourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpunit10IndexPath,
+            coverageDir: dirname($phpunit10IndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/infection/tests/e2e/PHPUnit_10-1/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'PHPUnit 10' => [
+            $phpunit10IndexPath,
+            dirname($phpunit10IndexPath),
+            [
+                $createPhpUnit10SourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpUnit10SourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpUnit10SourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpUnit10SourceFileInfo('Covered/functions.php.xml'),
+                $createPhpUnit10SourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpUnit10SourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpUnit10SourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpUnit10SourceFileInfo('Uncovered/functions.php.xml'),
+            ],
+        ];
+
+        $phpunit11IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-11/coverage-xml/index.xml');
+
+        $createPhpUnit11SourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpunit11IndexPath,
+            coverageDir: dirname($phpunit11IndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/infection/tests/e2e/PHPUnit_11/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'PHPUnit 11' => [
+            $phpunit11IndexPath,
+            dirname($phpunit11IndexPath),
+            [
+                $createPhpUnit11SourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpUnit11SourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpUnit11SourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpUnit11SourceFileInfo('Covered/functions.php.xml'),
+                $createPhpUnit11SourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpUnit11SourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpUnit11SourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpUnit11SourceFileInfo('Uncovered/functions.php.xml'),
+            ],
+        ];
+
+        $phpunit12_0IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-12-0/coverage-xml/index.xml');
+
+        $createPhpUnit12_0SourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpunit12_0IndexPath,
+            coverageDir: dirname($phpunit12_0IndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/infection/tests/e2e/PHPUnit_12-0/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'PHPUnit 12.0' => [
+            $phpunit12_0IndexPath,
+            dirname($phpunit12_0IndexPath),
+            [
+                $createPhpUnit12_0SourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Covered/functions.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpUnit12_0SourceFileInfo('Uncovered/functions.php.xml'),
+            ],
+        ];
+
+        $phpunit12_5IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-12-5/index.xml');
+
+        $createPhpUnit12_5SourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpunit12_5IndexPath,
+            coverageDir: dirname($phpunit12_5IndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/infection/tests/e2e/PHPUnit_12-5/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'PHPUnit 12.5' => [
+            $phpunit12_5IndexPath,
+            dirname($phpunit12_5IndexPath),
+            [
+                $createPhpUnit12_5SourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Covered/functions.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpUnit12_5SourceFileInfo('Uncovered/functions.php.xml'),
+            ],
+        ];
+
+        $phpspecIndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpspec/index.xml');
+
+        $createPhpSpecSourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpspecIndexPath,
+            coverageDir: dirname($phpspecIndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'PhpSpec' => [
+            $phpspecIndexPath,
+            dirname($phpspecIndexPath),
+            [
+                $createPhpSpecSourceFileInfo('Covered/BaseCalculator.php.xml'),
+                $createPhpSpecSourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpSpecSourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpSpecSourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpSpecSourceFileInfo('Covered/functions.php.xml'),
+                $createPhpSpecSourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpSpecSourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpSpecSourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpSpecSourceFileInfo('Uncovered/functions.php.xml'),
+            ],
+        ];
+
+        $codeceptionIndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/codeception/coverage-xml/index.xml');
+
+        $createCodeceptionSourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $codeceptionIndexPath,
+            coverageDir: dirname($codeceptionIndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'Codeception' => [
+            $codeceptionIndexPath,
+            dirname($codeceptionIndexPath),
+            [
+                $createCodeceptionSourceFileInfo('Covered/Calculator.php.xml'),
+                $createCodeceptionSourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createCodeceptionSourceFileInfo('Covered/UserService.php.xml'),
+                $createCodeceptionSourceFileInfo('Covered/functions.php.xml'),
+                $createCodeceptionSourceFileInfo('Database.php.xml'),
+            ],
+        ];
+
+        $noProjectSourceIndexPath = Path::canonicalize(self::FIXTURES_DIR . '/index-without-project-source.xml');
+
+        yield [
+            $noProjectSourceIndexPath,
+            dirname($noProjectSourceIndexPath),
+            new InvalidCoverage(
+                sprintf(
+                    'Could not find the source attribute for the project in the file "%s".',
+                    $noProjectSourceIndexPath,
+                ),
+            ),
+        ];
+
+        $invalidXmlIndexPath = Path::canonicalize(self::FIXTURES_DIR . '/invalid-index.xml');
+
+        yield [
+            $invalidXmlIndexPath,
+            dirname($invalidXmlIndexPath),
+            // TODO: this is not ideal
+            new InvalidArgumentException(
+                sprintf(
+                    'The file "%s" does not contain valid XML.',
+                    $invalidXmlIndexPath,
+                ),
+            ),
         ];
     }
 
@@ -211,56 +406,5 @@ final class IndexXmlCoverageParserTest extends TestCase
             </phpunit>
             XML
         ];
-    }
-
-    public function test_it_errors_when_no_phpunit_project_source_could_be_found(): void
-    {
-        $xml = <<<'XML'
-            <?xml version="1.0"?>
-                <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-                  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-                    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-                    <driver name="xdebug" version="2.5.1"/>
-                  </build>
-                  <project>
-                    <tests>
-                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-                    </tests>
-                    <directory name="/">
-                      <totals>
-                        <lines total="913" comments="130" code="783" executable="348" executed="24" percent="6.90"/>
-                      </totals>
-                    </directory>
-                  </project>
-                  <!-- The rest of the file has been removed for this test-->
-                </phpunit>
-            XML;
-
-        file_put_contents($this->generatedIndexXmlPath, $xml);
-
-        $parser = new IndexXmlCoverageParser(
-            isSourceFiltered: false,
-            fileSystem: new FakeFileSystem(),
-        );
-
-        // Note that the result is lazy, hence the exception is not thrown (yet).
-        $sources = $parser->parse(
-            $this->generatedIndexXmlPath,
-            __DIR__,
-        );
-
-        $this->expectExceptionObject(
-            new InvalidCoverage(
-                sprintf(
-                    'Could not find the source attribute for the project in the file "%s".',
-                    $this->generatedIndexXmlPath,
-                ),
-            ),
-        );
-
-        foreach ($sources as $source) {
-            return;
-        }
     }
 }
