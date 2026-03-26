@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\NodeDumper;
 
+use Infection\Framework\ClassName;
+use PhpParser\Node\Name;
 use function get_debug_type;
 use function implode;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
@@ -414,6 +416,20 @@ final class NodeDumper
                                 continue;
                             }
                         }
+                    }
+
+                    if ($key === 'resolvedName') {
+                        Assert::isInstanceOf($value, Name::class);
+
+                        $shortClassName = ClassName::getShortClassName($value::class);
+
+                        $nodeDetails .= sprintf(
+                            '%s(%s)',
+                            $shortClassName,
+                            (string) $value,
+                        );
+
+                        continue;
                     }
 
                     // This was added: add native support for Node ids. This removes
