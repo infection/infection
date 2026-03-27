@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @internal
  */
-final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
+final class SkipIgnoredNodesVisitor extends NodeVisitorAbstract
 {
     /**
      * @param NodeIgnorer[] $nodeIgnorers

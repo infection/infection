@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,7 +54,7 @@ final class InterfaceIgnorerTest extends VisitorTestCase
         $nodes = $this->parse($code);
 
         $traverser = new NodeTraverser(
-            new NonMutableNodesIgnorerVisitor([new InterfaceIgnorer()]),
+            new SkipIgnoredNodesVisitor([new InterfaceIgnorer()]),
             new MarkTraversedNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);
