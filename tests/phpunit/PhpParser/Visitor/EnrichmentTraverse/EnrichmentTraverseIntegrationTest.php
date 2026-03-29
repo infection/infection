@@ -1229,7 +1229,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'class with an abstract method' => [
+        yield 'infection-ignore-all corrupting the name resolution' => [
             file_get_contents(self::FIXTURES_DIR . '/ProblematicIgnoreAll.php'),
             <<<'AST'
                 array(
@@ -1407,6 +1407,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         )
                                                         class: Name(
                                                             nodeId: 26
+                                                            // This is incorrect!
                                                             resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
                                                             parent: nodeId(24)
                                                             isInsideFunction: true
