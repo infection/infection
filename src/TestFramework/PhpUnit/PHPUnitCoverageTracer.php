@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit;
 
 use function array_map;
-use DomainException;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitReport;
@@ -50,7 +49,7 @@ use Infection\TestFramework\Tracing\Trace\LazyTrace;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * @internal
@@ -66,11 +65,6 @@ final class PHPUnitCoverageTracer implements Tracer
     public function __construct(
         private readonly PHPUnitXmlReportFactory $parser,
     ) {
-    }
-
-    public function hasTrace(SplFileInfo $fileInfo): bool
-    {
-        throw new DomainException('Not implemented.');
     }
 
     public function trace(SplFileInfo $fileInfo): Trace

@@ -65,23 +65,18 @@ final class CachedTracer implements Tracer
     ) {
     }
 
-    public function hasTrace(SplFileInfo $fileInfo): bool
-    {
-        return $this->tryToTrace($fileInfo) instanceof Trace;
-    }
-
     public function trace(SplFileInfo $fileInfo): Trace
     {
-        $trace = $this->tryToTrace($fileInfo);
+        $traceOrException = $this->tryToTrace($fileInfo);
 
-        if ($trace instanceof Throwable) {
-            throw $trace;
+        if ($traceOrException instanceof Throwable) {
+            throw $traceOrException;
         }
 
-        return $trace;
+        return $traceOrException;
     }
 
-    private function tryToTrace(SplFileInfo $fileInfo): Trace
+    private function tryToTrace(SplFileInfo $fileInfo): Trace|RuntimeException
     {
         $sourcePathname = $fileInfo->getPathname();
 

@@ -82,6 +82,8 @@ final class PHPUnitXmlReport
      *                               is expected to either be absolute, or it
      *                               should be relative to the PHPUnit source
      *                               (configured in the PHPUnit configuration file).
+     *
+     * TODO: coverage info?
      */
     public function findSourceFileInfo(string $sourcePathname): ?SourceFileIndexXmlInfo
     {

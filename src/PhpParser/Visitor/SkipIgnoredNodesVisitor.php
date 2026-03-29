@@ -33,49 +33,16 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/FileSystem/Filesystem.php
-namespace Infection\FileSystem;
-
-use function is_dir;
-use function is_file;
-use function is_readable;
-use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
-use Symfony\Component\Finder\Finder;
-========
 namespace Infection\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
->>>>>>>> upstream/master:src/PhpParser/Visitor/SkipIgnoredNodesVisitor.php
 
 /**
  * @internal
  */
-<<<<<<<< HEAD:src/FileSystem/Filesystem.php
-class FileSystem extends SymfonyFilesystem
-{
-    public function isReadableFile(string $filename): bool
-    {
-        return is_file($filename) && is_readable($filename);
-    }
-
-    public function isReadableDirectory(string $filename): bool
-    {
-        return is_dir($filename) && is_readable($filename);
-    }
-
-    public function realPath(string $filename): string
-    {
-        return realpath($filename);
-    }
-
-    public function createFinder(): Finder
-    {
-        return Finder::create();
-========
 final class SkipIgnoredNodesVisitor extends NodeVisitorAbstract
 {
     /**
@@ -95,6 +62,5 @@ final class SkipIgnoredNodesVisitor extends NodeVisitorAbstract
         }
 
         return null;
->>>>>>>> upstream/master:src/PhpParser/Visitor/SkipIgnoredNodesVisitor.php
     }
 }

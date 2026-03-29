@@ -33,41 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationGeneration;
+namespace Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer;
 
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\CannotBeInstantiated;
+use Symfony\Component\Filesystem\Path;
 
-/**
- * @internal
- */
-<<<<<<<< HEAD:src/TestFramework/Coverage/Locator/CachedLocator.php
-final class CachedLocator implements ReportLocator
-========
-final readonly class ConsoleNoProgressLogger implements MutationGenerationLogger
->>>>>>>> upstream/master:src/Logger/MutationGeneration/ConsoleNoProgressLogger.php
+final class PhpUnit11Provider
 {
-    public function __construct(
-        private OutputInterface $output,
-    ) {
-    }
+    use CannotBeInstantiated;
 
-    public function start(int $sourceFilesCount): void
-    {
-        $this->output->writeln([
-            '',
-            'Generate mutants...',
-            '',
-            'Processing source code files...',
-        ]);
-    }
+    private const FIXTURES_DIR = __DIR__ . '/../../Coverage/Fixtures';
 
-    public function advance(): void
+    public static function traceProvider(): iterable
     {
-        // Do nothing.
-    }
-
-    public function finish(): void
-    {
-        // Do nothing.
+        yield [
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-11/coverage-xml/index.xml'),
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-11/junit.xml'),
+        ];
     }
 }

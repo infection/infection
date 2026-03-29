@@ -33,11 +33,7 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:tests/phpunit/TestFramework/PhpUnit/PHPUnitCoverageTracer/Fixtures/src/DemoCounterService.php
-namespace Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\src;
-========
 namespace Infection\Tests\TestingUtility\FileSystem;
->>>>>>>> upstream/master:tests/phpunit/TestingUtility/FileSystem/MockSplFileInfo.php
 
 use SplFileInfo;
 

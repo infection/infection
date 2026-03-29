@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Closure;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 final class LazyTrace implements Trace
@@ -84,7 +84,7 @@ final class LazyTrace implements Trace
         return $this->getTestLocator()->hasTests();
     }
 
-    public function getTests(): ?TestLocations
+    public function getTests(): TestLocations
     {
         if ($this->testLocations === null) {
             $this->testLocations = ($this->lazyTestLocations)();

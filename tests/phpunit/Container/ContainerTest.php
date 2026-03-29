@@ -33,16 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Container;
 
 use function array_keys;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +51,7 @@ use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
-#[CoversClass(Container::class)]
+#[CoversNothing]
 #[Group('integration')]
 final class ContainerTest extends TestCase
 {

@@ -40,11 +40,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-<<<<<<<< HEAD:src/TestFramework/Coverage/Locator/CachedLocator.php
-final class CachedLocator implements ReportLocator
-========
 final readonly class ConsoleNoProgressLogger implements MutationGenerationLogger
->>>>>>>> upstream/master:src/Logger/MutationGeneration/ConsoleNoProgressLogger.php
 {
     public function __construct(
         private OutputInterface $output,

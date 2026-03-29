@@ -66,7 +66,8 @@ interface Trace
     public function hasTests(): bool;
 
     /**
-     * TODO: to double check; seems weird
+     * TODO: to double check why we throw that exception here.
+     *
      * @throws TestNotFound
      */
     public function getTests(): TestLocations;

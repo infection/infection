@@ -47,6 +47,7 @@ use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactor
 use Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -86,9 +87,16 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
+        string $indexPath,
+        string $junitPath,
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
+        $tracer = $this->createTracer(
+            $indexPath,
+            $junitPath,
+        );
+
         $actual = $this->tracer->trace($fileInfo);
 
         TraceAssertion::assertEquals($expected, $actual);
@@ -96,6 +104,13 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
     public static function traceProvider(): iterable
     {
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 11] ',
+            PhpUnit11Provider::traceProvider(),
+        );
+
+        return;
+
         $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
 
         $splFileInfo = new SplFileInfo(
@@ -401,6 +416,18 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 ),
             ),
         ];
+    }
+
+    private function createTracer(
+        string $indexPath,
+        string $junitPath,
+    ): PHPUnitCoverageTracer {
+        return new PHPUnitCoverageTracer(
+            new PHPUnitXmlReportFactory(
+                indexReportLocator: new FixedLocator($indexPath),
+                jUnitReportLocator: new FixedLocator($junitPath),
+            ),
+        );
     }
 
     private function copyReportFromTemplateIfMissing(string $coveragePath): void

@@ -33,30 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing;
-
-use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\Throwable\TestNotFound;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\Tracing\Trace\Trace;
+namespace Infection\Metrics;
 
 /**
  * @internal
+ * @final
  */
-interface TraceProvider
+readonly class MaxTimeoutsChecker
 {
+    public function __construct(
+        private ?int $maxTimeouts,
+    ) {
+    }
+
     /**
-     * @throws NoSourceFound
-     * @throws NoReportFound
-     * @throws TooManyReportsFound
-     * @throws ReportLocationThrowable
-     * @throws TestNotFound
-     *
-     * @throws InvalidCoverage
-     * @return iterable<Trace>
+     * @throws MaxTimeoutCountReached
      */
-    public function provideTraces(): iterable;
+    public function checkTimeouts(int $timedOutCount): void
+    {
+        if ($this->maxTimeouts === null) {
+            return;
+        }
+
+        if ($timedOutCount > $this->maxTimeouts) {
+            throw MaxTimeoutCountReached::create($this->maxTimeouts, $timedOutCount);
+        }
+    }
 }
