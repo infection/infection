@@ -55,39 +55,39 @@ final class Foreach_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates to new array in foreach' => [
-            <<<'PHP'
-                <?php
-
-                $array = [1, 2];
-                foreach ($array as $value) {
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $array = [1, 2];
-                foreach ([] as $value) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $array = [1, 2];
+                    foreach ($array as $value) {
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $array = [1, 2];
+                    foreach ([] as $value) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not change whether items were passed by reference' => [
-            <<<'PHP'
-                <?php
-
-                $array = [1, 2];
-                foreach ($array as $key => &$value) {
-                    echo $value;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $array = [1, 2];
-                foreach ([] as $key => &$value) {
-                    echo $value;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $array = [1, 2];
+                    foreach ($array as $key => &$value) {
+                        echo $value;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $array = [1, 2];
+                    foreach ([] as $key => &$value) {
+                        echo $value;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

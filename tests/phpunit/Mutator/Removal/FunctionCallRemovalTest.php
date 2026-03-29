@@ -55,131 +55,131 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes a function call without parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    foo();
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                foo();
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It removes a function call with parameters' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    bar(3, 4);
+                    $a = 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
 
-                bar(3, 4);
-                $a = 3;
-                PHP,
-            <<<'PHP'
-                <?php
-
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It removes dynamic function calls with string' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $start = true;
+                    ('foo')();
+                    $end = true;
 
-                $start = true;
-                ('foo')();
-                $end = true;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $start = true;
 
-                PHP,
-            <<<'PHP'
-                <?php
+                    $end = true;
 
-                $start = true;
-
-                $end = true;
-
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It removes dynamic function call with variable' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $start = true;
+                    $foo();
+                    $end = true;
 
-                $start = true;
-                $foo();
-                $end = true;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $start = true;
 
-                PHP,
-            <<<'PHP'
-                <?php
+                    $end = true;
 
-                $start = true;
-
-                $end = true;
-
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a function call that is assigned to something' => [
-            <<<'PHP'
-                <?php
-
-                $b = foo();
-                $a = 3;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b = foo();
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a function call within a statement' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (foo()) {
+                        $a = 3;
+                    }
+                    while (foo()) {
+                        $a = 3;
+                    }
 
-                if (foo()) {
-                    $a = 3;
-                }
-                while (foo()) {
-                    $a = 3;
-                }
-
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a function call that is the parameter of another function or method' => [
-            <<<'PHP'
-                <?php
-
-                $a = foo(3, bar());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = foo(3, bar());
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove a method call' => [
-            <<<'PHP'
-                <?php
-
-                $this->foo();
-                $a = 3;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->foo();
+                    $a = 3;
+                    PHP,
+            ),
         ];
 
         yield 'It does not remove disallowed calls' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    assert(true === true);
+                    aSsert(true === true);
+                    \assert(true === true);
+                    fclose($fileHandle);
+                    closedir($close);
+                    curl_close($curlHandle);
+                    fclose();
+                    mysqli_free_result();
+                    mysqli_close();
+                    socket_close();
+                    openssl_free_key();
 
-                assert(true === true);
-                aSsert(true === true);
-                \assert(true === true);
-                fclose($fileHandle);
-                closedir($close);
-                curl_close($curlHandle);
-                fclose();
-                mysqli_free_result();
-                mysqli_close();
-                socket_close();
-                openssl_free_key();
-
-                $a = 3;
-                PHP,
+                    $a = 3;
+                    PHP,
+            ),
         ];
     }
 }

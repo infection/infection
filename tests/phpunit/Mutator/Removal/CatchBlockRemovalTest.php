@@ -55,89 +55,89 @@ final class CatchBlockRemovalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes catch block' => [
-            <<<'PHP'
-                <?php
-
-                try {
-                    $callback();
-                } catch (\DomainException $e) {
-                    $logger->log($e);
-                } catch (\LogicException $e) {
-                    throw $e;
-                } catch (\Throwable $e) {
-                    throw new \RuntimeException();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $callback();
+                    } catch (\DomainException $e) {
+                        $logger->log($e);
+                    } catch (\LogicException $e) {
+                        throw $e;
+                    } catch (\Throwable $e) {
+                        throw new \RuntimeException();
+                    }
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    try {
-                        $callback();
-                    } catch (\LogicException $e) {
-                        throw $e;
-                    } catch (\Throwable $e) {
-                        throw new \RuntimeException();
-                    }
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    try {
-                        $callback();
-                    } catch (\DomainException $e) {
-                        $logger->log($e);
-                    } catch (\Throwable $e) {
-                        throw new \RuntimeException();
-                    }
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    try {
-                        $callback();
-                    } catch (\DomainException $e) {
-                        $logger->log($e);
-                    } catch (\LogicException $e) {
-                        throw $e;
-                    }
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        try {
+                            $callback();
+                        } catch (\LogicException $e) {
+                            throw $e;
+                        } catch (\Throwable $e) {
+                            throw new \RuntimeException();
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        try {
+                            $callback();
+                        } catch (\DomainException $e) {
+                            $logger->log($e);
+                        } catch (\Throwable $e) {
+                            throw new \RuntimeException();
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        try {
+                            $callback();
+                        } catch (\DomainException $e) {
+                            $logger->log($e);
+                        } catch (\LogicException $e) {
+                            throw $e;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate with one catch block' => [
-            <<<'PHP'
-                <?php
-
-                try {
-                    $callback();
-                } catch (\DomainException $e) {
-                    $logger->log($e);
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $callback();
+                    } catch (\DomainException $e) {
+                        $logger->log($e);
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if catch block does not contain statements' => [
-            <<<'PHP'
-                <?php
-
-                try {
-                    $callback();
-                } catch (\DomainException $e) {
-                    // DO nothing
-                } catch (\Throwable $e) {
-                    throw new \RuntimeException();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                try {
-                    $callback();
-                } catch (\DomainException $e) {
-                    // DO nothing
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $callback();
+                    } catch (\DomainException $e) {
+                        // DO nothing
+                    } catch (\Throwable $e) {
+                        throw new \RuntimeException();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $callback();
+                    } catch (\DomainException $e) {
+                        // DO nothing
+                    }
+                    PHP,
+            ),
         ];
     }
 }

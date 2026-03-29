@@ -45,10 +45,12 @@ final class UnsupportedMethod extends DomainException
 {
     public static function method(string $class, string $method): self
     {
-        return new self(sprintf(
-            'Did not expect "%s::%s()" to be called',
-            $class,
-            $method,
-        ));
+        return new self(
+            sprintf(
+                'Did not expect "%s::%s()" to be called',
+                $class,
+                $method,
+            ),
+        );
     }
 }

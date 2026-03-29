@@ -38,14 +38,13 @@ namespace Infection\Benchmark\MutationGenerator;
 use function class_exists;
 use Closure;
 use function function_exists;
-use Infection\Container;
-use Infection\Mutation\FileMutationGenerator;
+use Infection\Container\Container;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
+use SplFileInfo;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -69,11 +68,6 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
 if (!class_exists(EmptyTraceTracer::class, false)) {
     final readonly class EmptyTraceTracer implements Tracer
     {
-        public function hasTrace(SplFileInfo $fileInfo): bool
-        {
-            return true;
-        }
-
         public function trace(SplFileInfo $fileInfo): Trace
         {
             require_once $fileInfo->getRealPath();
@@ -101,13 +95,12 @@ return static function (int $maxCount): Closure {
         true,
     );
 
-    $fileMutationGenerator = new FileMutationGenerator(
-        $container->getFileParser(),
-        $container->getNodeTraverserFactory(),
-        $container->getLineRangeCalculator(),
-        $container->getSourceLineMatcher(),
-        new EmptyTraceTracer(),
-    );
+    $fileMutationGenerator = Container::create()
+        ->cloneWithService(
+            Tracer::class,
+            new EmptyTraceTracer(),
+        )
+        ->getFileMutationGenerator();
 
     return static function () use ($sources, $fileMutationGenerator, $mutators, $maxCount): int {
         $count = 0;
@@ -117,7 +110,6 @@ return static function (int $maxCount): Closure {
                 $source,
                 false,
                 $mutators,
-                [],
             );
 
             foreach ($mutations as $_) {

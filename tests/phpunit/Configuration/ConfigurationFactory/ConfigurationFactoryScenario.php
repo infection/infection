@@ -607,4 +607,46 @@ final class ConfigurationFactoryScenario
                     ->build(),
             );
     }
+
+    public function forValueForTimeoutsAsEscaped(
+        ?bool $timeoutsAsEscapedFromSchemaConfiguration,
+        bool $timeoutsAsEscapedFromInput,
+        bool $expectedTimeoutsAsEscaped,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTimeoutsAsEscaped($timeoutsAsEscapedFromSchemaConfiguration),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withTimeoutsAsEscaped($timeoutsAsEscapedFromInput),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withTimeoutsAsEscaped($expectedTimeoutsAsEscaped)
+                    ->build(),
+            );
+    }
+
+    public function forValueForMaxTimeouts(
+        ?int $maxTimeoutsFromSchemaConfiguration,
+        ?int $maxTimeoutsFromInput,
+        ?int $expectedMaxTimeouts,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withMaxTimeouts($maxTimeoutsFromSchemaConfiguration),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withMaxTimeouts($maxTimeoutsFromInput),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withMaxTimeouts($expectedMaxTimeouts)
+                    ->build(),
+            );
+    }
 }

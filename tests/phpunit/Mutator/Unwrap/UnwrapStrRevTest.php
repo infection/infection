@@ -55,132 +55,132 @@ final class UnwrapStrRevTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-                <?php
-
-                $a = strrev('Good Afternoon!');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strrev('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = strrev(\Class_With_Const::Const);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strrev(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of strtolower' => [
-            <<<'PHP'
-                <?php
-
-                $a = \strrev('Good Afternoon!');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \strrev('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                if (strrev($a) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if (strrev($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when strtolower is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = sTrReV('Good Afternoon!');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = sTrReV('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when strtolower uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = strrev($foo->bar());
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strrev($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = strrev(array_reduce($words, function (string $carry, string $item) {
-                    return $carry . substr($item, 0, 1);
-                }));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_reduce($words, function (string $carry, string $item) {
-                    return $carry . substr($item, 0, 1);
-                });
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strrev(array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    }));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    });
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other str* calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = strtolower('Good Afternoon!');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower('Good Afternoon!');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named strtolower' => [
-            <<<'PHP'
-                <?php
-
-                function strrev($string)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function strrev($string)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'strrev';
 
-                $a = 'strrev';
-
-                $b = $a('FooBar');
-                PHP,
+                    $b = $a('FooBar');
+                    PHP,
+            ),
         ];
     }
 }

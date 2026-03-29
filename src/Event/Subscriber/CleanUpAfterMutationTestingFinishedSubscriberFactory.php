@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -50,7 +49,7 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriberFactory implem
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function create(): EventSubscriber
     {
         return $this->debug
             ? new NullSubscriber()

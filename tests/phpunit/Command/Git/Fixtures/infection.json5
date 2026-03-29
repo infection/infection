@@ -1,0 +1,6 @@
+{
+    "$schema": "../../../../../resources/schema.json",
+    "source": {
+        "directories": ["src", "lib"]
+    },
+}

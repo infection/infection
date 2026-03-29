@@ -6,66 +6,28 @@ rules:
     - Infection\DevTools\PHPStan\Rules\InfectionContainerRule
 
 parameters:
-    tmpDir: ../build/cache/phpstan-src
+    tmpDir: ../var/cache/phpstan
     inferPrivatePropertyTypeFromConstructor: true
     sidzIgnoreMagicNumbers: [0, 0.0, 1, -1, 1.0, -1.0, 100]
     sidzIgnoreNumericStrings: true
     parallel:
         processTimeout: 120.0
     ignoreErrors:
-        - '#generic class ReflectionClass (but )?does not specify its types#'
-        - '#^Parameter \#\d+ \$.+ \(.+\) of method .+ should be contravariant with parameter \$.+ \(.+\) of method .+$#'
-        - '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-        - '#^Dead catch - InvalidArgumentException is never thrown in the try block\.$#'
-        - '#^Variable (method|property) (access|call) #'
-        - '#^Call to internal method PHPUnit\\Framework\\TestCase\:\:addToAssertionCount\(\) from outside its root namespace PHPUnit\.$#'
-        - '#^Call to.* method .*\(\) of internal class OndraM\\CiDetector\\TrinaryLogic from outside its root namespace OndraM\.$#'
-        -
-            path: '../src/Mutator/MutatorResolver.php'
-            message: '#^Method Infection\\Mutator\\MutatorResolver::resolveSettings\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-            count: 1
-        -
-            path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
-            message: '#return type has no value type specified in iterable type array#'
-        -
-            path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
-            message: '#return type with generic class ArrayObject does not specify its types\: TKey, TValue#'
-
-        -
-            message: "#^Generator expects value type list\\<PhpParser\\\\Node\\\\Stmt\\>, array\\<PhpParser\\\\Node\\\\Stmt\\> given\\.$#"
-            count: 1
-            path: ../src/Mutator/Unwrap/UnwrapFinally.php
-
-        -
-            message: "#^Generator expects value type list\\<PhpParser\\\\Node\\\\Stmt\\>, non\\-empty\\-array\\<PhpParser\\\\Node\\\\Stmt\\> given\\.$#"
-            count: 1
-            path: ../src/Mutator/Unwrap/UnwrapFinally.php
-
-        -
-            message: "#Do not use magic number (.*)#"
-            count: 5
-            path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
-
-        -
-            message: "#Do not use magic number (.*)#"
-            count: 12
-            path: ../src/Mutator/Extensions/MBString.php
-
-        -
-            message: "#Do not use magic number (.*)#"
-            count: 8
-            path: ../src/Mutator/Extensions/BCMath.php
-        -
-            identifier: arrayFilter.strict
-        -
-            identifier: shipmonk.deadMethod
-            path: ../src/Testing
         # While it's not used yet, left for consistency as we have ending column passed and used
         -
             message: '#^Unused Infection\\Mutant\\MutantExecutionResult\:\:getOriginalStartingColumn$#'
             identifier: shipmonk.deadMethod
             count: 1
             path: ../src/Mutant/MutantExecutionResult.php
+
+        # It would be nice to properly address those; They are false positives, but we did not figure
+        # out how to properly configure PHPStan to understand it.
+        -
+            message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
+            path:  ../tests/*
+        -
+            message: "#^.*expects Symfony\\\\Component\\\\Console\\\\Output\\\\OutputInterface, Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput given\\.$#"
+            path:  ../tests/*
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
@@ -74,10 +36,6 @@ parameters:
             message: '#Do not (use|return|assign) magic number (.)#'
             paths:
                 - ../tests/*
-        -
-            message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
-            count: 11
-            path:  ../tests/*
         -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
             path: ../tests/*
@@ -119,12 +77,6 @@ parameters:
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
 
-        -
-            message: "#FS::tmpFile#"
-            identifier: shipmonk.deadMethod
-            count: 1
-            path: ../tests/phpunit/TestingUtility/FS.php
-
         # We are explicitly testing the guards here
         -
             identifier: argument.type
@@ -157,6 +109,11 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
 
+        # Test enum fixtures have cases that exist as test data, not all are used
+        -
+            identifier: shipmonk.deadEnumCase
+            path: ../tests/*
+
         # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
             identifier: argument.type
@@ -186,7 +143,18 @@ parameters:
         -
             message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoSourceFound) in PHPDoc \@throws tag but it.+s not thrown\.$#'
             identifier: throws.unusedType
-            path: ../src/Container.php
+            path: ../src/Container/Container.php
+
+        # This is legit; To review if that remains to be true once we dealt with
+        # https://github.com/infection/infection/issues/2760.
+        -
+            message: '#getDefaultLocation#'
+            identifier: shipmonk.deadMethod
+            path: ../src/TestFramework/Coverage/Locator/ReportLocator.php
+        -
+            message: '#getDefaultLocation#'
+            identifier: shipmonk.deadMethod
+            path: ../src/TestFramework/Coverage/Locator/FakeLocator.php
 
         # PHPStan cannot really properly infer the types here
         -
@@ -204,6 +172,27 @@ parameters:
             identifier: argument.type
             path: ../src/Mutator/NodeMutationGenerator.php
 
+        # This class is copy/pasted from PhpParser so we don't want to change it too much
+        -
+            identifier: if.condNotBoolean
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
+        -
+            identifier: booleanAnd.rightNotBoolean
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
+        -
+            rawMessage: Variable property access on PhpParser\Node.
+            identifier: property.dynamicName
+            count: 1
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
+        -
+            rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
+            path: ../src/PhpParser/NodeDumper/NodeDumper.php
+
+        # False-positives
+        -
+            message: '#TeamCity::escapeValue\(\) should return non-empty-string#'
+            identifier: return.type
+            path: ../src/Logger/MutationAnalysis/TeamCity/TeamCity.php
     level: 8
     paths:
         - ../src
@@ -216,6 +205,10 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
+        - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
+        - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
+        - ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
         - ../tests/benchmark/MutationGenerator/sources (?)

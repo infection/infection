@@ -55,44 +55,44 @@ final class DoWhileTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates expression part from boolean true to false' => [
-            <<<'PHP'
-                <?php
-
-                do {
-                } while (true);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                do {
-                } while (false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    do {
+                    } while (true);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    do {
+                    } while (false);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates expression part from variable to false' => [
-            <<<'PHP'
-                <?php
-
-                do {
-                    $condition = true;
-                } while ($condition);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                do {
-                    $condition = true;
-                } while (false);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    do {
+                        $condition = true;
+                    } while ($condition);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    do {
+                        $condition = true;
+                    } while (false);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate expression part in while loop to false' => [
-            <<<'PHP'
-                <?php
-
-                while (true) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                    }
+                    PHP,
+            ),
         ];
     }
 }

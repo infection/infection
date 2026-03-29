@@ -55,127 +55,127 @@ final class ConcatTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Flips two concatenated variables' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $b = 'bar';
-                $a . $b;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $b = 'bar';
-                $b . $a;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $b = 'bar';
+                    $a . $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $b = 'bar';
+                    $b . $a;
+                    PHP,
+            ),
         ];
 
         yield 'Flips multiple concatenated variables' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $b = 'bar';
-                $c = 'baz';
-                $a . $b . $c;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $b = 'bar';
+                    $c = 'baz';
+                    $a . $b . $c;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = 'foo';
-                    $b = 'bar';
-                    $c = 'baz';
-                    $b . $a . $c;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'foo';
-                    $b = 'bar';
-                    $c = 'baz';
-                    $a . $c . $b;
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'foo';
+                        $b = 'bar';
+                        $c = 'baz';
+                        $b . $a . $c;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'foo';
+                        $b = 'bar';
+                        $c = 'baz';
+                        $a . $c . $b;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Flips the operands of more than two concatenation operators' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'a';
-                $b = 'b';
-                $c = 'c';
-                $e = 'e';
-                $a . $b . $c . 'd' . $e;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'a';
+                    $b = 'b';
+                    $c = 'c';
+                    $e = 'e';
+                    $a . $b . $c . 'd' . $e;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $c = 'c';
-                    $e = 'e';
-                    $b . $a . $c . 'd' . $e;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $c = 'c';
-                    $e = 'e';
-                    $a . $c . $b . 'd' . $e;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $c = 'c';
-                    $e = 'e';
-                    $a . $b . 'd' . $c . $e;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = 'a';
-                    $b = 'b';
-                    $c = 'c';
-                    $e = 'e';
-                    $a . $b . $c . $e . 'd';
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $c = 'c';
+                        $e = 'e';
+                        $b . $a . $c . 'd' . $e;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $c = 'c';
+                        $e = 'e';
+                        $a . $c . $b . 'd' . $e;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $c = 'c';
+                        $e = 'e';
+                        $a . $b . 'd' . $c . $e;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = 'a';
+                        $b = 'b';
+                        $c = 'c';
+                        $e = 'e';
+                        $a . $b . $c . $e . 'd';
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Does not flip the same variable' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $a . $a;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $a . $a;
+                    PHP,
+            ),
             [],
         ];
 
         yield 'Does not flip the same variable - multiple concatenation' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'foo';
-                $a . $a . $a;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'foo';
+                    $a . $a . $a;
+                    PHP,
+            ),
             [],
         ];
 
         yield 'Does not flip the same value' => [
-            <<<'PHP'
-                <?php
-
-                'foo' . 'foo';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    'foo' . 'foo';
+                    PHP,
+            ),
             [],
         ];
     }

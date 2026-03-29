@@ -35,7 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\Source\Exception\NoSourceFound;
+use SplFileInfo;
 
 /**
  * The SourceCollector is the service responsible for collecting all the source
@@ -46,13 +47,8 @@ use Symfony\Component\Finder\SplFileInfo;
 interface SourceCollector
 {
     /**
-     * Whether the collector collects all the project source files, or if they
-     * are filtered, e.g. to match a user input filter or to git added/modified
-     * files.
-     */
-    public function isFiltered(): bool;
-
-    /**
+     * @throws NoSourceFound
+     *
      * @return SplFileInfo[]
      */
     public function collect(): array;

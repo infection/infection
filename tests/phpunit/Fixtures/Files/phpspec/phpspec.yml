@@ -1,4 +1,0 @@
-extensions:
-    CodeCoverageExtension: ~
-    TestExtension:
-        options: 123

@@ -60,75 +60,75 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Mutate nullsafe method call' => [
-            <<<'PHP'
-                <?php
-
-                $class?->getName();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $class->getName();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->getName();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class->getName();
+                    PHP,
+            ),
         ];
 
         yield 'Mutate nullsafe method call only' => [
-            <<<'PHP'
-                <?php
-
-                $class?->getName()?->property;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $class->getName()?->property;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->getName()?->property;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class->getName()?->property;
+                    PHP,
+            ),
         ];
 
         yield 'Mutate chain of nullsafe method calls' => [
-            <<<'PHP'
-                <?php
-
-                $class?->getObject()?->getName();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->getObject()?->getName();
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $class->getObject()?->getName();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $class?->getObject()->getName();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $class->getObject()?->getName();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $class?->getObject()->getName();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Mutate nullsafe applied right when class has been instantiated' => [
-            <<<'PHP'
-                <?php
-
-                (new SomeClass())?->methodCall();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                (new SomeClass())->methodCall();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (new SomeClass())?->methodCall();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (new SomeClass())->methodCall();
+                    PHP,
+            ),
         ];
 
         yield 'Mutate nullsafe with dynamic method name' => [
-            <<<'PHP'
-                <?php
-
-                $class?->{$methodCall}();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $class->{$methodCall}();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class?->{$methodCall}();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $class->{$methodCall}();
+                    PHP,
+            ),
         ];
     }
 }

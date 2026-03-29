@@ -55,105 +55,105 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Spread assignment for a raw array' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...[1, 2, 3]];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = [1, 2, 3];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...[1, 2, 3]];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [1, 2, 3];
+                    PHP,
+            ),
         ];
 
         yield 'Spread assignment for a raw empty array' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...[]];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = [];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...[]];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [];
+                    PHP,
+            ),
         ];
 
         yield 'Spread assignment for a variable' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...$collection];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $collection;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...$collection];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $collection;
+                    PHP,
+            ),
         ];
 
         yield 'Spread assignment for a function call' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...getCollection()];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = getCollection();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...getCollection()];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = getCollection();
+                    PHP,
+            ),
         ];
 
         yield 'Spread assignment for a method call' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...$object->getCollection()];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $object->getCollection();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...$object->getCollection()];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $object->getCollection();
+                    PHP,
+            ),
         ];
 
         yield 'Spread assignment for a new iterator object' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...new ArrayIterator(['a', 'b', 'c'])];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = new ArrayIterator(['a', 'b', 'c']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...new ArrayIterator(['a', 'b', 'c'])];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = new ArrayIterator(['a', 'b', 'c']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate argument unpacking' => [
-            <<<'PHP'
-                <?php
-
-                function foo(...$array) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function foo(...$array) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate list construct' => [
-            <<<'PHP'
-                <?php
-
-                [$left, $right] = ['left', 'right'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [$left, $right] = ['left', 'right'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate spread expression in array with more than one element' => [
-            <<<'PHP'
-                <?php
-
-                $a = [...[1, 2, 3], 4];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = [...[1, 2, 3], 4];
+                    PHP,
+            ),
         ];
     }
 }

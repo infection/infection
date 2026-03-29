@@ -1,0 +1,22 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnit_12_5\\": "src/"
+        },
+        "files": [
+            "src/Covered/functions.php",
+            "src/Uncovered/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnit_12_5\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

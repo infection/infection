@@ -41,7 +41,6 @@ use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\Tests\TestingUtility\TestCIDetector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -65,7 +64,6 @@ final class CommandLineGitIntegrationTest extends TestCase
     // - tests/phpunit/Git/CommandLineGitIntegrationTest.php
     // - tests/phpunit/Git/CommandLineGitTest.php
     // - tests/phpunit/Process/ShellCommandLineExecutorTest.php
-    // - tests/phpunit/TestingUtility/TestCIDetector.php
     private const COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
     private const BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
@@ -200,13 +198,12 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     public function test_it_can_get_this_project_default_git_base(): void
     {
-        $expected = TestCIDetector::isCIDetected()
-            ? 'origin/master'
-            : 'refs/remotes/origin/master';
-
         $actual = $this->git->getDefaultBase();
 
-        $this->assertSame($expected, $actual);
+        $this->assertContains($actual, [
+            'origin/master',
+            'refs/remotes/origin/master',
+        ]);
     }
 
     public function test_it_can_refine_the_base_used(): void

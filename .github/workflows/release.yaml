@@ -13,14 +13,15 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       -
         name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
           php-version: 8.2
-          ini-values: memory_limit=512M, xdebug.mode=off
+          coverage: none
+          ini-values: memory_limit=512M, opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
           tools: 'composer'
         env:
           # This is necessary when installing a tool with a specific version
@@ -28,7 +29,7 @@ jobs:
 
       -
         name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
@@ -48,13 +49,13 @@ jobs:
               --yes \
               --passphrase="${{ secrets.GPG_PASSPHRASE }}" \
               --detach-sign \
-              --output build/infection.phar.asc \
-              build/infection.phar
+              --output dist/infection.phar.asc \
+              dist/infection.phar
 
       - name: Upload PHAR to release
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/infection.phar*
+          file: dist/infection.phar*
           file_glob: true
           tag: ${{ github.ref }}

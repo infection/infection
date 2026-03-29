@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator;
 
-use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
 use Symfony\Component\Finder\Finder;
 
@@ -45,14 +44,6 @@ use Symfony\Component\Finder\Finder;
 final class DemoReportLocator extends BaseReportLocator
 {
     public const FILENAME_REGEX = '/^.+\.demo$/';
-
-    public function __construct(
-        FileSystem $filesystem,
-        string $sourceDirectory,
-        string $defaultPathname,
-    ) {
-        parent::__construct($filesystem, $sourceDirectory, $defaultPathname);
-    }
 
     protected function configureFinder(Finder $finder): void
     {

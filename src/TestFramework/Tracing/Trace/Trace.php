@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\Throwable\TestNotFound;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * A Trace is an envelope for a source file which contains comprehensive information about all tests associated with
@@ -63,18 +63,13 @@ interface Trace
      */
     public function getRealPath(): string;
 
-    /**
-     * This is used by PathFilterIterator to filter out excluded files for mutation testing
-     */
-    public function getRelativePathname(): string;
-
     public function hasTests(): bool;
 
     /**
      * TODO: to double check; seems weird
      * @throws TestNotFound
      */
-    public function getTests(): ?TestLocations;
+    public function getTests(): TestLocations;
 
     /**
      * @return iterable<TestLocation>

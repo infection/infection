@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\Node\ComplexType;
@@ -102,10 +101,5 @@ final readonly class ReturnTypeHelper
 
         // Check for return null;
         return $this->node->expr->name->toLowerString() === self::NULL;
-    }
-
-    public function hasNextStmtNode(): bool
-    {
-        return $this->node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE) !== null;
     }
 }

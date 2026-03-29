@@ -55,145 +55,145 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-                <?php
-
-                $a = substr('Good Afternoon!', 0, -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = substr('Good Afternoon!', 0, -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = substr(\Class_With_Const::Const, 0, -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = substr(\Class_With_Const::Const, 0, -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_replace' => [
-            <<<'PHP'
-                <?php
-
-                $a = \substr('Good Afternoon!', 0, -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \substr('Good Afternoon!', 0, -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                if (substr($a, 0, -1) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if (substr($a, 0, -1) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when sUbStR is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = sUbStR('Good Afternoon!', 0, -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'Good Afternoon!';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = sUbStR('Good Afternoon!', 0, -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when substr uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = substr($foo->bar(), 0, -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = substr($foo->bar(), 0, -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = substr(array_reduce($words, function (string $carry, string $item) {
-                    return $carry;
-                }), 0, -1);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_reduce($words, function (string $carry, string $item) {
-                    return $carry;
-                });
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = substr(array_reduce($words, function (string $carry, string $item) {
+                        return $carry;
+                    }), 0, -1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reduce($words, function (string $carry, string $item) {
+                        return $carry;
+                    });
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other str* calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = strrev('Afternoon');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strrev('Afternoon');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named str_replace' => [
-            <<<'PHP'
-                <?php
-
-                function substr($search , $replace , $subject , int &$count = null)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function substr($search , $replace , $subject , int &$count = null)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'substr';
 
-                $a = 'substr';
-
-                $b = $a('Bar', 0, -1);
-                PHP,
+                    $b = $a('Bar', 0, -1);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly complex code with dynamic method name. Related to https://github.com/infection/infection/issues/1799' => [
-            <<<'PHP'
-                <?php
-
-                $object->{substr($key, 0, -2)}();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $object->{$key}();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $object->{substr($key, 0, -2)}();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $object->{$key}();
+                    PHP,
+            ),
         ];
     }
 }

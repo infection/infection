@@ -35,20 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\FileSystem\FileStore;
 use PhpParser\Node\Stmt;
 use PhpParser\Parser;
 use PhpParser\Token;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Throwable;
 
 /**
  * @internal
- * @final
  */
-class FileParser
+final readonly class FileParser
 {
     public function __construct(
-        private readonly Parser $parser,
+        private Parser $parser,
+        private FileStore $fileStore,
     ) {
     }
 
@@ -61,7 +62,9 @@ class FileParser
     {
         try {
             return [
-                $this->parser->parse($fileInfo->getContents()) ?? [],
+                $this->parser->parse(
+                    $this->fileStore->getContents($fileInfo),
+                ) ?? [],
                 $this->parser->getTokens(),
             ];
         } catch (Throwable $throwable) {

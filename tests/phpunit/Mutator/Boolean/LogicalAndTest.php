@@ -55,24 +55,24 @@ final class LogicalAndTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical and' => [
-            <<<'PHP'
-                <?php
-
-                true && false;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                true || false;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    true && false;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    true || false;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate logical lower and' => [
-            <<<'PHP'
-                <?php
-
-                true and false;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    true and false;
+                    PHP,
+            ),
         ];
     }
 }

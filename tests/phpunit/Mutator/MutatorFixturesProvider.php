@@ -57,6 +57,9 @@ final class MutatorFixturesProvider
      */
     private static array $testCaseFixtureDirMapping = [];
 
+    /**
+     * @param class-string $class
+     */
     public static function getFixtureFileContent(string $class, string $file): string
     {
         Assert::isAOf($class, BaseMutatorTestCase::class);

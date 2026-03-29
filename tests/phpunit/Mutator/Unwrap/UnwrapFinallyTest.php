@@ -56,53 +56,50 @@ final class UnwrapFinallyTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Can unwrap try-finally block without catches' => [
-            '<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
 
-function withoutChecks(callable $fn): void
-{
-    $this->useChecks = false;
-    try {
-        $fn();
-    } finally {
-        $this->useChecks = true;
-    }
-}',
-            '<?php
-
-function withoutChecks(callable $fn): void
-{
-    $this->useChecks = false;
-    $fn();
-    $this->useChecks = true;
-}',
+                    try {
+                        $fn();
+                    } finally {
+                        $this->useChecks = true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
+                    $fn();
+                    $this->useChecks = true;
+                    PHP,
+            ),
         ];
 
         yield 'Can unwrap finally statements and leave try-catch' => [
-            '<?php
-
-function withoutChecks(callable $fn): void
-{
-    $this->useChecks = false;
-    try {
-        $fn();
-    } catch (\Throwable $e) {
-        throw $e;
-    } finally {
-        $this->useChecks = true;
-    }
-}',
-            '<?php
-
-function withoutChecks(callable $fn): void
-{
-    $this->useChecks = false;
-    try {
-        $fn();
-    } catch (\Throwable $e) {
-        throw $e;
-    }
-    $this->useChecks = true;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
+                    try {
+                        $fn();
+                    } catch (\Throwable $e) {
+                        throw $e;
+                    } finally {
+                        $this->useChecks = true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
+                    try {
+                        $fn();
+                    } catch (\Throwable $e) {
+                        throw $e;
+                    }
+                    $this->useChecks = true;
+                    PHP,
+            ),
         ];
     }
 }

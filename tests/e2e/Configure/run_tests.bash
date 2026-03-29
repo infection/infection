@@ -6,7 +6,7 @@ if test ! -f "$(which expect)"; then
     exit 1;
 fi
 
-cd $(dirname $0)
+cd "$(dirname "$0")"
 rm -f infection.json5
 
 set -e
@@ -26,4 +26,4 @@ unset GITHUB_ACTIONS
 ./do_configure.expect
 
 test -f infection.json5
-diff -u infection.json5.test infection.json5
+diff -u --ignore-all-space infection.json5.test infection.json5

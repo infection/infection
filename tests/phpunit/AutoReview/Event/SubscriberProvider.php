@@ -64,7 +64,8 @@ final class SubscriberProvider
         self::$subscriberClasses = array_values(array_filter(
             iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
             static fn (string $class): bool => $class !== EventSubscriber::class
-                && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class),
+                && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
+                && !(new ReflectionClass($class))->isAbstract(),
         ));
 
         yield from self::$subscriberClasses;

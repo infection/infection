@@ -55,141 +55,141 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_unique(['foo', 'bar', 'bar']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_unique(['foo', 'bar', 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_unique(\Class_With_Const::Const);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_unique(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_unique' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_unique(['foo', 'bar', 'bar']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_unique(['foo', 'bar', 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo', 'bar', 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo', 'bar', 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_unique' => [
-            <<<'PHP'
-                <?php
-
-                function array_unique($array)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_unique($array)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'bar'];
-                if (array_unique($a) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'bar'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'bar'];
+                    if (array_unique($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'bar'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_unique is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_UnIqUe(['foo', 'bar', 'bar']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_UnIqUe(['foo', 'bar', 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_unique uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_unique($foo->bar());
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_unique($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_unique(['foo', 'bar', 'bar']));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo', 'bar', 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_unique(['foo', 'bar', 'bar']));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo', 'bar', 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $sortFlags parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_unique(['foo', 'bar', 'bar'], $sortFlags);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo', 'bar', 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_unique(['foo', 'bar', 'bar'], $sortFlags);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_unique';
 
-                $a = 'array_unique';
-
-                $b = $a(['foo', 'bar', 'bar']);
-                PHP,
+                    $b = $a(['foo', 'bar', 'bar']);
+                    PHP,
+            ),
         ];
     }
 }

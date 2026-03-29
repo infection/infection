@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 readonly INFECTION=../../../bin/infection
 
 rm -rf infection-file.txt
@@ -13,9 +15,9 @@ else
     php $INFECTION
 fi
 
-if [[ -v GOLDEN ]]; then
-   cp -v infection.log expected-output.txt
-   cp -v infection-file.txt expected-file.txt
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+    cp -v infection-file.txt expected-file.txt
 fi
 
 diff -u expected-output.txt infection.log

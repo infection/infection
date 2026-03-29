@@ -51,7 +51,7 @@ class Logs
         private readonly ?string $perMutatorFilePath,
         private bool $useGitHubAnnotationsLogger,
         private readonly ?StrykerConfig $strykerConfig,
-        private readonly ?string $summaryJsonLogFilePath,
+        private ?string $summaryJsonLogFilePath,
     ) {
     }
 
@@ -139,5 +139,10 @@ class Logs
     public function getSummaryJsonLogFilePath(): ?string
     {
         return $this->summaryJsonLogFilePath;
+    }
+
+    public function setSummaryJsonLogFilePath(string $summaryJsonLogFilePath): void
+    {
+        $this->summaryJsonLogFilePath = $summaryJsonLogFilePath;
     }
 }

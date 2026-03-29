@@ -55,141 +55,141 @@ final class UnwrapArrayUdiffUassocTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_udiff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_udiff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_udiff_uassoc' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if (array_udiff_uassoc($a, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if (array_udiff_uassoc($a, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_udiff_uassoc is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_UdIfF_UaSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_UdIfF_UaSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_udiff_uassoc uses functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_udiff_uassoc($foo->bar(), $foo->baz(), $valueCompareFunc, $keyCompareFunc);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_udiff_uassoc($foo->bar(), $foo->baz(), $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo' => 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo' => 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_udiff_uassoc' => [
-            <<<'PHP'
-                <?php
-
-                function array_udiff_uassoc($array, $array1, $array2)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_udiff_uassoc($array, $array1, $array2)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_udiff_uassoc';
 
-                $a = 'array_udiff_uassoc';
-
-                $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP,
+                    $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
+                    PHP,
+            ),
         ];
     }
 }

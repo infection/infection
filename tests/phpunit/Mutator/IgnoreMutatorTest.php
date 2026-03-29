@@ -166,7 +166,7 @@ final class IgnoreMutatorTest extends TestCase
     {
         $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
 
-        $mutatedNodeMock = $this->createMock(Node::class);
+        $mutatedNodeMock = $this->createStub(Node::class);
 
         $this->mutatorMock
             ->expects($this->once())

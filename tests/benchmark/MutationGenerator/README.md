@@ -26,6 +26,11 @@ make tests/benchmark/MutationGenerator/sources
 
 # tar your changes
 tar --cd=tests/benchmark/MutationGenerator -czf tests/benchmark/MutationGenerator/sources.tar.gz sources
+
+# On macOS, remove extended attributes to prevent tar warnings in CI:
+cd tests/benchmark/MutationGenerator
+xattr -cr sources/
+COPYFILE_DISABLE=1 tar -czf sources.tar.gz sources/
 ```
 
 

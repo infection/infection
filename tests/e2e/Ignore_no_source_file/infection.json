@@ -1,0 +1,16 @@
+{
+    "$schema": "./../../../resources/schema.json",
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "var/infection.log"
+    },
+    "mutators": {
+        "PublicVisibility": true
+    },
+    "tmpDir": "var/infection"
+}

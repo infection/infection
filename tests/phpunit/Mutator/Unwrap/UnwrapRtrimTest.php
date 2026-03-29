@@ -55,132 +55,132 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-                <?php
-
-                $a = rtrim(' Good Afternoon! ');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ' Good Afternoon! ';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = rtrim(' Good Afternoon! ');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ' Good Afternoon! ';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = rtrim(\Class_With_Const::Const);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = rtrim(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of trim' => [
-            <<<'PHP'
-                <?php
-
-                $a = \rtrim(' Good Afternoon! ');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ' Good Afternoon! ';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \rtrim(' Good Afternoon! ');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ' Good Afternoon! ';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ' Good Afternoon! ';
-                if (rtrim($a) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ' Good Afternoon! ';
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ' Good Afternoon! ';
+                    if (rtrim($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ' Good Afternoon! ';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when trim is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = RtRiM(' Good Afternoon! ');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ' Good Afternoon! ';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = RtRiM(' Good Afternoon! ');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ' Good Afternoon! ';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when trim uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = rtrim($foo->bar());
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = rtrim($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = rtrim(array_reduce($words, function (string $carry, string $item) {
-                    return $carry . substr($item, 0, 1);
-                }));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_reduce($words, function (string $carry, string $item) {
-                    return $carry . substr($item, 0, 1);
-                });
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = rtrim(array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    }));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    });
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other *trim calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = ltrim(' Good Afternoon! ');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ltrim(' Good Afternoon! ');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named trim' => [
-            <<<'PHP'
-                <?php
-
-                function rtrim($string)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function rtrim($string)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'rtrim';
 
-                $a = 'rtrim';
-
-                $b = $a(' FooBar ');
-                PHP,
+                    $b = $a(' FooBar ');
+                    PHP,
+            ),
         ];
     }
 }

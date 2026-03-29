@@ -57,105 +57,105 @@ final class FalseValueTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates false to true' => [
-            <<<'PHP'
-                <?php
-
-                return false;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return false;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return true;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate the string false to true' => [
-            <<<'PHP'
-                <?php
-
-                return 'false';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return 'false';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate switch(false) to true' => [
-            <<<'PHP'
-                <?php
-
-                switch (false) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch (false) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate match(false) to true to prevent overlap with MatchArmRemoval' => [
-            <<<'PHP'
-                <?php
-
-                match(false) {
-                    $count > 0 && $count <= 10 => 'small',
-                    $count <= 50 => 'medium',
-                    $count > 50 => 'huge',
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match(false) {
+                        $count > 0 && $count <= 10 => 'small',
+                        $count <= 50 => 'medium',
+                        $count > 50 => 'huge',
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in ternary condition to prevent overlap with TernaryMutator' => [
-            <<<'PHP'
-                <?php
-
-                $x == false ? 'yes' : 'no';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $x == false ? 'yes' : 'no';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with equal' => [
-            <<<'PHP'
-                <?php
-
-                if ($x == false) {
-                } else {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x == false) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-equal' => [
-            <<<'PHP'
-                <?php
-
-                if ($x != false) {
-                } else {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x != false) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with identical' => [
-            <<<'PHP'
-                <?php
-
-                if ($x === false) {
-                } else {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x === false) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-identical' => [
-            <<<'PHP'
-                <?php
-
-                if ($x !== false) {
-                } else {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x !== false) {
+                    } else {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates all caps false to true' => [
-            <<<'PHP'
-                <?php
-
-                return FALSE;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return FALSE;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return true;
+                    PHP,
+            ),
         ];
     }
 

@@ -55,79 +55,79 @@ final class Throw_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes the throw expression' => [
-            <<<'PHP'
-                <?php
-
-                throw new \Exception();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                new \Exception();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    throw new \Exception();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    new \Exception();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates throw in match non-default arm' => [
-            <<<'PHP'
-                <?php
-
-                match ($x) {
-                    0 => throw new \Exception(),
-                    default => '',
-                };
-                PHP,
-            <<<'PHP'
-                <?php
-
-                match ($x) {
-                    0 => new \Exception(),
-                    default => '',
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match ($x) {
+                        0 => throw new \Exception(),
+                        default => '',
+                    };
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match ($x) {
+                        0 => new \Exception(),
+                        default => '',
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate throw in match default arm to prevent overlap with MatchArmRemoval' => [
-            <<<'PHP'
-                <?php
-
-                match ($x) {
-                    default => throw new \Exception(),
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    match ($x) {
+                        default => throw new \Exception(),
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It mutates throw in switch non-default case' => [
-            <<<'PHP'
-                <?php
-
-                switch ($x) {
-                    case true:
-                        throw new \Exception();
-                    default:
-                        $s = '';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                switch ($x) {
-                    case true:
-                        new \Exception();
-                    default:
-                        $s = '';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch ($x) {
+                        case true:
+                            throw new \Exception();
+                        default:
+                            $s = '';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch ($x) {
+                        case true:
+                            new \Exception();
+                        default:
+                            $s = '';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate throw in switch default-arm to prevent overlap with SharedCaseRemoval' => [
-            <<<'PHP'
-                <?php
-
-                switch ($x) {
-                    case true: $s = ''; break;
-                    default: throw new \Exception();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch ($x) {
+                        case true: $s = ''; break;
+                        default: throw new \Exception();
+                    }
+                    PHP,
+            ),
         ];
     }
 }

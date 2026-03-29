@@ -35,15 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * @internal
  */
 final class CachedSourceCollector implements SourceCollector
 {
-    private ?bool $filtered = null;
-
     /**
      * @var SplFileInfo[]
      */
@@ -52,15 +50,6 @@ final class CachedSourceCollector implements SourceCollector
     public function __construct(
         private readonly SourceCollector $decoratedCollector,
     ) {
-    }
-
-    public function isFiltered(): bool
-    {
-        if ($this->filtered === null) {
-            $this->filtered = $this->decoratedCollector->isFiltered();
-        }
-
-        return $this->filtered;
     }
 
     public function collect(): array

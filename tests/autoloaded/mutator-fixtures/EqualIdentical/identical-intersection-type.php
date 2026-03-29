@@ -15,5 +15,10 @@ function doFoo(): A&B
 {
     return new C();
 }
-doFoo() === doFoo();
-doFoo() == doFoo();
+
+class Demo {
+    function compareFoos() {
+        doFoo() === doFoo();
+        doFoo() == doFoo();
+    }
+}

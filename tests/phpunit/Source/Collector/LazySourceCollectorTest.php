@@ -39,12 +39,12 @@ use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 #[CoversClass(LazySourceCollector::class)]
 final class LazySourceCollectorTest extends TestCase
@@ -60,7 +60,7 @@ final class LazySourceCollectorTest extends TestCase
         $this->expectExceptionObject($exception);
 
         // Only now it consumes the factory.
-        $collector->isFiltered();
+        $collector->collect();
     }
 
     public function test_it_exposes_its_decorated_collector(): void
@@ -80,32 +80,17 @@ final class LazySourceCollectorTest extends TestCase
     #[DataProvider('decoratedCollectorProvider')]
     public function test_it_decorates_the_given_collector(
         SourceCollector $decoratedCollector,
-        bool $expectedIsFiltered,
         array $expectedFiles,
     ): void {
         $collector = new LazySourceCollector($decoratedCollector);
 
-        $this->assertSame($expectedIsFiltered, $collector->isFiltered());
         $this->assertSame($expectedFiles, $collector->collect());
     }
 
     public static function decoratedCollectorProvider(): iterable
     {
         yield [
-            new FixedSourceCollector(
-                false,
-                [],
-            ),
-            false,
-            [],
-        ];
-
-        yield [
-            new FixedSourceCollector(
-                true,
-                [],
-            ),
-            true,
+            new FixedSourceCollector([]),
             [],
         ];
 
@@ -115,13 +100,11 @@ final class LazySourceCollectorTest extends TestCase
 
             return [
                 new FixedSourceCollector(
-                    true,
                     [
                         'key1' => $file1,
                         'key2' => $file2,
                     ],
                 ),
-                true,
                 [
                     'key1' => $file1,
                     'key2' => $file2,

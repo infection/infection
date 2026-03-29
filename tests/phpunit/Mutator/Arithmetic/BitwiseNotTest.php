@@ -55,16 +55,16 @@ final class BitwiseNotTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield [
-            <<<'PHP'
-                <?php
-
-                ~2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ~2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    2;
+                    PHP,
+            ),
         ];
     }
 }

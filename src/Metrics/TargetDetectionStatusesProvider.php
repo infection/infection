@@ -38,8 +38,8 @@ namespace Infection\Metrics;
 use Generator;
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
-use Infection\Logger\TextFileLogger;
 use Infection\Mutant\DetectionStatus;
+use Infection\Reporter\TextFileReporter;
 use function iterator_to_array;
 
 /**
@@ -53,13 +53,14 @@ class TargetDetectionStatusesProvider
         private readonly string $logVerbosity,
         private readonly bool $onlyCoveredMode,
         private readonly ?int $numberOfShownMutations,
+        private readonly bool $withTimeouts = false,
     ) {
     }
 
     /**
      * Implementation follows the logic in LoggerFactory, TextFileLogger, etc.
      *
-     * @see TextFileLogger
+     * @see TextFileReporter
      *
      * @return array<key-of<DetectionStatus>, DetectionStatus>
      */
@@ -80,6 +81,10 @@ class TargetDetectionStatusesProvider
     {
         if ($this->numberOfShownMutations !== 0) {
             yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
+
+            if ($this->withTimeouts) {
+                yield DetectionStatus::TIMED_OUT->name => DetectionStatus::TIMED_OUT;
+            }
         }
 
         if (!$this->onlyCoveredMode) {

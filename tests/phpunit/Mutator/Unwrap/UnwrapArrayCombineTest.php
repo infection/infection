@@ -55,180 +55,180 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_combine(['A', B, 'C'], ['foo', 'bar', 'baz']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_combine(['A', B, 'C'], ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', B, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo', 'bar', 'baz'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', B, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo', 'bar', 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_combine(\Class_With_Const::Const, ['foo', 'bar', 'baz']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_combine(\Class_With_Const::Const, ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = \Class_With_Const::Const;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo', 'bar', 'baz'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = \Class_With_Const::Const;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo', 'bar', 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_combine' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_combine(['A', B, 'C'], ['foo', 'bar', 'baz']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_combine(['A', B, 'C'], ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', B, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo', 'bar', 'baz'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', B, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo', 'bar', 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 'B', 'C'];
-                if (array_combine($a, ['foo', 'bar', 'baz']) === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 'B', 'C'];
+                    if (array_combine($a, ['foo', 'bar', 'baz']) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 'B', 'C'];
-                    if ($a === $a) {
-                        return true;
-                    }
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 'B', 'C'];
-                    if (['foo', 'bar', 'baz'] === $a) {
-                        return true;
-                    }
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 'B', 'C'];
+                        if ($a === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 'B', 'C'];
+                        if (['foo', 'bar', 'baz'] === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_combine is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_CoMbInE(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_CoMbInE(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 'B', 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['foo', 'bar', 'baz'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 'B', 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['foo', 'bar', 'baz'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_combine uses functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_combine($foo->bar(), $foo->baz());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_combine($foo->bar(), $foo->baz());
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->bar();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->baz();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->bar();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_combine(['A', 'B', 'C'], ['foo', 'bar', 'baz']));
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_combine(['A', 'B', 'C'], ['foo', 'bar', 'baz']));
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['A', 'B', 'C']);
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['foo', 'bar', 'baz']);
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['A', 'B', 'C']);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_combine' => [
-            <<<'PHP'
-                <?php
-
-                function array_combine($array, $array1, $array2)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_combine($array, $array1, $array2)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_combine';
 
-                $a = 'array_combine';
-
-                $b = $a(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
-                PHP,
+                    $b = $a(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
         ];
     }
 }

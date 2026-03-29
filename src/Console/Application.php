@@ -39,10 +39,18 @@ use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Debug\DumpAstCommand;
+use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
+use Infection\Command\Git\GitBaseReferenceCommand;
+use Infection\Command\Git\GitChangedFilesCommand;
+use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\InitialTest\InitialTestRunCommand;
+use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
-use Infection\Container;
+use Infection\Container\Container;
 use OutOfBoundsException;
 use function preg_quote;
 use function Safe\preg_match;
@@ -100,13 +108,23 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
+        $fileSystem = Container::create()->getFileSystem();
+
         return array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
+                new MockTeamCityCommand($fileSystem),
+                new DumpAstCommand($fileSystem),
+                new GitBaseReferenceCommand(),
+                new GitChangedFilesCommand(),
+                new GitChangedLinesCommand(),
+                new GitDefaultBaseCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
+                new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
+                new InitialTestRunCommand(),
             ],
         );
     }

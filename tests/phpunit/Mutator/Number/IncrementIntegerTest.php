@@ -57,272 +57,269 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It increments an integer' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === 10) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($foo === 11) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 10) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 11) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment assigment of 0' => [
-            <<<'PHP'
-                <?php
-
-                $foo = 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in greater comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo > 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo > 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in greater or equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo >= 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo >= 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in smaller comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo < 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo < 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in smaller or equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo <= 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo <= 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo == 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo == 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in not equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo != 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo != 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in identical comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment 0 in not identical comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo !== 0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo !== 0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It increments one' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === 1) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($foo === 2) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 1) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 2) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment floats' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === 1.0) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === 1.0) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It increments a negative integer' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo === -10) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if ($foo === -9) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === -10) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($foo === -9) {
+                        echo 'bar';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment limit argument of preg_split function when it equals to -1' => [
-            <<<'PHP'
-                <?php
-                preg_split('//', 'string', -1);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', -1);
+                    PHP,
+            ),
         ];
 
         yield 'It does increment limit argument of preg_split function when it equals to 0' => [
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', 0);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', 1);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', 1);
+                    PHP,
+            ),
         ];
 
         yield 'It does increment limit argument of preg_split function when it equals to -2' => [
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', -2);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_split('//', 'string', -1);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', -2);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_split('//', 'string', -1);
+                    PHP,
+            ),
         ];
 
         $maxInt = PHP_INT_MAX;
 
         yield 'It does not increment max int' => [
-            <<<"PHP"
-                <?php
-
-                random_int(10000000, {$maxInt});
-                PHP,
-            <<<"PHP"
-                <?php
-
-                random_int(10000001, {$maxInt});
-                PHP,
+            self::wrapCodeInMethod(
+                <<<PHP
+                    random_int(10000000, {$maxInt});
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<PHP
+                    random_int(10000001, {$maxInt});
+                    PHP,
+            ),
         ];
 
         $minIntPlus1 = PHP_INT_MIN + 1;
         $minIntPlus2 = $minIntPlus1 + 1;
 
         yield 'It increments min int plus one, up to value of -PHP_INT_MAX' => [
-            <<<"PHP"
-                <?php
-
-                if (\$foo === {$minIntPlus1}) {
-                    echo 'bar';
-                }
-                PHP,
-            <<<"PHP"
-                <?php
-
-                if (\$foo === {$minIntPlus2}) {
-                    echo 'bar';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<PHP
+                    if (\$foo === {$minIntPlus1}) { echo 'bar'; }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<PHP
+                    if (\$foo === {$minIntPlus2}) { echo 'bar'; }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment preg_match() return value above 1 on identical comparison' => [
-            <<<"PHP"
-                <?php
-
-                if (preg_match() === 1) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_match() === 1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment preg_match() return value above 1 on equal comparison' => [
-            <<<"PHP"
-                <?php
-
-                if (preg_match() == 1) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_match() == 1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment preg_match() return value above 1 on not-equal comparison' => [
-            <<<"PHP"
-                <?php
-
-                if (preg_mAtch() != 1) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_mAtch() != 1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It increments return value above 1 on not-equal comparison for userland function' => [
-            <<<'PHP'
-                <?php
-
-                if (doFoo() != 1) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (doFoo() != 2) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (doFoo() != 1) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (doFoo() != 2) {}
+                    PHP,
+            ),
         ];
 
         yield 'It increments return value above 1 on not-equal comparison for dynamic function call' => [
-            <<<'PHP'
-                <?php
-
-                $fn = 'doFoo';
-                if ($fn() != 1) {}
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $fn = 'doFoo';
-                if ($fn() != 2) {}
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $fn = 'doFoo';
+                    if ($fn() != 1) {}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $fn = 'doFoo';
+                    if ($fn() != 2) {}
+                    PHP,
+            ),
         ];
     }
 }

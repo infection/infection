@@ -55,105 +55,105 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
     public static function provideMutationCases(): iterable
     {
         yield 'It mutates correctly removing dollar when provided with a string and flags' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('~some-regexp$~ig', 'irrelevant');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_match('~some-regexp~ig', 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp$~ig', 'irrelevant');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp~ig', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly removing dollar when preg_match function is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                pReG_MaTcH('~some-regexp~ig', 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    pReG_MaTcH('~some-regexp~ig', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly removing dollar when provided with a string and without flags' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('~some-regexp$~', 'irrelevant');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_match('~some-regexp~', 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp$~', 'irrelevant');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp~', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly removing dollar when delimiter is not standard' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('^some-regexp$^i', 'irrelevant');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                preg_match('^some-regexp^i', 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('^some-regexp$^i', 'irrelevant');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('^some-regexp^i', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression with an encapsed variable' => [
-            <<<'PHP'
-                <?php
-
-                preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression when no "$" is present' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('~some-regexp~ig', 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp~ig', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression when "$" is used as an exact character' => [
-            <<<'PHP'
-                <?php
-
-                preg_match('~some-reg\$exp~ig', 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-reg\$exp~ig', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression when provided with an unpacked array' => [
-            <<<'PHP'
-                <?php
-
-                preg_match(...foo());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match(...foo());
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression when provided with a variable' => [
-            <<<'PHP'
-                <?php
-
-                preg_match($regex, 'irrelevant');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match($regex, 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $f = 'preg_match';
 
-                $f = 'preg_match';
-
-                $f('~some-regexp$~ig', 'irrelevant');
-                PHP,
+                    $f('~some-regexp$~ig', 'irrelevant');
+                    PHP,
+            ),
         ];
     }
 }

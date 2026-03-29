@@ -55,127 +55,127 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an string' => [
-            <<<'PHP'
-                <?php
-
-                $a = strtoupper('infection');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'infection';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtoupper('infection');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'infection';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = strtoupper(\Class_With_Const::Const);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtoupper(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of strtoupper' => [
-            <<<'PHP'
-                <?php
-
-                $a = \strtoupper('infection');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'infection';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \strtoupper('infection');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'infection';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other strto calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = strtolower('INFECTION');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower('INFECTION');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named strtoupper' => [
-            <<<'PHP'
-                <?php
-
-                function strtoupper($text)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function strtoupper($text)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = 'infection';
-                if (strtoupper($a) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'infection';
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'infection';
+                    if (strtoupper($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'infection';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when strtoupper is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = StrToUpper('infection');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = 'infection';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = StrToUpper('infection');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'infection';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when strtoupper uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = strtoupper($foo->bar());
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtoupper($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtoupper', strtoupper('infection'));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtoupper', 'infection');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtoupper', strtoupper('infection'));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtoupper', 'infection');
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
-
-                 $a = 'strtoupper';
-                 $b = $a('infection');
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                     $a = 'strtoupper';
+                     $b = $a('infection');
+                    PHP,
+            ),
         ];
     }
 }

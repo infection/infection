@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing\Trace;
 
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * @internal
@@ -54,11 +54,6 @@ final readonly class EmptyTrace implements Trace
     public function getRealPath(): string
     {
         return $this->sourceFileInfo->getRealPath();
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFileInfo->getRelativePathname();
     }
 
     public function hasTests(): bool

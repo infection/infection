@@ -37,24 +37,28 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function implode;
-use Infection\Configuration\Configuration;
+use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\DebugOption;
+use Infection\Command\Option\MapSourceClassToTestOption;
+use Infection\Command\Option\SourceFilterOptions;
+use Infection\Command\Option\TestFrameworkOption;
+use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Engine;
-use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Git\Git;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
@@ -65,10 +69,7 @@ use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -77,8 +78,6 @@ final class RunCommand extends BaseCommand
 {
     /** @var string */
     public const OPTION_THREADS = 'threads';
-
-    public const OPTION_MAP_SOURCE_CLASS_TO_TEST = 'map-source-class-to-test';
 
     /** @var string */
     public const OPTION_LOGGER_GITHUB = 'logger-github';
@@ -95,13 +94,15 @@ final class RunCommand extends BaseCommand
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
+    public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+
     /** @var string */
-    private const OPTION_TEST_FRAMEWORK = 'test-framework';
+    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+
+    /** @var string */
+    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
     private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
-
-    /** @var string */
-    private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
 
     /** @var string */
     private const OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
@@ -116,28 +117,13 @@ final class RunCommand extends BaseCommand
     private const OPTION_FORCE_PROGRESS = 'force-progress';
 
     /** @var string */
-    private const OPTION_CONFIGURATION = 'configuration';
-
-    /** @var string */
     private const OPTION_COVERAGE = 'coverage';
 
     /** @var string */
     private const OPTION_MUTATORS = 'mutators';
 
     /** @var string */
-    private const OPTION_FILTER = 'filter';
-
-    /** @var string */
     private const OPTION_FORMATTER = 'formatter';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_FILTER = 'git-diff-filter';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_LINES = 'git-diff-lines';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
 
     /** @var string */
     private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
@@ -162,34 +148,22 @@ final class RunCommand extends BaseCommand
     private const OPTION_LOG_VERBOSITY = 'log-verbosity';
 
     /** @var string */
-    private const OPTION_INITIAL_TESTS_PHP_OPTIONS = 'initial-tests-php-options';
-
-    /** @var string */
     private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
-
-    /** @var string */
-    private const OPTION_DEBUG = 'debug';
 
     /** @var string */
     private const OPTION_DRY_RUN = 'dry-run';
 
     private const OPTION_MUTANT_ID = 'id';
 
+    private const OPTION_TEAMCITY = 'teamcity';
+
     protected function configure(): void
     {
         $this
             ->setName('run')
-            ->setDescription('Runs the mutation testing.')
-            ->addOption(
-                self::OPTION_TEST_FRAMEWORK,
-                null,
-                InputOption::VALUE_REQUIRED,
-                sprintf(
-                    'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::getTypes()),
-                ),
-                Container::DEFAULT_TEST_FRAMEWORK,
-            )
+            ->setDescription('Runs the mutation testing.');
+
+        TestFrameworkOption::addOption($this)
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL,
                 null,
@@ -199,14 +173,9 @@ final class RunCommand extends BaseCommand
                     implode('", "', StaticAnalysisToolTypes::getTypes()),
                 ),
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
-            )
-            ->addOption(
-                self::OPTION_TEST_FRAMEWORK_OPTIONS,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Options to be passed to the test framework',
-                Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            )
+            );
+
+        TestFrameworkOptionsOption::addOption($this)
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS,
                 null,
@@ -245,14 +214,9 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Output progress bars and mutation count during progress even if a CI is detected',
-            )
-            ->addOption(
-                self::OPTION_CONFIGURATION,
-                'c',
-                InputOption::VALUE_REQUIRED,
-                'Path to the configuration file to use',
-                Container::DEFAULT_CONFIG_FILE,
-            )
+            );
+
+        ConfigurationOption::addOption($this)
             ->addOption(
                 self::OPTION_COVERAGE,
                 null,
@@ -266,47 +230,18 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf('Specify particular mutators, e.g. <comment>"--%s=Plus,PublicVisibility"</comment>', self::OPTION_MUTATORS),
                 Container::DEFAULT_MUTATORS_INPUT,
-            )
-            ->addOption(
-                self::OPTION_FILTER,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Filter which files to mutate. For example "src/Service/Mailer.php,src/Entity/Foobar.php".',
-                Container::DEFAULT_FILTER,
-            )
+            );
+
+        SourceFilterOptions::addOption($this)
             ->addOption(
                 self::OPTION_FORMATTER,
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the formatter to use (%s)',
-                    FormatterName::quotedCommaSeparatedList(),
+                    MutationAnalysisLoggerName::quotedCommaSeparatedList(),
                 ),
                 Container::DEFAULT_FORMATTER_NAME->value,
-            )
-            ->addOption(
-                self::OPTION_GIT_DIFF_FILTER,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Filter files to mutate by git <comment>"--diff-filter"</comment> option. <comment>A</comment> - only for added files, <comment>AM</comment> - for added and modified.',
-                Container::DEFAULT_GIT_DIFF_FILTER,
-            )
-            ->addOption(
-                self::OPTION_GIT_DIFF_LINES,
-                null,
-                InputOption::VALUE_NONE,
-                sprintf(
-                    'Mutates only added and modified <comment>lines</comment> in files (applies the git diff filter "%s").',
-                    Git::DEFAULT_GIT_DIFF_FILTER,
-                ),
-                Container::DEFAULT_GIT_DIFF_FILTER,
-            )
-            ->addOption(
-                self::OPTION_GIT_DIFF_BASE,
-                null,
-                InputOption::VALUE_REQUIRED,
-                sprintf('Base for <comment>"--%1$s"</comment> option. Can be the git branch short name, full name or a commit hash. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
-                Container::DEFAULT_GIT_DIFF_BASE,
             )
             ->addOption(
                 self::OPTION_LOGGER_GITHUB,
@@ -321,14 +256,9 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
                 Container::DEFAULT_MUTANT_ID,
-            )
-            ->addOption(
-                self::OPTION_MAP_SOURCE_CLASS_TO_TEST,
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Enables test files filtering during "Initial Tests Run" stage when `--filter`/`--git-diff-filter`/`--git-diff-lines` are used. With this option, only those test files are executed to provide coverage, that cover changed/added source files.',
-                false,
-            )
+            );
+
+        MapSourceClassToTestOption::addOption($this)
             ->addOption(
                 self::OPTION_LOGGER_GITLAB,
                 null,
@@ -352,6 +282,12 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Path to text report file.',
+            )
+            ->addOption(
+                self::OPTION_LOGGER_SUMMARY_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to summary JSON report file (statistics only, no mutation details).',
             )
             ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
@@ -380,22 +316,27 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_MIN_COVERED_MSI,
             )
             ->addOption(
+                self::OPTION_WITH_TIMEOUTS,
+                null,
+                InputOption::VALUE_NONE,
+                'Treat timed out mutants as escaped (affects MSI calculation)',
+            )
+            ->addOption(
+                self::OPTION_MAX_TIMEOUTS,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Maximum allowed timeouts. Build fails if exceeded',
+                Container::DEFAULT_MAX_TIMEOUTS,
+            )
+            ->addOption(
                 self::OPTION_LOG_VERBOSITY,
                 null,
                 InputOption::VALUE_REQUIRED,
                 '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 Container::DEFAULT_LOG_VERBOSITY,
-            )
-            ->addOption(
-                self::OPTION_INITIAL_TESTS_PHP_OPTIONS,
-                null,
-                InputOption::VALUE_REQUIRED,
-                sprintf(
-                    'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if <comment>"--%s"</comment> option presented',
-                    self::OPTION_COVERAGE,
-                ),
-                Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            )
+            );
+
+        InitialTestsPhpOptionsOption::addOption($this)
             ->addOption(
                 self::OPTION_SKIP_INITIAL_TESTS,
                 null,
@@ -408,30 +349,40 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_OPTIONAL,
                 'Ignore MSI violations with zero mutations',
                 self::OPTION_VALUE_NOT_PROVIDED,
-            )
-            ->addOption(
-                self::OPTION_DEBUG,
-                null,
-                InputOption::VALUE_NONE,
-                'Will not clean up utility files from Infection temporary folder. Adds command lines to the logs and prints Initial Tests output to stdout.',
-            )
+            );
+
+        DebugOption::addOption($this);
+
+        $this
             ->addOption(
                 self::OPTION_DRY_RUN,
                 null,
                 InputOption::VALUE_NONE,
                 'Runs mutation testing and does not run killer processes.',
             )
-        ;
+            ->addOption(
+                self::OPTION_TEAMCITY,
+                null,
+                InputOption::VALUE_NONE,
+                'Changes the progress output to Teamcity.',
+            );
     }
 
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
-        $container = $this->createContainer($io, $logger);
         $consoleOutput = new ConsoleOutput($logger);
 
+        // Currently, the configuration is mandatory, hence there is no way to
+        // say "do not use a config". If this becomes possible in the future,
+        // though, it will likely be a `--no-config` option rather than relying
+        // on this value to be set to an empty string.
+        $configFile = ConfigurationOption::get($io);
+
+        $container = $this->createContainer($configFile, $io, $logger);
+
         try {
-            $this->startUp($container, $consoleOutput, $logger, $io);
+            $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
             $config = $container->getConfiguration();
 
@@ -445,6 +396,7 @@ final class RunCommand extends BaseCommand
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
+                $container->getMaxTimeoutsChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
@@ -464,7 +416,7 @@ final class RunCommand extends BaseCommand
             }
 
             throw $noSourceFoundException;
-        } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
@@ -473,26 +425,16 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function createContainer(IO $io, LoggerInterface $logger): Container
-    {
+    /**
+     * @param non-empty-string|null $configFile
+     */
+    private function createContainer(
+        ?string $configFile,
+        IO $io,
+        LoggerInterface $logger,
+    ): Container {
         $input = $io->getInput();
-
-        // Currently the configuration is mandatory hence there is no way to
-        // say "do not use a config". If this becomes possible in the future
-        // though, it will likely be a `--no-config` option rather than relying
-        // on this value to be set to an empty string.
-        $configFile = trim((string) $input->getOption(self::OPTION_CONFIGURATION));
-
-        $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
-        $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
-        $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
-        $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
-        $staticAnalysisToolOptions = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS));
-        $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
-        $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
-        $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
-        $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
-        $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
+        $commandHelper = new RunCommandHelper($input);
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -513,60 +455,51 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $sourceFilter = self::getSourceFilter($input);
-
-        $commandHelper = new RunCommandHelper($input);
-
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
-            configFile: $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
-            mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
+            configFile: $configFile,
+            mutatorsInput: $commandHelper->getStringOption(self::OPTION_MUTATORS, Container::DEFAULT_MUTATORS_INPUT),
             numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
-            logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
-            // To keep in sync with Container::DEFAULT_DEBUG
-            debug: (bool) $input->getOption(self::OPTION_DEBUG),
+            logVerbosity: $commandHelper->getStringOption(self::OPTION_LOG_VERBOSITY, Container::DEFAULT_LOG_VERBOSITY),
+            debug: DebugOption::get($io),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            formatterName: self::getFormatterName($input),
+            loggerName: self::getMutationAnalysisLoggerName(
+                $commandHelper,
+                (bool) $input->getOption(self::OPTION_TEAMCITY),
+            ),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             noProgress: $noProgress,
             forceProgress: $forceProgress,
-            existingCoveragePath: $coverage === ''
-                ? Container::DEFAULT_EXISTING_COVERAGE_PATH
-                : $coverage,
-            initialTestsPhpOptions: $initialTestsPhpOptions === ''
-                ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
-                : $initialTestsPhpOptions,
+            existingCoveragePath: $commandHelper->getStringOption(self::OPTION_COVERAGE, Container::DEFAULT_EXISTING_COVERAGE_PATH),
+            initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
             ignoreMsiWithNoMutations: $commandHelper->getIgnoreMsiWithNoMutations(),
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
+            timeoutsAsEscaped: $commandHelper->getTimeoutsAsEscaped(),
+            maxTimeouts: $commandHelper->getMaxTimeouts(),
             msiPrecision: $msiPrecision,
-            testFramework: $testFramework === ''
-                ? Container::DEFAULT_TEST_FRAMEWORK
-                : $testFramework,
-            testFrameworkExtraOptions: $testFrameworkExtraOptions === ''
-                ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
-                : $testFrameworkExtraOptions,
-            staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
-                ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
-                : $staticAnalysisToolOptions,
-            sourceFilter: $sourceFilter,
+            testFramework: TestFrameworkOption::get($io),
+            testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
+            staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
+            sourceFilter: SourceFilterOptions::get($io),
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),
-            gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
-            htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
-            textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            gitlabLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_GITLAB, Container::DEFAULT_GITLAB_LOGGER_PATH),
+            htmlLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_HTML, Container::DEFAULT_HTML_LOGGER_PATH),
+            textLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_TEXT, Container::DEFAULT_TEXT_LOGGER_PATH),
+            summaryJsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_SUMMARY_JSON, Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
-            mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
-            loggerProjectRootDirectory: $loggerProjectRootDirectory,
-            staticAnalysisTool: $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
+            mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
+            loggerProjectRootDirectory: $commandHelper->getStringOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY),
+            staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
     }
@@ -574,10 +507,11 @@ final class RunCommand extends BaseCommand
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
         $installationDecider = $container->getAdapterInstallationDecider();
+
         $configuration = $container->getConfiguration();
         $configTestFramework = $configuration->testFramework;
 
-        $adapterName = trim((string) $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)) ?: $configTestFramework;
+        $adapterName = TestFrameworkOption::get($io) ?? $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
@@ -592,16 +526,20 @@ final class RunCommand extends BaseCommand
         $container->getAdapterInstaller()->install($adapterName);
     }
 
+    /**
+     * @param non-empty-string|null $configFile
+     */
     private function startUp(
         Container $container,
+        ?string $configFile,
         ConsoleOutput $consoleOutput,
         LoggerInterface $logger,
         IO $io,
     ): void {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if (($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) !== '') {
-            $locator->locate($customConfigPath);
+        if ($configFile !== null) {
+            $locator->locate($configFile);
         } else {
             $this->runConfigurationCommand($locator, $io);
         }
@@ -639,7 +577,7 @@ final class RunCommand extends BaseCommand
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
 
-        $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
+        $container->getSubscriberRegisterer()->registerSubscribers();
 
         $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
@@ -652,7 +590,7 @@ final class RunCommand extends BaseCommand
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                sprintf('--%s', self::OPTION_TEST_FRAMEWORK) => $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK) ?: TestFrameworkTypes::PHPUNIT,
+                sprintf('--%s', TestFrameworkOption::NAME) => $io->getInput()->getOption(TestFrameworkOption::NAME) ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);
@@ -672,151 +610,17 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(InputInterface $input): FormatterName
-    {
-        $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
-
-        return FormatterName::from($value);
-    }
-
-    private static function getSourceFilter(InputInterface $input): PlainFilter|IncompleteGitDiffFilter|null
-    {
-        $filter = self::getPlainFilter($input);
-        $gitFilter = self::getGitFilter($input);
-
-        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter);
-
-        return $filter ?? $gitFilter;
-    }
-
-    private static function getPlainFilter(InputInterface $input): ?PlainFilter
-    {
-        $value = trim((string) $input->getOption(self::OPTION_FILTER));
-
-        return PlainFilter::tryToCreate($value);
-    }
-
-    private static function getGitFilter(InputInterface $input): ?IncompleteGitDiffFilter
-    {
-        $gitDiffFilter = self::getGitDiffFilter($input);
-
-        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
-        $gitDiffBase = self::getGitDiffBase($input);
-
-        self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
-
-        if ($isForGitDiffLines) {
-            $gitDiffFilter = Git::DEFAULT_GIT_DIFF_FILTER;
-        }
-
-        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
-
-        return $gitDiffFilter !== null
-            ? new IncompleteGitDiffFilter($gitDiffFilter, $gitDiffBase)
-            : null;
-    }
-
-    /**
-     * @return non-empty-string|null
-     */
-    private static function getGitDiffFilter(InputInterface $input): ?string
-    {
-        $value = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
-
-        if ($value === null) {
-            return null;
-        }
-
-        $trimmedValue = trim((string) $value);
-
-        Assert::stringNotEmpty(
-            $trimmedValue,
-            sprintf(
-                'Expected a non-blank value for the option "--%s".',
-                self::OPTION_GIT_DIFF_FILTER,
-            ),
-        );
-
-        return $trimmedValue;
-    }
-
-    /**
-     * @return non-empty-string|null
-     */
-    private static function getGitDiffBase(InputInterface $input): ?string
-    {
-        $value = $input->getOption(self::OPTION_GIT_DIFF_BASE);
-
-        if ($value === null) {
-            return null;
-        }
-
-        $trimmedValue = trim((string) $value);
-
-        Assert::stringNotEmpty(
-            $trimmedValue,
-            sprintf(
-                'Expected a non-blank value for the option "--%s".',
-                self::OPTION_GIT_DIFF_BASE,
-            ),
-        );
-
-        return $trimmedValue;
-    }
-
-    private static function assertOnlyOneTypeOfGitFiltering(
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-    ): void {
-        if ($isForGitDiffLines
-            && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
+    private static function getMutationAnalysisLoggerName(
+        RunCommandHelper $commandHelper,
+        bool $teamcity,
+    ): MutationAnalysisLoggerName {
+        return $teamcity
+            ? MutationAnalysisLoggerName::TEAMCITY
+            : MutationAnalysisLoggerName::from(
+                $commandHelper->getStringOption(
+                    self::OPTION_FORMATTER,
+                    Container::DEFAULT_FORMATTER_NAME->value,
                 ),
             );
-        }
-    }
-
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string|null $gitDiffBase
-     */
-    private static function assertGitBaseHasRequiredFilter(
-        ?string $gitDiffFilter,
-        ?string $gitDiffBase,
-    ): void {
-        if ($gitDiffBase !== null
-            && $gitDiffFilter === null
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
-                    self::OPTION_GIT_DIFF_BASE,
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
-    }
-
-    private static function assertOnlyOneTypeOfFiltering(
-        ?PlainFilter $plainFilter,
-        ?IncompleteGitDiffFilter $gitFilter,
-    ): void {
-        if ($plainFilter !== null && $gitFilter !== null) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
-                    self::OPTION_FILTER,
-                    self::OPTION_GIT_DIFF_FILTER,
-                    self::OPTION_FILTER,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
     }
 }

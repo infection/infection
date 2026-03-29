@@ -55,73 +55,73 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates float one to zero' => [
-            <<<'PHP'
-                <?php
-
-                10 + 1.0;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                10 + 0.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 1.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 0.0;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates float zero to one' => [
-            <<<'PHP'
-                <?php
-
-                10 + 0.0;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                10 + 1.0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 0.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 1.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate int zero to one' => [
-            <<<'PHP'
-                <?php
-
-                10 + 0;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate int one to zer0' => [
-            <<<'PHP'
-                <?php
-
-                10 + 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate the string 0.0' => [
-            <<<'PHP'
-                <?php
-
-                'a' . '0.0';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    'a' . '0.0';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other floats' => [
-            <<<'PHP'
-                <?php
-
-                10 + 2.0;
-                10 + 1.1;
-                10 + 0.5;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    10 + 2.0;
+                    10 + 1.1;
+                    10 + 0.5;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate in a comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($a < 0.0) {
-                    echo "small";
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($a < 0.0) {
+                        echo "small";
+                    }
+                    PHP,
+            ),
         ];
     }
 }

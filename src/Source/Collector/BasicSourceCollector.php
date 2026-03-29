@@ -40,6 +40,7 @@ use function count;
 use function dirname;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\Source\Exception\NoSourceFound;
 use Iterator;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Path;
@@ -52,8 +53,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 final readonly class BasicSourceCollector implements SourceCollector
 {
-    private bool $filtered;
-
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
@@ -63,27 +62,17 @@ final readonly class BasicSourceCollector implements SourceCollector
         private array $excludedFilesOrDirectories,
         private ?PlainFilter $filter,
     ) {
-        $this->filtered = $this->filter !== null;
-    }
-
-    public function isFiltered(): bool
-    {
-        return $this->filtered;
     }
 
     public function collect(): array
     {
-        if ($this->sourceDirectories === []) {
-            return [];
+        $files = $this->doCollect();
+
+        if (count($files) === 0) {
+            throw NoSourceFound::noSourceFileFound($this->filter);
         }
 
-        $iterator = $this->filter(
-            $this
-                ->createFinder()
-                ->getIterator(),
-        );
-
-        return take($iterator)->toList();
+        return $files;
     }
 
     /**
@@ -108,6 +97,24 @@ final readonly class BasicSourceCollector implements SourceCollector
             $excludedFilesOrDirectories,
             $filter,
         );
+    }
+
+    /**
+     * @return SplFileInfo[]
+     */
+    private function doCollect(): array
+    {
+        if ($this->sourceDirectories === []) {
+            return [];
+        }
+
+        $iterator = $this->filter(
+            $this
+                ->createFinder()
+                ->getIterator(),
+        );
+
+        return take($iterator)->toList();
     }
 
     /**

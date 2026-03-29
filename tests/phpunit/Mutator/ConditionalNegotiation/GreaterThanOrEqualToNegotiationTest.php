@@ -55,23 +55,24 @@ final class GreaterThanOrEqualToNegotiationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates greater than or equal to' => [
-            <<<'PHP'
-                <?php
-
-                1 >= 1;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                1 < 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 >= 1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 < 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate inside ternary to prevent overlap with TernaryMutator' => [
-            <<<'PHP'
-                <?php
-                $x >= 6 ? 'yes' : 'no';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $x >= 6 ? 'yes' : 'no';
+                    PHP,
+            ),
         ];
     }
 }

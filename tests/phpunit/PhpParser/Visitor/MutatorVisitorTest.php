@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use Infection\Framework\Str;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\StringNormalizer;
 use LogicException;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -75,7 +75,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
         $output = SingletonContainer::getPrinter()->print($updatedNodes, $mutation);
 
-        $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
+        $this->assertSame($expectedCodeOutput, Str::rTrimLines($output));
     }
 
     public static function providesMutationCases(): iterable

@@ -63,6 +63,7 @@ class MetricsCalculator implements Collector
 
     public function __construct(
         private readonly int $roundingPrecision,
+        private readonly bool $timeoutsAsEscaped = false,
     ) {
         foreach (DetectionStatus::cases() as $status) {
             $this->countByStatus[$status->value] = 0;
@@ -218,7 +219,7 @@ class MetricsCalculator implements Collector
 
     private function getCalculator(): Calculator
     {
-        return $this->calculator ??= Calculator::fromMetrics($this);
+        return $this->calculator ??= Calculator::fromMetrics($this, $this->timeoutsAsEscaped);
     }
 
     private static function foldToZero(float $value): float

@@ -55,16 +55,16 @@ final class LessThanTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates less than' => [
-            <<<'PHP'
-                <?php
-
-                1 < 2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                1 <= 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 < 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 <= 2;
+                    PHP,
+            ),
         ];
     }
 }

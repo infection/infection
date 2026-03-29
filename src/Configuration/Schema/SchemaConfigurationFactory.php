@@ -70,6 +70,8 @@ class SchemaConfigurationFactory
             ignoreMsiWithNoMutations: $rawConfig->ignoreMsiWithNoMutations ?? null,
             minMsi: $rawConfig->minMsi ?? null,
             minCoveredMsi: $rawConfig->minCoveredMsi ?? null,
+            timeoutsAsEscaped: $rawConfig->timeoutsAsEscaped ?? null,
+            maxTimeouts: $rawConfig->maxTimeouts ?? null,
             mutators: (array) ($rawConfig->mutators ?? []),
             testFramework: self::getTestFramework($rawConfig),
             bootstrap: self::normalizeString($rawConfig->bootstrap ?? null),

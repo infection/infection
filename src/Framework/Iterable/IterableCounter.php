@@ -37,7 +37,6 @@ namespace Infection\Framework\Iterable;
 
 use function count;
 use Infection\CannotBeInstantiated;
-use Infection\Console\OutputFormatter\AbstractOutputFormatter;
 use function is_array;
 use function iterator_to_array;
 
@@ -48,14 +47,19 @@ final class IterableCounter
 {
     use CannotBeInstantiated;
 
+    // Follows the Symfony ProgressBar convention: 0 indicates an unknown number of steps.
+    public const UNKNOWN_COUNT = 0;
+
     /**
      * @param iterable<mixed> $subjects
+     *
+     * @return positive-int|self::UNKNOWN_COUNT
      */
     public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
     {
         if ($runConcurrently) {
             // This number is typically fed to ProgressFormatter/ProgressBar or variants.
-            return AbstractOutputFormatter::UNKNOWN_COUNT;
+            return self::UNKNOWN_COUNT;
         }
 
         if (is_array($subjects)) {

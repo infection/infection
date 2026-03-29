@@ -87,6 +87,8 @@ final class ConfigurationBuilder
         private ?float $minMsi,
         private ?int $numberOfShownMutations,
         private ?float $minCoveredMsi,
+        private bool $timeoutsAsEscaped,
+        private ?int $maxTimeouts,
         private int $msiPrecision,
         private int $threadCount,
         private bool $dryRun,
@@ -129,6 +131,8 @@ final class ConfigurationBuilder
             minMsi: $configuration->minMsi,
             numberOfShownMutations: $configuration->numberOfShownMutations,
             minCoveredMsi: $configuration->minCoveredMsi,
+            timeoutsAsEscaped: $configuration->timeoutsAsEscaped,
+            maxTimeouts: $configuration->maxTimeouts,
             msiPrecision: $configuration->msiPrecision,
             threadCount: $configuration->threadCount,
             dryRun: $configuration->isDryRun,
@@ -169,6 +173,8 @@ final class ConfigurationBuilder
             minMsi: null,
             numberOfShownMutations: null,
             minCoveredMsi: null,
+            timeoutsAsEscaped: false,
+            maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
             dryRun: false,
@@ -231,6 +237,8 @@ final class ConfigurationBuilder
             minMsi: 50.0,
             numberOfShownMutations: 10,
             minCoveredMsi: 60.0,
+            timeoutsAsEscaped: true,
+            maxTimeouts: 5,
             msiPrecision: 2,
             threadCount: 4,
             dryRun: true,
@@ -469,6 +477,22 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    public function withTimeoutsAsEscaped(bool $timeoutsAsEscaped): self
+    {
+        $clone = clone $this;
+        $clone->timeoutsAsEscaped = $timeoutsAsEscaped;
+
+        return $clone;
+    }
+
+    public function withMaxTimeouts(?int $maxTimeouts): self
+    {
+        $clone = clone $this;
+        $clone->maxTimeouts = $maxTimeouts;
+
+        return $clone;
+    }
+
     public function withMsiPrecision(int $msiPrecision): self
     {
         $clone = clone $this;
@@ -582,6 +606,8 @@ final class ConfigurationBuilder
             minMsi: $this->minMsi,
             numberOfShownMutations: $this->numberOfShownMutations,
             minCoveredMsi: $this->minCoveredMsi,
+            timeoutsAsEscaped: $this->timeoutsAsEscaped,
+            maxTimeouts: $this->maxTimeouts,
             msiPrecision: $this->msiPrecision,
             threadCount: $this->threadCount,
             isDryRun: $this->dryRun,

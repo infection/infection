@@ -56,173 +56,173 @@ final class ArrayAnyTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a variable' => [
-            <<<'PHP'
-                <?php
-
-                $anyPositive = array_any($numbers, fn ($number) => $number > 0);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $anyPositive = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = array_any($numbers, fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = true;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $anyPositive = array_any(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $anyPositive = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = array_any(['A', 1, 'C'], fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = true;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $anyPositive = array_any(\Class_With_Const::Const, fn ($number) => $number > 0);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $anyPositive = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = array_any(\Class_With_Const::Const, fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = true;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_any' => [
-            <<<'PHP'
-                <?php
-
-                $anyPositive = \array_any(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $anyPositive = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = \array_any(['A', 1, 'C'], fn ($number) => $number > 0);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $anyPositive = true;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_any' => [
-            <<<'PHP'
-                <?php
-
-                function array_any($text, $other)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_any($text, $other)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                if (array_any(['A', 1, 'C'], fn ($number) => $number > 0)) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (true) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (array_any(['A', 1, 'C'], fn ($number) => $number > 0)) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (true) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_any is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = arRay_aNy(['A', 1, 'C'], 'is_int');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = arRay_aNy(['A', 1, 'C'], 'is_int');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = true;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_any uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_any($foo->bar(), 'is_int');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_any($foo->bar(), 'is_int');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = true;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_any(array_filter(['A', 1, 'C'], function($char): bool {
-                    return !is_int($char);
-                }), 'is_int');
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = true;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_any(array_filter(['A', 1, 'C'], function($char): bool {
+                        return !is_int($char);
+                    }), 'is_int');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = true;
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_any';
 
-                $a = 'array_any';
-
-                $b = $a([1, 2, 3], 'is_int');
-                PHP,
+                    $b = $a([1, 2, 3], 'is_int');
+                    PHP,
+            ),
         ];
 
         if (PHP_VERSION_ID >= 80400) {
             yield 'It mutates correctly when provided inside getter PHP 8.4 syntax' => [
-                <<<'PHP'
-                    <?php
-
-                    new class
-                    {
-                        private array $numbers = [];
-                        public function __construct(array $numbers)
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        new class
                         {
-                            $this->numbers = $numbers;
-                        }
+                            private array $numbers = [];
+                            public function __construct(array $numbers)
+                            {
+                                $this->numbers = $numbers;
+                            }
 
-                        public bool $anyPositive { get => array_any(fn (int $number) => $number > 0); }
-                    };
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    new class
-                    {
-                        private array $numbers = [];
-                        public function __construct(array $numbers)
+                            public bool $anyPositive { get => array_any(fn (int $number) => $number > 0); }
+                        };
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        new class
                         {
-                            $this->numbers = $numbers;
-                        }
+                            private array $numbers = [];
+                            public function __construct(array $numbers)
+                            {
+                                $this->numbers = $numbers;
+                            }
 
-                        public bool $anyPositive { get => true; }
-                    };
-                    PHP,
+                            public bool $anyPositive { get => true; }
+                        };
+                        PHP,
+                ),
             ];
         }
     }

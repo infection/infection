@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
 
 readonly INFECTION="../../../bin/infection --min-msi=100"
 

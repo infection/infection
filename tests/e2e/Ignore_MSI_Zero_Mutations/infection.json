@@ -1,4 +1,5 @@
 {
+    "$schema": "./../../../resources/schema.json",
     "timeout": 25,
     "source": {
         "directories": [
@@ -6,10 +7,10 @@
         ]
     },
     "logs": {
-        "summary": "infection.log"
+        "summary": "var/infection.log"
     },
     "mutators": {
-        "PublicVisibility": true
+        "Plus": true
     },
-    "tmpDir": "."
+    "tmpDir": "var/infection"
 }

@@ -36,38 +36,31 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Source\Collector\FixedSourceCollector;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use Infection\Tests\WithConsecutive;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(MutationGenerator::class)]
 final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfoA = new MockSplFileInfo([
-            'file' => 'testA.txt',
-        ]);
-        $fileInfoB = new MockSplFileInfo([
-            'file' => 'testB.txt',
-        ]);
+        $fileInfoA = new MockSplFileInfo(realPath: '/path/to/fileA.txt');
+        $fileInfoB = new MockSplFileInfo(realPath: '/path/to/fileB.txt');
 
         $sourceCollector = new FixedSourceCollector(
-            false,
             [
                 $fileInfoA,
                 $fileInfoB,
@@ -75,13 +68,12 @@ final class MutationGeneratorTest extends TestCase
         );
 
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
-        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
+        $eventDispatcherMock = $this->createStub(EventDispatcher::class);
         $onlyCovered = true;
-        $nodeIgnorers = [new FakeIgnorer()];
 
-        $mutation0 = $this->createMock(Mutation::class);
-        $mutation1 = $this->createMock(Mutation::class);
-        $mutation2 = $this->createMock(Mutation::class);
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation2 = $this->createStub(Mutation::class);
 
         $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
         $fileMutationGenerator
@@ -89,8 +81,8 @@ final class MutationGeneratorTest extends TestCase
             ->method('generate')
             ->with(
                 ...WithConsecutive::create(
-                    [$fileInfoA, $onlyCovered, $mutators, $nodeIgnorers],
-                    [$fileInfoB, $onlyCovered, $mutators, $nodeIgnorers],
+                    [$fileInfoA, $onlyCovered, $mutators],
+                    [$fileInfoB, $onlyCovered, $mutators],
                 ),
             )
             ->willReturnOnConsecutiveCalls(
@@ -113,7 +105,7 @@ final class MutationGeneratorTest extends TestCase
         );
 
         $mutations = iterator_to_array(
-            $mutationGenerator->generate($onlyCovered, $nodeIgnorers),
+            $mutationGenerator->generate($onlyCovered),
             preserve_keys: false,
         );
 
@@ -128,8 +120,14 @@ final class MutationGeneratorTest extends TestCase
             ->method('dispatch')
             ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(2)],
-                [new MutableFileWasProcessed()],
-                [new MutableFileWasProcessed()],
+                [new MutableFileWasProcessed(
+                    'path/to/fileA',
+                    [],
+                )],
+                [new MutableFileWasProcessed(
+                    'path/to/fileB',
+                    [],
+                )],
                 [new MutationGenerationWasFinished()],
             ))
         ;
@@ -141,18 +139,9 @@ final class MutationGeneratorTest extends TestCase
         ;
 
         $sourceCollector = new FixedSourceCollector(
-            false,
             [
-                new SplFileInfo(
-                    'fileA',
-                    'relativePathToFileA',
-                    'relativePathnameToFileA',
-                ),
-                new SplFileInfo(
-                    'fileB',
-                    'relativePathToFileB',
-                    'relativePathnameToFileB',
-                ),
+                new MockSplFileInfo(realPath: 'path/to/fileA'),
+                new MockSplFileInfo(realPath: 'path/to/fileB'),
             ],
         );
 
@@ -163,7 +152,7 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGeneratorMock,
         );
 
-        foreach ($mutationGenerator->generate(false, []) as $_) {
+        foreach ($mutationGenerator->generate(false) as $_) {
             // We just want to iterate here to trigger the generator
         }
     }

@@ -41,8 +41,6 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Token;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function sprintf;
 use Webmozart\Assert\Assert;
 
 abstract class BaseVisitorTestCase extends TestCase
@@ -77,10 +75,5 @@ abstract class BaseVisitorTestCase extends TestCase
         }
 
         return $traverser->traverse($nodes);
-    }
-
-    final protected function getFileContent(string $file): string
-    {
-        return file_get_contents(sprintf(__DIR__ . '/../../../autoloaded/mutator-fixtures/%s', $file));
     }
 }

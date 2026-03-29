@@ -2661,6 +2661,8 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'ignoreMsiWithNoMutations' => null,
             'minMsi' => null,
             'minCoveredMsi' => null,
+            'timeoutsAsEscaped' => null,
+            'maxTimeouts' => null,
             'mutators' => [],
             'testFramework' => null,
             'bootstrap' => null,

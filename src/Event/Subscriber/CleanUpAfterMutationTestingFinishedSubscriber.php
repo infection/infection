@@ -35,14 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 /**
  * @internal
  */
-final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements EventSubscriber
+final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
 {
     private const PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
 

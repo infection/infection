@@ -55,55 +55,55 @@ final class NotEqualNotIdenticalTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates with two variables' => [
-            <<<'PHP'
-                <?php
-
-                $a != $b;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a !== $b;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a != $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a !== $b;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates with a cast' => [
-            <<<'PHP'
-                <?php
-
-                (int) $c != 2;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                (int) $c !== 2;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $c != 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $c !== 2;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $d != null;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $d !== null;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $d != null;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $d !== null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates with a function' => [
-            <<<'PHP'
-                <?php
-
-                false != strpos();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                false !== strpos();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    false != strpos();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    false !== strpos();
+                    PHP,
+            ),
         ];
     }
 }

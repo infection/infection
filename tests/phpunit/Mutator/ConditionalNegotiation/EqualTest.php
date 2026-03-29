@@ -55,40 +55,40 @@ final class EqualTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates not strict comparison' => [
-            <<<'PHP'
-                <?php
-
-                1 == 1;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                1 != 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 == 1;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 != 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate strict comparison' => [
-            <<<'PHP'
-                <?php
-
-                1 === 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 === 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate not equals comparison' => [
-            <<<'PHP'
-                <?php
-
-                1 !== 1;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 !== 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate inside ternary to prevent overlap with TernaryMutator' => [
-            <<<'PHP'
-                <?php
-
-                $x == false ? 'yes' : 'no';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $x == false ? 'yes' : 'no';
+                    PHP,
+            ),
         ];
     }
 }

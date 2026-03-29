@@ -55,141 +55,141 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_change_key_case(['foo' => 'bar']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_change_key_case(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_change_key_case(\Class_With_Const::Const);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = \Class_With_Const::Const;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_change_key_case(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_change_key_case' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_change_key_case(['foo' => 'bar']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_change_key_case(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C'], 2);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C'], 2);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_change_key_case' => [
-            <<<'PHP'
-                <?php
-
-                function array_change_key_case($array, $case)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_change_key_case($array, $case)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if (array_change_key_case($a) === $a) {
-                    return true;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                if ($a === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if (array_change_key_case($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_change_key_case is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_ChAnGe_KeY_cAsE(['foo' => 'bar']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_ChAnGe_KeY_cAsE(['foo' => 'bar']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_change_key_case uses another function as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_change_key_case($foo->bar());
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = $foo->bar();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_change_key_case($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_change_key_case(['foo' => 'bar']));
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['foo' => 'bar']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_change_key_case(['foo' => 'bar']));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $case parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_change_key_case(['foo' => 'bar'], $case);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['foo' => 'bar'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_change_key_case(['foo' => 'bar'], $case);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo' => 'bar'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_change_key_case';
 
-                $a = 'array_change_key_case';
-
-                $b = $a(['foo' => 'bar']);
-                PHP,
+                    $b = $a(['foo' => 'bar']);
+                    PHP,
+            ),
         ];
     }
 }

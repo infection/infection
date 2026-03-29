@@ -39,14 +39,14 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use SplObjectStorage;
 
@@ -57,41 +57,34 @@ use SplObjectStorage;
 class NodeTraverserFactory
 {
     /**
-     * @param NodeIgnorer[] $nodeIgnorers
+     * @see /doc/nomenclature.md#ast-enrichment
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function createEnrichmentTraverser(): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
 
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        $nodeIgnorers = [
+            $changingIgnorer,
+            new InterfaceIgnorer(),
+            new AbstractMethodIgnorer(),
+        ];
 
-        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                // must be `false` for pretty-printing to work properly
-                // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
-                'replaceNodes' => false,
-            ]),
+        return new NodeTraverser(
+            new NextConnectingVisitor(),
+            new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
+            new SkipIgnoredNodesVisitor($nodeIgnorers),
+            NameResolverFactory::create(),
+            new ParentConnectingVisitor(),
+            new ReflectionVisitor(),
+            new LabelNodesAsEligibleVisitor(),
         );
-        $traverser->addVisitor(new ParentConnectingVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
     }
 
-    public function createPreTraverser(): NodeTraverserInterface
+    public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NextConnectingVisitor());
-
-        return $traverser;
+        return new NodeTraverser(
+            new NodeVisitor\CloningVisitor(),
+            $mutationVisitor,
+        );
     }
 }

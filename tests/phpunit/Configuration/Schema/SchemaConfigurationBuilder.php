@@ -63,6 +63,8 @@ final class SchemaConfigurationBuilder
         private ?bool $ignoreMsiWithNoMutations,
         private ?float $minMsi,
         private ?float $minCoveredMsi,
+        private ?bool $timeoutsAsEscaped,
+        private ?int $maxTimeouts,
         private array $mutators,
         private ?string $testFramework,
         private ?string $bootstrap,
@@ -87,6 +89,8 @@ final class SchemaConfigurationBuilder
             ignoreMsiWithNoMutations: $schema->ignoreMsiWithNoMutations,
             minMsi: $schema->minMsi,
             minCoveredMsi: $schema->minCoveredMsi,
+            timeoutsAsEscaped: $schema->timeoutsAsEscaped,
+            maxTimeouts: $schema->maxTimeouts,
             mutators: $schema->mutators,
             testFramework: $schema->testFramework,
             bootstrap: $schema->bootstrap,
@@ -111,6 +115,8 @@ final class SchemaConfigurationBuilder
             ignoreMsiWithNoMutations: null,
             minMsi: null,
             minCoveredMsi: null,
+            timeoutsAsEscaped: null,
+            maxTimeouts: null,
             mutators: [],
             testFramework: null,
             bootstrap: null,
@@ -146,6 +152,8 @@ final class SchemaConfigurationBuilder
             ignoreMsiWithNoMutations: true,
             minMsi: 80.0,
             minCoveredMsi: 90.0,
+            timeoutsAsEscaped: true,
+            maxTimeouts: 5,
             mutators: ['@default' => true],
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: 'bootstrap.php',
@@ -240,6 +248,22 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    public function withTimeoutsAsEscaped(?bool $timeoutsAsEscaped): self
+    {
+        $clone = clone $this;
+        $clone->timeoutsAsEscaped = $timeoutsAsEscaped;
+
+        return $clone;
+    }
+
+    public function withMaxTimeouts(?int $maxTimeouts): self
+    {
+        $clone = clone $this;
+        $clone->maxTimeouts = $maxTimeouts;
+
+        return $clone;
+    }
+
     /**
      * @param array<string, mixed> $mutators
      */
@@ -326,6 +350,8 @@ final class SchemaConfigurationBuilder
             ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
             minMsi: $this->minMsi,
             minCoveredMsi: $this->minCoveredMsi,
+            timeoutsAsEscaped: $this->timeoutsAsEscaped,
+            maxTimeouts: $this->maxTimeouts,
             mutators: $this->mutators,
             testFramework: $this->testFramework,
             bootstrap: $this->bootstrap,

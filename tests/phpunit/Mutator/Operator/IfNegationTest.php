@@ -55,227 +55,227 @@ final class IfNegationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It preserve elseif and else expression' => [
-            <<<'PHP'
-                <?php
-
-                if ($this->fooBar()) {
-                    return 1;
-                } elseif ($this->barFoo()) {
-                    return 2;
-                } else {
-                    return 3;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (!$this->fooBar()) {
-                    return 1;
-                } elseif ($this->barFoo()) {
-                    return 2;
-                } else {
-                    return 3;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($this->fooBar()) {
+                        return 1;
+                    } elseif ($this->barFoo()) {
+                        return 2;
+                    } else {
+                        return 3;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (!$this->fooBar()) {
+                        return 1;
+                    } elseif ($this->barFoo()) {
+                        return 2;
+                    } else {
+                        return 3;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates array item fetch' => [
-            <<<'PHP'
-                <?php
-
-                if ($array[0]) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!$array[0]) {
+                    if ($array[0]) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!$array[0]) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates variable' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!$foo) {
+                    if ($foo) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!$foo) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates method call' => [
-            <<<'PHP'
-                <?php
-
-                if ($this->foo()) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!$this->foo()) {
+                    if ($this->foo()) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!$this->foo()) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates static calls' => [
-            <<<'PHP'
-                <?php
-
-                if (self::foo()) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!self::foo()) {
+                    if (self::foo()) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!self::foo()) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates constant calls' => [
-            <<<'PHP'
-                <?php
-
-                if (self::FOO) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!self::FOO) {
+                    if (self::FOO) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!self::FOO) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates closure calls' => [
-            <<<'PHP'
-                <?php
-
-                if ($foo()) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!$foo()) {
+                    if ($foo()) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!$foo()) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates invoke calls' => [
-            <<<'PHP'
-                <?php
-
-                if (($this->foo)()) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!($this->foo)()) {
+                    if (($this->foo)()) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!($this->foo)()) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates function calls' => [
-            <<<'PHP'
-                <?php
-
-                if (a()) {
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    if (!a()) {
+                    if (a()) {
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        if (!a()) {
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate already negated expression' => [
-            <<<'PHP'
-                <?php
-
-                if (!$this->fooBar()) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (!$this->fooBar()) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($this->fooBar() == 1) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($this->fooBar() == 1) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate not equal comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($this->fooBar() != 1) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($this->fooBar() != 1) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate identical comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($this->fooBar() === true) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($this->fooBar() === true) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate not identical comparison' => [
-            <<<'PHP'
-                <?php
-
-                if ($this->fooBar() !== true) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($this->fooBar() !== true) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate and condition' => [
-            <<<'PHP'
-                <?php
-
-                if (a() && b()) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (a() && b()) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate or condition' => [
-            <<<'PHP'
-                <?php
-
-                if (a() || b()) {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (a() || b()) {
+                    }
+                    PHP,
+            ),
         ];
     }
 }

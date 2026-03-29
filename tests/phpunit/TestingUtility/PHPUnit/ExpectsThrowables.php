@@ -62,6 +62,7 @@ trait ExpectsThrowables
                 throw $throwable;
             }
 
+            // @phpstan-ignore method.internal
             $this->addToAssertionCount(1);
 
             return $throwable;

@@ -55,30 +55,30 @@ final class YieldValueTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with key and value to a yield with a value only' => [
-            <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $a => $b);
-                };
-                PHP,
-            (static fn () => <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $b);
-                };
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a => $b);
+                    };
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $b);
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [
-            <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $b);
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $b);
+                    };
+                    PHP,
+            ),
         ];
     }
 }

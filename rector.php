@@ -33,6 +33,7 @@
 
 declare(strict_types=1);
 
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector;
 use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetchRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
@@ -44,11 +45,14 @@ use Rector\CodeQuality\Rector\Include_\AbsolutizeRequireAndIncludePathRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\ConstFetch\RemovePhpVersionIdCheckRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
+use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
+use Rector\Php73\Rector\String_\SensitiveHereNowDocRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
@@ -82,6 +86,13 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tests/phpunit',
     ])
+    ->withSkipPath(
+        __DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php',
+    )
+    ->withCache(
+        cacheClass: FileCacheStorage::class,
+        cacheDirectory: __DIR__ . '/var/cache/rector',
+    )
     ->withPhpSets(php82: true)
     ->withPreparedSets(
         deadCode: true,
@@ -117,6 +128,7 @@ return RectorConfig::configure()
         ],
     )
     ->withSkip([
+        'Rector\PHPUnit\CodeQuality\Rector\ClassMethod\BareCreateMockAssignToDirectUseRector',
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
         AddInstanceofAssertForNullableInstanceRector::class,
@@ -147,8 +159,14 @@ return RectorConfig::configure()
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
         RemovePhpVersionIdCheckRector::class => true,
+        RemoveUnreachableStatementRector::class => [
+            __DIR__ . '/tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php',
+        ],
         RemoveUnusedConstructorParamRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        RemoveUnusedPrivateMethodRector::class => [
+            __DIR__ . '/src/Git/CommandLineGit.php',
         ],
         RemoveUnusedPrivateMethodParameterRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
@@ -157,6 +175,7 @@ return RectorConfig::configure()
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
+        SensitiveHereNowDocRector::class,
         SimplifyDeMorganBinaryRector::class,
         SimplifyIfElseToTernaryRector::class,
         SimplifyIfReturnBoolRector::class => [
