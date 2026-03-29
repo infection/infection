@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
-use Exception;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
@@ -808,7 +807,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         traits: array(
                                             0: Name(
                                                 nodeId: 9
-                                                resolvedName: nodeId(9)
+                                                resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\TraitExample)
                                                 parent: nodeId(8)
                                                 eligible: true
                                                 origNode: nodeId(9)
@@ -1070,7 +1069,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         traits: array(
                                             0: Name(
                                                 nodeId: 9
-                                                resolvedName: nodeId(9)
+                                                resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\TraitExample)
                                                 parent: nodeId(8)
                                                 eligible: true
                                                 origNode: nodeId(9)

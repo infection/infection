@@ -193,7 +193,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     left: Expr_FuncCall(
                                                         name: Name(
                                                             nodeId: 16
-                                                            namespacedName: nodeId(16)
+                                                            namespacedName: FullyQualified(InfectionReflectionPartOfSignature\count)
                                                             parent: nodeId(15)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
@@ -344,7 +344,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                             0: Attribute(
                                                                 name: Name(
                                                                     nodeId: 12
-                                                                    resolvedName: nodeId(12)
+                                                                    resolvedName: FullyQualified(InfectionReflectionPartOfSignatureWithAttributes\CustomAttribute)
                                                                     parent: nodeId(11)
                                                                     isInsideFunction: true
                                                                     isOnFunctionSignature: true
@@ -358,7 +358,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                                         value: Expr_ConstFetch(
                                                                             name: Name(
                                                                                 nodeId: 15
-                                                                                namespacedName: nodeId(15)
+                                                                                namespacedName: FullyQualified(InfectionReflectionPartOfSignatureWithAttributes\false)
                                                                                 parent: nodeId(14)
                                                                                 isInsideFunction: true
                                                                                 isOnFunctionSignature: true
@@ -452,7 +452,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     left: Expr_FuncCall(
                                                         name: Name(
                                                             nodeId: 22
-                                                            namespacedName: nodeId(22)
+                                                            namespacedName: FullyQualified(InfectionReflectionPartOfSignatureWithAttributes\count)
                                                             parent: nodeId(21)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
@@ -713,7 +713,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                         expr: Expr_FuncCall(
                                                             name: Name(
                                                                 nodeId: 10
-                                                                namespacedName: nodeId(10)
+                                                                namespacedName: FullyQualified(InfectionReflectionPlainFunctionInClass\count)
                                                                 parent: nodeId(9)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: false
@@ -832,7 +832,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                         expr: Expr_FuncCall(
                                                             name: Name(
                                                                 nodeId: 13
-                                                                namespacedName: nodeId(13)
+                                                                namespacedName: FullyQualified(InfectionReflectionPlainFunctionInClosure\count)
                                                                 parent: nodeId(12)
                                                             )
                                                             args: array(
@@ -996,7 +996,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 expr: Expr_New(
                                     class: Name(
                                         nodeId: 7
-                                        resolvedName: nodeId(7)
+                                        resolvedName: FullyQualified(stdClass)
                                         parent: nodeId(6)
                                     )
                                     nodeId: 6
@@ -1247,7 +1247,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     class: Stmt_Class(
                                                         extends: Name(
                                                             nodeId: 11
-                                                            resolvedName: nodeId(11)
+                                                            resolvedName: FullyQualified(InfectionReflectionAnonymousClass\A)
                                                             parent: nodeId(10)
                                                             isInsideFunction: true
                                                             isStrictTypes: false

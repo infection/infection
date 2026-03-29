@@ -42,8 +42,8 @@ use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
@@ -72,7 +72,7 @@ class NodeTraverserFactory
         return new NodeTraverser(
             new NextConnectingVisitor(),
             new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
-            new NonMutableNodesIgnorerVisitor($nodeIgnorers),
+            new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
