@@ -196,7 +196,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 implements: array(
                                     0: Name(
                                         nodeId: 8
-                                        resolvedName: nodeId(8)
+                                        resolvedName: FullyQualified(Infection\Tests\Command\Debug\DumpAstCommand\Greeter)
                                         parent: nodeId(6)
                                         eligible: true
                                         origNode: nodeId(8)

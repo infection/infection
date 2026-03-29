@@ -39,6 +39,7 @@ use Exception;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
@@ -55,6 +56,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
+use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -67,6 +69,7 @@ final class NodeDumperTest extends TestCase
     #[DataProvider('codeWithDefaultConfigurationProvider')]
     #[DataProvider('decoratedNodesProvider')]
     #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
+    #[DataProvider('resolvedNameAttributeProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
         $node = $scenario->node;
@@ -764,6 +767,207 @@ final class NodeDumperTest extends TestCase
                                 )
                                 nodeId: 10
                                 functionScope: nodeId(10)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+    }
+
+    public static function resolvedNameAttributeProvider(): iterable
+    {
+        yield 'resolvedName with FullyQualified name' => (static function () {
+            $node = new Name('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                resolvedName: FullyQualified(App\Foo)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName with identified FullyQualified name' => (static function () {
+            $node = new Name('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new FullyQualified('App\\Foo'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                resolvedName: FullyQualified(App\Foo)
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName with plain Name' => (static function () {
+            $node = new Name('Bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new Name('Bar'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                resolvedName: Name(Bar)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName with plain identified Name' => (static function () {
+            $node = new Name('Bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new Name('Bar'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                resolvedName: Name(Bar)
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName is not shown without dumpOtherAttributes' => (static function () {
+            $node = new Name('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with FullyQualified name' => (static function () {
+            $node = new Node\Stmt\Class_('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                namespacedName: FullyQualified(App\Foo)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with identified FullyQualified name' => (static function () {
+            $node = new Node\Stmt\Class_('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new FullyQualified('App\\Foo'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                namespacedName: FullyQualified(App\Foo)
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with plain Name' => (static function () {
+            $node = new Node\Stmt\Function_('bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new Name('bar'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Function(
+                                name: Identifier
+                                namespacedName: Name(bar)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with plain identified Name' => (static function () {
+            $node = new Node\Stmt\Function_('bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new Name('bar'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Function(
+                                name: Identifier
+                                namespacedName: Name(bar)
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName is not shown without dumpOtherAttributes' => (static function () {
+            $node = new Node\Stmt\Class_('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Class(
+                                name: Identifier
                             )
                         )
                         AST,
