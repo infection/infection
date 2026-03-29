@@ -111,7 +111,7 @@ final class JUnitReport
     /**
      * @throws TestNotFound
      *
-     * @return Infection\TestFramework\Coverage\JUnit\TestInfo|\TestNotFound
+     * @return TestInfo
      */
     private function lookup(string $testId): array
     {

@@ -36,195 +36,147 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitReport;
 
 use Infection\TestFramework\Coverage\JUnit\JUnitReport;
-use Infection\TestFramework\Coverage\Throwable\TestNotFound;
-use Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest;
-use Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
+use function Safe\file_put_contents;
+use function Safe\unlink;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 
 /**
  * @phpstan-import-type TestInfo from JUnitReport
  */
+#[Group('integration')]
 #[CoversClass(JUnitReport::class)]
 final class JUnitReportTest extends TestCase
 {
     use ExpectsThrowables;
 
-    private const FIXTURE_DIR = __DIR__ . '/Fixtures';
+    private string $generatedJunitPath;
 
-    public function test_it_throws_an_exception_if_the_report_file_does_not_exist(): void
+    protected function setUp(): void
     {
-        $report = new JUnitReport('/path/to/unknown.xml');
-
-        $this->expectExceptionObject(
-            new InvalidArgumentException('The path "/path/to/unknown.xml" is not a file.'),
-        );
-
-        // We need to request a test info for to initiate the parsing/loading of the file.
-        $report->getTestInfo('ThisValueDoesNotMatterForThisTest');
+        $this->generatedJunitPath = FS::tmpFile('JUnitTestFileDataProviderTest');
     }
 
-    public function test_it_throws_an_exception_if_the_report_file_is_invalid_xml(): void
+    protected function tearDown(): void
     {
-        $report = new JUnitReport(__FILE__);
-
-        $this->expectExceptionObject(
-            new InvalidArgumentException(
-                sprintf(
-                    'The file "%s" does not contain valid XML.',
-                    __FILE__,
-                ),
-            ),
-        );
-
-        $report->getTestInfo('App\UnknownTest');
+        unlink($this->generatedJunitPath);
     }
 
     /**
-     * @param non-empty-array<class-string, TestInfo|class-string<Throwable>> $expected
+     * @param TestInfo|class-string<Throwable> $expected
      */
     #[DataProvider('infoProvider')]
     public function test_it_can_get_the_test_info_for_a_given_test_id(
-        string $xmlPathname,
-        array $expected,
+        string $xml,
+        string $testId,
+        array|string $expected,
     ): void {
-        $report = new JUnitReport(
-            Path::canonicalize($xmlPathname),
+        $provider = new JUnitReport(
+            $this->createJUnit($xml),
         );
 
-        $actual = [];
+        if (is_string($expected)) {
+            $this->expectException($expected);
 
-        foreach ($expected as $testId => $expectedInfo) {
-            if (is_string($expectedInfo)) {
-                $actualException = $this->expectToThrow(
-                    static fn () => $report->getTestInfo($testId),
-                );
-                $this->assertInstanceOf($expectedInfo, $actualException);
-                unset($expected[$testId]);
-            } else {
-                $actual[$testId] = $report->getTestInfo($testId);
-            }
+            $provider->getTestInfo($testId);
+        } else {
+            $actual = $provider->getTestInfo($testId);
+
+            $this->assertEquals($expected, $actual);
         }
-
-        $this->assertEquals($expected, $actual);
     }
 
     /**
-     * @param non-empty-array<class-string, TestInfo|class-string<Throwable>> $expected
+     * @param TestInfo|class-string<Throwable> $expected
      */
     #[DataProvider('infoProvider')]
     public function test_it_is_idempotent(
-        string $xmlPathname,
-        array $expected,
+        string $xml,
+        string $testId,
+        array|string $expected,
     ): void {
         $report = new JUnitReport(
-            Path::canonicalize($xmlPathname),
+            $this->createJUnit($xml),
         );
 
-        $resultOfTheFirstTraverse = [];
-        $resultOfTheFirstTraverseSecondCall = [];
-        $resultOfTheSecondTraverse = [];
+        if (is_string($expected)) {
+            $resultOfTheFirstCall = $this->expectToThrow(
+                static fn () => $report->getTestInfo($testId),
+            );
+            $resultOfTheSecondCall = $this->expectToThrow(
+                static fn () => $report->getTestInfo($testId),
+            );
 
-        foreach ($expected as $testId => $expectedInfo) {
-            if (is_string($expectedInfo)) {
-                $resultOfTheFirstTraverse[$testId] = $this->expectToThrow(
-                    static fn () => $report->getTestInfo($testId),
-                );
-                $resultOfTheFirstTraverseSecondCall[$testId] = $this->expectToThrow(
-                    static fn () => $report->getTestInfo($testId),
-                );
-            } else {
-                $resultOfTheFirstTraverse[$testId] = $report->getTestInfo($testId);
-                $resultOfTheFirstTraverseSecondCall[$testId] = $report->getTestInfo($testId);
-            }
+            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
+        } else {
+            $resultOfTheFirstCall = $report->getTestInfo($testId);
+            $resultOfTheSecondCall = $report->getTestInfo($testId);
+
+            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
         }
-
-        foreach ($expected as $testId => $expectedInfo) {
-            if (is_string($expectedInfo)) {
-                $resultOfTheSecondTraverse[$testId] = $this->expectToThrow(
-                    static fn () => $report->getTestInfo($testId),
-                );
-            } else {
-                $resultOfTheSecondTraverse[$testId] = $report->getTestInfo($testId);
-            }
-        }
-
-        $this->assertEquals($resultOfTheFirstTraverse, $resultOfTheFirstTraverseSecondCall);
-        $this->assertEquals($resultOfTheFirstTraverse, $resultOfTheSecondTraverse);
     }
 
     public static function infoProvider(): iterable
     {
-        yield 'JUnit file generated by PHPUnit' => [
-            self::FIXTURE_DIR . '/phpunit-junit.xml',
-            [
-                // TODO: Would be nice to support it
-                'Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest::test_it_can_mutate with data set &quot;It does not mutate when a variable function name is used&quot;' => TestNotFound::class,
-                // TODO: Would be nice to support it
-                'Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest::test_it_can_mutate with data' => TestNotFound::class,
-                UnwrapArrayIntersectUassocTest::class => self::createTestInfo(
-                    '/path/to/project/tests/phpunit/Mutator/Unwrap/UnwrapArrayIntersectUassocTest.php',
-                    0.912992,
-                ),
-                ProtectedVisibilityTest::class => self::createTestInfo(
-                    '/path/to/project/tests/phpunit/Mutator/FunctionSignature/ProtectedVisibilityTest.php',
-                    0.053797,
-                ),
-            ],
-        ];
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 09] ',
+            PhpUnit09Provider::infoProvider(),
+        );
 
-        // https://github.com/infection/infection/pull/800
-        yield 'JUnit file generated by Codeception' => [
-            self::FIXTURE_DIR . '/codeception-junit.xml',
-            [
-                'App\Tests\unit\SourceClassTest' => self::createTestInfo(
-                    '/codeception/tests/unit/SourceClassTest.php',
-                    0.006096,
-                ),
-            ],
-        ];
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 10] ',
+            PhpUnit10Provider::infoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 11] ',
+            PhpUnit11Provider::infoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 12] ',
+            PhpUnit12Provider::infoProvider(),
+        );
+
+        // https://codeception.com/docs/UnitTests
+        yield from DataProviderFactory::prefix(
+            '[Codeception (unit)] ',
+            CodeceptionUnitProvider::infoProvider(),
+        );
 
         // https://codeception.com/docs/BDD
-        // https://github.com/infection/infection/pull/1034
-        yield 'JUnit file generated by CodeceptionBDD' => [
-            self::FIXTURE_DIR . '/codeception-bdd-junit.xml',
-            [
-                'FeatureA:Scenario A1' => self::createTestInfo(
-                    '/codeception/tests/bdd/FeatureA.feature',
-                    0.039365,
-                ),
-            ],
-        ];
+        yield from DataProviderFactory::prefix(
+            '[Codeception (BDD style)] ',
+            CodeceptionBDDProvider::infoProvider(),
+        );
 
-        // https://github.com/infection/infection/pull/1503
-        yield 'JUnit file generated by CodeceptionCest' => [
-            self::FIXTURE_DIR . '/codeception-cest-junit.xml',
-            [
-                'app\controllers\ExampleCest:FeatureA' => self::createTestInfo(
-                    '/app/controllers/ExampleCest.php',
-                    1.0E-6,
-                ),
-            ],
+        // https://codeception.com/docs/AdvancedUsage#Cest-Classes
+        yield from DataProviderFactory::prefix(
+            '[Codeception (Cest style)] ',
+            CodeceptionCestProvider::infoProvider(),
+        );
+
+        yield 'invalid XML' => [
+            '',
+            'Acme\Service',
+            InvalidArgumentException::class,
         ];
     }
 
-    /**
-     * @return TestInfo
-     */
-    private static function createTestInfo(
-        string $location,
-        float $executionTime,
-    ): array {
-        return [
-            'location' => $location,
-            'executionTime' => $executionTime,
-        ];
+    private function createJUnit(string $contents): string
+    {
+        $pathname = Path::canonicalize($this->generatedJunitPath);
+        file_put_contents($pathname, $contents);
+
+        return $pathname;
     }
 }
