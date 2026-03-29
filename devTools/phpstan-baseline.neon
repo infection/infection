@@ -262,18 +262,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
 
 		-
-			rawMessage: 'Method Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
-
-		-
-			rawMessage: 'Method Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor::enterNode() never returns array<PhpParser\Node> so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/PhpParser/Visitor/NonMutableNodesIgnorerVisitor.php
-
-		-
 			rawMessage: 'Method Infection\PhpParser\Visitor\ReflectionVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
 			identifier: return.unusedType
 			count: 1
@@ -284,6 +272,18 @@ parameters:
 			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
+
+		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
+			identifier: return.unusedType
+			count: 1
+			path: ../src/PhpParser/Visitor/SkipIgnoredNodesVisitor.php
+
+		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor::enterNode() never returns array<PhpParser\Node> so it can be removed from the return type.'
+			identifier: return.unusedType
+			count: 1
+			path: ../src/PhpParser/Visitor/SkipIgnoredNodesVisitor.php
 
 		-
 			rawMessage: 'Parameter #2 $env (array<bool|string>|null) of method Infection\Process\OriginalPhpProcess::start() should be contravariant with parameter $env (array) of method Symfony\Component\Process\Process::start()'

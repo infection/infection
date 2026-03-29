@@ -40,8 +40,8 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
@@ -75,7 +75,7 @@ final class NodeTraverserFactoryTest extends TestCase
             [
                 NextConnectingVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
-                NonMutableNodesIgnorerVisitor::class,
+                SkipIgnoredNodesVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
