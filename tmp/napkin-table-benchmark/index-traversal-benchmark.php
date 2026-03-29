@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\Framework\SafeDOMXPath;
 
 class TraversalApproach
 {

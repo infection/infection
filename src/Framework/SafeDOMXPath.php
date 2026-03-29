@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\XML;
+namespace Infection\Framework;
 
 use DOMAttr;
 use DOMDocument;
@@ -48,6 +48,9 @@ use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
+ * TODO: this was extracted from `Infection\TestFramework`. This was moved to Framework because
+ * it is closer to a Spl/Standard library utility than anything. To extract its move to a separate PR.
+ *
  * @internal
  */
 final readonly class SafeDOMXPath

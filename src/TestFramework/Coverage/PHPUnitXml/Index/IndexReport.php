@@ -39,7 +39,7 @@ use function array_key_exists;
 use function dirname;
 use DOMElement;
 use Generator;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\Framework\SafeDOMXPath;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;

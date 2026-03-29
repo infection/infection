@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\XML\SafeDOMXPath;
+namespace Infection\Tests\Framework\SafeDOMXPath;
 
 use DOMDocument;
 use DOMNode;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\Framework\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

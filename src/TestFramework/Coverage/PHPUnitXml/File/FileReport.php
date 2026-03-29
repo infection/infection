@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
 use function array_map;
 use DOMNode;
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\Framework\SafeDOMXPath;
 use function iterator_to_array;
 
 /**
