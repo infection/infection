@@ -33,17 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Tracing;
 
+use function array_map;
 use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function usort;
 
 /**
+ * Resolves the order in which test files should be run against a mutant,
+ * prioritizing the fastest tests first
+ *
  * @internal
  */
-final class JUnitTestCaseSorter
+final class TestRunOrderResolver
 {
     /**
      * Expected average number of buckets. Exposed for testing purposes.
@@ -59,11 +63,13 @@ final class JUnitTestCaseSorter
     public const USE_BUCKET_SORT_AFTER = 15;
 
     /**
+     * Returns unique test file paths ordered by execution time (fastest first).
+     *
      * @param TestLocation[] $tests
      *
-     * @return iterable<string>
+     * @return string[]
      */
-    public function getUniqueSortedFileNames(array $tests): iterable
+    public function getOrderedTestFilePaths(array $tests): array
     {
         $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
@@ -113,16 +119,14 @@ final class JUnitTestCaseSorter
     /**
      * @param iterable<TestLocation> $sortedTestLocations
      *
-     * @return iterable<string>
+     * @return array<string>
      */
-    private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
+    private static function sortedLocationsGenerator(iterable $sortedTestLocations): array
     {
-        foreach ($sortedTestLocations as $testLocation) {
-            /** @var string $filePath */
-            $filePath = $testLocation->getFilePath();
-
-            yield $filePath;
-        }
+        return array_map(
+            static fn (TestLocation $testLocation): string => $testLocation->getFilePath(),
+            $sortedTestLocations,
+        );
     }
 
     /**

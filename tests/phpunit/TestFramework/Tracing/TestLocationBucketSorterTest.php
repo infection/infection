@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Tracing;
 
 use function abs;
 use function array_map;
@@ -42,11 +42,10 @@ use function array_slice;
 use ArrayIterator;
 use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
-use Infection\TestFramework\Coverage\JUnit\TestLocationBucketSorter;
+use Infection\TestFramework\Tracing\TestLocationBucketSorter;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
 use function iterator_to_array;
-use function log;
 use function microtime;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -206,7 +205,7 @@ final class TestLocationBucketSorterTest extends TestCase
             JUnitTimes::JUNIT_TIMES,
         );
 
-        yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
+        yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, TestRunOrderResolver::USE_BUCKET_SORT_AFTER * 10))];
 
         yield 'All locations' => [new ArrayIterator($locations)];
     }
