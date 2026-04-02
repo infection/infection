@@ -72,7 +72,7 @@ final class SchemaConfigurationFileTest extends TestCase
 
             $this->fail('Expected the content to be invalid.');
         } catch (Exception) {
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
         }
 
         $validPathname = self::FIXTURES_DIR . '/file.json';

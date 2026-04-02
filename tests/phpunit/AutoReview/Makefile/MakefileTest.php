@@ -364,7 +364,7 @@ final class MakefileTest extends BaseMakefileTestCase
         array $items,
     ): void {
         if (count($items) === 0) {
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }
@@ -385,7 +385,7 @@ final class MakefileTest extends BaseMakefileTestCase
         array $items,
     ): void {
         if (count($items) === 0) {
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }

@@ -65,6 +65,8 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $clock = $this->createMock(TimeSpy::class);
         $clock->expects($this->never())
             ->method($this->anything());
@@ -72,8 +74,6 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(4, 0, $clock);
 
         $runner->run([]);
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_starts_the_given_processes(): void
