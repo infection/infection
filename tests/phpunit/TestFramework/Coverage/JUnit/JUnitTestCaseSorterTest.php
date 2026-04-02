@@ -37,72 +37,74 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
-use function iterator_to_array;
 use function log;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
 #[CoversClass(JUnitTestCaseSorter::class)]
 final class JUnitTestCaseSorterTest extends TestCase
 {
-    public function test_it_returns_first_file_name_if_there_is_only_one(): void
-    {
-        $coverageTestCases = [
-            new TestLocation(
-                'testMethod1',
-                '/path/to/test-file-1',
-                0.000234,
-            ),
-        ];
-
+    /**
+     * @param TestLocation[] $testLocations
+     * @param string[] $expected
+     */
+    #[DataProvider('scenarioProvider')]
+    public function test_it_resolves_the_unique_test_locations_ordered_from_fastest_to_slowest(
+        array $testLocations,
+        array $expected,
+    ): void {
         $sorter = new JUnitTestCaseSorter();
 
-        $uniqueSortedFileNames = $sorter->getUniqueSortedFileNames($coverageTestCases);
+        $actual = take($sorter->getUniqueSortedFileNames($testLocations))->toList();
 
-        $this->assertSame(['/path/to/test-file-1'], $uniqueSortedFileNames);
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_returns_unique_and_sorted_by_time_test_cases(): void
+    public static function scenarioProvider(): iterable
     {
-        $coverageTestCases = [
-            new TestLocation(
-                'testMethod1',
-                '/path/to/test-file-1',
-                0.500234,
-            ),
-            new TestLocation(
-                'testMethod2',
-                '/path/to/test-file-2',
-                0.900221,
-            ),
-            new TestLocation(
-                'testMethod3_1',
-                '/path/to/test-file-3',
-                0.000022,
-            ),
-            new TestLocation(
-                'testMethod3_2',
-                '/path/to/test-file-4',
-                0.210022,
-            ),
+        yield [
+            [
+                new TestLocation(
+                    'testMethod1',
+                    '/path/to/test-file-1',
+                    0.000234,
+                ),
+            ],
+            ['/path/to/test-file-1'],
         ];
 
-        $sorter = new JUnitTestCaseSorter();
-
-        $uniqueSortedFileNames = iterator_to_array(
-            $sorter->getUniqueSortedFileNames($coverageTestCases),
-            false,
-        );
-
-        $this->assertSame(
+        yield [
+            [
+                new TestLocation(
+                    'testMethod1',
+                    '/path/to/test-file-1',
+                    0.500234,
+                ),
+                new TestLocation(
+                    'testMethod2',
+                    '/path/to/test-file-2',
+                    0.900221,
+                ),
+                new TestLocation(
+                    'testMethod3_1',
+                    '/path/to/test-file-3',
+                    0.000022,
+                ),
+                new TestLocation(
+                    'testMethod3_2',
+                    '/path/to/test-file-4',
+                    0.210022,
+                ),
+            ],
             [
                 '/path/to/test-file-3',
                 '/path/to/test-file-4',
                 '/path/to/test-file-1',
                 '/path/to/test-file-2',
             ],
-            $uniqueSortedFileNames,
-        );
+        ];
     }
 
     public function test_it_has_correct_constants_for_bucket_sort(): void
