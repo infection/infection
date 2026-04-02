@@ -62,7 +62,7 @@ class MutationConfigBuilder extends ConfigBuilder
         private readonly string $originalXmlConfigContent,
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly string $projectDir,
-        private readonly TestRunOrderResolver $jUnitTestCaseSorter,
+        private readonly TestRunOrderResolver $testRunOrderResolver,
     ) {
     }
 
@@ -235,7 +235,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $testSuite = $xPath->document->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $orderedTestFilePaths = $this->jUnitTestCaseSorter->getOrderedTestFilePaths($tests);
+        $orderedTestFilePaths = $this->testRunOrderResolver->resolve($tests);
 
         foreach ($orderedTestFilePaths as $testFilePath) {
             $fileElement = $xPath->document->createElement('file', $testFilePath);

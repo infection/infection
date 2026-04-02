@@ -41,22 +41,23 @@ use function log;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
 #[CoversClass(TestRunOrderResolver::class)]
-final class TestLocationSorterTest extends TestCase
+final class TestRunOrderResolverTest extends TestCase
 {
     /**
      * @param TestLocation[] $testLocations
      * @param string[] $expected
      */
     #[DataProvider('scenarioProvider')]
-    public function test_it_returns_first_file_name_if_there_is_only_one(
+    public function test_it_resolves_the_unique_test_locations_ordered_from_fastest_to_slowest(
         array $testLocations,
         array $expected,
     ): void {
         $resolver = new TestRunOrderResolver();
 
-        $actual = $resolver->getOrderedTestFilePaths($testLocations);
+        $actual = take($resolver->resolve($testLocations))->toList();
 
         $this->assertSame($expected, $actual);
     }

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use function array_map;
 use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function Pipeline\take;
 use function usort;
 
 /**
@@ -47,7 +47,7 @@ use function usort;
  *
  * @internal
  */
-final class TestRunOrderResolver
+final readonly class TestRunOrderResolver
 {
     /**
      * Expected average number of buckets. Exposed for testing purposes.
@@ -67,9 +67,9 @@ final class TestRunOrderResolver
      *
      * @param TestLocation[] $tests
      *
-     * @return string[]
+     * @return iterable<string>
      */
-    public function getOrderedTestFilePaths(array $tests): array
+    public function resolve(array $tests): iterable
     {
         $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
@@ -119,14 +119,13 @@ final class TestRunOrderResolver
     /**
      * @param iterable<TestLocation> $sortedTestLocations
      *
-     * @return array<string>
+     * @return iterable<string>
      */
-    private static function sortedLocationsGenerator(iterable $sortedTestLocations): array
+    private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
     {
-        return array_map(
-            static fn (TestLocation $testLocation): string => $testLocation->getFilePath(),
-            $sortedTestLocations,
-        );
+        return yield from take($sortedTestLocations)
+            ->map(static fn (TestLocation $testLocation) => $testLocation->getFilePath())
+            ->stream();
     }
 
     /**
