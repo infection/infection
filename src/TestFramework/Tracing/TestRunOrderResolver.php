@@ -38,7 +38,6 @@ namespace Infection\TestFramework\Tracing;
 use function count;
 use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function Pipeline\take;
 use function usort;
 
 /**
@@ -123,9 +122,16 @@ final readonly class TestRunOrderResolver
      */
     private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
     {
-        return yield from take($sortedTestLocations)
-            ->map(static fn (TestLocation $testLocation): ?string => $testLocation->getFilePath())
-            ->stream();
+        foreach ($sortedTestLocations as $testLocation) {
+            // Note that there is a type issue here: $filePath is a string|null,
+            // but we expect strings.
+            // It is because in practice this code is used on completed TestLocation
+            // objects for which there is always a file type.
+            // Since this is a hotpath no assertion is being added here.
+            $filePath = $testLocation->getFilePath();
+
+            yield $filePath;
+        }
     }
 
     /**

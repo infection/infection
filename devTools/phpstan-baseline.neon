@@ -427,12 +427,6 @@ parameters:
 			path: ../src/TestFramework/Tracing/TestRunOrderResolver.php
 
 		-
-			rawMessage: 'Unable to resolve the template type TMapKey in call to method Pipeline\Standard<mixed,Infection\AbstractTestFramework\Coverage\TestLocation>::map()'
-			identifier: argument.templateType
-			count: 1
-			path: ../src/TestFramework/Tracing/TestRunOrderResolver.php
-
-		-
 			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::createMutator() has parameter $settings with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
