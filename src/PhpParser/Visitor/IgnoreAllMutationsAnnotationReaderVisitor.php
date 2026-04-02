@@ -48,11 +48,13 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 {
     private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
+    private bool $ignore;
+
     /**
      * @param SplObjectStorage<object, mixed> $ignoredNodes
      */
     public function __construct(
-        private readonly ChangingIgnorer $changingIgnorer,
+        //private readonly ChangingIgnorer $changingIgnorer,
         private readonly SplObjectStorage $ignoredNodes,
     ) {
     }
@@ -61,8 +63,10 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
     {
         foreach ($node->getComments() as $comment) {
             if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
-                $this->changingIgnorer->startIgnoring();
+                $this->ignore = true;
                 $this->ignoredNodes->offsetSet($node);
+
+                break;
             }
         }
 
@@ -73,7 +77,7 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
     {
         if ($this->ignoredNodes->offsetExists($node)) {
             $this->ignoredNodes->offsetUnset($node);
-            $this->changingIgnorer->stopIgnoring();
+            $this->ignore = false;
         }
 
         return null;
