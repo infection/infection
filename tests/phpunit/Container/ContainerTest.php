@@ -68,39 +68,39 @@ final class ContainerTest extends TestCase
 
     public function test_it_can_build_simple_services_without_configuration(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $container = new Container([]);
 
         $container->getFileSystem();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_resolve_some_dependencies_without_configuration(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $container = new Container([]);
 
         $container->getAdapterInstallationDecider();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_resolve_all_dependencies_with_configuration(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $container = SingletonContainer::getContainer();
 
         $container->getSubscriberRegisterer();
         $container->getTestFrameworkFinder();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $container = SingletonContainer::getContainer();
 
         $container->getFileSystem();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
@@ -167,7 +167,7 @@ final class ContainerTest extends TestCase
 
         // Another happy path: the service cannot be created without a factory
         if ($service === null) {
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }
@@ -202,7 +202,7 @@ final class ContainerTest extends TestCase
             $service = $container->{$methodName}();
         } catch (Error|AssertException) {
             // Ignore services that require extra configuration
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }

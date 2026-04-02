@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 
+use Infection\PhpParser\NodeDumper\NodeDumper;
+use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
@@ -78,7 +78,7 @@ abstract class VisitorTestCase extends TestCase
 
     protected function createDumper(): NodeDumper
     {
-        return new NodeDumper();
+        return SingletonContainer::getContainer()->getNodeDumper();
     }
 
     /**

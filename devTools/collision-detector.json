@@ -5,6 +5,7 @@
     ],
 	"excludePaths": [
         "../tests/e2e/",
-        "../tests/benchmark/"
+        "../tests/benchmark/",
+        "../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures"
     ]
 }

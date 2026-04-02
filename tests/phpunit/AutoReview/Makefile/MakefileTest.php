@@ -364,6 +364,7 @@ final class MakefileTest extends BaseMakefileTestCase
         array $items,
     ): void {
         if (count($items) === 0) {
+            // @phpstan-ignore method.internal
             $this->addToAssertionCount(1);
 
             return;
@@ -385,7 +386,7 @@ final class MakefileTest extends BaseMakefileTestCase
         array $items,
     ): void {
         if (count($items) === 0) {
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }

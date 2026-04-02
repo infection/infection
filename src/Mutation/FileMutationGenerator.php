@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Command\Debug\DumpAstCommand;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -139,6 +140,10 @@ class FileMutationGenerator
     }
 
     /**
+     * Copy/pasted to DumpAstCommand.
+     *
+     * @see DumpAstCommand
+     *
      * @throws UnparsableFile
      *
      * @return array{Stmt[], Token[]}
@@ -147,9 +152,8 @@ class FileMutationGenerator
     {
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        // Pre-traverse the nodes to connect them
-        $preTraverser = $this->traverserFactory->createEnrichmentTraverser();
-        $preTraverser->traverse($initialStatements);
+        $traverser = $this->traverserFactory->createEnrichmentTraverser();
+        $traverser->traverse($initialStatements);
 
         return [$initialStatements, $originalFileTokens];
     }

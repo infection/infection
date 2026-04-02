@@ -37,9 +37,9 @@ namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -62,7 +62,7 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
                 $changingIgnorer,
                 new SplObjectStorage(),
             ),
-            new NonMutableNodesIgnorerVisitor([$changingIgnorer]),
+            new SkipIgnoredNodesVisitor([$changingIgnorer]),
             new MarkTraversedNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);

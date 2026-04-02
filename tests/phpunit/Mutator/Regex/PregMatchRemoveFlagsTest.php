@@ -130,6 +130,27 @@ final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
             ],
         ];
 
+        // https://github.com/infection/infection/issues/2977
+        yield 'It preserves non-canonical backslash encoding in the regex body when only flags change' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/iU', '', $m);
+                    PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/U', '', $m);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/i', '', $m);
+                        PHP,
+                ),
+            ],
+        ];
+
         yield 'It does not mutate regular expression with an encapsed variable' => [
             self::wrapCodeInMethod(
                 <<<'PHP'

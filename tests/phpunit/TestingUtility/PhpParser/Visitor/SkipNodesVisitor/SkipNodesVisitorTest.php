@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PhpParser\Visitor\SkipNodesVisitor;
 
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
