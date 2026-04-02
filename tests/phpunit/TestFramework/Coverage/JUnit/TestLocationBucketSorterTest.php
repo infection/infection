@@ -116,7 +116,7 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
-     * @param ArrayIterator<TestLocation> $uniqueTestLocations
+     * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
@@ -137,7 +137,7 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * Sanity check
      *
-     * @param ArrayIterator<TestLocation> $uniqueTestLocations
+     * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_quicksort_sorts_correctly(ArrayIterator $uniqueTestLocations): void
@@ -153,7 +153,7 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
-     * @param ArrayIterator<TestLocation> $uniqueTestLocations
+     * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_faster_than_quicksort(ArrayIterator $uniqueTestLocations): void
@@ -227,6 +227,9 @@ final class TestLocationBucketSorterTest extends TestCase
         return abs($a - $b) / (abs($a) + abs($b));
     }
 
+    /**
+     * @param TestLocation[] $uniqueTestLocations
+     */
     private static function quicksort(&$uniqueTestLocations): void
     {
         usort(

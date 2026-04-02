@@ -1231,30 +1231,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\JUnit\TestLocationBucketSorterTest::quicksort() has parameter $uniqueTestLocations with no type specified.'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\JUnit\TestLocationBucketSorterTest::test_it_sorts_correctly() has parameter $uniqueTestLocations with generic class ArrayIterator but does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\JUnit\TestLocationBucketSorterTest::test_it_sorts_faster_than_quicksort() has parameter $uniqueTestLocations with generic class ArrayIterator but does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\JUnit\TestLocationBucketSorterTest::test_quicksort_sorts_correctly() has parameter $uniqueTestLocations with generic class ArrayIterator but does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
 			count: 1
