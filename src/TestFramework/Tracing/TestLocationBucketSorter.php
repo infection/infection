@@ -42,7 +42,7 @@ use function ksort;
 /**
  * @internal
  */
-final class TestLocationBucketSorter
+final readonly class TestLocationBucketSorter
 {
     use CannotBeInstantiated;
 

@@ -124,7 +124,7 @@ final readonly class TestRunOrderResolver
     private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
     {
         return yield from take($sortedTestLocations)
-            ->map(static fn (TestLocation $testLocation) => $testLocation->getFilePath())
+            ->map(static fn (TestLocation $testLocation): ?string => $testLocation->getFilePath())
             ->stream();
     }
 
