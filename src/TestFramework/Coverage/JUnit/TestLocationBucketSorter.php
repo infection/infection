@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\CannotBeInstantiated;
 use function ksort;
 
 /**
@@ -43,6 +44,8 @@ use function ksort;
  */
 final class TestLocationBucketSorter
 {
+    use CannotBeInstantiated;
+
     /**
      * Pre-sort first buckets, optimistically assuming that most projects
      * won't have tests longer than a second.
@@ -57,10 +60,6 @@ final class TestLocationBucketSorter
         6 => [],
         7 => [],
     ];
-
-    private function __construct()
-    {
-    }
 
     /**
      * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
