@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Tracing;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
@@ -42,7 +42,7 @@ use function ksort;
 /**
  * @internal
  */
-final class TestLocationBucketSorter
+final readonly class TestLocationBucketSorter
 {
     use CannotBeInstantiated;
 

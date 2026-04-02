@@ -388,21 +388,6 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
-			count: 1
-			path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
-
-		-
-			rawMessage: Do not use magic number in bitwise operations. Move to constant with a suitable name.
-			count: 3
-			path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
-
-		-
-			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
-			count: 1
-			path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -419,6 +404,27 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
+			count: 1
+			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
+
+		-
+			rawMessage: Do not use magic number in bitwise operations. Move to constant with a suitable name.
+			count: 3
+			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
+
+		-
+			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
+			count: 1
+			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
+
+		-
+			rawMessage: 'Generator expects value type string, string|null given.'
+			identifier: generator.valueType
+			count: 1
+			path: ../src/TestFramework/Tracing/TestRunOrderResolver.php
 
 		-
 			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::createMutator() has parameter $settings with no value type specified in iterable type array.'
@@ -1153,12 +1159,6 @@ parameters:
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
-			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
-			identifier: div.rightNonNumeric
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1229,6 +1229,12 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
+
+		-
+			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
+			identifier: div.rightNonNumeric
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
 
 		-
 			rawMessage: Access to an undefined property PhpParser\NodeVisitor::$range.

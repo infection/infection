@@ -33,18 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Tracing;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function log;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 
-#[CoversClass(JUnitTestCaseSorter::class)]
-final class JUnitTestCaseSorterTest extends TestCase
+#[CoversClass(TestRunOrderResolver::class)]
+final class TestRunOrderResolverTest extends TestCase
 {
     /**
      * @param TestLocation[] $testLocations
@@ -55,9 +55,9 @@ final class JUnitTestCaseSorterTest extends TestCase
         array $testLocations,
         array $expected,
     ): void {
-        $sorter = new JUnitTestCaseSorter();
+        $resolver = new TestRunOrderResolver();
 
-        $actual = take($sorter->getUniqueSortedFileNames($testLocations))->toList();
+        $actual = take($resolver->resolve($testLocations))->toList();
 
         $this->assertSame($expected, $actual);
     }
@@ -111,9 +111,9 @@ final class JUnitTestCaseSorterTest extends TestCase
     {
         $this->assertLessThan(
             // Quicksort's average O(n log n)
-            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * log(JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER),
+            TestRunOrderResolver::USE_BUCKET_SORT_AFTER * log(TestRunOrderResolver::USE_BUCKET_SORT_AFTER),
             // Bucket Sort's average O(n + k)
-            JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER + JUnitTestCaseSorter::BUCKETS_COUNT,
+            TestRunOrderResolver::USE_BUCKET_SORT_AFTER + TestRunOrderResolver::BUCKETS_COUNT,
         );
     }
 }
