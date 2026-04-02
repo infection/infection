@@ -217,6 +217,8 @@ final class PHPStanAdapterTest extends TestCase
     #[DataProvider('provideValidVersions')]
     public function test_it_accepts_valid_versions(string $version): void
     {
+        $this->expectNotToPerformAssertions();
+
         $adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
             $this->createStub(PHPStanMutantExecutionResultFactory::class),
@@ -232,8 +234,6 @@ final class PHPStanAdapterTest extends TestCase
 
         // This should not throw an exception
         $adapter->assertMinimumVersionSatisfied();
-
-        $this->addToAssertionCount(1);
     }
 
     #[DataProvider('provideInvalidVersions')]

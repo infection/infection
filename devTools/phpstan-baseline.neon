@@ -499,12 +499,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/Event/SubscriberProvider.php
 
 		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/AutoReview/Event/SubscriberTest.php
-
-		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
 			count: 1
@@ -571,28 +565,10 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProviderTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupTest.php
-
-		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 2
-			path: ../tests/phpunit/AutoReview/Makefile/MakefileTest.php
 
 		-
 			rawMessage: 'Cannot call method getPrerequisites() on Fidry\Makefile\Rule|null.'
@@ -605,12 +581,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: ../tests/phpunit/AutoReview/Mutator/MutatorProviderTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\AutoReview\Mutator\MutatorTest::getPublicMethods() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
@@ -691,28 +661,10 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
 		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFileTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaValidatorTest.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 6
-			path: ../tests/phpunit/Container/ContainerTest.php
 
 		-
 			rawMessage: Variable method call on Infection\Container\Container.
@@ -1123,12 +1075,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
 
 		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
 			identifier: missingType.generics
 			count: 1
@@ -1145,12 +1091,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php
 
 		-
 			rawMessage: 'Parameter #1 $className of static method Infection\Reflection\AnonymousClassReflection::fromClassName() expects class-string, string given.'
@@ -1213,24 +1153,6 @@ parameters:
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 5
-			path: ../tests/phpunit/TestFramework/Coverage/CoverageChecker/CoverageCheckerTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
-
-		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
 			count: 1
@@ -1289,12 +1211,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
-
-		-
-			rawMessage: 'Call to internal method PHPUnit\Framework\TestCase::addToAssertionCount() from outside its root namespace PHPUnit.'
-			identifier: method.internal
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
 
 		-
 			rawMessage: 'Call to method PHPUnit\Framework\Assert::assertTrue() with true will always evaluate to true.'
