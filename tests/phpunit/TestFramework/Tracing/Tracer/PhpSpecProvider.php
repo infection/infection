@@ -37,8 +37,8 @@ namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Symfony\Component\Filesystem\Path;
 
@@ -65,7 +65,7 @@ final class PhpSpecProvider
                     realPath: $sourcePath,
                     hasTest: true,
                     tests: new TestLocations(
-                        byLine: [
+                        testLocationsByLine: [
                             9 => [
                                 new TestLocation(
                                     method: 'spec\Infection\PhpSpecAdapter\E2ETests\PhpSpec\Covered\CalculatorSpec::it_adds_two_positive_numbers',
@@ -208,13 +208,13 @@ final class PhpSpecProvider
                                 ),
                             ],
                         ],
-                        byMethod: [
-                            'add' => new SourceMethodLineRange(7, 10),
-                            'subtract' => new SourceMethodLineRange(12, 15),
-                            'multiply' => new SourceMethodLineRange(17, 20),
-                            'divide' => new SourceMethodLineRange(22, 29),
-                            'isPositive' => new SourceMethodLineRange(31, 34),
-                            'absolute' => new SourceMethodLineRange(36, 39),
+                        methodLineRangesByMethodName: [
+                            'add' => MethodLineRangeFactory::create('add', 7, 10),
+                            'subtract' => MethodLineRangeFactory::create('subtract', 12, 15),
+                            'multiply' => MethodLineRangeFactory::create('multiply', 17, 20),
+                            'divide' => MethodLineRangeFactory::create('divide', 22, 29),
+                            'isPositive' => MethodLineRangeFactory::create('isPositive', 31, 34),
+                            'absolute' => MethodLineRangeFactory::create('absolute', 36, 39),
                         ],
                     ),
                 ),
@@ -231,7 +231,7 @@ final class PhpSpecProvider
                     realPath: $sourcePath,
                     hasTest: true,
                     tests: new TestLocations(
-                        byLine: [
+                        testLocationsByLine: [
                             11 => [
                                 new TestLocation(
                                     method: 'spec\Infection\PhpSpecAdapter\E2ETests\PhpSpec\Covered\UserServiceSpec::it_adds_user_successfully',
@@ -351,11 +351,11 @@ final class PhpSpecProvider
                                 ),
                             ],
                         ],
-                        byMethod: [
-                            'log' => new SourceMethodLineRange(9, 12),
-                            'getLogs' => new SourceMethodLineRange(14, 17),
-                            'clearLogs' => new SourceMethodLineRange(19, 22),
-                            'hasLogs' => new SourceMethodLineRange(24, 27),
+                        methodLineRangesByMethodName: [
+                            'log' => MethodLineRangeFactory::create('log', 9, 12),
+                            'getLogs' => MethodLineRangeFactory::create('getLogs', 14, 17),
+                            'clearLogs' => MethodLineRangeFactory::create('clearLogs', 19, 22),
+                            'hasLogs' => MethodLineRangeFactory::create('hasLogs', 24, 27),
                         ],
                     ),
                 ),
@@ -372,7 +372,7 @@ final class PhpSpecProvider
                     realPath: $sourcePath,
                     hasTest: true,
                     tests: new TestLocations(
-                        byLine: [
+                        testLocationsByLine: [
                             13 => [
                                 new TestLocation(
                                     method: 'spec\Infection\PhpSpecAdapter\E2ETests\PhpSpec\Covered\UserServiceSpec::it_adds_user_successfully',
@@ -705,12 +705,12 @@ final class PhpSpecProvider
                                 ),
                             ],
                         ],
-                        byMethod: [
-                            'addUser' => new SourceMethodLineRange(11, 26),
-                            'removeUser' => new SourceMethodLineRange(28, 38),
-                            'getUser' => new SourceMethodLineRange(40, 43),
-                            'userExists' => new SourceMethodLineRange(45, 48),
-                            'getUserCount' => new SourceMethodLineRange(50, 53),
+                        methodLineRangesByMethodName: [
+                            'addUser' => MethodLineRangeFactory::create('addUser', 11, 26),
+                            'removeUser' => MethodLineRangeFactory::create('removeUser', 28, 38),
+                            'getUser' => MethodLineRangeFactory::create('getUser', 40, 43),
+                            'userExists' => MethodLineRangeFactory::create('userExists', 45, 48),
+                            'getUserCount' => MethodLineRangeFactory::create('getUserCount', 50, 53),
                         ],
                     ),
                 ),
@@ -727,7 +727,7 @@ final class PhpSpecProvider
                     realPath: $sourcePath,
                     hasTest: true,
                     tests: new TestLocations(
-                        byLine: [
+                        testLocationsByLine: [
                             7 => [
                                 new TestLocation(
                                     method: 'spec\Infection\PhpSpecAdapter\E2ETests\PhpSpec\Covered\FormatNameFunctionSpec::it_formats_name_with_both_names',
@@ -808,7 +808,7 @@ final class PhpSpecProvider
                                 ),
                             ],
                         ],
-                        byMethod: [],
+                        methodLineRangesByMethodName: [],
                     ),
                 ),
             ];

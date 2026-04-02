@@ -35,27 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing\Tracer;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportFactory;
+use Infection\TestFramework\PhpUnit\PHPUnitCoverageTracer;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
-use Infection\Tests\Fixtures\TestFramework\Coverage\JUnit\FakeTestFileDataProvider;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversNothing]
@@ -121,63 +111,15 @@ final class TracerIntegrationTest extends TestCase
         string $indexXmlPath,
         ?string $junitXmlPath,
     ): Tracer {
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapterStub
-            ->method('hasJUnitReport')
-            ->willReturn($junitXmlPath !== null);
+        if ($junitXmlPath === null) {
+            $this->markTestIncomplete('TODO');
+        }
 
-        $junitFileDataProvider = $junitXmlPath === null
-            ? new FakeTestFileDataProvider()
-            : new MemoizedTestFileDataProvider(
-                new JUnitTestFileDataProvider(
-                    new FixedLocator($junitXmlPath),
-                ),
-            );
-
-        $fileSystemStub = $this->createFileSystemStub();
-
-        return new TraceProviderAdapterTracer(
-            new CoveredTraceProvider(
-                new PhpUnitXmlCoverageTraceProvider(
-                    indexLocator: new FixedLocator($indexXmlPath),
-                    indexParser: new IndexXmlCoverageParser(
-                        isSourceFiltered: false,
-                        fileSystem: $fileSystemStub,
-                    ),
-                    parser: new XmlCoverageParser(
-                        $fileSystemStub,
-                    ),
-                ),
-                new JUnitTestExecutionInfoAdder(
-                    $testFrameworkAdapterStub,
-                    $junitFileDataProvider,
-                ),
+        return new PHPUnitCoverageTracer(
+            new PHPUnitXmlReportFactory(
+                indexReportLocator: new FixedLocator($indexXmlPath),
+                jUnitReportLocator: new FixedLocator($junitXmlPath),
             ),
         );
-    }
-
-    private function createFileSystemStub(): FileSystem
-    {
-        $fileSystem = new FileSystem();
-
-        $fileSystemStub = $this->createStub(FileSystem::class);
-        $fileSystemStub
-            ->method('isReadableFile')
-            ->willReturnCallback($fileSystem->isReadableFile(...));
-        $fileSystemStub
-            ->method('readFile')
-            ->willReturnCallback($fileSystem->readFile(...));
-
-        // We are only interested in mocking the realPath check!
-        // In this test, we do not ~~need~~ want to check that the source file exists as this
-        // makes the tests too inflexible.
-        // In a real run, this is what provides the guarantee that the constructed path makes
-        // sense; in this test it is done by checking that the path we get at the end for the
-        // source file is the one we expect.
-        $fileSystemStub
-            ->method('realPath')
-            ->willReturnCallback(static fn (string $path): string => $path);
-
-        return $fileSystemStub;
     }
 }

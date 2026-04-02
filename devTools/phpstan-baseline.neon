@@ -403,12 +403,6 @@ parameters:
 			path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
 
 		-
-			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
-			identifier: arrayFilter.strict
-			count: 1
-			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
-
-		-
 			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
 			identifier: method.childParameterType
 			count: 1
@@ -1228,7 +1222,7 @@ parameters:
 			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
 			identifier: property.notFound
 			count: 2
-			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
+			path: ../tests/phpunit/Framework/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
 			rawMessage: Access to an undefined property PhpParser\NodeVisitor::$range.

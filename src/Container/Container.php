@@ -51,7 +51,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
-use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -151,21 +150,15 @@ use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
-use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReportLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportFactory;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\PHPUnitCoverageTracer;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\Tracing\CachedTracer;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\TestFramework\Tracing\TraceProvider;
-use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
@@ -262,22 +255,14 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
-                $container->getTraceProvider(),
-            ),
-            TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
-                $container->getPhpUnitXmlCoverageTraceProvider(),
-                $container->getJUnitTestExecutionInfoAdder(),
-            ),
-            PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
+            PHPUnitXmlReportFactory::class => static fn (self $container): PHPUnitXmlReportFactory => new PHPUnitXmlReportFactory(
                 $container->getIndexXmlCoverageLocator(),
-                $container->getIndexXmlCoverageParser(),
-                $container->getXmlCoverageParser(),
+                $container->getJUnitReportLocator(),
             ),
-            IndexXmlCoverageLocator::class => static fn (self $container) => IndexXmlCoverageLocator::create(
-                $container->getFileSystem(),
-                $container->getConfiguration()->coveragePath,
+            Tracer::class => static fn (self $container) => new CachedTracer(
+                new PHPUnitCoverageTracer(
+                    $container->get(PHPUnitXmlReportFactory::class),
+                ),
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
                 [$container->getProjectDir()],
@@ -328,9 +313,6 @@ final class Container extends DIContainer
             StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
                 (string) $container->getConfiguration()->phpStan->configDir,
             ),
-            MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
-                new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
-            ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
             PrettyPrinterAbstract::class => static fn (): InfectionPrettyPrinter => new InfectionPrettyPrinter(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
@@ -366,6 +348,10 @@ final class Container extends DIContainer
                 );
             },
             JUnitReportLocator::class => static fn (self $container) => JUnitReportLocator::create(
+                $container->getFileSystem(),
+                $container->getConfiguration()->coveragePath,
+            ),
+            IndexReportLocator::class => static fn (self $container) => IndexReportLocator::create(
                 $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,
             ),
@@ -782,11 +768,6 @@ final class Container extends DIContainer
         return $this->get(Tracer::class);
     }
 
-    public function getTraceProvider(): TraceProvider
-    {
-        return $this->get(TraceProvider::class);
-    }
-
     public function getDiffColorizer(): DiffColorizer
     {
         return $this->get(DiffColorizer::class);
@@ -1176,19 +1157,9 @@ final class Container extends DIContainer
         return $this->get(StaticAnalysisToolFactory::class);
     }
 
-    private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
+    private function getIndexXmlCoverageLocator(): ReportLocator
     {
-        return $this->get(JUnitTestExecutionInfoAdder::class);
-    }
-
-    private function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
-    {
-        return $this->get(PhpUnitXmlCoverageTraceProvider::class);
-    }
-
-    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
-    {
-        return $this->get(IndexXmlCoverageLocator::class);
+        return $this->get(IndexReportLocator::class);
     }
 
     private function getProjectDir(): string
@@ -1196,19 +1167,9 @@ final class Container extends DIContainer
         return $this->get(ProjectDirProvider::class)->getProjectDir();
     }
 
-    private function getJUnitReportLocator(): JUnitReportLocator
+    private function getJUnitReportLocator(): ReportLocator
     {
         return $this->get(JUnitReportLocator::class);
-    }
-
-    private function getIndexXmlCoverageParser(): IndexXmlCoverageParser
-    {
-        return $this->get(IndexXmlCoverageParser::class);
-    }
-
-    private function getXmlCoverageParser(): XmlCoverageParser
-    {
-        return $this->get(XmlCoverageParser::class);
     }
 
     /**
