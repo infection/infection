@@ -119,6 +119,8 @@ final readonly class TestRunOrderResolver
      * @param iterable<TestLocation> $sortedTestLocations
      *
      * @return iterable<string>
+     *
+     * @psalm-suppress InvalidReturnType
      */
     private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
     {
