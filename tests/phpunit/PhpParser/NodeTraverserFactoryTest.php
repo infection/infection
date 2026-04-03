@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser;
 
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -74,12 +74,12 @@ final class NodeTraverserFactoryTest extends TestCase
             $traverser,
             [
                 NextConnectingVisitor::class,
-                IgnoreAllMutationsAnnotationReaderVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
+                ExcludeIgnoredNodesVisitor::class,
                 SkipIgnoredNodesVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
-                LabelNodesAsEligibleVisitor::class,
             ],
         );
     }

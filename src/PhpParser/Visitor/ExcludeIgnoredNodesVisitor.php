@@ -33,30 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor\IgnoreNode;
+namespace Infection\PhpParser\Visitor;
 
+use PhpParser\Comment;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use function str_contains;
 
 /**
  * @internal
- * @final
  */
-class ChangingIgnorer implements NodeIgnorer
+final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
-    private bool $ignore = false;
+    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
-    public function ignores(Node $node): bool
+    private ?Node $excludedStartNode = null;
+
+    public function enterNode(Node $node): ?Node
     {
-        return $this->ignore;
+        if ($this->excludedStartNode !== null) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+
+            return null;
+        }
+
+        if (self::hasIgnoreAnnotation($node)) {
+            $this->excludedStartNode = $node;
+
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
+
+        return null;
     }
 
-    public function startIgnoring(): void
+    public function leaveNode(Node $node): ?Node
     {
-        $this->ignore = true;
+        if ($node === $this->excludedStartNode) {
+            $this->excludedStartNode = null;
+        }
+
+        return null;
     }
 
-    public function stopIgnoring(): void
+    private static function hasIgnoreAnnotation(Node $node): bool
     {
-        $this->ignore = false;
+        foreach ($node->getComments() as $comment) {
+            if (self::commentContainsAnnotation($comment)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function commentContainsAnnotation(Comment $comment): bool
+    {
+        return str_contains(
+            $comment->getText(),
+            self::IGNORE_ALL_MUTATIONS_ANNOTATION,
+        );
     }
 }

@@ -33,20 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SplObjectStorage;
 
-#[CoversClass(IgnoreAllMutationsAnnotationReaderVisitor::class)]
-final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCase
+#[CoversClass(ExcludeIgnoredNodesVisitor::class)]
+final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
 {
     #[DataProvider('nodeProvider')]
     public function test_it_marks_nodes_with_the_ignore_all_comment_as_ignored(
@@ -55,15 +51,9 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
     ): void {
         $nodes = $this->parse($code);
 
-        $changingIgnorer = new ChangingIgnorer();
-
         $traverser = new NodeTraverser(
-            new IgnoreAllMutationsAnnotationReaderVisitor(
-                $changingIgnorer,
-                new SplObjectStorage(),
-            ),
-            new SkipIgnoredNodesVisitor([$changingIgnorer]),
-            new MarkTraversedNodesAsVisitedVisitor(),
+            new ExcludeIgnoredNodesVisitor(),
+            new MarkAllButIneligibleNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);
 
@@ -189,9 +179,9 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
 
                 // @infection-ignore-all
                 class ClassWithExcludedMethod {
-                    function nonExcludedMethod() {}
+                    function indirectlyExcludedMethod1() {}
 
-                    function excludedMethod() {}
+                    function indirectlyExcludedMethod2() {}
                 }
 
                 PHP,
@@ -201,6 +191,60 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
                         name: Name
                         stmts: array(
                             0: <skipped>
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
+
+        yield 'comment on the namespace' => [
+            <<<'PHP'
+                <?php
+
+                // @infection-ignore-all
+                namespace Infection\Tests\Virtual;
+
+                class Demo {
+                    function nonExcludedMethod() {}
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: <skipped>
+                )
+                AST,
+        ];
+
+        yield 'comment on a use statement' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                // @infection-ignore-all
+                use RuntimeException;
+
+                class Demo {
+                    function method() {}
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: <skipped>
+                            1: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                )
+                            )
                         )
                         kind: 1
                     )
@@ -254,6 +298,34 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
                                     )
                                 )
                             )
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
+
+        yield 'comment on the class and method' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                // @infection-ignore-all
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
+
+                    // @infection-ignore-all
+                    function excludedMethod() {}
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: <skipped>
                         )
                         kind: 1
                     )

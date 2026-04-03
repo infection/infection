@@ -551,6 +551,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             nodeId: 17
                                             origNode: nodeId(17)
                                         )
+                                        eligible: true
                                         nodeId: 12
                                         origNode: nodeId(12)
                                     )
@@ -741,6 +742,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         origNode: nodeId(12)
                                     )
                                 )
+                                eligible: true
                                 nodeId: 6
                                 origNode: nodeId(6)
                             )
@@ -1132,6 +1134,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             nodeId: 19
                                             origNode: nodeId(19)
                                         )
+                                        eligible: true
                                         nodeId: 14
                                         origNode: nodeId(14)
                                     )
@@ -1229,7 +1232,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'infection-ignore-all corrupting the name resolution' => [
+        // Incorrect as in: used on a node that is not a mutation candidate
+        yield 'with incorrect usage infection-ignore-all' => [
             file_get_contents(self::FIXTURES_DIR . '/ProblematicIgnoreAll.php'),
             <<<'AST'
                 array(
@@ -1300,20 +1304,28 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 uses: array(
                                     0: UseItem(
                                         name: Name(
+                                            eligible: false
                                             nodeId: 12
                                             origNode: nodeId(12)
+                                            parent: nodeId(11)
                                         )
                                         alias: Identifier(
+                                            eligible: false
                                             nodeId: 13
                                             origNode: nodeId(13)
+                                            parent: nodeId(11)
                                         )
+                                        eligible: false
                                         nodeId: 11
                                         origNode: nodeId(11)
+                                        parent: nodeId(10)
                                     )
                                 )
+                                eligible: false
                                 next: nodeId(14)
                                 nodeId: 10
                                 origNode: nodeId(10)
+                                parent: nodeId(4)
                             )
                             2: Stmt_Class(
                                 name: Identifier(
@@ -1416,7 +1428,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             origNode: nodeId(26)
                                                             parent: nodeId(24)
                                                             reflectionClass: Infection\Reflection\NullReflection
-                                                            resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
+                                                            resolvedName: FullyQualified(RuntimeException)
                                                         )
                                                         eligible: true
                                                         functionName: check

@@ -33,49 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use SplObjectStorage;
-use function str_contains;
 
 /**
  * @internal
  */
-final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstract
+final class MarkAllButIneligibleNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
-
-    /**
-     * @param SplObjectStorage<object, mixed> $ignoredNodes
-     */
-    public function __construct(
-        private readonly ChangingIgnorer $changingIgnorer,
-        private readonly SplObjectStorage $ignoredNodes,
-    ) {
-    }
-
-    public function enterNode(Node $node): ?Node
+    public function enterNode(Node $node): null
     {
-        foreach ($node->getComments() as $comment) {
-            if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
-                $this->changingIgnorer->startIgnoring();
-                $this->ignoredNodes->offsetSet($node);
-
-                break;
-            }
-        }
-
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        if ($this->ignoredNodes->offsetExists($node)) {
-            $this->ignoredNodes->offsetUnset($node);
-            $this->changingIgnorer->stopIgnoring();
+        if (!LabelNodesAsEligibleVisitor::isExplicitlyIneligible($node)) {
+            MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
         }
 
         return null;

@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use function array_flip;
-use function array_intersect_key;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
@@ -44,7 +42,6 @@ use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -65,7 +62,7 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
 
         $nodesById = $this->addIdsToNodes($nodes);
 
-        self::markNodeAsEligible($nodesById, $eligibleNodeIds);
+        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
 
         $traverser = new NodeTraverser(
             new ReflectionVisitor(),
@@ -277,21 +274,5 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                 )
                 AST,
         ];
-    }
-
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
-     */
-    private static function markNodeAsEligible(array $nodesById, array $eligibleNodeIds): void
-    {
-        $eligibleNodes = array_intersect_key(
-            $nodesById,
-            array_flip($eligibleNodeIds),
-        );
-
-        foreach ($eligibleNodes as $node) {
-            LabelNodesAsEligibleVisitor::markAsEligible($node);
-        }
     }
 }
