@@ -63,6 +63,8 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
             if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
                 $this->changingIgnorer->startIgnoring();
                 $this->ignoredNodes->offsetSet($node);
+
+                break;
             }
         }
 
