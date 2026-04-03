@@ -1228,5 +1228,292 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 )
                 AST,
         ];
+
+        yield 'infection-ignore-all corrupting the name resolution' => [
+            file_get_contents(self::FIXTURES_DIR . '/ProblematicIgnoreAll.php'),
+            <<<'AST'
+                array(
+                    0: Stmt_Declare(
+                        declares: array(
+                            0: DeclareItem(
+                                key: Identifier(
+                                    nodeId: 2
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(2)
+                                )
+                                value: Scalar_Int(
+                                    rawValue: 1
+                                    kind: KIND_DEC (10)
+                                    nodeId: 3
+                                    parent: nodeId(1)
+                                    eligible: true
+                                    origNode: nodeId(3)
+                                )
+                                nodeId: 1
+                                parent: nodeId(0)
+                                eligible: true
+                                origNode: nodeId(1)
+                            )
+                        )
+                        nodeId: 0
+                        eligible: true
+                        next: nodeId(4)
+                        origNode: nodeId(0)
+                    )
+                    1: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 5
+                            parent: nodeId(4)
+                            eligible: true
+                            origNode: nodeId(5)
+                        )
+                        stmts: array(
+                            0: Stmt_Use(
+                                uses: array(
+                                    0: UseItem(
+                                        name: Name(
+                                            nodeId: 8
+                                            parent: nodeId(7)
+                                            eligible: true
+                                            origNode: nodeId(8)
+                                        )
+                                        alias: Identifier(
+                                            nodeId: 9
+                                            parent: nodeId(7)
+                                            eligible: true
+                                            origNode: nodeId(9)
+                                        )
+                                        nodeId: 7
+                                        parent: nodeId(6)
+                                        eligible: true
+                                        origNode: nodeId(7)
+                                    )
+                                )
+                                nodeId: 6
+                                parent: nodeId(4)
+                                eligible: true
+                                next: nodeId(10)
+                                origNode: nodeId(6)
+                            )
+                            1: Stmt_Use(
+                                uses: array(
+                                    0: UseItem(
+                                        name: Name(
+                                            nodeId: 12
+                                            origNode: nodeId(12)
+                                        )
+                                        alias: Identifier(
+                                            nodeId: 13
+                                            origNode: nodeId(13)
+                                        )
+                                        nodeId: 11
+                                        origNode: nodeId(11)
+                                    )
+                                )
+                                nodeId: 10
+                                next: nodeId(14)
+                                origNode: nodeId(10)
+                            )
+                            2: Stmt_Class(
+                                name: Identifier(
+                                    nodeId: 15
+                                    parent: nodeId(14)
+                                    eligible: true
+                                    origNode: nodeId(15)
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 17
+                                            parent: nodeId(16)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            functionScope: nodeId(16)
+                                            reflectionClass: Infection\Reflection\NullReflection
+                                            functionName: check
+                                            eligible: true
+                                            origNode: nodeId(17)
+                                            mutationCandidate: true
+                                        )
+                                        params: array(
+                                            0: Param(
+                                                type: Identifier(
+                                                    nodeId: 19
+                                                    parent: nodeId(18)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: true
+                                                    functionScope: nodeId(16)
+                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    functionName: check
+                                                    eligible: true
+                                                    origNode: nodeId(19)
+                                                    mutationCandidate: true
+                                                )
+                                                var: Expr_Variable(
+                                                    nodeId: 20
+                                                    parent: nodeId(18)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: true
+                                                    functionScope: nodeId(16)
+                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    functionName: check
+                                                    eligible: true
+                                                    origNode: nodeId(20)
+                                                    mutationCandidate: true
+                                                )
+                                                nodeId: 18
+                                                parent: nodeId(16)
+                                                isInsideFunction: true
+                                                isOnFunctionSignature: true
+                                                isStrictTypes: true
+                                                functionScope: nodeId(16)
+                                                reflectionClass: Infection\Reflection\NullReflection
+                                                functionName: check
+                                                eligible: true
+                                                origNode: nodeId(18)
+                                                mutationCandidate: true
+                                            )
+                                        )
+                                        returnType: Identifier(
+                                            nodeId: 21
+                                            parent: nodeId(16)
+                                            isInsideFunction: true
+                                            isStrictTypes: true
+                                            functionScope: nodeId(16)
+                                            reflectionClass: Infection\Reflection\NullReflection
+                                            functionName: check
+                                            eligible: true
+                                            origNode: nodeId(21)
+                                            mutationCandidate: true
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_BinaryOp_BooleanOr(
+                                                    left: Expr_Instanceof(
+                                                        expr: Expr_Variable(
+                                                            nodeId: 25
+                                                            parent: nodeId(24)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: true
+                                                            functionScope: nodeId(16)
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            functionName: check
+                                                            eligible: true
+                                                            origNode: nodeId(25)
+                                                            mutationCandidate: true
+                                                        )
+                                                        class: Name(
+                                                            nodeId: 26
+                                                            resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
+                                                            parent: nodeId(24)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: true
+                                                            functionScope: nodeId(16)
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            functionName: check
+                                                            eligible: true
+                                                            origNode: nodeId(26)
+                                                            mutationCandidate: true
+                                                        )
+                                                        nodeId: 24
+                                                        parent: nodeId(23)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        functionScope: nodeId(16)
+                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        functionName: check
+                                                        eligible: true
+                                                        origNode: nodeId(24)
+                                                        mutationCandidate: true
+                                                    )
+                                                    right: Expr_Instanceof(
+                                                        expr: Expr_Variable(
+                                                            nodeId: 28
+                                                            parent: nodeId(27)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: true
+                                                            functionScope: nodeId(16)
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            functionName: check
+                                                            eligible: true
+                                                            origNode: nodeId(28)
+                                                            mutationCandidate: true
+                                                        )
+                                                        class: Name(
+                                                            nodeId: 29
+                                                            resolvedName: FullyQualified(InvalidArgumentException)
+                                                            parent: nodeId(27)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: true
+                                                            functionScope: nodeId(16)
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            functionName: check
+                                                            eligible: true
+                                                            origNode: nodeId(29)
+                                                            mutationCandidate: true
+                                                        )
+                                                        nodeId: 27
+                                                        parent: nodeId(23)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: true
+                                                        functionScope: nodeId(16)
+                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        functionName: check
+                                                        eligible: true
+                                                        origNode: nodeId(27)
+                                                        mutationCandidate: true
+                                                    )
+                                                    nodeId: 23
+                                                    parent: nodeId(22)
+                                                    isInsideFunction: true
+                                                    isStrictTypes: true
+                                                    functionScope: nodeId(16)
+                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    functionName: check
+                                                    eligible: true
+                                                    origNode: nodeId(23)
+                                                    mutationCandidate: true
+                                                )
+                                                nodeId: 22
+                                                parent: nodeId(16)
+                                                isInsideFunction: true
+                                                isStrictTypes: true
+                                                functionScope: nodeId(16)
+                                                reflectionClass: Infection\Reflection\NullReflection
+                                                functionName: check
+                                                eligible: true
+                                                origNode: nodeId(22)
+                                                mutationCandidate: true
+                                            )
+                                        )
+                                        nodeId: 16
+                                        parent: nodeId(14)
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        reflectionClass: Infection\Reflection\NullReflection
+                                        functionName: check
+                                        eligible: true
+                                        origNode: nodeId(16)
+                                        mutationCandidate: true
+                                    )
+                                )
+                                nodeId: 14
+                                parent: nodeId(4)
+                                eligible: true
+                                origNode: nodeId(14)
+                            )
+                        )
+                        kind: 1
+                        nodeId: 4
+                        eligible: true
+                        next: nodeId(6)
+                        origNode: nodeId(4)
+                    )
+                )
+                AST,
+        ];
     }
 }
