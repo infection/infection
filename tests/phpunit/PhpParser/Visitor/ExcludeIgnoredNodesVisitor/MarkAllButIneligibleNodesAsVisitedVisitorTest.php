@@ -65,8 +65,8 @@ final class MarkAllButIneligibleNodesAsVisitedVisitorTest extends VisitorTestCas
 
         $nodesById = $this->addIdsToNodes($nodes);
 
-        $eligibleNodeIds = $eligibleNodeIds ?? array_keys($nodesById);
-        $ineligibleNodeIds = $ineligibleNodeIds ?? array_keys($nodesById);
+        $eligibleNodeIds ??= array_keys($nodesById);
+        $ineligibleNodeIds ??= array_keys($nodesById);
 
         self::ensureNoCommonNodes($eligibleNodeIds, $ineligibleNodeIds);
 
