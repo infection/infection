@@ -188,9 +188,9 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
 
                 // @infection-ignore-all
                 class ClassWithExcludedMethod {
-                    function nonExcludedMethod() {}
+                    function indirectlyExcludedMethod1() {}
 
-                    function excludedMethod() {}
+                    function indirectlyExcludedMethod2() {}
                 }
 
                 PHP,
@@ -200,6 +200,60 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
                         name: Name
                         stmts: array(
                             0: <skipped>
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
+
+        yield 'comment on the namespace' => [
+            <<<'PHP'
+                <?php
+
+                // @infection-ignore-all
+                namespace Infection\Tests\Virtual;
+
+                class Demo {
+                    function nonExcludedMethod() {}
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: <skipped>
+                )
+                AST,
+        ];
+
+        yield 'comment on a use statement' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                // @infection-ignore-all
+                use RuntimeException;
+
+                class Demo {
+                    function method() {}
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: <skipped>
+                            1: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                )
+                            )
                         )
                         kind: 1
                     )
@@ -253,6 +307,34 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
                                     )
                                 )
                             )
+                        )
+                        kind: 1
+                    )
+                )
+                AST,
+        ];
+
+        yield 'comment on the class and method' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                // @infection-ignore-all
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
+
+                    // @infection-ignore-all
+                    function excludedMethod() {}
+                }
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: <skipped>
                         )
                         kind: 1
                     )

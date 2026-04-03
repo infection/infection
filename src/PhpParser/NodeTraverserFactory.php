@@ -66,12 +66,12 @@ class NodeTraverserFactory
 
         return new NodeTraverser(
             new NextConnectingVisitor(),
+            new LabelNodesAsEligibleVisitor(),
             new ExcludeIgnoredNodesVisitor(),
             new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
-            new LabelNodesAsEligibleVisitor(),
         );
     }
 

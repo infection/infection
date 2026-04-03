@@ -48,6 +48,8 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
     private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
+    private ?Node $excludedStartNode = null;
+
     /**
      * @param SplObjectStorage<object, mixed> $ignoredNodes
      */
@@ -58,8 +60,10 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): ?Node
     {
-        if (self::hasIgnoreAnnotation($node)) {
-            $this->ignoredNodes->offsetSet($node);
+        if (null !== $this->excludedStartNode) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        } elseif (self::hasIgnoreAnnotation($node)) {
+            $this->excludedStartNode = $node;
 
             LabelNodesAsEligibleVisitor::markAsIneligible($node);
         }
@@ -69,8 +73,8 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): ?Node
     {
-        if ($this->ignoredNodes->offsetExists($node)) {
-            $this->ignoredNodes->offsetUnset($node);
+        if ($node === $this->excludedStartNode) {
+            $this->excludedStartNode = null;
         }
 
         return null;
