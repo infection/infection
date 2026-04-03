@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Tracing;
 
 use function abs;
 use function array_map;
@@ -42,11 +42,10 @@ use function array_slice;
 use ArrayIterator;
 use function extension_loaded;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
-use Infection\TestFramework\Coverage\JUnit\TestLocationBucketSorter;
+use Infection\TestFramework\Tracing\TestLocationBucketSorter;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes;
 use function iterator_to_array;
-use function log;
 use function microtime;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -116,7 +115,7 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
-     * @param ArrayIterator<TestLocation> $uniqueTestLocations
+     * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_correctly(ArrayIterator $uniqueTestLocations): void
@@ -137,7 +136,7 @@ final class TestLocationBucketSorterTest extends TestCase
     /**
      * Sanity check
      *
-     * @param ArrayIterator<TestLocation> $uniqueTestLocations
+     * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_quicksort_sorts_correctly(ArrayIterator $uniqueTestLocations): void
@@ -153,7 +152,7 @@ final class TestLocationBucketSorterTest extends TestCase
     }
 
     /**
-     * @param ArrayIterator<TestLocation> $uniqueTestLocations
+     * @param ArrayIterator<array-key, TestLocation> $uniqueTestLocations
      */
     #[DataProvider('locationsArrayProvider')]
     public function test_it_sorts_faster_than_quicksort(ArrayIterator $uniqueTestLocations): void
@@ -166,7 +165,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }
@@ -206,7 +205,7 @@ final class TestLocationBucketSorterTest extends TestCase
             JUnitTimes::JUNIT_TIMES,
         );
 
-        yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, JUnitTestCaseSorter::USE_BUCKET_SORT_AFTER * 10))];
+        yield 'Ten times the minimal amount of locations' => [new ArrayIterator(array_slice($locations, 0, TestRunOrderResolver::USE_BUCKET_SORT_AFTER * 10))];
 
         yield 'All locations' => [new ArrayIterator($locations)];
     }
@@ -227,6 +226,9 @@ final class TestLocationBucketSorterTest extends TestCase
         return abs($a - $b) / (abs($a) + abs($b));
     }
 
+    /**
+     * @param TestLocation[] $uniqueTestLocations
+     */
     private static function quicksort(&$uniqueTestLocations): void
     {
         usort(
