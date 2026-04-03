@@ -74,12 +74,12 @@ final class NodeTraverserFactoryTest extends TestCase
             $traverser,
             [
                 NextConnectingVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
                 ExcludeIgnoredNodesVisitor::class,
                 SkipIgnoredNodesVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
-                LabelNodesAsEligibleVisitor::class,
             ],
         );
     }
