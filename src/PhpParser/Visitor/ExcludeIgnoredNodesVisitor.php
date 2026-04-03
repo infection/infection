@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use SplObjectStorage;
@@ -44,30 +44,24 @@ use function str_contains;
 /**
  * @internal
  */
-final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstract
+final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
     private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
-
-    private bool $ignore;
 
     /**
      * @param SplObjectStorage<object, mixed> $ignoredNodes
      */
     public function __construct(
-        //private readonly ChangingIgnorer $changingIgnorer,
-        private readonly SplObjectStorage $ignoredNodes,
+        private readonly SplObjectStorage $ignoredNodes = new SplObjectStorage(),
     ) {
     }
 
     public function enterNode(Node $node): ?Node
     {
-        foreach ($node->getComments() as $comment) {
-            if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
-                $this->ignore = true;
-                $this->ignoredNodes->offsetSet($node);
+        if (self::hasIgnoreAnnotation($node)) {
+            $this->ignoredNodes->offsetSet($node);
 
-                break;
-            }
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
         }
 
         return null;
@@ -77,9 +71,27 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
     {
         if ($this->ignoredNodes->offsetExists($node)) {
             $this->ignoredNodes->offsetUnset($node);
-            $this->ignore = false;
         }
 
         return null;
+    }
+
+    private static function hasIgnoreAnnotation(Node $node): bool
+    {
+        foreach ($node->getComments() as $comment) {
+            if (self::commentContainsAnnotation($comment)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function commentContainsAnnotation(Comment $comment): bool
+    {
+        return str_contains(
+            $comment->getText(),
+            self::IGNORE_ALL_MUTATIONS_ANNOTATION,
+        );
     }
 }

@@ -33,20 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SplObjectStorage;
 
-#[CoversClass(IgnoreAllMutationsAnnotationReaderVisitor::class)]
-final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCase
+#[CoversClass(ExcludeIgnoredNodesVisitor::class)]
+final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
 {
     #[DataProvider('nodeProvider')]
     public function test_it_marks_nodes_with_the_ignore_all_comment_as_ignored(
@@ -55,21 +52,23 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
     ): void {
         $nodes = $this->parse($code);
 
-        $changingIgnorer = new ChangingIgnorer();
+        $ineligibleNodes = new SplObjectStorage();
 
         $traverser = new NodeTraverser(
-            new IgnoreAllMutationsAnnotationReaderVisitor(
-                $changingIgnorer,
-                new SplObjectStorage(),
-            ),
-            new SkipIgnoredNodesVisitor([$changingIgnorer]),
-            new MarkTraversedNodesAsVisitedVisitor(),
+            new ExcludeIgnoredNodesVisitor($ineligibleNodes),
+            new MarkAllButIneligibleNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);
 
         $actual = $this->dumper->dump($nodes);
 
         $this->assertSame($expected, $actual);
+
+        $this->assertCount(
+            0,
+            $ineligibleNodes,
+            'Expected the internal list of ineligible nodes tracked to have been cleaned up.',
+        );
     }
 
     public static function nodeProvider(): iterable

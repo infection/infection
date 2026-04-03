@@ -33,30 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
- * @final
  */
-class ChangingIgnorer implements NodeIgnorer
+final class MarkAllButIneligibleNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    private bool $ignore = false;
-
-    public function ignores(Node $node): bool
+    public function enterNode(Node $node): null
     {
-        return $this->ignore;
-    }
+        if (!LabelNodesAsEligibleVisitor::isExplicitlyIneligible($node)) {
+            MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
+        }
 
-    public function startIgnoring(): void
-    {
-        $this->ignore = true;
-    }
-
-    public function stopIgnoring(): void
-    {
-        $this->ignore = false;
+        return null;
     }
 }

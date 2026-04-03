@@ -54,6 +54,11 @@ final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
         return $node->hasAttribute(self::ELIGIBLE);
     }
 
+    public static function isExplicitlyIneligible(Node $node): bool
+    {
+        return $node->getAttribute(self::ELIGIBLE, true) === false;
+    }
+
     public function enterNode(Node $node): ?int
     {
         self::markAsEligible($node);
@@ -64,5 +69,10 @@ final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
     public static function markAsEligible(Node $node): void
     {
         $node->setAttribute(self::ELIGIBLE, true);
+    }
+
+    public static function markAsIneligible(Node $node): void
+    {
+        $node->setAttribute(self::ELIGIBLE, false);
     }
 }
