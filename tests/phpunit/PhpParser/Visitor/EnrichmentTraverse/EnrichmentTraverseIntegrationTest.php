@@ -1407,7 +1407,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         )
                                                         class: Name(
                                                             nodeId: 26
-                                                            # This is incorrect! Should be `FullyQualified(RuntimeException)`
                                                             resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
                                                             parent: nodeId(24)
                                                             isInsideFunction: true
