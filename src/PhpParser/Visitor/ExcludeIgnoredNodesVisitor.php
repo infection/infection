@@ -50,14 +50,6 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 
     private ?Node $excludedStartNode = null;
 
-    /**
-     * @param SplObjectStorage<object, mixed> $ignoredNodes
-     */
-    public function __construct(
-        private readonly SplObjectStorage $ignoredNodes = new SplObjectStorage(),
-    ) {
-    }
-
     public function enterNode(Node $node): ?Node
     {
         if (null !== $this->excludedStartNode) {

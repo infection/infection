@@ -50,6 +50,7 @@ use function is_float;
 use function is_int;
 use function is_object;
 use function is_string;
+use function ksort;
 use Later\Interfaces\Deferred;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -384,7 +385,10 @@ final class NodeDumper
             }
 
             if ($this->dumpOtherAttributes) {
-                foreach ($node->getAttributes() as $key => $value) {
+                $attributes = $node->getAttributes();
+                ksort($attributes);
+
+                foreach ($attributes as $key => $value) {
                     if (isset(self::IGNORE_ATTRIBUTES[$key])) {
                         continue;
                     }
