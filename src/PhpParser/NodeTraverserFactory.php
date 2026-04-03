@@ -36,12 +36,11 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
@@ -56,7 +55,6 @@ use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use SplFileInfo;
-use SplObjectStorage;
 
 /**
  * @internal
@@ -78,17 +76,15 @@ readonly class NodeTraverserFactory
         SplFileInfo $sourceFile,
         Trace $trace,
     ): NodeTraverserInterface {
-        $changingIgnorer = new ChangingIgnorer();
-
         $nodeIgnorers = [
-            $changingIgnorer,
             new InterfaceIgnorer(),
             new AbstractMethodIgnorer(),
         ];
 
         $visitors = [
             new NextConnectingVisitor(),
-            new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
+            new LabelNodesAsEligibleVisitor(),
+            new ExcludeIgnoredNodesVisitor(),
             new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),

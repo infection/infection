@@ -92,14 +92,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 2
                             )
                             expr: Scalar_Int(
-                                rawValue: 1
                                 kind: KIND_DEC (10)
                                 nodeId: 3
+                                rawValue: 1
                             )
                             nodeId: 1
                         )
-                        nodeId: 0
                         next: nodeId(4)
+                        nodeId: 0
                     )
                     1: Stmt_Expression(
                         expr: Expr_Assign(
@@ -107,14 +107,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 6
                             )
                             expr: Scalar_Int(
-                                rawValue: 2
                                 kind: KIND_DEC (10)
                                 nodeId: 7
+                                rawValue: 2
                             )
                             nodeId: 5
                         )
-                        nodeId: 4
                         next: nodeId(8)
+                        nodeId: 4
                     )
                     2: Stmt_Expression(
                         expr: Expr_Assign(
@@ -122,9 +122,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 10
                             )
                             expr: Scalar_Int(
-                                rawValue: 3
                                 kind: KIND_DEC (10)
                                 nodeId: 11
+                                rawValue: 3
                             )
                             nodeId: 9
                         )
@@ -168,9 +168,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 2
                             )
                             expr: Scalar_Int(
-                                rawValue: 1
                                 kind: KIND_DEC (10)
                                 nodeId: 3
+                                rawValue: 1
                             )
                             nodeId: 1
                         )
@@ -187,14 +187,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                         nodeId: 8
                                     )
                                     expr: Scalar_Int(
-                                        rawValue: 2
                                         kind: KIND_DEC (10)
                                         nodeId: 9
+                                        rawValue: 2
                                     )
                                     nodeId: 7
                                 )
-                                nodeId: 6
                                 next: nodeId(10)
+                                nodeId: 6
                             )
                             1: Stmt_Expression(
                                 expr: Expr_Assign(
@@ -202,9 +202,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                         nodeId: 12
                                     )
                                     expr: Scalar_Int(
-                                        rawValue: 3
                                         kind: KIND_DEC (10)
                                         nodeId: 13
+                                        rawValue: 3
                                     )
                                     nodeId: 11
                                 )
@@ -219,14 +219,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 16
                             )
                             expr: Scalar_Int(
-                                rawValue: 4
                                 kind: KIND_DEC (10)
                                 nodeId: 17
+                                rawValue: 4
                             )
                             nodeId: 15
                         )
-                        nodeId: 14
                         next: nodeId(18)
+                        nodeId: 14
                     )
                     3: Stmt_Expression(
                         expr: Expr_Assign(
@@ -241,14 +241,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                                 nodeId: 24
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 5
                                                 kind: KIND_DEC (10)
                                                 nodeId: 25
+                                                rawValue: 5
                                             )
                                             nodeId: 23
                                         )
-                                        nodeId: 22
                                         next: nodeId(26)
+                                        nodeId: 22
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -256,9 +256,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                                 nodeId: 28
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 6
                                                 kind: KIND_DEC (10)
                                                 nodeId: 29
+                                                rawValue: 6
                                             )
                                             nodeId: 27
                                         )
@@ -269,8 +269,8 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             )
                             nodeId: 19
                         )
-                        nodeId: 18
                         next: nodeId(30)
+                        nodeId: 18
                     )
                     4: Stmt_Expression(
                         expr: Expr_Assign(
@@ -278,14 +278,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 32
                             )
                             expr: Scalar_Int(
-                                rawValue: 7
                                 kind: KIND_DEC (10)
                                 nodeId: 33
+                                rawValue: 7
                             )
                             nodeId: 31
                         )
-                        nodeId: 30
                         next: nodeId(34)
+                        nodeId: 30
                     )
                     5: Stmt_Expression(
                         expr: Expr_Assign(
@@ -298,9 +298,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                         nodeId: 39
                                     )
                                     expr: Scalar_Int(
-                                        rawValue: 8
                                         kind: KIND_DEC (10)
                                         nodeId: 40
+                                        rawValue: 8
                                     )
                                     nodeId: 38
                                 )
@@ -308,8 +308,8 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             )
                             nodeId: 35
                         )
-                        nodeId: 34
                         next: nodeId(41)
+                        nodeId: 34
                     )
                     6: Stmt_Expression(
                         expr: Expr_Assign(
@@ -317,9 +317,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 43
                             )
                             expr: Scalar_Int(
-                                rawValue: 9
                                 kind: KIND_DEC (10)
                                 nodeId: 44
+                                rawValue: 9
                             )
                             nodeId: 42
                         )
@@ -348,14 +348,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 2
                             )
                             expr: Scalar_Int(
-                                rawValue: 1
                                 kind: KIND_DEC (10)
                                 nodeId: 3
+                                rawValue: 1
                             )
                             nodeId: 1
                         )
-                        nodeId: 0
                         next: nodeId(4)
+                        nodeId: 0
                     )
                     1: Stmt_Expression(
                         expr: Expr_Assign(
@@ -363,14 +363,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 6
                             )
                             expr: Scalar_Int(
-                                rawValue: 2
                                 kind: KIND_DEC (10)
                                 nodeId: 7
+                                rawValue: 2
                             )
                             nodeId: 5
                         )
-                        nodeId: 4
                         next: nodeId(8)
+                        nodeId: 4
                     )
                     2: Stmt_Expression(
                         expr: Expr_Assign(
@@ -378,9 +378,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 10
                             )
                             expr: Scalar_Int(
-                                rawValue: 3
                                 kind: KIND_DEC (10)
                                 nodeId: 11
+                                rawValue: 3
                             )
                             nodeId: 9
                         )
@@ -425,14 +425,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                                 nodeId: 6
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 1
                                                 kind: KIND_DEC (10)
                                                 nodeId: 7
+                                                rawValue: 1
                                             )
                                             nodeId: 5
                                         )
-                                        nodeId: 4
                                         next: nodeId(8)
+                                        nodeId: 4
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -440,9 +440,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                                 nodeId: 10
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 2
                                                 kind: KIND_DEC (10)
                                                 nodeId: 11
+                                                rawValue: 2
                                             )
                                             nodeId: 9
                                         )
@@ -462,14 +462,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                                 nodeId: 16
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 3
                                                 kind: KIND_DEC (10)
                                                 nodeId: 17
+                                                rawValue: 3
                                             )
                                             nodeId: 15
                                         )
-                                        nodeId: 14
                                         next: nodeId(18)
+                                        nodeId: 14
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -477,9 +477,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                                 nodeId: 20
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 4
                                                 kind: KIND_DEC (10)
                                                 nodeId: 21
+                                                rawValue: 4
                                             )
                                             nodeId: 19
                                         )
@@ -515,9 +515,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 2
                             )
                             expr: Scalar_Int(
-                                rawValue: 1
                                 kind: KIND_DEC (10)
                                 nodeId: 3
+                                rawValue: 1
                             )
                             nodeId: 1
                         )
@@ -535,9 +535,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                 nodeId: 8
                             )
                             expr: Scalar_Int(
-                                rawValue: 2
                                 kind: KIND_DEC (10)
                                 nodeId: 9
+                                rawValue: 2
                             )
                             nodeId: 7
                         )
@@ -586,11 +586,11 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     0: Stmt_Return(
                                         expr: Scalar_String(
                                             kind: KIND_SINGLE_QUOTED (1)
-                                            rawValue: 'early'
                                             nodeId: 7
+                                            rawValue: 'early'
                                         )
-                                        nodeId: 6
                                         next: nodeId(8)
+                                        nodeId: 6
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -605,12 +605,12 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             )
                                             nodeId: 9
                                         )
-                                        nodeId: 8
                                         next: nodeId(13)
+                                        nodeId: 8
                                     )
                                 )
-                                nodeId: 4
                                 next: nodeId(6)
+                                nodeId: 4
                             )
                             1: Stmt_Expression(
                                 expr: Expr_Assign(
@@ -618,23 +618,23 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                         nodeId: 15
                                     )
                                     expr: Scalar_Int(
-                                        rawValue: 1
                                         kind: KIND_DEC (10)
                                         nodeId: 16
+                                        rawValue: 1
                                     )
                                     nodeId: 14
                                 )
-                                nodeId: 13
                                 next: nodeId(17)
+                                nodeId: 13
                             )
                             2: Stmt_Return(
                                 expr: Scalar_String(
                                     kind: KIND_SINGLE_QUOTED (1)
-                                    rawValue: 'normal'
                                     nodeId: 18
+                                    rawValue: 'normal'
                                 )
-                                nodeId: 17
                                 next: nodeId(19)
+                                nodeId: 17
                             )
                             3: Stmt_Expression(
                                 expr: Expr_Assign(
@@ -642,9 +642,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                         nodeId: 21
                                     )
                                     expr: Scalar_Int(
-                                        rawValue: 2
                                         kind: KIND_DEC (10)
                                         nodeId: 22
+                                        rawValue: 2
                                     )
                                     nodeId: 20
                                 )
@@ -680,14 +680,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                         nodeId: 4
                                     )
                                     expr: Scalar_Int(
-                                        rawValue: 1
                                         kind: KIND_DEC (10)
                                         nodeId: 5
+                                        rawValue: 1
                                     )
                                     nodeId: 3
                                 )
-                                nodeId: 2
                                 next: nodeId(6)
+                                nodeId: 2
                             )
                             1: Stmt_Return(
                                 expr: Expr_Variable(

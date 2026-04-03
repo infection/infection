@@ -108,9 +108,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                 nodeId: 2
                             )
                             expr: Scalar_Int(
-                                rawValue: 1
                                 kind: KIND_DEC (10)
                                 nodeId: 3
+                                rawValue: 1
                             )
                             nodeId: 1
                         )
@@ -128,9 +128,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                             nodeId: 8
                                         )
                                         default: Scalar_Int(
-                                            rawValue: 2
                                             kind: KIND_DEC (10)
                                             nodeId: 9
+                                            rawValue: 2
                                         )
                                         nodeId: 7
                                     )
@@ -147,9 +147,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                             nodeId: 13
                                         )
                                         default: Scalar_Int(
-                                            rawValue: 3
                                             kind: KIND_DEC (10)
                                             nodeId: 14
+                                            rawValue: 3
                                         )
                                         nodeId: 12
                                     )
@@ -164,9 +164,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                                 nodeId: 18
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 4
                                                 kind: KIND_DEC (10)
                                                 nodeId: 19
+                                                rawValue: 4
                                             )
                                             nodeId: 17
                                         )
@@ -185,9 +185,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                             nodeId: 23
                                         )
                                         default: Scalar_Int(
-                                            rawValue: 5
                                             kind: KIND_DEC (10)
                                             nodeId: 24
+                                            rawValue: 5
                                         )
                                         nodeId: 22
                                     )
@@ -202,9 +202,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                                 nodeId: 28
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 6
                                                 kind: KIND_DEC (10)
                                                 nodeId: 29
+                                                rawValue: 6
                                             )
                                             nodeId: 27
                                         )
@@ -233,9 +233,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                 nodeId: 2
                             )
                             expr: Scalar_Int(
-                                rawValue: 1
                                 kind: KIND_DEC (10)
                                 nodeId: 3
+                                rawValue: 1
                             )
                             nodeId: 1
                         )
@@ -253,9 +253,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                             nodeId: 8
                                         )
                                         default: Scalar_Int(
-                                            rawValue: 2
                                             kind: KIND_DEC (10)
                                             nodeId: 9
+                                            rawValue: 2
                                         )
                                         nodeId: 7
                                     )
@@ -273,9 +273,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                             nodeId: 23
                                         )
                                         default: Scalar_Int(
-                                            rawValue: 5
                                             kind: KIND_DEC (10)
                                             nodeId: 24
+                                            rawValue: 5
                                         )
                                         nodeId: 22
                                     )
@@ -290,9 +290,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                                 nodeId: 28
                                             )
                                             expr: Scalar_Int(
-                                                rawValue: 6
                                                 kind: KIND_DEC (10)
                                                 nodeId: 29
+                                                rawValue: 6
                                             )
                                             nodeId: 27
                                         )

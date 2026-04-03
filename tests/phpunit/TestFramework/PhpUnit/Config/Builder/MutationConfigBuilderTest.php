@@ -44,10 +44,10 @@ use DOMXPath;
 use function escapeshellarg;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -790,7 +790,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
             'project/dir',
-            new JUnitTestCaseSorter(),
+            new TestRunOrderResolver(),
         );
     }
 

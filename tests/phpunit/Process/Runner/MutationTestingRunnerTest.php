@@ -737,8 +737,6 @@ final class MutationTestingRunnerTest extends TestCase
 
         foreach ($expectedClasses as $expectedClass) {
             if ($value instanceof $expectedClass) {
-                $this->addToAssertionCount(1);
-
                 return;
             }
         }

@@ -911,6 +911,8 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(new Filesystem()),
             __DIR__ . '/../../../../..',
@@ -927,8 +929,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
 
         $configManipulator->validate('/path/to/phpunit.xml', $xPath);
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_removes_default_test_suite(): void

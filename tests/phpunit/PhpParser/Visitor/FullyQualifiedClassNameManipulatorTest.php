@@ -104,7 +104,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                         expr: Expr_FuncCall(
                             name: Name(
                                 nodeId: 4
-                                resolvedName: nodeId(4)
+                                resolvedName: FullyQualified(calculate)
                             )
                             nodeId: 3
                         )
@@ -143,8 +143,8 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                             1: Stmt_Expression(
                                 expr: Expr_FuncCall(
                                     name: Name(
+                                        namespacedName: FullyQualified(Infection\Tests\Virtual\calculate)
                                         nodeId: 6
-                                        namespacedName: nodeId(6)
                                     )
                                     nodeId: 5
                                 )
@@ -191,7 +191,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                         expr: Expr_StaticCall(
                             class: Name(
                                 nodeId: 6
-                                resolvedName: nodeId(6)
+                                resolvedName: FullyQualified(Calculator)
                             )
                             name: Identifier(
                                 nodeId: 7
@@ -244,7 +244,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                                 expr: Expr_StaticCall(
                                     class: Name(
                                         nodeId: 8
-                                        resolvedName: nodeId(8)
+                                        resolvedName: FullyQualified(Infection\Tests\Virtual\Calculator)
                                     )
                                     name: Identifier(
                                         nodeId: 9
