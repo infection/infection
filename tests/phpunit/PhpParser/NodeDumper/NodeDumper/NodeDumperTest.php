@@ -765,8 +765,8 @@ final class NodeDumperTest extends TestCase
                                         value: value1
                                     )
                                 )
-                                nodeId: 10
                                 functionScope: nodeId(10)
+                                nodeId: 10
                             )
                         )
                         AST,
@@ -808,8 +808,8 @@ final class NodeDumperTest extends TestCase
                     <<<'AST'
                         array(
                             0: Name(
-                                resolvedName: FullyQualified(App\Foo)
                                 nodeId: 10
+                                resolvedName: FullyQualified(App\Foo)
                             )
                         )
                         AST,
@@ -848,8 +848,8 @@ final class NodeDumperTest extends TestCase
                     <<<'AST'
                         array(
                             0: Name(
-                                resolvedName: Name(Bar)
                                 nodeId: 10
+                                resolvedName: Name(Bar)
                             )
                         )
                         AST,

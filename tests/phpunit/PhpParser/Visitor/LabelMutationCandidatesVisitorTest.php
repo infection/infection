@@ -134,8 +134,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'first'
                                                                     nodeId: 11
+                                                                    rawValue: 'first'
                                                                 )
                                                                 nodeId: 10
                                                             )
@@ -145,8 +145,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'second'
                                                                     nodeId: 14
+                                                                    rawValue: 'second'
                                                                 )
                                                                 nodeId: 13
                                                             )
@@ -156,8 +156,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'third'
                                                                     nodeId: 17
+                                                                    rawValue: 'third'
                                                                 )
                                                                 nodeId: 16
                                                             )
@@ -209,8 +209,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    nodeId: 3
                                     eligible: true
+                                    nodeId: 3
                                 )
                                 stmts: array(
                                     0: Stmt_ClassMethod(
@@ -228,8 +228,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'first'
                                                                     nodeId: 11
+                                                                    rawValue: 'first'
                                                                 )
                                                                 nodeId: 10
                                                             )
@@ -239,8 +239,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'second'
                                                                     nodeId: 14
+                                                                    rawValue: 'second'
                                                                 )
                                                                 nodeId: 13
                                                             )
@@ -250,8 +250,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'third'
                                                                     nodeId: 17
+                                                                    rawValue: 'third'
                                                                 )
                                                                 nodeId: 16
                                                             )
@@ -263,9 +263,9 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                 nodeId: 6
                                             )
                                         )
-                                        nodeId: 4
                                         eligible: true
                                         mutationCandidate: true
+                                        nodeId: 4
                                     )
                                 )
                                 nodeId: 2

@@ -130,8 +130,8 @@ final class ChangingIgnorerTest extends VisitorTestCase
                                                 exprs: array(
                                                     0: Scalar_String(
                                                         kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'something'
                                                         nodeId: 10
+                                                        rawValue: 'something'
                                                     )
                                                 )
                                                 nodeId: 9
@@ -143,8 +143,8 @@ final class ChangingIgnorerTest extends VisitorTestCase
                                                     exprs: array(
                                                         0: Scalar_String(
                                                             kind: KIND_SINGLE_QUOTED (1)
-                                                            rawValue: 'yell at the clouds'
                                                             nodeId: 13
+                                                            rawValue: 'yell at the clouds'
                                                         )
                                                     )
                                                     nodeId: 12
@@ -205,8 +205,8 @@ final class ChangingIgnorerTest extends VisitorTestCase
                                                     exprs: array(
                                                         0: Scalar_String(
                                                             kind: KIND_SINGLE_QUOTED (1)
-                                                            rawValue: 'yell at the clouds'
                                                             nodeId: 13
+                                                            rawValue: 'yell at the clouds'
                                                         )
                                                     )
                                                     nodeId: 12

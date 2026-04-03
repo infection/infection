@@ -143,8 +143,8 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                             1: Stmt_Expression(
                                 expr: Expr_FuncCall(
                                     name: Name(
-                                        nodeId: 6
                                         namespacedName: FullyQualified(Infection\Tests\Virtual\calculate)
+                                        nodeId: 6
                                     )
                                     nodeId: 5
                                 )
