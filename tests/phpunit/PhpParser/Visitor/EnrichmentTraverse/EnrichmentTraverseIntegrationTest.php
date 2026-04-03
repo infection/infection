@@ -1229,7 +1229,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'infection-ignore-all corrupting the name resolution' => [
+        // Incorrect as in: used on a node that is not a mutation candidate
+        yield 'with incorrect usage infection-ignore-all' => [
             file_get_contents(self::FIXTURES_DIR . '/ProblematicIgnoreAll.php'),
             <<<'AST'
                 array(
@@ -1301,17 +1302,25 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     0: UseItem(
                                         name: Name(
                                             nodeId: 12
+                                            parent: nodeId(11)
+                                            eligible: true
                                             origNode: nodeId(12)
                                         )
                                         alias: Identifier(
                                             nodeId: 13
+                                            parent: nodeId(11)
+                                            eligible: true
                                             origNode: nodeId(13)
                                         )
                                         nodeId: 11
+                                        parent: nodeId(10)
+                                        eligible: true
                                         origNode: nodeId(11)
                                     )
                                 )
                                 nodeId: 10
+                                eligible: true
+                                parent: nodeId(4)
                                 next: nodeId(14)
                                 origNode: nodeId(10)
                             )
@@ -1407,7 +1416,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         )
                                                         class: Name(
                                                             nodeId: 26
-                                                            resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
+                                                            resolvedName: FullyQualified(RuntimeException)
                                                             parent: nodeId(24)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
