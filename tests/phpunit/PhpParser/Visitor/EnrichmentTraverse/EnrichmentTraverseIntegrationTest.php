@@ -551,6 +551,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             nodeId: 17
                                             origNode: nodeId(17)
                                         )
+                                        eligible: true
                                         nodeId: 12
                                         origNode: nodeId(12)
                                     )
@@ -741,6 +742,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         origNode: nodeId(12)
                                     )
                                 )
+                                eligible: true
                                 nodeId: 6
                                 origNode: nodeId(6)
                             )
@@ -1132,6 +1134,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             nodeId: 19
                                             origNode: nodeId(19)
                                         )
+                                        eligible: true
                                         nodeId: 14
                                         origNode: nodeId(14)
                                     )
@@ -1301,24 +1304,24 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 uses: array(
                                     0: UseItem(
                                         name: Name(
+                                            eligible: false
                                             nodeId: 12
-                                            parent: nodeId(11)
-                                            eligible: true
                                             origNode: nodeId(12)
+                                            parent: nodeId(11)
                                         )
                                         alias: Identifier(
+                                            eligible: false
                                             nodeId: 13
-                                            parent: nodeId(11)
-                                            eligible: true
                                             origNode: nodeId(13)
+                                            parent: nodeId(11)
                                         )
+                                        eligible: false
                                         nodeId: 11
-                                        parent: nodeId(10)
-                                        eligible: true
                                         origNode: nodeId(11)
+                                        parent: nodeId(10)
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 next: nodeId(14)
                                 nodeId: 10
                                 origNode: nodeId(10)
@@ -1422,10 +1425,10 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             isStrictTypes: true
                                                             mutationCandidate: true
                                                             nodeId: 26
-                                                            resolvedName: FullyQualified(RuntimeException)
+                                                            origNode: nodeId(26)
                                                             parent: nodeId(24)
                                                             reflectionClass: Infection\Reflection\NullReflection
-                                                            resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
+                                                            resolvedName: FullyQualified(RuntimeException)
                                                         )
                                                         eligible: true
                                                         functionName: check
