@@ -38,7 +38,6 @@ namespace Infection\PhpParser\Visitor;
 use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use SplObjectStorage;
 use function str_contains;
 
 /**
@@ -52,9 +51,13 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): ?Node
     {
-        if (null !== $this->excludedStartNode) {
+        if ($this->excludedStartNode !== null) {
             LabelNodesAsEligibleVisitor::markAsIneligible($node);
-        } elseif (self::hasIgnoreAnnotation($node)) {
+
+            return null;
+        }
+
+        if (self::hasIgnoreAnnotation($node)) {
             $this->excludedStartNode = $node;
 
             LabelNodesAsEligibleVisitor::markAsIneligible($node);
