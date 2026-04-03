@@ -1274,17 +1274,25 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     0: UseItem(
                                         name: Name(
                                             nodeId: 8
+                                            parent: nodeId(7)
+                                            eligible: true
                                             origNode: nodeId(8)
                                         )
                                         alias: Identifier(
                                             nodeId: 9
+                                            parent: nodeId(7)
+                                            eligible: true
                                             origNode: nodeId(9)
                                         )
                                         nodeId: 7
+                                        parent: nodeId(6)
+                                        eligible: true
                                         origNode: nodeId(7)
                                     )
                                 )
                                 nodeId: 6
+                                parent: nodeId(4)
+                                eligible: true
                                 next: nodeId(10)
                                 origNode: nodeId(6)
                             )
@@ -1293,25 +1301,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     0: UseItem(
                                         name: Name(
                                             nodeId: 12
-                                            parent: nodeId(11)
-                                            eligible: true
                                             origNode: nodeId(12)
                                         )
                                         alias: Identifier(
                                             nodeId: 13
-                                            parent: nodeId(11)
-                                            eligible: true
                                             origNode: nodeId(13)
                                         )
                                         nodeId: 11
-                                        parent: nodeId(10)
-                                        eligible: true
                                         origNode: nodeId(11)
                                     )
                                 )
                                 nodeId: 10
-                                parent: nodeId(4)
-                                eligible: true
                                 next: nodeId(14)
                                 origNode: nodeId(10)
                             )
@@ -1407,7 +1407,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         )
                                                         class: Name(
                                                             nodeId: 26
-                                                            // This is incorrect!
+                                                            # This is incorrect! Should be `FullyQualified(RuntimeException)`
                                                             resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\Problem)
                                                             parent: nodeId(24)
                                                             isInsideFunction: true

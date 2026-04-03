@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-// @infection-ignore-all
 use InvalidArgumentException as Other;
+// @infection-ignore-all
 use RuntimeException as Problem;
 
 final class Demo
