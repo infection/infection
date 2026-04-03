@@ -154,131 +154,131 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    nodeId: 2
-                                    parent: nodeId(1)
                                     eligible: true
+                                    nodeId: 2
                                     origNode: nodeId(2)
+                                    parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    rawValue: 1
+                                    eligible: true
                                     kind: KIND_DEC (10)
                                     nodeId: 3
-                                    parent: nodeId(1)
-                                    eligible: true
                                     origNode: nodeId(3)
+                                    parent: nodeId(1)
+                                    rawValue: 1
                                 )
-                                nodeId: 1
-                                parent: nodeId(0)
                                 eligible: true
+                                nodeId: 1
                                 origNode: nodeId(1)
+                                parent: nodeId(0)
                             )
                         )
-                        nodeId: 0
                         eligible: true
                         next: nodeId(4)
+                        nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            nodeId: 5
-                            parent: nodeId(4)
                             eligible: true
+                            nodeId: 5
                             origNode: nodeId(5)
+                            parent: nodeId(4)
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    nodeId: 7
-                                    parent: nodeId(6)
                                     eligible: true
+                                    nodeId: 7
                                     origNode: nodeId(7)
+                                    parent: nodeId(6)
                                 )
                                 implements: array(
                                     0: Name(
-                                        nodeId: 8
-                                        resolvedName: FullyQualified(Infection\Tests\Command\Debug\DumpAstCommand\Greeter)
-                                        parent: nodeId(6)
                                         eligible: true
+                                        nodeId: 8
                                         origNode: nodeId(8)
+                                        parent: nodeId(6)
+                                        resolvedName: FullyQualified(Infection\Tests\Command\Debug\DumpAstCommand\Greeter)
                                     )
                                 )
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 10
-                                            parent: nodeId(9)
+                                            eligible: true
+                                            functionName: greet
+                                            functionScope: nodeId(9)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(9)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: greet
-                                            eligible: true
-                                            origNode: nodeId(10)
                                             mutationCandidate: true
+                                            nodeId: 10
+                                            origNode: nodeId(10)
+                                            parent: nodeId(9)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                         )
                                         returnType: Identifier(
-                                            nodeId: 11
-                                            parent: nodeId(9)
+                                            eligible: true
+                                            functionName: greet
+                                            functionScope: nodeId(9)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(9)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: greet
-                                            eligible: true
-                                            origNode: nodeId(11)
                                             mutationCandidate: true
+                                            nodeId: 11
+                                            origNode: nodeId(11)
+                                            parent: nodeId(9)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                         )
                                         stmts: array(
                                             0: Stmt_Echo(
                                                 exprs: array(
                                                     0: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'Hello world!'
-                                                        nodeId: 13
-                                                        parent: nodeId(12)
+                                                        eligible: true
+                                                        functionName: greet
+                                                        functionScope: nodeId(9)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(9)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: greet
-                                                        eligible: true
-                                                        origNode: nodeId(13)
+                                                        kind: KIND_SINGLE_QUOTED (1)
                                                         mutationCandidate: true
+                                                        nodeId: 13
+                                                        origNode: nodeId(13)
+                                                        parent: nodeId(12)
+                                                        rawValue: 'Hello world!'
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                                     )
                                                 )
-                                                nodeId: 12
-                                                parent: nodeId(9)
+                                                eligible: true
+                                                functionName: greet
+                                                functionScope: nodeId(9)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                functionScope: nodeId(9)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: greet
-                                                eligible: true
-                                                origNode: nodeId(12)
                                                 mutationCandidate: true
+                                                nodeId: 12
+                                                origNode: nodeId(12)
+                                                parent: nodeId(9)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                             )
                                         )
-                                        nodeId: 9
-                                        parent: nodeId(6)
+                                        eligible: true
+                                        functionName: greet
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: greet
-                                        eligible: true
-                                        origNode: nodeId(9)
                                         mutationCandidate: true
+                                        nodeId: 9
+                                        origNode: nodeId(9)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                     )
                                 )
-                                nodeId: 6
-                                parent: nodeId(4)
                                 eligible: true
+                                nodeId: 6
                                 origNode: nodeId(6)
+                                parent: nodeId(4)
                             )
                         )
-                        kind: 1
-                        nodeId: 4
                         eligible: true
+                        kind: 1
                         next: nodeId(6)
+                        nodeId: 4
                         origNode: nodeId(4)
                     )
                 )
