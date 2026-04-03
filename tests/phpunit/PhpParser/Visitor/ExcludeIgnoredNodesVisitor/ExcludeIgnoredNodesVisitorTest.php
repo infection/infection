@@ -40,7 +40,6 @@ use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SplObjectStorage;
 
 #[CoversClass(ExcludeIgnoredNodesVisitor::class)]
 final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
@@ -52,10 +51,8 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
     ): void {
         $nodes = $this->parse($code);
 
-        $ineligibleNodes = new SplObjectStorage();
-
         $traverser = new NodeTraverser(
-            new ExcludeIgnoredNodesVisitor($ineligibleNodes),
+            new ExcludeIgnoredNodesVisitor(),
             new MarkAllButIneligibleNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);
@@ -63,12 +60,6 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
         $actual = $this->dumper->dump($nodes);
 
         $this->assertSame($expected, $actual);
-
-        $this->assertCount(
-            0,
-            $ineligibleNodes,
-            'Expected the internal list of ineligible nodes tracked to have been cleaned up.',
-        );
     }
 
     public static function nodeProvider(): iterable
