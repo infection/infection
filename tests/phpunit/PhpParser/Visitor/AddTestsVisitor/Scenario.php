@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\AddTestsVisitor;
 
+use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 
 final class Scenario
 {
+    public bool $expectedHasTests;
+
     /**
      * @param list<TestLocation> $traceTests
      * @param list<TestLocation> $expectedTests
@@ -50,6 +53,7 @@ final class Scenario
         public int $expectedTraceCallCount,
         public array $expectedTests,
     ) {
+        $this->expectedHasTests = count($this->expectedTests) > 0;
     }
 
     public function withIsEligible(?bool $isEligible): self
@@ -94,6 +98,7 @@ final class Scenario
     {
         $clone = clone $this;
         $clone->expectedTests = $expectedTests;
+        $clone->expectedHasTests = count($expectedTests) > 0;
 
         return $clone;
     }

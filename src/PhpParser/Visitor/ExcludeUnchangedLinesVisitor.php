@@ -39,6 +39,9 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @internal
+ */
 final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
 {
     public function __construct(

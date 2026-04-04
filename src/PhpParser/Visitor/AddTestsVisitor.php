@@ -44,9 +44,12 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use function Pipeline\take;
 
+/**
+ * @internal
+ */
 final class AddTestsVisitor extends NodeVisitorAbstract
 {
-    private const TESTS = 'tests';
+    public const TESTS = 'tests';
 
     public function __construct(
         private readonly Trace $trace,
@@ -82,7 +85,7 @@ final class AddTestsVisitor extends NodeVisitorAbstract
 
     public static function hasTests(Node $node): bool
     {
-        return count(self::getTests($node)) === 0;
+        return count(self::getTests($node)) > 0;
     }
 
     /**

@@ -77,6 +77,7 @@ final class AddTestsVisitorTest extends TestCase
         $actual = AddTestsVisitor::getTests($node);
 
         $this->assertSame($scenario->expectedTests, $actual);
+        $this->assertSame($scenario->expectedHasTests, AddTestsVisitor::hasTests($node));
     }
 
     #[DataProvider('scenarioProvider')]

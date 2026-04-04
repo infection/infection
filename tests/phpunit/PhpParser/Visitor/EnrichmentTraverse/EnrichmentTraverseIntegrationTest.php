@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -52,17 +55,32 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
+    /**
+     * @param list<TestLocation>|null $testedNodeIds
+     */
     #[DataProvider('nodeProvider')]
     public function test_it_creates_a_rich_ast(
         string $code,
+        ?array $testedNodeIds,
         string $expected,
     ): void {
         $traverserFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
+        $source = new MockSplFileInfo(realPath: '/path/to/source.php');
+
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->method('getAllTestsForMutation')
+            ->willReturn($testedNodeIds);
+
         $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
-        $traverserFactory->createEnrichmentTraverser()->traverse($nodes);
+        $traverserFactory
+            ->createEnrichmentTraverser(
+                $source,
+            )
+            ->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
                 new LabelMutationCandidatesVisitor(),
