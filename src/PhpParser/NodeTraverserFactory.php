@@ -35,20 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use SplObjectStorage;
 
 /**
  * @internal
@@ -61,22 +59,19 @@ class NodeTraverserFactory
      */
     public function createEnrichmentTraverser(): NodeTraverserInterface
     {
-        $changingIgnorer = new ChangingIgnorer();
-
         $nodeIgnorers = [
-            $changingIgnorer,
             new InterfaceIgnorer(),
             new AbstractMethodIgnorer(),
         ];
 
         return new NodeTraverser(
             new NextConnectingVisitor(),
-            new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()),
-            new NonMutableNodesIgnorerVisitor($nodeIgnorers),
+            new LabelNodesAsEligibleVisitor(),
+            new ExcludeIgnoredNodesVisitor(),
+            new SkipIgnoredNodesVisitor($nodeIgnorers),
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
-            new LabelNodesAsEligibleVisitor(),
         );
     }
 

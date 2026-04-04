@@ -72,8 +72,6 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(4, 0, $clock);
 
         $runner->run([]);
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_starts_the_given_processes(): void

@@ -41,9 +41,9 @@ use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_put_contents;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -62,7 +62,7 @@ class MutationConfigBuilder extends ConfigBuilder
         private readonly string $originalXmlConfigContent,
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly string $projectDir,
-        private readonly JUnitTestCaseSorter $jUnitTestCaseSorter,
+        private readonly TestRunOrderResolver $testRunOrderResolver,
     ) {
     }
 
@@ -235,12 +235,12 @@ class MutationConfigBuilder extends ConfigBuilder
         $testSuite = $xPath->document->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($tests);
+        $orderedTestFilePaths = $this->testRunOrderResolver->resolve($tests);
 
-        foreach ($uniqueTestFilePaths as $testFilePath) {
-            $file = $xPath->document->createElement('file', $testFilePath);
+        foreach ($orderedTestFilePaths as $testFilePath) {
+            $fileElement = $xPath->document->createElement('file', $testFilePath);
 
-            $testSuite->appendChild($file);
+            $testSuite->appendChild($fileElement);
         }
 
         Assert::isInstanceOf($nodeToAppendTestSuite, DOMNode::class);

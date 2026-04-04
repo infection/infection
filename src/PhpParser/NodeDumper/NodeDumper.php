@@ -37,7 +37,10 @@ namespace Infection\PhpParser\NodeDumper;
 
 use function get_debug_type;
 use function implode;
+use function in_array;
+use Infection\Framework\ClassName;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
@@ -47,6 +50,7 @@ use function is_float;
 use function is_int;
 use function is_object;
 use function is_string;
+use function ksort;
 use Later\Interfaces\Deferred;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -54,6 +58,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\List_;
+use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\InterpolatedString;
 use PhpParser\Node\Scalar\String_;
@@ -405,7 +410,10 @@ final class NodeDumper
             }
 
             if ($this->dumpOtherAttributes) {
-                foreach ($node->getAttributes() as $key => $value) {
+                $attributes = $node->getAttributes();
+                ksort($attributes);
+
+                foreach ($attributes as $key => $value) {
                     if (isset($this->ignoredAttributesByKey[$key])) {
                         continue;
                     }
@@ -439,6 +447,20 @@ final class NodeDumper
                                 continue;
                             }
                         }
+                    }
+
+                    if (in_array($key, [FullyQualifiedClassNameManipulator::RESOLVED_NAME, FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME], true)) {
+                        Assert::isInstanceOf($value, Name::class);
+
+                        $shortClassName = ClassName::getShortClassName($value::class);
+
+                        $nodeDetails .= sprintf(
+                            '%s(%s)',
+                            $shortClassName,
+                            (string) $value,
+                        );
+
+                        continue;
                     }
 
                     // This was added: add native support for Node ids. This removes
