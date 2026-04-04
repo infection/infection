@@ -73,6 +73,8 @@ final class DumpAstCommand extends BaseCommand
 
     private const CHANGED_LINES_RANGES = 'changed-lines-ranges';
 
+    private const CHANGED_LINES_PARTS_COUNT = 2;
+
     public function __construct(
         private readonly FileSystem $fileSystem,
     ) {
@@ -222,16 +224,13 @@ final class DumpAstCommand extends BaseCommand
         );
     }
 
-    /**
-     * @return list<ChangedLinesRange>|null
-     */
     private static function parseChangedLinesRange(string $item): ChangedLinesRange
     {
         $parts = explode(':', $item);
 
         Assert::count(
             $parts,
-            2,
+            self::CHANGED_LINES_PARTS_COUNT,
             sprintf(
                 'Expected a range to follow the pattern "<startLineNumber>:<endLineNumber>". Got "%s".',
                 $item,
@@ -245,10 +244,13 @@ final class DumpAstCommand extends BaseCommand
             ),
         );
 
-        return ChangedLinesRange::create(
-            (int) $parts[0],
-            (int) $parts[1],
-        );
+        $startLine = (int) $parts[0];
+        $endLine = (int) $parts[1];
+
+        Assert::natural($startLine);
+        Assert::natural($endLine);
+
+        return ChangedLinesRange::create($startLine, $endLine);
     }
 
     /**

@@ -1868,6 +1868,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         // Incorrect as in: used on a node that is not a mutation candidate
         yield 'with incorrect usage infection-ignore-all' => [
             file_get_contents(self::FIXTURES_DIR . '/ProblematicIgnoreAll.php'),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Declare(

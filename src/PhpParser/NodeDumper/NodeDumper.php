@@ -124,6 +124,9 @@ final class NodeDumper
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
     ];
 
+    /**
+     * @var array<string, true>
+     */
     private array $ignoredAttributesByKey = [];
 
     // Removed instance properties for stateless refactor
