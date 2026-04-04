@@ -244,7 +244,9 @@ final class DumpAstCommand extends BaseCommand
             ),
         );
 
+        /** @psalm-suppress InvalidArrayAccess */
         $startLine = (int) $parts[0];
+        /** @psalm-suppress InvalidArrayAccess */
         $endLine = (int) $parts[1];
 
         Assert::natural($startLine);
