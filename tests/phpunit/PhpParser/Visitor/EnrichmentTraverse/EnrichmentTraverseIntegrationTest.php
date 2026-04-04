@@ -936,91 +936,87 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             origNode: nodeId(19)
                                             parent: nodeId(14)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
-                                            origNode: nodeId(19)
-                                            mutationCandidate: true
                                         )
                                         stmts: array(
                                             0: Stmt_If(
                                                 cond: Expr_BinaryOp_Identical(
                                                     left: Expr_Variable(
-                                                        nodeId: 22
-                                                        parent: nodeId(21)
+                                                        eligible: true
+                                                        functionName: concreteMethod
+                                                        functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(14)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: concreteMethod
-                                                        eligible: true
-                                                        origNode: nodeId(22)
                                                         mutationCandidate: true
+                                                        nodeId: 22
+                                                        origNode: nodeId(22)
+                                                        parent: nodeId(21)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                                     )
                                                     right: Expr_ConstFetch(
                                                         name: Name(
-                                                            nodeId: 24
-                                                            namespacedName: nodeId(24)
-                                                            parent: nodeId(23)
+                                                            eligible: true
+                                                            functionName: concreteMethod
+                                                            functionScope: nodeId(14)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            functionScope: nodeId(14)
-                                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: concreteMethod
-                                                            eligible: true
-                                                            origNode: nodeId(24)
                                                             mutationCandidate: true
+                                                            namespacedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\null)
+                                                            nodeId: 24
+                                                            origNode: nodeId(24)
+                                                            parent: nodeId(23)
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                                         )
-                                                        nodeId: 23
-                                                        parent: nodeId(21)
+                                                        eligible: true
+                                                        functionName: concreteMethod
+                                                        functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(14)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: concreteMethod
-                                                        eligible: true
-                                                        origNode: nodeId(23)
                                                         mutationCandidate: true
+                                                        nodeId: 23
+                                                        origNode: nodeId(23)
+                                                        parent: nodeId(21)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                                     )
-                                                    nodeId: 21
-                                                    parent: nodeId(20)
+                                                    eligible: true
+                                                    functionName: concreteMethod
+                                                    functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(21)
                                                     mutationCandidate: true
+                                                    nodeId: 21
+                                                    origNode: nodeId(21)
+                                                    parent: nodeId(20)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                 )
                                                 stmts: array(
                                                     0: Stmt_Echo(
                                                         exprs: array(
                                                             0: Scalar_String(
-                                                                kind: KIND_SINGLE_QUOTED (1)
-                                                                rawValue: 'nothing to do'
-                                                                nodeId: 26
-                                                                parent: nodeId(25)
+                                                                eligible: true
+                                                                functionName: concreteMethod
+                                                                functionScope: nodeId(14)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: true
-                                                                functionScope: nodeId(14)
-                                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: concreteMethod
-                                                                eligible: true
-                                                                origNode: nodeId(26)
+                                                                kind: KIND_SINGLE_QUOTED (1)
                                                                 mutationCandidate: true
+                                                                nodeId: 26
+                                                                origNode: nodeId(26)
+                                                                parent: nodeId(25)
+                                                                rawValue: 'nothing to do'
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                             )
                                                         )
-                                                        nodeId: 25
-                                                        parent: nodeId(20)
+                                                        eligible: true
+                                                        functionName: concreteMethod
+                                                        functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(14)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: concreteMethod
-                                                        eligible: true
-                                                        next: nodeId(27)
-                                                        origNode: nodeId(25)
                                                         mutationCandidate: true
+                                                        next: nodeId(27)
+                                                        nodeId: 25
+                                                        origNode: nodeId(25)
+                                                        parent: nodeId(20)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                                     )
                                                 )
                                                 else: Stmt_Else(
@@ -1028,65 +1024,70 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         0: Stmt_Expression(
                                                             expr: Expr_FuncCall(
                                                                 name: Expr_Variable(
-                                                                    nodeId: 30
-                                                                    parent: nodeId(29)
+                                                                    eligible: true
+                                                                    functionName: concreteMethod
+                                                                    functionScope: nodeId(14)
                                                                     isInsideFunction: true
                                                                     isStrictTypes: true
-                                                                    functionScope: nodeId(14)
-                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                    functionName: concreteMethod
-                                                                    eligible: true
-                                                                    origNode: nodeId(30)
                                                                     mutationCandidate: true
+                                                                    nodeId: 30
+                                                                    origNode: nodeId(30)
+                                                                    parent: nodeId(29)
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                                 )
-                                                                nodeId: 29
-                                                                parent: nodeId(28)
+                                                                eligible: true
+                                                                functionName: concreteMethod
+                                                                functionScope: nodeId(14)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: true
-                                                                functionScope: nodeId(14)
-                                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: concreteMethod
-                                                                eligible: true
-                                                                origNode: nodeId(29)
                                                                 mutationCandidate: true
+                                                                nodeId: 29
+                                                                origNode: nodeId(29)
+                                                                parent: nodeId(28)
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                             )
-                                                            nodeId: 28
-                                                            parent: nodeId(27)
+                                                            eligible: true
+                                                            functionName: concreteMethod
+                                                            functionScope: nodeId(14)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            functionScope: nodeId(14)
-                                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: concreteMethod
-                                                            eligible: true
-                                                            origNode: nodeId(28)
                                                             mutationCandidate: true
+                                                            nodeId: 28
+                                                            origNode: nodeId(28)
+                                                            parent: nodeId(27)
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                                         )
                                                     )
-                                                    nodeId: 27
-                                                    parent: nodeId(20)
+                                                    eligible: true
+                                                    functionName: concreteMethod
+                                                    functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    next: nodeId(28)
-                                                    origNode: nodeId(27)
                                                     mutationCandidate: true
+                                                    next: nodeId(28)
+                                                    nodeId: 27
+                                                    origNode: nodeId(27)
+                                                    parent: nodeId(20)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                 )
-                                                nodeId: 20
-                                                parent: nodeId(14)
+                                                eligible: true
+                                                functionName: concreteMethod
+                                                functionScope: nodeId(14)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                functionScope: nodeId(14)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: concreteMethod
-                                                eligible: true
-                                                next: nodeId(25)
-                                                origNode: nodeId(20)
                                                 mutationCandidate: true
+                                                next: nodeId(25)
+                                                nodeId: 20
+                                                origNode: nodeId(20)
+                                                parent: nodeId(14)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                             )
                                         )
+                                        eligible: true
+                                        functionName: concreteMethod
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
+                                        mutationCandidate: true
                                         nodeId: 14
                                         origNode: nodeId(14)
                                         parent: nodeId(6)
@@ -1094,93 +1095,92 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     )
                                     3: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 32
-                                            parent: nodeId(31)
+                                            eligible: true
+                                            functionName: abstractMethod
+                                            functionScope: nodeId(31)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(31)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: abstractMethod
-                                            eligible: true
-                                            origNode: nodeId(32)
                                             mutationCandidate: true
+                                            nodeId: 32
+                                            origNode: nodeId(32)
+                                            parent: nodeId(31)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
-                                                    nodeId: 34
-                                                    parent: nodeId(33)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(31)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                )
-                                                var: Expr_Variable(
                                                     eligible: true
-                                                    origNode: nodeId(34)
-                                                    mutationCandidate: true
-                                                )
-                                                var: Expr_Variable(
-                                                    nodeId: 35
-                                                    parent: nodeId(33)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: true
-                                                    functionScope: nodeId(31)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: abstractMethod
-                                                    eligible: true
-                                                    origNode: nodeId(35)
+                                                    functionScope: nodeId(31)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: true
                                                     mutationCandidate: true
+                                                    nodeId: 34
+                                                    origNode: nodeId(34)
+                                                    parent: nodeId(33)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                 )
-                                                nodeId: 33
-                                                parent: nodeId(31)
+                                                var: Expr_Variable(
+                                                    eligible: true
+                                                    functionName: abstractMethod
+                                                    functionScope: nodeId(31)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: true
+                                                    mutationCandidate: true
+                                                    nodeId: 35
+                                                    origNode: nodeId(35)
+                                                    parent: nodeId(33)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                )
+                                                eligible: true
+                                                functionName: abstractMethod
+                                                functionScope: nodeId(31)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                functionScope: nodeId(31)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: abstractMethod
-                                                eligible: true
-                                                origNode: nodeId(33)
                                                 mutationCandidate: true
+                                                nodeId: 33
+                                                origNode: nodeId(33)
+                                                parent: nodeId(31)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                             )
                                         )
                                         returnType: Identifier(
-                                            nodeId: 36
-                                            parent: nodeId(31)
+                                            eligible: true
+                                            functionName: abstractMethod
+                                            functionScope: nodeId(31)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(31)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: abstractMethod
-                                            eligible: true
-                                            origNode: nodeId(36)
                                             mutationCandidate: true
+                                            nodeId: 36
+                                            origNode: nodeId(36)
+                                            parent: nodeId(31)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                         )
-                                        nodeId: 31
-                                        parent: nodeId(6)
+                                        eligible: true
+                                        functionName: abstractMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: abstractMethod
-                                        eligible: true
-                                        origNode: nodeId(31)
                                         mutationCandidate: true
+                                        nodeId: 31
+                                        origNode: nodeId(31)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                     )
                                 )
-                                nodeId: 6
-                                parent: nodeId(4)
                                 eligible: true
                                 next: nodeId(8)
+                                nodeId: 6
                                 origNode: nodeId(6)
+                                parent: nodeId(4)
                             )
                         )
-                        kind: 1
-                        nodeId: 4
                         eligible: true
+                        kind: 1
                         next: nodeId(6)
+                        nodeId: 4
                         origNode: nodeId(4)
                     )
                 )
@@ -1196,275 +1196,275 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    startLine: 34
+                                    eligible: true
                                     endLine: 34
                                     nodeId: 2
-                                    parent: nodeId(1)
-                                    eligible: true
                                     origNode: nodeId(2)
+                                    parent: nodeId(1)
+                                    startLine: 34
                                 )
                                 value: Scalar_Int(
-                                    startLine: 34
+                                    eligible: true
                                     endLine: 34
-                                    rawValue: 1
                                     kind: KIND_DEC (10)
                                     nodeId: 3
-                                    parent: nodeId(1)
-                                    eligible: true
                                     origNode: nodeId(3)
+                                    parent: nodeId(1)
+                                    rawValue: 1
+                                    startLine: 34
                                 )
-                                startLine: 34
+                                eligible: true
                                 endLine: 34
                                 nodeId: 1
-                                parent: nodeId(0)
-                                eligible: true
                                 origNode: nodeId(1)
+                                parent: nodeId(0)
+                                startLine: 34
                             )
                         )
-                        startLine: 34
-                        endLine: 34
-                        nodeId: 0
                         eligible: true
+                        endLine: 34
                         next: nodeId(4)
+                        nodeId: 0
                         origNode: nodeId(0)
+                        startLine: 34
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            startLine: 36
+                            eligible: true
                             endLine: 36
                             nodeId: 5
-                            parent: nodeId(4)
-                            eligible: true
                             origNode: nodeId(5)
+                            parent: nodeId(4)
+                            startLine: 36
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    startLine: 38
+                                    eligible: true
                                     endLine: 38
                                     nodeId: 7
-                                    parent: nodeId(6)
-                                    eligible: true
                                     origNode: nodeId(7)
+                                    parent: nodeId(6)
+                                    startLine: 38
                                 )
                                 stmts: array(
                                     0: Stmt_TraitUse(
                                         traits: array(
                                             0: Name(
-                                                startLine: 40
+                                                eligible: true
                                                 endLine: 40
                                                 nodeId: 9
-                                                resolvedName: nodeId(9)
-                                                parent: nodeId(8)
-                                                eligible: true
                                                 origNode: nodeId(9)
+                                                parent: nodeId(8)
+                                                resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\TraitExample)
+                                                startLine: 40
                                             )
                                         )
-                                        startLine: 40
-                                        endLine: 40
-                                        nodeId: 8
-                                        parent: nodeId(6)
                                         eligible: true
+                                        endLine: 40
                                         next: nodeId(10)
+                                        nodeId: 8
                                         origNode: nodeId(8)
+                                        parent: nodeId(6)
+                                        startLine: 40
                                     )
                                     1: Stmt_ClassConst(
                                         consts: array(
                                             0: Const(
                                                 name: Identifier(
-                                                    startLine: 42
+                                                    eligible: true
                                                     endLine: 42
                                                     nodeId: 12
-                                                    parent: nodeId(11)
-                                                    eligible: true
                                                     origNode: nodeId(12)
+                                                    parent: nodeId(11)
+                                                    startLine: 42
                                                 )
                                                 value: Scalar_String(
-                                                    startLine: 42
+                                                    eligible: true
                                                     endLine: 42
                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: ''
                                                     nodeId: 13
-                                                    parent: nodeId(11)
-                                                    eligible: true
                                                     origNode: nodeId(13)
+                                                    parent: nodeId(11)
+                                                    rawValue: ''
+                                                    startLine: 42
                                                 )
-                                                startLine: 42
+                                                eligible: true
                                                 endLine: 42
                                                 nodeId: 11
-                                                parent: nodeId(10)
-                                                eligible: true
                                                 origNode: nodeId(11)
+                                                parent: nodeId(10)
+                                                startLine: 42
                                             )
                                         )
-                                        startLine: 42
+                                        eligible: true
                                         endLine: 42
                                         nodeId: 10
-                                        parent: nodeId(6)
-                                        eligible: true
                                         origNode: nodeId(10)
+                                        parent: nodeId(6)
+                                        startLine: 42
                                     )
                                     2: Stmt_ClassMethod(
                                         name: Identifier(
-                                            startLine: 44
+                                            eligible: true
                                             endLine: 44
-                                            nodeId: 15
-                                            parent: nodeId(14)
+                                            functionName: concreteMethod
+                                            functionScope: nodeId(14)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(14)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
+                                            nodeId: 15
                                             origNode: nodeId(15)
+                                            parent: nodeId(14)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            startLine: 44
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
-                                                    startLine: 44
+                                                    eligible: true
                                                     endLine: 44
-                                                    nodeId: 17
-                                                    parent: nodeId(16)
+                                                    functionName: concreteMethod
+                                                    functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
+                                                    nodeId: 17
                                                     origNode: nodeId(17)
+                                                    parent: nodeId(16)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    startLine: 44
                                                 )
                                                 var: Expr_Variable(
-                                                    startLine: 44
+                                                    eligible: true
                                                     endLine: 44
-                                                    nodeId: 18
-                                                    parent: nodeId(16)
+                                                    functionName: concreteMethod
+                                                    functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
+                                                    nodeId: 18
                                                     origNode: nodeId(18)
+                                                    parent: nodeId(16)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    startLine: 44
                                                 )
-                                                startLine: 44
+                                                eligible: true
                                                 endLine: 44
-                                                nodeId: 16
-                                                parent: nodeId(14)
+                                                functionName: concreteMethod
+                                                functionScope: nodeId(14)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                functionScope: nodeId(14)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: concreteMethod
-                                                eligible: true
+                                                nodeId: 16
                                                 origNode: nodeId(16)
+                                                parent: nodeId(14)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                startLine: 44
                                             )
                                         )
                                         returnType: Identifier(
-                                            startLine: 44
+                                            eligible: true
                                             endLine: 44
-                                            nodeId: 19
-                                            parent: nodeId(14)
+                                            functionName: concreteMethod
+                                            functionScope: nodeId(14)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(14)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: concreteMethod
-                                            eligible: true
+                                            nodeId: 19
                                             origNode: nodeId(19)
+                                            parent: nodeId(14)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            startLine: 44
                                         )
                                         stmts: array(
                                             0: Stmt_If(
                                                 cond: Expr_BinaryOp_Identical(
                                                     left: Expr_Variable(
-                                                        startLine: 46
+                                                        eligible: true
                                                         endLine: 46
-                                                        nodeId: 22
-                                                        parent: nodeId(21)
+                                                        functionName: concreteMethod
+                                                        functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(14)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: concreteMethod
-                                                        eligible: true
-                                                        origNode: nodeId(22)
                                                         mutationCandidate: true
+                                                        nodeId: 22
+                                                        origNode: nodeId(22)
+                                                        parent: nodeId(21)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        startLine: 46
                                                     )
                                                     right: Expr_ConstFetch(
                                                         name: Name(
-                                                            startLine: 46
+                                                            eligible: true
                                                             endLine: 46
-                                                            nodeId: 24
-                                                            namespacedName: nodeId(24)
-                                                            parent: nodeId(23)
+                                                            functionName: concreteMethod
+                                                            functionScope: nodeId(14)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            functionScope: nodeId(14)
-                                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: concreteMethod
-                                                            eligible: true
-                                                            origNode: nodeId(24)
                                                             mutationCandidate: true
+                                                            namespacedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\null)
+                                                            nodeId: 24
+                                                            origNode: nodeId(24)
+                                                            parent: nodeId(23)
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            startLine: 46
                                                         )
-                                                        startLine: 46
+                                                        eligible: true
                                                         endLine: 46
-                                                        nodeId: 23
-                                                        parent: nodeId(21)
+                                                        functionName: concreteMethod
+                                                        functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(14)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: concreteMethod
-                                                        eligible: true
-                                                        origNode: nodeId(23)
                                                         mutationCandidate: true
+                                                        nodeId: 23
+                                                        origNode: nodeId(23)
+                                                        parent: nodeId(21)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        startLine: 46
                                                     )
-                                                    startLine: 46
+                                                    eligible: true
                                                     endLine: 46
-                                                    nodeId: 21
-                                                    parent: nodeId(20)
+                                                    functionName: concreteMethod
+                                                    functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
-                                                    origNode: nodeId(21)
                                                     mutationCandidate: true
+                                                    nodeId: 21
+                                                    origNode: nodeId(21)
+                                                    parent: nodeId(20)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    startLine: 46
                                                 )
                                                 stmts: array(
                                                     0: Stmt_Echo(
                                                         exprs: array(
                                                             0: Scalar_String(
-                                                                startLine: 47
+                                                                eligible: true
                                                                 endLine: 47
-                                                                kind: KIND_SINGLE_QUOTED (1)
-                                                                rawValue: 'nothing to do'
-                                                                nodeId: 26
-                                                                parent: nodeId(25)
+                                                                functionName: concreteMethod
+                                                                functionScope: nodeId(14)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: true
-                                                                functionScope: nodeId(14)
-                                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: concreteMethod
-                                                                eligible: true
+                                                                kind: KIND_SINGLE_QUOTED (1)
+                                                                nodeId: 26
                                                                 origNode: nodeId(26)
+                                                                parent: nodeId(25)
+                                                                rawValue: 'nothing to do'
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                startLine: 47
                                                             )
                                                         )
-                                                        startLine: 47
+                                                        eligible: true
                                                         endLine: 47
-                                                        nodeId: 25
-                                                        parent: nodeId(20)
+                                                        functionName: concreteMethod
+                                                        functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        functionScope: nodeId(14)
-                                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: concreteMethod
-                                                        eligible: true
                                                         next: nodeId(27)
+                                                        nodeId: 25
                                                         origNode: nodeId(25)
+                                                        parent: nodeId(20)
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        startLine: 47
                                                     )
                                                 )
                                                 else: Stmt_Else(
@@ -1472,180 +1472,182 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         0: Stmt_Expression(
                                                             expr: Expr_FuncCall(
                                                                 name: Expr_Variable(
-                                                                    startLine: 49
+                                                                    eligible: true
                                                                     endLine: 49
-                                                                    nodeId: 30
-                                                                    parent: nodeId(29)
+                                                                    functionName: concreteMethod
+                                                                    functionScope: nodeId(14)
                                                                     isInsideFunction: true
                                                                     isStrictTypes: true
-                                                                    functionScope: nodeId(14)
-                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                    functionName: concreteMethod
-                                                                    eligible: true
+                                                                    nodeId: 30
                                                                     origNode: nodeId(30)
+                                                                    parent: nodeId(29)
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    startLine: 49
                                                                 )
-                                                                startLine: 49
+                                                                eligible: true
                                                                 endLine: 49
-                                                                nodeId: 29
-                                                                parent: nodeId(28)
+                                                                functionName: concreteMethod
+                                                                functionScope: nodeId(14)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: true
-                                                                functionScope: nodeId(14)
-                                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: concreteMethod
-                                                                eligible: true
+                                                                nodeId: 29
                                                                 origNode: nodeId(29)
+                                                                parent: nodeId(28)
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                startLine: 49
                                                             )
-                                                            startLine: 49
+                                                            eligible: true
                                                             endLine: 49
-                                                            nodeId: 28
-                                                            parent: nodeId(27)
+                                                            functionName: concreteMethod
+                                                            functionScope: nodeId(14)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            functionScope: nodeId(14)
-                                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: concreteMethod
-                                                            eligible: true
+                                                            nodeId: 28
                                                             origNode: nodeId(28)
+                                                            parent: nodeId(27)
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            startLine: 49
                                                         )
                                                     )
-                                                    startLine: 48
+                                                    eligible: true
                                                     endLine: 50
-                                                    nodeId: 27
-                                                    parent: nodeId(20)
+                                                    functionName: concreteMethod
+                                                    functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(14)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: concreteMethod
-                                                    eligible: true
                                                     next: nodeId(28)
+                                                    nodeId: 27
                                                     origNode: nodeId(27)
+                                                    parent: nodeId(20)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    startLine: 48
                                                 )
-                                                startLine: 46
+                                                eligible: true
                                                 endLine: 50
-                                                nodeId: 20
-                                                parent: nodeId(14)
+                                                functionName: concreteMethod
+                                                functionScope: nodeId(14)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                functionScope: nodeId(14)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: concreteMethod
-                                                eligible: true
-                                                next: nodeId(25)
-                                                origNode: nodeId(20)
                                                 mutationCandidate: true
+                                                next: nodeId(25)
+                                                nodeId: 20
+                                                origNode: nodeId(20)
+                                                parent: nodeId(14)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                startLine: 46
                                             )
                                         )
-                                        startLine: 44
+                                        eligible: true
                                         endLine: 51
-                                        nodeId: 14
-                                        parent: nodeId(6)
+                                        functionName: concreteMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: concreteMethod
-                                        eligible: true
-                                        origNode: nodeId(14)
                                         mutationCandidate: true
+                                        nodeId: 14
+                                        origNode: nodeId(14)
+                                        parent: nodeId(6)
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        startLine: 44
                                     )
                                     3: Stmt_ClassMethod(
                                         name: Identifier(
-                                            startLine: 53
+                                            eligible: true
                                             endLine: 53
-                                            nodeId: 32
-                                            parent: nodeId(31)
+                                            functionName: abstractMethod
+                                            functionScope: nodeId(31)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(31)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: abstractMethod
-                                            eligible: true
+                                            nodeId: 32
                                             origNode: nodeId(32)
+                                            parent: nodeId(31)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            startLine: 53
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
-                                                    startLine: 53
+                                                    eligible: true
                                                     endLine: 53
-                                                    nodeId: 34
-                                                    parent: nodeId(33)
+                                                    functionName: abstractMethod
+                                                    functionScope: nodeId(31)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(31)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: abstractMethod
-                                                    eligible: true
+                                                    nodeId: 34
                                                     origNode: nodeId(34)
+                                                    parent: nodeId(33)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    startLine: 53
                                                 )
                                                 var: Expr_Variable(
-                                                    startLine: 53
+                                                    eligible: true
                                                     endLine: 53
-                                                    nodeId: 35
-                                                    parent: nodeId(33)
+                                                    functionName: abstractMethod
+                                                    functionScope: nodeId(31)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    functionScope: nodeId(31)
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: abstractMethod
-                                                    eligible: true
+                                                    nodeId: 35
                                                     origNode: nodeId(35)
+                                                    parent: nodeId(33)
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    startLine: 53
                                                 )
-                                                startLine: 53
+                                                eligible: true
                                                 endLine: 53
-                                                nodeId: 33
-                                                parent: nodeId(31)
+                                                functionName: abstractMethod
+                                                functionScope: nodeId(31)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                functionScope: nodeId(31)
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: abstractMethod
-                                                eligible: true
+                                                nodeId: 33
                                                 origNode: nodeId(33)
+                                                parent: nodeId(31)
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                startLine: 53
                                             )
                                         )
                                         returnType: Identifier(
-                                            startLine: 53
+                                            eligible: true
                                             endLine: 53
-                                            nodeId: 36
-                                            parent: nodeId(31)
+                                            functionName: abstractMethod
+                                            functionScope: nodeId(31)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            functionScope: nodeId(31)
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: abstractMethod
-                                            eligible: true
+                                            nodeId: 36
                                             origNode: nodeId(36)
+                                            parent: nodeId(31)
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            startLine: 53
                                         )
-                                        startLine: 53
+                                        eligible: true
                                         endLine: 55
+                                        functionName: abstractMethod
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: true
                                         nodeId: 31
+                                        origNode: nodeId(31)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: abstractMethod
-                                        eligible: true
-                                        origNode: nodeId(31)
+                                        startLine: 53
                                     )
                                 )
-                                startLine: 38
+                                eligible: true
                                 endLine: 56
+                                next: nodeId(8)
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
-                                eligible: true
-                                next: nodeId(8)
-                                origNode: nodeId(6)
+                                startLine: 38
                             )
                         )
-                        startLine: 36
+                        eligible: true
                         endLine: 56
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
                         origNode: nodeId(4)
+                        startLine: 36
                     )
                 )
                 AST,
