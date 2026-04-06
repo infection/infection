@@ -54,7 +54,9 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
+use Psr\Log\NullLogger;
 use function sprintf;
+use Symfony\Component\Console\Output\NullOutput;
 use Throwable;
 use function token_get_all;
 use const TOKEN_PARSE;
@@ -242,7 +244,13 @@ abstract class BaseMutatorTestCase extends TestCase
             ),
         );
 
-        $factory = SingletonContainer::getContainer()->getNodeTraverserFactory();
+        $factory = SingletonContainer::getContainer()
+            ->withValues(
+                output: new NullOutput(),
+                logger: new NullLogger(),
+                withUncovered: true,
+            )
+            ->getNodeTraverserFactory();
 
         $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 

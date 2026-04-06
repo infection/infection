@@ -112,6 +112,7 @@ final class DumpAstCommand extends BaseCommand
                 logger: $logger,
                 output: $io->getOutput(),
                 configFile: $configFile,
+                withUncovered: true,
             );
 
         $nodes = $this->createAst($container, $file);
@@ -202,10 +203,6 @@ final class DumpAstCommand extends BaseCommand
         $formatter->setStyle(
             'eligible',
             new OutputFormatterStyle(background: 'green'),
-        );
-        $formatter->setStyle(
-            'mutation-candidate',
-            new OutputFormatterStyle(background: 'red'),
         );
     }
 }
