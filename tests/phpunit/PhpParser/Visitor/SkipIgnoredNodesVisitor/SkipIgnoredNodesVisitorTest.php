@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 
-use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use function array_keys;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;

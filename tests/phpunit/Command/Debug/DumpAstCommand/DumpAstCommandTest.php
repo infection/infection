@@ -155,20 +155,20 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
@@ -181,7 +181,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -189,14 +189,14 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 7
                                     origNode: nodeId(7)
                                     parent: nodeId(6)
                                 )
                                 implements: array(
                                     0: Name(
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 8
                                         origNode: nodeId(8)
                                         parent: nodeId(6)
@@ -206,77 +206,77 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             functionName: greet
                                             functionScope: nodeId(9)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 10
                                             origNode: nodeId(10)
                                             parent: nodeId(9)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         returnType: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             functionName: greet
                                             functionScope: nodeId(9)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 11
                                             origNode: nodeId(11)
                                             parent: nodeId(9)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         stmts: array(
                                             0: Stmt_Echo(
                                                 exprs: array(
                                                     0: Scalar_String(
-                                                        eligible: true
+                                                        eligible: false
                                                         functionName: greet
                                                         functionScope: nodeId(9)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         kind: KIND_SINGLE_QUOTED (1)
-                                                        mutationCandidate: true
                                                         nodeId: 13
                                                         origNode: nodeId(13)
                                                         parent: nodeId(12)
                                                         rawValue: 'Hello world!'
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                 )
-                                                eligible: true
+                                                eligible: false
                                                 functionName: greet
                                                 functionScope: nodeId(9)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 12
                                                 origNode: nodeId(12)
                                                 parent: nodeId(9)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
-                                        eligible: true
+                                        eligible: false
                                         functionName: greet
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 9
                                         origNode: nodeId(9)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4

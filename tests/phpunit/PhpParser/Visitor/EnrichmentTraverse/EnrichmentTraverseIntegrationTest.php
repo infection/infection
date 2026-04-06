@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
@@ -86,7 +86,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
             ->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->createMutationTraverser(
-                new LabelMutationCandidatesVisitor(),
+                new MarkTraversedNodesAsVisitedVisitor(),
             )
             ->traverse($nodes);
 
@@ -105,33 +105,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -139,7 +139,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 7
                                     origNode: nodeId(7)
                                     parent: nodeId(6)
@@ -152,11 +152,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(8)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 9
                                             origNode: nodeId(9)
                                             parent: nodeId(8)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         returnType: Identifier(
                                             eligible: true
@@ -164,11 +164,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(8)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 10
                                             origNode: nodeId(10)
                                             parent: nodeId(8)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -180,12 +180,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         kind: KIND_DEC (10)
-                                                        mutationCandidate: true
                                                         nodeId: 13
                                                         origNode: nodeId(13)
                                                         parent: nodeId(12)
                                                         rawValue: 1
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                     right: Scalar_Int(
                                                         eligible: true
@@ -194,45 +194,45 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         kind: KIND_DEC (10)
-                                                        mutationCandidate: true
                                                         nodeId: 14
                                                         origNode: nodeId(14)
                                                         parent: nodeId(12)
                                                         rawValue: 2
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                     eligible: true
                                                     functionName: first
                                                     functionScope: nodeId(8)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 12
                                                     origNode: nodeId(12)
                                                     parent: nodeId(11)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: first
                                                 functionScope: nodeId(8)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 11
                                                 origNode: nodeId(11)
                                                 parent: nodeId(8)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
                                         eligible: true
                                         functionName: first
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 8
                                         origNode: nodeId(8)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
                                     )
                                     1: Stmt_ClassMethod(
                                         name: Identifier(
@@ -241,11 +241,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(15)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 16
                                             origNode: nodeId(16)
                                             parent: nodeId(15)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         returnType: Identifier(
                                             eligible: true
@@ -253,11 +253,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(15)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 17
                                             origNode: nodeId(17)
                                             parent: nodeId(15)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -269,12 +269,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         kind: KIND_DEC (10)
-                                                        mutationCandidate: true
                                                         nodeId: 20
                                                         origNode: nodeId(20)
                                                         parent: nodeId(19)
                                                         rawValue: 1
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                     right: Scalar_Int(
                                                         eligible: true
@@ -283,54 +283,54 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         kind: KIND_DEC (10)
-                                                        mutationCandidate: true
                                                         nodeId: 21
                                                         origNode: nodeId(21)
                                                         parent: nodeId(19)
                                                         rawValue: 2
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                     eligible: true
                                                     functionName: second
                                                     functionScope: nodeId(15)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 19
                                                     origNode: nodeId(19)
                                                     parent: nodeId(18)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: second
                                                 functionScope: nodeId(15)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 18
                                                 origNode: nodeId(18)
                                                 parent: nodeId(15)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
                                         eligible: true
                                         functionName: second
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 15
                                         origNode: nodeId(15)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
@@ -348,33 +348,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -382,7 +382,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Function(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 7
                                     origNode: nodeId(7)
                                     parent: nodeId(6)
@@ -390,43 +390,43 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 params: array(
                                     0: Param(
                                         type: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 9
                                             origNode: nodeId(9)
                                             parent: nodeId(8)
                                         )
                                         var: Expr_Variable(
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 10
                                             origNode: nodeId(10)
                                             parent: nodeId(8)
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 8
                                         origNode: nodeId(8)
                                         parent: nodeId(6)
                                     )
                                     1: Param(
                                         type: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 12
                                             origNode: nodeId(12)
                                             parent: nodeId(11)
                                         )
                                         var: Expr_Variable(
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 13
                                             origNode: nodeId(13)
                                             parent: nodeId(11)
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 11
                                         origNode: nodeId(11)
                                         parent: nodeId(6)
                                     )
                                 )
                                 returnType: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 14
                                     origNode: nodeId(14)
                                     parent: nodeId(6)
@@ -435,36 +435,36 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     0: Stmt_Return(
                                         expr: Expr_BinaryOp_Identical(
                                             left: Expr_Variable(
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 17
                                                 origNode: nodeId(17)
                                                 parent: nodeId(16)
                                             )
                                             right: Expr_Variable(
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 18
                                                 origNode: nodeId(18)
                                                 parent: nodeId(16)
                                             )
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 16
                                             origNode: nodeId(16)
                                             parent: nodeId(15)
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 15
                                         origNode: nodeId(15)
                                         parent: nodeId(6)
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 isStrictTypes: true
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         nodeId: 4
                         origNode: nodeId(4)
@@ -481,33 +481,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -515,7 +515,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Trait(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 7
                                     origNode: nodeId(7)
                                     parent: nodeId(6)
@@ -525,26 +525,26 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         consts: array(
                                             0: Const(
                                                 name: Identifier(
-                                                    eligible: true
+                                                    eligible: false
                                                     nodeId: 10
                                                     origNode: nodeId(10)
                                                     parent: nodeId(9)
                                                 )
                                                 value: Scalar_String(
-                                                    eligible: true
+                                                    eligible: false
                                                     kind: KIND_SINGLE_QUOTED (1)
                                                     nodeId: 11
                                                     origNode: nodeId(11)
                                                     parent: nodeId(9)
                                                     rawValue: ''
                                                 )
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 9
                                                 origNode: nodeId(9)
                                                 parent: nodeId(8)
                                             )
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 8
                                         origNode: nodeId(8)
                                         parent: nodeId(6)
@@ -572,7 +572,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             nodeId: 17
                                             origNode: nodeId(17)
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 12
                                         origNode: nodeId(12)
                                     )
@@ -583,11 +583,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(18)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 19
                                             origNode: nodeId(19)
                                             parent: nodeId(18)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
@@ -598,11 +598,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 21
                                                     origNode: nodeId(21)
                                                     parent: nodeId(20)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
                                                     eligible: true
@@ -611,11 +611,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 22
                                                     origNode: nodeId(22)
                                                     parent: nodeId(20)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: concreteMethod
@@ -623,11 +623,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 20
                                                 origNode: nodeId(20)
                                                 parent: nodeId(18)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
@@ -636,31 +636,31 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(18)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 23
                                             origNode: nodeId(23)
                                             parent: nodeId(18)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         eligible: true
                                         functionName: concreteMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 18
                                         origNode: nodeId(18)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 next: nodeId(8)
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
@@ -678,33 +678,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -763,12 +763,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         origNode: nodeId(12)
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 6
                                 origNode: nodeId(6)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
@@ -786,33 +786,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -820,7 +820,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 7
                                     origNode: nodeId(7)
                                     parent: nodeId(6)
@@ -829,14 +829,14 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     0: Stmt_TraitUse(
                                         traits: array(
                                             0: Name(
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 9
                                                 origNode: nodeId(9)
                                                 parent: nodeId(8)
                                                 resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\TraitExample)
                                             )
                                         )
-                                        eligible: true
+                                        eligible: false
                                         next: nodeId(10)
                                         nodeId: 8
                                         origNode: nodeId(8)
@@ -846,26 +846,26 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         consts: array(
                                             0: Const(
                                                 name: Identifier(
-                                                    eligible: true
+                                                    eligible: false
                                                     nodeId: 12
                                                     origNode: nodeId(12)
                                                     parent: nodeId(11)
                                                 )
                                                 value: Scalar_String(
-                                                    eligible: true
+                                                    eligible: false
                                                     kind: KIND_SINGLE_QUOTED (1)
                                                     nodeId: 13
                                                     origNode: nodeId(13)
                                                     parent: nodeId(11)
                                                     rawValue: ''
                                                 )
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 11
                                                 origNode: nodeId(11)
                                                 parent: nodeId(10)
                                             )
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 10
                                         origNode: nodeId(10)
                                         parent: nodeId(6)
@@ -877,11 +877,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(14)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 15
                                             origNode: nodeId(15)
                                             parent: nodeId(14)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
@@ -892,11 +892,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 17
                                                     origNode: nodeId(17)
                                                     parent: nodeId(16)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
                                                     eligible: true
@@ -905,11 +905,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 18
                                                     origNode: nodeId(18)
                                                     parent: nodeId(16)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: concreteMethod
@@ -917,11 +917,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 16
                                                 origNode: nodeId(16)
                                                 parent: nodeId(14)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
@@ -930,21 +930,21 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(14)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 19
                                             origNode: nodeId(19)
                                             parent: nodeId(14)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         eligible: true
                                         functionName: concreteMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 14
                                         origNode: nodeId(14)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
                                     )
                                     3: Stmt_ClassMethod(
                                         name: Identifier(
@@ -953,11 +953,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(20)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 21
                                             origNode: nodeId(21)
                                             parent: nodeId(20)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
@@ -968,11 +968,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 23
                                                     origNode: nodeId(23)
                                                     parent: nodeId(22)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
                                                     eligible: true
@@ -981,11 +981,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 24
                                                     origNode: nodeId(24)
                                                     parent: nodeId(22)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: abstractMethod
@@ -993,11 +993,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 22
                                                 origNode: nodeId(22)
                                                 parent: nodeId(20)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
@@ -1006,31 +1006,31 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(20)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 25
                                             origNode: nodeId(25)
                                             parent: nodeId(20)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                            tests: Closure
                                         )
                                         eligible: true
                                         functionName: abstractMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 20
                                         origNode: nodeId(20)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                        tests: Closure
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 next: nodeId(8)
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
@@ -1048,33 +1048,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -1082,7 +1082,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 7
                                     origNode: nodeId(7)
                                     parent: nodeId(6)
@@ -1091,14 +1091,14 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     0: Stmt_TraitUse(
                                         traits: array(
                                             0: Name(
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 9
                                                 origNode: nodeId(9)
                                                 parent: nodeId(8)
                                                 resolvedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\TraitExample)
                                             )
                                         )
-                                        eligible: true
+                                        eligible: false
                                         next: nodeId(10)
                                         nodeId: 8
                                         origNode: nodeId(8)
@@ -1108,26 +1108,26 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         consts: array(
                                             0: Const(
                                                 name: Identifier(
-                                                    eligible: true
+                                                    eligible: false
                                                     nodeId: 12
                                                     origNode: nodeId(12)
                                                     parent: nodeId(11)
                                                 )
                                                 value: Scalar_String(
-                                                    eligible: true
+                                                    eligible: false
                                                     kind: KIND_SINGLE_QUOTED (1)
                                                     nodeId: 13
                                                     origNode: nodeId(13)
                                                     parent: nodeId(11)
                                                     rawValue: ''
                                                 )
-                                                eligible: true
+                                                eligible: false
                                                 nodeId: 11
                                                 origNode: nodeId(11)
                                                 parent: nodeId(10)
                                             )
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 10
                                         origNode: nodeId(10)
                                         parent: nodeId(6)
@@ -1155,7 +1155,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             nodeId: 19
                                             origNode: nodeId(19)
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 14
                                         origNode: nodeId(14)
                                     )
@@ -1166,11 +1166,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(20)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 21
                                             origNode: nodeId(21)
                                             parent: nodeId(20)
                                             reflectionClass: Infection\Reflection\NullReflection
+                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
@@ -1181,11 +1181,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 23
                                                     origNode: nodeId(23)
                                                     parent: nodeId(22)
                                                     reflectionClass: Infection\Reflection\NullReflection
+                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
                                                     eligible: true
@@ -1194,11 +1194,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 24
                                                     origNode: nodeId(24)
                                                     parent: nodeId(22)
                                                     reflectionClass: Infection\Reflection\NullReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: concreteMethod
@@ -1206,11 +1206,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 22
                                                 origNode: nodeId(22)
                                                 parent: nodeId(20)
                                                 reflectionClass: Infection\Reflection\NullReflection
+                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
@@ -1219,31 +1219,31 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(20)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 25
                                             origNode: nodeId(25)
                                             parent: nodeId(20)
                                             reflectionClass: Infection\Reflection\NullReflection
+                                            tests: Closure
                                         )
                                         eligible: true
                                         functionName: concreteMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 20
                                         origNode: nodeId(20)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\NullReflection
+                                        tests: Closure
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 next: nodeId(8)
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
@@ -1262,33 +1262,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 2
                                     origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    eligible: true
+                                    eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 1
                                 origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         next: nodeId(4)
                         nodeId: 0
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
-                            eligible: true
+                            eligible: false
                             nodeId: 5
                             origNode: nodeId(5)
                             parent: nodeId(4)
@@ -1298,24 +1298,24 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 uses: array(
                                     0: UseItem(
                                         name: Name(
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 8
                                             origNode: nodeId(8)
                                             parent: nodeId(7)
                                         )
                                         alias: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             nodeId: 9
                                             origNode: nodeId(9)
                                             parent: nodeId(7)
                                         )
-                                        eligible: true
+                                        eligible: false
                                         nodeId: 7
                                         origNode: nodeId(7)
                                         parent: nodeId(6)
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 next: nodeId(10)
                                 nodeId: 6
                                 origNode: nodeId(6)
@@ -1350,7 +1350,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                             )
                             2: Stmt_Class(
                                 name: Identifier(
-                                    eligible: true
+                                    eligible: false
                                     nodeId: 15
                                     origNode: nodeId(15)
                                     parent: nodeId(14)
@@ -1363,11 +1363,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(16)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 17
                                             origNode: nodeId(17)
                                             parent: nodeId(16)
                                             reflectionClass: Infection\Reflection\NullReflection
+                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
@@ -1378,11 +1378,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 19
                                                     origNode: nodeId(19)
                                                     parent: nodeId(18)
                                                     reflectionClass: Infection\Reflection\NullReflection
+                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
                                                     eligible: true
@@ -1391,11 +1391,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 20
                                                     origNode: nodeId(20)
                                                     parent: nodeId(18)
                                                     reflectionClass: Infection\Reflection\NullReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: check
@@ -1403,11 +1403,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 18
                                                 origNode: nodeId(18)
                                                 parent: nodeId(16)
                                                 reflectionClass: Infection\Reflection\NullReflection
+                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
@@ -1416,11 +1416,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(16)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            mutationCandidate: true
                                             nodeId: 21
                                             origNode: nodeId(21)
                                             parent: nodeId(16)
                                             reflectionClass: Infection\Reflection\NullReflection
+                                            tests: Closure
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -1432,11 +1432,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             functionScope: nodeId(16)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            mutationCandidate: true
                                                             nodeId: 25
                                                             origNode: nodeId(25)
                                                             parent: nodeId(24)
                                                             reflectionClass: Infection\Reflection\NullReflection
+                                                            tests: Closure
                                                         )
                                                         class: Name(
                                                             eligible: true
@@ -1444,23 +1444,23 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             functionScope: nodeId(16)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            mutationCandidate: true
                                                             nodeId: 26
                                                             origNode: nodeId(26)
                                                             parent: nodeId(24)
                                                             reflectionClass: Infection\Reflection\NullReflection
                                                             resolvedName: FullyQualified(RuntimeException)
+                                                            tests: Closure
                                                         )
                                                         eligible: true
                                                         functionName: check
                                                         functionScope: nodeId(16)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        mutationCandidate: true
                                                         nodeId: 24
                                                         origNode: nodeId(24)
                                                         parent: nodeId(23)
                                                         reflectionClass: Infection\Reflection\NullReflection
+                                                        tests: Closure
                                                     )
                                                     right: Expr_Instanceof(
                                                         expr: Expr_Variable(
@@ -1469,11 +1469,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             functionScope: nodeId(16)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            mutationCandidate: true
                                                             nodeId: 28
                                                             origNode: nodeId(28)
                                                             parent: nodeId(27)
                                                             reflectionClass: Infection\Reflection\NullReflection
+                                                            tests: Closure
                                                         )
                                                         class: Name(
                                                             eligible: true
@@ -1481,65 +1481,65 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             functionScope: nodeId(16)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            mutationCandidate: true
                                                             nodeId: 29
                                                             origNode: nodeId(29)
                                                             parent: nodeId(27)
                                                             reflectionClass: Infection\Reflection\NullReflection
                                                             resolvedName: FullyQualified(InvalidArgumentException)
+                                                            tests: Closure
                                                         )
                                                         eligible: true
                                                         functionName: check
                                                         functionScope: nodeId(16)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        mutationCandidate: true
                                                         nodeId: 27
                                                         origNode: nodeId(27)
                                                         parent: nodeId(23)
                                                         reflectionClass: Infection\Reflection\NullReflection
+                                                        tests: Closure
                                                     )
                                                     eligible: true
                                                     functionName: check
                                                     functionScope: nodeId(16)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 23
                                                     origNode: nodeId(23)
                                                     parent: nodeId(22)
                                                     reflectionClass: Infection\Reflection\NullReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: check
                                                 functionScope: nodeId(16)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 nodeId: 22
                                                 origNode: nodeId(22)
                                                 parent: nodeId(16)
                                                 reflectionClass: Infection\Reflection\NullReflection
+                                                tests: Closure
                                             )
                                         )
                                         eligible: true
                                         functionName: check
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        mutationCandidate: true
                                         nodeId: 16
                                         origNode: nodeId(16)
                                         parent: nodeId(14)
                                         reflectionClass: Infection\Reflection\NullReflection
+                                        tests: Closure
                                     )
                                 )
-                                eligible: true
+                                eligible: false
                                 nodeId: 14
                                 origNode: nodeId(14)
                                 parent: nodeId(4)
                             )
                         )
-                        eligible: true
+                        eligible: false
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4

@@ -42,7 +42,7 @@ use Infection\Container\Container;
 use Infection\FileSystem\FileSystem;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -152,7 +152,7 @@ final class DumpAstCommand extends BaseCommand
 
         return $traverserFactory
             ->createMutationTraverser(
-                new LabelMutationCandidatesVisitor(),
+                new MarkTraversedNodesAsVisitedVisitor(),
             )
             ->traverse($initialStatements);
     }

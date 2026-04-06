@@ -89,7 +89,6 @@ readonly class NodeTraverserFactory
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
-            new LabelNodesAsEligibleVisitor(),
             new ExcludeNonMutableCodeVisitor(),
             new ExcludeUnchangedLinesVisitor(
                 $this->sourceLineMatcher,
