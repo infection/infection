@@ -55,13 +55,9 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
-    /**
-     * @param list<TestLocation>|null $testedNodeIds
-     */
     #[DataProvider('nodeProvider')]
     public function test_it_creates_a_rich_ast(
         string $code,
-        ?array $testedNodeIds,
         string $expected,
     ): void {
         $traverserFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
@@ -71,7 +67,13 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->method('getAllTestsForMutation')
-            ->willReturn($testedNodeIds);
+            ->willReturn([
+                new TestLocation(
+                    'someMethod',
+                    '/path/to/test.php',
+                    0.23,
+                ),
+            ]);
 
         $nodes = $this->parse($code);
 
@@ -79,6 +81,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $traverserFactory
             ->createEnrichmentTraverser(
                 $source,
+                $traceMock,
             )
             ->traverse($nodes);
         $traversedNodes = $traverserFactory

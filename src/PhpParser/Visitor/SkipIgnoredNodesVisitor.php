@@ -57,7 +57,8 @@ final class SkipIgnoredNodesVisitor extends NodeVisitorAbstract
     {
         foreach ($this->nodeIgnorers as $nodeIgnorer) {
             if ($nodeIgnorer->ignores($node)) {
-                // TODO: check if that can't mess up the name resolution in some cases...
+                LabelNodesAsEligibleVisitor::markAsIneligible($node);
+
                 return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
             }
         }
