@@ -246,8 +246,8 @@ abstract class BaseMutatorTestCase extends TestCase
 
         $factory = SingletonContainer::getContainer()
             ->withValues(
-                output: new NullOutput(),
                 logger: new NullLogger(),
+                output: new NullOutput(),
                 withUncovered: true,
             )
             ->getNodeTraverserFactory();
