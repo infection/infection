@@ -35,16 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Command\Debug;
 
+use function array_map;
+use function explode;
 use Infection\Command\BaseCommand;
+use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Container\Container;
+use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\Source\Matcher\SimpleSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use Psr\Log\LoggerInterface;
 use SplFileObject;
 use function sprintf;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -62,6 +70,10 @@ final class DumpAstCommand extends BaseCommand
     private const FILE_PATH_ARGUMENT = 'file';
 
     private const SHOW_ATTRIBUTES = 'show-attributes';
+
+    private const CHANGED_LINES_RANGES = 'changed-lines-ranges';
+
+    private const CHANGED_LINES_PARTS_COUNT = 2;
 
     public function __construct(
         private readonly FileSystem $fileSystem,
@@ -92,34 +104,39 @@ final class DumpAstCommand extends BaseCommand
             InputOption::VALUE_NONE,
             'Show all the attributes',
         );
+        $this->addOption(
+            self::CHANGED_LINES_RANGES,
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'List of changed line ranges. E.g. "10:12,24:30" will indicate that the lines 10, 11, 12, 24, 25, ..., 30 changed.',
+        );
 
         ConfigurationOption::addOption($this);
+
+        SourceFilterOptions::addOption($this);
+        BaseOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool
     {
         $file = $this->getFile($io);
         $shouldShowAttributes = self::shouldShowAttributes($io);
+        $changedLinesRanges = self::getChangedLinesRanges($io);
+        $hasChangedLines = $changedLinesRanges !== null;
         $configFile = ConfigurationOption::get($io);
         $logger = new ConsoleLogger($io);
         self::configureFormatter($io);
 
-        $container = $this
-            ->getApplication()
-            ->getContainer()
-            ->withValues(
-                logger: $logger,
-                output: $io->getOutput(),
-                configFile: $configFile,
-            );
+        $container = $this->createContainer($logger, $io, $configFile, $changedLinesRanges);
 
         $nodes = $this->createAst($container, $file);
 
         $io->write(
             $container->getNodeDumper()->dump(
                 $nodes,
-                dumpOtherAttributes: $shouldShowAttributes,
+                dumpOtherAttributes: $shouldShowAttributes || $hasChangedLines,
                 decorateNodes: $io->isDecorated(),
+                showLineNumbers: $hasChangedLines,
             ),
         );
 
@@ -148,7 +165,10 @@ final class DumpAstCommand extends BaseCommand
 
         return $traverserFactory
             ->createMutationTraverser(
-                new LabelMutationCandidatesVisitor(),
+                new LabelMutationCandidatesVisitor(
+                    $file->getRealPath(),
+                    $container->getSourceLineMatcher(),
+                ),
             )
             ->traverse($initialStatements);
     }
@@ -184,11 +204,93 @@ final class DumpAstCommand extends BaseCommand
     }
 
     /**
+     * @return list<ChangedLinesRange>|null
+     */
+    private static function getChangedLinesRanges(IO $io): ?array
+    {
+        if (!$io->getInput()->hasParameterOption('--' . self::CHANGED_LINES_RANGES, onlyParams: true)) {
+            return null;
+        }
+
+        $value = (string) $io->getInput()->getOption(self::CHANGED_LINES_RANGES);
+
+        if ($value === '') {
+            return [];
+        }
+
+        return array_map(
+            self::parseChangedLinesRange(...),
+            explode(',', $value),
+        );
+    }
+
+    private static function parseChangedLinesRange(string $item): ChangedLinesRange
+    {
+        $parts = explode(':', $item);
+
+        Assert::count(
+            $parts,
+            self::CHANGED_LINES_PARTS_COUNT,
+            sprintf(
+                'Expected a range to follow the pattern "<startLineNumber>:<endLineNumber>". Got "%s".',
+                $item,
+            ),
+        );
+        Assert::allIntegerish(
+            $parts,
+            sprintf(
+                'Invalid line numbers. Failed for the range "%s".',
+                $item,
+            ),
+        );
+
+        /** @psalm-suppress InvalidArrayAccess */
+        $startLine = (int) $parts[0];
+        /** @psalm-suppress InvalidArrayAccess */
+        $endLine = (int) $parts[1];
+
+        Assert::natural($startLine);
+        Assert::natural($endLine);
+
+        return ChangedLinesRange::create($startLine, $endLine);
+    }
+
+    /**
      * @param Node[] $nodes
      */
     private static function addIdsToNodes(array $nodes): void
     {
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
+    }
+
+    /**
+     * @param non-empty-string|null $configFile
+     * @param list<ChangedLinesRange>|null $changedLinesRanges
+     */
+    private function createContainer(
+        LoggerInterface $logger,
+        IO $io,
+        ?string $configFile,
+        ?array $changedLinesRanges,
+    ): Container {
+        $container = $this
+            ->getApplication()
+            ->getContainer()
+            ->withValues(
+                logger: $logger,
+                output: $io->getOutput(),
+                configFile: $configFile,
+                sourceFilter: SourceFilterOptions::get($io),
+            );
+
+        if ($changedLinesRanges !== null) {
+            $container = $container->cloneWithService(
+                SourceLineMatcher::class,
+                new SimpleSourceLineMatcher($changedLinesRanges),
+            );
+        }
+
+        return $container;
     }
 
     private static function configureFormatter(IO $io): void

@@ -70,6 +70,7 @@ final class NodeDumperTest extends TestCase
     #[DataProvider('decoratedNodesProvider')]
     #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
     #[DataProvider('resolvedNameAttributeProvider')]
+    #[DataProvider('showLineNumbersProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
         $node = $scenario->node;
@@ -90,6 +91,7 @@ final class NodeDumperTest extends TestCase
             $scenario->dumpOtherAttributes,
             $scenario->onlyVisitedNodes,
             $scenario->decorateNodes,
+            $scenario->showLineNumbers,
         );
 
         if ($expected instanceof Exception) {
@@ -974,5 +976,132 @@ final class NodeDumperTest extends TestCase
                 )
                 ->build();
         })();
+    }
+
+    public static function showLineNumbersProvider(): iterable
+    {
+        yield 'line numbers are shown when enabled' => NodeDumperScenario::forCode(
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                PHP,
+        )
+            ->withShowAllNodes()
+            ->withDumpProperties()
+            ->withDumpOtherAttributes()
+            ->withShowLineNumbers()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                    endLine: 3
+                                    startLine: 3
+                                )
+                                expr: Scalar_Int(
+                                    value: 1
+                                    endLine: 3
+                                    kind: KIND_DEC (10)
+                                    rawValue: 1
+                                    startLine: 3
+                                )
+                                endLine: 3
+                                startLine: 3
+                            )
+                            endLine: 3
+                            startLine: 3
+                        )
+                    )
+                    AST,
+            )
+            ->build();
+
+        yield 'line numbers are hidden by default' => NodeDumperScenario::forCode(
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                PHP,
+        )
+            ->withShowAllNodes()
+            ->withDumpProperties()
+            ->withDumpOtherAttributes()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                )
+                                expr: Scalar_Int(
+                                    value: 1
+                                    kind: KIND_DEC (10)
+                                    rawValue: 1
+                                )
+                            )
+                        )
+                    )
+                    AST,
+            )
+            ->build();
+
+        yield 'line numbers with multi-line code' => NodeDumperScenario::forCode(
+            <<<'PHP'
+                <?php
+
+                $a = [
+                    'hello',
+                ];
+                PHP,
+        )
+            ->withShowAllNodes()
+            ->withDumpProperties()
+            ->withDumpOtherAttributes()
+            ->withShowLineNumbers()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                    endLine: 3
+                                    startLine: 3
+                                )
+                                expr: Expr_Array(
+                                    items: array(
+                                        0: ArrayItem(
+                                            key: null
+                                            value: Scalar_String(
+                                                value: hello
+                                                endLine: 4
+                                                kind: KIND_SINGLE_QUOTED (1)
+                                                rawValue: 'hello'
+                                                startLine: 4
+                                            )
+                                            byRef: false
+                                            unpack: false
+                                            endLine: 4
+                                            startLine: 4
+                                        )
+                                    )
+                                    endLine: 5
+                                    kind: KIND_SHORT (2)
+                                    startLine: 3
+                                )
+                                endLine: 5
+                                startLine: 3
+                            )
+                            endLine: 5
+                            startLine: 3
+                        )
+                    )
+                    AST,
+            )
+            ->build();
     }
 }
