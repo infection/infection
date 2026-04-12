@@ -1171,12 +1171,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() should return DOMNodeList but returns DOMNodeList<DOMNameSpaceNode|DOMNode>|false.'
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -1191,12 +1185,6 @@ parameters:
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
 			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::queryXpath() should return DOMNodeList but returns DOMNodeList<DOMNameSpaceNode|DOMNode>|false.'
-			identifier: return.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
