@@ -277,6 +277,14 @@ final readonly class XmlConfigurationManipulator
         $filterNode->appendChild($listNode);
     }
 
+    private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
+    {
+        foreach ($xPath->queryList($nodeQuery) as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
+            $node->parentNode?->removeChild($node);
+        }
+    }
+
     private function nodeExists(SafeDOMXPath $xPath, string $nodeName): bool
     {
         return $xPath->queryCount(sprintf('/phpunit/%s', $nodeName)) > 0;
@@ -377,14 +385,6 @@ final readonly class XmlConfigurationManipulator
         }
 
         throw new LogicException(sprintf('Unknown lib XML error level "%s"', $error->level));
-    }
-
-    private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
-    {
-        foreach ($xPath->queryList($nodeQuery) as $node) {
-            Assert::isInstanceOf($node, DOMNode::class);
-            $node->parentNode?->removeChild($node);
-        }
     }
 
     private function getOrCreateNode(SafeDOMXPath $xPath, DOMDocument $dom, string $nodeName): DOMElement

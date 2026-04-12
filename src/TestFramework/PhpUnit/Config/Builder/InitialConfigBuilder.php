@@ -106,6 +106,17 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
+        if (version_compare($version, '12.0', '>=')) {
+            // For PHPUnit 12.0+, preserve the original coverage configuration as-is.
+            $this->configManipulator->addOrUpdateSourceIncludeNodes(
+                xPath: $xPath,
+                srcDirs: $this->srcDirs,
+                filteredSourceFilesToMutate: [],
+            );
+
+            return;
+        }
+
         if (version_compare($version, '10.1', '>=')) {
             $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
