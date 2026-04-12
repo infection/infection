@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use DOMDocument;
 use DOMNodeList;
-use DOMXPath;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\SafeDOMXPath;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
 use const PHP_EOL;
@@ -552,13 +551,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         ];
     }
 
-    // TODO: at this point it is better to use the SafeDOMXPath...
     private function queryXpath(string $xml, string $query): DOMNodeList
     {
-        $dom = new DOMDocument();
-        $dom->loadXML($xml);
-
-        return (new DOMXPath($dom))->query($query);
+        return SafeDOMXPath::fromString($xml)->queryList($query);
     }
 
     private function createConfigBuilderForPHPUnit93(): InitialConfigBuilder
