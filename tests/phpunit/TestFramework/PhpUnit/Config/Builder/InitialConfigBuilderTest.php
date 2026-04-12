@@ -577,7 +577,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         return new InitialConfigBuilder(
             $this->tmp,
             file_get_contents($phpunitXmlPath),
-            new XmlConfigurationManipulator($replacer, ''),
+            new XmlConfigurationManipulator($replacer),
             new XmlConfigurationVersionProvider(),
             $srcDirs,
             $filteredSourceFilesToMutate,

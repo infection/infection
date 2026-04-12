@@ -783,7 +783,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         return new MutationConfigBuilder(
             $this->tmp,
             file_get_contents($phpunitXmlPath),
-            new XmlConfigurationManipulator($replacer, ''),
+            new XmlConfigurationManipulator($replacer),
             'project/dir',
             new TestRunOrderResolver(),
         );

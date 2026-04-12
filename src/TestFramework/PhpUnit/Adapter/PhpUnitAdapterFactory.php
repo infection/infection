@@ -84,7 +84,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 new Filesystem(),
                 $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
