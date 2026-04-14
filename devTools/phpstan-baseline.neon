@@ -91,6 +91,18 @@ parameters:
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-empty-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
+
+		-
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-empty-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -406,6 +418,12 @@ parameters:
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
 
 		-
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
 			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
 			identifier: method.childParameterType
 			count: 1
@@ -416,6 +434,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string, 2?: ''/phpunit''}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
 			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
@@ -541,7 +565,7 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
-			rawMessage: 'Parameter #1 $func of method Pipeline\Standard<int,string>::map() expects (callable(): (Generator<mixed, iterable<class-string, string>, mixed, mixed>|iterable<class-string, string>))|(callable(string): (Generator<mixed, iterable<class-string, string>, mixed, mixed>|iterable<class-string, string>))|null, Closure(class-string): iterable<class-string, string> given.'
+			rawMessage: 'Parameter #1 $func of method Pipeline\Standard<int,string>::map() expects (callable(): (array<class-string, string>|Generator<mixed, array<class-string, string>|Traversable<class-string, string>, mixed, mixed>|Traversable<class-string, string>))|(callable(string): (array<class-string, string>|Generator<mixed, array<class-string, string>|Traversable<class-string, string>, mixed, mixed>|Traversable<class-string, string>))|null, Closure(class-string): iterable<class-string, string> given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
@@ -559,7 +583,7 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
-			rawMessage: 'Parameter #1 $values of method Pipeline\Standard<mixed,list<string>|null>::append() expects iterable<array{string, string}|null>|null, list<array{mixed, iterable<class-string, string>}> given.'
+			rawMessage: 'Parameter #1 $values of method Pipeline\Standard<mixed,list<string>|null>::append() expects iterable<array{string, string}|null>|null, list<array{mixed, array<class-string, string>|Traversable<class-string, string>}> given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
