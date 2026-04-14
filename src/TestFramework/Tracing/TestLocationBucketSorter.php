@@ -33,56 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+namespace Infection\TestFramework\Tracing;
 
-use function in_array;
-use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-use SplObjectStorage;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\CannotBeInstantiated;
+use function ksort;
 
-final class MarkNodesAsIgnoredVisitor extends NodeVisitorAbstract
+/**
+ * @internal
+ */
+final readonly class TestLocationBucketSorter
 {
-    /**
-     * @var SplObjectStorage<Node, null>
-     */
-    private readonly SplObjectStorage $ignoredNodes;
+    use CannotBeInstantiated;
 
     /**
-     * @param array<positive-int|0> $ignoredNodeIds
+     * Pre-sort first buckets, optimistically assuming that most projects
+     * won't have tests longer than a second.
      */
-    public function __construct(
-        private readonly array $ignoredNodeIds,
-        private readonly ChangingIgnorer $changingIgnorer,
-    ) {
-        $this->ignoredNodes = new SplObjectStorage();
-    }
+    private const INIT_BUCKETS = [
+        0 => [],
+        1 => [],
+        2 => [],
+        3 => [],
+        4 => [],
+        5 => [],
+        6 => [],
+        7 => [],
+    ];
 
-    public function enterNode(Node $node): null
+    /**
+     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
+     *
+     * @param TestLocation[] $uniqueTestLocations
+     *
+     * @return iterable<TestLocation>
+     */
+    public static function bucketSort(array $uniqueTestLocations): iterable
     {
-        if ($this->ignores($node)) {
-            $this->changingIgnorer->startIgnoring();
-            $this->ignoredNodes->offsetSet($node);
+        $buckets = self::INIT_BUCKETS;
+
+        foreach ($uniqueTestLocations as $location) {
+            // @codeCoverageIgnoreStart
+            // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
+
+            // Quick drop off lower bits, reducing precision to 8th of a second
+            $msTime = (int) (($location->getExecutionTime() ?? 0) * 1024) >> 7; // * 1024 / 128
+
+            // For anything above 4 seconds reduce precision to 4 seconds
+            if ($msTime > 32) {
+                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
+            }
+            // @codeCoverageIgnoreEnd
+
+            $buckets[$msTime][] = $location;
         }
 
-        return null;
-    }
+        ksort($buckets);
 
-    public function leaveNode(Node $node): null
-    {
-        if ($this->ignoredNodes->offsetExists($node)) {
-            $this->changingIgnorer->stopIgnoring();
-            $this->ignoredNodes->offsetUnset($node);
+        foreach ($buckets as $bucket) {
+            yield from $bucket;
         }
-
-        return null;
-    }
-
-    private function ignores(Node $node): bool
-    {
-        $id = AddIdToTraversedNodesVisitor::getNodeId($node);
-
-        return in_array($id, $this->ignoredNodeIds, true);
     }
 }

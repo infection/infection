@@ -33,30 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
 
-use PhpParser\Node;
+use InvalidArgumentException as Other;
+// @infection-ignore-all
+use RuntimeException as Problem;
 
-/**
- * @internal
- * @final
- */
-class ChangingIgnorer implements NodeIgnorer
+final class Demo
 {
-    private bool $ignore = false;
-
-    public function ignores(Node $node): bool
+    public function check(object $value): bool
     {
-        return $this->ignore;
-    }
-
-    public function startIgnoring(): void
-    {
-        $this->ignore = true;
-    }
-
-    public function stopIgnoring(): void
-    {
-        $this->ignore = false;
+        return $value instanceof Problem || $value instanceof Other;
     }
 }

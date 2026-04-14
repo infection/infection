@@ -33,49 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Source\Matcher;
 
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-use SplObjectStorage;
-use function str_contains;
+use Infection\Differ\ChangedLinesRange;
 
 /**
+ * Simple implementation that will tell if any configured line ranges matches
+ * the given criteria.
+ *
+ * This can be useful for testing purposes.
+ *
  * @internal
  */
-final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstract
+final readonly class SimpleSourceLineMatcher implements SourceLineMatcher
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
-
     /**
-     * @param SplObjectStorage<object, mixed> $ignoredNodes
+     * @param list<ChangedLinesRange> $changedLinesRanges
      */
     public function __construct(
-        private readonly ChangingIgnorer $changingIgnorer,
-        private readonly SplObjectStorage $ignoredNodes,
+        private array $changedLinesRanges,
     ) {
     }
 
-    public function enterNode(Node $node): ?Node
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        foreach ($node->getComments() as $comment) {
-            if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
-                $this->changingIgnorer->startIgnoring();
-                $this->ignoredNodes->offsetSet($node);
+        foreach ($this->changedLinesRanges as $changedLinesRange) {
+            if ($changedLinesRange->touches($startLine, $endLine)) {
+                return true;
             }
         }
 
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        if ($this->ignoredNodes->offsetExists($node)) {
-            $this->ignoredNodes->offsetUnset($node);
-            $this->changingIgnorer->stopIgnoring();
-        }
-
-        return null;
+        return false;
     }
 }

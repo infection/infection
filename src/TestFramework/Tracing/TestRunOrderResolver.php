@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Tracing;
 
 use function count;
 use function current;
@@ -41,9 +41,12 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function usort;
 
 /**
+ * Resolves the order in which test files should be run against a mutant,
+ * prioritizing the fastest tests first
+ *
  * @internal
  */
-final class JUnitTestCaseSorter
+final readonly class TestRunOrderResolver
 {
     /**
      * Expected average number of buckets. Exposed for testing purposes.
@@ -59,11 +62,13 @@ final class JUnitTestCaseSorter
     public const USE_BUCKET_SORT_AFTER = 15;
 
     /**
+     * Returns unique test file paths ordered by execution time (fastest first).
+     *
      * @param TestLocation[] $tests
      *
      * @return iterable<string>
      */
-    public function getUniqueSortedFileNames(array $tests): iterable
+    public function resolve(array $tests): iterable
     {
         $uniqueTestLocations = $this->uniqueByTestFile($tests);
 
@@ -114,11 +119,17 @@ final class JUnitTestCaseSorter
      * @param iterable<TestLocation> $sortedTestLocations
      *
      * @return iterable<string>
+     *
+     * @psalm-suppress InvalidReturnType
      */
     private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
     {
         foreach ($sortedTestLocations as $testLocation) {
-            /** @var string $filePath */
+            // Note that there is a type issue here: $filePath is a string|null,
+            // but we expect strings.
+            // It is because in practice this code is used on completed TestLocation
+            // objects for which there is always a file type.
+            // Since this is a hotpath no assertion is being added here.
             $filePath = $testLocation->getFilePath();
 
             yield $filePath;

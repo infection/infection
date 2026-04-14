@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
+use Infection\Source\Matcher\SourceLineMatcher;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -56,6 +57,12 @@ final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
 {
     public const MUTATION_CANDIDATE = 'mutationCandidate';
 
+    public function __construct(
+        private readonly string $filePath,
+        private readonly SourceLineMatcher $sourceLineMatcher,
+    ) {
+    }
+
     public function enterNode(Node $node): null
     {
         MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
@@ -67,6 +74,11 @@ final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
         if (!$this->isOnFunctionSignature($node)
             && !$this->isInsideFunction($node)
         ) {
+            return null;
+        }
+
+        /** @psalm-suppress InvalidArgument */
+        if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return null;
         }
 

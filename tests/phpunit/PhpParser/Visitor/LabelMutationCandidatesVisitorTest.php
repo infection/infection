@@ -35,16 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use function array_flip;
-use function array_intersect_key;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -65,11 +63,14 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
 
         $nodesById = $this->addIdsToNodes($nodes);
 
-        self::markNodeAsEligible($nodesById, $eligibleNodeIds);
+        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
 
         $traverser = new NodeTraverser(
             new ReflectionVisitor(),
-            new LabelMutationCandidatesVisitor(),
+            new LabelMutationCandidatesVisitor(
+                '/path/to/source.php',
+                new NullSourceLineMatcher(),
+            ),
             new KeepOnlyDesiredAttributesVisitor(
                 MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
                 LabelNodesAsEligibleVisitor::ELIGIBLE,
@@ -134,8 +135,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'first'
                                                                     nodeId: 11
+                                                                    rawValue: 'first'
                                                                 )
                                                                 nodeId: 10
                                                             )
@@ -145,8 +146,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'second'
                                                                     nodeId: 14
+                                                                    rawValue: 'second'
                                                                 )
                                                                 nodeId: 13
                                                             )
@@ -156,8 +157,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'third'
                                                                     nodeId: 17
+                                                                    rawValue: 'third'
                                                                 )
                                                                 nodeId: 16
                                                             )
@@ -209,8 +210,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
-                                    nodeId: 3
                                     eligible: true
+                                    nodeId: 3
                                 )
                                 stmts: array(
                                     0: Stmt_ClassMethod(
@@ -228,8 +229,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'first'
                                                                     nodeId: 11
+                                                                    rawValue: 'first'
                                                                 )
                                                                 nodeId: 10
                                                             )
@@ -239,8 +240,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'second'
                                                                     nodeId: 14
+                                                                    rawValue: 'second'
                                                                 )
                                                                 nodeId: 13
                                                             )
@@ -250,8 +251,8 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                             value: Expr_ArrowFunction(
                                                                 expr: Scalar_String(
                                                                     kind: KIND_SINGLE_QUOTED (1)
-                                                                    rawValue: 'third'
                                                                     nodeId: 17
+                                                                    rawValue: 'third'
                                                                 )
                                                                 nodeId: 16
                                                             )
@@ -263,9 +264,9 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                                                 nodeId: 6
                                             )
                                         )
-                                        nodeId: 4
                                         eligible: true
                                         mutationCandidate: true
+                                        nodeId: 4
                                     )
                                 )
                                 nodeId: 2
@@ -277,21 +278,5 @@ final class LabelMutationCandidatesVisitorTest extends VisitorTestCase
                 )
                 AST,
         ];
-    }
-
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
-     */
-    private static function markNodeAsEligible(array $nodesById, array $eligibleNodeIds): void
-    {
-        $eligibleNodes = array_intersect_key(
-            $nodesById,
-            array_flip($eligibleNodeIds),
-        );
-
-        foreach ($eligibleNodes as $node) {
-            LabelNodesAsEligibleVisitor::markAsEligible($node);
-        }
     }
 }

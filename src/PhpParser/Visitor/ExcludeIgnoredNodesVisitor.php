@@ -33,66 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function ksort;
+use PhpParser\Comment;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use function str_contains;
 
 /**
  * @internal
  */
-final class TestLocationBucketSorter
+final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * Pre-sort first buckets, optimistically assuming that most projects
-     * won't have tests longer than a second.
-     */
-    private const INIT_BUCKETS = [
-        0 => [],
-        1 => [],
-        2 => [],
-        3 => [],
-        4 => [],
-        5 => [],
-        6 => [],
-        7 => [],
-    ];
+    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
-    private function __construct()
+    private ?Node $excludedStartNode = null;
+
+    public function enterNode(Node $node): ?Node
     {
+        if ($this->excludedStartNode !== null) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+
+            return null;
+        }
+
+        if (self::hasIgnoreAnnotation($node)) {
+            $this->excludedStartNode = $node;
+
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
+
+        return null;
     }
 
-    /**
-     * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
-     *
-     * @param TestLocation[] $uniqueTestLocations
-     *
-     * @return iterable<TestLocation>
-     */
-    public static function bucketSort(array $uniqueTestLocations): iterable
+    public function leaveNode(Node $node): ?Node
     {
-        $buckets = self::INIT_BUCKETS;
+        if ($node === $this->excludedStartNode) {
+            $this->excludedStartNode = null;
+        }
 
-        foreach ($uniqueTestLocations as $location) {
-            // @codeCoverageIgnoreStart
-            // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
+        return null;
+    }
 
-            // Quick drop off lower bits, reducing precision to 8th of a second
-            $msTime = (int) (($location->getExecutionTime() ?? 0) * 1024) >> 7; // * 1024 / 128
-
-            // For anything above 4 seconds reduce precision to 4 seconds
-            if ($msTime > 32) {
-                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
+    private static function hasIgnoreAnnotation(Node $node): bool
+    {
+        foreach ($node->getComments() as $comment) {
+            if (self::commentContainsAnnotation($comment)) {
+                return true;
             }
-            // @codeCoverageIgnoreEnd
-
-            $buckets[$msTime][] = $location;
         }
 
-        ksort($buckets);
+        return false;
+    }
 
-        foreach ($buckets as $bucket) {
-            yield from $bucket;
-        }
+    private static function commentContainsAnnotation(Comment $comment): bool
+    {
+        return str_contains(
+            $comment->getText(),
+            self::IGNORE_ALL_MUTATIONS_ANNOTATION,
+        );
     }
 }

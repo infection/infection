@@ -33,53 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 
-use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
-use Infection\PhpParser\Visitor\NameResolverFactory;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class MarkAllButIneligibleNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @see /doc/nomenclature.md#ast-enrichment
-     */
-    public function createEnrichmentTraverser(): NodeTraverserInterface
+    public function enterNode(Node $node): null
     {
-        $nodeIgnorers = [
-            new InterfaceIgnorer(),
-            new AbstractMethodIgnorer(),
-        ];
+        if (!LabelNodesAsEligibleVisitor::isExplicitlyIneligible($node)) {
+            MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
+        }
 
-        return new NodeTraverser(
-            new NextConnectingVisitor(),
-            new LabelNodesAsEligibleVisitor(),
-            new ExcludeIgnoredNodesVisitor(),
-            new SkipIgnoredNodesVisitor($nodeIgnorers),
-            NameResolverFactory::create(),
-            new ParentConnectingVisitor(),
-            new ReflectionVisitor(),
-        );
-    }
-
-    public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
-    {
-        return new NodeTraverser(
-            new NodeVisitor\CloningVisitor(),
-            $mutationVisitor,
-        );
+        return null;
     }
 }
