@@ -40,6 +40,7 @@ use function array_values;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -71,6 +72,7 @@ final class ConfigurationBuilder
         private string $tmpDir,
         private PhpUnit $phpUnit,
         private PhpStan $phpStan,
+        private Mago $mago,
         private array $mutators,
         private string $testFramework,
         private ?string $bootstrap,
@@ -113,6 +115,7 @@ final class ConfigurationBuilder
             tmpDir: $configuration->tmpDir,
             phpUnit: $configuration->phpUnit,
             phpStan: $configuration->phpStan,
+            mago: $configuration->mago,
             mutators: $configuration->mutators,
             testFramework: $configuration->testFramework,
             bootstrap: $configuration->bootstrap,
@@ -157,6 +160,7 @@ final class ConfigurationBuilder
             tmpDir: '/tmp/infection',
             phpUnit: new PhpUnit(null, null),
             phpStan: new PhpStan(null, null),
+            mago: new Mago(null, null),
             mutators: [],
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: null,
@@ -216,6 +220,7 @@ final class ConfigurationBuilder
             tmpDir: '/tmp/infection-test',
             phpUnit: new PhpUnit('config/phpunit', 'bin/phpunit'),
             phpStan: new PhpStan('config/phpstan', 'bin/phpstan'),
+            mago: new Mago('config/mago', 'bin/mago'),
             mutators: [
                 'Fake' => new IgnoreMutator(
                     new IgnoreConfig([]),
@@ -342,6 +347,14 @@ final class ConfigurationBuilder
     {
         $clone = clone $this;
         $clone->phpStan = $phpStan;
+
+        return $clone;
+    }
+
+    public function withMago(Mago $mago): self
+    {
+        $clone = clone $this;
+        $clone->mago = $mago;
 
         return $clone;
     }
@@ -590,6 +603,7 @@ final class ConfigurationBuilder
             tmpDir: $this->tmpDir,
             phpUnit: $this->phpUnit,
             phpStan: $this->phpStan,
+            mago: $this->mago,
             mutators: $this->mutators,
             testFramework: $this->testFramework,
             bootstrap: $this->bootstrap,

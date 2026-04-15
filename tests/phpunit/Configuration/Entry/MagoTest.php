@@ -33,53 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class SchemaConfiguration
+#[CoversClass(Mago::class)]
+final class MagoTest extends TestCase
 {
-    /**
-     * @param non-empty-string $pathname
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
-     */
-    public function __construct(
-        public string $pathname,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public Mago $mago,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public ?bool $timeoutsAsEscaped,
-        public ?int $maxTimeouts,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
-    ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    #[DataProvider('basePathProvider')]
+    public function test_it_can_create_a_new_instance_with_absolute_paths(
+        Mago $mago,
+        string $basePath,
+        Mago $expected,
+    ): void {
+        $originalMago = clone $mago;
+
+        $actual = $mago->withAbsolutePaths($basePath);
+
+        $this->assertEquals($expected, $actual);
+        // Sanity check
+        $this->assertEquals($originalMago, $mago);
+    }
+
+    public static function basePathProvider(): iterable
+    {
+        yield 'minimal' => [
+            new Mago(null, null),
+            '/path/to/project',
+            new Mago(
+                '/path/to/project',
+                null,
+            ),
+        ];
+
+        yield 'both paths are relative' => [
+            new Mago(
+                'devTools/mago',
+                'devTools/mago/bin/mago',
+            ),
+            '/path/to/project',
+            new Mago(
+                '/path/to/project/devTools/mago',
+                '/path/to/project/devTools/mago/bin/mago',
+            ),
+        ];
+
+        yield 'both paths are absolute' => [
+            new Mago(
+                '/path/to/another-project/devTools/mago',
+                '/path/to/another-project/devTools/mago/bin/mago',
+            ),
+            '/path/to/project',
+            new Mago(
+                '/path/to/another-project/devTools/mago',
+                '/path/to/another-project/devTools/mago/bin/mago',
+            ),
+        ];
     }
 }

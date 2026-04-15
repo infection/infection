@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use function array_map;
 use function explode;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -75,6 +76,7 @@ readonly class Configuration
         public string $tmpDir,
         public PhpUnit $phpUnit,
         public PhpStan $phpStan,
+        public Mago $mago,
         public array $mutators,
         public string $testFramework,
         public ?string $bootstrap,

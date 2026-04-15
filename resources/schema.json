@@ -152,6 +152,21 @@
                 }
             }
         },
+        "mago": {
+            "type": "object",
+            "description": "Mago additional settings.",
+            "additionalProperties": false,
+            "properties": {
+                "configDir": {
+                    "type": "string",
+                    "description": "Path to directory containing mago configuration file."
+                },
+                "customPath": {
+                    "type": "string",
+                    "description": "Custom path to mago executable."
+                }
+            }
+        },
         "ignoreMsiWithNoMutations": {
             "type": "boolean",
             "description": "Ignore MSI violations with zero mutations."
