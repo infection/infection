@@ -35,17 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use function array_filter;
-use const DIRECTORY_SEPARATOR;
-use function implode;
 use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use SplFileInfo;
-use function sprintf;
-use function str_replace;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
+use function array_filter;
+use function implode;
+use function sprintf;
+use function str_replace;
 use function trim;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * @internal

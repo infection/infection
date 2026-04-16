@@ -93,6 +93,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new PCOVDirectoryProvider(),
             new InitialConfigBuilder(
                 $tmpDir,
+                $testFrameworkConfigPath,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),

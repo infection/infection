@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\XML;
 
 use DOMAttr;
 use DOMDocument;
@@ -44,8 +44,8 @@ use DOMNodeList;
 use DOMXPath;
 use Error;
 use InvalidArgumentException;
-use function sprintf;
 use Webmozart\Assert\Assert;
+use function sprintf;
 
 /**
  * @internal
@@ -100,6 +100,8 @@ final readonly class SafeDOMXPath
      *
      * @param bool|null $formatOutput Nicely formats output with indentation and extra space. Has no effect if the document was loaded with preserveWhitespace enabled.
      *
+     * @throws InvalidXml
+     *
      * @see https://php.net/manual/en/class.domdocument.php#domdocument.props.formatoutput
      */
     public static function fromString(
@@ -115,15 +117,16 @@ final readonly class SafeDOMXPath
             $document->formatOutput = $formatOutput;
         }
 
+        // For an empty string, loadXML throws a ValueError exception
+        if ('' === $xml) {
+            throw InvalidXml::forString($xml);
+        }
+
         $success = @$document->loadXML($xml);
 
-        Assert::true(
-            $success,
-            sprintf(
-                'The string "%s" is not valid XML.',
-                $xml,
-            ),
-        );
+        if (false === $success) {
+            throw InvalidXml::forString($xml);
+        }
 
         $xPath = new self($document);
 

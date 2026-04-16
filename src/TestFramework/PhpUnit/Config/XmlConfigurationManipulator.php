@@ -38,12 +38,12 @@ namespace Infection\TestFramework\PhpUnit\Config;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
-use function implode;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
+use Webmozart\Assert\Assert;
+use function implode;
 use function sprintf;
 use function version_compare;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -179,6 +179,9 @@ final readonly class XmlConfigurationManipulator
 
     // TODO: fix return type... There is no point in returning true if we
     //   never return false.
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
     public function validate(string $configPath, SafeDOMXPath $xPath): true
     {
         if ($xPath->queryCount('/phpunit') === 0) {
