@@ -450,6 +450,47 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         );
     }
 
+    public function test_it_does_not_crash_when_mutant_line_exceeds_file_length(): void
+    {
+        $metricsCalculator = new MetricsCalculator(2);
+        $resultsCollector = new ResultsCollector();
+
+        // ForHtmlReport.php has 49 lines; use line 80 to trigger out-of-bounds
+        $result = self::createMutantExecutionResult(
+            DetectionStatus::ERROR,
+            <<<'DIFF'
+                @@ @@
+                -    $a = 1;
+                +    $a = 2;
+                DIFF,
+            'abc123outofbounds',
+            IgnoreMutator::class,
+            realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
+            80,
+            80,
+            0,
+            0,
+            [
+                new TestLocation('TestClass::test_method1', '/infection/path/to/TestClass.php', 0.123),
+            ],
+            'Fatal error output',
+        );
+
+        $metricsCalculator->collect($result);
+        $resultsCollector->collect($result);
+
+        $report = (new StrykerHtmlReportBuilder($metricsCalculator, $resultsCollector))->build();
+
+        $mutants = current($report['files'])['mutants'];
+
+        $this->assertCount(1, $mutants);
+        $this->assertSame('abc123outofbounds', $mutants[0]['id']);
+        $this->assertSame(80, $mutants[0]['location']['start']['line']);
+        // column defaults to 0→1 since the line doesn't exist
+        $this->assertSame(0, $mutants[0]['location']['start']['column']);
+        $this->assertSame(1, $mutants[0]['location']['end']['column']);
+    }
+
     /**
      * @param array<int, TestLocation> $testLocations
      */
