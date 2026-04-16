@@ -297,6 +297,22 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertGreaterThanOrEqual(1, $coverageIncludeDirectories->length);
     }
 
+    public function test_it_ignores_filtered_source_files_for_phpunit_12_when_creating_source_include_node(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'));
+
+        $sourceIncludeFiles = $this->queryXpath($xml, '/phpunit/source/include/file');
+        $sourceIncludeDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $sourceIncludeFiles);
+        $this->assertSame(0, $sourceIncludeFiles->length);
+
+        $this->assertInstanceOf(DOMNodeList::class, $sourceIncludeDirectories);
+        $this->assertSame(2, $sourceIncludeDirectories->length);
+    }
+
     public function test_it_creates_coverage_include_node_if_does_not_exist_for_10_0_version_of_phpunit(): void
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
