@@ -78,6 +78,7 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
+        "carthage-software/mago": "^1.20",
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
         "phpbench/phpbench": "^1.4",
