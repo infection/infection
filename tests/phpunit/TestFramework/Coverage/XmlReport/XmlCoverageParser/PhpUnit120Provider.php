@@ -37,9 +37,9 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use Symfony\Component\Filesystem\Path;
 
 final class PhpUnit120Provider
