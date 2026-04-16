@@ -464,7 +464,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 +    $a = 2;
                 DIFF,
             'abc123outofbounds',
-            IgnoreMutator::class,
+            PublicVisibility::class,
             realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
             0,
             0,
