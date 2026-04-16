@@ -234,7 +234,8 @@ final readonly class StrykerHtmlReportBuilder
                 $fileAsArrayOfLines = preg_split('/\n|\r\n?/', $originalCode);
                 $replacement = $this->retrieveReplacementFromDiff($result->getMutantDiff());
 
-                $originalCodeLine = $fileAsArrayOfLines[$result->getOriginalStartingLine() - 1];
+                $lineIndex = $result->getOriginalStartingLine() - 1;
+                $originalCodeLine = $fileAsArrayOfLines[$lineIndex] ?? '';
                 $originalCodeLineLength = strlen($originalCodeLine) + 1;
 
                 $startingColumn = $originalCodeLineLength - strlen(ltrim($originalCodeLine));
