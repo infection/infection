@@ -46,6 +46,9 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use Throwable;
+use ValueError;
+use Webmozart\Assert\InvalidArgumentException as WebmozartAssertInvalidArgumentException;
 
 #[Group('integration')]
 #[CoversClass(SafeDOMXPath::class)]
@@ -309,15 +312,56 @@ final class SafeDOMXPathTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string(): void
+    #[DataProvider('invalidXmlProvider')]
+    public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string(
+        string $invalidXml,
+        Throwable $expected,
+    ): void {
+        // TODO: when bumping to PHPUnit 12.5.0 we can use ::expectExceptionObject() instead.
+        try {
+            SafeDOMXPath::fromString($invalidXml);
+
+            $this->fail('Expected an exception to be thrown.');
+        } catch (Throwable $actual) {
+            $this->assertEquals(
+                [
+                    'class' => $expected::class,
+                    'message' => $expected->getMessage(),
+                    'code' => $expected->getCode(),
+                    'hasPrevious' => $expected->getPrevious() !== null,
+                ],
+                [
+                    'class' => $actual::class,
+                    'message' => $actual->getMessage(),
+                    'code' => $actual->getCode(),
+                    'hasPrevious' => $actual->getPrevious() !== null,
+                ],
+            );
+        }
+    }
+
+    public static function invalidXmlProvider(): iterable
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException(
+        yield 'empty string' => [
+            '',
+            new ValueError(
+                'DOMDocument::loadXML(): Argument #1 ($source) must not be empty',
+            ),
+        ];
+
+        yield 'blank string' => [
+            ' ',
+            new WebmozartAssertInvalidArgumentException(
+                'The string " " is not valid XML.',
+            ),
+        ];
+
+        yield 'a non XML string' => [
+            'Hello world!',
+            new WebmozartAssertInvalidArgumentException(
                 'The string "Hello world!" is not valid XML.',
             ),
-        );
-
-        SafeDOMXPath::fromString('Hello world!');
+        ];
     }
 
     public function test_it_can_query_elements(): void
