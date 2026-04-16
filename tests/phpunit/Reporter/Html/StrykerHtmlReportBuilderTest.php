@@ -455,7 +455,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $metricsCalculator = new MetricsCalculator(2);
         $resultsCollector = new ResultsCollector();
 
-        // ForHtmlReport.php has 49 lines; use line 80 to trigger out-of-bounds
+        // Errored mutants can report originalStartingLine=0, making the index -1
         $result = self::createMutantExecutionResult(
             DetectionStatus::ERROR,
             <<<'DIFF'
@@ -466,8 +466,8 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             'abc123outofbounds',
             IgnoreMutator::class,
             realpath(__DIR__ . '/../../Fixtures/ForHtmlReport.php'),
-            80,
-            80,
+            0,
+            0,
             0,
             0,
             [
@@ -485,8 +485,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
 
         $this->assertCount(1, $mutants);
         $this->assertSame('abc123outofbounds', $mutants[0]['id']);
-        $this->assertSame(80, $mutants[0]['location']['start']['line']);
-        // column defaults to 0→1 since the line doesn't exist
+        $this->assertSame(0, $mutants[0]['location']['start']['line']);
         $this->assertSame(0, $mutants[0]['location']['start']['column']);
         $this->assertSame(1, $mutants[0]['location']['end']['column']);
     }
