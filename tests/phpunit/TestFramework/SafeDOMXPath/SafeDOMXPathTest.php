@@ -37,15 +37,15 @@ namespace Infection\Tests\TestFramework\SafeDOMXPath;
 
 use DOMDocument;
 use DOMNode;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Path;
 use function Safe\file_get_contents;
 use function sprintf;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(SafeDOMXPath::class)]

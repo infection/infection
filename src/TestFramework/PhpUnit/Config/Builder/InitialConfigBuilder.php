@@ -37,49 +37,40 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\InvalidXml;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\file_put_contents;
 use function sprintf;
 use function version_compare;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private readonly string $originalXmlConfigContent;
-
     /**
      * @param string[] $srcDirs
      * @param string[] $filteredSourceFilesToMutate
      */
     public function __construct(
         private readonly string $tmpDir,
-        string $originalXmlConfigContent,
+        private readonly string $originalXmlConfigPath,
+        private readonly string $originalXmlConfigContent,
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly XmlConfigurationVersionProvider $versionProvider,
         private readonly array $srcDirs,
         private readonly array $filteredSourceFilesToMutate,
     ) {
-        Assert::notEmpty(
-            $originalXmlConfigContent,
-            'The original XML config content cannot be an empty string',
-        );
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
     }
 
     public function build(string $version): string
     {
         $path = $this->buildPath();
 
-        $xPath = SafeDOMXPath::fromString(
-            $this->originalXmlConfigContent,
-            preserveWhiteSpace: false,
-            formatOutput: true,
-        );
+        $xPath = $this->getConfigXPath();
 
         $this->configManipulator->validate($path, $xPath);
 
@@ -94,6 +85,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
+        // TODO: they are more FS occurrences to check...
         file_put_contents($path, $xPath->document->saveXML());
 
         return $path;
@@ -160,5 +152,27 @@ class InitialConfigBuilder implements ConfigBuilder
         }
 
         return false;
+    }
+
+    /**
+     * @throws InvalidPhpUnitConfiguration
+     */
+    private function getConfigXPath(): SafeDOMXPath
+    {
+        try {
+            return SafeDOMXPath::fromString(
+                $this->originalXmlConfigContent,
+                preserveWhiteSpace: false,
+                formatOutput: true,
+            );
+        } catch (InvalidXml $exception) {
+            throw new InvalidPhpUnitConfiguration(
+                sprintf(
+                    'The PHPUnit original configuration file "%s" is not a valid XML file.',
+                    $this->originalXmlConfigPath,
+                ),
+                previous: $exception,
+            );
+        }
     }
 }

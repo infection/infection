@@ -35,29 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
-use function array_map;
 use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
-use function escapeshellarg;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use function array_map;
+use function escapeshellarg;
+use function iterator_to_array;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(MutationConfigBuilder::class)]
@@ -783,7 +783,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         return new MutationConfigBuilder(
             $this->tmp,
             file_get_contents($phpunitXmlPath),
-            new XmlConfigurationManipulator($replacer, ''),
+            new XmlConfigurationManipulator($replacer),
             'project/dir',
             new TestRunOrderResolver(),
         );

@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
+use Webmozart\Assert\Assert;
 use function Safe\preg_replace;
 use function sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal

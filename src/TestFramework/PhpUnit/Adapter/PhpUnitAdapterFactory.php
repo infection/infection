@@ -84,7 +84,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 new Filesystem(),
                 $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
@@ -94,6 +93,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new PCOVDirectoryProvider(),
             new InitialConfigBuilder(
                 $tmpDir,
+                $testFrameworkConfigPath,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),

@@ -38,9 +38,9 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use DOMElement;
 use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\SafeDOMXPath;
-use function sprintf;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use Webmozart\Assert\Assert;
+use function sprintf;
 
 /**
  * @internal

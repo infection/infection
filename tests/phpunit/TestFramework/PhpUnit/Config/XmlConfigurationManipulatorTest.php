@@ -36,24 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
-use const E_ALL;
-use Infection\Framework\OperatingSystem;
-use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\SafeDOMXPath;
-use InvalidArgumentException;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function restore_error_handler;
-use function set_error_handler;
-use function sprintf;
-use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(XmlConfigurationManipulator::class)]
@@ -65,7 +55,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
     {
         $this->configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(new Filesystem()),
-            '',
         );
     }
 
@@ -785,47 +774,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
         $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
     }
 
-    /**
-     * @param list<string> $errorMessages
-     */
-    #[DataProvider('invalidSchemaProvider')]
-    public function test_it_cannot_validates_xml_if_schema_file_is_invalid(
-        string $xsdSchema,
-        array $errorMessages,
-    ): void {
-        $xPath = $this->createXPath(<<<XML
-            <?xml version="1.0" encoding="UTF-8"?>
-            <phpunit
-                xsi:noNamespaceSchemaLocation="$xsdSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                foo="bar"
-            >
-                <invalid></invalid>
-            </phpunit>
-            XML
-        );
-
-        set_error_handler(
-            static function (int $type, string $message, string $file, string $line): void {
-                // Silence!
-            },
-            E_ALL,
-        );
-
-        try {
-            $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
-
-            $this->fail('Expected exception to be thrown');
-        } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
-            $this->assertContains(
-                Str::toUnixLineEndings($exception->getMessage()),
-                $errorMessages,
-            );
-        } finally {
-            restore_error_handler();
-        }
-    }
-
     public function test_it_works_if_schema_location_is_absent_but_xmlns_xsi_is_present(): void
     {
         $xPath = $this->createXPath(<<<XML_WRAP
@@ -837,98 +785,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
 
         $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
-    }
-
-    /**
-     * require an external connection to download the XSD
-     */
-    #[DataProvider('schemaProvider')]
-    #[Group('integration')]
-    public function test_it_validates_xml_by_xsd(string $xsdSchema): void
-    {
-        $xPath = $this->createXPath(<<<XML
-            <?xml version="1.0" encoding="UTF-8"?>
-            <phpunit
-                xsi:noNamespaceSchemaLocation="$xsdSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                foo="bar"
-            >
-                <invalid></invalid>
-            </phpunit>
-            XML
-        );
-
-        try {
-            $this->configManipulator->validate('/path/to/phpunit.xml', $xPath);
-
-            $this->fail('Expected exception to be thrown');
-        } catch (InvalidPhpUnitConfiguration $exception) {
-            $infectionPath = sprintf(
-                '%s%s',
-                OperatingSystem::isWindows() ? 'file:/' : '',
-                Path::canonicalize(__DIR__ . '/../../../../../'),
-            );
-
-            $errorMessage = str_replace(
-                $infectionPath,
-                '/path/to/infection',
-                Str::toUnixLineEndings($exception->getMessage()),
-            );
-
-            $this->assertSame(
-                <<<'EOF'
-                    The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-                    [Error] Element 'phpunit', attribute 'foo': The attribute 'foo' is not allowed.
-                     in /path/to/infection/ (line 6, col 0)
-                    [Error] Element 'invalid': This element is not expected.
-                     in /path/to/infection/ (line 7, col 0)
-
-                    EOF,
-                $errorMessage,
-            );
-        }
-    }
-
-    /**
-     * Might require an external connection to download the XSD
-     */
-    #[DataProvider('schemaProvider')]
-    #[Group('integration')]
-    public function test_it_passes_validation_by_xsd(string $xsdSchema): void
-    {
-        $xPath = $this->createXPath(<<<XML
-            <?xml version="1.0" encoding="UTF-8"?>
-            <phpunit
-                xsi:noNamespaceSchemaLocation="$xsdSchema"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            >
-            </phpunit>
-            XML
-        );
-
-        $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
-    }
-
-    public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
-    {
-        $this->expectNotToPerformAssertions();
-
-        $configManipulator = new XmlConfigurationManipulator(
-            new PathReplacer(new Filesystem()),
-            __DIR__ . '/../../../../..',
-        );
-
-        $xPath = $this->createXPath(<<<XML_WRAP
-            <?xml version="1.0" encoding="UTF-8"?>
-            <phpunit
-                xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            >
-            </phpunit>
-            XML_WRAP
-        );
-
-        $configManipulator->validate('/path/to/phpunit.xml', $xPath);
     }
 
     public function test_it_removes_default_test_suite(): void
@@ -958,49 +814,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
                 XML,
         );
-    }
-
-    public static function schemaProvider(): iterable
-    {
-        yield 'remote XSD' => ['https://raw.githubusercontent.com/sebastianbergmann/phpunit/7.4.0/phpunit.xsd'];
-
-        yield 'local XSD' => ['./vendor/phpunit/phpunit/phpunit.xsd'];
-    }
-
-    public static function invalidSchemaProvider(): iterable
-    {
-        yield 'empty' => [
-            '',
-            ['Invalid schema path found ""'],
-        ];
-
-        yield 'invalid path' => [
-            '/unknown/path/to/phpunit.xsd',
-            ['Invalid schema path found "/unknown/path/to/phpunit.xsd"'],
-        ];
-
-        yield 'invalid URL' => [
-            'https://unknown.example.com',
-            // different libxml2 versions has slightly different error messages
-            [
-                <<<'EOF'
-                    The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-                    [Warning] failed to load external entity "https://unknown.example.com"
-
-                    [Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
-
-
-                    EOF,
-                <<<'EOF'
-                    The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-                    [Warning] failed to load "https://unknown.example.com": No such file or directory
-
-                    [Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
-
-
-                    EOF,
-            ],
-        ];
     }
 
     private function assertItChangesPostPHPUnit93Configuration(Closure $changeXml, string $expectedXml): void

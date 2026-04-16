@@ -93,11 +93,13 @@ final class InitialTestRunCommand extends BaseCommand
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );
 
+
         $container->getSubscriberRegisterer()->registerSubscribers();
 
         $configuration = $container->getConfiguration();
         $initialTestsPhpOptions = self::getInitialTestsPhpOptions($configuration);
 
+        $container->getFileSystem()->mkdir($configuration->tmpDir);
         $initialTestSuiteInnerProcess = $container
             ->getInitialTestsRunProcessFactory()
             ->createProcess(
