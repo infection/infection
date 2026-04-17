@@ -41,6 +41,8 @@ use DOMNode;
 use DOMNodeList;
 use function escapeshellarg;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\InMemoryFileSystem;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -51,13 +53,11 @@ use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -76,25 +76,14 @@ final class MutationConfigBuilderTest extends TestCase
 
     private string $projectPath;
 
-    private MockObject&Filesystem $filesystem;
-
-    /**
-     * @var array<string, string>
-     */
-    private array $dumpedFiles;
+    private FileSystem $filesystem;
 
     private MutationConfigBuilder $builder;
 
     protected function setUp(): void
     {
         $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
-        $this->dumpedFiles = [];
-        $this->filesystem = $this->createMock(Filesystem::class);
-        $this->filesystem
-            ->method('dumpFile')
-            ->willReturnCallback(function (string $path, string $content): void {
-                $this->dumpedFiles[$path] = $content;
-            });
+        $this->filesystem = new InMemoryFileSystem();
 
         $this->builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit.xml');
     }
@@ -114,14 +103,16 @@ final class MutationConfigBuilderTest extends TestCase
             $configurationPath,
         );
 
-        $xml = $this->readDumpedFile($configurationPath);
+        $xml = $this->filesystem->readFile($configurationPath);
 
         $this->assertNotFalse(
             @simplexml_load_string($xml),
             'Expected dumped configuration content to be a valid XML file.',
         );
 
-        $this->assertArrayHasKey(self::TMP_DIR . '/interceptor.autoload.a1b2c3.infection.php', $this->dumpedFiles);
+        $this->assertTrue(
+            $this->filesystem->isReadableFile(self::TMP_DIR . '/interceptor.autoload.a1b2c3.infection.php'),
+        );
     }
 
     public function test_it_preserves_white_spaces_and_formatting(): void
@@ -162,7 +153,7 @@ final class MutationConfigBuilderTest extends TestCase
                 </phpunit>
 
                 XML,
-            $this->readDumpedFile($configurationPath),
+            $this->filesystem->readFile($configurationPath),
         );
     }
 
@@ -199,22 +190,26 @@ final class MutationConfigBuilderTest extends TestCase
                 </phpunit>
 
                 XML,
-            $this->readDumpedFile($this->builder->build(
-                [
-                    new TestLocation(
-                        'FooTest::test_foo',
-                        '/path/to/FooTest.php',
-                        1.,
-                    ),
-                ],
-                self::MUTATED_FILE_PATH,
-                'hash1',
-                self::ORIGINAL_FILE_PATH,
-                '7.1',
-            )),
+            $this->filesystem->readFile(
+                $this->builder->build(
+                    [
+                        new TestLocation(
+                            'FooTest::test_foo',
+                            '/path/to/FooTest.php',
+                            1.,
+                        ),
+                    ],
+                    self::MUTATED_FILE_PATH,
+                    'hash1',
+                    self::ORIGINAL_FILE_PATH,
+                    '7.1',
+                ),
+            ),
         );
 
-        $phpCode = $this->readDumpedFile(self::TMP_DIR . '/interceptor.autoload.hash1.infection.php');
+        $phpCode = $this->filesystem->readFile(
+            self::TMP_DIR . '/interceptor.autoload.hash1.infection.php',
+        );
 
         $this->assertSame(
             <<<PHP
@@ -265,22 +260,26 @@ final class MutationConfigBuilderTest extends TestCase
                 </phpunit>
 
                 XML,
-            $this->readDumpedFile($this->builder->build(
-                [
-                    new TestLocation(
-                        'BarTest::test_bar_1',
-                        '/path/to/BarTest.php',
-                        1.,
-                    ),
-                ],
-                self::MUTATED_FILE_PATH,
-                'hash2',
-                self::ORIGINAL_FILE_PATH,
-                '7.1',
-            )),
+            $this->filesystem->readFile(
+                $this->builder->build(
+                    [
+                        new TestLocation(
+                            'BarTest::test_bar_1',
+                            '/path/to/BarTest.php',
+                            1.,
+                        ),
+                    ],
+                    self::MUTATED_FILE_PATH,
+                    'hash2',
+                    self::ORIGINAL_FILE_PATH,
+                    '7.1',
+                ),
+            ),
         );
 
-        $phpCode = $this->readDumpedFile(self::TMP_DIR . '/interceptor.autoload.hash2.infection.php');
+        $phpCode = $this->filesystem->readFile(
+            self::TMP_DIR . '/interceptor.autoload.hash2.infection.php',
+        );
 
         $this->assertSame(
             <<<PHP
@@ -321,13 +320,15 @@ final class MutationConfigBuilderTest extends TestCase
 
     public function test_it_sets_custom_autoloader(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
 
@@ -340,7 +341,7 @@ final class MutationConfigBuilderTest extends TestCase
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
         $this->assertStringContainsString(
             'app/autoload2.php',
-            $this->readDumpedFile($expectedCustomAutoloadFilePath),
+            $this->filesystem->readFile($expectedCustomAutoloadFilePath),
         );
     }
 
@@ -348,13 +349,15 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_bootstrap.xml');
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $resultAutoLoaderFilePath = $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue;
 
@@ -367,19 +370,21 @@ final class MutationConfigBuilderTest extends TestCase
         $this->assertSame($expectedCustomAutoloadFilePath, $resultAutoLoaderFilePath);
         $this->assertStringContainsString(
             'vendor/autoload.php',
-            $this->readDumpedFile($expectedCustomAutoloadFilePath),
+            $this->filesystem->readFile($expectedCustomAutoloadFilePath),
         );
     }
 
     public function test_it_sets_stops_on_failure(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $stopOnFailure = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
 
@@ -388,13 +393,15 @@ final class MutationConfigBuilderTest extends TestCase
 
     public function test_it_deactivates_the_colors(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $colors = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
 
@@ -414,7 +421,7 @@ final class MutationConfigBuilderTest extends TestCase
         );
 
         $testSuite = $this->queryXpath(
-            $this->readDumpedFile($configurationPath),
+            $this->filesystem->readFile($configurationPath),
             '/phpunit/testsuite',
         );
 
@@ -424,13 +431,15 @@ final class MutationConfigBuilderTest extends TestCase
 
     public function test_it_removes_original_loggers(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
@@ -440,13 +449,15 @@ final class MutationConfigBuilderTest extends TestCase
 
     public function test_it_removes_printer_class(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $printerClass = $this->queryXpath($xml, '/phpunit/@printerClass');
 
@@ -458,13 +469,15 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
 
@@ -475,13 +488,15 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_without_coverage_whitelist.xml');
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.2',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.2',
+            ),
+        );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
 
@@ -492,13 +507,15 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.2',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.2',
+            ),
+        );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
 
@@ -509,13 +526,15 @@ final class MutationConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit_with_order_set.xml');
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.3',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.3',
+            ),
+        );
 
         $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder')[0]->nodeValue;
         $this->assertSame('defects', $executionOrder);
@@ -536,13 +555,15 @@ final class MutationConfigBuilderTest extends TestCase
         array $tests,
         array $expectedFiles,
     ): void {
-        $xml = $this->readDumpedFile($this->builder->build(
-            $tests,
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                $tests,
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $files = array_map(
             static fn (DOMNode|DOMNameSpaceNode $file): string => $file->nodeValue,
@@ -557,13 +578,15 @@ final class MutationConfigBuilderTest extends TestCase
 
     public function test_it_removes_default_test_suite(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '7.1',
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '7.1',
+            ),
+        );
 
         $defaultTestSuite = $this->queryXpath($xml, '/phpunit/@defaultTestSuite');
 
@@ -591,7 +614,7 @@ final class MutationConfigBuilderTest extends TestCase
 
         $this->assertStringContainsString(
             'IncludeInterceptor.php',
-            $this->readDumpedFile($expectedCustomAutoloadFilePath),
+            $this->filesystem->readFile($expectedCustomAutoloadFilePath),
         );
     }
 
@@ -601,13 +624,15 @@ final class MutationConfigBuilderTest extends TestCase
         string $attributeName,
         int $expectedNodeCount,
     ): void {
-        $xml = $this->readDumpedFile($this->builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            $version,
-        ));
+        $xml = $this->filesystem->readFile(
+            $this->builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                $version,
+            ),
+        );
 
         $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
 
@@ -622,13 +647,15 @@ final class MutationConfigBuilderTest extends TestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '5.2',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '5.2',
+            ),
+        );
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
 
@@ -642,13 +669,15 @@ final class MutationConfigBuilderTest extends TestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = $this->readDumpedFile($builder->build(
-            [],
-            self::MUTATED_FILE_PATH,
-            self::HASH,
-            self::ORIGINAL_FILE_PATH,
-            '5.2',
-        ));
+        $xml = $this->filesystem->readFile(
+            $builder->build(
+                [],
+                self::MUTATED_FILE_PATH,
+                self::HASH,
+                self::ORIGINAL_FILE_PATH,
+                '5.2',
+            ),
+        );
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
 
@@ -762,7 +791,7 @@ final class MutationConfigBuilderTest extends TestCase
     ): MutationConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
-        $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
+        $replacer = new PathReplacer(new FileSystem(), $this->projectPath);
 
         return new MutationConfigBuilder(
             self::TMP_DIR,
@@ -772,13 +801,6 @@ final class MutationConfigBuilderTest extends TestCase
             new TestRunOrderResolver(),
             $this->filesystem,
         );
-    }
-
-    private function readDumpedFile(string $path): string
-    {
-        $this->assertArrayHasKey($path, $this->dumpedFiles, sprintf('Expected the file "%s" to have been dumped.', $path));
-
-        return $this->dumpedFiles[$path];
     }
 
     private function assertPHPSyntaxIsValid(string $phpCode): void

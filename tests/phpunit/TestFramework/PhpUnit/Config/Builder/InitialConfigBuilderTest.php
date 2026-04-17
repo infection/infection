@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
 use DOMNodeList;
+use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\InMemoryFileSystem;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
@@ -47,12 +49,10 @@ use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -65,25 +65,14 @@ final class InitialConfigBuilderTest extends TestCase
 
     private string $projectPath;
 
-    private MockObject&Filesystem $filesystem;
-
-    /**
-     * @var array<string, string>
-     */
-    private array $dumpedFiles;
+    private FileSystem $filesystem;
 
     private InitialConfigBuilder $builder;
 
     protected function setUp(): void
     {
         $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
-        $this->dumpedFiles = [];
-        $this->filesystem = $this->createMock(Filesystem::class);
-        $this->filesystem
-            ->method('dumpFile')
-            ->willReturnCallback(function (string $path, string $content): void {
-                $this->dumpedFiles[$path] = $content;
-            });
+        $this->filesystem = new InMemoryFileSystem();
 
         $this->builder = $this->createConfigBuilder();
     }
@@ -97,7 +86,7 @@ final class InitialConfigBuilderTest extends TestCase
             $configurationPath,
         );
 
-        $xml = $this->readDumpedFile($configurationPath);
+        $xml = $this->filesystem->readFile($configurationPath);
 
         $this->assertNotFalse(
             @simplexml_load_string($xml),
@@ -119,7 +108,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $this->assertSame(
             file_get_contents(self::FIXTURES . '/format-whitespace/expected-phpunit.xml'),
-            $this->readDumpedFile($configurationPath),
+            $this->filesystem->readFile($configurationPath),
         );
     }
 
@@ -162,7 +151,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_replaces_relative_path_to_absolute_path(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
@@ -177,7 +166,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_sets_stops_on_failure(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $stopOnFailure = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
 
@@ -186,7 +175,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_deactivates_the_colors(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $colors = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
 
@@ -195,7 +184,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_disables_caching(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $cacheResult = $this->queryXpath($xml, '/phpunit/@cacheResult')[0]->nodeValue;
 
@@ -204,7 +193,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_deactivates_stderr_redirection(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $stdErr = $this->queryXpath($xml, '/phpunit/@stderr')[0]->nodeValue;
 
@@ -213,7 +202,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_replaces_bootstrap_file(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $bootstrap = Path::normalize(
             $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue,
@@ -224,7 +213,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_removes_original_loggers(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
@@ -233,7 +222,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_does_not_add_coverage_loggers_ever_for_legacy_configuration(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
@@ -246,7 +235,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilderForPHPUnit93();
 
-        $xml = $this->readDumpedFile($builder->build('9.4'));
+        $xml = $this->filesystem->readFile($builder->build('9.4'));
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging');
 
@@ -259,7 +248,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = $this->readDumpedFile(
+        $xml = $this->filesystem->readFile(
             $this->createConfigBuilder($phpunitXmlPath)->build('6.5'),
         );
 
@@ -274,7 +263,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = $this->readDumpedFile(
+        $xml = $this->filesystem->readFile(
             $this->createConfigBuilder($phpunitXmlPath)->build('9.3'),
         );
 
@@ -289,7 +278,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
 
-        $xml = $this->readDumpedFile(
+        $xml = $this->filesystem->readFile(
             $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('9.3'),
         );
 
@@ -304,7 +293,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = $this->readDumpedFile(
+        $xml = $this->filesystem->readFile(
             $this->createConfigBuilder($phpunitXmlPath)->build('10.0'),
         );
 
@@ -319,7 +308,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = $this->readDumpedFile(
+        $xml = $this->filesystem->readFile(
             $this->createConfigBuilder($phpunitXmlPath)->build('10.0'),
         );
 
@@ -334,7 +323,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = $this->readDumpedFile(
+        $xml = $this->filesystem->readFile(
             $this->createConfigBuilder($phpunitXmlPath)->build('10.1'),
         );
 
@@ -347,7 +336,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
@@ -360,7 +349,7 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $builder = $this->createConfigBuilderForPHPUnit93();
 
-        $xml = $this->readDumpedFile($builder->build('9.4'));
+        $xml = $this->filesystem->readFile($builder->build('9.4'));
 
         $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include');
 
@@ -371,7 +360,7 @@ final class InitialConfigBuilderTest extends TestCase
 
     public function test_it_removes_printer_class(): void
     {
-        $xml = $this->readDumpedFile($this->builder->build('6.5'));
+        $xml = $this->filesystem->readFile($this->builder->build('6.5'));
 
         $printerClass = $this->queryXpath($xml, '/phpunit/@printerClass');
 
@@ -386,7 +375,7 @@ final class InitialConfigBuilderTest extends TestCase
         string $attributeName,
         int $expectedNodeCount,
     ): void {
-        $xml = $this->readDumpedFile($this->builder->build($version));
+        $xml = $this->filesystem->readFile($this->builder->build($version));
 
         $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
 
@@ -401,7 +390,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = $this->readDumpedFile($builder->build('7.2'));
+        $xml = $this->filesystem->readFile($builder->build('7.2'));
 
         $executionOrder = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
 
@@ -420,7 +409,7 @@ final class InitialConfigBuilderTest extends TestCase
         string $attributeName,
         int $expectedNodeCount,
     ): void {
-        $xml = $this->readDumpedFile($this->builder->build($version));
+        $xml = $this->filesystem->readFile($this->builder->build($version));
 
         $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
 
@@ -435,7 +424,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = $this->readDumpedFile($builder->build('5.2'));
+        $xml = $this->filesystem->readFile($builder->build('5.2'));
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
 
@@ -449,7 +438,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = $this->readDumpedFile($builder->build('5.2'));
+        $xml = $this->filesystem->readFile($builder->build('5.2'));
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
 
@@ -494,7 +483,7 @@ final class InitialConfigBuilderTest extends TestCase
                 </phpunit>
 
                 XML,
-            $this->readDumpedFile($configurationPath),
+            $this->filesystem->readFile($configurationPath),
         );
     }
 
@@ -597,7 +586,7 @@ final class InitialConfigBuilderTest extends TestCase
 
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
+        $replacer = new PathReplacer(new FileSystem(), $this->projectPath);
 
         return new InitialConfigBuilder(
             self::TMP_DIR,
@@ -608,12 +597,5 @@ final class InitialConfigBuilderTest extends TestCase
             $srcDirs,
             $filteredSourceFilesToMutate,
         );
-    }
-
-    private function readDumpedFile(string $path): string
-    {
-        $this->assertArrayHasKey($path, $this->dumpedFiles, sprintf('Expected the file "%s" to have been dumped.', $path));
-
-        return $this->dumpedFiles[$path];
     }
 }

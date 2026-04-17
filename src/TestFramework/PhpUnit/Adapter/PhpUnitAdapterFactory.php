@@ -37,8 +37,8 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -50,12 +50,13 @@ use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class PhpUnitAdapterFactory
+final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
     /**
      * @param string[] $sourceDirectories
@@ -70,7 +71,6 @@ final class PhpUnitAdapterFactory
         string $projectDir,
         array $sourceDirectories,
         bool $skipCoverage,
-        FileSystem $fileSystem,
         bool $executeOnlyCoveringTestCases = false,
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
@@ -81,7 +81,7 @@ final class PhpUnitAdapterFactory
 
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
-                $fileSystem,
+                new Filesystem(),
                 $testFrameworkConfigDir,
             ),
             $testFrameworkConfigDir,
@@ -97,7 +97,7 @@ final class PhpUnitAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
-                $fileSystem,
+                new Filesystem(),
                 $sourceDirectories,
                 array_map(
                     static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
@@ -110,7 +110,7 @@ final class PhpUnitAdapterFactory
                 $configManipulator,
                 $projectDir,
                 new TestRunOrderResolver(),
-                $fileSystem,
+                new Filesystem(),
             ),
             new ArgumentsAndOptionsBuilder(
                 $executeOnlyCoveringTestCases,

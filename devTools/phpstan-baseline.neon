@@ -103,6 +103,65 @@ parameters:
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
+			rawMessage: Do not use magic number as default parameter. Move to constant with a suitable name.
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::chgrp() has parameter $files with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::chmod() has parameter $files with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::chown() has parameter $files with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::exists() has parameter $files with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::mirror() has parameter $iterator with no value type specified in iterable type Traversable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::mirror() has parameter $options with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::mkdir() has parameter $dirs with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::remove() has parameter $files with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
+			rawMessage: 'Method Infection\FileSystem\InMemoryFileSystem::touch() has parameter $files with no value type specified in iterable type iterable.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/FileSystem/InMemoryFileSystem.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -424,10 +483,28 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
+			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
 			rawMessage: 'Parameter #1 $className of static method Infection\Framework\ClassName::getShortClassName() expects class-string, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
 			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string, 2?: ''/phpunit''}.'
@@ -1243,12 +1320,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
 
 		-
-			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
-			identifier: property.notFound
-			count: 2
-			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
-
-		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
 			count: 1
@@ -1277,3 +1348,10 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
+
+		-
+			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
+

@@ -95,11 +95,10 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        $xml = $xPath->document->saveXML();
-
-        Assert::string($xml);
-
-        $this->filesystem->dumpFile($path, $xml);
+        $this->filesystem->dumpFile(
+            $path,
+            $xPath->document->saveXML(),
+        );
 
         return $path;
     }

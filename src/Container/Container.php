@@ -293,7 +293,6 @@ final class Container extends DIContainer
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
-                    $container->getFileSystem(),
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
