@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use ArrayObject;
 use DOMNodeList;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
@@ -42,12 +43,13 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\XML\SafeDOMXPath;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
@@ -56,19 +58,33 @@ use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(InitialConfigBuilder::class)]
-final class InitialConfigBuilderTest extends FileSystemTestCase
+final class InitialConfigBuilderTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/Fixtures';
 
+    private const TMP_DIR = '/tmp/infection';
+
     private string $projectPath;
+
+    private MockObject&Filesystem $filesystem;
+
+    /**
+     * @var ArrayObject<string, string>
+     */
+    private ArrayObject $dumpedFiles;
 
     private InitialConfigBuilder $builder;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
+        $this->dumpedFiles = new ArrayObject();
+        $this->filesystem = $this->createMock(Filesystem::class);
+        $this->filesystem
+            ->method('dumpFile')
+            ->willReturnCallback(function (string $path, string $content): void {
+                $this->dumpedFiles[$path] = $content;
+            });
 
         $this->builder = $this->createConfigBuilder();
     }
@@ -78,13 +94,11 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $configurationPath = $this->builder->build('6.5');
 
         $this->assertSame(
-            $this->tmp . '/phpunitConfiguration.initial.infection.xml',
+            self::TMP_DIR . '/phpunitConfiguration.initial.infection.xml',
             $configurationPath,
         );
 
-        $this->assertFileExists($configurationPath);
-
-        $xml = file_get_contents($configurationPath);
+        $xml = $this->readDumpedFile($configurationPath);
 
         $this->assertNotFalse(
             @simplexml_load_string($xml),
@@ -104,9 +118,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $configurationPath = $builder->build('6.5');
 
-        $this->assertFileEquals(
-            self::FIXTURES . '/format-whitespace/expected-phpunit.xml',
-            $configurationPath,
+        $this->assertSame(
+            file_get_contents(self::FIXTURES . '/format-whitespace/expected-phpunit.xml'),
+            $this->readDumpedFile($configurationPath),
         );
     }
 
@@ -140,7 +154,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
             $this->assertSame(
                 sprintf(
                     'The file "%s/phpunitConfiguration.initial.infection.xml" is not a valid PHPUnit configuration file',
-                    $this->tmp,
+                    self::TMP_DIR,
                 ),
                 $exception->getMessage(),
             );
@@ -149,7 +163,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_replaces_relative_path_to_absolute_path(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $directories = $this->queryXpath($xml, '/phpunit/testsuites/testsuite/directory');
 
@@ -164,7 +178,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_sets_stops_on_failure(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $stopOnFailure = $this->queryXpath($xml, '/phpunit/@stopOnFailure')[0]->nodeValue;
 
@@ -173,7 +187,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_deactivates_the_colors(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $colors = $this->queryXpath($xml, '/phpunit/@colors')[0]->nodeValue;
 
@@ -182,7 +196,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_disables_caching(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $cacheResult = $this->queryXpath($xml, '/phpunit/@cacheResult')[0]->nodeValue;
 
@@ -191,7 +205,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_deactivates_stderr_redirection(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $stdErr = $this->queryXpath($xml, '/phpunit/@stderr')[0]->nodeValue;
 
@@ -200,7 +214,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_replaces_bootstrap_file(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $bootstrap = Path::normalize(
             $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue,
@@ -211,7 +225,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_removes_original_loggers(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log[@type="coverage-html"]');
 
@@ -220,7 +234,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_does_not_add_coverage_loggers_ever_for_legacy_configuration(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging/log');
 
@@ -233,7 +247,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $builder = $this->createConfigBuilderForPHPUnit93();
 
-        $xml = file_get_contents($builder->build('9.4'));
+        $xml = $this->buildConfigurationXml($builder, '9.4');
 
         $logEntries = $this->queryXpath($xml, '/phpunit/logging');
 
@@ -246,7 +260,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('6.5'));
+        $xml = $this->buildConfigurationXml(
+            $this->createConfigBuilder($phpunitXmlPath),
+            '6.5',
+        );
 
         $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
@@ -259,7 +276,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('9.3'));
+        $xml = $this->buildConfigurationXml(
+            $this->createConfigBuilder($phpunitXmlPath),
+            '9.3',
+        );
 
         $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
@@ -272,7 +292,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('9.3'));
+        $xml = $this->buildConfigurationXml(
+            $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php']),
+            '9.3',
+        );
 
         $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
 
@@ -285,7 +308,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.0'));
+        $xml = $this->buildConfigurationXml(
+            $this->createConfigBuilder($phpunitXmlPath),
+            '10.0',
+        );
 
         $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
 
@@ -298,7 +324,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.0'));
+        $xml = $this->buildConfigurationXml(
+            $this->createConfigBuilder($phpunitXmlPath),
+            '10.0',
+        );
 
         $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
@@ -311,7 +340,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath)->build('10.1'));
+        $xml = $this->buildConfigurationXml(
+            $this->createConfigBuilder($phpunitXmlPath),
+            '10.1',
+        );
 
         $includedDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
 
@@ -322,7 +354,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $whitelistedDirectories = $this->queryXpath($xml, '/phpunit/filter/whitelist/directory');
 
@@ -335,7 +367,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $builder = $this->createConfigBuilderForPHPUnit93();
 
-        $xml = file_get_contents($builder->build('9.4'));
+        $xml = $this->buildConfigurationXml($builder, '9.4');
 
         $includedDirectories = $this->queryXpath($xml, '/phpunit/coverage/include');
 
@@ -346,7 +378,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
     public function test_it_removes_printer_class(): void
     {
-        $xml = file_get_contents($this->builder->build('6.5'));
+        $xml = $this->buildConfigurationXml($this->builder, '6.5');
 
         $printerClass = $this->queryXpath($xml, '/phpunit/@printerClass');
 
@@ -361,7 +393,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         string $attributeName,
         int $expectedNodeCount,
     ): void {
-        $xml = file_get_contents($this->builder->build($version));
+        $xml = $this->buildConfigurationXml($this->builder, $version);
 
         $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
 
@@ -376,7 +408,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = file_get_contents($builder->build('7.2'));
+        $xml = $this->buildConfigurationXml($builder, '7.2');
 
         $executionOrder = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'executionOrder'));
 
@@ -395,7 +427,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         string $attributeName,
         int $expectedNodeCount,
     ): void {
-        $xml = file_get_contents($this->builder->build($version));
+        $xml = $this->buildConfigurationXml($this->builder, $version);
 
         $nodes = $this->queryXpath($xml, sprintf('/phpunit/@%s', $attributeName));
 
@@ -410,7 +442,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = file_get_contents($builder->build('5.2'));
+        $xml = $this->buildConfigurationXml($builder, '5.2');
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnRisky'));
 
@@ -424,7 +456,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $builder = $this->createConfigBuilder($phpunitXmlPath);
 
-        $xml = file_get_contents($builder->build('5.2'));
+        $xml = $this->buildConfigurationXml($builder, '5.2');
 
         $failOnRisky = $this->queryXpath($xml, sprintf('/phpunit/@%s', 'failOnWarning'));
 
@@ -469,7 +501,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
                 </phpunit>
 
                 XML,
-            file_get_contents($configurationPath),
+            $this->readDumpedFile($configurationPath),
         );
     }
 
@@ -575,12 +607,30 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
 
         return new InitialConfigBuilder(
-            $this->tmp,
+            self::TMP_DIR,
             file_get_contents($phpunitXmlPath),
             new XmlConfigurationManipulator($replacer, ''),
             new XmlConfigurationVersionProvider(),
+            $this->filesystem,
             $srcDirs,
             $filteredSourceFilesToMutate,
         );
+    }
+
+    private function buildConfigurationXml(
+        InitialConfigBuilder $builder,
+        string $version,
+    ): string {
+        return $this->readDumpedFile($builder->build($version));
+    }
+
+    private function readDumpedFile(string $path): string
+    {
+        $this->assertTrue(
+            $this->dumpedFiles->offsetExists($path),
+            sprintf('Expected the file "%s" to have been dumped.', $path),
+        );
+
+        return $this->dumpedFiles[$path];
     }
 }

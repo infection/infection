@@ -97,6 +97,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
+                new Filesystem(),
                 $sourceDirectories,
                 array_map(
                     static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
@@ -109,6 +110,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $configManipulator,
                 $projectDir,
                 new TestRunOrderResolver(),
+                new Filesystem(),
             ),
             new ArgumentsAndOptionsBuilder(
                 $executeOnlyCoveringTestCases,
