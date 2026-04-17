@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0548bf305724f0c7ffe38a7fb5d8e5a0",
+    "content-hash": "8689d06749b81e6a743263baebe8013d",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -2466,6 +2466,62 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "carthage-software/mago",
+            "version": "1.20.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/carthage-software/mago.git",
+                "reference": "c0453e95b56d78d1d6c520cfe927fbdf167fe552"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/carthage-software/mago/zipball/c0453e95b56d78d1d6c520cfe927fbdf167fe552",
+                "reference": "c0453e95b56d78d1d6c520cfe927fbdf167fe552",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~8.1 || ~8.2 || ~8.3 || ~8.4 || ~8.5 || ~8.6"
+            },
+            "suggest": {
+                "ext-curl": "To show binary download progress"
+            },
+            "bin": [
+                "composer/bin/mago"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "composer/functions.php",
+                    "composer/internal.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT OR Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Saif Eddin Gmati",
+                    "email": "azjezz@carthage.software"
+                }
+            ],
+            "description": "Mago is a toolchain for PHP that aims to provide a set of tools to help developers write better code.",
+            "keywords": [
+                "dev"
+            ],
+            "support": {
+                "issues": "https://github.com/carthage-software/mago/issues",
+                "source": "https://github.com/carthage-software/mago/tree/1.20.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/azjezz",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-15T01:10:46+00:00"
+        },
         {
             "name": "doctrine/annotations",
             "version": "2.0.2",
