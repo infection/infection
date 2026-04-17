@@ -1,0 +1,46 @@
+# Welcome to Mago!
+# For full documentation, see https://mago.carthage.software/tools/overview
+version = "1"
+php-version = "8.2.0"
+
+[source]
+workspace = "."
+paths = [
+    "src",
+    "tests/autoloaded",
+    "tests/benchmark",
+    "tests/phpunit"
+]
+includes = ["vendor"]
+excludes = [
+    "tests/benchmark/MutationGenerator/sources",
+    "tests/benchmark/Tracing/benchmark-source",
+    "tests/benchmark/Tracing/coverage"
+]
+
+[source.glob]
+literal-separator = true
+
+[linter]
+integrations = ["symfony", "phpunit"]
+
+[linter.rules]
+ambiguous-function-call = { enabled = false }
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000 }
+
+[analyzer]
+baseline = "devTools/mago-baseline.toml"
+plugins = []
+find-unused-definitions = true
+find-unused-expressions = true
+analyze-dead-code = true
+memoize-properties = true
+allow-possibly-undefined-array-keys = true
+check-throws = true
+check-missing-override = false
+find-unused-parameters = true
+strict-list-index-checks = false
+no-boolean-literal-comparison = true
+check-missing-type-hints = true
+register-super-globals = true

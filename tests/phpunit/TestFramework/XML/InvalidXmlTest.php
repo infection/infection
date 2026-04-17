@@ -33,24 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
+namespace Infection\Tests\TestFramework\XML;
 
-class ConcreteClass
+use Infection\TestFramework\XML\InvalidXml;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(InvalidXml::class)]
+final class InvalidXmlTest extends TestCase
 {
-    use TraitExample;
-
-    public const CONSTANT_EXAMPLE = '';
-
-    public function concreteMethod(mixed $param): void
+    public function test_it_can_create_an_instance_for_an_invalid_file(): void
     {
-        if ($param === null) {
-            echo 'nothing to do';
-        } else {
-            $param();
-        }
+        $exception = InvalidXml::forFile('/path/to/invalid.xml');
+
+        $this->assertSame(
+            'The file "/path/to/invalid.xml" does not contain valid XML.',
+            $exception->getMessage(),
+        );
     }
 
-    public function abstractMethod(mixed $param): void
+    public function test_it_can_create_an_instance_for_an_invalid_xml_string(): void
     {
+        $exception = InvalidXml::forString('notAnXmlString');
+
+        $this->assertSame(
+            'The string "notAnXmlString" is not valid XML.',
+            $exception->getMessage(),
+        );
     }
 }

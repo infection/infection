@@ -33,24 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
+namespace Infection\Source\Matcher;
 
-class ConcreteClass
+use Infection\Differ\ChangedLinesRange;
+
+/**
+ * Simple implementation that will tell if any configured line ranges matches
+ * the given criteria.
+ *
+ * This can be useful for testing purposes.
+ *
+ * @internal
+ */
+final readonly class SimpleSourceLineMatcher implements SourceLineMatcher
 {
-    use TraitExample;
-
-    public const CONSTANT_EXAMPLE = '';
-
-    public function concreteMethod(mixed $param): void
-    {
-        if ($param === null) {
-            echo 'nothing to do';
-        } else {
-            $param();
-        }
+    /**
+     * @param list<ChangedLinesRange> $changedLinesRanges
+     */
+    public function __construct(
+        private array $changedLinesRanges,
+    ) {
     }
 
-    public function abstractMethod(mixed $param): void
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
+        foreach ($this->changedLinesRanges as $changedLinesRange) {
+            if ($changedLinesRange->touches($startLine, $endLine)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

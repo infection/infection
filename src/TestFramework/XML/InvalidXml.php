@@ -33,24 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures;
+namespace Infection\TestFramework\XML;
 
-class ConcreteClass
+use function sprintf;
+use UnexpectedValueException;
+
+/**
+ * @internal
+ */
+final class InvalidXml extends UnexpectedValueException
 {
-    use TraitExample;
-
-    public const CONSTANT_EXAMPLE = '';
-
-    public function concreteMethod(mixed $param): void
+    public static function forFile(string $pathname): self
     {
-        if ($param === null) {
-            echo 'nothing to do';
-        } else {
-            $param();
-        }
+        return new self(
+            sprintf(
+                'The file "%s" does not contain valid XML.',
+                $pathname,
+            ),
+        );
     }
 
-    public function abstractMethod(mixed $param): void
+    public static function forString(string $xml): self
     {
+        return new self(
+            sprintf(
+                'The string "%s" is not valid XML.',
+                $xml,
+            ),
+        );
     }
 }

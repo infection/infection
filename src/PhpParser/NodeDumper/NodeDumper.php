@@ -123,6 +123,11 @@ final class NodeDumper
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
     ];
 
+    /**
+     * @var array<string, true>
+     */
+    private array $ignoredAttributesByKey = [];
+
     // Removed instance properties for stateless refactor
     /**
      * @param bool $dumpComments whether comments should be dumped
@@ -138,6 +143,7 @@ final class NodeDumper
         // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
         private bool $decorateNodes = false,
+        private bool $showLineNumbers = false,
     ) {
     }
 
@@ -159,6 +165,7 @@ final class NodeDumper
         // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
         ?bool $decorateNodes = null,
+        ?bool $showLineNumbers = null,
     ): string {
         $result = '';
         $newLine = "\n";
@@ -176,6 +183,23 @@ final class NodeDumper
         if ($decorateNodes !== null) {
             $originalHighlightMutationCandidates = $this->decorateNodes;
             $this->decorateNodes = $decorateNodes;
+        }
+
+        if ($showLineNumbers !== null) {
+            $originalShowLineNumbers = $this->showLineNumbers;
+            $this->showLineNumbers = $showLineNumbers;
+        }
+
+        $this->ignoredAttributesByKey = self::IGNORE_ATTRIBUTES;
+
+        if ($this->showLineNumbers) {
+            Assert::notFalse(
+                $this->dumpOtherAttributes,
+                'The NodeDumper cannot display line numbers if the attributes cannot be shown.',
+            );
+
+            unset($this->ignoredAttributesByKey['startLine']);
+            unset($this->ignoredAttributesByKey['endLine']);
         }
 
         if ($dumpPositions !== null) {
@@ -199,6 +223,10 @@ final class NodeDumper
 
         if ($decorateNodes !== null) {
             $this->decorateNodes = $originalHighlightMutationCandidates;
+        }
+
+        if ($showLineNumbers !== null) {
+            $this->showLineNumbers = $originalShowLineNumbers;
         }
 
         if ($onlyVisitedNodes !== null) {
@@ -380,7 +408,7 @@ final class NodeDumper
                 ksort($attributes);
 
                 foreach ($attributes as $key => $value) {
-                    if (isset(self::IGNORE_ATTRIBUTES[$key])) {
+                    if (isset($this->ignoredAttributesByKey[$key])) {
                         continue;
                     }
 
