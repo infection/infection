@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvide
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\TestFramework\XML\InvalidXml;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -45,7 +46,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Exception\IOException;
-use ValueError;
 
 #[Group('integration')]
 #[CoversClass(SourceFileInfoProvider::class)]
@@ -188,8 +188,7 @@ final class SourceFileInfoProviderTest extends TestCase
             $fileSystemMock,
         );
 
-        // TODO: this is not ideal...
-        $this->expectException(ValueError::class);
+        $this->expectException(InvalidXml::class);
 
         $provider->provideFileInfo();
     }

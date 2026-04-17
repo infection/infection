@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\XML;
 
 use DOMAttr;
 use DOMDocument;
@@ -60,6 +60,9 @@ final readonly class SafeDOMXPath
         $this->xPath = new DOMXPath($document);
     }
 
+    /**
+     * @throws InvalidXml
+     */
     public static function fromFile(
         string $pathname,
         ?string $namespace = null,
@@ -70,13 +73,9 @@ final readonly class SafeDOMXPath
         $document = new DOMDocument();
         $loaded = @$document->load($pathname);
 
-        Assert::true(
-            $loaded,
-            sprintf(
-                'The file "%s" does not contain valid XML.',
-                $pathname,
-            ),
-        );
+        if (!$loaded) {
+            throw InvalidXml::forFile($pathname);
+        }
 
         $xPath = new self($document);
 
@@ -100,6 +99,8 @@ final readonly class SafeDOMXPath
      *
      * @param bool|null $formatOutput Nicely formats output with indentation and extra space. Has no effect if the document was loaded with preserveWhitespace enabled.
      *
+     * @throws InvalidXml
+     *
      * @see https://php.net/manual/en/class.domdocument.php#domdocument.props.formatoutput
      */
     public static function fromString(
@@ -115,15 +116,15 @@ final readonly class SafeDOMXPath
             $document->formatOutput = $formatOutput;
         }
 
+        if ($xml === '') {
+            throw InvalidXml::forString($xml);
+        }
+
         $success = @$document->loadXML($xml);
 
-        Assert::true(
-            $success,
-            sprintf(
-                'The string "%s" is not valid XML.',
-                $xml,
-            ),
-        );
+        if (!$success) {
+            throw InvalidXml::forString($xml);
+        }
 
         $xPath = new self($document);
 

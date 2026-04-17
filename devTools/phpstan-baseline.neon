@@ -1252,7 +1252,7 @@ parameters:
 			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
 			identifier: property.notFound
 			count: 2
-			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
+			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
