@@ -5979,6 +5979,12 @@ count = 1
 [[issues]]
 file = "src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider::getXPath`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider::testCaseMapGenerator`.'
 count = 1
 
@@ -6051,6 +6057,12 @@ count = 1
 [[issues]]
 file = "src/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser::parse`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser::parseNodes`.'
 count = 1
 
@@ -6070,6 +6082,12 @@ count = 1
 file = "src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\XmlReport\InvalidCoverage` in `Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider::retrieveSourceFileInfo`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider::provideXPath`.'
 count = 1
 
 [[issues]]
@@ -6267,6 +6285,12 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::build`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::build`.'
 count = 1
 
@@ -6287,6 +6311,12 @@ file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
 code = "possibly-false-argument"
 message = "Argument #1 of method `domnode::appendchild` is possibly `false`, but parameter type `DOMNode` does not accept it."
 count = 2
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder::getXPath`.'
+count = 1
 
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
@@ -6400,102 +6430,6 @@ count = 1
 file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider::provide`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "avoid-catching-error"
-message = "Avoid catching 'Error' class instances."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "invalid-array-access"
-message = "Cannot access array index on object `DOMNodeList<DOMNameSpaceNode|DOMNode>` that does not implement `ArrayAccess`."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "invalid-array-index"
-message = "Invalid index type `int(0)` used for array access on `DOMNodeList<DOMNameSpaceNode|DOMNode>`."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `infection\testframework\safedomxpath::querycount`: expected `non-negative-int`, but found `int`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "never-return"
-message = "Cannot return value with type 'never' from this function."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "possibly-null-property-access"
-message = "Attempting to access a property on a possibly `null` value."
-count = 2
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "redundant-null-coalesce"
-message = "Redundant null coalesce: left-hand side can never be `null` or undefined."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::queryList`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::fromFile`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::fromString`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::getElement`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::queryAttribute`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::queryElement`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::queryList`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/SafeDOMXPath.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\SafeDOMXPath::registerNamespace`.'
 count = 1
 
 [[issues]]
@@ -6670,6 +6604,102 @@ count = 1
 file = "src/TestFramework/VersionParser.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\VersionParser::parse`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "avoid-catching-error"
+message = "Avoid catching 'Error' class instances."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "invalid-array-access"
+message = "Cannot access array index on object `DOMNodeList<DOMNameSpaceNode|DOMNode>` that does not implement `ArrayAccess`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "invalid-array-index"
+message = "Invalid index type `int(0)` used for array access on `DOMNodeList<DOMNameSpaceNode|DOMNode>`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `infection\testframework\xml\safedomxpath::querycount`: expected `non-negative-int`, but found `int`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "never-return"
+message = "Cannot return value with type 'never' from this function."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "possibly-null-property-access"
+message = "Attempting to access a property on a possibly `null` value."
+count = 2
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "redundant-null-coalesce"
+message = "Redundant null coalesce: left-hand side can never be `null` or undefined."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::queryList`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::fromFile`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::fromString`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::getElement`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::queryAttribute`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::queryElement`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::queryList`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\TestFramework\XML\SafeDOMXPath::registerNamespace`.'
 count = 1
 
 [[issues]]
@@ -29671,9 +29701,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/CodeceptionProvider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\CodeceptionProvider::infoProvider`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpSpecProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpSpecProvider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpSpecProvider::infoProvider`.'
 count = 1
 
 [[issues]]
@@ -29683,9 +29725,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit09Provider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit09Provider::infoProvider`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit10Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit10Provider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit10Provider::infoProvider`.'
 count = 1
 
 [[issues]]
@@ -29695,15 +29749,33 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit11Provider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit11Provider::infoProvider`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit120Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit120Provider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit120Provider::infoProvider`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit125Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit125Provider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit125Provider::infoProvider`.'
 count = 1
 
 [[issues]]
@@ -29740,6 +29812,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/XmlCoverageParserTest.php"
 code = "non-existent-method"
 message = 'Method `createstub` does not exist on type `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\XmlCoverageParserTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/XmlCoverageParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\XmlCoverageParserTest::lineCoverageProvider`.'
 count = 1
 
 [[issues]]
@@ -30141,6 +30219,12 @@ count = 2
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::createConfigBuilder`.'
 count = 1
 
@@ -30333,7 +30417,7 @@ count = 11
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `1015983213910025095:19536`: expected `string`, but found `null|string`."
+message = "Invalid return type for function `1015983213910025095:19540`: expected `string`, but found `null|string`."
 count = 1
 
 [[issues]]
@@ -30387,7 +30471,7 @@ count = 3
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "nullable-return-statement"
-message = "Function `1015983213910025095:19536` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
+message = "Function `1015983213910025095:19540` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
 count = 1
 
 [[issues]]
@@ -30400,6 +30484,12 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$returnCode`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::queryXpath`.'
 count = 1
 
 [[issues]]
@@ -30650,6 +30740,12 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\PhpUnit\Config\XmlConfigurationManipulatorTest::createXPath`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -30706,120 +30802,6 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `validXmlFileProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "mixed-method-access"
-message = "Attempting to access a method on a non-object type (`mixed`)."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-method"
-message = 'Method `assertcount` does not exist on type `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest`.'
-count = 8
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-method"
-message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest`.'
-count = 4
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-method"
-message = 'Method `assertnotnull` does not exist on type `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-method"
-message = 'Method `assertnull` does not exist on type `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest`.'
-count = 7
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-method"
-message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest`.'
-count = 15
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-method"
-message = 'Method `expectexceptionobject` does not exist on type `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest`.'
-count = 20
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "non-existent-property"
-message = "Property `$attributes` does not exist on class `DOMNameSpaceNode`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\SafeDOMXPath::getelement`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\SafeDOMXPath::queryattribute`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\SafeDOMXPath::querycount`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\SafeDOMXPath::queryelement`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\SafeDOMXPath::querylist`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "possibly-null-property-access"
-message = "Attempting to access a property on a possibly `null` value."
-count = 6
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_with_a_namespace_registered`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_without_a_namespace`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_be_created_for_an_xml_string_with_a_namespace_registered_if_the_document_has_no_namespace`.'
 count = 1
 
 [[issues]]
@@ -31414,6 +31396,342 @@ count = 1
 file = "tests/phpunit/TestFramework/VersionParserTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/InvalidXmlTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\XML\InvalidXmlTest`.'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `invalidXmlProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `validXmlFileProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-method"
+message = 'Method `assertcount` does not exist on type `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest`.'
+count = 8
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-method"
+message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-method"
+message = 'Method `assertnotnull` does not exist on type `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest`.'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-method"
+message = 'Method `assertnull` does not exist on type `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest`.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest`.'
+count = 15
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-method"
+message = 'Method `expectexceptionobject` does not exist on type `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest`.'
+count = 20
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "non-existent-property"
+message = "Property `$attributes` does not exist on class `DOMNameSpaceNode`."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\XML\SafeDOMXPath::getelement`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\XML\SafeDOMXPath::queryattribute`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\XML\SafeDOMXPath::querycount`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\XML\SafeDOMXPath::queryelement`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\TestFramework\XML\SafeDOMXPath::querylist`: expected `DOMNode|null`, but possibly received `DOMNameSpaceNode|DOMNode|null`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "possibly-null-property-access"
+message = "Attempting to access a property on a possibly `null` value."
+count = 6
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_file_with_a_namespace_registered`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_file`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_with_a_namespace_registered`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_without_a_namespace`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_with_a_formatted_output`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_query_an_attribute_relative_to_another_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_query_an_attribute`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_query_an_element_relative_to_another_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_query_an_element`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_query_elements_relative_to_another_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_query_elements`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_be_created_for_an_xml_file_with_a_namespace_registered_if_the_document_has_no_namespace`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_be_created_for_an_xml_string_with_a_namespace_registered_if_the_document_has_no_namespace`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_a_non_dom_element`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_attribute_for_which_there_is_more_than_one_item`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_attribute_with_a_dom_node_that_cannot_be_fetched`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_attribute_with_an_invalid_context_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_attribute_with_an_invalid_query`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_element_for_which_there_is_more_than_one_item`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_element_with_a_dom_node_that_cannot_be_fetched`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_element_with_an_invalid_context_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_an_element_with_an_invalid_query`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_count_with_a_query_with_an_invalid_context_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_the_count_with_a_query_with_a_dom_node_that_cannot_be_fetched`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_the_count_with_an_invalid_query`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_with_a_query_with_a_dom_node_that_cannot_be_fetched`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_with_a_query_with_an_invalid_context_node`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_query_with_an_invalid_query`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_has_document_property`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_returns_null_if_the_attribute_could_not_be_found`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_returns_null_if_the_element_could_not_be_found`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_file`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_throws_if_it_cannot_get_a_dom_element`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_with_a_namespace_registered`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_without_a_namespace`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_be_created_for_an_xml_string_with_a_namespace_registered_if_the_document_has_no_namespace`.'
 count = 1
 
 [[issues]]
