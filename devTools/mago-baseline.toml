@@ -1574,12 +1574,6 @@ count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaValidator.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 2
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaValidator.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -2864,12 +2858,6 @@ count = 1
 
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, array<array-key, (callable(...mixed): mixed)>>`."
-count = 1
-
-[[issues]]
-file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -3692,18 +3680,6 @@ count = 1
 
 [[issues]]
 file = "src/Logger/Console/BasicConsoleLogger.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, int(256)|int(32)|int(64)>`."
-count = 1
-
-[[issues]]
-file = "src/Logger/Console/BasicConsoleLogger.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, string('error')|string('info')>`."
-count = 1
-
-[[issues]]
-file = "src/Logger/Console/BasicConsoleLogger.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Webmozart\Assert\InvalidArgumentException` in `Infection\Logger\Console\BasicConsoleLogger::log`.'
 count = 1
@@ -3748,12 +3724,6 @@ count = 1
 file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `infection\logger\mutationanalysis\teamcity\teamcity::escapevalue`: expected `non-empty-string`, but found `array<array-key, mixed>|string`.'
-count = 1
-
-[[issues]]
-file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
-code = "mismatched-array-index"
-message = "Invalid array key type: `int|string` is not a valid key for this array."
 count = 1
 
 [[issues]]
@@ -4028,33 +3998,57 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/Boolean/LogicalOr.php"
-code = "invalid-callable"
-message = "Expression of type `never` cannot be called as a function or method."
-count = 1
-
-[[issues]]
-file = "src/Mutator/Boolean/LogicalOr.php"
-code = "match-default-arm-always-executed"
-message = "This default arm is always executed because no other arms can match."
-count = 1
-
-[[issues]]
-file = "src/Mutator/Boolean/LogicalOr.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `infection\mutator\boolean\logicalor::canmutate`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Boolean/LogicalOr.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `reflectionclass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `non-empty-string`."
 count = 1
 
 [[issues]]
 file = "src/Mutator/Boolean/LogicalOr.php"
-code = "unreachable-match-arm"
-message = "This match arm is unreachable."
-count = 8
+code = "possibly-null-operand"
+message = "Left operand in `<=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Left operand in `<` comparison might be `null` (type `float|int|null`)."
+count = 3
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Left operand in `>=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Left operand in `>` comparison might be `null` (type `float|int|null`)."
+count = 3
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `<=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `<` comparison might be `null` (type `float|int|null`)."
+count = 3
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `>=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `>` comparison might be `null` (type `float|int|null`)."
+count = 3
 
 [[issues]]
 file = "src/Mutator/Boolean/TrueValue.php"
@@ -4654,12 +4648,6 @@ count = 1
 file = "src/Mutator/Removal/SharedCaseRemoval.php"
 code = "invalid-operand"
 message = "Invalid type for left operand."
-count = 2
-
-[[issues]]
-file = "src/Mutator/Removal/SharedCaseRemoval.php"
-code = "mixed-array-index"
-message = 'Invalid index type `mixed` used for array access on `array<array-key, PhpParser\Node\Stmt\Case_>`.'
 count = 2
 
 [[issues]]
@@ -5494,12 +5482,6 @@ count = 1
 file = "src/Reporter/Http/StrykerCurlClient.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Safe\Exceptions\CurlException` in `Infection\Reporter\Http\StrykerCurlClient::request`.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/PerMutatorReporter.php"
-code = "mismatched-array-index"
-message = "Invalid array key type: `array-key` is not a valid key for this array."
 count = 1
 
 [[issues]]
@@ -8636,12 +8618,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, null>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -11651,12 +11627,6 @@ file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 2
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
@@ -25700,12 +25670,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -31810,12 +31774,6 @@ count = 1
 file = "tests/phpunit/TestingUtility/Iterable/NonRewindableIteratorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `valuesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/Iterable/NonRewindableIteratorTest.php"
-code = "invalid-array-index"
-message = '''Invalid index type `('TKey.infection\tests\testingutility\iterable\nonrewindableiteratortest::toarraywithoutrewind() extends mixed)|null` used for array access on `array<('TKey.infection\tests\testingutility\iterable\nonrewindableiteratortest::toarraywithoutrewind() extends mixed)|string(''), ('TValue.infection\tests\testingutility\iterable\nonrewindableiteratortest::toarraywithoutrewind() extends mixed)|null>`.'''
 count = 1
 
 [[issues]]
