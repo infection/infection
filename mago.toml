@@ -39,6 +39,13 @@ analyze-dead-code = true
 memoize-properties = true
 allow-possibly-undefined-array-keys = true
 check-throws = true
+unchecked-exceptions = [
+    "LogicException",
+    "Error",
+    "PHPUnit\\Exception",
+    "Psr\\Container\\ContainerExceptionInterface",
+    "Safe\\Exceptions\\SafeExceptionInterface",
+]
 check-missing-override = false
 find-unused-parameters = true
 strict-list-index-checks = false
