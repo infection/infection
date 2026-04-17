@@ -964,11 +964,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        mutationCandidate: true
                                                         nodeId: 22
                                                         origNode: nodeId(22)
                                                         parent: nodeId(21)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                     right: Expr_ConstFetch(
                                                         name: Name(
@@ -977,34 +977,34 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             functionScope: nodeId(14)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            mutationCandidate: true
                                                             namespacedName: FullyQualified(Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\Fixtures\null)
                                                             nodeId: 24
                                                             origNode: nodeId(24)
                                                             parent: nodeId(23)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            tests: Closure
                                                         )
                                                         eligible: true
                                                         functionName: concreteMethod
                                                         functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        mutationCandidate: true
                                                         nodeId: 23
                                                         origNode: nodeId(23)
                                                         parent: nodeId(21)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                     eligible: true
                                                     functionName: concreteMethod
                                                     functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     nodeId: 21
                                                     origNode: nodeId(21)
                                                     parent: nodeId(20)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 stmts: array(
                                                     0: Stmt_Echo(
@@ -1016,12 +1016,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                 isInsideFunction: true
                                                                 isStrictTypes: true
                                                                 kind: KIND_SINGLE_QUOTED (1)
-                                                                mutationCandidate: true
                                                                 nodeId: 26
                                                                 origNode: nodeId(26)
                                                                 parent: nodeId(25)
                                                                 rawValue: 'nothing to do'
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                tests: Closure
                                                             )
                                                         )
                                                         eligible: true
@@ -1029,12 +1029,12 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         functionScope: nodeId(14)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
-                                                        mutationCandidate: true
                                                         next: nodeId(27)
                                                         nodeId: 25
                                                         origNode: nodeId(25)
                                                         parent: nodeId(20)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        tests: Closure
                                                     )
                                                 )
                                                 else: Stmt_Else(
@@ -1047,33 +1047,33 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                     functionScope: nodeId(14)
                                                                     isInsideFunction: true
                                                                     isStrictTypes: true
-                                                                    mutationCandidate: true
                                                                     nodeId: 30
                                                                     origNode: nodeId(30)
                                                                     parent: nodeId(29)
                                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    tests: Closure
                                                                 )
                                                                 eligible: true
                                                                 functionName: concreteMethod
                                                                 functionScope: nodeId(14)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: true
-                                                                mutationCandidate: true
                                                                 nodeId: 29
                                                                 origNode: nodeId(29)
                                                                 parent: nodeId(28)
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                tests: Closure
                                                             )
                                                             eligible: true
                                                             functionName: concreteMethod
                                                             functionScope: nodeId(14)
                                                             isInsideFunction: true
                                                             isStrictTypes: true
-                                                            mutationCandidate: true
                                                             nodeId: 28
                                                             origNode: nodeId(28)
                                                             parent: nodeId(27)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            tests: Closure
                                                         )
                                                     )
                                                     eligible: true
@@ -1081,24 +1081,24 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     functionScope: nodeId(14)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
-                                                    mutationCandidate: true
                                                     next: nodeId(28)
                                                     nodeId: 27
                                                     origNode: nodeId(27)
                                                     parent: nodeId(20)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 functionName: concreteMethod
                                                 functionScope: nodeId(14)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
-                                                mutationCandidate: true
                                                 next: nodeId(25)
                                                 nodeId: 20
                                                 origNode: nodeId(20)
                                                 parent: nodeId(14)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
+                                                tests: Closure
                                             )
                                         )
                                         eligible: true
@@ -1171,9 +1171,9 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             functionScope: nodeId(31)
                                             isInsideFunction: true
                                             isStrictTypes: true
-                                            nodeId: 25
-                                            origNode: nodeId(25)
-                                            parent: nodeId(20)
+                                            nodeId: 36
+                                            origNode: nodeId(36)
+                                            parent: nodeId(31)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             tests: Closure
                                         )
@@ -1181,8 +1181,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         functionName: abstractMethod
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
-                                        nodeId: 20
-                                        origNode: nodeId(20)
+                                        nodeId: 31
+                                        origNode: nodeId(31)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         tests: Closure
@@ -1193,7 +1193,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
-                                startLine: 38
                             )
                         )
                         eligible: false
@@ -1201,7 +1200,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                         next: nodeId(6)
                         nodeId: 4
                         origNode: nodeId(4)
-                        startLine: 36
                     )
                 )
                 AST,

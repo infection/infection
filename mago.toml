@@ -28,6 +28,7 @@ integrations = ["symfony", "phpunit"]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
+assertion-style = { enabled = true, style = "this" }
 
 [analyzer]
 baseline = "devTools/mago-baseline.toml"
@@ -38,6 +39,11 @@ analyze-dead-code = true
 memoize-properties = true
 allow-possibly-undefined-array-keys = true
 check-throws = true
+unchecked-exceptions = [
+    "LogicException",
+    "Error",
+    "PHPUnit\\Framework\\Exception",
+]
 check-missing-override = false
 find-unused-parameters = true
 strict-list-index-checks = false

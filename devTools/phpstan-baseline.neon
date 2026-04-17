@@ -268,22 +268,16 @@ parameters:
 			path: ../src/Mutator/Util/AbstractSingleSubExprNegation.php
 
 		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\AddTestsVisitor::createAllTestsForNodeLocator() should return Closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation> but returns Closure(): array.'
+			identifier: return.type
+			count: 1
+			path: ../src/PhpParser/Visitor/AddTestsVisitor.php
+
+		-
 			rawMessage: Access to an undefined property PhpParser\Node::$namespacedName.
 			identifier: property.notFound
 			count: 1
 			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
-
-		-
-			rawMessage: 'Parameter #2 $startLine of method Infection\Source\Matcher\SourceLineMatcher::touches() expects int<1, max>, -1|int<1, max> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php
-
-		-
-			rawMessage: 'Parameter #3 $endLine of method Infection\Source\Matcher\SourceLineMatcher::touches() expects int<1, max>, -1|int<1, max> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php
 
 		-
 			rawMessage: 'Method Infection\PhpParser\Visitor\ReflectionVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
@@ -1237,12 +1231,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
 
 		-
-			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
-			identifier: property.notFound
-			count: 2
-			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
-
-		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
 			count: 1
@@ -1271,4 +1259,10 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
+
+		-
+			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
