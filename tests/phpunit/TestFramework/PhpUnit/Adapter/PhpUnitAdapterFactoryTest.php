@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\FileSystem\FakeFileSystem;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -55,6 +56,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/project',
             [],
             true,
+            new FakeFileSystem(),
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

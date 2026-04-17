@@ -424,12 +424,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
-			identifier: method.childParameterType
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
 			rawMessage: 'Parameter #1 $className of static method Infection\Framework\ClassName::getShortClassName() expects class-string, string given.'
 			identifier: argument.type
 			count: 1
@@ -1283,4 +1277,3 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
-

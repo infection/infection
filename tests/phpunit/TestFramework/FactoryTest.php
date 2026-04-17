@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
+use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -60,6 +61,7 @@ final class FactoryTest extends TestCase
             $this->createStub(TestFrameworkFinder::class),
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeFileSystem(),
             new FakeSourceCollector(),
             [],
         );
@@ -77,6 +79,7 @@ final class FactoryTest extends TestCase
             $this->createStub(TestFrameworkFinder::class),
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
+            new FakeFileSystem(),
             new FakeSourceCollector(),
             [
                 'infection/codeception-adapter' => [

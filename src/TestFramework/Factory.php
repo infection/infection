@@ -39,6 +39,7 @@ use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -64,6 +65,7 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
+        private FileSystem $fileSystem,
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
     ) {
@@ -86,6 +88,7 @@ final readonly class Factory
                 $this->projectDir,
                 $this->infectionConfig->source->directories,
                 $skipCoverage,
+                $this->fileSystem,
                 $this->infectionConfig->executeOnlyCoveringTestCases,
                 $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,

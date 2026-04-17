@@ -41,8 +41,8 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\XML\SafeDOMXPath;
 use function sprintf;
-use function version_compare;
 use Symfony\Component\Filesystem\Filesystem;
+use function version_compare;
 use Webmozart\Assert\Assert;
 
 /**
@@ -95,7 +95,11 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        $this->filesystem->dumpFile($path, $xPath->document->saveXML());
+        $xml = $xPath->document->saveXML();
+
+        Assert::string($xml);
+
+        $this->filesystem->dumpFile($path, $xml);
 
         return $path;
     }

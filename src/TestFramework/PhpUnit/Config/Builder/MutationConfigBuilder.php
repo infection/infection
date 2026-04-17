@@ -117,7 +117,11 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $path = $this->buildPath($mutationHash);
 
-        $this->filesystem->dumpFile($path, $xPath->document->saveXML());
+        $xml = $xPath->document->saveXML();
+
+        Assert::string($xml);
+
+        $this->filesystem->dumpFile($path, $xml);
 
         return $path;
     }
