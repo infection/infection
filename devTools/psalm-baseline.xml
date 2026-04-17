@@ -36,7 +36,7 @@
       <code><![CDATA[$domElement->nodeValue]]></code>
     </InaccessibleProperty>
   </file>
-  <file src="src/TestFramework/SafeDOMXPath.php">
+  <file src="src/TestFramework/XML/SafeDOMXPath.php">
     <InvalidTemplateParam>
       <code><![CDATA[DOMNodeList<DOMNameSpaceNode|DOMNode>]]></code>
     </InvalidTemplateParam>

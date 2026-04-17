@@ -41,7 +41,7 @@ use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
 use const PHP_EOL;

@@ -33,11 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\SafeDOMXPath;
+namespace Infection\Tests\TestFramework\XML\SafeDOMXPath;
 
 use DOMDocument;
 use DOMNode;
-use Infection\TestFramework\SafeDOMXPath;
+use Exception;
+use Infection\TestFramework\XML\InvalidXml;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -46,9 +48,6 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Throwable;
-use ValueError;
-use Webmozart\Assert\InvalidArgumentException as WebmozartAssertInvalidArgumentException;
 
 #[Group('integration')]
 #[CoversClass(SafeDOMXPath::class)]
@@ -157,7 +156,7 @@ final class SafeDOMXPathTest extends TestCase
         $pathname = __DIR__ . '/invalid.xml';
 
         $this->expectExceptionObject(
-            new InvalidArgumentException(
+            new InvalidXml(
                 sprintf(
                     'The file "%s" does not contain valid XML.',
                     $pathname,
@@ -315,50 +314,32 @@ final class SafeDOMXPathTest extends TestCase
     #[DataProvider('invalidXmlProvider')]
     public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string(
         string $invalidXml,
-        Throwable $expected,
+        Exception $expected,
     ): void {
-        // TODO: when bumping to PHPUnit 12.5.0 we can use ::expectExceptionObject() instead.
-        try {
-            SafeDOMXPath::fromString($invalidXml);
+        $this->expectExceptionObject($expected);
 
-            $this->fail('Expected an exception to be thrown.');
-        } catch (Throwable $actual) {
-            $this->assertEquals(
-                [
-                    'class' => $expected::class,
-                    'message' => $expected->getMessage(),
-                    'code' => $expected->getCode(),
-                    'hasPrevious' => $expected->getPrevious() !== null,
-                ],
-                [
-                    'class' => $actual::class,
-                    'message' => $actual->getMessage(),
-                    'code' => $actual->getCode(),
-                    'hasPrevious' => $actual->getPrevious() !== null,
-                ],
-            );
-        }
+        SafeDOMXPath::fromString($invalidXml);
     }
 
     public static function invalidXmlProvider(): iterable
     {
         yield 'empty string' => [
             '',
-            new ValueError(
-                'DOMDocument::loadXML(): Argument #1 ($source) must not be empty',
+            new InvalidXml(
+                'The string "" is not valid XML.',
             ),
         ];
 
         yield 'blank string' => [
             ' ',
-            new WebmozartAssertInvalidArgumentException(
+            new InvalidXml(
                 'The string " " is not valid XML.',
             ),
         ];
 
         yield 'a non XML string' => [
             'Hello world!',
-            new WebmozartAssertInvalidArgumentException(
+            new InvalidXml(
                 'The string "Hello world!" is not valid XML.',
             ),
         ];
