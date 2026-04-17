@@ -31,6 +31,7 @@ halstead = { effort-threshold = 7000 }
 
 [analyzer]
 baseline = "devTools/mago-baseline.toml"
+minimum-fail-level = "warning"
 plugins = []
 find-unused-definitions = true
 find-unused-expressions = true
