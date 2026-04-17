@@ -21,11 +21,6 @@ excludes = [
 [source.glob]
 literal-separator = true
 
-[formatter]
-print-width = 120
-tab-width = 4
-use-tabs = false
-
 [linter]
 integrations = ["symfony", "phpunit"]
 
