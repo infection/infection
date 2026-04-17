@@ -42,9 +42,9 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\TestFramework\XML\InvalidXml;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -350,8 +350,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         yield [
             $invalidXmlIndexPath,
             dirname($invalidXmlIndexPath),
-            // TODO: this is not ideal
-            new InvalidArgumentException(
+            new InvalidXml(
                 sprintf(
                     'The file "%s" does not contain valid XML.',
                     $invalidXmlIndexPath,

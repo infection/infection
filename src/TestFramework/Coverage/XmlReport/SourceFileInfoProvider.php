@@ -39,7 +39,7 @@ use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function implode;
 use Infection\FileSystem\FileSystem;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use SplFileInfo;
 use function sprintf;
 use function str_replace;
