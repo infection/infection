@@ -61,30 +61,6 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\Comm
 count = 1
 
 [[issues]]
-file = "src/Command/ConfigureCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Command\ConfigureCommand::executeCommand`.'
-count = 1
-
-[[issues]]
-file = "src/Command/ConfigureCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Command\ConfigureCommand::saveConfig`.'
-count = 1
-
-[[issues]]
-file = "src/Command/ConfigureCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Command\ConfigureCommand::executeCommand`.'
-count = 1
-
-[[issues]]
-file = "src/Command/ConfigureCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Command\ConfigureCommand::saveConfig`.'
-count = 1
-
-[[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
@@ -112,6 +88,12 @@ count = 2
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "no-value"
 message = 'Argument #2 passed to method `infection\differ\changedlinesrange::create` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "possibly-false-argument"
+message = 'Argument #1 of method `infection\phpparser\visitor\labelmutationcandidatesvisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
 count = 1
 
 [[issues]]
@@ -154,12 +136,6 @@ count = 1
 file = "src/Command/Debug/MockTeamCityCommand.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/MockTeamCityCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\StreamException` in `Infection\Command\Debug\MockTeamCityCommand::getLinesFromStdin`.'
 count = 1
 
 [[issues]]
@@ -319,12 +295,6 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
-file = "src/Command/ListSourcesCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Command\ListSourcesCommand::executeCommand`.'
-count = 1
-
-[[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "invalid-return-statement"
 message = "Invalid return type for function `12472592161311982528:3960`: expected `string`, but found `null|string`."
@@ -352,18 +322,6 @@ count = 1
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "possible-method-access-on-null"
 message = "Attempting to call a method on `null`."
-count = 1
-
-[[issues]]
-file = "src/Command/MakeCustomMutatorCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Command\MakeCustomMutatorCommand::createProjectFilesFromTemplates`.'
-count = 1
-
-[[issues]]
-file = "src/Command/MakeCustomMutatorCommand.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Command\MakeCustomMutatorCommand::createProjectFilesFromTemplates`.'
 count = 1
 
 [[issues]]
@@ -669,12 +627,6 @@ count = 1
 [[issues]]
 file = "src/Config/ValueProvider/ExcludeDirsProvider.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Config\ValueProvider\ExcludeDirsProvider::get`.'
-count = 1
-
-[[issues]]
-file = "src/Config/ValueProvider/ExcludeDirsProvider.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Console\Exception\RuntimeException` in `Infection\Config\ValueProvider\ExcludeDirsProvider::get`.'
 count = 1
 
@@ -741,18 +693,6 @@ count = 1
 [[issues]]
 file = "src/Config/ValueProvider/TestFrameworkConfigPathProvider.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Config\ValueProvider\TestFrameworkConfigPathProvider::get`.'
-count = 1
-
-[[issues]]
-file = "src/Config/ValueProvider/TestFrameworkConfigPathProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Config\ValueProvider\TestFrameworkConfigPathProvider::get`.'
-count = 1
-
-[[issues]]
-file = "src/Config/ValueProvider/TestFrameworkConfigPathProvider.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Console\Exception\RuntimeException` in `Infection\Config\ValueProvider\TestFrameworkConfigPathProvider::askTestFrameworkConfigLocation`.'
 count = 1
 
@@ -796,18 +736,6 @@ count = 1
 file = "src/Configuration/ConfigurationFactory.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `UnexpectedValueException` in `Infection\Configuration\ConfigurationFactory::resolveMutators`.'
-count = 1
-
-[[issues]]
-file = "src/Configuration/Entry/StrykerConfig.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Configuration\Entry\StrykerConfig::__construct`.'
-count = 1
-
-[[issues]]
-file = "src/Configuration/Entry/StrykerConfig.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Configuration\Entry\StrykerConfig::applicableForBranch`.'
 count = 1
 
 [[issues]]
@@ -955,12 +883,6 @@ message = 'Could not infer a precise return type for function `infection\configu
 count = 1
 
 [[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFile.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Configuration\Schema\SchemaConfigurationFile::getDecodedContents`.'
-count = 1
-
-[[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFileLoader.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Configuration\Schema\InvalidFile` in `Infection\Configuration\Schema\SchemaConfigurationFileLoader::loadFile`.'
@@ -998,12 +920,6 @@ count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaValidator.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 2
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaValidator.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -1030,12 +946,6 @@ count = 1
 file = "src/Console/Application.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Console\Application::getPrettyVersion`.'
-count = 1
-
-[[issues]]
-file = "src/Console/Application.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Console\Application::getPrettyVersion`.'
 count = 1
 
 [[issues]]
@@ -1084,990 +994,6 @@ count = 1
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Container\Container::getProcessRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getAdapterInstallationDecider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getAdapterInstaller`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getCiDetector`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getCleanUpAfterMutationTestingFinishedSubscriberFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getComposerExecutableFinder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getConfigurationFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getConfiguration`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getCoverageChecker`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getDiffColorizer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getDiffSourceCodeMatcher`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getDiffer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getEventDispatcher`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFileMutationGenerator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFileParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFileReporterFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFileStore`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFileSystem`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getFilteringResultsCollectorFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getGit`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getIndexXmlCoverageLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getIndexXmlCoverageParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getInitialStaticAnalysisProcessFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getInitialStaticAnalysisRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getInitialTestRunProcessFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getInitialTestsRunProcessFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getInitialTestsRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getJUnitReportLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getJUnitTestExecutionInfoAdder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getLineRangeCalculator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getLogger`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMaxTimeoutsChecker`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMemoryFormatter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMemoryLimiter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMetricsCalculator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMinMsiChecker`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutantCodeFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutantExecutionResultFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutantFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutantProcessContainerFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutatedCodePrinter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutationAnalysisLoggerFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutationAnalysisLogger`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutationGenerator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutationTestingRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutatorFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getMutatorResolver`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getNodeDumper`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getNodeTraverserFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getOutput`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getPhpUnitXmlCoverageTraceProvider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getPrinter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getProcessRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getProjectDir`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getReporter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getResultsCollector`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getRootsFileLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getRootsFileOrDirectoryLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getSchemaConfigurationFileLoader`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getSchemaConfigurationLoader`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getSchemaConfiguration`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getShellCommandLineExecutor`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getSourceCollector`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getSourceLineMatcher`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStaticAnalysisConfigLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStaticAnalysisToolAdapter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStaticAnalysisToolExecutableFinder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStaticAnalysisToolFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStopwatch`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStrykerHtmlReportBuilder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getStrykerLoggerFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getSubscriberRegisterer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTargetDetectionStatusesProvider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTestFrameworkAdapter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTestFrameworkConfigLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTestFrameworkExtraOptionsFilter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTestFrameworkFinder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTimeFormatter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTraceProvider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getTracer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Container\Container::getXmlCoverageParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getAdapterInstallationDecider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getAdapterInstaller`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getCiDetector`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getCleanUpAfterMutationTestingFinishedSubscriberFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getComposerExecutableFinder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getConfigurationFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getConfiguration`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getCoverageChecker`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getDiffColorizer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getDiffSourceCodeMatcher`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getDiffer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getEventDispatcher`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFileMutationGenerator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFileParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFileReporterFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFileStore`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFileSystem`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getFilteringResultsCollectorFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getGit`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getIndexXmlCoverageLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getIndexXmlCoverageParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getInitialStaticAnalysisProcessFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getInitialStaticAnalysisRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getInitialTestRunProcessFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getInitialTestsRunProcessFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getInitialTestsRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getJUnitReportLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getJUnitTestExecutionInfoAdder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getLineRangeCalculator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getLogger`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMaxTimeoutsChecker`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMemoryFormatter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMemoryLimiter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMetricsCalculator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMinMsiChecker`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutantCodeFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutantExecutionResultFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutantFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutantProcessContainerFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutatedCodePrinter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutationAnalysisLoggerFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutationAnalysisLogger`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutationGenerator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutationTestingRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutatorFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getMutatorResolver`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getNodeDumper`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getNodeTraverserFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getOutput`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getParser`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getPhpUnitXmlCoverageTraceProvider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getPrinter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getProcessRunner`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getProjectDir`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getReporter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getResultsCollector`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getRootsFileLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getRootsFileOrDirectoryLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getSchemaConfigurationFileLoader`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getSchemaConfigurationLoader`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getSchemaConfiguration`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getShellCommandLineExecutor`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getSourceCollector`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getSourceLineMatcher`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStaticAnalysisConfigLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStaticAnalysisToolAdapter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStaticAnalysisToolExecutableFinder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStaticAnalysisToolFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStopwatch`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStrykerHtmlReportBuilder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getStrykerLoggerFactory`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getSubscriberRegisterer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTargetDetectionStatusesProvider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTestFrameworkAdapter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTestFrameworkConfigLocator`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTestFrameworkExtraOptionsFilter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTestFrameworkFinder`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTimeFormatter`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTraceProvider`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getTracer`.'
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Container\Container::getXmlCoverageParser`.'
 count = 1
 
 [[issues]]
@@ -2137,18 +1063,6 @@ message = "Reference created from a previously undefined variable `$matches`."
 count = 1
 
 [[issues]]
-file = "src/Differ/DiffColorizer.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Differ\DiffColorizer::isMultiLineDiff`.'
-count = 1
-
-[[issues]]
-file = "src/Differ/DiffSourceCodeMatcher.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Differ\DiffSourceCodeMatcher::matches`.'
-count = 1
-
-[[issues]]
 file = "src/Differ/Differ.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `infection\differ\differ::processtokens`: expected `array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}`, but found `mixed`.'
@@ -2170,18 +1084,6 @@ count = 1
 file = "src/Differ/Tokens.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `infection\differ\tokens::computerange`: expected `array{0: int(0)|positive-int, 1: int(0)|positive-int}`, but found `list{non-negative-int, int}`.'
-count = 1
-
-[[issues]]
-file = "src/Engine.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Engine::getFilteredExtraOptionsForMutant`.'
-count = 1
-
-[[issues]]
-file = "src/Engine.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\StringsException` in `Infection\Engine::getFilteredExtraOptionsForMutant`.'
 count = 1
 
 [[issues]]
@@ -2222,12 +1124,6 @@ count = 1
 
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, array<array-key, (callable(...mixed): mixed)>>`."
-count = 1
-
-[[issues]]
-file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -2260,18 +1156,6 @@ count = 1
 file = "src/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriber.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber::onMutationTestingWasFinished`.'
-count = 1
-
-[[issues]]
-file = "src/Event/Subscriber/DispatchPcntlSignalSubscriber.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcntlException` in `Infection\Event\Subscriber\DispatchPcntlSignalSubscriber::onMutantProcessWasFinished`.'
-count = 1
-
-[[issues]]
-file = "src/Event/Subscriber/StopInfectionOnSigintSignalSubscriber.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcntlException` in `Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber::onMutationTestingWasStarted`.'
 count = 1
 
 [[issues]]
@@ -2320,18 +1204,6 @@ count = 1
 file = "src/FileSystem/FileSystem.php"
 code = "unused-parameter"
 message = "Parameter `$type` is never used."
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/ConcreteComposerExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\FileSystem\Finder\ConcreteComposerExecutableFinder::find`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/ConcreteComposerExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Finder\ConcreteComposerExecutableFinder::find`.'
 count = 1
 
 [[issues]]
@@ -2397,42 +1269,6 @@ count = 1
 [[issues]]
 file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::addVendorBinToPath`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::findStaticAnalysisExecutable`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::findFromBatchFile`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::find`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::addVendorBinToPath`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::findFromBatchFile`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\filesystem\finder\exception\finderexception` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::findStaticAnalysisExecutable`.'
 count = 1
 
@@ -2476,42 +1312,6 @@ count = 1
 file = "src/FileSystem/Finder/TestFrameworkFinder.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$match`."
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\FileSystem\Finder\TestFrameworkFinder::addVendorBinToPath`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\FileSystem\Finder\TestFrameworkFinder::findTestFramework`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Finder\TestFrameworkFinder::findFromBatchFile`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Finder\TestFrameworkFinder::find`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\FileSystem\Finder\TestFrameworkFinder::addVendorBinToPath`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Finder/TestFrameworkFinder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\FileSystem\Finder\TestFrameworkFinder::findFromBatchFile`.'
 count = 1
 
 [[issues]]
@@ -2563,12 +1363,6 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrD
 count = 1
 
 [[issues]]
-file = "src/FileSystem/Locator/RootsFileLocator.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Locator\RootsFileLocator::locate`.'
-count = 1
-
-[[issues]]
 file = "src/FileSystem/Locator/RootsFileOrDirectoryLocator.php"
 code = "redundant-type-comparison"
 message = "Redundant type assertion: `$roots` of type `array<array-key, string>` is always not `iterable<mixed, string>`."
@@ -2578,12 +1372,6 @@ count = 1
 file = "src/FileSystem/Locator/RootsFileOrDirectoryLocator.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileNotFound` in `Infection\FileSystem\Locator\RootsFileOrDirectoryLocator::innerLocateOneOf`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/Locator/RootsFileOrDirectoryLocator.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\FileSystem\Locator\RootsFileOrDirectoryLocator::locate`.'
 count = 1
 
 [[issues]]
@@ -2647,12 +1435,6 @@ message = 'Invalid return type for function `infection\framework\str::findlastno
 count = 1
 
 [[issues]]
-file = "src/Framework/Str.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\MbstringException` in `Infection\Framework\Str::convertToUtf8`.'
-count = 1
-
-[[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `infection\git\commandlinegit::getchangedfilerelativepaths`: expected `non-empty-string`, but found `string`.'
@@ -2703,24 +1485,6 @@ count = 2
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Git\CommandLineGit::diff`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Git\CommandLineGit::parseChangedLinesRangeFromLine`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Git\CommandLineGit::parseFilePathFromLine`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Git\CommandLineGit::diff`.'
 count = 1
 
@@ -2755,18 +1519,6 @@ message = 'Invalid argument type for argument #2 of `webmozart\assert\assert::ke
 count = 1
 
 [[issues]]
-file = "src/Logger/Console/BasicConsoleLogger.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, int(256)|int(32)|int(64)>`."
-count = 1
-
-[[issues]]
-file = "src/Logger/Console/BasicConsoleLogger.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, string('error')|string('info')>`."
-count = 1
-
-[[issues]]
 file = "src/Logger/Console/ConsoleLogger.php"
 code = "incompatible-parameter-type"
 message = 'Parameter `$level` of `Infection\Logger\Console\ConsoleLogger::log()` expects type `string` but parent `Psr\Log\LoggerInterface::log()` expects type `mixed`'
@@ -2794,24 +1546,6 @@ count = 1
 file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `infection\logger\mutationanalysis\teamcity\teamcity::escapevalue`: expected `non-empty-string`, but found `array<array-key, mixed>|string`.'
-count = 1
-
-[[issues]]
-file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
-code = "mismatched-array-index"
-message = "Invalid array key type: `int|string` is not a valid key for this array."
-count = 1
-
-[[issues]]
-file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Logger\MutationAnalysis\TeamCity\TeamCity::testStarted`.'
-count = 1
-
-[[issues]]
-file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Logger\MutationAnalysis\TeamCity\TeamCity::escapeValue`.'
 count = 1
 
 [[issues]]
@@ -2960,33 +1694,57 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/Boolean/LogicalOr.php"
-code = "invalid-callable"
-message = "Expression of type `never` cannot be called as a function or method."
-count = 1
-
-[[issues]]
-file = "src/Mutator/Boolean/LogicalOr.php"
-code = "match-default-arm-always-executed"
-message = "This default arm is always executed because no other arms can match."
-count = 1
-
-[[issues]]
-file = "src/Mutator/Boolean/LogicalOr.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `infection\mutator\boolean\logicalor::canmutate`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Boolean/LogicalOr.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `reflectionclass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `non-empty-string`."
 count = 1
 
 [[issues]]
 file = "src/Mutator/Boolean/LogicalOr.php"
-code = "unreachable-match-arm"
-message = "This match arm is unreachable."
-count = 8
+code = "possibly-null-operand"
+message = "Left operand in `<=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Left operand in `<` comparison might be `null` (type `float|int|null`)."
+count = 3
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Left operand in `>=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Left operand in `>` comparison might be `null` (type `float|int|null`)."
+count = 3
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `<=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `<` comparison might be `null` (type `float|int|null`)."
+count = 3
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `>=` comparison might be `null` (type `float|int|null`)."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/LogicalOr.php"
+code = "possibly-null-operand"
+message = "Right operand in `>` comparison might be `null` (type `float|int|null`)."
+count = 3
 
 [[issues]]
 file = "src/Mutator/Boolean/TrueValue.php"
@@ -3266,6 +2024,48 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/NodeMutationGenerator.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>|list<mixed>` is less specific than the declared return type `array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation>` for function `infection\mutator\nodemutationgenerator::getalltestsforcurrentnode` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
+code = "mixed-property-type-coercion"
+message = 'A value with a less specific type `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>|list<mixed>` is being assigned to property `$$testsMemoized` (array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation>|null).'
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `infection\mutator\nodemutationgenerator::isinsidefunction`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `infection\mutator\nodemutationgenerator::isonfunctionsignature`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
+code = "no-value"
+message = "Argument #1 passed to function `iterator_to_array` has type `never`, meaning it cannot produce a value."
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+count = 1
+
+[[issues]]
+file = "src/Mutator/NodeMutationGenerator.php"
 code = "redundant-type-comparison"
 message = 'Redundant type assertion: `$mutators` of type `array<array-key, Infection\Mutator\Mutator<PhpParser\Node>>` is always not `iterable<mixed, Infection\Mutator\Mutator<PhpParser\Node>>`.'
 count = 1
@@ -3367,18 +2167,6 @@ message = "Reference created from a previously undefined variable `$matches`."
 count = 2
 
 [[issues]]
-file = "src/Mutator/Regex/PregMatchRemoveCaret.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Mutator\Regex\PregMatchRemoveCaret::isProperRegexToMutate`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Regex/PregMatchRemoveCaret.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Mutator\Regex\PregMatchRemoveCaret::mutateRegex`.'
-count = 1
-
-[[issues]]
 file = "src/Mutator/Regex/PregMatchRemoveDollar.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
@@ -3391,18 +2179,6 @@ message = "Reference created from a previously undefined variable `$matches`."
 count = 2
 
 [[issues]]
-file = "src/Mutator/Regex/PregMatchRemoveDollar.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Mutator\Regex\PregMatchRemoveDollar::isProperRegexToMutate`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Regex/PregMatchRemoveDollar.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Mutator\Regex\PregMatchRemoveDollar::mutateRegex`.'
-count = 1
-
-[[issues]]
 file = "src/Mutator/Regex/PregMatchRemoveFlags.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
@@ -3413,18 +2189,6 @@ file = "src/Mutator/Regex/PregMatchRemoveFlags.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$matches`."
 count = 2
-
-[[issues]]
-file = "src/Mutator/Regex/PregMatchRemoveFlags.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Mutator\Regex\PregMatchRemoveFlags::isProperRegexToMutate`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Regex/PregMatchRemoveFlags.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Mutator\Regex\PregMatchRemoveFlags::mutateRegex`.'
-count = 1
 
 [[issues]]
 file = "src/Mutator/Regex/PregQuote.php"
@@ -3448,12 +2212,6 @@ count = 1
 file = "src/Mutator/Removal/SharedCaseRemoval.php"
 code = "invalid-operand"
 message = "Invalid type for left operand."
-count = 2
-
-[[issues]]
-file = "src/Mutator/Removal/SharedCaseRemoval.php"
-code = "mixed-array-index"
-message = 'Invalid index type `mixed` used for array access on `array<array-key, PhpParser\Node\Stmt\Case_>`.'
 count = 2
 
 [[issues]]
@@ -3637,12 +2395,6 @@ message = "Potential array in middle operand of string concatenation."
 count = 1
 
 [[issues]]
-file = "src/PhpParser/InfectionPrettyPrinter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\PhpParser\InfectionPrettyPrinter::pSingleQuotedString`.'
-count = 1
-
-[[issues]]
 file = "src/PhpParser/MutatedNode.php"
 code = "redundant-type-comparison"
 message = 'Redundant type assertion: `$value` of type `array<array-key, PhpParser\Node>` is always not `iterable<mixed, PhpParser\Node>`.'
@@ -3751,63 +2503,9 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\PhpP
 count = 1
 
 [[issues]]
-file = "src/PhpParser/NodeTraverserFactory.php"
-code = "possibly-false-argument"
-message = 'Argument #2 of method `infection\phpparser\visitor\excludeunchangedlinesvisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
 file = "src/PhpParser/Visitor/AddIdToTraversedNodesVisitor/AddIdToTraversedNodesVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `infection\phpparser\visitor\addidtotraversednodesvisitor\addidtotraversednodesvisitor::getnodeid`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/AddTestsVisitor.php"
-code = "less-specific-nested-return-statement"
-message = '''Returned type `(closure(): nonnull)` is less specific than the declared return type `(closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation>)` for function `infection\phpparser\visitor\addtestsvisitor::createalltestsfornodelocator` due to nested 'mixed'.'''
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/AddTestsVisitor.php"
-code = "mixed-return-statement"
-message = "Could not infer a precise return type for function `16684525231735625562:3144`. Saw type `nonnull`."
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/AddTestsVisitor.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `infection\phpparser\visitor\addtestsvisitor::isonfunctionsignature`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/ExcludeNonMutableCodeVisitor.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `infection\phpparser\visitor\excludenonmutablecodevisitor::isinsidefunction`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/ExcludeNonMutableCodeVisitor.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `infection\phpparser\visitor\excludenonmutablecodevisitor::isonfunctionsignature`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor::excludeUntouchedNodes`.'
 count = 1
 
 [[issues]]
@@ -3820,6 +2518,36 @@ count = 1
 file = "src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php"
 code = "non-existent-property"
 message = 'Property `$namespacedName` does not exist on interface `PhpParser\Node`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `infection\phpparser\visitor\labelmutationcandidatesvisitor::isinsidefunction`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `infection\phpparser\visitor\labelmutationcandidatesvisitor::isonfunctionsignature`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor::enterNode`.'
 count = 1
 
 [[issues]]
@@ -3973,12 +2701,6 @@ message = 'Argument type mismatch for argument #1 of `infection\reporter\basetex
 count = 1
 
 [[issues]]
-file = "src/Reporter/FileReporter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Reporter\FileReporter::report`.'
-count = 1
-
-[[issues]]
 file = "src/Reporter/FileReporterFactory.php"
 code = "invalid-yield-key-type"
 message = "Invalid key type yielded; expected `string`, but found `null|string`."
@@ -3991,27 +2713,9 @@ message = 'Argument #2 of method `symfony\component\filesystem\path::makerelativ
 count = 1
 
 [[issues]]
-file = "src/Reporter/GitHubAnnotationsReporter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\ExecException` in `Infection\Reporter\GitHubAnnotationsReporter::__construct`.'
-count = 1
-
-[[issues]]
 file = "src/Reporter/GitLabCodeQualityReporter.php"
 code = "possibly-null-argument"
 message = 'Argument #2 of method `symfony\component\filesystem\path::makerelative` is possibly `null`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/GitLabCodeQualityReporter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\ExecException` in `Infection\Reporter\GitLabCodeQualityReporter::__construct`.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/HtmlFileReporter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Reporter\Html\HtmlFileReporter::getMutationTestingReport`.'
 count = 1
 
 [[issues]]
@@ -4087,30 +2791,6 @@ message = "Redundant type assertion: `$originalCode` of type `string` is always 
 count = 1
 
 [[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Reporter\Html\StrykerHtmlReportBuilder::retrieveFiles`.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Reporter\Html\StrykerHtmlReportBuilder::getKilledBy`.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Reporter\Html\StrykerHtmlReportBuilder::getTestsCompleted`.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Reporter\Html\StrykerHtmlReportBuilder::retrieveReplacementFromDiff`.'
-count = 1
-
-[[issues]]
 file = "src/Reporter/Http/StrykerCurlClient.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `infection\reporter\http\response::__construct`: expected `int`, but found `mixed`.'
@@ -4120,18 +2800,6 @@ count = 1
 file = "src/Reporter/Http/StrykerCurlClient.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "src/Reporter/Http/StrykerCurlClient.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\CurlException` in `Infection\Reporter\Http\StrykerCurlClient::request`.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/PerMutatorReporter.php"
-code = "mismatched-array-index"
-message = "Invalid array key type: `array-key` is not a valid key for this array."
 count = 1
 
 [[issues]]
@@ -4157,18 +2825,6 @@ file = "src/Reporter/ShowMutationsReporter.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
 count = 2
-
-[[issues]]
-file = "src/Reporter/StrykerReporter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Reporter\StrykerReporter::report`.'
-count = 1
-
-[[issues]]
-file = "src/Resource/Memory/MemoryLimiterEnvironment.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Resource\Memory\MemoryLimiterEnvironment::hasMemoryLimitSet`.'
-count = 1
 
 [[issues]]
 file = "src/Source/Collector/BasicSourceCollector.php"
@@ -4198,12 +2854,6 @@ count = 1
 file = "src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `infection\filesystem\locator\fileordirectorynotfound::multiplefilesdonotexist`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator::locate`.'
 count = 1
 
 [[issues]]
@@ -4359,25 +3009,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/Config/TestFrameworkConfigLocator.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\TestFramework\Config\TestFrameworkConfigLocator::locate`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Config/TestFrameworkConfigLocator.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\filesystem\locator\fileordirectorynotfound` in `Infection\TestFramework\Config\TestFrameworkConfigLocator::locate`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Coverage/CoverageChecker.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\Coverage\CoverageChecker::isPcovIncludedInInitialTestPhpOptions`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Coverage/CoverageChecker.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\Coverage\CoverageChecker::isXdebugIncludedInInitialTestPhpOptions`.'
 count = 1
 
 [[issues]]
@@ -4474,12 +3106,6 @@ count = 1
 file = "src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider::getXPath`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider::testCaseMapGenerator`.'
 count = 1
 
 [[issues]]
@@ -4639,24 +3265,6 @@ message = 'Potentially unhandled exception `Infection\AbstractTestFramework\Inva
 count = 1
 
 [[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::getMemoryUsed`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::isSyntaxError`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter::testsPass`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "falsable-return-statement"
 message = "Function `38891935849420780:4202` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
@@ -4681,12 +3289,6 @@ message = 'Possible argument type mismatch for argument #6 of `infection\testfra
 count = 1
 
 [[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `infection\testframework\phpunit\commandline\filterbuilder::splitmethodnamefromproviderkey`: expected `array{0: string, 1: string}`, but found `non-empty-list<string>`.'
@@ -4696,12 +3298,6 @@ count = 1
 file = "src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::build`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::build`.'
 count = 1
 
 [[issues]]
@@ -4720,12 +3316,6 @@ count = 2
 file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder::getXPath`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder::build`.'
 count = 1
 
 [[issues]]
@@ -4780,12 +3370,6 @@ count = 1
 file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider::provide`.'
 count = 1
 
 [[issues]]
@@ -4912,12 +3496,6 @@ count = 1
 file = "src/TestFramework/VersionParser.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/VersionParser.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\TestFramework\VersionParser::parse`.'
 count = 1
 
 [[issues]]
@@ -6265,18 +4843,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Loc
 count = 1
 
 [[issues]]
-file = "tests/benchmark/Tracing/create-main.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Benchmark\Tracing\collectSources`.'
-count = 1
-
-[[issues]]
-file = "tests/benchmark/Tracing/create-main.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Benchmark\Tracing\collectSources`.'
-count = 1
-
-[[issues]]
 file = "tests/benchmark/Tracing/profile.php"
 code = "invalid-callable"
 message = "Expression of type `mixed` cannot be called as a function or method."
@@ -6337,12 +4903,6 @@ message = 'Method `fail` does not exist on type `Infection\Tests\AutoReview\Buil
 count = 1
 
 [[issues]]
-file = "tests/phpunit/AutoReview/BuildConfigYmlTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\BuildConfigYmlTest::test_valid_yaml_has_key`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/AutoReview/ConcreteClassReflector.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `reflectionclass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
@@ -6352,12 +4912,6 @@ count = 1
 file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulationTest.php"
 code = "non-existent-method"
 message = 'Method `assertstringcontainsstring` does not exist on type `Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulationTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulationTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulationTest::test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait`.'
 count = 1
 
 [[issues]]
@@ -6436,18 +4990,6 @@ count = 1
 file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations`.'
 count = 1
 
 [[issues]]
@@ -6668,18 +5210,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestedClassForIoOperations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
 code = "yield-from-non-iterable"
 message = "Cannot `yield from` non-iterable type `null`."
 count = 1
@@ -6800,12 +5330,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
-code = "mixed-array-index"
-message = "Invalid index type `mixed` used for array access on `array<array-key, null>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -6820,18 +5344,6 @@ count = 1
 file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
 code = "possibly-undefined-variable"
 message = "Variable `$matches` might not have been defined on all execution paths leading to this point."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector::retrieveSafeFileSystemFunctions`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector::retrieveSafeFileSystemFunctions`.'
 count = 1
 
 [[issues]]
@@ -6970,12 +5482,6 @@ count = 1
 file = "tests/phpunit/AutoReview/Mutator/MutatorProvider.php"
 code = "mixed-property-type-coercion"
 message = "Mixed property type coercion"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Mutator/MutatorProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\SplException` in `Infection\Tests\AutoReview\Mutator\MutatorProvider::provideConfigurableMutatorClasses`.'
 count = 1
 
 [[issues]]
@@ -7147,24 +5653,6 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
-file = "tests/phpunit/AutoReview/Mutator/MutatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\SplException` in `Infection\Tests\AutoReview\Mutator\MutatorTest::test_configurable_mutators_declare_a_mutator_config`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Mutator/MutatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\SplException` in `Infection\Tests\AutoReview\Mutator\MutatorTest::test_mutators_do_not_declare_public_methods`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Mutator/MutatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\SplException` in `Infection\Tests\AutoReview\Mutator\MutatorTest::test_only_configurable_mutators_have_a_config`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `infection\tests\autoreview\phpdoc\phpdocparser::parse` due to nested 'mixed'.'''
@@ -7198,12 +5686,6 @@ count = 1
 file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$matches`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Tests\AutoReview\PhpDoc\PHPDocParser::parse`.'
 count = 1
 
 [[issues]]
@@ -7651,12 +6133,6 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\Test
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Command\Debug\MockTeamCityCommandTest::createTeamCityLog`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Command/DescribeCommandTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Command\DescribeCommandTest`.'
@@ -7802,18 +6278,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\Git\GitChangedFilesCommandTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\Git\GitChangedFilesCommandTest::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -7882,18 +6346,6 @@ count = 2
 file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitChangedLinesCommandTest::test_it_outputs_changed_lines`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\Git\GitChangedLinesCommandTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\Git\GitChangedLinesCommandTest::tearDown`.'
 count = 1
 
 [[issues]]
@@ -7982,18 +6434,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\InitialTest\InitialTestRunCommandTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\InitialTest\InitialTestRunCommandTest::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -8026,18 +6466,6 @@ count = 1
 file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_source_files`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::tearDown`.'
 count = 1
 
 [[issues]]
@@ -8122,12 +6550,6 @@ count = 1
 file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_uppercases_the_value_from_quetion_helper`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_it_create_custom_mutator_when_name_is_provided`.'
 count = 1
 
 [[issues]]
@@ -8251,12 +6673,6 @@ message = 'Method `assertsame` does not exist on type `Infection\Tests\Config\Gu
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Config/Guesser/PhpUnitPathGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\PhpUnitPathGuesserTest::test_it_guesses_correctly`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `infection\config\guesser\sourcedirguesser::__construct`: expected `stdClass`, but found `mixed`.'
@@ -8284,54 +6700,6 @@ count = 1
 file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
 code = "non-existent-method"
 message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tests\Config\Guesser\SourceDirGuesserTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_parser_psr0`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_parser_psr4`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_list_if_contains_array_of_paths_without_src`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_null_when_does_not_have_autoload`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_null_when_does_not_have_psr_autoload`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_only_src_if_contains_array_of_paths`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_only_src_if_several_are_in_psr_config`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/Guesser/SourceDirGuesserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_throw_invalid_autoload_exception`.'
 count = 1
 
 [[issues]]
@@ -8374,24 +6742,6 @@ count = 1
 file = "tests/phpunit/Config/ValueProvider/BaseProviderTestCase.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$output`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/BaseProviderTestCase.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\ExecException` in `Infection\Tests\Config\ValueProvider\BaseProviderTestCase::hasSttyAvailable`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/BaseProviderTestCase.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Config\ValueProvider\BaseProviderTestCase::createStreamOutput`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/BaseProviderTestCase.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Config\ValueProvider\BaseProviderTestCase::getInputStream`.'
 count = 1
 
 [[issues]]
@@ -8445,24 +6795,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::test_passes_when_correct_dir_typed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::test_returns_an_array_with_incremented_keys_started_from_zero`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::tearDown`.'
 count = 1
 
@@ -8506,12 +6838,6 @@ count = 1
 file = "tests/phpunit/Config/ValueProvider/PCOVDirectoryProviderTest.php"
 code = "non-existent-method"
 message = 'Method `marktestskipped` does not exist on type `Infection\Tests\Config\ValueProvider\PCOVDirectoryProviderTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/PCOVDirectoryProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Config\ValueProvider\PCOVDirectoryProviderTest::test_it_loads_current_value_from_environment`.'
 count = 1
 
 [[issues]]
@@ -8921,12 +7247,6 @@ file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 2
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
@@ -9343,12 +7663,6 @@ message = 'Too few arguments provided for method `infection\configuration\schema
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::test_it_can_create_a_config`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileLoaderTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
@@ -9376,12 +7690,6 @@ count = 2
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileLoaderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Configuration\Schema\SchemaConfigurationFileLoaderTest::test_it_create_a_configuration_from_a_file_path`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileLoaderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Configuration\Schema\SchemaConfigurationFileLoaderTest::test_it_create_a_configuration_from_a_file_path`.'
 count = 1
 
 [[issues]]
@@ -9526,12 +7834,6 @@ count = 2
 file = "tests/phpunit/Configuration/Schema/SchemaValidatorTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Configuration\Schema\SchemaValidatorTest::createConfigWithContents`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaValidatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Configuration\Schema\SchemaValidatorTest::createConfigWithContents`.'
 count = 1
 
 [[issues]]
@@ -9682,42 +7984,6 @@ count = 1
 file = "tests/phpunit/Console/E2ETest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\Tests\Console\E2ETest::installComposerDeps`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Console/E2ETest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Console\E2ETest::runOnE2EFixture`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Console/E2ETest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Console\E2ETest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Console/E2ETest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Console\E2ETest::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Console/E2ETest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\Console\E2ETest::test_it_runs_configure_command_if_no_configuration`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Console/E2ETest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Console\E2ETest::runOnE2EFixture`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Console/E2ETest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Console\E2ETest::test_it_runs_on_itself`.'
 count = 1
 
 [[issues]]
@@ -10012,18 +8278,6 @@ count = 1
 file = "tests/phpunit/Container/ContainerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound` in `Infection\Tests\Container\ContainerTest::test_it_can_build_lazy_source_file_data_factory_that_fails_on_use`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Container/ContainerTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\ContainerExceptionInterface` in `Infection\Tests\Container\ContainerTest::test_it_can_be_instantiated_without_any_services`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Container/ContainerTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Psr\Container\NotFoundExceptionInterface` in `Infection\Tests\Container\ContainerTest::test_it_can_be_instantiated_without_any_services`.'
 count = 1
 
 [[issues]]
@@ -10633,12 +8887,6 @@ message = "Redundant type assertion: `$environmentVariables` of type `array<stri
 count = 1
 
 [[issues]]
-file = "tests/phpunit/EnvVariableManipulation/EnvBackup.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\EnvVariableManipulation\EnvBackup::restore`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/EnvVariableManipulation/EnvBackupTest.php"
 code = "non-existent-method"
 message = 'Method `assertfalse` does not exist on type `Infection\Tests\EnvVariableManipulation\EnvBackupTest`.'
@@ -10649,12 +8897,6 @@ file = "tests/phpunit/EnvVariableManipulation/EnvBackupTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\EnvVariableManipulation\EnvBackupTest`.'
 count = 4
-
-[[issues]]
-file = "tests/phpunit/EnvVariableManipulation/EnvBackupTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\EnvVariableManipulation\EnvBackupTest::test_it_can_backup_and_restore_environment_variables`.'
-count = 1
 
 [[issues]]
 file = "tests/phpunit/Environment/BuildContextResolverTest.php"
@@ -11175,24 +9417,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/FileSystem/FileSystemTestCase.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\FileSystem\FileSystemTestCase::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/FileSystemTestCase.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\FileSystem\FileSystemTestCase::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/FileSystemTestCase.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\FileSystemTestCase::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/FileSystemTestCase.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\FileSystemTestCase::setUp`.'
 count = 1
 
@@ -11283,30 +9507,6 @@ count = 2
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Finder\MockVendor::__construct`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Finder\MockVendor::setUpComposerBatchTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Finder\MockVendor::setUpPlatformTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Finder\MockVendor::setUpProjectBatchTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\Finder\MockVendor::__construct`.'
 count = 1
 
@@ -11385,30 +9585,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest::test_it_adds_vendor_bin_to_path_if_needed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest::test_it_finds_framework_executable`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest::test_it_finds_framework_script_from_bat`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest::test_invalid_custom_path_throws_exception`.'
 count = 1
 
@@ -11482,30 +9658,6 @@ count = 5
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "string-member-selector"
 message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\DirException` in `Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest::test_it_adds_vendor_bin_to_path_if_needed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest::test_it_finds_framework_executable`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest::test_it_finds_framework_script_from_bat`.'
 count = 1
 
 [[issues]]
@@ -11648,30 +9800,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileLocatorTest::invalidPathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileLocatorTest::multipleInvalidPathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileLocatorTest::multiplePathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileLocatorTest::pathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -11752,30 +9880,6 @@ count = 1
 file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\FileSystem\Locator\RootsFileOrDirectoryLocatorTest::test_it_can_locate_one_of_the_given_files`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileOrDirectoryLocatorTest::invalidPathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileOrDirectoryLocatorTest::multipleInvalidPathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileOrDirectoryLocatorTest::multiplePathsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\FileSystem\Locator\RootsFileOrDirectoryLocatorTest::pathsProvider`.'
 count = 1
 
 [[issues]]
@@ -12583,12 +10687,6 @@ message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tes
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Logger/Console/ConsoleLoggerTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Logger\Console\ConsoleLoggerTest::valueToCastProvider`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Logger/MutationAnalysis/ConsoleDotLoggerTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `detectionStatusProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -13352,6 +11450,12 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #4 of `infection\mutation\filemutationgenerator::__construct`: expected `Infection\Source\Matcher\SourceLineMatcher`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -13390,7 +11494,7 @@ count = 1
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "non-existent-method"
 message = 'Method `createstub` does not exist on type `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest`.'
-count = 1
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
@@ -14431,12 +12535,6 @@ message = "Type `iterable` in return type of `mutationsProvider` is imprecise, e
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Mutator/Extensions/MBStringTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\MiscException` in `Infection\Tests\Mutator\Extensions\MBStringTest::defineMissingMbCaseConstants`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Mutator/FunctionSignature/ProtectedVisibilityTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `mutationsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -14764,12 +12862,6 @@ count = 1
 file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorFixturesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Mutator\MutatorFixturesProvider::getFixtureFileContent`.'
 count = 1
 
 [[issues]]
@@ -15286,12 +13378,6 @@ count = 1
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/ProfileListProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Mutator\ProfileListProvider::implementedMutatorProvider`.'
 count = 1
 
 [[issues]]
@@ -16095,12 +14181,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/FileParserTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\PhpParser\FileParserTest::test_it_throws_upon_failure`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Throwable` in `Infection\Tests\PhpParser\FileParserTest::test_it_throws_upon_failure`.'
 count = 1
 
@@ -16238,12 +14318,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `visitorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `infection\tests\phpparser\nodetraverserfactorytest::getvisitorclassnames`: expected `list<class-string<PhpParser\NodeVisitor>>`, but found `list<string>`.'
 count = 1
@@ -16270,6 +14344,12 @@ count = 1
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorReflection`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
+code = "unused-method"
+message = "Method `setup()` is never used."
 count = 1
 
 [[issues]]
@@ -16339,51 +14419,9 @@ message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `scenarioProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `anything` does not exist on type `Infection\Tests\PhpParser\Visitor\AddTestsVisitor\AddTestsVisitorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\AddTestsVisitor\AddTestsVisitorTest`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `exactly` does not exist on type `Infection\Tests\PhpParser\Visitor\AddTestsVisitor\AddTestsVisitorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `never` does not exist on type `Infection\Tests\PhpParser\Visitor\AddTestsVisitor\AddTestsVisitorTest`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -16396,12 +14434,6 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\EnrichmentTraverseIntegrationTest::test_it_creates_a_rich_ast`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\EnrichmentTraverseIntegrationTest::nodeProvider`.'
 count = 1
 
 [[issues]]
@@ -16462,60 +14494,6 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/ExcludeIgnoredNodesVisitor/MarkAllButIneligibleNodesAsVisitedVisitorTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor\MarkAllButIneligibleNodesAsVisitedVisitorTest::test_it_labels_visited_nodes_as_visited_and_eligible_nodes_as_mutation_candidates`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeNonMutableCodeVisitor/ExcludeNonMutableCodeVisitorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `scenarioProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeNonMutableCodeVisitor/ExcludeNonMutableCodeVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\ExcludeNonMutableCodeVisitor\ExcludeNonMutableCodeVisitorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `expectnottoperformassertions` does not exist on type `Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitorTest::test_it_marks_nodes_belonging_to_unchanged_lines_as_ineligible`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUntestedNodesVisitorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUntestedNodesVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\ExcludeUntestedNodesVisitorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUntestedNodesVisitorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeUntestedNodesVisitorTest::test_it_marks_eligible_untested_nodes_as_ineligible`.'
 count = 1
 
 [[issues]]
@@ -16606,6 +14584,24 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/IgnoreNode/InterfaceIgnorerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\IgnoreNode\InterfaceIgnorerTest::test_it_ignores_interfaces`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/LabelMutationCandidatesVisitorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/LabelMutationCandidatesVisitorTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\LabelMutationCandidatesVisitorTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/LabelMutationCandidatesVisitorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\LabelMutationCandidatesVisitorTest::test_it_labels_visited_nodes_as_visited_and_eligible_nodes_as_mutation_candidates`.'
 count = 1
 
 [[issues]]
@@ -16813,21 +14809,9 @@ message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\Poten
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ReflectionVisitorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\PhpParser\Visitor\ReflectionVisitorTest::nodeProvider`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/SkipIgnoredNodesVisitorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/SkipIgnoredNodesVisitorTest.php"
-code = "non-existent-method"
-message = 'Method `assertfalse` does not exist on type `Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\SkipIgnoredNodesVisitorTest`.'
 count = 1
 
 [[issues]]
@@ -16839,7 +14823,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/SkipIgnoredNodesVisitorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\SkipIgnoredNodesVisitorTest::test_it_skips_the_traversal_of_ignored_nodes_and_its_children`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\SkipIgnoredNodesVisitorTest::test_it_annotates_the_next_nodes`.'
 count = 1
 
 [[issues]]
@@ -16893,12 +14877,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php"
 code = "non-existent-method"
-message = 'Method `assertfalse` does not exist on type `Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCaseTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php"
-code = "non-existent-method"
 message = 'Method `assertgreaterthanorequal` does not exist on type `Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCaseTest`.'
 count = 1
 
@@ -16930,12 +14908,6 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCaseTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php"
-code = "non-existent-method"
-message = 'Method `asserttrue` does not exist on type `Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCaseTest`.'
 count = 1
 
 [[issues]]
@@ -18134,18 +16106,6 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/Reporter/GitHubAnnotationsReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\GitHubAnnotationsReporterTest::test_it_reports_correctly_with_ci_github_workspace`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/GitHubAnnotationsReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\GitHubAnnotationsReporterTest::test_it_reports_correctly_with_custom_github_workspace`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/GitHubAnnotationsReporterTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -18173,30 +16133,6 @@ file = "tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php"
 code = "non-existent-method"
 message = 'Method `assertstringcontainsstring` does not exist on type `Infection\Tests\Reporter\GitLabCodeQualityReporterTest`.'
 count = 2
-
-[[issues]]
-file = "tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\GitLabCodeQualityReporterTest::test_it_reports_correctly_with_ci_project_dir`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\GitLabCodeQualityReporterTest::test_it_reports_correctly_with_custom_project_dir`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Reporter\GitLabCodeQualityReporterTest::assertReportedContentIs`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\UrlException` in `Infection\Tests\Reporter\GitLabCodeQualityReporterTest::createNonUtf8CharactersCollector`.'
-count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php"
@@ -18236,12 +16172,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -18262,36 +16192,6 @@ count = 1
 file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
 code = "possibly-null-argument"
 message = 'Argument #2 of method `infection\mutant\mutantexecutionresult::__construct` is possibly `null`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Reporter\Html\StrykerHtmlReportBuilderTest::initHtmlReportCollector`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\Reporter\Html\StrykerHtmlReportBuilderTest::metricsProvider`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Reporter\Html\StrykerHtmlReportBuilderTest::assertJsonDocumentMatchesSchema`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Reporter\Html\StrykerHtmlReportBuilderTest::test_it_reports_correctly_with_mutations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\UrlException` in `Infection\Tests\Reporter\Html\StrykerHtmlReportBuilderTest::initHtmlReportCollector`.'
 count = 1
 
 [[issues]]
@@ -18352,18 +16252,6 @@ count = 1
 file = "tests/phpunit/Reporter/JsonReporterTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Reporter\JsonReporterTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/JsonReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Reporter\JsonReporterTest::assertReportedContentIs`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/JsonReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\UrlException` in `Infection\Tests\Reporter\JsonReporterTest::createNonUtf8CharactersCollector`.'
 count = 1
 
 [[issues]]
@@ -18482,36 +16370,6 @@ count = 4
 
 [[issues]]
 file = "tests/phpunit/Reporter/StrykerReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\StrykerReporterTest::test_it_sends_report_missing_our_api_key`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/StrykerReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\StrykerReporterTest::test_it_sends_report_when_everything_is_ok_with_our_key_for_full_report`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/StrykerReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\StrykerReporterTest::test_it_sends_report_when_everything_is_ok_with_our_key`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/StrykerReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\StrykerReporterTest::test_it_sends_report_when_everything_is_ok_with_stryker_key_and_matching_branch_regex`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/StrykerReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Reporter\StrykerReporterTest::test_it_sends_report_when_everything_is_ok_with_stryker_key`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/StrykerReporterTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -18538,12 +16396,6 @@ count = 1
 file = "tests/phpunit/Reporter/SummaryJsonReporterTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Reporter\SummaryJsonReporterTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/SummaryJsonReporterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\JsonException` in `Infection\Tests\Reporter\SummaryJsonReporterTest::assertReportedContentIs`.'
 count = 1
 
 [[issues]]
@@ -18646,24 +16498,6 @@ count = 2
 file = "tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Resource\Memory\MemoryLimiterEnvironmentTest::test_it_does_not_use_the_system_ini_if_phpdbg_is_disabled_and_xdebug_handler_is_detected`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Resource\Memory\MemoryLimiterEnvironmentTest::setUp`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Resource\Memory\MemoryLimiterEnvironmentTest::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\InfoException` in `Infection\Tests\Resource\Memory\MemoryLimiterEnvironmentTest::test_it_can_detect_if_a_memory_limit_is_set`.'
 count = 1
 
 [[issues]]
@@ -19280,18 +17114,6 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/TestFramework/AdapterInstallationDeciderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\AdapterInstallationDeciderTest::test_it_should_install_when_user_answers_yes`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/AdapterInstallationDeciderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\StreamException` in `Infection\Tests\TestFramework\AdapterInstallationDeciderTest::test_it_should_install_when_user_answers_yes`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/AdapterInstallationDeciderTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
@@ -19795,33 +17617,15 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionBDDProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\CodeceptionBDDProvider::infoProvider`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionCestProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionCestProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\CodeceptionCestProvider::infoProvider`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionUnitProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionUnitProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\CodeceptionUnitProvider::infoProvider`.'
 count = 1
 
 [[issues]]
@@ -19857,18 +17661,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/JUnitTestFileDataProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::createJUnit`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/JUnitTestFileDataProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/JUnitTestFileDataProviderTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::setUp`.'
 count = 1
 
@@ -19891,21 +17683,9 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit09Provider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit09Provider::infoProvider`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit10Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit10Provider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit10Provider::infoProvider`.'
 count = 1
 
 [[issues]]
@@ -19915,21 +17695,9 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit11Provider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit11Provider::infoProvider`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit12Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit12Provider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit12Provider::infoProvider`.'
 count = 1
 
 [[issues]]
@@ -20547,18 +18315,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser\IndexXmlCoverageParserTest::tearDown`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser\IndexXmlCoverageParserTest::test_it_errors_when_no_lines_were_executed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser\IndexXmlCoverageParserTest::setUp`.'
 count = 1
 
@@ -20656,12 +18412,6 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/PhpUnitXmlCoverageTraceProviderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound` in `Infection\Tests\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProviderTest::test_it_can_parse_coverage_data`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/XmlReport/PhpUnitXmlCoverageTraceProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProviderTest::test_it_can_parse_coverage_data`.'
 count = 1
 
 [[issues]]
@@ -21145,168 +18895,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidX
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::createConfigBuilder`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_adds_execution_order_for_proper_phpunit_versions`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_builds_and_dump_the_xml_configuration`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_creates_a_configuration`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_creates_coverage_filter_whitelist_node_if_does_not_exist_and_version_situation_is_uncertain`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_creates_coverage_filter_whitelist_node_if_does_not_exist`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_creates_coverage_include_node_if_does_not_exist_for_10_0_version_of_phpunit`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_creates_source_include_node_if_does_not_exist_for_10_1_version_of_phpunit`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_deactivates_stderr_redirection`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_deactivates_the_colors`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_disables_caching`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_add_coverage_loggers_ever_for_latest_configuration`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_add_coverage_loggers_ever_for_legacy_configuration`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_create_coverage_filter_whitelist_node_if_already_exist`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_create_coverage_include_node_if_already_exist`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_create_legacy_coverage_filter_whitelist_node_for_10_0_version_of_phpunit`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_update_order_if_it_is_already_set`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_removes_original_loggers`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_removes_printer_class`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_replaces_bootstrap_file`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_replaces_coverage_filter_include_node_if_exists_but_filtered_source_files_provided`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_replaces_relative_path_to_absolute_path`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_sets_stops_on_failure`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\SimplexmlException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_builds_and_dump_the_xml_configuration`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `failOnProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -21412,144 +19000,6 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::queryXpath`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\ExecException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::assertPHPSyntaxIsValid`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::createConfigBuilder`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_interceptor_is_included`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_builds_and_dump_the_xml_configuration`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_can_build_the_config_for_multiple_mutations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_deactivates_the_colors`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_does_not_set_default_execution_order_for_phpunit_7_1`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_does_not_update_fail_on_warning_attributes_if_it_is_already_set`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_handles_root_test_suite`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_preserves_white_spaces_and_formatting`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_removes_default_test_suite`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_removes_original_loggers`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_removes_printer_class`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_custom_autoloader_when_attribute_is_absent`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_custom_autoloader`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_default_execution_order_when_attribute_is_absent_for_phpunit_7_2`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_default_execution_order_when_attribute_is_present_for_phpunit_7_2`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_defects_execution_order_and_cache_result_when_attribute_is_present_for_phpunit_7_3`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_sorted_list_of_test_files`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_sets_stops_on_failure`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\SimplexmlException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::test_it_builds_and_dump_the_xml_configuration`.'
 count = 1
 
 [[issues]]
@@ -21736,18 +19186,6 @@ count = 1
 file = "tests/phpunit/TestFramework/TestFrameworkExtraOptionsFilterTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\TestFrameworkExtraOptionsFilterTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/TestFrameworkExtraOptionsFilterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\PcreException` in `Infection\Tests\TestFramework\TestFrameworkExtraOptionsFilterTest::test_it_skips_filter_for_mutant_process`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/TestFrameworkExtraOptionsFilterTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\StringsException` in `Infection\Tests\TestFramework\TestFrameworkExtraOptionsFilterTest::test_it_skips_filter_for_mutant_process`.'
 count = 1
 
 [[issues]]
@@ -22537,24 +19975,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidX
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_with_a_namespace_registered`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_can_be_created_for_an_xml_string_without_a_namespace`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Safe\Exceptions\FilesystemException` in `Infection\Tests\TestFramework\XML\SafeDOMXPath\SafeDOMXPathTest::test_it_cannot_be_created_for_an_xml_string_with_a_namespace_registered_if_the_document_has_no_namespace`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Testing/BaseMutatorTestCaseIntegrationTest.php"
 code = "non-existent-method"
 message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\Testing\BaseMutatorTestCaseIntegrationTest`.'
@@ -22622,12 +20042,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestingUtility/Iterable/NonRewindableIteratorTest.php"
-code = "invalid-array-index"
-message = '''Invalid index type `('TKey.infection\tests\testingutility\iterable\nonrewindableiteratortest::toarraywithoutrewind() extends mixed)|null` used for array access on `array<('TKey.infection\tests\testingutility\iterable\nonrewindableiteratortest::toarraywithoutrewind() extends mixed)|string(''), ('TValue.infection\tests\testingutility\iterable\nonrewindableiteratortest::toarraywithoutrewind() extends mixed)|null>`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/Iterable/NonRewindableIteratorTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\TestingUtility\Iterable\NonRewindableIteratorTest`.'
 count = 2
@@ -22690,12 +20104,6 @@ count = 1
 file = "tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowables.php"
 code = "non-existent-method"
 message = 'Method `fail` does not exist on type `Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowables.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `PHPUnit\Exception` in `Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables::expectToThrow`.'
 count = 1
 
 [[issues]]

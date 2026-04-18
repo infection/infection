@@ -32,6 +32,7 @@ assertion-style = { enabled = true, style = "this" }
 
 [analyzer]
 baseline = "devTools/mago-baseline.toml"
+minimum-fail-level = "warning"
 plugins = []
 find-unused-definitions = true
 find-unused-expressions = true
@@ -42,7 +43,9 @@ check-throws = true
 unchecked-exceptions = [
     "LogicException",
     "Error",
-    "PHPUnit\\Framework\\Exception",
+    "PHPUnit\\Exception",
+    "Psr\\Container\\ContainerExceptionInterface",
+    "Safe\\Exceptions\\SafeExceptionInterface",
 ]
 check-missing-override = false
 find-unused-parameters = true
