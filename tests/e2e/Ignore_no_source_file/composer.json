@@ -13,9 +13,6 @@
         }
     },
     "config": {
-        "sort-packages": true,
-        "audit": {
-            "block-insecure": false
-        }
+        "sort-packages": true
     }
 }
