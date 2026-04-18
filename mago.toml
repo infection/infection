@@ -24,7 +24,6 @@ excludes = [
     "tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php",
     "tests/phpunit/Mutation/FileMutationGenerator/Fixtures",
     "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures",
-    "tests/phpunit/WithConsecutive.php",
 ]
 
 [source.glob]
