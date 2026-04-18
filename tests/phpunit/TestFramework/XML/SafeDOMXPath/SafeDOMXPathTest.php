@@ -33,11 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\SafeDOMXPath;
+namespace Infection\Tests\TestFramework\XML\SafeDOMXPath;
 
 use DOMDocument;
 use DOMNode;
-use Infection\TestFramework\SafeDOMXPath;
+use Exception;
+use Infection\TestFramework\XML\InvalidXml;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -154,7 +156,7 @@ final class SafeDOMXPathTest extends TestCase
         $pathname = __DIR__ . '/invalid.xml';
 
         $this->expectExceptionObject(
-            new InvalidArgumentException(
+            new InvalidXml(
                 sprintf(
                     'The file "%s" does not contain valid XML.',
                     $pathname,
@@ -309,15 +311,38 @@ final class SafeDOMXPathTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string(): void
+    #[DataProvider('invalidXmlProvider')]
+    public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string(
+        string $invalidXml,
+        Exception $expected,
+    ): void {
+        $this->expectExceptionObject($expected);
+
+        SafeDOMXPath::fromString($invalidXml);
+    }
+
+    public static function invalidXmlProvider(): iterable
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException(
+        yield 'empty string' => [
+            '',
+            new InvalidXml(
+                'The string "" is not valid XML.',
+            ),
+        ];
+
+        yield 'blank string' => [
+            ' ',
+            new InvalidXml(
+                'The string " " is not valid XML.',
+            ),
+        ];
+
+        yield 'a non XML string' => [
+            'Hello world!',
+            new InvalidXml(
                 'The string "Hello world!" is not valid XML.',
             ),
-        );
-
-        SafeDOMXPath::fromString('Hello world!');
+        ];
     }
 
     public function test_it_can_query_elements(): void

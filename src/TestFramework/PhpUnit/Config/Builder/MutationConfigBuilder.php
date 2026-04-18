@@ -42,8 +42,8 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\file_put_contents;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -124,7 +124,6 @@ class MutationConfigBuilder extends ConfigBuilder
     private function getXPath(): SafeDOMXPath
     {
         if ($this->xPath === null) {
-            /** @psalm-suppress InaccessibleProperty */
             $this->xPath = SafeDOMXPath::fromString(
                 $this->originalXmlConfigContent,
                 preserveWhiteSpace: false,

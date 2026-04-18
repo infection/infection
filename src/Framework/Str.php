@@ -64,9 +64,6 @@ final class Str
         "\r" => "\n",
     ];
 
-    /**
-     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
-     */
     public static function toSystemLineEndings(string $value): string
     {
         return strtr(
@@ -75,9 +72,6 @@ final class Str
         );
     }
 
-    /**
-     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
-     */
     public static function toUnixLineEndings(string $value): string
     {
         return strtr(
@@ -183,8 +177,6 @@ final class Str
     }
 
     /**
-     * @psalm-suppress InvalidArrayOffset,InvalidReturnStatement,InvalidReturnType
-     *
      * @param list<string> $lines
      * @param int<0,max> $firstNonEmptyLineIndex
      *

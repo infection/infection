@@ -38,10 +38,10 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
+use Infection\TestFramework\XML\InvalidXml;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
-use InvalidArgumentException;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -167,7 +167,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
         yield 'invalid XML' => [
             '',
             'Acme\Service',
-            InvalidArgumentException::class,
+            InvalidXml::class,
         ];
     }
 

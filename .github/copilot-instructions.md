@@ -51,7 +51,6 @@ vendor/bin/phpunit --filter=MutatorGenerator        # Run specific test (replace
 - `infection.json5` - Infection's own configuration
 - `phpunit.xml.dist` - PHPUnit configuration
 - `.php-cs-fixer.php` - Code style rules
-- `psalm.xml` - Static analysis configuration
 
 ## Coding Standards
 
