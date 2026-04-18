@@ -24,9 +24,6 @@ PHPSTAN=./vendor/bin/phpstan
 RECTOR=./vendor/bin/rector
 COLLISION_DETECTOR=./vendor/bin/detect-collisions
 
-PSALM=./.tools/psalm
-PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
-
 PHPUNIT_BIN=vendor/phpunit/phpunit/phpunit
 CI ?=
 PHPUNIT=$(PHPUNIT_BIN)$(if $(CI), --no-progress,)
@@ -93,17 +90,9 @@ phpstan: vendor $(PHPSTAN)
 phpstan-baseline: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
 
-.PHONY: psalm-baseline
-psalm-baseline: vendor
-	$(PSALM) --threads=max --set-baseline=devTools/psalm-baseline.xml
-
 .PHONY: detect-collisions
 detect-collisions: vendor $(PHPSTAN)
 	$(COLLISION_DETECTOR) --configuration devTools/collision-detector.json
-
-.PHONY: psalm
-psalm: vendor $(PSALM)
-	$(PSALM) --threads=max --use-baseline=devTools/psalm-baseline.xml
 
 .PHONY: rector
 rector: vendor $(RECTOR)
@@ -182,7 +171,7 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan psalm validate test-autoreview rector-check detect-collisions
+autoreview: cs-check phpstan validate test-autoreview rector-check detect-collisions
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -279,11 +268,6 @@ $(PHP_CS_FIXER): Makefile
 	touch -c $@
 
 $(PHPSTAN): vendor
-	touch -c $@
-
-$(PSALM): Makefile
-	wget -q $(PSALM_URL) --output-document=$(PSALM)
-	chmod a+x $(PSALM)
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD

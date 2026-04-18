@@ -168,8 +168,6 @@ final class FilterBuilder
     }
 
     /**
-     * @psalm-suppress InvalidReturnType, InvalidReturnStatement
-     *
      * @return array{string, string}
      */
     private static function splitMethodNameFromProviderKey(
