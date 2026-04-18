@@ -44,8 +44,8 @@ use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\XML\SafeDOMXPath;
-use function Safe\file_put_contents;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /**
@@ -63,6 +63,7 @@ class MutationConfigBuilder extends ConfigBuilder
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly string $projectDir,
         private readonly TestRunOrderResolver $testRunOrderResolver,
+        private readonly Filesystem $filesystem,
     ) {
     }
 
@@ -105,7 +106,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($tests, $xPath);
 
-        file_put_contents(
+        $this->filesystem->dumpFile(
             $customAutoloadFilePath,
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
@@ -116,7 +117,10 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $path = $this->buildPath($mutationHash);
 
-        file_put_contents($path, $xPath->document->saveXML());
+        $this->filesystem->dumpFile(
+            $path,
+            $xPath->document->saveXML(),
+        );
 
         return $path;
     }

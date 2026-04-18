@@ -40,8 +40,8 @@ use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\XML\SafeDOMXPath;
-use function Safe\file_put_contents;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -61,6 +61,7 @@ class InitialConfigBuilder implements ConfigBuilder
         string $originalXmlConfigContent,
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly XmlConfigurationVersionProvider $versionProvider,
+        private readonly Filesystem $filesystem,
         private readonly array $srcDirs,
         private readonly array $filteredSourceFilesToMutate,
     ) {
@@ -94,7 +95,10 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        file_put_contents($path, $xPath->document->saveXML());
+        $this->filesystem->dumpFile(
+            $path,
+            $xPath->document->saveXML(),
+        );
 
         return $path;
     }
