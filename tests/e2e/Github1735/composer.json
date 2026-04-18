@@ -11,5 +11,10 @@
         "psr-4": {
             "Github1735\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }
