@@ -11,10 +11,5 @@
         "psr-4": {
             "ProfileIgnoreCombination\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

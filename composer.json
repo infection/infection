@@ -104,12 +104,6 @@
         "allow-plugins": {
             "phpstan/extension-installer": true,
             "infection/extension-installer": true
-        },
-        "audit": {
-            "ignore": {
-                "PKSA-5jz8-6tcw-pbk4": "PHPUnit argument injection - no fix in 11.x line",
-                "PKSA-z3gr-8qht-p93v": "PHPUnit security advisory - no fix in 11.x line"
-            }
         }
     },
     "autoload": {

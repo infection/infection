@@ -12,10 +12,5 @@
         "psr-4": {
             "PHPStan_Integration\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }
