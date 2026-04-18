@@ -281,6 +281,38 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertSame(1, $coverageIncludeFiles->length);
     }
 
+    public function test_it_does_not_replace_coverage_filter_include_node_for_phpunit_12_even_if_filtered_source_files_provided(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'));
+
+        $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
+        $coverageIncludeDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeFiles);
+        $this->assertSame(0, $coverageIncludeFiles->length);
+
+        $this->assertInstanceOf(DOMNodeList::class, $coverageIncludeDirectories);
+        $this->assertGreaterThanOrEqual(1, $coverageIncludeDirectories->length);
+    }
+
+    public function test_it_ignores_filtered_source_files_for_phpunit_12_when_creating_source_include_node(): void
+    {
+        $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
+
+        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'));
+
+        $sourceIncludeFiles = $this->queryXpath($xml, '/phpunit/source/include/file');
+        $sourceIncludeDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
+
+        $this->assertInstanceOf(DOMNodeList::class, $sourceIncludeFiles);
+        $this->assertSame(0, $sourceIncludeFiles->length);
+
+        $this->assertInstanceOf(DOMNodeList::class, $sourceIncludeDirectories);
+        $this->assertSame(2, $sourceIncludeDirectories->length);
+    }
+
     public function test_it_creates_coverage_include_node_if_does_not_exist_for_10_0_version_of_phpunit(): void
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
