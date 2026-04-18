@@ -11,10 +11,5 @@
         "psr-4": {
             "Test_PHP_Options_Config\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

@@ -14,10 +14,5 @@
     },
     "require": {
         "webmozart/assert": "^1.9"
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

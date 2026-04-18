@@ -12,10 +12,5 @@
         "psr-4": {
             "Stream_Wrapper_Execution\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

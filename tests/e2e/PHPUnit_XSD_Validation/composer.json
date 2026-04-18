@@ -11,10 +11,5 @@
         "psr-4": {
             "PHPUnit_XSD_Validation\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

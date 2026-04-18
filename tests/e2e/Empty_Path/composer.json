@@ -11,10 +11,5 @@
         "psr-4": {
             "EmptyPass\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

@@ -11,10 +11,5 @@
         "psr-4": {
             "ExceptionCode\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

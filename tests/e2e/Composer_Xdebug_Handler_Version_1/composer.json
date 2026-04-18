@@ -14,10 +14,5 @@
     },
     "require": {
         "composer/xdebug-handler": "^1"
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

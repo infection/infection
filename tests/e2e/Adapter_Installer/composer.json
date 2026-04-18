@@ -11,10 +11,5 @@
         "psr-4": {
             "Adapter_Installer\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }

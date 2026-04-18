@@ -11,10 +11,5 @@
         "psr-4": {
             "Syntax_Error_PHPUnit\\Test\\": "tests/"
         }
-    },
-    "config": {
-        "audit": {
-            "block-insecure": false
-        }
     }
 }
