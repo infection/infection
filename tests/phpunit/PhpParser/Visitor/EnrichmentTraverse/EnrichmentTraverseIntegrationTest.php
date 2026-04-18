@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor\EnrichmentTraverse;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Container\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SimpleSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
@@ -67,32 +69,17 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         ?array $changedLinesRange,
         string $expected,
     ): void {
-        $traverserFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
-
-        $sourceLineMatcher = $changedLinesRange === null
-            ? new NullSourceLineMatcher()
-            : new SimpleSourceLineMatcher($changedLinesRange);
-
-        $source = new MockSplFileInfo(realPath: '/path/to/source.php');
-
-        $traceMock = $this->createMock(Trace::class);
-        $traceMock
-            ->method('getAllTestsForMutation')
-            ->willReturn([
-                new TestLocation(
-                    'someMethod',
-                    '/path/to/test.php',
-                    0.23,
-                ),
-            ]);
+        $traverserFactory = $this
+            ->createContainer($changedLinesRange)
+            ->getNodeTraverserFactory();
 
         $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
         $traverserFactory
             ->createEnrichmentTraverser(
-                $source,
-                $traceMock,
+                new MockSplFileInfo(realPath: '/path/to/source.php'),
+                $this->createTraceMock(),
             )
             ->traverse($nodes);
         $traversedNodes = $traverserFactory
@@ -1324,7 +1311,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     )
                                     2: Stmt_ClassMethod(
                                         name: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             endLine: 44
                                             functionName: concreteMethod
                                             functionScope: nodeId(14)
@@ -1335,12 +1322,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             parent: nodeId(14)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             startLine: 44
-                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
-                                                    eligible: true
+                                                    eligible: false
                                                     endLine: 44
                                                     functionName: concreteMethod
                                                     functionScope: nodeId(14)
@@ -1352,10 +1338,9 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     parent: nodeId(16)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     startLine: 44
-                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
-                                                    eligible: true
+                                                    eligible: false
                                                     endLine: 44
                                                     functionName: concreteMethod
                                                     functionScope: nodeId(14)
@@ -1367,9 +1352,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     parent: nodeId(16)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     startLine: 44
-                                                    tests: Closure
                                                 )
-                                                eligible: true
+                                                eligible: false
                                                 endLine: 44
                                                 functionName: concreteMethod
                                                 functionScope: nodeId(14)
@@ -1381,11 +1365,10 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 parent: nodeId(14)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 startLine: 44
-                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             endLine: 44
                                             functionName: concreteMethod
                                             functionScope: nodeId(14)
@@ -1396,7 +1379,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             parent: nodeId(14)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             startLine: 44
-                                            tests: Closure
                                         )
                                         stmts: array(
                                             0: Stmt_If(
@@ -1461,7 +1443,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     0: Stmt_Echo(
                                                         exprs: array(
                                                             0: Scalar_String(
-                                                                eligible: true
+                                                                eligible: false
                                                                 endLine: 47
                                                                 functionName: concreteMethod
                                                                 functionScope: nodeId(14)
@@ -1474,10 +1456,9 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                 rawValue: 'nothing to do'
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                                 startLine: 47
-                                                                tests: Closure
                                                             )
                                                         )
-                                                        eligible: true
+                                                        eligible: false
                                                         endLine: 47
                                                         functionName: concreteMethod
                                                         functionScope: nodeId(14)
@@ -1489,7 +1470,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         parent: nodeId(20)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         startLine: 47
-                                                        tests: Closure
                                                     )
                                                 )
                                                 else: Stmt_Else(
@@ -1497,7 +1477,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                         0: Stmt_Expression(
                                                             expr: Expr_FuncCall(
                                                                 name: Expr_Variable(
-                                                                    eligible: true
+                                                                    eligible: false
                                                                     endLine: 49
                                                                     functionName: concreteMethod
                                                                     functionScope: nodeId(14)
@@ -1508,9 +1488,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                     parent: nodeId(29)
                                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                                     startLine: 49
-                                                                    tests: Closure
                                                                 )
-                                                                eligible: true
+                                                                eligible: false
                                                                 endLine: 49
                                                                 functionName: concreteMethod
                                                                 functionScope: nodeId(14)
@@ -1521,9 +1500,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                                 parent: nodeId(28)
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                                 startLine: 49
-                                                                tests: Closure
                                                             )
-                                                            eligible: true
+                                                            eligible: false
                                                             endLine: 49
                                                             functionName: concreteMethod
                                                             functionScope: nodeId(14)
@@ -1534,10 +1512,9 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                             parent: nodeId(27)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                                             startLine: 49
-                                                            tests: Closure
                                                         )
                                                     )
-                                                    eligible: true
+                                                    eligible: false
                                                     endLine: 50
                                                     functionName: concreteMethod
                                                     functionScope: nodeId(14)
@@ -1549,7 +1526,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     parent: nodeId(20)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     startLine: 48
-                                                    tests: Closure
                                                 )
                                                 eligible: true
                                                 endLine: 50
@@ -1580,7 +1556,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                     )
                                     3: Stmt_ClassMethod(
                                         name: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             endLine: 53
                                             functionName: abstractMethod
                                             functionScope: nodeId(31)
@@ -1591,12 +1567,11 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             parent: nodeId(31)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             startLine: 53
-                                            tests: Closure
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
-                                                    eligible: true
+                                                    eligible: false
                                                     endLine: 53
                                                     functionName: abstractMethod
                                                     functionScope: nodeId(31)
@@ -1608,10 +1583,9 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     parent: nodeId(33)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     startLine: 53
-                                                    tests: Closure
                                                 )
                                                 var: Expr_Variable(
-                                                    eligible: true
+                                                    eligible: false
                                                     endLine: 53
                                                     functionName: abstractMethod
                                                     functionScope: nodeId(31)
@@ -1623,9 +1597,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                     parent: nodeId(33)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     startLine: 53
-                                                    tests: Closure
                                                 )
-                                                eligible: true
+                                                eligible: false
                                                 endLine: 53
                                                 functionName: abstractMethod
                                                 functionScope: nodeId(31)
@@ -1637,11 +1610,10 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                                 parent: nodeId(31)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 startLine: 53
-                                                tests: Closure
                                             )
                                         )
                                         returnType: Identifier(
-                                            eligible: true
+                                            eligible: false
                                             endLine: 53
                                             functionName: abstractMethod
                                             functionScope: nodeId(31)
@@ -1652,9 +1624,8 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                             parent: nodeId(31)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             startLine: 53
-                                            tests: Closure
                                         )
-                                        eligible: true
+                                        eligible: false
                                         endLine: 55
                                         functionName: abstractMethod
                                         isOnFunctionSignature: true
@@ -1664,7 +1635,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         startLine: 53
-                                        tests: Closure
                                     )
                                 )
                                 eligible: false
@@ -2198,5 +2168,38 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 )
                 AST,
         ];
+    }
+
+    /**
+     * @param list<ChangedLinesRange>|null $changedLinesRange
+     */
+    private function createContainer(
+        ?array $changedLinesRange,
+    ): Container {
+        $sourceLineMatcher = $changedLinesRange === null
+            ? new NullSourceLineMatcher()
+            : new SimpleSourceLineMatcher($changedLinesRange);
+
+        return SingletonContainer::getContainer()
+            ->cloneWithService(
+                SourceLineMatcher::class,
+                $sourceLineMatcher,
+            );
+    }
+
+    private function createTraceMock(): Trace
+    {
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->method('getAllTestsForMutation')
+            ->willReturn([
+                new TestLocation(
+                    'someMethod',
+                    '/path/to/test.php',
+                    0.23,
+                ),
+            ]);
+
+        return $traceMock;
     }
 }
