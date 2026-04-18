@@ -138,7 +138,6 @@ final readonly class TeamCity
             $attributes['expected'] = $to;
         }
 
-        /** @psalm-suppress InvalidArgument */
         return $this->write($messageName, $attributes);
     }
 
@@ -164,8 +163,6 @@ final readonly class TeamCity
     }
 
     /**
-     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
-     *
      * @return TestClosingMessage
      */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
@@ -214,8 +211,6 @@ final readonly class TeamCity
     }
 
     /**
-     * @psalm-suppress InvalidReturnType
-     *
      * @return non-empty-string
      */
     private static function escapeValue(string|int|float $value): string
@@ -237,7 +232,6 @@ final readonly class TeamCity
             );
         }
 
-        /** @psalm-suppress InvalidReturnStatement */
         return $escapedValue;
     }
 }

@@ -18,8 +18,6 @@
 /phpbench.json          export-ignore
 /phpunit.xml.dist       export-ignore
 /phpunit_autoreview.xml export-ignore
-/psalm.xml              export-ignore
-/psalm-baseline.xml     export-ignore
 /rector.php             export-ignore
 /scoper.inc.php         export-ignore
 /setup_environment.sh   export-ignore

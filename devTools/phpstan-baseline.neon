@@ -436,6 +436,18 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
 
 		-
+			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
 			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string, 2?: ''/phpunit''}.'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -1249,12 +1261,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
 
 		-
-			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
-			identifier: property.notFound
-			count: 2
-			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
-
-		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
 			count: 1
@@ -1283,4 +1289,10 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
+
+		-
+			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
