@@ -250,9 +250,7 @@ final class DumpAstCommand extends BaseCommand
             ),
         );
 
-        /** @psalm-suppress InvalidArrayAccess */
         $startLine = (int) $parts[0];
-        /** @psalm-suppress InvalidArrayAccess */
         $endLine = (int) $parts[1];
 
         Assert::natural($startLine);
@@ -286,8 +284,8 @@ final class DumpAstCommand extends BaseCommand
                 logger: $logger,
                 output: $io->getOutput(),
                 configFile: $configFile,
-                sourceFilter: SourceFilterOptions::get($io),
                 withUncovered: true,
+                sourceFilter: SourceFilterOptions::get($io),
             );
 
         if ($changedLinesRanges !== null) {

@@ -100,7 +100,6 @@ final readonly class MBString implements ConfigurableMutator
 
     /**
      * @psalm-mutation-free
-     * @psalm-suppress ImpureMethodCall
      *
      * @return iterable<Node\Expr\FuncCall>
      */

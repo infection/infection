@@ -58,7 +58,6 @@ use const JSON_UNESCAPED_SLASHES;
 use OutOfBoundsException;
 use RuntimeException;
 use function Safe\file_get_contents;
-use function Safe\file_put_contents;
 use function Safe\glob;
 use function Safe\json_decode;
 use function Safe\json_encode;
@@ -68,6 +67,7 @@ use function str_starts_with;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -164,7 +164,14 @@ final class ConfigureCommand extends BaseCommand
         $textLogFileProvider = new TextLogFileProvider($consoleHelper, $questionHelper);
         $textLogFilePath = $textLogFileProvider->get($io, $dirsInCurrentDir);
 
-        $this->saveConfig($sourceDirs, $excludedDirs, $phpUnitConfigPath, $phpUnitCustomExecutablePath, $textLogFilePath);
+        $this->saveConfig(
+            $fileSystem,
+            $sourceDirs,
+            $excludedDirs,
+            $phpUnitConfigPath,
+            $phpUnitCustomExecutablePath,
+            $textLogFilePath,
+        );
 
         $io->newLine();
         $io->writeln(sprintf(
@@ -181,6 +188,7 @@ final class ConfigureCommand extends BaseCommand
      * @param string[] $excludedDirs
      */
     private function saveConfig(
+        Filesystem $filesystem,
         array $sourceDirs,
         array $excludedDirs,
         ?string $phpUnitConfigPath = null,
@@ -228,7 +236,7 @@ final class ConfigureCommand extends BaseCommand
             '@default' => true,
         ];
 
-        file_put_contents(
+        $filesystem->dumpFile(
             SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
             json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );

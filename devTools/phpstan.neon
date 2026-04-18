@@ -89,6 +89,12 @@ parameters:
         -
             identifier: missingType.iterableValue
             path: ../src/FileSystem/FakeFileSystem.php
+        -
+            message: "#Do not use magic number as default parameter#"
+            path: ../src/FileSystem/InMemoryFileSystem.php
+        -
+            identifier: missingType.iterableValue
+            path: ../src/FileSystem/InMemoryFileSystem.php
 
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -

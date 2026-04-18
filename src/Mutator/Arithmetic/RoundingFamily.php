@@ -86,7 +86,6 @@ final class RoundingFamily implements Mutator
     {
         /** @var Node\Name $name */
         $name = $node->name;
-        /** @psalm-suppress ImpureMethodCall */
         $currentFunctionName = $name->toLowerString();
 
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);

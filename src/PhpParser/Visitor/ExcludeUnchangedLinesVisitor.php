@@ -61,7 +61,6 @@ final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
 
     private function excludeUntouchedNodes(Node $node): void
     {
-        /** @psalm-suppress InvalidArgument */
         $touches = $this->sourceLineMatcher->touches(
             $this->filePath,
             $node->getStartLine(),

@@ -295,6 +295,66 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
+    public function test_it_keeps_existing_source_include_directories_when_all_files_are_mutated(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <directory>custom-src/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <directory>custom-src/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_replaces_existing_source_include_directories_with_files_when_filtered_sources_are_provided(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <directory>src/</directory>
+                      <directory>examples/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes(
+                    $xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php'],
+                );
+            },
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <file>src/File1.php</file>
+                      <file>example/File2.php</file>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+        );
+    }
+
     public function test_it_removes_existing_loggers_from_post_93_configuration(): void
     {
         $this->assertItChangesPostPHPUnit93Configuration(
