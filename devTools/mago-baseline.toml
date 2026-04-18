@@ -11499,12 +11499,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "mixed-argument"
-message = "Cannot unpack argument of type `mixed` because it is not guaranteed to be iterable."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
-code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
 count = 3
 
@@ -11537,12 +11531,6 @@ file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Mutation\MutationGeneratorTest`.'
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
-code = "non-existent-method"
-message = 'Method `create` does not exist on type `Infection\Tests\WithConsecutive`.'
-count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
@@ -12501,12 +12489,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/IgnoreMutatorTest.php"
 code = "mixed-argument"
-message = "Cannot unpack argument of type `mixed` because it is not guaranteed to be iterable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/IgnoreMutatorTest.php"
-code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
 count = 8
 
@@ -12532,12 +12514,6 @@ count = 3
 file = "tests/phpunit/Mutator/IgnoreMutatorTest.php"
 code = "non-existent-method"
 message = 'Method `asserttrue` does not exist on type `Infection\Tests\Mutator\IgnoreMutatorTest`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/IgnoreMutatorTest.php"
-code = "non-existent-method"
-message = 'Method `create` does not exist on type `Infection\Tests\WithConsecutive`.'
 count = 1
 
 [[issues]]
@@ -15345,12 +15321,6 @@ count = 8
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-argument"
-message = "Cannot unpack argument of type `mixed` because it is not guaranteed to be iterable."
-count = 11
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\Builder\InvocationMocker::method`: expected `PHPUnit\Framework\Constraint\Constraint|PHPUnit\Framework\MockObject\Runtime\PropertyHook|string`, but found `mixed`.'
 count = 8
 
@@ -15461,12 +15431,6 @@ file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "non-existent-method"
 message = 'Method `callback` does not exist on type `Infection\Tests\Process\Runner\MutationTestingRunnerTest`.'
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "non-existent-method"
-message = 'Method `create` does not exist on type `Infection\Tests\WithConsecutive`.'
-count = 11
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
@@ -20405,3 +20369,51 @@ file = "tests/phpunit/UnsupportedMethodTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\UnsupportedMethodTest`.'
 count = 2
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "imprecise-type"
+message = "Type `array` in return type of `create` is imprecise, equivalent to `array<array-key, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "invalid-iterator"
+message = "The expression provided to `foreach` is not iterable. It resolved to type `mixed`, which is not iterable."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "invalid-return-tag"
+message = "Failed to resolve `@return` type string."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "missing-parameter-type"
+message = "Parameter `$parameterGroups` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `count`: expected `Countable|array<array-key, mixed>`, but found `mixed`."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "possibly-null-operand"
+message = "Right operand in `<` comparison might be `null` (type `non-negative-int|null`)."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/WithConsecutive.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\WithConsecutive::create`.'
+count = 1
