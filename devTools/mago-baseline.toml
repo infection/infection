@@ -1413,7 +1413,7 @@ count = 1
 [[issues]]
 file = "src/Framework/Enum/EnumBucket.php"
 code = "redundant-type-comparison"
-message = '''Redundant type assertion: `$value` of type `('T.infection\framework\enum\enumbucket extends BackedEnum)` is always not `BackedEnum|BackedEnum`.'''
+message = '''Redundant type assertion: `$value` of type `('T.infection\framework\enum\enumbucket extends BackedEnum)` is always not `BackedEnum`.'''
 count = 1
 
 [[issues]]

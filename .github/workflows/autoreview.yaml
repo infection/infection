@@ -62,13 +62,6 @@ jobs:
           key: "${{ matrix.php-version }}-phpstan-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-phpstan"
 
-      - name: Configure Psalm GitHub Actions cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ./var/cache/psalm
-          key: "${{ matrix.php-version }}-psalm-${{ github.run_id }}"
-          restore-keys: "${{ matrix.php-version }}-psalm"
-
       - name: Get composer cache directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT

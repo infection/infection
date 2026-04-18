@@ -96,12 +96,10 @@ final class BasicConsoleLogger extends AbstractLogger implements LoggerInterface
             'The log level %s does not exist',
         );
 
-        /** @psalm-suppress InvalidArrayOffset */
         $output = self::FORMAT_LEVEL_MAP[$level] === self::ERROR
             ? $this->errorOutput
             : $this->output;
 
-        /** @psalm-suppress InvalidArrayOffset */
         if ($output->getVerbosity() >= self::VERBOSITY_LEVEL_MAP[$level]) {
             $output->write(
                 (string) $message,

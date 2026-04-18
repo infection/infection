@@ -77,7 +77,6 @@ final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        /** @psalm-suppress InvalidArgument */
         if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return null;
         }
