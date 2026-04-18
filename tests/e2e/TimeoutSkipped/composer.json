@@ -11,5 +11,10 @@
         "psr-4": {
             "TimeoutSkipped\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }
