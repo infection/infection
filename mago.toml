@@ -13,9 +13,17 @@ paths = [
 ]
 includes = ["vendor"]
 excludes = [
+    "src/FileSystem/DummyFileSystem.php",
+    "src/CustomMutator/templates",
     "tests/benchmark/MutationGenerator/sources",
     "tests/benchmark/Tracing/benchmark-source",
-    "tests/benchmark/Tracing/coverage"
+    "tests/benchmark/Tracing/coverage",
+    "tests/benchmark/Tracing/sources",
+    "tests/phpunit/Fixtures",
+    "tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php",
+    "tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php",
+    "tests/phpunit/Mutation/FileMutationGenerator/Fixtures",
+    "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures",
 ]
 
 [source.glob]

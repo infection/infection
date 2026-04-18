@@ -974,6 +974,12 @@ count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
+code = "non-existent-class"
+message = 'Class `Infection\FileSystem\DummyFileSystem` not found.'
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #2 of `dicontainer\container::inject`: expected `('T.infection\container\container::clonewithservice() extends object)`, but possibly received `('T.infection\container\container::clonewithservice() extends object)|(closure(infection\container\container): ('T.infection\container\container::clonewithservice() extends object))`.'''
 count = 1
@@ -1000,42 +1006,6 @@ count = 1
 file = "src/Container/Container.php"
 code = "unused-parameter"
 message = "Parameter `$container` is never used."
-count = 1
-
-[[issues]]
-file = "src/CustomMutator/templates/__Name__.php"
-code = "invalid-yield-value-type"
-message = 'Invalid value type yielded; expected `unknown-ref(App\Mutator\TODO)`, but found `PhpParser\Node`.'
-count = 1
-
-[[issues]]
-file = "src/CustomMutator/templates/__Name__.php"
-code = "missing-template-parameter"
-message = 'Too few template arguments for `Infection\Mutator\Mutator`: expected 1, but found 0.'
-count = 1
-
-[[issues]]
-file = "src/CustomMutator/templates/__Name__.php"
-code = "no-value"
-message = 'Argument #2 passed to method `infection\mutator\definition::__construct` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "src/CustomMutator/templates/__Name__.php"
-code = "non-existent-class-like"
-message = 'Cannot find class, interface, enum, or type alias `App\Mutator\TODO`.'
-count = 1
-
-[[issues]]
-file = "src/CustomMutator/templates/__Name__.php"
-code = "non-existent-class-like"
-message = 'Class, interface, enum, or trait `App\Mutator\MutatorCategory` not found.'
-count = 1
-
-[[issues]]
-file = "src/CustomMutator/templates/__Name__Test.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `mutationsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -1156,12 +1126,6 @@ count = 1
 file = "src/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriber.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber::onMutationTestingWasFinished`.'
-count = 1
-
-[[issues]]
-file = "src/FileSystem/DummyFileSystem.php"
-code = "imprecise-type"
-message = "Type `iterable` in parameter `$files` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -6079,12 +6043,6 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\Test
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php"
-code = "missing-return-statement"
-message = "Missing return statement in function 'greet'"
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `invalidTimeValueProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -7027,6 +6985,18 @@ message = "Method `setup()` is never used."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Configuration/ConfigurationBuilder.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\mutator\ignoremutator::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationBuilder.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Mutator\FakeMutator` not found.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Configuration/ConfigurationBuilderTest.php"
 code = "non-existent-method"
 message = 'Method `assertequals` does not exist on type `Infection\Tests\Configuration\ConfigurationBuilderTest`.'
@@ -7036,6 +7006,24 @@ count = 1
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `valueProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "no-value"
+message = 'Argument #5 passed to method `infection\configuration\configurationfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\DummyCiDetector` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Mutator\CustomMutator` not found.'
 count = 1
 
 [[issues]]
@@ -8996,6 +8984,54 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "invalid-property-access"
+message = "Attempting to access a property on a non-object type (`never`)."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "no-value"
+message = 'Argument #1 passed to method `Infection\Event\EventDispatcher\SyncEventDispatcher::addsubscriber` has type `never`, meaning it cannot produce a value.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "no-value"
+message = 'Argument #1 passed to method `Infection\Event\EventDispatcher\SyncEventDispatcher::dispatch` has type `never`, meaning it cannot produce a value.'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\UnknownEventSubscriber` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\UserEventSubscriber` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\UserWasCreated` not found.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Event/EventDispatcher/SyncEventDispatcherTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Event\EventDispatcher\SyncEventDispatcherTest`.'
 count = 4
@@ -9124,7 +9160,7 @@ count = 1
 file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 1
+count = 4
 
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
@@ -9135,14 +9171,38 @@ count = 2
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
 code = "no-value"
-message = 'Argument #1 passed to method `infection\tests\fixtures\event\ionullsubscriber::__construct` has type `never`, meaning it cannot produce a value.'
-count = 3
+message = 'Argument #1 passed to method `infection\event\subscriber\chainsubscriberfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\event\subscriber\chainsubscriberfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
+code = "no-value"
+message = 'Argument #3 passed to method `infection\event\subscriber\chainsubscriberfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Console\FakeOutput` not found.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\DummySubscriberFactory` not found.'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\IONullSubscriber` not found.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
@@ -9338,6 +9398,48 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "invalid-method-access"
+message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher)`).'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "no-value"
+message = 'Argument #1 passed to method `infection\event\subscriber\chainsubscriberfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\event\subscriber\chainsubscriberfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "no-value"
+message = 'Argument #3 passed to method `infection\event\subscriber\chainsubscriberfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\DummySubscriberFactory` not found.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "non-existent-class-like"
+message = 'Cannot find class, interface, enum, or type alias `Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
 code = "non-existent-method"
 message = 'Method `assertcount` does not exist on type `Infection\Tests\Event\Subscriber\SubscriberRegistererTest`.'
 count = 3
@@ -9347,6 +9449,12 @@ file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Event\Subscriber\SubscriberRegistererTest`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `infection\event\subscriber\subscriberregisterer::__construct`: expected `Infection\Event\EventDispatcher\EventDispatcher`, but possibly received `unknown-ref(Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher)`.'
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
@@ -9922,228 +10030,6 @@ count = 1
 file = "tests/phpunit/FileSystem/TmpDirProviderTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Console/FakeOutputSymfony6.php"
-code = "imprecise-type"
-message = "Type `iterable` in parameter `$messages` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Console/FakeOutputSymfony7.php"
-code = "imprecise-type"
-message = "Type `iterable` in parameter `$messages` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Fixtures/DummyCiDetector.php"
-code = "unused-parameter"
-message = "Parameter `$environment` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/EventDispatcherCollector.php"
-code = "imprecise-type"
-message = "Type `array` in property `$events` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/EventDispatcherCollector.php"
-code = "imprecise-type"
-message = "Type `array` in return type of `getEvents` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/UnknownEventSubscriber.php"
-code = "unused-parameter"
-message = "Parameter `$event` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/UserEventSubscriber.php"
-code = "missing-property-type"
-message = "Property `$count` is missing a type hint."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/UserEventSubscriber.php"
-code = "mixed-operand"
-message = "Cannot reliably increment a `mixed` operand."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/UserEventSubscriber.php"
-code = "unused-parameter"
-message = "Parameter `$event` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Event/UserWasCreatedCounterSubscriber.php"
-code = "unused-parameter"
-message = "Parameter `$event` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRealPathFinder.php"
-code = "imprecise-type"
-message = "Type `array` in parameter `$filter` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRealPathFinder.php"
-code = "imprecise-type"
-message = "Type `array` in parameter `$sourceDirectories` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRealPathFinder.php"
-code = "imprecise-type"
-message = "Type `array` in property `$filters` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRealPathFinder.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #1 of `symfony\component\finder\finder::in`: expected `array<array-key, string>|string`, but provided type `array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRealPathFinder.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #2 of `symfony\component\finder\iterator\multiplepcrefilteriterator::__construct`: expected `array<array-key, string>`, but provided type `non-empty-array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRelativePathFinder.php"
-code = "imprecise-type"
-message = "Type `array` in parameter `$filter` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRelativePathFinder.php"
-code = "imprecise-type"
-message = "Type `array` in parameter `$sourceDirectories` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRelativePathFinder.php"
-code = "imprecise-type"
-message = "Type `array` in property `$filters` is imprecise, equivalent to `array<array-key, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRelativePathFinder.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #1 of `symfony\component\finder\finder::in`: expected `array<array-key, string>|string`, but provided type `array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Finder/MockRelativePathFinder.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #2 of `symfony\component\finder\iterator\multiplepcrefilteriterator::__construct`: expected `array<array-key, string>`, but provided type `non-empty-array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport.php"
-code = "always-matching-switch-case"
-message = "This switch case will always match, making subsequent cases unreachable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport.php"
-code = "redundant-comparison"
-message = "Redundant `!==` comparison: left-hand side is always not identical to right-hand side."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport.php"
-code = "redundant-condition"
-message = "This condition (type `true`) will always evaluate to true."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport.php"
-code = "unreachable-switch-default"
-message = "Unreachable default case"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport.php"
-code = "unused-parameter"
-message = "Parameter `$a` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport.php"
-code = "unused-parameter"
-message = "Parameter `$keys` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport2.php"
-code = "unused-parameter"
-message = "Parameter `$a` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/ForHtmlReport2.php"
-code = "unused-parameter"
-message = "Parameter `$b` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Mutator/CustomMutator.php"
-code = "missing-template-parameter"
-message = 'Too few template arguments for `Infection\Mutator\Mutator`: expected 1, but found 0.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Mutator/CustomNameMutator.php"
-code = "missing-template-parameter"
-message = 'Too few template arguments for `Infection\Mutator\Mutator`: expected 1, but found 0.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Mutator/FakeMutator.php"
-code = "missing-template-parameter"
-message = 'Too few template arguments for `Infection\Mutator\Mutator`: expected 1, but found 0.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/PhpParser/FakeVisitor.php"
-code = "docblock-type-mismatch"
-message = 'Docblock return type `PhpParser\Node|array<array-key, PhpParser\Node>|int` is incompatible with native return type `void`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Fixtures/PhpParser/FakeVisitor.php"
-code = "docblock-type-mismatch"
-message = 'Docblock return type `array<array-key, PhpParser\Node>` is incompatible with native return type `void`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Process/DummyMutantProcess.php"
-code = "extend-final-class"
-message = 'Class `Infection\Tests\Fixtures\Process\DummyMutantProcess` cannot extend final class `Infection\Process\MutantProcess`'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Resource/Memory/FakeMemoryFormatter.php"
-code = "extend-final-class"
-message = 'Class `Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter` cannot extend final class `Infection\Resource\Memory\MemoryFormatter`'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/Resource/Time/FakeTimeFormatter.php"
-code = "extend-final-class"
-message = 'Class `Infection\Tests\Fixtures\Resource\Time\FakeTimeFormatter` cannot extend final class `Infection\Resource\Time\TimeFormatter`'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Fixtures/TestFramework/DummyTestFrameworkFactory.php"
-code = "imprecise-type"
-message = "Type `array` in parameter `$sourceDirectories` is imprecise, equivalent to `array<array-key, mixed>`."
 count = 1
 
 [[issues]]
@@ -11468,6 +11354,18 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Mutator\FakeMutator` not found.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeNode` not found.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "non-existent-method"
 message = 'Method `anything` does not exist on type `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest`.'
 count = 1
@@ -11615,6 +11513,18 @@ file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 4
+
+[[issues]]
+file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\mutator\ignoremutator::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Mutator\FakeMutator` not found.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
@@ -14330,6 +14240,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
+code = "no-value"
+message = 'Argument #1 passed to method `Infection\PhpParser\NodeTraverserFactory::createmutationtraverser` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeVisitor` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\PhpParser\NodeTraverserFactoryTest`.'
 count = 1
@@ -14338,6 +14260,12 @@ count = 1
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\NodeTraverserFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
+code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #2 of `Infection\Tests\PhpParser\NodeTraverserFactoryTest::asserttraverservisitorsare`: expected `list<class-string<PhpParser\NodeVisitor>>`, but possibly received `list{class-string('PhpParser\NodeVisitor\CloningVisitor'), class-string('Infection\Tests\Fixtures\PhpParser\FakeVisitor')}`.'''
 count = 1
 
 [[issues]]
@@ -14434,24 +14362,6 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\EnrichmentTraverseIntegrationTest::test_it_creates_a_rich_ast`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/AbstractMethod.php"
-code = "unused-parameter"
-message = "Parameter `$param` is never used."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/ConcreteClass.php"
-code = "invalid-callable"
-message = "Expression of type `nonnull` cannot be called as a function or method."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/TraitExample.php"
-code = "unused-parameter"
-message = "Parameter `$param` is never used."
 count = 1
 
 [[issues]]
@@ -14996,6 +14906,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `timeoutDataProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
@@ -15005,6 +14921,12 @@ file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 2
+
+[[issues]]
+file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
@@ -15200,8 +15122,38 @@ count = 3
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
+code = "invalid-method-access"
+message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`).'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `array_map`: expected `array<('K.array_map() extends array-key), object>`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\process\runner\initialstaticanalysisrunner::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
+code = "non-existent-class-like"
+message = 'Cannot find class, interface, enum, or type alias `Infection\Tests\Fixtures\Event\EventDispatcherCollector`.'
 count = 1
 
 [[issues]]
@@ -15242,9 +15194,57 @@ count = 6
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "invalid-method-access"
+message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`).'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 2
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `end`: expected `array<array-key, ('T.end() extends mixed)>|object`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `array_map`: expected `array<('K.array_map() extends array-key), object>`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\process\runner\initialtestsrunner::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "non-existent-class-like"
+message = 'Cannot find class, interface, enum, or type alias `Infection\Tests\Fixtures\Event\EventDispatcherCollector`.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
@@ -15284,6 +15284,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #1 of `array_filter`: expected `array<array-key, mixed>`, but possibly received `array<array-key, mixed>|list<mixed>|object`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\Runner\InitialTestsRunnerTest::test_it_stops_the_process_execution_on_the_first_error`.'
 count = 1
@@ -15302,15 +15308,9 @@ count = 11
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertaresameevents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished|Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted>`, but provided type `array<array-key, mixed>` is less specific.'
-count = 7
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::asserthasevent`: expected `array<array-key, object>`, but provided type `array<array-key, mixed>` is less specific.'
-count = 1
+code = "invalid-method-access"
+message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`).'
+count = 10
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
@@ -15332,6 +15332,18 @@ count = 22
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertaresameevents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished|Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted>`, but found `mixed`.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::asserthasevent`: expected `array<array-key, object>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 6
@@ -15340,6 +15352,24 @@ count = 6
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `infection\tests\process\runner\mutationtestingrunnertest::someiterable`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "no-value"
+message = 'Argument #4 passed to method `infection\process\runner\mutationtestingrunner::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "non-existent-class-like"
+message = 'Cannot find class, interface, enum, or type alias `Infection\Tests\Fixtures\Event\EventDispatcherCollector`.'
 count = 1
 
 [[issues]]
@@ -15452,6 +15482,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #4 of `infection\process\runner\mutationtestingrunner::__construct`: expected `Infection\Event\EventDispatcher\EventDispatcher`, but possibly received `unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Process\Runner\MutationTestingRunnerTest::invokeMethod`.'
 count = 1
@@ -15461,6 +15497,12 @@ file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
@@ -15518,12 +15560,6 @@ count = 6
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #3 of `infection\tests\fixtures\process\dummymutantprocess::__construct`: expected `Infection\Mutant\TestFrameworkMutantExecutionResultFactory`, but found `mixed`.'
-count = 4
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -15533,6 +15569,18 @@ file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "mixed-method-access"
 message = "Attempting to access a method on a non-object type (`mixed`)."
 count = 17
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "no-value"
+message = 'Argument #1 passed to method `infection\process\mutantprocesscontainer::__construct` has type `never`, meaning it cannot produce a value.'
+count = 5
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Process\DummyMutantProcess` not found.'
+count = 5
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
@@ -15980,6 +16028,42 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\reporter\filereporter::__construct` has type `never`, meaning it cannot produce a value.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
+code = "no-value"
+message = 'Argument #3 passed to method `infection\reporter\filereporter::__construct` has type `never`, meaning it cannot produce a value.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
+code = "no-value"
+message = 'Argument #4 passed to method `infection\reporter\filereporter::__construct` has type `never`, meaning it cannot produce a value.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\FileSystem\DummyFileSystem` not found.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Logger\FakeLogger` not found.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter` not found.'
+count = 7
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileLocationReporter/FileLocationReporterTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Reporter\FileLocationReporter\FileLocationReporterTest`.'
 count = 1
@@ -16022,6 +16106,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/FileReporterFactoryTest.php"
+code = "no-value"
+message = 'Argument #7 passed to method `infection\reporter\filereporterfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileReporterFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Logger\FakeLogger` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileReporterFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\Reporter\FileReporterFactoryTest`.'
 count = 1
@@ -16055,6 +16151,18 @@ file = "tests/phpunit/Reporter/FileReporterTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
 count = 2
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileReporterTest.php"
+code = "no-value"
+message = 'Argument #3 passed to method `infection\reporter\filereporter::__construct` has type `never`, meaning it cannot produce a value.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileReporterTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter` not found.'
+count = 4
 
 [[issues]]
 file = "tests/phpunit/Reporter/FileReporterTest.php"
@@ -16328,6 +16436,30 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
+code = "no-value"
+message = 'Argument #3 passed to method `infection\reporter\strykerreporterfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
+code = "no-value"
+message = 'Argument #4 passed to method `infection\reporter\strykerreporterfactory::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\FakeCiDetector` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Logger\FakeLogger` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\Reporter\StrykerReporterFactoryTest`.'
 count = 2
@@ -16414,6 +16546,30 @@ count = 1
 file = "tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `infection\resource\listener\performanceloggersubscriber::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
+code = "no-value"
+message = 'Argument #3 passed to method `infection\resource\listener\performanceloggersubscriber::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Time\FakeTimeFormatter` not found.'
 count = 1
 
 [[issues]]
@@ -16520,6 +16676,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `memoryLimitProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
@@ -16535,6 +16697,18 @@ file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #2 of `Infection\Resource\Memory\MemoryLimiter::limitmemory`: expected `Infection\AbstractTestFramework\TestFrameworkAdapter`, but found `mixed`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `Infection\Resource\Memory\MemoryLimiter::limitmemory` has type `never`, meaning it cannot produce a value.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter` not found.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
@@ -19208,6 +19382,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
+code = "no-value"
+message = "Argument #2 passed to function `array_map` has type `never`, meaning it cannot produce a value."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
+code = "non-existent-class-like"
+message = 'Class, interface, enum, or trait `Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\JUnitTimes` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
 code = "non-existent-method"
 message = 'Method `assertGreaterThan` does not exist on type `Infection\Tests\TestFramework\Tracing\TestLocationBucketSorterTest`.'
 count = 2
@@ -19612,6 +19798,12 @@ count = 8
 file = "tests/phpunit/TestFramework/Tracing/Tracer/TracerIntegrationTest.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `infection\tests\testframework\tracing\tracer\tracerintegrationtest::createfilesystemstub`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/TracerIntegrationTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\TestFramework\Coverage\JUnit\FakeTestFileDataProvider` not found.'
 count = 1
 
 [[issues]]
