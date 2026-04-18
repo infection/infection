@@ -11,5 +11,10 @@
         "psr-4": {
             "Test_Framework_Options_Config\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

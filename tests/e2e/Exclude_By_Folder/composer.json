@@ -11,5 +11,10 @@
         "psr-4": {
             "Exclude_By_Folder\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

@@ -11,5 +11,10 @@
         "psr-4": {
             "ExecPath\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

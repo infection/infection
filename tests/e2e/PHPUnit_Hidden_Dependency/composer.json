@@ -11,5 +11,10 @@
         "psr-4": {
             "PHPUnit_Hidden_Dependency\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }
