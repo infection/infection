@@ -128,7 +128,6 @@ class MutationConfigBuilder extends ConfigBuilder
     private function getXPath(): SafeDOMXPath
     {
         if ($this->xPath === null) {
-            /** @psalm-suppress InaccessibleProperty */
             $this->xPath = SafeDOMXPath::fromString(
                 $this->originalXmlConfigContent,
                 preserveWhiteSpace: false,
