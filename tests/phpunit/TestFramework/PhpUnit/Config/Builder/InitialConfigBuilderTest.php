@@ -293,7 +293,9 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_with_coverage_include_directories.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'));
+        $xml = $this->filesystem->readFile(
+            $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'),
+        );
 
         $coverageIncludeFiles = $this->queryXpath($xml, '/phpunit/coverage/include/file');
         $coverageIncludeDirectories = $this->queryXpath($xml, '/phpunit/coverage/include/directory');
@@ -309,7 +311,9 @@ final class InitialConfigBuilderTest extends TestCase
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_without_coverage_whitelist.xml';
 
-        $xml = file_get_contents($this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'));
+        $xml = $this->filesystem->readFile(
+            $this->createConfigBuilder($phpunitXmlPath, ['src/File1.php'])->build('12.0'),
+        );
 
         $sourceIncludeFiles = $this->queryXpath($xml, '/phpunit/source/include/file');
         $sourceIncludeDirectories = $this->queryXpath($xml, '/phpunit/source/include/directory');
