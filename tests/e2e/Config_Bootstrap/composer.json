@@ -11,5 +11,10 @@
         "psr-4": {
             "ConfigBoostrap\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

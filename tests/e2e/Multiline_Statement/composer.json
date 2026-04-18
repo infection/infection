@@ -12,5 +12,10 @@
         "psr-4": {
             "MultilineStatement\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

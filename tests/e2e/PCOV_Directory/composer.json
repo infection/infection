@@ -11,5 +11,10 @@
         "psr-4": {
             "PCOV_Directory\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

@@ -11,5 +11,10 @@
         "psr-0": {
             "Initial_Configuration": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

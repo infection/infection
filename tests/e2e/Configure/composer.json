@@ -11,5 +11,10 @@
         "psr-4": {
             "Namespace_\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }
