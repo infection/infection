@@ -11,5 +11,10 @@
         "psr-4": {
             "Ignore_All_Mutations\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

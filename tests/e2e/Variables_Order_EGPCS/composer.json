@@ -11,5 +11,10 @@
         "psr-4": {
             "Variables_Order_EGPCS\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

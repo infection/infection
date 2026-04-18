@@ -11,5 +11,10 @@
         "psr-0": {
             "PSR_0_Autoloader\\Tests": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

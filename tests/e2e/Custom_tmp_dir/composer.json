@@ -11,5 +11,10 @@
         "psr-4": {
             "TmpNamespace_\\Test\\": "tests/"
         }
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }

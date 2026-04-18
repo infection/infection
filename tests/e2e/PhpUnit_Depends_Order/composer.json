@@ -11,5 +11,10 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6.20"
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
     }
 }
