@@ -11354,6 +11354,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
+code = "missing-magic-method"
+message = "Call to documented magic method `method()` on a class that cannot handle it."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
 code = "non-existent-method"
 message = 'Method `assertarrayhaskey` does not exist on type `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest`.'
 count = 1
