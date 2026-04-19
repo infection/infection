@@ -629,10 +629,10 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             ),
             [
-                new class($this->createStub(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new readonly class($this->createStub(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
-                        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-                        private readonly Process $nextProcessMock,
+                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+                        private Process $nextProcessMock,
                     ) {
                     }
 
