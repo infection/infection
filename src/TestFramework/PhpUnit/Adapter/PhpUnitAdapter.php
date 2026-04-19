@@ -46,6 +46,7 @@ use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
+use Override;
 use function Safe\preg_match;
 use function sprintf;
 use function trim;
@@ -86,6 +87,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
      *
      * @return string[]
      */
+    #[Override]
     public function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
@@ -161,6 +163,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         return 'PHPUnit';
     }
 
+    #[Override]
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         $recommendations = parent::getInitialTestsFailRecommendations($commandLine);

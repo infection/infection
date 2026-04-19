@@ -11,6 +11,7 @@ final class FakeMemoryFormatter extends MemoryFormatter
     {
     }
 
+    #[\Override]
     public function toHumanReadableString(float $bytes): string
     {
         return parent::toHumanReadableString($this->bytes);

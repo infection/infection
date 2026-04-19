@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
+use Override;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -48,6 +49,7 @@ final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
     ) {
     }
 
+    #[Override]
     public function startAnalysis(int $mutationCount): void
     {
         parent::startAnalysis($mutationCount);
@@ -55,6 +57,7 @@ final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
         $this->progressBar->start($mutationCount);
     }
 
+    #[Override]
     public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
         parent::finishEvaluation($executionResult);

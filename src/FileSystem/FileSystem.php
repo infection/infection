@@ -40,6 +40,7 @@ use function is_dir;
 use function is_file;
 use function is_readable;
 use function method_exists;
+use Override;
 use function restore_error_handler;
 use Safe\Exceptions\FilesystemException;
 use function Safe\realpath;
@@ -82,6 +83,7 @@ class FileSystem extends SymfonyFilesystem
     /**
      * @infection-ignore-all
      */
+    #[Override]
     public function readFile(string $filename): string
     {
         // @phpstan-ignore function.alreadyNarrowedType

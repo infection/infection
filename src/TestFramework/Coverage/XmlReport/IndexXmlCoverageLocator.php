@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Override;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -70,6 +71,7 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
         );
     }
 
+    #[Override]
     protected function createInvalidReportSource(string $coverageDirectory): InvalidReportSource
     {
         return new InvalidReportSource(
@@ -80,6 +82,7 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
         );
     }
 
+    #[Override]
     protected function createTooManyReportsFound(
         string $coverageDirectory,
         array $reportPathnames,
@@ -98,6 +101,7 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
         );
     }
 
+    #[Override]
     protected function createNoReportFound(string $coverageDirectory): NoReportFound
     {
         return new NoReportFound(

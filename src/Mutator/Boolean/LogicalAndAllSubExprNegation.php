@@ -40,6 +40,7 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractAllSubExprNegation;
 use Infection\Mutator\Util\NameResolver;
 use function is_string;
+use Override;
 use PhpParser\Node;
 use ReflectionClass;
 use ReflectionException;
@@ -73,6 +74,7 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
         return Node\Expr\BinaryOp\BooleanAnd::class;
     }
 
+    #[Override]
     protected function isSubConditionMutable(Node\Expr $node): bool
     {
         if (!parent::isSubConditionMutable($node)) {

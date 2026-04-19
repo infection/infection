@@ -37,6 +37,7 @@ namespace Infection\Mutator\Unwrap;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 
 /**
@@ -87,6 +88,7 @@ final class UnwrapArrayCombine extends AbstractFunctionUnwrapMutator
     /**
      * @psalm-pure
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield 0;

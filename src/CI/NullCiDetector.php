@@ -38,17 +38,20 @@ namespace Infection\CI;
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
+use Override;
 
 /**
  * @internal
  */
 final class NullCiDetector extends CiDetector
 {
+    #[Override]
     public function isCiDetected(): bool
     {
         return false;
     }
 
+    #[Override]
     public function detect(): CiInterface
     {
         throw new CiNotDetectedException('No CI server detectable with this detector');

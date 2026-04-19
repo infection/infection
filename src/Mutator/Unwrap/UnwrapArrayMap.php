@@ -38,6 +38,7 @@ namespace Infection\Mutator\Unwrap;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 use function range;
 
@@ -85,6 +86,7 @@ final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from range(1, count($node->args) - 1);

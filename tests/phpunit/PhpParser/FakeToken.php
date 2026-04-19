@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use Infection\Tests\UnsupportedMethod;
+use Override;
 use PhpParser\Token;
 
 final class FakeToken extends Token
@@ -78,11 +79,13 @@ final class FakeToken extends Token
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
+    #[Override]
     public function getEndPos(): int
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
+    #[Override]
     public function getEndLine(): int
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);

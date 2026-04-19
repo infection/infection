@@ -39,6 +39,7 @@ use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
+use Override;
 use function sprintf;
 use function str_repeat;
 use function strlen;
@@ -59,6 +60,7 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     ) {
     }
 
+    #[Override]
     public function startAnalysis(int $mutationCount): void
     {
         parent::startAnalysis($mutationCount);
@@ -80,11 +82,13 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         ]);
     }
 
+    #[Override]
     public function startEvaluation(Mutation $mutation): void
     {
         // Do nothing.
     }
 
+    #[Override]
     public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
         parent::finishEvaluation($executionResult);
