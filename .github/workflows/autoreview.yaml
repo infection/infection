@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        # Should use the latest supported PHP version
+        # Should use the oldest supported PHP version
         php-version: ['8.3']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
@@ -79,6 +79,11 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Download Mago
+        run: vendor/bin/mago --version
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run auto-review tests
         # Ensures we see all the errors
