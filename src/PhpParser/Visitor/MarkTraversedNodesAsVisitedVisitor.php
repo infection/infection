@@ -47,7 +47,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    public const VISITED_ATTRIBUTE = 'visited';
+    public const string VISITED_ATTRIBUTE = 'visited';
 
     public static function wasVisited(Node $node): bool
     {

@@ -51,7 +51,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(FileReporter::class)]
 final class FileReporterTest extends FileSystemTestCase
 {
-    private const LOG_FILE_PATH = '/path/to/text.log';
+    private const string LOG_FILE_PATH = '/path/to/text.log';
 
     private MockObject&Filesystem $fileSystemMock;
 

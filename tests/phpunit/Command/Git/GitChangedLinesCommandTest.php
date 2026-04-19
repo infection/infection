@@ -57,11 +57,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(GitChangedLinesCommand::class)]
 final class GitChangedLinesCommandTest extends TestCase
 {
-    private const REFERENCE = 'xyz1234';
+    private const string REFERENCE = 'xyz1234';
 
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
-    private const SOURCE_DIRECTORIES = ['src', 'lib'];
+    private const array SOURCE_DIRECTORIES = ['src', 'lib'];
 
     private string $cwd = '';
 

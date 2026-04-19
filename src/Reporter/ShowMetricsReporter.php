@@ -47,11 +47,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final readonly class ShowMetricsReporter implements Reporter
 {
-    private const PAD_LENGTH = 8;
+    private const int PAD_LENGTH = 8;
 
-    private const LOW_QUALITY_THRESHOLD = 50;
+    private const int LOW_QUALITY_THRESHOLD = 50;
 
-    private const MEDIUM_QUALITY_THRESHOLD = 90;
+    private const int MEDIUM_QUALITY_THRESHOLD = 90;
 
     public function __construct(
         private OutputInterface $output,

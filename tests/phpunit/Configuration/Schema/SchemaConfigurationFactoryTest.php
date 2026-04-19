@@ -67,9 +67,9 @@ use stdClass;
 #[CoversClass(SchemaConfigurationFactory::class)]
 final class SchemaConfigurationFactoryTest extends TestCase
 {
-    private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
+    private const string SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
 
-    private const PROFILES = [
+    private const array PROFILES = [
         '@arithmetic',
         '@boolean',
         '@cast',

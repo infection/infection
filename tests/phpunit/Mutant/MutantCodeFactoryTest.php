@@ -51,13 +51,13 @@ use Webmozart\Assert\Assert;
 #[CoversClass(MutantCodeFactory::class)]
 final class MutantCodeFactoryTest extends TestCase
 {
-    private const PHP_TO_BE_MUTATED_CODE = <<<'PHP_WRAP'
+    private const string PHP_TO_BE_MUTATED_CODE = <<<'PHP_WRAP'
         <?php
 
         $a = PHP_INT_MAX - 33;
         PHP_WRAP;
 
-    private const PHP_UNTOUCHED_CODE = <<<'PHP_WRAP'
+    private const string PHP_UNTOUCHED_CODE = <<<'PHP_WRAP'
         <?php
 
         namespace PHPStan_Integration;

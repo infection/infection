@@ -52,7 +52,7 @@ final class DryRunProcess extends Process
      * Output that TestFrameworkAdapter::testsPass() recognizes as passing tests.
      * The pattern "OK (" triggers testsPass() to return true, causing ESCAPED status.
      */
-    public const PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
+    public const string PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
 
     public static function fromProcess(Process $process): self
     {

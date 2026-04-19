@@ -43,7 +43,7 @@ use Infection\Mutator\MutatorConfig;
  */
 final class MBStringConfig extends AllowedFunctionsConfig implements MutatorConfig
 {
-    private const KNOWN_FUNCTIONS = [
+    private const array KNOWN_FUNCTIONS = [
         'mb_chr',
         'mb_ord',
         'mb_parse_str',

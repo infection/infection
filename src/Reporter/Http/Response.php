@@ -42,11 +42,11 @@ use Webmozart\Assert\Assert;
  */
 final readonly class Response
 {
-    public const HTTP_OK = 200;
+    public const int HTTP_OK = 200;
 
-    public const HTTP_CREATED = 201;
+    public const int HTTP_CREATED = 201;
 
-    public const HTTP_MAX_ERROR_CODE = 599;
+    public const int HTTP_MAX_ERROR_CODE = 599;
 
     public function __construct(
         public int $statusCode,

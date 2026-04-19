@@ -49,7 +49,7 @@ final class IoCodeDetector
     use CannotBeInstantiated;
 
     // See https://www.php.net/manual/en/ref.filesystem.php
-    private const NATIVE_FUNCTIONS = [
+    private const array NATIVE_FUNCTIONS = [
         'basename',
         'chgrp',
         'chmod',
@@ -133,7 +133,7 @@ final class IoCodeDetector
         'unlink',
     ];
 
-    private const ARBITRARY_STATEMENTS = [
+    private const array ARBITRARY_STATEMENTS = [
         'use Symfony\Component\Filesystem\Filesystem;',
     ];
 

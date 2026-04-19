@@ -44,7 +44,7 @@ use Webmozart\Assert\Assert;
  */
 final readonly class ArrayItemRemovalConfig implements MutatorConfig
 {
-    private const REMOVE_VALUES = [
+    private const array REMOVE_VALUES = [
         'first',
         'last',
         'all',

@@ -46,7 +46,7 @@ final class CodeceptionProvider
 {
     use CannotBeInstantiated;
 
-    private const FIXTURES_DIR = __DIR__ . '/../../Coverage/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/../../Coverage/Fixtures';
 
     public static function infoProvider(): iterable
     {

@@ -74,10 +74,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class ConfigureCommand extends BaseCommand
 {
-    public const NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
+    public const string NONINTERACTIVE_MODE_ERROR = 'Infection config generator requires an interactive mode.';
 
-    /** @var string */
-    private const OPTION_TEST_FRAMEWORK = 'test-framework';
+    private const string OPTION_TEST_FRAMEWORK = 'test-framework';
 
     protected function configure(): void
     {

@@ -49,7 +49,7 @@ use Psr\Log\LogLevel;
 #[CoversClass(StrykerDashboardClient::class)]
 final class StrykerDashboardClientTest extends TestCase
 {
-    private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
+    private const string API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
 
     private MockObject&StrykerCurlClient $clientMock;
 

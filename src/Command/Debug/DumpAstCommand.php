@@ -67,13 +67,13 @@ use Webmozart\Assert\Assert;
  */
 final class DumpAstCommand extends BaseCommand
 {
-    private const FILE_PATH_ARGUMENT = 'file';
+    private const string FILE_PATH_ARGUMENT = 'file';
 
-    private const SHOW_ATTRIBUTES = 'show-attributes';
+    private const string SHOW_ATTRIBUTES = 'show-attributes';
 
-    private const CHANGED_LINES_RANGES = 'changed-lines-ranges';
+    private const string CHANGED_LINES_RANGES = 'changed-lines-ranges';
 
-    private const CHANGED_LINES_PARTS_COUNT = 2;
+    private const int CHANGED_LINES_PARTS_COUNT = 2;
 
     public function __construct(
         private readonly FileSystem $fileSystem,

@@ -53,7 +53,7 @@ use function Safe\file_get_contents;
 #[CoversNothing]
 final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     /**
      * @param list<ChangedLinesRange>|null $changedLinesRange

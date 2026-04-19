@@ -50,7 +50,7 @@ use Webmozart\Assert\Assert;
  */
 final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
 {
-    private const DOTS_PER_ROW = 50;
+    private const int DOTS_PER_ROW = 50;
 
     private ?int $mutationCount = null;
 

@@ -55,7 +55,7 @@ use Webmozart\Assert\Assert;
  */
 readonly class Configuration
 {
-    private const LOG_VERBOSITY = [
+    private const array LOG_VERBOSITY = [
         'all',
         'none',
         'default',

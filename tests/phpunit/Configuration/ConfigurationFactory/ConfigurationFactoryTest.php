@@ -77,7 +77,7 @@ use function sys_get_temp_dir;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
-    private const GIT_DEFAULT_BASE = 'test/default';
+    private const string GIT_DEFAULT_BASE = 'test/default';
 
     /**
      * @var array<string, Mutator>|null

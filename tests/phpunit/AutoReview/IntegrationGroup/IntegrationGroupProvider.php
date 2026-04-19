@@ -55,7 +55,7 @@ final class IntegrationGroupProvider
      *
      * A better solution would be to find all tests that do not have corresponding class.
      */
-    private const KNOWN_INTEGRATIONAL_TESTS = [
+    private const array KNOWN_INTEGRATIONAL_TESTS = [
         E2ETest::class,
     ];
 

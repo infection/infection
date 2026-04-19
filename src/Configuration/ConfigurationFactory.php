@@ -82,7 +82,7 @@ class ConfigurationFactory
     /**
      * Default allowed timeout (on a test basis) in seconds
      */
-    private const DEFAULT_TIMEOUT = 10;
+    private const int DEFAULT_TIMEOUT = 10;
 
     public function __construct(
         private readonly TmpDirProvider $tmpDirProvider,

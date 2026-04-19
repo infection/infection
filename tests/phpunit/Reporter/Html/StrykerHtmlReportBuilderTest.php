@@ -68,7 +68,7 @@ use function sprintf;
 #[CoversClass(StrykerHtmlReportBuilder::class)]
 final class StrykerHtmlReportBuilderTest extends TestCase
 {
-    private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
+    private const string SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
 
     /**
      * @param array<string, array<string, mixed>|string> $expectedReport

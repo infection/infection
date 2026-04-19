@@ -51,7 +51,7 @@ final class PregMatchMatches implements Mutator
 {
     use GetMutatorName;
 
-    private const MIN_ARGS_TO_MUTATE = 3;
+    private const int MIN_ARGS_TO_MUTATE = 3;
 
     public static function getDefinition(): Definition
     {

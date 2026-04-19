@@ -64,15 +64,15 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(MutationConfigBuilder::class)]
 final class MutationConfigBuilderTest extends TestCase
 {
-    public const HASH = 'a1b2c3';
+    public const string HASH = 'a1b2c3';
 
-    private const FIXTURES = __DIR__ . '/Fixtures';
+    private const string FIXTURES = __DIR__ . '/Fixtures';
 
-    private const TMP_DIR = '/tmp/infection';
+    private const string TMP_DIR = '/tmp/infection';
 
-    private const ORIGINAL_FILE_PATH = '/original/file/path';
+    private const string ORIGINAL_FILE_PATH = '/original/file/path';
 
-    private const MUTATED_FILE_PATH = '/mutated/file/path';
+    private const string MUTATED_FILE_PATH = '/mutated/file/path';
 
     private string $projectPath;
 

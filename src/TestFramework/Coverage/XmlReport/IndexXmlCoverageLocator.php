@@ -52,9 +52,9 @@ use Symfony\Component\Finder\Finder;
  */
 final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportLocator
 {
-    public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
+    public const string INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 
-    private const DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
+    private const string DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
 
     public static function create(
         FileSystem $filesystem,

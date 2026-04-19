@@ -45,7 +45,7 @@ use function str_contains;
  */
 final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
+    private const string IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
     private ?Node $excludedStartNode = null;
 

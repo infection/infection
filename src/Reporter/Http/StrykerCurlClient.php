@@ -59,7 +59,7 @@ use function sprintf;
  */
 class StrykerCurlClient
 {
-    private const STRYKER_DASHBOARD_API_BASE_URL = 'https://dashboard.stryker-mutator.io/api/reports';
+    private const string STRYKER_DASHBOARD_API_BASE_URL = 'https://dashboard.stryker-mutator.io/api/reports';
 
     public function request(
         string $repositorySlug,

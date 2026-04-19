@@ -61,9 +61,9 @@ final class IndexXmlCoverageParserTest extends TestCase
 {
     use ExpectsThrowables;
 
-    private const GENERAL_FIXTURES_DIR = __DIR__ . '/../../Fixtures';
+    private const string GENERAL_FIXTURES_DIR = __DIR__ . '/../../Fixtures';
 
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     private string $generatedIndexXmlPath;
 

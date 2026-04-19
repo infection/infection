@@ -43,9 +43,9 @@ use function Safe\preg_match;
  */
 final class XmlConfigurationVersionProvider
 {
-    private const LAST_LEGACY_VERSION = '9.2';
+    private const string LAST_LEGACY_VERSION = '9.2';
 
-    private const NEXT_MAINSTREAM_VERSION = '9.3';
+    private const string NEXT_MAINSTREAM_VERSION = '9.3';
 
     public function provide(SafeDOMXPath $xPath): string
     {

@@ -50,7 +50,7 @@ use function sprintf;
 #[CoversClass(SchemaConfigurationFile::class)]
 final class SchemaConfigurationFileTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
+    private const string FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
 
     public function test_it_can_be_instantiated(): void
     {

@@ -56,13 +56,13 @@ final class SourceFilterOptions
 {
     use CannotBeInstantiated;
 
-    public const PLAIN_FILTER_NAME = 'filter';
+    public const string PLAIN_FILTER_NAME = 'filter';
 
-    private const GIT_DIFF_FILTER_NAME = 'git-diff-filter';
+    private const string GIT_DIFF_FILTER_NAME = 'git-diff-filter';
 
-    private const GIT_DIFF_LINES_NAME = 'git-diff-lines';
+    private const string GIT_DIFF_LINES_NAME = 'git-diff-lines';
 
-    private const GIT_DIFF_BASE_NAME = 'git-diff-base';
+    private const string GIT_DIFF_BASE_NAME = 'git-diff-base';
 
     /**
      * @template T of Command

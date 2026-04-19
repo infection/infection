@@ -48,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final readonly class FileLocationReporter implements Reporter
 {
-    private const PAD_LENGTH = 8;
+    private const int PAD_LENGTH = 8;
 
     public function __construct(
         private Reporter $decoratedReporter,

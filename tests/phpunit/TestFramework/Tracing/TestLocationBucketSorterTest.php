@@ -63,10 +63,8 @@ final class TestLocationBucketSorterTest extends TestCase
 {
     /**
      * Used for floating point comparisons.
-     *
-     * @var float
      */
-    private const EPSILON = 0.0001;
+    private const float EPSILON = 0.0001;
 
     public function test_it_sorts(): void
     {
