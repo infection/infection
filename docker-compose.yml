@@ -1,5 +1,5 @@
 services:
-  php82:
+  php83:
     build:
       context: devTools
       args:
