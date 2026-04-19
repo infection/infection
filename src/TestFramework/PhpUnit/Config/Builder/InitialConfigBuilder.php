@@ -112,6 +112,11 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         if (version_compare($version, '12.0', '>=')) {
             // For PHPUnit 12.0+, preserve the original coverage configuration as-is.
+            // Otherwise, if the initial tests executed cover code that is outside
+            // configured sources, PHPUnit will fail with a warning.
+            // Historically, this was done for performance reasons, but since then
+            // PHPUnit coverage was reworked and optimised, and there are no more
+            // benefits to doing this.
             $this->configManipulator->addOrUpdateSourceIncludeNodes(
                 xPath: $xPath,
                 srcDirs: $this->srcDirs,
