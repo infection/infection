@@ -103,7 +103,6 @@ return RectorConfig::configure()
         typeDeclarations: true,
     )
     ->withRules([
-        AddOverrideAttributeToOverriddenMethodsRector::class,
         AddTypeToConstRector::class,
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
@@ -132,6 +131,10 @@ return RectorConfig::configure()
         ],
     )
     ->withSkip([
+        AddOverrideAttributeToOverriddenMethodsRector::class => [
+            // To remove this skip once we drop support for Symfony 6.4.
+            'src/FileSystem/FileSystem.php',
+        ],
         'Rector\PHPUnit\CodeQuality\Rector\ClassMethod\BareCreateMockAssignToDirectUseRector',
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
