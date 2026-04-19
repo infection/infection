@@ -96,7 +96,7 @@ return RectorConfig::configure()
         cacheClass: FileCacheStorage::class,
         cacheDirectory: __DIR__ . '/var/cache/rector',
     )
-    ->withPhpSets(php82: true)
+    ->withPhpSets(php83: true)
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,
