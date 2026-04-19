@@ -15513,7 +15513,7 @@ count = 34
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `class@anonymous:14053425703945415052-24615:25393::__construct`: expected `Infection\Mutant\TestFrameworkMutantExecutionResultFactory`, but found `mixed`.'
+message = 'Invalid argument type for argument #1 of `class@anonymous:14053425703945415052-24615:25384::__construct`: expected `Infection\Mutant\TestFrameworkMutantExecutionResultFactory`, but found `mixed`.'
 count = 1
 
 [[issues]]
