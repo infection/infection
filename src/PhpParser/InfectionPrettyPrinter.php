@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Override;
 use PhpParser\PrettyPrinter\Standard;
 use function Safe\preg_replace;
 
@@ -52,6 +53,7 @@ final class InfectionPrettyPrinter extends Standard
      * source like '\\\|' (3 backslashes) to '\\\\|' (4 backslashes), making mutation
      * diffs noisier than necessary. Dropping that rule keeps the original encoding.
      */
+    #[Override]
     protected function pSingleQuotedString(string $string): string
     {
         return '\'' . preg_replace('/\'|\\\\(?=[\'\\\\]|$)/', '\\\\$0', $string) . '\'';

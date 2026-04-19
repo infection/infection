@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use Override;
 use Symfony\Component\Finder\Finder;
 use Traversable;
 
@@ -43,98 +44,120 @@ use Traversable;
  */
 final class DummyFileSystem extends FileSystem
 {
+    #[Override]
     public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
     {
     }
 
+    #[Override]
     public function mkdir($dirs, int $mode = 0777): void
     {
     }
 
+    #[Override]
     public function exists(string|iterable $files): bool
     {
         return false;
     }
 
+    #[Override]
     public function touch($files, ?int $time = null, ?int $atime = null): void
     {
     }
 
+    #[Override]
     public function remove($files): void
     {
     }
 
+    #[Override]
     public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): void
     {
     }
 
+    #[Override]
     public function chown($files, $user, bool $recursive = false): void
     {
     }
 
+    #[Override]
     public function chgrp($files, $group, bool $recursive = false): void
     {
     }
 
+    #[Override]
     public function rename(string $origin, string $target, bool $overwrite = false): void
     {
     }
 
+    #[Override]
     public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
     {
     }
 
+    #[Override]
     public function hardlink(string $originFile, $targetFiles): void
     {
     }
 
+    #[Override]
     public function readlink(string $path, bool $canonicalize = false): string
     {
         return '';
     }
 
+    #[Override]
     public function makePathRelative(string $endPath, string $startPath): string
     {
         return '';
     }
 
+    #[Override]
     public function mirror(string $originDir, string $targetDir, ?Traversable $iterator = null, array $options = []): void
     {
     }
 
+    #[Override]
     public function isAbsolutePath(string $file): bool
     {
         return true;
     }
 
+    #[Override]
     public function tempnam(string $dir, string $prefix, string $suffix = ''): string
     {
         return '';
     }
 
+    #[Override]
     public function dumpFile(string $filename, $content): void
     {
     }
 
+    #[Override]
     public function appendToFile(string $filename, $content, bool $lock = false): void
     {
     }
 
+    #[Override]
     public function readFile(string $filename): string
     {
         return '';
     }
 
+    #[Override]
     public function isReadableFile(string $filename): bool
     {
         return false;
     }
 
+    #[Override]
     public function isReadableDirectory(string $filename): bool
     {
         return false;
     }
 
+    #[Override]
     public function createFinder(): Finder
     {
         return Finder::create();

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Reporter;
 
 use Infection\Mutant\MutantExecutionResult;
+use Override;
 use const PHP_EOL;
 use function sprintf;
 use function trim;
@@ -57,6 +58,7 @@ final readonly class GitHubActionsLogTextFileReporter extends BaseTextFileReport
     /**
      * @param MutantExecutionResult[] $executionResults
      */
+    #[Override]
     protected function getResultsLine(
         array $executionResults,
         string $headlinePrefix,

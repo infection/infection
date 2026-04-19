@@ -37,6 +37,7 @@ namespace App\Tests\Mutator;
 
 use App\Mutator\__Name__;
 use Infection\Testing\BaseMutatorTestCase;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -102,6 +103,7 @@ final class __Name__Test extends BaseMutatorTestCase
         //        ];
     }
 
+    #[Override]
     protected function getTestedMutatorClassName(): string
     {
         return __Name__::class;

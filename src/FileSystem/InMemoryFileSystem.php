@@ -37,6 +37,7 @@ namespace Infection\FileSystem;
 
 use function array_key_exists;
 use DomainException;
+use Override;
 use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Finder\Finder;
@@ -53,6 +54,7 @@ final class InMemoryFileSystem extends FileSystem
      */
     private array $files = [];
 
+    #[Override]
     public function dumpFile(string $filename, $content = ''): void
     {
         Assert::stringNotEmpty($content);
@@ -64,51 +66,61 @@ final class InMemoryFileSystem extends FileSystem
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function isReadableFile(string $filename): bool
     {
         return array_key_exists($filename, $this->files);
     }
 
+    #[Override]
     public function realPath(string $filename): string
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function isReadableDirectory(string $filename): bool
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function createFinder(): Finder
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function mkdir(iterable|string $dirs, int $mode = 0o777): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function exists(iterable|string $files): bool
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function touch(iterable|string $files, ?int $time = null, ?int $atime = null): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function remove(iterable|string $files): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function chmod(
         iterable|string $files,
         int $mode,
@@ -118,41 +130,49 @@ final class InMemoryFileSystem extends FileSystem
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function chown(iterable|string $files, int|string $user, bool $recursive = false): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function chgrp(iterable|string $files, int|string $group, bool $recursive = false): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function rename(string $origin, string $target, bool $overwrite = false): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function hardlink(string $originFile, iterable|string $targetFiles): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function readlink(string $path, bool $canonicalize = false): ?string
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function makePathRelative(string $endPath, string $startPath): string
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function mirror(
         string $originDir,
         string $targetDir,
@@ -162,21 +182,25 @@ final class InMemoryFileSystem extends FileSystem
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function isAbsolutePath(string $file): bool
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function tempnam(string $dir, string $prefix, string $suffix = ''): string
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function appendToFile(string $filename, $content, bool $lock = false): never
     {
         throw new DomainException('Unexpected call.');
     }
 
+    #[Override]
     public function readFile(string $filename): string
     {
         if (!array_key_exists($filename, $this->files)) {

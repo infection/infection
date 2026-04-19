@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use Infection\Console\Application;
 use Infection\Console\IO;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,6 +50,7 @@ abstract class BaseCommand extends Command
 {
     protected ?IO $io = null;
 
+    #[Override]
     final public function getApplication(): Application
     {
         $application = parent::getApplication();
