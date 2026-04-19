@@ -55,9 +55,9 @@ use function version_compare;
  */
 final class PHPStanAdapter implements StaticAnalysisToolAdapter
 {
-    private const VERSION_1 = 1;
+    private const int VERSION_1 = 1;
 
-    private const VERSION_2 = 2;
+    private const int VERSION_2 = 2;
 
     /**
      * @param list<string> $staticAnalysisToolOptions

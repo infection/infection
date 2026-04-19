@@ -46,7 +46,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class SkipNodesVisitor extends NodeVisitorAbstract
 {
-    public const DEFAULT_STOP_TRAVERSE_TYPE = self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+    public const int DEFAULT_STOP_TRAVERSE_TYPE = self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
 
     /**
      * @param list<int> $nodeIds

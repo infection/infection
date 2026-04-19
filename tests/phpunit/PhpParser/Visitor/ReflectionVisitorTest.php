@@ -50,7 +50,7 @@ use function Safe\file_get_contents;
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends VisitorTestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../autoloaded/mutator-fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/../../../autoloaded/mutator-fixtures';
 
     /**
      * @param list<string>|null $desiredAttributes

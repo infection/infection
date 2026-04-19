@@ -65,11 +65,11 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    public const PACKAGE_NAME = 'infection/infection';
+    public const string PACKAGE_NAME = 'infection/infection';
 
-    private const NAME = 'Infection - PHP Mutation Testing Framework';
+    private const string NAME = 'Infection - PHP Mutation Testing Framework';
 
-    private const LOGO = '
+    private const string LOGO = '
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \

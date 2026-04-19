@@ -50,7 +50,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(ListSourcesCommand::class)]
 final class ListSourcesCommandTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     private string $cwd;
 

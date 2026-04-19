@@ -53,7 +53,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorIntegrationTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     public function test_it_generates_mutations_for_a_given_file(): void
     {

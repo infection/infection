@@ -43,7 +43,7 @@ final class EnvManipulatorCodeDetector
 {
     use CannotBeInstantiated;
 
-    private const FUNCTIONS = [
+    private const array FUNCTIONS = [
         'putenv',
         'Safe\putenv',
     ];

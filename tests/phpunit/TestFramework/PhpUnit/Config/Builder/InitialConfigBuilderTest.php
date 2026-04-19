@@ -59,9 +59,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(InitialConfigBuilder::class)]
 final class InitialConfigBuilderTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/Fixtures';
+    private const string FIXTURES = __DIR__ . '/Fixtures';
 
-    private const TMP_DIR = '/tmp/infection';
+    private const string TMP_DIR = '/tmp/infection';
 
     private string $projectPath;
 

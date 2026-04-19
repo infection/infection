@@ -45,7 +45,7 @@ use Symfony\Component\Finder\Finder;
  */
 final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
 {
-    private const PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
+    private const string PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
 
     public function __construct(
         private Filesystem $filesystem,

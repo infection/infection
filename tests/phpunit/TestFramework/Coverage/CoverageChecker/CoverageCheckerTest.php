@@ -65,9 +65,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
-    private const COVERAGE_DIR_PATH = __DIR__ . '/Fixtures';
+    private const string COVERAGE_DIR_PATH = __DIR__ . '/Fixtures';
 
-    private const JUNIT_PATH = __DIR__ . '/Fixtures/junit.xml';
+    private const string JUNIT_PATH = __DIR__ . '/Fixtures/junit.xml';
 
     public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_junit_report(): void
     {

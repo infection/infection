@@ -58,7 +58,7 @@ use function substr_count;
 #[CoversNothing]
 final class MakefileTest extends BaseMakefileTestCase
 {
-    private const MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
+    private const string MAKEFILE_PATH = __DIR__ . '/../../../../Makefile';
 
     public function test_the_default_goal_is_the_help_command(): void
     {

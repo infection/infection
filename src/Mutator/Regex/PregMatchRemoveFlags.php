@@ -47,7 +47,7 @@ use function str_split;
  */
 final class PregMatchRemoveFlags extends AbstractPregMatch
 {
-    public const ANALYSE_REGEX = '/^([^\w\s\\\\])(.*)([^\w\s\\\\])([gmixXsuUAJD]*)$/';
+    public const string ANALYSE_REGEX = '/^([^\w\s\\\\])(.*)([^\w\s\\\\])([gmixXsuUAJD]*)$/';
 
     public static function getDefinition(): Definition
     {

@@ -44,7 +44,7 @@ use function str_contains;
  */
 class DiffSourceCodeMatcher
 {
-    private const POSSIBLE_DELIMITERS = [
+    private const array POSSIBLE_DELIMITERS = [
         '#', '%', ':', ';', '=', '?', '@', '^', '~',
     ];
 

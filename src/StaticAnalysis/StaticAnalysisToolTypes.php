@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class StaticAnalysisToolTypes
 {
-    public const PHPSTAN = 'phpstan';
+    public const string PHPSTAN = 'phpstan';
 
     /**
      * @var string[]

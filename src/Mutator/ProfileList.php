@@ -45,7 +45,10 @@ final class ProfileList
 {
     use CannotBeInstantiated;
 
-    public const ALL_PROFILES = [
+    /**
+     * @var array<string, list<class-string>|list<string>>
+     */
+    public const array ALL_PROFILES = [
         '@arithmetic' => self::ARITHMETIC_PROFILE,
         '@boolean' => self::BOOLEAN_PROFILE,
         '@cast' => self::CAST_PROFILE,
@@ -67,7 +70,7 @@ final class ProfileList
         '@unwrap' => self::UNWRAP_PROFILE,
     ];
 
-    public const ARITHMETIC_PROFILE = [
+    public const array ARITHMETIC_PROFILE = [
         Arithmetic\Assignment::class,
         Arithmetic\AssignmentEqual::class,
         Arithmetic\BitwiseAnd::class,
@@ -93,7 +96,7 @@ final class ProfileList
         Arithmetic\ShiftRight::class,
     ];
 
-    public const BOOLEAN_PROFILE = [
+    public const array BOOLEAN_PROFILE = [
         Boolean\ArrayAll::class,
         Boolean\ArrayAny::class,
         Boolean\ArrayItem::class,
@@ -117,14 +120,14 @@ final class ProfileList
         Boolean\Yield_::class,
     ];
 
-    public const CONDITIONAL_BOUNDARY_PROFILE = [
+    public const array CONDITIONAL_BOUNDARY_PROFILE = [
         ConditionalBoundary\GreaterThan::class,
         ConditionalBoundary\GreaterThanOrEqualTo::class,
         ConditionalBoundary\LessThan::class,
         ConditionalBoundary\LessThanOrEqualTo::class,
     ];
 
-    public const CONDITIONAL_NEGOTIATION_PROFILE = [
+    public const array CONDITIONAL_NEGOTIATION_PROFILE = [
         ConditionalNegotiation\Equal::class,
         ConditionalNegotiation\GreaterThanNegotiation::class,
         ConditionalNegotiation\GreaterThanOrEqualToNegotiation::class,
@@ -135,34 +138,34 @@ final class ProfileList
         ConditionalNegotiation\NotIdentical::class,
     ];
 
-    public const EQUAL_PROFILE = [
+    public const array EQUAL_PROFILE = [
         Boolean\NotIdenticalNotEqual::class,
     ];
 
-    public const FUNCTION_SIGNATURE_PROFILE = [
+    public const array FUNCTION_SIGNATURE_PROFILE = [
         FunctionSignature\ProtectedVisibility::class,
         FunctionSignature\PublicVisibility::class,
     ];
 
-    public const IDENTICAL_PROFILE = [
+    public const array IDENTICAL_PROFILE = [
         Boolean\EqualIdentical::class,
         Boolean\NotEqualNotIdentical::class,
     ];
 
-    public const NULLIFY_PROFILE = [
+    public const array NULLIFY_PROFILE = [
         Nullify\ArrayFind::class,
         Nullify\ArrayFindKey::class,
         Nullify\ArrayFirst::class,
         Nullify\ArrayLast::class,
     ];
 
-    public const NUMBER_PROFILE = [
+    public const array NUMBER_PROFILE = [
         Number\DecrementInteger::class,
         Number\IncrementInteger::class,
         Number\OneZeroFloat::class,
     ];
 
-    public const OPERATOR_PROFILE = [
+    public const array OPERATOR_PROFILE = [
         Operator\AssignCoalesce::class,
         Operator\Break_::class,
         Operator\Catch_::class,
@@ -181,7 +184,7 @@ final class ProfileList
         Operator\Throw_::class,
     ];
 
-    public const REGEX_PROFILE = [
+    public const array REGEX_PROFILE = [
         Regex\PregMatchMatches::class,
         Regex\PregMatchRemoveCaret::class,
         Regex\PregMatchRemoveDollar::class,
@@ -189,7 +192,7 @@ final class ProfileList
         Regex\PregQuote::class,
     ];
 
-    public const REMOVAL_PROFILE = [
+    public const array REMOVAL_PROFILE = [
         Removal\ArrayItemRemoval::class,
         Removal\CatchBlockRemoval::class,
         Removal\CloneRemoval::class,
@@ -201,7 +204,7 @@ final class ProfileList
         Removal\SharedCaseRemoval::class,
     ];
 
-    public const RETURN_VALUE_PROFILE = [
+    public const array RETURN_VALUE_PROFILE = [
         ReturnValue\ArrayOneItem::class,
         ReturnValue\FloatNegation::class,
         ReturnValue\FunctionCall::class,
@@ -211,18 +214,18 @@ final class ProfileList
         ReturnValue\YieldValue::class,
     ];
 
-    public const SORT_PROFILE = [
+    public const array SORT_PROFILE = [
         Sort\Spaceship::class,
     ];
 
-    public const LOOP_PROFILE = [
+    public const array LOOP_PROFILE = [
         Loop\DoWhile::class,
         Loop\For_::class,
         Loop\Foreach_::class,
         Loop\While_::class,
     ];
 
-    public const CAST_PROFILE = [
+    public const array CAST_PROFILE = [
         Cast\CastArray::class,
         Cast\CastBool::class,
         Cast\CastFloat::class,
@@ -231,7 +234,7 @@ final class ProfileList
         Cast\CastString::class,
     ];
 
-    public const UNWRAP_PROFILE = [
+    public const array UNWRAP_PROFILE = [
         Unwrap\UnwrapArrayChangeKeyCase::class,
         Unwrap\UnwrapArrayChunk::class,
         Unwrap\UnwrapArrayColumn::class,
@@ -284,12 +287,15 @@ final class ProfileList
         Unwrap\UnwrapUcWords::class,
     ];
 
-    public const EXTENSIONS_PROFILE = [
+    public const array EXTENSIONS_PROFILE = [
         Extensions\BCMath::class,
         Extensions\MBString::class,
     ];
 
-    public const DEFAULT_PROFILE = [
+    /**
+     * @var list<string>
+     */
+    public const array DEFAULT_PROFILE = [
         '@arithmetic',
         '@boolean',
         '@cast',
@@ -307,7 +313,10 @@ final class ProfileList
         '@unwrap',
     ];
 
-    public const ALL_MUTATORS = [
+    /**
+     * @var array<string, class-string>
+     */
+    public const array ALL_MUTATORS = [
         // Arithmetic
         'Assignment' => Arithmetic\Assignment::class,
         'AssignmentEqual' => Arithmetic\AssignmentEqual::class,

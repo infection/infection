@@ -40,7 +40,7 @@ use PhpParser\NodeVisitorAbstract;
 
 final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    public const SKIP_ATTRIBUTE = 'skip';
+    public const string SKIP_ATTRIBUTE = 'skip';
 
     public static function markNodeAsSkipped(Node $node): Node
     {

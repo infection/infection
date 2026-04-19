@@ -46,7 +46,7 @@ use function str_contains;
  */
 class SchemaValidator
 {
-    private const SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
+    private const string SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
 
     /**
      * @throws InvalidSchema
