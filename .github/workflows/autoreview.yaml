@@ -81,7 +81,7 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
 
       - name: Download Mago
-        shell: vendor/bin/mago --version
+        run: vendor/bin/mago --version
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
