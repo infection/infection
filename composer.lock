@@ -2468,16 +2468,16 @@
     "packages-dev": [
         {
             "name": "carthage-software/mago",
-            "version": "1.22.0",
+            "version": "1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carthage-software/mago.git",
-                "reference": "88c4170fb16e5aa941f035b6a924017505c934ce"
+                "reference": "62b96def49b2ecc66ed5359347f52d5c45bb42d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carthage-software/mago/zipball/88c4170fb16e5aa941f035b6a924017505c934ce",
-                "reference": "88c4170fb16e5aa941f035b6a924017505c934ce",
+                "url": "https://api.github.com/repos/carthage-software/mago/zipball/62b96def49b2ecc66ed5359347f52d5c45bb42d1",
+                "reference": "62b96def49b2ecc66ed5359347f52d5c45bb42d1",
                 "shasum": ""
             },
             "require": {
@@ -2512,7 +2512,7 @@
             ],
             "support": {
                 "issues": "https://github.com/carthage-software/mago/issues",
-                "source": "https://github.com/carthage-software/mago/tree/1.22.0"
+                "source": "https://github.com/carthage-software/mago/tree/1.23.0"
             },
             "funding": [
                 {
@@ -2520,7 +2520,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-18T06:49:40+00:00"
+            "time": "2026-04-19T09:20:11+00:00"
         },
         {
             "name": "doctrine/annotations",
