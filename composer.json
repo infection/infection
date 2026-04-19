@@ -42,7 +42,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -98,7 +98,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.0"
+            "php": "8.3.0"
         },
         "sort-packages": true,
         "allow-plugins": {

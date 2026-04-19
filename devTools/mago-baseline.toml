@@ -32,6 +32,18 @@ count = 1
 
 [[issues]]
 file = "src/Command/ConfigureCommand.php"
+code = "missing-constant-type"
+message = "Class constant `NONINTERACTIVE_MODE_ERROR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/ConfigureCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_TEST_FRAMEWORK` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/ConfigureCommand.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\Config\Guesser\SourceDirGuesser::__construct`: expected `stdClass`, but found `mixed`.'
 count = 1
@@ -71,6 +83,30 @@ file = "src/Command/Debug/DumpAstCommand.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
 count = 2
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "missing-constant-type"
+message = "Class constant `CHANGED_LINES_PARTS_COUNT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "missing-constant-type"
+message = "Class constant `CHANGED_LINES_RANGES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "missing-constant-type"
+message = "Class constant `FILE_PATH_ARGUMENT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/DumpAstCommand.php"
+code = "missing-constant-type"
+message = "Class constant `SHOW_ATTRIBUTES` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
@@ -130,6 +166,30 @@ count = 1
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Command\Debug\DumpAstCommand::getFile`.'
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/MockTeamCityCommand.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_TIME_IN_MILLISECONDS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/MockTeamCityCommand.php"
+code = "missing-constant-type"
+message = "Class constant `LOG_FILE_PATH_ARGUMENT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/MockTeamCityCommand.php"
+code = "missing-constant-type"
+message = "Class constant `MILLISECONDS_IN_MICROSECONDS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Debug/MockTeamCityCommand.php"
+code = "missing-constant-type"
+message = "Class constant `TIME_IN_MICRO_SECONDS_OPTION` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -242,6 +302,12 @@ count = 1
 
 [[issues]]
 file = "src/Command/Git/Option/BaseOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Git/Option/BaseOption.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -250,6 +316,12 @@ count = 1
 file = "src/Command/Git/Option/FilterOption.php"
 code = "invalid-return-statement"
 message = '''Invalid return type for function `Infection\Command\Git\Option\FilterOption::addOption`: expected `('T.infection\command\git\option\filteroption::addoption() extends Symfony\Component\Console\Command\Command)`, but found `$this(Symfony\Component\Console\Command\Command)`.'''
+count = 1
+
+[[issues]]
+file = "src/Command/Git/Option/FilterOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -284,6 +356,12 @@ count = 1
 
 [[issues]]
 file = "src/Command/InitialTest/Option/InitialTestsPhpOptionsOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/InitialTest/Option/InitialTestsPhpOptionsOption.php"
 code = "unused-template-parameter"
 message = 'Template parameter `T` is never used in method `Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption::addOption`.'
 count = 1
@@ -304,6 +382,12 @@ count = 1
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "invalid-return-statement"
 message = "Invalid return type for function `12472592161311982528:3960`: expected `string`, but found `null|string`."
+count = 1
+
+[[issues]]
+file = "src/Command/MakeCustomMutatorCommand.php"
+code = "missing-constant-type"
+message = "Class constant `MUTATOR_NAME_ARGUMENT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -343,9 +427,21 @@ message = '''Invalid return type for function `Infection\Command\Option\Configur
 count = 1
 
 [[issues]]
+file = "src/Command/Option/ConfigurationOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Command/Option/DebugOption.php"
 code = "invalid-return-statement"
 message = '''Invalid return type for function `Infection\Command\Option\DebugOption::addOption`: expected `('T.infection\command\option\commandoption::addoption() extends Symfony\Component\Console\Command\Command)`, but found `$this(Symfony\Component\Console\Command\Command)`.'''
+count = 1
+
+[[issues]]
+file = "src/Command/Option/DebugOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -364,6 +460,12 @@ count = 1
 file = "src/Command/Option/MapSourceClassToTestOption.php"
 code = "invalid-return-statement"
 message = '''Invalid return type for function `Infection\Command\Option\MapSourceClassToTestOption::addOption`: expected `('T.infection\command\option\commandoption::addoption() extends Symfony\Component\Console\Command\Command)`, but found `$this(Symfony\Component\Console\Command\Command)`.'''
+count = 1
+
+[[issues]]
+file = "src/Command/Option/MapSourceClassToTestOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -392,6 +494,30 @@ count = 1
 
 [[issues]]
 file = "src/Command/Option/SourceFilterOptions.php"
+code = "missing-constant-type"
+message = "Class constant `GIT_DIFF_BASE_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Option/SourceFilterOptions.php"
+code = "missing-constant-type"
+message = "Class constant `GIT_DIFF_FILTER_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Option/SourceFilterOptions.php"
+code = "missing-constant-type"
+message = "Class constant `GIT_DIFF_LINES_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Option/SourceFilterOptions.php"
+code = "missing-constant-type"
+message = "Class constant `PLAIN_FILTER_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Option/SourceFilterOptions.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 2
@@ -410,6 +536,12 @@ count = 1
 
 [[issues]]
 file = "src/Command/Option/TestFrameworkOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Option/TestFrameworkOption.php"
 code = "unused-template-parameter"
 message = 'Template parameter `T` is never used in method `Infection\Command\Option\TestFrameworkOption::addOption`.'
 count = 1
@@ -422,8 +554,188 @@ count = 1
 
 [[issues]]
 file = "src/Command/Option/TestFrameworkOptionsOption.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/Option/TestFrameworkOptionsOption.php"
 code = "unused-template-parameter"
 message = 'Template parameter `T` is never used in method `Infection\Command\Option\TestFrameworkOptionsOption::addOption`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_COVERAGE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_DRY_RUN` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_EXECUTE_ONLY_COVERING_TEST_CASES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_FORCE_PROGRESS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_FORMATTER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_IGNORE_MSI_WITH_NO_MUTATIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOGGER_GITHUB` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOGGER_GITLAB` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOGGER_HTML` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOGGER_PROJECT_ROOT_DIRECTORY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOGGER_SUMMARY_JSON` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOGGER_TEXT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_LOG_VERBOSITY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_MAX_TIMEOUTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_MIN_COVERED_MSI` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_MIN_MSI` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_MUTANT_ID` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_MUTATORS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_NO_PROGRESS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_SHOW_MUTATIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_SKIP_INITIAL_TESTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_STATIC_ANALYSIS_TOOL_OPTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_STATIC_ANALYSIS_TOOL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_TEAMCITY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_THREADS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_USE_NOOP_MUTATORS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_VALUE_NOT_PROVIDED` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_WITH_TIMEOUTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "missing-constant-type"
+message = "Class constant `OPTION_WITH_UNCOVERED` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -560,6 +872,12 @@ count = 2
 
 [[issues]]
 file = "src/Config/Guesser/PhpUnitPathGuesser.php"
+code = "missing-constant-type"
+message = "Class constant `CURRENT_DIR_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Config/Guesser/PhpUnitPathGuesser.php"
 code = "mixed-assignment"
 message = "Assigning `nonnull` type to a variable may lead to unexpected behavior."
 count = 1
@@ -610,6 +928,12 @@ count = 1
 file = "src/Config/ValueProvider/ExcludeDirsProvider.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `list<truthy-mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Config\ValueProvider\ExcludeDirsProvider::get` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Config/ValueProvider/ExcludeDirsProvider.php"
+code = "missing-constant-type"
+message = "Class constant `EXCLUDED_ROOT_DIRS` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -722,6 +1046,12 @@ count = 1
 
 [[issues]]
 file = "src/Configuration/Configuration.php"
+code = "missing-constant-type"
+message = "Class constant `LOG_VERBOSITY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Configuration/Configuration.php"
 code = "redundant-type-comparison"
 message = 'Redundant type assertion: `$mutators` of type `array<string, Infection\Mutator\Mutator<PhpParser\Node>>` is always not `iterable<mixed, Infection\Mutator\Mutator<PhpParser\Node>>`.'
 count = 1
@@ -736,6 +1066,12 @@ count = 1
 file = "src/Configuration/ConfigurationFactory.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `array<string, list<mixed>>` is less specific than the declared return type `array<string, array<int, string>>` for function `Infection\Configuration\ConfigurationFactory::retrieveIgnoreSourceCodeMutatorsMap` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Configuration/ConfigurationFactory.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_TIMEOUT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -902,6 +1238,36 @@ count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_DIST_JSON5_CONFIG_FILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_DIST_JSON_CONFIG_FILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_JSON5_CONFIG_FILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_JSON_CONFIG_FILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
+code = "missing-constant-type"
+message = "Class constant `POSSIBLE_DEFAULT_CONFIG_FILE_NAMES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileNotFound` in `Infection\Configuration\Schema\SchemaConfigurationLoader::loadConfiguration`.'
 count = 1
@@ -910,6 +1276,12 @@ count = 1
 file = "src/Configuration/Schema/SchemaConfigurationLoader.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Configuration\Schema\SchemaConfigurationLoader::loadConfiguration`.'
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaValidator.php"
+code = "missing-constant-type"
+message = "Class constant `SCHEMA_FILE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -950,14 +1322,104 @@ count = 1
 
 [[issues]]
 file = "src/Console/Application.php"
+code = "missing-constant-type"
+message = "Class constant `LOGO` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/Application.php"
+code = "missing-constant-type"
+message = "Class constant `NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/Application.php"
+code = "missing-constant-type"
+message = "Class constant `PACKAGE_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/Application.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Console\Application::getPrettyVersion`.'
+count = 1
+
+[[issues]]
+file = "src/Console/ConsoleOutput.php"
+code = "missing-constant-type"
+message = "Class constant `MIN_MSI_CAN_GET_INCREASED_NOTICE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/ConsoleOutput.php"
+code = "missing-constant-type"
+message = "Class constant `RUNNING_WITH_DEBUGGER_NOTE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/Input/MsiParser.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_PRECISION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/Input/MsiParser.php"
+code = "missing-constant-type"
+message = "Class constant `EXPLODE_PARTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `ALLOWED_OPTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `DEBUG_INTEGER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `DEBUG` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `NONE_INTEGER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `NONE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `NORMAL_INTEGER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Console/LogVerbosity.php"
+code = "missing-constant-type"
+message = "Class constant `NORMAL` is missing a type hint."
 count = 1
 
 [[issues]]
 file = "src/Console/LogVerbosity.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/Console/XdebugHandler.php"
+code = "missing-constant-type"
+message = "Class constant `PREFIX` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -976,6 +1438,228 @@ count = 1
 file = "src/Container/Container.php"
 code = "less-specific-nested-argument-type"
 message = '''Argument type mismatch for argument #2 of `Infection\Container\Container::offsetSet`: expected `(closure(Infection\Container\Container): ('T.infection\container\container::clonewithservice() extends object))`, but provided type `('T.infection\container\container::clonewithservice() extends Closure)|Closure` is less specific.'''
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_CONFIG_FILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_DEBUG` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_DRY_RUN` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_EXISTING_COVERAGE_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_FILTER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_FORCE_PROGRESS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_FORMATTER_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_GITLAB_LOGGER_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_GIT_DIFF_BASE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_GIT_DIFF_FILTER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_HTML_LOGGER_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_INITIAL_TESTS_PHP_OPTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_LOG_VERBOSITY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MAX_TIMEOUTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MIN_COVERED_MSI` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MIN_MSI` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MSI_PRECISION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MUTANT_ID` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_MUTATORS_INPUT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_NO_PROGRESS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_SHOW_MUTATIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_SKIP_INITIAL_TESTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_STATIC_ANALYSIS_TOOL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_SUMMARY_JSON_LOGGER_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_TEST_FRAMEWORK` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_TEXT_LOGGER_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_THREAD_COUNT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_TIMEOUTS_AS_ESCAPED` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_USE_GITHUB_LOGGER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_USE_NOOP_MUTATORS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_WITH_UNCOVERED` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1039,6 +1723,12 @@ message = "Reference created from a previously undefined variable `$matches`."
 count = 1
 
 [[issues]]
+file = "src/Differ/DiffSourceCodeMatcher.php"
+code = "missing-constant-type"
+message = "Class constant `POSSIBLE_DELIMITERS` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Differ/Differ.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\Differ\Differ::processTokens`: expected `array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}`, but found `mixed`.'
@@ -1060,6 +1750,12 @@ count = 1
 file = "src/Differ/Tokens.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Differ\Tokens::computeRange`: expected `array{0: int(0)|positive-int, 1: int(0)|positive-int}`, but found `list{non-negative-int, int}`.'
+count = 1
+
+[[issues]]
+file = "src/Differ/Tokens.php"
+code = "missing-constant-type"
+message = "Class constant `CONTEXT_LINES` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1126,6 +1822,12 @@ count = 1
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Event\EventDispatcher\SyncEventDispatcher::inferSubscribedEvents`.'
+count = 1
+
+[[issues]]
+file = "src/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriber.php"
+code = "missing-constant-type"
+message = "Class constant `PHPUNIT_RESULT_CACHE_PATTERN` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1202,6 +1904,12 @@ count = 1
 
 [[issues]]
 file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
+code = "missing-constant-type"
+message = "Class constant `BAT_EXTENSION_LENGTH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
 count = 1
@@ -1246,6 +1954,12 @@ count = 1
 file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\filesystem\finder\exception\finderexception` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::shouldUseCustomPath`.'
+count = 1
+
+[[issues]]
+file = "src/FileSystem/Finder/TestFrameworkFinder.php"
+code = "missing-constant-type"
+message = "Class constant `BAT_EXTENSION_LENGTH` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1363,6 +2077,12 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileNot
 count = 1
 
 [[issues]]
+file = "src/FileSystem/TmpDirProvider.php"
+code = "missing-constant-type"
+message = "Class constant `BASE_DIR_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Framework/ClassName.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Framework\ClassName::getShortClassName`: expected `non-empty-string`, but found `string`.'
@@ -1417,9 +2137,27 @@ message = '''Invalid argument type for argument #1 of `Infection\Framework\Itera
 count = 1
 
 [[issues]]
+file = "src/Framework/Iterable/IterableCounter.php"
+code = "missing-constant-type"
+message = "Class constant `UNKNOWN_COUNT` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Framework/Str.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Framework\Str::findLastNonEmptyLineIndex`: expected `non-negative-int`, but found `int`.'
+count = 1
+
+[[issues]]
+file = "src/Framework/Str.php"
+code = "missing-constant-type"
+message = "Class constant `SYSTEM_LINE_ENDINGS_REPLACEMENT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Framework/Str.php"
+code = "missing-constant-type"
+message = "Class constant `UNIX_LINE_ENDINGS_REPLACEMENT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1438,6 +2176,36 @@ count = 1
 file = "src/Git/CommandLineGit.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Git/CommandLineGit.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_SYMBOLIC_REFERENCE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Git/CommandLineGit.php"
+code = "missing-constant-type"
+message = "Class constant `DIFF_LINE_PATH_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Git/CommandLineGit.php"
+code = "missing-constant-type"
+message = "Class constant `DIFF_LINE_RANGE_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Git/CommandLineGit.php"
+code = "missing-constant-type"
+message = "Class constant `DIFF_LINE_RANGE_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Git/CommandLineGit.php"
+code = "missing-constant-type"
+message = "Class constant `DIFF_LINE_REGEX` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1489,6 +2257,18 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
+file = "src/Git/Git.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_GIT_DIFF_FILTER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Git/Git.php"
+code = "missing-constant-type"
+message = "Class constant `FALLBACK_BASE` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger::start`.'
@@ -1498,6 +2278,30 @@ count = 1
 file = "src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger::start`.'
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/BasicConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `ERROR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/BasicConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `FORMAT_LEVEL_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/BasicConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `INFO` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/BasicConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `VERBOSITY_LEVEL_MAP` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1520,6 +2324,36 @@ count = 1
 
 [[issues]]
 file = "src/Logger/Console/ConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `ERROR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/ConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `FORMAT_LEVEL_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/ConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `INFO` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/ConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `IO_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/ConsoleLogger.php"
+code = "missing-constant-type"
+message = "Class constant `VERBOSITY_LEVEL_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/Console/ConsoleLogger.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
@@ -1531,9 +2365,39 @@ message = "Possible argument type mismatch for argument #2 of `strtr`: expected 
 count = 1
 
 [[issues]]
+file = "src/Logger/MutationAnalysis/ConsoleDotLogger.php"
+code = "missing-constant-type"
+message = "Class constant `DOTS_PER_ROW` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Logger\MutationAnalysis\TeamCity\TeamCity::escapeValue`: expected `non-empty-string`, but found `array<array-key, mixed>|string`.'
+count = 1
+
+[[issues]]
+file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
+code = "missing-constant-type"
+message = "Class constant `CHARACTERS_TO_ESCAPE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
+code = "missing-constant-type"
+message = "Class constant `ESCAPED_CHARACTERS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/MutationAnalysis/TeamCity/TeamCity.php"
+code = "missing-constant-type"
+message = "Class constant `UNICODE_CHARACTER_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Logger/MutationAnalysis/TeamCity/Test.php"
+code = "missing-constant-type"
+message = "Class constant `MILLISECONDS_PER_SECOND` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1546,6 +2410,12 @@ count = 1
 file = "src/Metrics/FilteringResultsCollectorFactory.php"
 code = "invalid-argument"
 message = 'Invalid argument type for argument #2 of `Infection\Metrics\FilteringResultsCollector::__construct`: expected `array<array-key, enum(Infection\Mutant\DetectionStatus)>`, but found `non-empty-array<key-of<enum(Infection\Mutant\DetectionStatus)>, enum(Infection\Mutant\DetectionStatus)>`.'
+count = 1
+
+[[issues]]
+file = "src/Metrics/MinMsiChecker.php"
+code = "missing-constant-type"
+message = "Class constant `VALUE_OVER_REQUIRED_TOLERANCE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1600,6 +2470,12 @@ count = 1
 file = "src/Mutant/MutantExecutionResult.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Mutant\MutantExecutionResult::toColumn`.'
+count = 1
+
+[[issues]]
+file = "src/Mutant/TestFrameworkMutantExecutionResultFactory.php"
+code = "missing-constant-type"
+message = "Class constant `PROCESS_MIN_ERROR_CODE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1666,6 +2542,12 @@ count = 1
 file = "src/Mutator/AllowedFunctionsConfig.php"
 code = "redundant-type-comparison"
 message = "Redundant type assertion: `$enabled` of type `bool` is always not `bool`."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Arithmetic/RoundingFamily.php"
+code = "missing-constant-type"
+message = "Class constant `MUTATORS_MAP` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1748,6 +2630,12 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/Boolean/TrueValueConfig.php"
+code = "missing-constant-type"
+message = "Class constant `KNOWN_FUNCTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Boolean/TrueValueConfig.php"
 code = "redundant-type-comparison"
 message = "Redundant type assertion: `$enabled` of type `bool` is always not `bool`."
 count = 1
@@ -1801,6 +2689,12 @@ message = 'Parameter `$settings` of `Infection\Mutator\Extensions\BCMathConfig::
 count = 1
 
 [[issues]]
+file = "src/Mutator/Extensions/BCMathConfig.php"
+code = "missing-constant-type"
+message = "Class constant `KNOWN_FUNCTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Mutator/Extensions/MBString.php"
 code = "less-specific-nested-return-statement"
 message = '''Returned type `(closure(PhpParser\Node\Expr\FuncCall): Generator<mixed, mixed, mixed, mixed>)` is less specific than the declared return type `(closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)` for function `Infection\Mutator\Extensions\MBString::makeConvertCaseMapper` due to nested 'mixed'.'''
@@ -1837,6 +2731,12 @@ message = 'Parameter `$settings` of `Infection\Mutator\Extensions\MBStringConfig
 count = 1
 
 [[issues]]
+file = "src/Mutator/Extensions/MBStringConfig.php"
+code = "missing-constant-type"
+message = "Class constant `KNOWN_FUNCTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Mutator/IgnoreConfig.php"
 code = "property-type-coercion"
 message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$$hashtable` (array<string, int>)."
@@ -1846,6 +2746,12 @@ count = 1
 file = "src/Mutator/IgnoreMutator.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #2 of `Infection\Mutator\IgnoreConfig::isIgnored`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Mutator/InvalidMutator.php"
+code = "missing-constant-type"
+message = "Class constant `GITHUB_BUG_LINK` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1964,6 +2870,30 @@ count = 2
 
 [[issues]]
 file = "src/Mutator/MutatorResolver.php"
+code = "missing-constant-type"
+message = "Class constant `GLOBAL_IGNORE_SETTING` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
+code = "missing-constant-type"
+message = "Class constant `GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
+code = "missing-constant-type"
+message = "Class constant `IGNORE_SETTING` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
+code = "missing-constant-type"
+message = "Class constant `IGNORE_SOURCE_CODE_BY_REGEX_SETTING` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\Mutator\MutatorResolver::registerFromClass`: expected `string`, but found `mixed`.'
 count = 1
@@ -2071,9 +3001,21 @@ message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no lon
 count = 1
 
 [[issues]]
+file = "src/Mutator/Number/DecrementInteger.php"
+code = "missing-constant-type"
+message = "Class constant `NON_NEGATIVE_INT_RETURNING_FUNCTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Mutator/Number/IncrementInteger.php"
 code = "deprecated-class"
 message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
+count = 1
+
+[[issues]]
+file = "src/Mutator/Number/IncrementInteger.php"
+code = "missing-constant-type"
+message = "Class constant `FUNCTIONS_RETURNING_MAX_INTEGER` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2125,6 +3067,132 @@ message = 'Class `PhpParser\Node\Expr\ArrayItem` is deprecated and should no lon
 count = 1
 
 [[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `ALL_MUTATORS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `ALL_PROFILES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `ARITHMETIC_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `BOOLEAN_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `CAST_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `CONDITIONAL_BOUNDARY_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `CONDITIONAL_NEGOTIATION_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `EQUAL_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `EXTENSIONS_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `FUNCTION_SIGNATURE_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `IDENTICAL_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `LOOP_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `NULLIFY_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `NUMBER_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `OPERATOR_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `REGEX_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `REMOVAL_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `RETURN_VALUE_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `SORT_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/ProfileList.php"
+code = "missing-constant-type"
+message = "Class constant `UNWRAP_PROFILE` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Mutator/Regex/AbstractPregMatch.php"
 code = "hidden-generator-return"
 message = 'The value returned by generator function `Infection\Mutator\Regex\AbstractPregMatch::mutate` may be inaccessible to callers.'
@@ -2143,6 +3211,18 @@ message = 'The value returned by generator function `Infection\Mutator\Regex\Pre
 count = 1
 
 [[issues]]
+file = "src/Mutator/Regex/PregMatchMatches.php"
+code = "missing-constant-type"
+message = "Class constant `MIN_ARGS_TO_MUTATE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Regex/PregMatchRemoveCaret.php"
+code = "missing-constant-type"
+message = "Class constant `ANALYSE_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Mutator/Regex/PregMatchRemoveCaret.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
@@ -2156,6 +3236,12 @@ count = 2
 
 [[issues]]
 file = "src/Mutator/Regex/PregMatchRemoveDollar.php"
+code = "missing-constant-type"
+message = "Class constant `ANALYSE_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Regex/PregMatchRemoveDollar.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
 count = 2
@@ -2165,6 +3251,12 @@ file = "src/Mutator/Regex/PregMatchRemoveDollar.php"
 code = "reference-to-undefined-variable"
 message = "Reference created from a previously undefined variable `$matches`."
 count = 2
+
+[[issues]]
+file = "src/Mutator/Regex/PregMatchRemoveFlags.php"
+code = "missing-constant-type"
+message = "Class constant `ANALYSE_REGEX` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "src/Mutator/Regex/PregMatchRemoveFlags.php"
@@ -2192,8 +3284,20 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/Removal/ArrayItemRemovalConfig.php"
+code = "missing-constant-type"
+message = "Class constant `REMOVE_VALUES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Removal/ArrayItemRemovalConfig.php"
 code = "redundant-type-comparison"
 message = "Redundant type assertion: `$this->limit` of type `int|int(2147483647)|int(9223372036854775807)` is always not `int`."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Removal/CatchBlockRemoval.php"
+code = "missing-constant-type"
+message = "Class constant `MIN_CATCH_COUNT_TO_MUTATE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2294,6 +3398,12 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/Unwrap/UnwrapArrayUintersectUassoc.php"
+code = "missing-constant-type"
+message = "Class constant `NON_MUTABLE_ARGS_COUNT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Unwrap/UnwrapArrayUintersectUassoc.php"
 code = "yield-from-invalid-value-type"
 message = "Invalid value type from `yield from`: current generator expects to yield `int`, but the inner iterable yields `array-key`."
 count = 1
@@ -2308,6 +3418,12 @@ count = 1
 file = "src/Mutator/Util/AbstractAllSubExprNegation.php"
 code = "incompatible-parameter-type"
 message = '''Parameter `$node` of `Infection\Mutator\Util\AbstractAllSubExprNegation::mutate()` expects type `PhpParser\Node\Expr` but parent `Infection\Mutator\Mutator::mutate()` expects type `('TNode.infection\mutator\util\abstractallsubexprnegation extends PhpParser\Node)`'''
+count = 1
+
+[[issues]]
+file = "src/Mutator/Util/AbstractAllSubExprNegation.php"
+code = "missing-constant-type"
+message = "Class constant `BOOLEANS` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2371,6 +3487,18 @@ message = 'Could not infer a precise return type for function `Infection\Mutator
 count = 1
 
 [[issues]]
+file = "src/Mutator/Util/ReturnTypeHelper.php"
+code = "missing-constant-type"
+message = "Class constant `NULL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Mutator/Util/ReturnTypeHelper.php"
+code = "missing-constant-type"
+message = "Class constant `VOID` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/PhpParser/FileParser.php"
 code = "possibly-false-argument"
 message = 'Argument #1 of method `Infection\PhpParser\UnparsableFile::fromInvalidFile` is possibly `false`, but parameter type `string` does not accept it.'
@@ -2392,6 +3520,12 @@ count = 1
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "invalid-operand"
 message = "Right operand in `&&` operation is an `array`."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/NodeDumper/NodeDumper.php"
+code = "missing-constant-type"
+message = "Class constant `IGNORE_ATTRIBUTES` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2492,8 +3626,32 @@ count = 1
 
 [[issues]]
 file = "src/PhpParser/Visitor/AddIdToTraversedNodesVisitor/AddIdToTraversedNodesVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `NODE_ID_ATTRIBUTE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/AddIdToTraversedNodesVisitor/AddIdToTraversedNodesVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor::getNodeId`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeIgnoredNodesVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `IGNORE_ALL_MUTATIONS_ANNOTATION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php"
+code = "missing-constant-type"
+message = "Class constant `RESOLVED_NAMESPACE_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php"
+code = "missing-constant-type"
+message = "Class constant `RESOLVED_NAME` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2506,6 +3664,12 @@ count = 1
 file = "src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php"
 code = "non-existent-property"
 message = 'Property `$namespacedName` does not exist on interface `PhpParser\Node`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `MUTATION_CANDIDATE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2540,8 +3704,32 @@ count = 1
 
 [[issues]]
 file = "src/PhpParser/Visitor/LabelNodesAsEligibleVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `ELIGIBLE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/LabelNodesAsEligibleVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor::isEligible`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/MarkTraversedNodesAsVisitedVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `VISITED_ATTRIBUTE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/NextConnectingVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `NEXT_ATTRIBUTE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ParentConnector.php"
+code = "missing-constant-type"
+message = "Class constant `PARENT_ATTRIBUTE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2554,6 +3742,42 @@ count = 1
 file = "src/PhpParser/Visitor/ParentConnector.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ParentConnector::getParent`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `FUNCTION_NAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `FUNCTION_SCOPE_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `IS_INSIDE_FUNCTION_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `IS_ON_FUNCTION_SIGNATURE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `REFLECTION_CLASS_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ReflectionVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `STRICT_TYPES_KEY` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2575,6 +3799,12 @@ message = 'Argument #1 of method `Infection\PhpParser\Visitor\ParentConnector::f
 count = 1
 
 [[issues]]
+file = "src/Process/DryRunProcess.php"
+code = "missing-constant-type"
+message = "Class constant `PASSING_TEST_OUTPUT` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Process/Factory/InitialTestsRunProcessFactory.php"
 code = "ambiguous-instantiation-target"
 message = "Ambiguous instantiation: the expression used with `new` can resolve to multiple different classes."
@@ -2584,6 +3814,18 @@ count = 1
 file = "src/Process/Factory/InitialTestsRunProcessFactory.php"
 code = "unsafe-instantiation"
 message = 'Unsafe `new $class_name`: constructor of `Symfony\Component\Process\Process` is not final and its signature might change in child classes, potentially leading to runtime errors.'
+count = 1
+
+[[issues]]
+file = "src/Process/Factory/MutantProcessContainerFactory.php"
+code = "missing-constant-type"
+message = "Class constant `TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Process/Factory/MutantProcessContainerFactory.php"
+code = "missing-constant-type"
+message = "Class constant `TIMEOUT_FACTOR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2648,6 +3890,12 @@ count = 1
 
 [[issues]]
 file = "src/Process/Runner/ParallelProcessRunner.php"
+code = "missing-constant-type"
+message = "Class constant `POLL_WAIT_IN_MS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Process/Runner/ParallelProcessRunner.php"
 code = "possibly-invalid-argument"
 message = 'Possible argument type mismatch for argument #1 of `Infection\Process\Runner\ProcessQueue::enqueueFrom`: expected `Iterator<mixed, Infection\Process\MutantProcessContainer>`, but possibly received `Generator<mixed, Infection\Process\MutantProcessContainer, mixed, mixed>`.'
 count = 3
@@ -2662,6 +3910,18 @@ count = 1
 file = "src/Process/Runner/ParallelProcessRunner.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Process\Runner\ParallelProcessRunner::startProcess`.'
+count = 1
+
+[[issues]]
+file = "src/Process/Runner/ProcessQueue.php"
+code = "missing-constant-type"
+message = "Class constant `MINIMAL_DEPTH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Process/Runner/ProcessQueue.php"
+code = "missing-constant-type"
+message = "Class constant `NANO_SECONDS_IN_MILLI_SECOND` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2683,9 +3943,33 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\R
 count = 1
 
 [[issues]]
+file = "src/Reflection/Visibility.php"
+code = "missing-constant-type"
+message = "Class constant `PROTECTED` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reflection/Visibility.php"
+code = "missing-constant-type"
+message = "Class constant `PUBLIC` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Reporter/BaseTextFileReporter.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #1 of `Infection\Reporter\BaseTextFileReporter::getMutatorLine`: expected `int`, but provided type `array-key` is less specific.'
+count = 1
+
+[[issues]]
+file = "src/Reporter/FileLocationReporter.php"
+code = "missing-constant-type"
+message = "Class constant `PAD_LENGTH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/FileReporter.php"
+code = "missing-constant-type"
+message = "Class constant `ALLOWED_PHP_STREAMS` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2693,6 +3977,12 @@ file = "src/Reporter/FileReporterFactory.php"
 code = "invalid-yield-key-type"
 message = "Invalid key type yielded; expected `string`, but found `null|string`."
 count = 8
+
+[[issues]]
+file = "src/Reporter/GitHubAnnotationsReporter.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_OUTPUT` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "src/Reporter/GitHubAnnotationsReporter.php"
@@ -2716,6 +4006,24 @@ count = 1
 file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
 code = "imprecise-type"
 message = "Type `array` in return type of `retrieveMutants` is imprecise, equivalent to `array<array-key, mixed>`."
+count = 1
+
+[[issues]]
+file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `DETECTION_STATUS_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `DIFF_HEADERS_LINES_COUNT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `PLUS_LENGTH` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2779,6 +4087,30 @@ message = "Redundant type assertion: `$originalCode` of type `string` is always 
 count = 1
 
 [[issues]]
+file = "src/Reporter/Http/Response.php"
+code = "missing-constant-type"
+message = "Class constant `HTTP_CREATED` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/Http/Response.php"
+code = "missing-constant-type"
+message = "Class constant `HTTP_MAX_ERROR_CODE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/Http/Response.php"
+code = "missing-constant-type"
+message = "Class constant `HTTP_OK` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/Http/StrykerCurlClient.php"
+code = "missing-constant-type"
+message = "Class constant `STRYKER_DASHBOARD_API_BASE_URL` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Reporter/Http/StrykerCurlClient.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\Reporter\Http\Response::__construct`: expected `int`, but found `mixed`.'
@@ -2788,6 +4120,30 @@ count = 1
 file = "src/Reporter/Http/StrykerCurlClient.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/Reporter/PerMutatorReporter.php"
+code = "missing-constant-type"
+message = "Class constant `ROUND_PRECISION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/ShowMetricsReporter.php"
+code = "missing-constant-type"
+message = "Class constant `LOW_QUALITY_THRESHOLD` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/ShowMetricsReporter.php"
+code = "missing-constant-type"
+message = "Class constant `MEDIUM_QUALITY_THRESHOLD` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Reporter/ShowMetricsReporter.php"
+code = "missing-constant-type"
+message = "Class constant `PAD_LENGTH` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2813,6 +4169,30 @@ file = "src/Reporter/ShowMutationsReporter.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
 count = 2
+
+[[issues]]
+file = "src/Resource/Memory/MemoryFormatter.php"
+code = "missing-constant-type"
+message = "Class constant `BYTES_IN_KB` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Resource/Memory/MemoryFormatter.php"
+code = "missing-constant-type"
+message = "Class constant `DECIMALS_TO_SHOW` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Resource/Memory/MemoryFormatter.php"
+code = "missing-constant-type"
+message = "Class constant `UNITS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Resource/Time/TimeFormatter.php"
+code = "missing-constant-type"
+message = "Class constant `TIME_HORIZONS` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "src/Source/Collector/BasicSourceCollector.php"
@@ -2846,8 +4226,26 @@ count = 1
 
 [[issues]]
 file = "src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_EXTENSIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\filesystem\locator\fileordirectorynotfound` in `Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator::locate`.'
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+code = "missing-constant-type"
+message = "Class constant `VERSION_1` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+code = "missing-constant-type"
+message = "Class constant `VERSION_2` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2882,6 +4280,12 @@ count = 1
 
 [[issues]]
 file = "src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
+code = "missing-constant-type"
+message = "Class constant `PROCESS_MIN_ERROR_CODE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `int|null`)."
 count = 1
@@ -2890,6 +4294,12 @@ count = 1
 file = "src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory::buildMutationConfigFile`.'
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/StaticAnalysisToolTypes.php"
+code = "missing-constant-type"
+message = "Class constant `PHPSTAN` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2942,6 +4352,12 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/AdapterInstallationDecider.php"
+code = "missing-constant-type"
+message = "Class constant `ADAPTER_NAME_TO_CLASS_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/AdapterInstallationDecider.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\TestFramework\AdapterInstallationDecider::shouldBeInstalled`. Saw type `mixed`.'
 count = 1
@@ -2950,6 +4366,18 @@ count = 1
 file = "src/TestFramework/AdapterInstallationDecider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Console\Exception\RuntimeException` in `Infection\TestFramework\AdapterInstallationDecider::shouldBeInstalled`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/AdapterInstaller.php"
+code = "missing-constant-type"
+message = "Class constant `OFFICIAL_ADAPTERS_MAP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/AdapterInstaller.php"
+code = "missing-constant-type"
+message = "Class constant `TIMEOUT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -2984,6 +4412,12 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/CommandLineBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `BAT_EXTENSION_LENGTH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/CommandLineBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\filesystem\finder\exception\finderexception` in `Infection\TestFramework\CommandLineBuilder::findPhp`.'
 count = 1
@@ -2996,8 +4430,26 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/Config/TestFrameworkConfigLocator.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_EXTENSIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Config/TestFrameworkConfigLocator.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\filesystem\locator\fileordirectorynotfound` in `Infection\TestFramework\Config\TestFrameworkConfigLocator::locate`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/CoverageChecker.php"
+code = "missing-constant-type"
+message = "Class constant `CODECEPTION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/CoverageChecker.php"
+code = "missing-constant-type"
+message = "Class constant `PHPUNIT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3019,9 +4471,27 @@ message = 'Parameter #1 of `Infection\TestFramework\Coverage\JUnit\JUnitReportLo
 count = 1
 
 [[issues]]
+file = "src/TestFramework/Coverage/JUnit/JUnitReportLocator.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_JUNIT_FILENAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/JUnit/JUnitReportLocator.php"
+code = "missing-constant-type"
+message = "Class constant `JUNIT_FILENAME_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/TestFramework/Coverage/JUnit/JUnitTestCaseTimeAdder.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `array_sum`: expected `array<array-key, float|int>`, but possibly received `array<array-key, float|null>`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php"
+code = "missing-constant-type"
+message = "Class constant `MAX_EXPLODE_PARTS` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3139,6 +4609,18 @@ message = 'Parameter #1 of `Infection\TestFramework\Coverage\XmlReport\IndexXmlC
 count = 1
 
 [[issues]]
+file = "src/TestFramework/Coverage/XmlReport/IndexXmlCoverageLocator.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_INDEX_RELATIVE_PATHNAME` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Coverage/XmlReport/IndexXmlCoverageLocator.php"
+code = "missing-constant-type"
+message = "Class constant `INDEX_FILENAME_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser::parse`.'
@@ -3211,9 +4693,21 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
+file = "src/TestFramework/MapSourceClassToTestStrategy.php"
+code = "missing-constant-type"
+message = "Class constant `SIMPLE` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
 code = "invalid-type-cast"
 message = "Non numeric string of type `string` implicitly cast to `float`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php"
+code = "missing-constant-type"
+message = "Class constant `COVERAGE_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3280,6 +4774,42 @@ count = 1
 file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder::splitMethodNameFromProviderKey`: expected `array{0: string, 1: string}`, but found `non-empty-list<string>`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `BAILOUT_OPTIMIZATION_LEVEL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `DROP_TEST_CASE_OPTIMIZATION_LEVEL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `MAX_EXPLODE_PARTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `NO_OPTIMIZATION_LEVEL` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php"
+code = "missing-constant-type"
+message = "Class constant `PCRE_LIMIT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3374,6 +4904,18 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
+code = "missing-constant-type"
+message = "Class constant `LAST_LEGACY_VERSION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
+code = "missing-constant-type"
+message = "Class constant `NEXT_MAINSTREAM_VERSION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php"
 code = "nullable-return-statement"
 message = 'Function `Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider::provide` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
 count = 1
@@ -3404,6 +4946,24 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/TestFrameworkTypes.php"
+code = "missing-constant-type"
+message = "Class constant `CODECEPTION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/TestFrameworkTypes.php"
+code = "missing-constant-type"
+message = "Class constant `PHPSPEC` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/TestFrameworkTypes.php"
+code = "missing-constant-type"
+message = "Class constant `PHPUNIT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/TestFrameworkTypes.php"
 code = "mixed-array-access"
 message = "Unsafe array access on type `mixed`."
 count = 2
@@ -3421,9 +4981,27 @@ message = 'Potential static method call on interface `Infection\AbstractTestFram
 count = 1
 
 [[issues]]
+file = "src/TestFramework/Tracing/TestLocationBucketSorter.php"
+code = "missing-constant-type"
+message = "Class constant `INIT_BUCKETS` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/TestFramework/Tracing/TestRunOrderResolver.php"
 code = "invalid-yield-value-type"
 message = "Invalid value type yielded; expected `string`, but found `null|string`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Tracing/TestRunOrderResolver.php"
+code = "missing-constant-type"
+message = "Class constant `BUCKETS_COUNT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Tracing/TestRunOrderResolver.php"
+code = "missing-constant-type"
+message = "Class constant `USE_BUCKET_SORT_AFTER` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3500,6 +5078,12 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/VersionParser.php"
+code = "missing-constant-type"
+message = "Class constant `VERSION_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/VersionParser.php"
 code = "nullable-return-statement"
 message = 'Function `Infection\TestFramework\VersionParser::parse` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
 count = 1
@@ -3568,6 +5152,12 @@ count = 3
 file = "src/Testing/BaseMutatorTestCase.php"
 code = "invalid-type-cast"
 message = "Casting type `null` to `array` will produce an empty array."
+count = 1
+
+[[issues]]
+file = "src/Testing/BaseMutatorTestCase.php"
+code = "missing-constant-type"
+message = "Class constant `WRAPPED_CODE_METHOD_BODY_INDENT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3863,6 +5453,12 @@ file = "tests/autoloaded/mutator-fixtures/EqualIdentical/identical-intersection-
 code = "unused-statement"
 message = "Expression has no effect as a statement"
 count = 2
+
+[[issues]]
+file = "tests/autoloaded/mutator-fixtures/EqualIdentical/non-numeric-non-empty-class-const.php"
+code = "missing-constant-type"
+message = "Class constant `BAR` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "tests/autoloaded/mutator-fixtures/EqualIdentical/non-numeric-non-empty-class-const.php"
@@ -4927,6 +6523,12 @@ message = 'Method `assertstringcontainsstring` does not exist on type `Infection
 count = 1
 
 [[issues]]
+file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulatorCodeDetector.php"
+code = "missing-constant-type"
+message = "Class constant `FUNCTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulatorCodeDetectorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `codeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -5186,6 +6788,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
+code = "missing-constant-type"
+message = "Class constant `KNOWN_INTEGRATIONAL_TESTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
 code = "possibly-false-argument"
 message = 'Argument #1 of function `Safe\file_get_contents` is possibly `false`, but parameter type `string` does not accept it.'
 count = 3
@@ -5336,6 +6944,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "missing-constant-type"
+message = "Class constant `ARBITRARY_STATEMENTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "missing-constant-type"
+message = "Class constant `NATIVE_FUNCTIONS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match_all`: expected `array<array-key, mixed>|null`, but found `mixed`.'
 count = 1
@@ -5380,6 +7000,12 @@ count = 1
 file = "tests/phpunit/AutoReview/Makefile/MakefileTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `subTargetProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/Makefile/MakefileTest.php"
+code = "missing-constant-type"
+message = "Class constant `MAKEFILE_PATH` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -5530,6 +7156,12 @@ count = 1
 file = "tests/phpunit/AutoReview/Mutator/MutatorProviderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\Mutator\MutatorProviderTest::test_configurable_mutator_class_provider_is_valid`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/Mutator/MutatorTest.php"
+code = "missing-constant-type"
+message = "Class constant `KNOWN_MUTATOR_PUBLIC_METHODS` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -5786,6 +7418,30 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
+code = "missing-constant-type"
+message = "Class constant `CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
+code = "missing-constant-type"
+message = "Class constant `EXTENSION_POINTS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
+code = "missing-constant-type"
+message = "Class constant `NON_FINAL_EXTENSION_CLASSES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
+code = "missing-constant-type"
+message = "Class constant `NON_TESTED_CONCRETE_CLASSES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "mixed-property-type-coercion"
 message = "Mixed property type coercion"
 count = 1
@@ -5920,6 +7576,12 @@ count = 1
 file = "tests/phpunit/BenchmarkSmokeTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideBenchmarks` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/BenchmarkSmokeTest.php"
+code = "missing-constant-type"
+message = "Class constant `BENCHMARK_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -6098,6 +7760,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `LOG_EXAMPLE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
 code = "non-existent-method"
 message = 'Method `assertcount` does not exist on type `Infection\Tests\Command\Debug\MockTeamCityCommandTest`.'
 count = 1
@@ -6236,6 +7904,24 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `REFERENCE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `SOURCE_DIRECTORIES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 3
@@ -6304,6 +7990,24 @@ count = 1
 file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `commandExecutionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `REFERENCE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `SOURCE_DIRECTORIES` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -6416,6 +8120,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 8
@@ -6460,6 +8170,12 @@ count = 1
 file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `inputProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -6848,6 +8564,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Config/ValueProvider/PhpUnitCustomExecutablePathProviderTest.php"
+code = "missing-constant-type"
+message = "Class constant `VALID_PHPUNIT_EXECUTABLE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Config/ValueProvider/PhpUnitCustomExecutablePathProviderTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
 count = 3
@@ -7058,6 +8780,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "missing-constant-type"
+message = "Class constant `GIT_DEFAULT_BASE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "no-value"
 message = 'Argument #5 passed to method `Infection\Configuration\ConfigurationFactory::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
@@ -7252,6 +8980,18 @@ count = 1
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
 message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "missing-constant-type"
+message = "Class constant `PROFILES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "missing-constant-type"
+message = "Class constant `SCHEMA_FILE` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -7742,6 +9482,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileTest.php"
 code = "non-existent-method"
 message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\Configuration\Schema\SchemaConfigurationFileTest`.'
 count = 1
@@ -7931,6 +9677,30 @@ file = "tests/phpunit/Console/E2ETest.php"
 code = "invalid-iterator"
 message = "The expression provided to `foreach` is not iterable. It resolved to type `mixed`, which is not iterable."
 count = 4
+
+[[issues]]
+file = "tests/phpunit/Console/E2ETest.php"
+code = "missing-constant-type"
+message = "Class constant `EXCLUDED_GROUP` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Console/E2ETest.php"
+code = "missing-constant-type"
+message = "Class constant `EXPECT_ERROR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Console/E2ETest.php"
+code = "missing-constant-type"
+message = "Class constant `EXPECT_SUCCESS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Console/E2ETest.php"
+code = "missing-constant-type"
+message = "Class constant `MAX_FAILING_COMPOSER_INSTALL` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Console/E2ETest.php"
@@ -9662,6 +11432,18 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
+code = "missing-constant-type"
+message = "Class constant `PACKAGE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
+code = "missing-constant-type"
+message = "Class constant `VENDOR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/MockVendor.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\Finder\MockVendor::__construct`.'
 count = 1
@@ -9962,6 +11744,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Locator/RootsFileLocatorTest.php"
 code = "non-existent-method"
 message = 'Method `assertnull` does not exist on type `Infection\Tests\FileSystem\Locator\RootsFileLocatorTest`.'
 count = 2
@@ -10042,6 +11830,12 @@ count = 1
 file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `pathsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -10319,6 +12113,18 @@ file = "tests/phpunit/Framework/StrTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Framework\StrTest`.'
 count = 6
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "missing-constant-type"
+message = "Class constant `BAD_COMMIT_REFERENCE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "missing-constant-type"
+message = "Class constant `COMMIT_REFERENCE` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
@@ -10684,6 +12490,12 @@ count = 1
 file = "tests/phpunit/Logger/MutationAnalysis/ConsoleDotLoggerTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `detectionStatusProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Logger/MutationAnalysis/ConsoleDotLoggerTest.php"
+code = "missing-constant-type"
+message = "Class constant `ANY_PRIME_NUMBER` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -11240,6 +13052,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "missing-constant-type"
+message = "Class constant `PHP_TO_BE_MUTATED_CODE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "missing-constant-type"
+message = "Class constant `PHP_UNTOUCHED_CODE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\Mutant\MutantCodeFactoryTest`.'
 count = 2
@@ -11374,6 +13198,12 @@ count = 3
 file = "tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php"
 code = "unused-method"
 message = "Method `setup()` is never used."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -12260,6 +14090,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/DefinitionTest.php"
+code = "missing-constant-type"
+message = "Class constant `MUTATORS_WITHOUT_REMEDIES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/DefinitionTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #1 of `array_fill_keys`: expected `array<array-key, ('K.array_fill_keys() extends array-key)>`, but found `mixed`."
 count = 1
@@ -12656,6 +14492,12 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorCategoryTest.php"
+code = "missing-constant-type"
+message = "Class constant `ALL_CONSTANT_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/MutatorCategoryTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #1 of `array_unique`: expected `array<('K.array_unique() extends array-key), ('V.array_unique() extends mixed)>`, but found `mixed`."
 count = 1
@@ -12841,6 +14683,12 @@ message = "Method `setup()` is never used."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Mutator/MutatorFixturesProvider.php"
+code = "missing-constant-type"
+message = "Class constant `MUTATOR_FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Mutator/MutatorParserTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `mutatorInputProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -13012,6 +14860,12 @@ count = 1
 file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
 code = "invalid-iterator"
 message = "The expression provided to `foreach` is not iterable. It resolved to type `mixed`, which is not iterable."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -14420,6 +16274,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\EnrichmentTraverseIntegrationTest`.'
 count = 1
@@ -14641,6 +16501,18 @@ message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\Poten
 count = 1
 
 [[issues]]
+file = "tests/phpunit/PhpParser/Visitor/MarkTraversedNodesAsVisitedVisitor/StopAtSkippedArgVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `SKIP_ATTRIBUTE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/MutationCollectorVisitorTest.php"
+code = "missing-constant-type"
+message = "Class constant `CODE` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/PhpParser/Visitor/MutationCollectorVisitorTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
@@ -14770,6 +16642,12 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/ReflectionVisitorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/ReflectionVisitorTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -15380,6 +17258,12 @@ count = 10
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "missing-constant-type"
+message = "Class constant `TIMEOUT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 8
@@ -15590,6 +17474,12 @@ count = 5
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "missing-constant-type"
+message = "Class constant `SIMULATED_TIME_MICROSECONDS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "missing-magic-method"
 message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 3
@@ -15778,6 +17668,12 @@ count = 1
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Process\Runner\ParallelProcessRunnerTest::test_wait_method_with_minus_mutation`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ProcessQueueTest.php"
+code = "missing-constant-type"
+message = "Class constant `SIMULATED_TIME_MICROSECONDS` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -16214,6 +18110,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/FileReporterTest.php"
+code = "missing-constant-type"
+message = "Class constant `LOG_FILE_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/FileReporterTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
 count = 2
@@ -16334,6 +18236,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `SCHEMA_FILE` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
 count = 1
@@ -16390,6 +18298,12 @@ count = 1
 file = "tests/phpunit/Reporter/Http/StrykerDashboardClientTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideResponseStatusCodes` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Reporter/Http/StrykerDashboardClientTest.php"
+code = "missing-constant-type"
+message = "Class constant `API_KEY` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -16898,6 +18812,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_ROOT` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php"
 code = "non-existent-method"
 message = 'Method `assertSame` does not exist on type `Infection\Tests\Source\Collector\BasicSourceCollector\BasicSourceCollectorTest`.'
 count = 1
@@ -17360,6 +19280,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/CommandLineBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `PHP_EXTRA_ARGS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/CommandLineBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `TEST_FRAMEWORK_ARGS` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/CommandLineBuilderTest.php"
 code = "non-existent-method"
 message = 'Method `assertcontains` does not exist on type `Infection\Tests\TestFramework\CommandLineBuilderTest`.'
 count = 6
@@ -17386,6 +19318,18 @@ count = 2
 file = "tests/phpunit/TestFramework/Config/TestFrameworkConfigLocatorTest.php"
 code = "non-existent-method"
 message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tests\TestFramework\Config\TestFrameworkConfigLocatorTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/CoverageChecker/CoverageCheckerTest.php"
+code = "missing-constant-type"
+message = "Class constant `COVERAGE_DIR_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/CoverageChecker/CoverageCheckerTest.php"
+code = "missing-constant-type"
+message = "Class constant `JUNIT_PATH` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -17512,6 +19456,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitReportLocatorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `reportPathnameProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitReportLocatorTest.php"
+code = "missing-constant-type"
+message = "Class constant `TEST_DEFAULT_JUNIT` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -17857,15 +19807,33 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionBDDProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionCestProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionCestProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionUnitProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionUnitProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -17923,9 +19891,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit09Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit10Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit10Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -17935,9 +19915,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit11Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit12Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit12Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18181,6 +20173,12 @@ message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Excepti
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php"
+code = "missing-constant-type"
+message = "Class constant `FILENAME_REGEX` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/Locator/FixedLocatorTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\Coverage\Locator\FixedLocatorTest`.'
@@ -18244,6 +20242,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageLocatorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `reportPathnameProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageLocatorTest.php"
+code = "missing-constant-type"
+message = "Class constant `TEST_DEFAULT_RELATIVE_PATHNAME` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18512,6 +20516,18 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php"
+code = "missing-constant-type"
+message = "Class constant `GENERAL_FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/IndexXmlCoverageParser/IndexXmlCoverageParserTest.php"
 code = "non-existent-method"
 message = 'Method `assertequals` does not exist on type `Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser\IndexXmlCoverageParserTest`.'
 count = 1
@@ -18661,9 +20677,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/CodeceptionProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpSpecProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpSpecProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18673,9 +20701,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit09Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit10Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit10Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18685,15 +20725,33 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit11Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit125Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit125Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit12Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit12Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18782,6 +20840,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/CodeceptionProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/CodeceptionProvider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\CodeceptionProvider::infoProvider`.'
 count = 1
@@ -18790,6 +20854,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpSpecProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpSpecProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18806,6 +20876,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit09Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit09Provider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit09Provider::infoProvider`.'
 count = 1
@@ -18814,6 +20890,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit10Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit10Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -18830,6 +20912,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit11Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit11Provider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit11Provider::infoProvider`.'
 count = 1
@@ -18842,6 +20930,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit120Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit120Provider.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit120Provider::infoProvider`.'
 count = 1
@@ -18850,6 +20944,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit125Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit125Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -19082,6 +21182,18 @@ count = 9
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `TMP_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "non-existent-method"
 message = 'Method `assertgreaterthanorequal` does not exist on type `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest`.'
 count = 1
@@ -19227,6 +21339,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_replace_coverage_filter_include_node_for_phpunit_12_even_if_filtered_source_files_provided`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_update_fail_on_risky_attributes_if_it_is_already_set`.'
 count = 1
 
@@ -19240,6 +21358,12 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_does_not_update_order_if_it_is_already_set`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_ignores_filtered_source_files_for_phpunit_12_when_creating_source_include_node`.'
 count = 1
 
 [[issues]]
@@ -19324,6 +21448,36 @@ count = 11
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "invalid-return-statement"
 message = "Invalid return type for function `1015983213910025095:19931`: expected `string`, but found `null|string`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `HASH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `MUTATED_FILE_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `ORIGINAL_FILE_PATH` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "missing-constant-type"
+message = "Class constant `TMP_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -19724,6 +21878,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
+code = "missing-constant-type"
+message = "Class constant `EPSILON` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php"
 code = "missing-parameter-type"
 message = "Parameter `$uniqueTestLocations` is missing a type hint."
 count = 1
@@ -20083,9 +22243,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/CodeceptionProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpSpecProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpSpecProvider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -20095,9 +22267,21 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit09Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit10Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit10Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -20107,15 +22291,33 @@ message = "Type `iterable` in return type of `infoProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit11Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit120Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit120Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit125Provider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `infoProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit125Provider.php"
+code = "missing-constant-type"
+message = "Class constant `FIXTURES_DIR` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -20212,6 +22414,12 @@ count = 1
 file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `validXmlFileProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php"
+code = "missing-constant-type"
+message = "Class constant `BOOKSTORE_XML` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -20599,6 +22807,18 @@ message = "Possibly using `null` as an array index to access element."
 count = 1
 
 [[issues]]
+file = "tests/phpunit/TestingUtility/Iterable/TrackableIterator.php"
+code = "missing-constant-type"
+message = "Class constant `EMPTY_KEY` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestingUtility/Iterable/TrackableIterator.php"
+code = "missing-constant-type"
+message = "Class constant `EMPTY_VALUE` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestingUtility/Iterable/TrackableIteratorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `valuesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -20686,6 +22906,12 @@ count = 1
 file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitorTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitorTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestingUtility/PhpParser/Visitor/SkipNodesVisitor/SkipNodesVisitor.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_STOP_TRAVERSE_TYPE` is missing a type hint."
 count = 1
 
 [[issues]]

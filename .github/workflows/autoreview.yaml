@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         # Should use the latest supported PHP version
-        php-version: ['8.2']
+        php-version: ['8.3']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
 
