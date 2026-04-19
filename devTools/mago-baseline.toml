@@ -9051,7 +9051,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'bootstrap': string('src/bootstrap.php'), 'initialTestsPhpOptions': string('-d zend_extension=xdebug.so'), 'logs': Infection\Configuration\Entry\Logs, 'mutators': array{'@arithmetic': true, '@boolean': true, '@cast': true, '@conditional_boundary': true, '@conditional_negotiation': true, '@default': true, '@function_signature': true, '@loop': true, '@number': true, '@operator': true, '@regex': true, '@removal': true, '@return_value': true, '@sort': true, 'ArrayItem': true, 'ArrayItemRemoval': object{ignore: list{string('file')}, settings: object{limit: int(10), remove: string('first')}}, 'ArrayOneItem': true, 'AssignCoalesce': true, 'Assignment': true, 'AssignmentEqual': true, 'BCMath': object{ignore: list{string('file')}, settings: object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}, 'BitwiseAnd': true, 'BitwiseNot': true, 'BitwiseOr': true, 'BitwiseXor': true, 'Break_': true, 'CastArray': true, 'CastBool': true, 'CastFloat': true, 'CastInt': true, 'CastObject': true, 'CastString': true, 'Coalesce': true, 'Continue_': true, 'Decrement': true, 'DecrementInteger': true, 'DivEqual': true, 'Division': true, 'Equal': true, 'EqualIdentical': true, 'Exponentiation': true, 'FalseValue': true, 'Finally_': true, 'FloatNegation': true, 'For_': true, 'Foreach_': true, 'FunctionCall': true, 'FunctionCallRemoval': true, 'GreaterThan': true, 'GreaterThanNegotiation': true, 'GreaterThanOrEqualTo': true, 'GreaterThanOrEqualToNegotiation': true, 'Identical': true, 'Increment': true, 'IncrementInteger': true, 'IntegerNegation': true, 'LessThan': true, 'LessThanNegotiation': true, 'LessThanOrEqualTo': true, 'LessThanOrEqualToNegotiation': true, 'LogicalAnd': true, 'LogicalLowerAnd': true, 'LogicalLowerOr': true, 'LogicalNot': true, 'LogicalOr': true, 'MBString': object{ignore: list{string('file')}, settings: object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}, 'MethodCallRemoval': true, 'Minus': true, 'MinusEqual': true, 'ModEqual': true, 'Modulus': true, 'MulEqual': true, 'Multiplication': true, 'NewObject': true, 'NotEqual': true, 'NotEqualNotIdentical': true, 'NotIdentical': true, 'NotIdenticalNotEqual': true, 'OneZeroFloat': true, 'Plus': true, 'PlusEqual': true, 'PowEqual': true, 'PregMatchMatches': true, 'PregQuote': true, 'ProtectedVisibility': true, 'PublicVisibility': true, 'RoundingFamily': true, 'ShiftLeft': true, 'ShiftRight': true, 'Spaceship': true, 'This': true, 'Throw_': true, 'TrueValue': object{ignore: list{string('fileA')}, settings: object{array_search: false, in_array: false}}, 'UnwrapArrayChangeKeyCase': true, 'UnwrapArrayChunk': true, 'UnwrapArrayColumn': true, 'UnwrapArrayCombine': true, 'UnwrapArrayDiff': true, 'UnwrapArrayDiffAssoc': true, 'UnwrapArrayDiffKey': true, 'UnwrapArrayDiffUassoc': true, 'UnwrapArrayDiffUkey': true, 'UnwrapArrayFilter': true, 'UnwrapArrayFlip': true, 'UnwrapArrayIntersect': true, 'UnwrapArrayIntersectAssoc': true, 'UnwrapArrayIntersectKey': true, 'UnwrapArrayIntersectUassoc': true, 'UnwrapArrayIntersectUkey': true, 'UnwrapArrayKeys': true, 'UnwrapArrayMap': true, 'UnwrapArrayMerge': true, 'UnwrapArrayMergeRecursive': true, 'UnwrapArrayPad': true, 'UnwrapArrayReduce': true, 'UnwrapArrayReplace': true, 'UnwrapArrayReplaceRecursive': true, 'UnwrapArrayReverse': true, 'UnwrapArraySlice': true, 'UnwrapArraySplice': true, 'UnwrapArrayUdiff': true, 'UnwrapArrayUdiffAssoc': true, 'UnwrapArrayUdiffUassoc': true, 'UnwrapArrayUintersect': true, 'UnwrapArrayUintersectAssoc': true, 'UnwrapArrayUintersectUassoc': true, 'UnwrapArrayUnique': true, 'UnwrapArrayValues': true, 'UnwrapLcFirst': true, 'UnwrapStrRepeat': true, 'UnwrapStrToLower': true, 'UnwrapStrToUpper': true, 'UnwrapTrim': true, 'UnwrapUcFirst': true, 'UnwrapUcWords': true, 'Yield_': true}, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'testFramework': string('phpunit'), 'testFrameworkOptions': string('--debug'), 'timeout': int(5), 'tmpDir': string('custom-tmp')}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'bootstrap': string('src/bootstrap.php'), 'initialTestsPhpOptions': string('-d zend_extension=xdebug.so'), 'logs': Infection\Configuration\Entry\Logs, 'mutators': array{'@arithmetic': true, '@boolean': true, '@cast': true, '@conditional_boundary': true, '@conditional_negotiation': true, '@default': true, '@function_signature': true, '@loop': true, '@number': true, '@operator': true, '@regex': true, '@removal': true, '@return_value': true, '@sort': true, 'ArrayItem': true, 'ArrayItemRemoval': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{limit: int(10), remove: string('first')}}, 'ArrayOneItem': true, 'AssignCoalesce': true, 'Assignment': true, 'AssignmentEqual': true, 'BCMath': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}, 'BitwiseAnd': true, 'BitwiseNot': true, 'BitwiseOr': true, 'BitwiseXor': true, 'Break_': true, 'CastArray': true, 'CastBool': true, 'CastFloat': true, 'CastInt': true, 'CastObject': true, 'CastString': true, 'Coalesce': true, 'Continue_': true, 'Decrement': true, 'DecrementInteger': true, 'DivEqual': true, 'Division': true, 'Equal': true, 'EqualIdentical': true, 'Exponentiation': true, 'FalseValue': true, 'Finally_': true, 'FloatNegation': true, 'For_': true, 'Foreach_': true, 'FunctionCall': true, 'FunctionCallRemoval': true, 'GreaterThan': true, 'GreaterThanNegotiation': true, 'GreaterThanOrEqualTo': true, 'GreaterThanOrEqualToNegotiation': true, 'Identical': true, 'Increment': true, 'IncrementInteger': true, 'IntegerNegation': true, 'LessThan': true, 'LessThanNegotiation': true, 'LessThanOrEqualTo': true, 'LessThanOrEqualToNegotiation': true, 'LogicalAnd': true, 'LogicalLowerAnd': true, 'LogicalLowerOr': true, 'LogicalNot': true, 'LogicalOr': true, 'MBString': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}, 'MethodCallRemoval': true, 'Minus': true, 'MinusEqual': true, 'ModEqual': true, 'Modulus': true, 'MulEqual': true, 'Multiplication': true, 'NewObject': true, 'NotEqual': true, 'NotEqualNotIdentical': true, 'NotIdentical': true, 'NotIdenticalNotEqual': true, 'OneZeroFloat': true, 'Plus': true, 'PlusEqual': true, 'PowEqual': true, 'PregMatchMatches': true, 'PregQuote': true, 'ProtectedVisibility': true, 'PublicVisibility': true, 'RoundingFamily': true, 'ShiftLeft': true, 'ShiftRight': true, 'Spaceship': true, 'This': true, 'Throw_': true, 'TrueValue': stdClass&object{ignore: list{string('fileA')}, settings: stdClass&object{array_search: false, in_array: false}}, 'UnwrapArrayChangeKeyCase': true, 'UnwrapArrayChunk': true, 'UnwrapArrayColumn': true, 'UnwrapArrayCombine': true, 'UnwrapArrayDiff': true, 'UnwrapArrayDiffAssoc': true, 'UnwrapArrayDiffKey': true, 'UnwrapArrayDiffUassoc': true, 'UnwrapArrayDiffUkey': true, 'UnwrapArrayFilter': true, 'UnwrapArrayFlip': true, 'UnwrapArrayIntersect': true, 'UnwrapArrayIntersectAssoc': true, 'UnwrapArrayIntersectKey': true, 'UnwrapArrayIntersectUassoc': true, 'UnwrapArrayIntersectUkey': true, 'UnwrapArrayKeys': true, 'UnwrapArrayMap': true, 'UnwrapArrayMerge': true, 'UnwrapArrayMergeRecursive': true, 'UnwrapArrayPad': true, 'UnwrapArrayReduce': true, 'UnwrapArrayReplace': true, 'UnwrapArrayReplaceRecursive': true, 'UnwrapArrayReverse': true, 'UnwrapArraySlice': true, 'UnwrapArraySplice': true, 'UnwrapArrayUdiff': true, 'UnwrapArrayUdiffAssoc': true, 'UnwrapArrayUdiffUassoc': true, 'UnwrapArrayUintersect': true, 'UnwrapArrayUintersectAssoc': true, 'UnwrapArrayUintersectUassoc': true, 'UnwrapArrayUnique': true, 'UnwrapArrayValues': true, 'UnwrapLcFirst': true, 'UnwrapStrRepeat': true, 'UnwrapStrToLower': true, 'UnwrapStrToUpper': true, 'UnwrapTrim': true, 'UnwrapUcFirst': true, 'UnwrapUcWords': true, 'Yield_': true}, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'testFramework': string('phpunit'), 'testFrameworkOptions': string('--debug'), 'timeout': int(5), 'tmpDir': string('custom-tmp')}`.'''
 count = 1
 
 [[issues]]
@@ -9135,37 +9135,37 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignore: list{string('file')}, settings: object{limit: int(10), remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{limit: int(10), remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{settings: object{limit: int(10)}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{settings: stdClass&object{limit: int(10)}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{settings: object{remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{settings: stdClass&object{remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -9183,31 +9183,31 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignore: list{string('file')}, settings: object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -9225,31 +9225,31 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignore: list{string('file')}, settings: object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -9267,37 +9267,37 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignore: list{string('fileA')}, settings: object{array_search: false, in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignore: list{string('fileA')}, settings: stdClass&object{array_search: false, in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{settings: object{array_search: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{settings: stdClass&object{array_search: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{settings: object{in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{settings: stdClass&object{in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -9333,13 +9333,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, stdClass&object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, stdClass&object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -9357,13 +9357,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), stdClass&object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), stdClass&object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
