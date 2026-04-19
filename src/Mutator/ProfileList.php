@@ -45,6 +45,9 @@ final class ProfileList
 {
     use CannotBeInstantiated;
 
+    /**
+     * @var array<string, list<class-string>|list<string>>
+     */
     public const array ALL_PROFILES = [
         '@arithmetic' => self::ARITHMETIC_PROFILE,
         '@boolean' => self::BOOLEAN_PROFILE,
@@ -289,6 +292,9 @@ final class ProfileList
         Extensions\MBString::class,
     ];
 
+    /**
+     * @var list<string>
+     */
     public const array DEFAULT_PROFILE = [
         '@arithmetic',
         '@boolean',
@@ -307,6 +313,9 @@ final class ProfileList
         '@unwrap',
     ];
 
+    /**
+     * @var array<string, class-string>
+     */
     public const array ALL_MUTATORS = [
         // Arithmetic
         'Assignment' => Arithmetic\Assignment::class,
