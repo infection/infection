@@ -49,6 +49,7 @@ final class StaticAnalysisToolTypesTest extends TestCase
         $this->assertSame(
             [
                 StaticAnalysisToolTypes::PHPSTAN,
+                StaticAnalysisToolTypes::MAGO,
             ],
             $types,
         );

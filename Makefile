@@ -76,6 +76,13 @@ cs: $(PHP_CS_FIXER)
 	LC_ALL=C sort -u .gitignore -o .gitignore
 	$(MAKE) check_trailing_whitespaces
 
+.PHONY: cs-docker
+cs-docker:	  	 	## Runs PHP-CS-Fixer in docker
+cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
+	$(DOCKER_RUN_82) $(PHP_CS_FIXER) fix -v --diff
+	LC_ALL=C sort -u .gitignore -o .gitignore
+	$(MAKE) check_trailing_whitespaces
+
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
 cs-check: $(PHP_CS_FIXER)

@@ -51,6 +51,9 @@ readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigLocator
         'neon',
         'neon.dist',
         'dist.neon',
+        'toml',
+        'json',
+        'yaml',
     ];
 
     public function __construct(

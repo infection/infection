@@ -33,56 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
-use function count;
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use function is_a;
-use Webmozart\Assert\Assert;
+use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class StaticAnalysisToolTypes
+#[Group('integration')]
+#[CoversClass(MagoAdapterFactory::class)]
+final class MagoAdapterFactoryTest extends TestCase
 {
-    public const string PHPSTAN = 'phpstan';
+    public function test_it_can_create_an_adapter(): void
+    {
+        $adapter = MagoAdapterFactory::create(
+            '/path/to/mago-config-path',
+            '/path/to/mago',
+            32.3,
+            '/tmp',
+            [],
+        );
 
-    public const string MAGO = 'mago';
-
-    /**
-     * @var string[]
-     */
-    private static array $defaultTypes = [
-        self::PHPSTAN,
-        self::MAGO,
-    ];
-
-    /**
-     * @param mixed[] $installedExtensions
-     *
-     * @return string[]
-     */
-    public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
-    ): array {
-        $types = self::$defaultTypes;
-
-        // todo [phpstan-integration]
-        //        if (count($installedExtensions) > 0) {
-        //            foreach ($installedExtensions as $installedExtension) {
-        //                $factory = $installedExtension['extra']['class'];
-        //
-        //                Assert::classExists($factory);
-        //
-        //                if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-        //                    continue;
-        //                }
-        //
-        //                $types[] = $factory::getAdapterName();
-        //            }
-        //        }
-
-        return $types;
+        $this->assertSame('Mago', $adapter->getName());
     }
 }

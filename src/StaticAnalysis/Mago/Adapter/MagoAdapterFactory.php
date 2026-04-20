@@ -33,53 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\StaticAnalysis\Mago\Adapter;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\Mago;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\VersionParser;
 
 /**
  * @internal
  */
-final readonly class SchemaConfiguration
+final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
     /**
-     * @param non-empty-string $pathname
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
+     * @param list<string> $staticAnalysisToolOptions
      */
-    public function __construct(
-        public string $pathname,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public Mago $mago,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public ?bool $timeoutsAsEscaped,
-        public ?int $maxTimeouts,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
-    ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    public static function create(
+        string $staticAnalysisConfigPath,
+        string $staticAnalysisToolExecutable,
+        float $timeout,
+        string $tmpDir,
+        array $staticAnalysisToolOptions,
+    ): StaticAnalysisToolAdapter {
+        return new MagoAdapter(
+            new MagoMutantExecutionResultFactory(),
+            $staticAnalysisConfigPath,
+            $staticAnalysisToolExecutable,
+            new CommandLineBuilder(),
+            new VersionParser(),
+            $timeout,
+            $staticAnalysisToolOptions,
+        );
     }
 }

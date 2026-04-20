@@ -43,6 +43,7 @@ use function dirname;
 use function file_exists;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -166,6 +167,7 @@ class ConfigurationFactory
             tmpDir: $namespacedTmpDir,
             phpUnit: $this->retrievePhpUnit($schema, $configDir),
             phpStan: $this->retrievePhpStan($schema, $configDir),
+            mago: $this->retrieveMago($schema, $configDir),
             mutators: $mutators,
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
@@ -264,6 +266,11 @@ class ConfigurationFactory
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
         return $schema->phpStan->withAbsolutePaths($configDir);
+    }
+
+    private function retrieveMago(SchemaConfiguration $schema, string $configDir): Mago
+    {
+        return $schema->mago->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(
