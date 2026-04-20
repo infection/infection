@@ -2989,12 +2989,6 @@ message = 'Parameter #1 of `Infection\TestFramework\Coverage\JUnit\JUnitReportLo
 count = 1
 
 [[issues]]
-file = "src/TestFramework/Coverage/JUnit/JUnitTestCaseTimeAdder.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `array_sum`: expected `array<array-key, float|int>`, but possibly received `array<array-key, float|null>`."
-count = 1
-
-[[issues]]
 file = "src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php"
 code = "possibly-undefined-variable"
 message = "Variable `$testsLocations` might not have been defined on all execution paths leading to this point."
@@ -3406,6 +3400,12 @@ count = 1
 file = "src/TestFramework/Tracing/TestRunOrderResolver.php"
 code = "possibly-null-operand"
 message = "Right operand in spaceship comparison (`<=>`) might be `null` (type `float|null`)."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Tracing/TestTotalTimeCalculator.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #1 of `array_sum`: expected `array<array-key, float|int>`, but possibly received `array<array-key, float|null>`."
 count = 1
 
 [[issues]]
@@ -17893,12 +17893,6 @@ message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Excepti
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestCaseTimeAdderTest.php"
-code = "non-existent-method"
-message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdderTest`.'
-count = 3
-
-[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\Builder\InvocationMocker::method`: expected `PHPUnit\Framework\Constraint\Constraint|PHPUnit\Framework\MockObject\Runtime\PropertyHook|string`, but found `mixed`.'
@@ -19961,6 +19955,12 @@ file = "tests/phpunit/TestFramework/Tracing/TestRunOrderResolverTest.php"
 code = "non-existent-method"
 message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\Tracing\TestRunOrderResolverTest`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Tracing/TestTotalTimeCalculatorTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\TestFramework\Tracing\TestTotalTimeCalculatorTest`.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/Throwable/NoTraceFoundTest.php"
