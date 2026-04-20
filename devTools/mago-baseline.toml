@@ -753,7 +753,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "less-specific-argument"
-message = 'Argument type mismatch for argument #13 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+message = 'Argument type mismatch for argument #14 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -807,19 +807,25 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #11 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
+message = 'Invalid argument type for argument #11 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `float|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #12 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null`, but found `mixed`.'
+message = 'Invalid argument type for argument #12 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #19 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
+message = 'Invalid argument type for argument #13 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #20 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -831,13 +837,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #8 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #9 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `float|null`, but found `mixed`.'
+message = 'Invalid argument type for argument #9 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -7099,6 +7099,18 @@ message = 'Method `assertequals` does not exist on type `Infection\Tests\Configu
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Configuration/Entry/MagoTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `basePathProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Entry/MagoTest.php"
+code = "non-existent-method"
+message = 'Method `assertequals` does not exist on type `Infection\Tests\Configuration\Entry\MagoTest`.'
+count = 2
+
+[[issues]]
 file = "tests/phpunit/Configuration/Entry/PhpStanTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `basePathProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -7209,13 +7221,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
-message = '''Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), mixed>`, but found `array{'bootstrap': null, 'ignoreMsiWithNoMutations': null, 'initialTestsPhpOptions': null, 'logs': infection\configuration\entry\logs, 'maxTimeouts': null, 'minCoveredMsi': null, 'minMsi': null, 'mutators': array{}, 'path': string('/path/to/config'), 'phpStan': Infection\Configuration\Entry\PhpStan, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'staticAnalysisTool': null, 'staticAnalysisToolOptions': null, 'testFramework': null, 'testFrameworkOptions': null, 'threadCount': null, 'timeout': null, 'timeoutsAsEscaped': null, 'tmpDir': null, ...<array<string, mixed>, mixed>}`.'''
+message = '''Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), mixed>`, but found `array{'bootstrap': null, 'ignoreMsiWithNoMutations': null, 'initialTestsPhpOptions': null, 'logs': infection\configuration\entry\logs, 'mago': Infection\Configuration\Entry\Mago, 'maxTimeouts': null, 'minCoveredMsi': null, 'minMsi': null, 'mutators': array{}, 'path': string('/path/to/config'), 'phpStan': Infection\Configuration\Entry\PhpStan, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'staticAnalysisTool': null, 'staticAnalysisToolOptions': null, 'testFramework': null, 'testFrameworkOptions': null, 'threadCount': null, 'timeout': null, 'timeoutsAsEscaped': null, 'tmpDir': null, ...<array<string, mixed>, mixed>}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
-message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
+message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('mago')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
 count = 1
 
 [[issues]]
@@ -7313,6 +7325,12 @@ file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'logs': infection\configuration\entry\logs, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 2
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mago': Infection\Configuration\Entry\Mago, 'source': Infection\Configuration\Entry\Source}`.'''
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
@@ -17039,6 +17057,216 @@ file = "tests/phpunit/StaticAnalysis/Config/StaticAnalysisConfigLocatorTest.php"
 code = "non-existent-method"
 message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tests\StaticAnalysis\Config\StaticAnalysisConfigLocatorTest`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `provideValidVersions` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\StaticAnalysis\Mago\Adapter\MagoAdapter::__construct`: expected `Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory`, but found `mixed`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `createstub` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `expectexception` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `expectnottoperformassertions` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `once` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_accepts_valid_versions`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_rejects_invalid_versions`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unused-method"
+message = "Method `setup()` is never used."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "deprecated-method"
+message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
+count = 5
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "missing-magic-method"
+message = "Call to documented magic method `method()` on a class that cannot handle it."
+count = 18
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertgreaterthan` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertlessthan` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `exactly` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `once` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "unused-method"
+message = "Method `setup()` is never used."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "deprecated-method"
+message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory::__construct`: expected `Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory`, but found `mixed`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertfalse` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `createstub` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `never` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `once` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactoryTest.php"
