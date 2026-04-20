@@ -49,7 +49,7 @@ use function Pipeline\take;
  */
 final class AddTestsVisitor extends NodeVisitorAbstract
 {
-    public const TESTS = 'tests';
+    public const string TESTS = 'tests';
 
     public function __construct(
         private readonly Trace $trace,

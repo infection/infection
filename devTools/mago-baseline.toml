@@ -2433,7 +2433,7 @@ count = 1
 [[issues]]
 file = "src/PhpParser/Visitor/AddTestsVisitor.php"
 code = "mixed-return-statement"
-message = "Could not infer a precise return type for function `16684525231735625562:3144`. Saw type `nonnull`."
+message = "Could not infer a precise return type for function `16684525231735625562:3151`. Saw type `nonnull`."
 count = 1
 
 [[issues]]
