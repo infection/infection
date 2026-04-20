@@ -53,14 +53,14 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     ) {
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function getTestFileInfo(string $testId): TestFileTimeData
     {
         $xPath = $this->getXPath();
 
         $node = null;
         $testFound = false;
 
-        foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
+        foreach (self::testCaseMapGenerator($testId) as $queryString => $placeholder) {
             $node = $xPath->queryElement(sprintf($queryString, $placeholder));
 
             if ($node !== null) {
@@ -72,7 +72,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
         if (!$testFound) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
-                $fullyQualifiedClassName,
+                $testId,
                 $this->jUnitLocator->locate(),
             );
         }
