@@ -19,7 +19,7 @@ jobs:
         name: Setup PHP
         uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
-          php-version: 8.2
+          php-version: 8.3
           coverage: none
           ini-values: memory_limit=512M, opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
           tools: 'composer'

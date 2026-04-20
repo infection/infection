@@ -52,7 +52,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
 {
     use GetMutatorName;
 
-    private const BOOLEANS = ['true', 'false'];
+    private const array BOOLEANS = ['true', 'false'];
 
     /**
      * @psalm-mutation-free

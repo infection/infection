@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class TmpDirProvider
 {
-    private const BASE_DIR_NAME = 'infection';
+    private const string BASE_DIR_NAME = 'infection';
 
     /**
      * Provides a Infection namespaced temporary directory path.

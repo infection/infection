@@ -44,9 +44,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final readonly class MockVendor
 {
-    public const VENDOR = 'phptester';
+    public const string VENDOR = 'phptester';
 
-    public const PACKAGE = 'awesome-php-tester';
+    public const string PACKAGE = 'awesome-php-tester';
 
     private string $packageScript;
 

@@ -76,86 +76,67 @@ use Symfony\Component\Console\Input\InputOption;
  */
 final class RunCommand extends BaseCommand
 {
-    /** @var string */
-    public const OPTION_THREADS = 'threads';
+    public const string OPTION_THREADS = 'threads';
 
-    /** @var string */
-    public const OPTION_LOGGER_GITHUB = 'logger-github';
+    public const string OPTION_LOGGER_GITHUB = 'logger-github';
 
-    /** @var string */
-    public const OPTION_SHOW_MUTATIONS = 'show-mutations';
+    public const string OPTION_SHOW_MUTATIONS = 'show-mutations';
 
-    /** @var string */
-    public const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
+    public const string OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
 
     /**
      * Sentinel value for VALUE_OPTIONAL options to distinguish "not provided" from "provided
      * without value"
      */
-    public const OPTION_VALUE_NOT_PROVIDED = false;
+    public const bool OPTION_VALUE_NOT_PROVIDED = false;
 
-    public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+    public const string OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
 
-    /** @var string */
-    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+    public const string OPTION_WITH_TIMEOUTS = 'with-timeouts';
 
-    /** @var string */
-    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
+    public const string OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
-    private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
+    private const string OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
-    /** @var string */
-    private const OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
+    private const string OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
 
-    /** @var string */
-    private const OPTION_WITH_UNCOVERED = 'with-uncovered';
+    private const string OPTION_WITH_UNCOVERED = 'with-uncovered';
 
-    /** @var string */
-    private const OPTION_NO_PROGRESS = 'no-progress';
+    private const string OPTION_NO_PROGRESS = 'no-progress';
 
-    /** @var string */
-    private const OPTION_FORCE_PROGRESS = 'force-progress';
+    private const string OPTION_FORCE_PROGRESS = 'force-progress';
 
-    /** @var string */
-    private const OPTION_COVERAGE = 'coverage';
+    private const string OPTION_COVERAGE = 'coverage';
 
-    /** @var string */
-    private const OPTION_MUTATORS = 'mutators';
+    private const string OPTION_MUTATORS = 'mutators';
 
-    /** @var string */
-    private const OPTION_FORMATTER = 'formatter';
+    private const string OPTION_FORMATTER = 'formatter';
 
-    /** @var string */
-    private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
+    private const string OPTION_LOGGER_GITLAB = 'logger-gitlab';
 
-    private const OPTION_LOGGER_PROJECT_ROOT_DIRECTORY = 'logger-project-root-directory';
+    private const string OPTION_LOGGER_PROJECT_ROOT_DIRECTORY = 'logger-project-root-directory';
 
-    private const OPTION_LOGGER_HTML = 'logger-html';
+    private const string OPTION_LOGGER_HTML = 'logger-html';
 
-    private const OPTION_LOGGER_TEXT = 'logger-text';
+    private const string OPTION_LOGGER_TEXT = 'logger-text';
 
-    private const OPTION_USE_NOOP_MUTATORS = 'noop';
+    private const string OPTION_USE_NOOP_MUTATORS = 'noop';
 
-    private const OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
+    private const string OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
 
-    /** @var string */
-    private const OPTION_MIN_MSI = 'min-msi';
+    private const string OPTION_MIN_MSI = 'min-msi';
 
-    /** @var string */
-    private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
+    private const string OPTION_MIN_COVERED_MSI = 'min-covered-msi';
 
-    /** @var string */
-    private const OPTION_LOG_VERBOSITY = 'log-verbosity';
+    private const string OPTION_LOG_VERBOSITY = 'log-verbosity';
 
-    /** @var string */
-    private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
+    private const string OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
 
-    /** @var string */
-    private const OPTION_DRY_RUN = 'dry-run';
+    private const string OPTION_DRY_RUN = 'dry-run';
 
-    private const OPTION_MUTANT_ID = 'id';
+    private const string OPTION_MUTANT_ID = 'id';
 
-    private const OPTION_TEAMCITY = 'teamcity';
+    private const string OPTION_TEAMCITY = 'teamcity';
 
     protected function configure(): void
     {

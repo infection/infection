@@ -48,9 +48,9 @@ use Webmozart\Assert\Assert;
  */
 class ProcessQueue
 {
-    private const MINIMAL_DEPTH = 1;
+    private const int MINIMAL_DEPTH = 1;
 
-    private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
+    private const int NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
     /**
      * @var SplQueue<MutantProcessContainer>

@@ -53,7 +53,7 @@ final class RoundingFamily implements Mutator
 {
     use GetMutatorName;
 
-    private const MUTATORS_MAP = [
+    private const array MUTATORS_MAP = [
         'floor',
         'ceil',
         'round',

@@ -47,7 +47,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 {
-    public const ELIGIBLE = 'eligible';
+    public const string ELIGIBLE = 'eligible';
 
     public static function isEligible(Node $node): bool
     {

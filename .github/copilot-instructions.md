@@ -26,7 +26,7 @@ Infection is a PHP mutation testing framework that helps developers measure the 
 
 ## Technology Stack
 
-- **PHP 8.2+** - Modern PHP with strict typing
+- **PHP 8.3+** - Modern PHP with strict typing
 - **Symfony Components** - Console, Process, Filesystem, Finder
 - **nikic/php-parser** - For PHP code parsing and manipulation
 - **PHPUnit** - Primary testing framework

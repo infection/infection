@@ -44,7 +44,7 @@ use function trim;
  */
 final readonly class PhpUnitPathGuesser
 {
-    private const CURRENT_DIR_PATH = '.';
+    private const string CURRENT_DIR_PATH = '.';
 
     public function __construct(
         private stdClass $composerJsonContent,

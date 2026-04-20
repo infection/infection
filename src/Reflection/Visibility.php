@@ -40,9 +40,9 @@ namespace Infection\Reflection;
  */
 final readonly class Visibility
 {
-    public const PUBLIC = 'public';
+    public const string PUBLIC = 'public';
 
-    public const PROTECTED = 'protected';
+    public const string PROTECTED = 'protected';
 
     private function __construct(
         private string $variant,

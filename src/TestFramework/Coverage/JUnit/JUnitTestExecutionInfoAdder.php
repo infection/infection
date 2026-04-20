@@ -51,7 +51,7 @@ use function Later\lazy;
  */
 class JUnitTestExecutionInfoAdder
 {
-    private const MAX_EXPLODE_PARTS = 2;
+    private const int MAX_EXPLODE_PARTS = 2;
 
     public function __construct(
         private readonly TestFrameworkAdapter $adapter,

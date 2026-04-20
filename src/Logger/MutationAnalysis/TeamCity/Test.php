@@ -47,7 +47,7 @@ use function sprintf;
  */
 final readonly class Test
 {
-    private const MILLISECONDS_PER_SECOND = 1000;
+    private const int MILLISECONDS_PER_SECOND = 1000;
 
     public function __construct(
         public string $id,

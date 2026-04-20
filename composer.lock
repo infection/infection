@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8689d06749b81e6a743263baebe8013d",
+    "content-hash": "af2ffe76c73b171824d9ccccc4064a73",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -2468,16 +2468,16 @@
     "packages-dev": [
         {
             "name": "carthage-software/mago",
-            "version": "1.22.0",
+            "version": "1.23.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carthage-software/mago.git",
-                "reference": "88c4170fb16e5aa941f035b6a924017505c934ce"
+                "reference": "4fdfd2df7271a80ecaff77906068675a769f7587"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carthage-software/mago/zipball/88c4170fb16e5aa941f035b6a924017505c934ce",
-                "reference": "88c4170fb16e5aa941f035b6a924017505c934ce",
+                "url": "https://api.github.com/repos/carthage-software/mago/zipball/4fdfd2df7271a80ecaff77906068675a769f7587",
+                "reference": "4fdfd2df7271a80ecaff77906068675a769f7587",
                 "shasum": ""
             },
             "require": {
@@ -2512,7 +2512,7 @@
             ],
             "support": {
                 "issues": "https://github.com/carthage-software/mago/issues",
-                "source": "https://github.com/carthage-software/mago/tree/1.22.0"
+                "source": "https://github.com/carthage-software/mago/tree/1.23.1"
             },
             "funding": [
                 {
@@ -2520,7 +2520,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-18T06:49:40+00:00"
+            "time": "2026-04-19T10:37:36+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -5697,7 +5697,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -5708,7 +5708,7 @@
         "ext-simplexml": "*"
     },
     "platform-overrides": {
-        "php": "8.2.0"
+        "php": "8.3.0"
     },
     "plugin-api-version": "2.9.0"
 }

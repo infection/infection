@@ -51,9 +51,9 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcessContainerFactory
 {
-    private const TIMEOUT_FACTOR = 5;
+    private const int TIMEOUT_FACTOR = 5;
 
-    private const TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+    private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,

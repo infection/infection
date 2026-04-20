@@ -53,7 +53,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SafeDOMXPath::class)]
 final class SafeDOMXPathTest extends TestCase
 {
-    private const BOOKSTORE_XML = <<<'XML'
+    private const string BOOKSTORE_XML = <<<'XML'
         <?xml version="1.0" encoding="UTF-8"?>
         <bookstore>
           <book category="cooking">

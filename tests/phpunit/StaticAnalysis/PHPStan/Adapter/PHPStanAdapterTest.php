@@ -55,7 +55,7 @@ final class PHPStanAdapterTest extends TestCase
 {
     private PHPStanAdapter $adapter;
 
-    private commandLineBuilder&MockObject $commandLineBuilder;
+    private CommandLineBuilder&MockObject $commandLineBuilder;
 
     protected function setUp(): void
     {

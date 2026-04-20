@@ -49,7 +49,7 @@ final class ConfigurationOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'configuration';
+    public const string NAME = 'configuration';
 
     /**
      * @template T of Command

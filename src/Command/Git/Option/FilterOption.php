@@ -51,7 +51,7 @@ final class FilterOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'filter';
+    public const string NAME = 'filter';
 
     /**
      * @template T of Command

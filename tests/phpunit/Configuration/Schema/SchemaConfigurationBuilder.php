@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -60,6 +61,7 @@ final class SchemaConfigurationBuilder
         private ?string $tmpDir,
         private PhpUnit $phpUnit,
         private PhpStan $phpStan,
+        private Mago $mago,
         private ?bool $ignoreMsiWithNoMutations,
         private ?float $minMsi,
         private ?float $minCoveredMsi,
@@ -86,6 +88,7 @@ final class SchemaConfigurationBuilder
             tmpDir: $schema->tmpDir,
             phpUnit: $schema->phpUnit,
             phpStan: $schema->phpStan,
+            mago: $schema->mago,
             ignoreMsiWithNoMutations: $schema->ignoreMsiWithNoMutations,
             minMsi: $schema->minMsi,
             minCoveredMsi: $schema->minCoveredMsi,
@@ -112,6 +115,7 @@ final class SchemaConfigurationBuilder
             tmpDir: null,
             phpUnit: new PhpUnit(null, null),
             phpStan: new PhpStan(null, null),
+            mago: new Mago(null, null),
             ignoreMsiWithNoMutations: null,
             minMsi: null,
             minCoveredMsi: null,
@@ -149,6 +153,7 @@ final class SchemaConfigurationBuilder
             tmpDir: '/tmp/infection',
             phpUnit: new PhpUnit('/config/phpunit', '/custom/phpunit'),
             phpStan: new PhpStan('/config/phpstan', '/custom/phpstan'),
+            mago: new Mago('/config/mago', '/custom/mago'),
             ignoreMsiWithNoMutations: true,
             minMsi: 80.0,
             minCoveredMsi: 90.0,
@@ -220,6 +225,14 @@ final class SchemaConfigurationBuilder
     {
         $clone = clone $this;
         $clone->phpStan = $phpStan;
+
+        return $clone;
+    }
+
+    public function withMago(Mago $mago): self
+    {
+        $clone = clone $this;
+        $clone->mago = $mago;
 
         return $clone;
     }
@@ -347,6 +360,7 @@ final class SchemaConfigurationBuilder
             tmpDir: $this->tmpDir,
             phpUnit: $this->phpUnit,
             phpStan: $this->phpStan,
+            mago: $this->mago,
             ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
             minMsi: $this->minMsi,
             minCoveredMsi: $this->minCoveredMsi,

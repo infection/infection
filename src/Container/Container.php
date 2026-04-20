@@ -185,79 +185,79 @@ use Webmozart\Assert\Assert;
  */
 final class Container extends DIContainer
 {
-    public const DEFAULT_CONFIG_FILE = null;
+    public const null DEFAULT_CONFIG_FILE = null;
 
-    public const DEFAULT_MUTATORS_INPUT = '';
+    public const string DEFAULT_MUTATORS_INPUT = '';
 
-    public const DEFAULT_SHOW_MUTATIONS = 20;
+    public const int DEFAULT_SHOW_MUTATIONS = 20;
 
-    public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
+    public const string DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
 
-    public const DEFAULT_DEBUG = false;
+    public const bool DEFAULT_DEBUG = false;
 
-    public const DEFAULT_WITH_UNCOVERED = false;
+    public const bool DEFAULT_WITH_UNCOVERED = false;
 
     public const DEFAULT_FORMATTER_NAME = MutationAnalysisLoggerName::DOT;
 
-    public const DEFAULT_MUTANT_ID = null;
+    public const null DEFAULT_MUTANT_ID = null;
 
-    public const DEFAULT_GIT_DIFF_FILTER = null;
+    public const null DEFAULT_GIT_DIFF_FILTER = null;
 
-    public const DEFAULT_GIT_DIFF_BASE = null;
+    public const null DEFAULT_GIT_DIFF_BASE = null;
 
-    public const DEFAULT_USE_GITHUB_LOGGER = null;
+    public const null DEFAULT_USE_GITHUB_LOGGER = null;
 
-    public const DEFAULT_GITLAB_LOGGER_PATH = null;
+    public const null DEFAULT_GITLAB_LOGGER_PATH = null;
 
-    public const DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY = null;
+    public const null DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY = null;
 
-    public const DEFAULT_HTML_LOGGER_PATH = null;
+    public const null DEFAULT_HTML_LOGGER_PATH = null;
 
-    public const DEFAULT_TEXT_LOGGER_PATH = null;
+    public const null DEFAULT_TEXT_LOGGER_PATH = null;
 
-    public const DEFAULT_SUMMARY_JSON_LOGGER_PATH = null;
+    public const null DEFAULT_SUMMARY_JSON_LOGGER_PATH = null;
 
-    public const DEFAULT_USE_NOOP_MUTATORS = false;
+    public const bool DEFAULT_USE_NOOP_MUTATORS = false;
 
-    public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
+    public const bool DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
 
-    public const DEFAULT_NO_PROGRESS = false;
+    public const bool DEFAULT_NO_PROGRESS = false;
 
-    public const DEFAULT_FORCE_PROGRESS = false;
+    public const bool DEFAULT_FORCE_PROGRESS = false;
 
-    public const DEFAULT_EXISTING_COVERAGE_PATH = null;
+    public const null DEFAULT_EXISTING_COVERAGE_PATH = null;
 
-    public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
+    public const null DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
 
-    public const DEFAULT_SKIP_INITIAL_TESTS = false;
+    public const bool DEFAULT_SKIP_INITIAL_TESTS = false;
 
-    public const DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS = false;
+    public const bool DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS = false;
 
-    public const DEFAULT_MIN_MSI = null;
+    public const null DEFAULT_MIN_MSI = null;
 
-    public const DEFAULT_MIN_COVERED_MSI = null;
+    public const null DEFAULT_MIN_COVERED_MSI = null;
 
-    public const DEFAULT_TIMEOUTS_AS_ESCAPED = false;
+    public const bool DEFAULT_TIMEOUTS_AS_ESCAPED = false;
 
-    public const DEFAULT_MAX_TIMEOUTS = null;
+    public const null DEFAULT_MAX_TIMEOUTS = null;
 
-    public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
+    public const int DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
 
-    public const DEFAULT_TEST_FRAMEWORK = null;
+    public const null DEFAULT_TEST_FRAMEWORK = null;
 
-    public const DEFAULT_STATIC_ANALYSIS_TOOL = null;
+    public const null DEFAULT_STATIC_ANALYSIS_TOOL = null;
 
-    public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
+    public const null DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
 
-    public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
+    public const null DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
-    public const DEFAULT_FILTER = null;
+    public const null DEFAULT_FILTER = null;
 
-    public const DEFAULT_THREAD_COUNT = null;
+    public const null DEFAULT_THREAD_COUNT = null;
 
-    public const DEFAULT_DRY_RUN = false;
+    public const bool DEFAULT_DRY_RUN = false;
 
-    public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
+    public const null DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
     public static function create(): self
     {

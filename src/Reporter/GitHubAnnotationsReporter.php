@@ -47,7 +47,7 @@ use function trim;
  */
 final class GitHubAnnotationsReporter implements LineMutationTestingResultsReporter
 {
-    public const DEFAULT_OUTPUT = 'php://stdout';
+    public const string DEFAULT_OUTPUT = 'php://stdout';
 
     public function __construct(
         private readonly ResultsCollector $resultsCollector,

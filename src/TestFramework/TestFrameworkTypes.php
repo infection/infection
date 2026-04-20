@@ -45,11 +45,11 @@ use Webmozart\Assert\Assert;
  */
 final class TestFrameworkTypes
 {
-    public const PHPUNIT = 'phpunit';
+    public const string PHPUNIT = 'phpunit';
 
-    public const PHPSPEC = 'phpspec';
+    public const string PHPSPEC = 'phpspec';
 
-    public const CODECEPTION = 'codeception';
+    public const string CODECEPTION = 'codeception';
 
     /**
      * @var string[]

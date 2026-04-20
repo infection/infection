@@ -1,9 +1,9 @@
 services:
-  php82:
+  php83:
     build:
       context: devTools
       args:
-        PHP_VERSION: '8.2'
+        PHP_VERSION: '8.3'
         XDEBUG_VERSION: '3.4.1'
     volumes:
       - .:/opt/infection

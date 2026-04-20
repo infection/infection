@@ -58,7 +58,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     // Must not match the default pattern we are looking for. This allows us
     // to distinguish the case when the locator is looking for the default
     // location provided and when it is looking for the file.
-    private const TEST_DEFAULT_JUNIT = 'test-junit.xml';
+    private const string TEST_DEFAULT_JUNIT = 'test-junit.xml';
 
     private FileSystem $fileSystem;
 

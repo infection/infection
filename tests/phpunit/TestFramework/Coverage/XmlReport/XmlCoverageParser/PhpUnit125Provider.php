@@ -46,7 +46,7 @@ final class PhpUnit125Provider
 {
     use CannotBeInstantiated;
 
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/../../Fixtures';
 
     public static function infoProvider(): iterable
     {

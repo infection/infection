@@ -50,7 +50,7 @@ final class MutatorFixturesProvider
 {
     use CannotBeInstantiated;
 
-    private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
+    private const string MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
 
     /**
      * @var array<string, string>

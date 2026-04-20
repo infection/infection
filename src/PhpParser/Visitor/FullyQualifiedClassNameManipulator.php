@@ -45,9 +45,9 @@ final class FullyQualifiedClassNameManipulator
 {
     use CannotBeInstantiated;
 
-    public const RESOLVED_NAME = 'resolvedName';
+    public const string RESOLVED_NAME = 'resolvedName';
 
-    public const RESOLVED_NAMESPACE_NAME = 'namespacedName';
+    public const string RESOLVED_NAMESPACE_NAME = 'namespacedName';
 
     public static function getFqcn(Node $node): ?Node\Name
     {

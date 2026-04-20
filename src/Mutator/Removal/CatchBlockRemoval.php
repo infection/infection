@@ -52,7 +52,7 @@ final class CatchBlockRemoval implements Mutator
 {
     use GetMutatorName;
 
-    private const MIN_CATCH_COUNT_TO_MUTATE = 2;
+    private const int MIN_CATCH_COUNT_TO_MUTATE = 2;
 
     public static function getDefinition(): Definition
     {

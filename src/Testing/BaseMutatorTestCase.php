@@ -64,7 +64,7 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
-    private const WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
+    private const string WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
 
     protected Mutator $mutator;
 

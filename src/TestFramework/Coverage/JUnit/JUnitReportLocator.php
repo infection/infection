@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Override;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -52,9 +53,9 @@ use Symfony\Component\Finder\Finder;
  */
 final class JUnitReportLocator extends BaseReportLocator implements ReportLocator
 {
-    public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
+    public const string JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
-    private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
+    private const string DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
     public static function create(
         FileSystem $filesystem,
@@ -71,6 +72,7 @@ final class JUnitReportLocator extends BaseReportLocator implements ReportLocato
         );
     }
 
+    #[Override]
     protected function createInvalidReportSource(string $coverageDirectory): InvalidReportSource
     {
         return new InvalidReportSource(
@@ -81,6 +83,7 @@ final class JUnitReportLocator extends BaseReportLocator implements ReportLocato
         );
     }
 
+    #[Override]
     protected function createTooManyReportsFound(
         string $coverageDirectory,
         array $reportPathnames,
@@ -99,6 +102,7 @@ final class JUnitReportLocator extends BaseReportLocator implements ReportLocato
         );
     }
 
+    #[Override]
     protected function createNoReportFound(string $coverageDirectory): NoReportFound
     {
         return new NoReportFound(

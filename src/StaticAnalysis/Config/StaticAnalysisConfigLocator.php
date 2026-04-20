@@ -47,10 +47,13 @@ use function sprintf;
  */
 readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigLocatorInterface
 {
-    private const DEFAULT_EXTENSIONS = [
+    private const array DEFAULT_EXTENSIONS = [
         'neon',
         'neon.dist',
         'dist.neon',
+        'toml',
+        'json',
+        'yaml',
     ];
 
     public function __construct(

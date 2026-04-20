@@ -45,7 +45,7 @@ use Webmozart\Assert\Assert;
  */
 final class VersionParser
 {
-    private const VERSION_REGEX = '/(?<version>\d+\.\d+\.?\w*|dev)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>[\+|@][0-9a-zA-Z.]+)?/';
+    private const string VERSION_REGEX = '/(?<version>\d+\.\d+\.?\w*|dev)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>[\+|@][0-9a-zA-Z.]+)?/';
 
     public function parse(string $content): string
     {

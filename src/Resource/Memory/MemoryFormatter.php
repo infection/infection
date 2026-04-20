@@ -47,11 +47,11 @@ use Webmozart\Assert\Assert;
  */
 class MemoryFormatter
 {
-    private const BYTES_IN_KB = 1024;
+    private const int BYTES_IN_KB = 1024;
 
-    private const DECIMALS_TO_SHOW = 2;
+    private const int DECIMALS_TO_SHOW = 2;
 
-    private const UNITS = [
+    private const array UNITS = [
         'B',
         'KB',
         'MB',

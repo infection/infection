@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration\Schema;
 
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -62,6 +63,7 @@ final readonly class SchemaConfiguration
         public ?string $tmpDir,
         public PhpUnit $phpUnit,
         public PhpStan $phpStan,
+        public Mago $mago,
         public ?bool $ignoreMsiWithNoMutations,
         public ?float $minMsi,
         public ?float $minCoveredMsi,

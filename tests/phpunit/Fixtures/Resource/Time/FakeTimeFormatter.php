@@ -11,6 +11,7 @@ final class FakeTimeFormatter extends TimeFormatter
     {
     }
 
+    #[\Override]
     public function toHumanReadableString(float $seconds): string
     {
         return parent::toHumanReadableString($this->seconds);

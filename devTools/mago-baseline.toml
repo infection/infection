@@ -165,18 +165,6 @@ count = 2
 [[issues]]
 file = "src/Command/DescribeCommand.php"
 code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_keys`: expected `array<('K.array_keys() extends array-key), ('V.array_keys() extends mixed)>`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "src/Command/DescribeCommand.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #2 of `array_key_exists`: expected `array<array-key, mixed>`, but found `mixed`."
-count = 2
-
-[[issues]]
-file = "src/Command/DescribeCommand.php"
-code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
 count = 2
 
@@ -297,7 +285,7 @@ count = 1
 [[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `12472592161311982528:3960`: expected `string`, but found `null|string`."
+message = "Invalid return type for function `12472592161311982528:3967`: expected `string`, but found `null|string`."
 count = 1
 
 [[issues]]
@@ -315,7 +303,7 @@ count = 2
 [[issues]]
 file = "src/Command/MakeCustomMutatorCommand.php"
 code = "nullable-return-statement"
-message = "Function `12472592161311982528:3960` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
+message = "Function `12472592161311982528:3967` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
 count = 1
 
 [[issues]]
@@ -759,7 +747,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "less-specific-argument"
-message = 'Argument type mismatch for argument #13 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+message = 'Argument type mismatch for argument #14 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -813,19 +801,25 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #11 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
+message = 'Invalid argument type for argument #11 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `float|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #12 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null`, but found `mixed`.'
+message = 'Invalid argument type for argument #12 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #19 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
+message = 'Invalid argument type for argument #13 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #20 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -837,13 +831,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #8 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #9 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `float|null`, but found `mixed`.'
+message = 'Invalid argument type for argument #9 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `bool|null`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -970,6 +958,12 @@ count = 1
 file = "src/Container/Container.php"
 code = "less-specific-nested-argument-type"
 message = '''Argument type mismatch for argument #2 of `Infection\Container\Container::offsetSet`: expected `(closure(Infection\Container\Container): ('T.infection\container\container::clonewithservice() extends object))`, but provided type `('T.infection\container\container::clonewithservice() extends Closure)|Closure` is less specific.'''
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_FORMATTER_NAME` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -1483,6 +1477,18 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
+file = "src/Git/Git.php"
+code = "missing-constant-type"
+message = "Class constant `DEFAULT_GIT_DIFF_FILTER` is missing a type hint."
+count = 1
+
+[[issues]]
+file = "src/Git/Git.php"
+code = "missing-constant-type"
+message = "Class constant `FALLBACK_BASE` is missing a type hint."
+count = 1
+
+[[issues]]
 file = "src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger::start`.'
@@ -1843,12 +1849,6 @@ message = 'Invalid argument type for argument #2 of `Infection\Mutator\IgnoreCon
 count = 1
 
 [[issues]]
-file = "src/Mutator/InvalidMutator.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_keys`: expected `array<('K.array_keys() extends array-key), ('V.array_keys() extends mixed)>`, but found `mixed`."
-count = 1
-
-[[issues]]
 file = "src/Mutator/MutatorFactory.php"
 code = "invalid-class-string-expression"
 message = "Expression of type `never` cannot be used as a class name."
@@ -1888,24 +1888,6 @@ count = 1
 file = "src/Mutator/MutatorFactory.php"
 code = "unsafe-instantiation"
 message = 'Potentially unsafe instantiation: `class-string<Infection\Mutator\ConfigurableMutator>` may contain the interface `Infection\Mutator\ConfigurableMutator` itself, which cannot be instantiated.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/MutatorParser.php"
-code = "less-specific-return-statement"
-message = 'Returned type `list<array-key>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Mutator\MutatorParser::parse`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/MutatorParser.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #2 of `array_key_exists`: expected `array<array-key, mixed>`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "src/Mutator/MutatorParser.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #2 of `array_search`: expected `array<('K.array_search() extends array-key), string>`, but found `mixed`."
 count = 1
 
 [[issues]]
@@ -1959,25 +1941,7 @@ count = 2
 [[issues]]
 file = "src/Mutator/MutatorResolver.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `Infection\Mutator\MutatorResolver::registerFromClass`: expected `string`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/MutatorResolver.php"
-code = "mixed-argument"
 message = "Invalid argument type for argument #1 of `array_unique`: expected `array<('K.array_unique() extends array-key), ('V.array_unique() extends mixed)>`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "src/Mutator/MutatorResolver.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #2 of `array_key_exists`: expected `array<array-key, mixed>`, but found `mixed`."
-count = 2
-
-[[issues]]
-file = "src/Mutator/MutatorResolver.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
 count = 1
 
 [[issues]]
@@ -2344,6 +2308,12 @@ count = 1
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "invalid-operand"
 message = "Right operand in `&&` operation is an `array`."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/NodeDumper/NodeDumper.php"
+code = "missing-constant-type"
+message = "Class constant `IGNORE_ATTRIBUTES` is missing a type hint."
 count = 1
 
 [[issues]]
@@ -3601,18 +3571,6 @@ message = "Redundant docblock type for variable `$expectedCodeSample`."
 count = 1
 
 [[issues]]
-file = "src/Testing/MutatorName.php"
-code = "less-specific-return-statement"
-message = 'Returned type `array-key` is less specific than the declared return type `string` for function `Infection\Testing\MutatorName::getName`.'
-count = 1
-
-[[issues]]
-file = "src/Testing/MutatorName.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_flip`: expected `array<('K.array_flip() extends array-key), ('V.array_flip() extends array-key)>`, but found `mixed`."
-count = 1
-
-[[issues]]
 file = "tests/autoloaded/mutator-code-samples/ReturnTypes.php"
 code = "missing-return-type"
 message = "Function `selfReturnWithoutReturnType` is missing a return type hint."
@@ -3839,6 +3797,12 @@ file = "tests/autoloaded/mutator-fixtures/EqualIdentical/identical-intersection-
 code = "unused-statement"
 message = "Expression has no effect as a statement"
 count = 2
+
+[[issues]]
+file = "tests/autoloaded/mutator-fixtures/EqualIdentical/non-numeric-non-empty-class-const.php"
+code = "missing-constant-type"
+message = "Class constant `BAR` is missing a type hint."
+count = 1
 
 [[issues]]
 file = "tests/autoloaded/mutator-fixtures/EqualIdentical/non-numeric-non-empty-class-const.php"
@@ -7111,6 +7075,18 @@ message = 'Method `assertequals` does not exist on type `Infection\Tests\Configu
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Configuration/Entry/MagoTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `basePathProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Entry/MagoTest.php"
+code = "non-existent-method"
+message = 'Method `assertequals` does not exist on type `Infection\Tests\Configuration\Entry\MagoTest`.'
+count = 2
+
+[[issues]]
 file = "tests/phpunit/Configuration/Entry/PhpStanTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `basePathProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -7221,25 +7197,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
-message = '''Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), mixed>`, but found `array{'bootstrap': null, 'ignoreMsiWithNoMutations': null, 'initialTestsPhpOptions': null, 'logs': infection\configuration\entry\logs, 'maxTimeouts': null, 'minCoveredMsi': null, 'minMsi': null, 'mutators': array{}, 'path': string('/path/to/config'), 'phpStan': Infection\Configuration\Entry\PhpStan, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'staticAnalysisTool': null, 'staticAnalysisToolOptions': null, 'testFramework': null, 'testFrameworkOptions': null, 'threadCount': null, 'timeout': null, 'timeoutsAsEscaped': null, 'tmpDir': null, ...<array<string, mixed>, mixed>}`.'''
+message = '''Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), mixed>`, but found `array{'bootstrap': null, 'ignoreMsiWithNoMutations': null, 'initialTestsPhpOptions': null, 'logs': infection\configuration\entry\logs, 'mago': Infection\Configuration\Entry\Mago, 'maxTimeouts': null, 'minCoveredMsi': null, 'minMsi': null, 'mutators': array{}, 'path': string('/path/to/config'), 'phpStan': Infection\Configuration\Entry\PhpStan, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'staticAnalysisTool': null, 'staticAnalysisToolOptions': null, 'testFramework': null, 'testFrameworkOptions': null, 'threadCount': null, 'timeout': null, 'timeoutsAsEscaped': null, 'tmpDir': null, ...<array<string, mixed>, mixed>}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
-message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
+message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('mago')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::assertJsonIsSchemaValid`: expected `stdClass`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_diff_key`: expected `array<('K.array_diff_key() extends array-key), ('V.array_diff_key() extends mixed)>`, but found `mixed`."
 count = 1
 
 [[issues]]
@@ -7287,7 +7257,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'bootstrap': string('src/bootstrap.php'), 'initialTestsPhpOptions': string('-d zend_extension=xdebug.so'), 'logs': Infection\Configuration\Entry\Logs, 'mutators': array{'@arithmetic': true, '@boolean': true, '@cast': true, '@conditional_boundary': true, '@conditional_negotiation': true, '@default': true, '@function_signature': true, '@loop': true, '@number': true, '@operator': true, '@regex': true, '@removal': true, '@return_value': true, '@sort': true, 'ArrayItem': true, 'ArrayItemRemoval': object{ignore: list{string('file')}, settings: object{limit: int(10), remove: string('first')}}, 'ArrayOneItem': true, 'AssignCoalesce': true, 'Assignment': true, 'AssignmentEqual': true, 'BCMath': object{ignore: list{string('file')}, settings: object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}, 'BitwiseAnd': true, 'BitwiseNot': true, 'BitwiseOr': true, 'BitwiseXor': true, 'Break_': true, 'CastArray': true, 'CastBool': true, 'CastFloat': true, 'CastInt': true, 'CastObject': true, 'CastString': true, 'Coalesce': true, 'Continue_': true, 'Decrement': true, 'DecrementInteger': true, 'DivEqual': true, 'Division': true, 'Equal': true, 'EqualIdentical': true, 'Exponentiation': true, 'FalseValue': true, 'Finally_': true, 'FloatNegation': true, 'For_': true, 'Foreach_': true, 'FunctionCall': true, 'FunctionCallRemoval': true, 'GreaterThan': true, 'GreaterThanNegotiation': true, 'GreaterThanOrEqualTo': true, 'GreaterThanOrEqualToNegotiation': true, 'Identical': true, 'Increment': true, 'IncrementInteger': true, 'IntegerNegation': true, 'LessThan': true, 'LessThanNegotiation': true, 'LessThanOrEqualTo': true, 'LessThanOrEqualToNegotiation': true, 'LogicalAnd': true, 'LogicalLowerAnd': true, 'LogicalLowerOr': true, 'LogicalNot': true, 'LogicalOr': true, 'MBString': object{ignore: list{string('file')}, settings: object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}, 'MethodCallRemoval': true, 'Minus': true, 'MinusEqual': true, 'ModEqual': true, 'Modulus': true, 'MulEqual': true, 'Multiplication': true, 'NewObject': true, 'NotEqual': true, 'NotEqualNotIdentical': true, 'NotIdentical': true, 'NotIdenticalNotEqual': true, 'OneZeroFloat': true, 'Plus': true, 'PlusEqual': true, 'PowEqual': true, 'PregMatchMatches': true, 'PregQuote': true, 'ProtectedVisibility': true, 'PublicVisibility': true, 'RoundingFamily': true, 'ShiftLeft': true, 'ShiftRight': true, 'Spaceship': true, 'This': true, 'Throw_': true, 'TrueValue': object{ignore: list{string('fileA')}, settings: object{array_search: false, in_array: false}}, 'UnwrapArrayChangeKeyCase': true, 'UnwrapArrayChunk': true, 'UnwrapArrayColumn': true, 'UnwrapArrayCombine': true, 'UnwrapArrayDiff': true, 'UnwrapArrayDiffAssoc': true, 'UnwrapArrayDiffKey': true, 'UnwrapArrayDiffUassoc': true, 'UnwrapArrayDiffUkey': true, 'UnwrapArrayFilter': true, 'UnwrapArrayFlip': true, 'UnwrapArrayIntersect': true, 'UnwrapArrayIntersectAssoc': true, 'UnwrapArrayIntersectKey': true, 'UnwrapArrayIntersectUassoc': true, 'UnwrapArrayIntersectUkey': true, 'UnwrapArrayKeys': true, 'UnwrapArrayMap': true, 'UnwrapArrayMerge': true, 'UnwrapArrayMergeRecursive': true, 'UnwrapArrayPad': true, 'UnwrapArrayReduce': true, 'UnwrapArrayReplace': true, 'UnwrapArrayReplaceRecursive': true, 'UnwrapArrayReverse': true, 'UnwrapArraySlice': true, 'UnwrapArraySplice': true, 'UnwrapArrayUdiff': true, 'UnwrapArrayUdiffAssoc': true, 'UnwrapArrayUdiffUassoc': true, 'UnwrapArrayUintersect': true, 'UnwrapArrayUintersectAssoc': true, 'UnwrapArrayUintersectUassoc': true, 'UnwrapArrayUnique': true, 'UnwrapArrayValues': true, 'UnwrapLcFirst': true, 'UnwrapStrRepeat': true, 'UnwrapStrToLower': true, 'UnwrapStrToUpper': true, 'UnwrapTrim': true, 'UnwrapUcFirst': true, 'UnwrapUcWords': true, 'Yield_': true}, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'testFramework': string('phpunit'), 'testFrameworkOptions': string('--debug'), 'timeout': int(5), 'tmpDir': string('custom-tmp')}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'bootstrap': string('src/bootstrap.php'), 'initialTestsPhpOptions': string('-d zend_extension=xdebug.so'), 'logs': Infection\Configuration\Entry\Logs, 'mutators': array{'@arithmetic': true, '@boolean': true, '@cast': true, '@conditional_boundary': true, '@conditional_negotiation': true, '@default': true, '@function_signature': true, '@loop': true, '@number': true, '@operator': true, '@regex': true, '@removal': true, '@return_value': true, '@sort': true, 'ArrayItem': true, 'ArrayItemRemoval': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{limit: int(10), remove: string('first')}}, 'ArrayOneItem': true, 'AssignCoalesce': true, 'Assignment': true, 'AssignmentEqual': true, 'BCMath': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}, 'BitwiseAnd': true, 'BitwiseNot': true, 'BitwiseOr': true, 'BitwiseXor': true, 'Break_': true, 'CastArray': true, 'CastBool': true, 'CastFloat': true, 'CastInt': true, 'CastObject': true, 'CastString': true, 'Coalesce': true, 'Continue_': true, 'Decrement': true, 'DecrementInteger': true, 'DivEqual': true, 'Division': true, 'Equal': true, 'EqualIdentical': true, 'Exponentiation': true, 'FalseValue': true, 'Finally_': true, 'FloatNegation': true, 'For_': true, 'Foreach_': true, 'FunctionCall': true, 'FunctionCallRemoval': true, 'GreaterThan': true, 'GreaterThanNegotiation': true, 'GreaterThanOrEqualTo': true, 'GreaterThanOrEqualToNegotiation': true, 'Identical': true, 'Increment': true, 'IncrementInteger': true, 'IntegerNegation': true, 'LessThan': true, 'LessThanNegotiation': true, 'LessThanOrEqualTo': true, 'LessThanOrEqualToNegotiation': true, 'LogicalAnd': true, 'LogicalLowerAnd': true, 'LogicalLowerOr': true, 'LogicalNot': true, 'LogicalOr': true, 'MBString': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}, 'MethodCallRemoval': true, 'Minus': true, 'MinusEqual': true, 'ModEqual': true, 'Modulus': true, 'MulEqual': true, 'Multiplication': true, 'NewObject': true, 'NotEqual': true, 'NotEqualNotIdentical': true, 'NotIdentical': true, 'NotIdenticalNotEqual': true, 'OneZeroFloat': true, 'Plus': true, 'PlusEqual': true, 'PowEqual': true, 'PregMatchMatches': true, 'PregQuote': true, 'ProtectedVisibility': true, 'PublicVisibility': true, 'RoundingFamily': true, 'ShiftLeft': true, 'ShiftRight': true, 'Spaceship': true, 'This': true, 'Throw_': true, 'TrueValue': stdClass&object{ignore: list{string('fileA')}, settings: stdClass&object{array_search: false, in_array: false}}, 'UnwrapArrayChangeKeyCase': true, 'UnwrapArrayChunk': true, 'UnwrapArrayColumn': true, 'UnwrapArrayCombine': true, 'UnwrapArrayDiff': true, 'UnwrapArrayDiffAssoc': true, 'UnwrapArrayDiffKey': true, 'UnwrapArrayDiffUassoc': true, 'UnwrapArrayDiffUkey': true, 'UnwrapArrayFilter': true, 'UnwrapArrayFlip': true, 'UnwrapArrayIntersect': true, 'UnwrapArrayIntersectAssoc': true, 'UnwrapArrayIntersectKey': true, 'UnwrapArrayIntersectUassoc': true, 'UnwrapArrayIntersectUkey': true, 'UnwrapArrayKeys': true, 'UnwrapArrayMap': true, 'UnwrapArrayMerge': true, 'UnwrapArrayMergeRecursive': true, 'UnwrapArrayPad': true, 'UnwrapArrayReduce': true, 'UnwrapArrayReplace': true, 'UnwrapArrayReplaceRecursive': true, 'UnwrapArrayReverse': true, 'UnwrapArraySlice': true, 'UnwrapArraySplice': true, 'UnwrapArrayUdiff': true, 'UnwrapArrayUdiffAssoc': true, 'UnwrapArrayUdiffUassoc': true, 'UnwrapArrayUintersect': true, 'UnwrapArrayUintersectAssoc': true, 'UnwrapArrayUintersectUassoc': true, 'UnwrapArrayUnique': true, 'UnwrapArrayValues': true, 'UnwrapLcFirst': true, 'UnwrapStrRepeat': true, 'UnwrapStrToLower': true, 'UnwrapStrToUpper': true, 'UnwrapTrim': true, 'UnwrapUcFirst': true, 'UnwrapUcWords': true, 'Yield_': true}, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'testFramework': string('phpunit'), 'testFrameworkOptions': string('--debug'), 'timeout': int(5), 'tmpDir': string('custom-tmp')}`.'''
 count = 1
 
 [[issues]]
@@ -7335,6 +7305,12 @@ count = 2
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mago': Infection\Configuration\Entry\Mago, 'source': Infection\Configuration\Entry\Source}`.'''
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'minCoveredMsi': float(3.14), 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
@@ -7371,37 +7347,37 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignore: list{string('file')}, settings: object{limit: int(10), remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{limit: int(10), remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{settings: object{limit: int(10)}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{settings: stdClass&object{limit: int(10)}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': object{settings: object{remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'ArrayItemRemoval': stdClass&object{settings: stdClass&object{remove: string('first')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -7419,31 +7395,31 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignore: list{string('file')}, settings: object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{bcadd: false, bccomp: false, bcdiv: false, bcmod: false, bcmul: false, bcpow: false, bcpowmod: false, bcsqrt: false, bcsub: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'BCMath': stdClass&object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -7461,31 +7437,31 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignore: list{string('file')}, settings: object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignore: list{string('file')}, settings: stdClass&object{mb_chr: false, mb_convert_case: false, mb_ord: false, mb_parse_str: false, mb_send_mail: false, mb_strcut: false, mb_stripos: false, mb_stristr: false, mb_strlen: false, mb_strpos: false, mb_strrchr: false, mb_strripos: false, mb_strrpos: false, mb_strstr: false, mb_strtolower: false, mb_strtoupper: false, mb_substr: false, mb_substr_count: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'MBString': stdClass&object{settings: stdClass}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -7503,37 +7479,37 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignore: list{string(' file '), string('')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignore: list{string('fileA'), string('fileB')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignore: list{string('fileA')}, settings: object{array_search: false, in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignore: list{string('fileA')}, settings: stdClass&object{array_search: false, in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{ignoreSourceCodeByRegex: list{string('.*test.*')}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{settings: object{array_search: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{settings: stdClass&object{array_search: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': object{settings: object{in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': array{'TrueValue': stdClass&object{settings: stdClass&object{in_array: false}}}, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -7563,49 +7539,49 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, false>, 'source': Infection\Configuration\Entry\Source}`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<array-key, true>, 'source': Infection\Configuration\Entry\Source}`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
-code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), false>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), stdClass&object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), stdClass&object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string('@arithmetic')|string('@boolean')|string('@cast')|string('@conditional_boundary')|string('@conditional_negotiation')|string('@default')|string('@function_signature')|string('@loop')|string('@number')|string('@operator')|string('@regex')|string('@removal')|string('@return_value')|string('@sort'), true>, 'source': Infection\Configuration\Entry\Source}`.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string, false>, 'source': Infection\Configuration\Entry\Source}`.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string, stdClass&object{ignore: list{string(' file '), string('')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string, stdClass&object{ignore: list{string('fileA'), string('fileB')}}>, 'source': Infection\Configuration\Entry\Source}`.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
+code = "possibly-invalid-argument"
+message = '''Possible argument type mismatch for argument #1 of `Infection\Tests\Configuration\Schema\SchemaConfigurationFactoryTest::createConfig`: expected `array<array<string, mixed>, mixed>`, but possibly received `array{'mutators': non-empty-array<string, true>, 'source': Infection\Configuration\Entry\Source}`.'''
 count = 1
 
 [[issues]]
@@ -12236,12 +12212,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/DefinitionTest.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_fill_keys`: expected `array<array-key, ('K.array_fill_keys() extends array-key)>`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/DefinitionTest.php"
 code = "non-existent-method"
 message = 'Method `assertInstanceOf` does not exist on type `Infection\Tests\Mutator\DefinitionTest`.'
 count = 1
@@ -12261,7 +12231,7 @@ count = 4
 [[issues]]
 file = "tests/phpunit/Mutator/DefinitionTest.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `array<array-key, array{}>`.'
+message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `array<class-string, array{}>`.'
 count = 1
 
 [[issues]]
@@ -12686,26 +12656,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #1 of `Infection\Tests\Mutator\MutatorFactoryTest::assertSameMutatorsByClass`: expected `array<array-key, string>`, but provided type `list<mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_fill_keys`: expected `array<array-key, ('K.array_fill_keys() extends array-key)>`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), ('V.array_values() extends mixed)>`, but found `mixed`."
 count = 1
 
 [[issues]]
@@ -12777,7 +12729,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `array<array-key, array{}>`.'
+message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `array<class-string, array{}>`.'
 count = 1
 
 [[issues]]
@@ -12980,36 +12932,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
-code = "invalid-array-element-key"
-message = "Invalid array key type."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
-code = "invalid-iterator"
-message = "The expression provided to `foreach` is not iterable. It resolved to type `mixed`, which is not iterable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `Infection\Testing\MutatorName::getName`: expected `string`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
 code = "non-existent-method"
 message = 'Method `expectnottoperformassertions` does not exist on type `Infection\Tests\Mutator\MutatorRobustnessTest`.'
 count = 1
@@ -13017,7 +12939,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `non-empty-array<array-key, array{}>`.'
+message = 'Possible argument type mismatch for argument #1 of `Infection\Mutator\MutatorFactory::create`: expected `array<class-string<Infection\Mutator\Mutator<PhpParser\Node>&Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<array-key, mixed>>`, but possibly received `non-empty-array<class-string, array{}>`.'
 count = 1
 
 [[issues]]
@@ -15681,7 +15603,7 @@ count = 34
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #1 of `class@anonymous:14053425703945415052-24611:25389::__construct`: expected `Infection\Mutant\TestFrameworkMutantExecutionResultFactory`, but found `mixed`.'
+message = 'Invalid argument type for argument #1 of `class@anonymous:14053425703945415052-24615:25384::__construct`: expected `Infection\Mutant\TestFrameworkMutantExecutionResultFactory`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -17207,6 +17129,216 @@ file = "tests/phpunit/StaticAnalysis/Config/StaticAnalysisConfigLocatorTest.php"
 code = "non-existent-method"
 message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tests\StaticAnalysis\Config\StaticAnalysisConfigLocatorTest`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `provideValidVersions` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\StaticAnalysis\Mago\Adapter\MagoAdapter::__construct`: expected `Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory`, but found `mixed`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `assertinstanceof` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `createstub` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `expectexception` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `expectexceptionmessage` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `expectnottoperformassertions` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "non-existent-method"
+message = 'Method `once` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_accepts_valid_versions`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_rejects_invalid_versions`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest::test_it_returns_version`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php"
+code = "unused-method"
+message = "Method `setup()` is never used."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "deprecated-method"
+message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
+count = 5
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "missing-magic-method"
+message = "Call to documented magic method `method()` on a class that cannot handle it."
+count = 18
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 4
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertgreaterthan` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertlessthan` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `exactly` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `once` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactoryTest`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
+code = "unused-method"
+message = "Method `setup()` is never used."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "deprecated-method"
+message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory::__construct`: expected `Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory`, but found `mixed`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `PHPUnit\Framework\MockObject\MockObject::expects`: expected `PHPUnit\Framework\MockObject\Rule\InvocationOrder`, but found `mixed`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertfalse` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `assertsame` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 6
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `createstub` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `never` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
+code = "non-existent-method"
+message = 'Method `once` does not exist on type `Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest`.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactoryTest.php"
@@ -19407,7 +19539,7 @@ count = 11
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `1015983213910025095:19931`: expected `string`, but found `null|string`."
+message = "Invalid return type for function `1015983213910025095:19966`: expected `string`, but found `null|string`."
 count = 1
 
 [[issues]]
@@ -19461,7 +19593,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "nullable-return-statement"
-message = "Function `1015983213910025095:19931` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
+message = "Function `1015983213910025095:19966` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`)."
 count = 1
 
 [[issues]]
