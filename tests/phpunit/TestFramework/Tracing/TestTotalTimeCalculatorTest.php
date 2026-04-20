@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Tracing;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
+use Infection\TestFramework\Tracing\TestTotalTimeCalculator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(JUnitTestCaseTimeAdder::class)]
-final class JUnitTestCaseTimeAdderTest extends TestCase
+#[CoversClass(TestTotalTimeCalculator::class)]
+final class TestTotalTimeCalculatorTest extends TestCase
 {
     public function test_it_returns_time_for_the_only_test(): void
     {
@@ -53,7 +53,7 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
             ),
         ];
 
-        $adder = new JUnitTestCaseTimeAdder($coverageTestCases);
+        $adder = new TestTotalTimeCalculator($coverageTestCases);
 
         $total = $adder->getTotalTestTime();
 
@@ -75,7 +75,7 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
             ),
         ];
 
-        $adder = new JUnitTestCaseTimeAdder($coverageTestCases);
+        $adder = new TestTotalTimeCalculator($coverageTestCases);
 
         $total = $adder->getTotalTestTime();
 
@@ -107,7 +107,7 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
             ),
         ];
 
-        $adder = new JUnitTestCaseTimeAdder($coverageTestCases);
+        $adder = new TestTotalTimeCalculator($coverageTestCases);
 
         $total = $adder->getTotalTestTime();
 

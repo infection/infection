@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Tracing;
 
 use function array_key_exists;
 use function array_sum;
@@ -44,7 +44,7 @@ use function substr;
 /**
  * @internal
  */
-final readonly class JUnitTestCaseTimeAdder
+final readonly class TestTotalTimeCalculator
 {
     /**
      * @param TestLocation[] $tests
@@ -62,7 +62,7 @@ final readonly class JUnitTestCaseTimeAdder
     }
 
     /**
-     * Returns unique'd test cases with timings. Timings are per test suite, not per test, therefore we have to unique by test suite name.
+     * Returns unique test cases with timings. Timings are per test suite, not per test, therefore, we have to unique by test suite name.
      *
      * @return array<float|null>
      */

@@ -39,7 +39,7 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\MutatedNode;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
+use Infection\TestFramework\Tracing\TestTotalTimeCalculator;
 use function md5;
 use PhpParser\Node;
 use PhpParser\Token;
@@ -178,7 +178,7 @@ class Mutation
     public function getNominalTestExecutionTime(): float
     {
         // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
-        return $this->nominalTimeToTest ??= (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
+        return $this->nominalTimeToTest ??= (new TestTotalTimeCalculator($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string
