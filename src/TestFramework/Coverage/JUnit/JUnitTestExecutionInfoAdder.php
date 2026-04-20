@@ -62,7 +62,7 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<Trace> $traces
      *
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      *
      * @return iterable<Trace>
      */
@@ -78,7 +78,7 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<Trace> $traces
      *
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      *
      * @return iterable<Trace>
      */
@@ -112,7 +112,7 @@ class JUnitTestExecutionInfoAdder
     }
 
     /**
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      */
     private function createCompleteTestLocation(TestLocation $test): TestLocation
     {

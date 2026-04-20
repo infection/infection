@@ -52,7 +52,7 @@ interface TestFileDataProvider
      * - 'Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testMultiplication'
      * - 'calculator:Dividing two numbers'
      *
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      */
     public function getTestFileInfo(string $testId): TestFileTimeData;
 }

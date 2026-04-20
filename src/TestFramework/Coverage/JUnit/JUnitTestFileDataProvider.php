@@ -71,7 +71,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         }
 
         if (!$testFound) {
-            throw TestFileNameNotFoundException::notFoundFromFQN(
+            throw TestNotFound::forTestId(
                 $testId,
                 $this->jUnitLocator->locate(),
             );
