@@ -483,7 +483,7 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Command\RunCommand::executeCommand`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -3003,7 +3003,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdder.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder::createCompleteTestLocationsGenerator`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder::createCompleteTestLocationsGenerator`.'
 count = 1
 
 [[issues]]
@@ -3441,7 +3441,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/Tracing/TraceProviderAdapterTracer.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\TestFramework\Tracing\TraceProviderAdapterTracer::getTraceGenerator`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\TestFramework\Tracing\TraceProviderAdapterTracer::getTraceGenerator`.'
 count = 1
 
 [[issues]]
@@ -4761,7 +4761,7 @@ count = 1
 [[issues]]
 file = "tests/benchmark/Tracing/create-main.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Benchmark\Tracing\collectSources`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Benchmark\Tracing\collectSources`.'
 count = 1
 
 [[issues]]
@@ -6681,7 +6681,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Container/ContainerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\Container\ContainerTest::test_it_can_build_lazy_source_file_data_factory_that_fails_on_use`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\Container\ContainerTest::test_it_can_build_lazy_source_file_data_factory_that_fails_on_use`.'
 count = 1
 
 [[issues]]
@@ -6969,43 +6969,43 @@ count = 1
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_initial_test_run_fails`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_initial_test_run_fails`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_initial_test_run_succeeds`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_initial_test_run_succeeds`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_max_timeouts_checker_receives_correct_timed_out_count`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_max_timeouts_checker_receives_correct_timed_out_count`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_memory_limiter_is_applied_after_static_analysis_when_enabled`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_memory_limiter_is_applied_after_static_analysis_when_enabled`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\EngineTest::test_memory_limiter_is_not_applied_when_initial_tests_are_skipped`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\EngineTest::test_memory_limiter_is_not_applied_when_initial_tests_are_skipped`.'
 count = 1
 
 [[issues]]
@@ -8343,13 +8343,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_dispatches_events`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_dispatches_events`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_returns_all_the_mutations_generated_for_each_files`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_returns_all_the_mutations_generated_for_each_files`.'
 count = 1
 
 [[issues]]
@@ -11655,7 +11655,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/CoveredTraceProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\CoveredTraceProviderTest::test_it_provides_traces`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\CoveredTraceProviderTest::test_it_provides_traces`.'
 count = 1
 
 [[issues]]
@@ -11931,19 +11931,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdderTest::test_it_adds_if_junit_is_provided`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdderTest::test_it_adds_if_junit_is_provided`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdderTest::test_it_does_not_add_if_junit_is_not_provided`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdderTest::test_it_does_not_add_if_junit_is_not_provided`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdderTest::test_it_does_not_load_the_trace_tests_until_necessary`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdderTest::test_it_does_not_load_the_trace_tests_until_necessary`.'
 count = 1
 
 [[issues]]
@@ -11973,13 +11973,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/JUnitTestFileDataProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::test_it_can_get_the_test_info_for_a_given_test_id`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::test_it_can_get_the_test_info_for_a_given_test_id`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/JUnitTestFileDataProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::test_it_is_idempotent`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\JUnitTestFileDataProviderTest::test_it_is_idempotent`.'
 count = 1
 
 [[issues]]
@@ -12015,7 +12015,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/MemoizedTestFileDataProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\JUnit\MemoizedTestFileDataProviderTest::test_it_memoize_get_test_file_info_calls`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\JUnit\MemoizedTestFileDataProviderTest::test_it_memoize_get_test_file_info_calls`.'
 count = 1
 
 [[issues]]
@@ -12501,7 +12501,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/PhpUnitXmlCoverageTraceProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException` in `Infection\Tests\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProviderTest::test_it_can_parse_coverage_data`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Tests\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProviderTest::test_it_can_parse_coverage_data`.'
 count = 1
 
 [[issues]]

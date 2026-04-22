@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Path;
 
@@ -65,37 +65,37 @@ final class PhpUnit10Provider
         yield 'test ID of a simple test' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_multiply',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test method of a simple test' => [
             $junitXml,
             'test_multiply',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a data provider with a numerical key' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#0',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a data provider with a string key' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#with a key',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a data provider with a string key with special characters' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#with a key with (\'&quot;#::&amp;) special characters',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test method of a test with a data provider' => [
             $junitXml,
             'test_subtract',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test case of a data provider' => [
@@ -110,25 +110,25 @@ final class PhpUnit10Provider
         yield 'test ID of a test with an external data provider with a numerical key' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#0',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with an external data provider with a string key' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#with a key',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with an external data provider with a string key with special characters' => [
             $junitXml,
             'Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#with a key with (\'&quot;#::&amp;) special characters',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test method of a test with an external data provider' => [
             $junitXml,
             'test_add',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test case of an external data provider' => [
