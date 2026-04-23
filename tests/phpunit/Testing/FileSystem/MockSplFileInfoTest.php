@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\FileSystem;
+namespace Infection\Tests\Testing\FileSystem;
 
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

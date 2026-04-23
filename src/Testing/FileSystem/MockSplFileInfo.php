@@ -33,35 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\PhpDoc;
+namespace Infection\Testing\FileSystem;
 
-use function array_unique;
-use function array_values;
-use function Safe\preg_match_all;
-use function Safe\preg_replace;
-use const SORT_STRING;
+use SplFileInfo;
 
-final class PHPDocParser
+/**
+ * @internal
+ */
+final class MockSplFileInfo extends SplFileInfo
 {
-    /**
-     * Parses the given PHP doc and returns the list of tags found.
-     *
-     * @return string[]
-     */
-    public function parse(string $phpDoc): array
+    public function __construct(
+        string $pathname = 'file.txt',
+        private readonly string|false $realPath = false,
+    ) {
+        parent::__construct($pathname);
+    }
+
+    public static function create(string $pathname): self
     {
-        $escapedPhpDoc = preg_replace(
-            '/\p{L}@[\p{L}\\\\]+/u',
-            '',
-            $phpDoc,
-        );
+        return new self($pathname, $pathname);
+    }
 
-        preg_match_all(
-            '/@[\p{L}\\\\]+/u',
-            $escapedPhpDoc,
-            $matches,
-        );
-
-        return array_values(array_unique($matches[0], SORT_STRING));
+    public function getRealPath(): false|string
+    {
+        return $this->realPath;
     }
 }
