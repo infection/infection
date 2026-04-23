@@ -3559,6 +3559,42 @@ message = "Redundant type assertion: `$expectedCodeSample` of type `string` is a
 count = 1
 
 [[issues]]
+file = "src/Testing/PhpDoc/PHPDocParser.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Testing\PhpDoc\PHPDocParser::parse` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/Testing/PhpDoc/PHPDocParser.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `array_unique`: expected `array<('K.array_unique() extends array-key), ('V.array_unique() extends mixed)>`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "src/Testing/PhpDoc/PHPDocParser.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `Safe\preg_match_all`: expected `array<array-key, mixed>|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Testing/PhpDoc/PHPDocParser.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Safe\preg_match_all`: expected `string`, but possibly received `array<array-key, mixed>|array<array-key, string>|string`.'
+count = 1
+
+[[issues]]
+file = "src/Testing/PhpDoc/PHPDocParser.php"
+code = "possibly-null-array-access"
+message = "Cannot perform array access on possibly `null` value."
+count = 1
+
+[[issues]]
+file = "src/Testing/PhpDoc/PHPDocParser.php"
+code = "reference-to-undefined-variable"
+message = "Reference created from a previously undefined variable `$matches`."
+count = 1
+
+[[issues]]
 file = "tests/autoloaded/mutator-code-samples/ReturnTypes.php"
 code = "missing-return-type"
 message = "Function `selfReturnWithoutReturnType` is missing a return type hint."
@@ -5308,48 +5344,6 @@ count = 1
 file = "tests/phpunit/AutoReview/Mutator/MutatorTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\Mutator\MutatorTest::test_mutators_have_a_definition`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "less-specific-nested-return-statement"
-message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Tests\AutoReview\PhpDoc\PHPDocParser::parse` due to nested 'mixed'.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_unique`: expected `array<('K.array_unique() extends array-key), ('V.array_unique() extends mixed)>`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #3 of `Safe\preg_match_all`: expected `array<array-key, mixed>|null`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Safe\preg_match_all`: expected `string`, but possibly received `array<array-key, mixed>|array<array-key, string>|string`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "possibly-null-array-access"
-message = "Cannot perform array access on possibly `null` value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParser.php"
-code = "reference-to-undefined-variable"
-message = "Reference created from a previously undefined variable `$matches`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/PhpDoc/PHPDocParserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `phpDocProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -13828,6 +13822,12 @@ count = 2
 file = "tests/phpunit/Testing/BaseMutatorTestCaseTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `codeToWrapInMethodProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Testing/PhpDoc/PHPDocParserTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `phpDocProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]

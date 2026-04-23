@@ -50,7 +50,7 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;

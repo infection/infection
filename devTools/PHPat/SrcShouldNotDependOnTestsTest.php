@@ -33,26 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\FileSystem;
+namespace Infection\DevTools\PHPat;
 
-use SplFileInfo;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class MockSplFileInfo extends SplFileInfo
+final class SrcShouldNotDependOnTestsTest
 {
-    public function __construct(
-        string $pathname = 'file.txt',
-        private readonly string|false $realPath = false,
-    ) {
-        parent::__construct($pathname);
-    }
-
-    public static function create(string $pathname): self
+    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
     {
-        return new self($pathname, $pathname);
-    }
-
-    public function getRealPath(): false|string
-    {
-        return $this->realPath;
+        return PHPat::rule()
+            ->classes(Selector::inNamespace('Infection'))
+            ->excluding(
+                Selector::inNamespace('Infection\\Tests'),
+                Selector::inNamespace('Infection\\Benchmark'),
+                Selector::inNamespace('Infection\\DevTools'),
+            )
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                Selector::AnyOf(
+                    Selector::inNamespace('Infection\\Tests'),
+                    Selector::inNamespace('Infection\\Benchmark'),
+                ),
+            )
+            ->because('Production code under src/ must not depend on tests/ or benchmarks.');
     }
 }

@@ -41,7 +41,7 @@ use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\XML\SafeDOMXPath;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
