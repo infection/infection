@@ -68,50 +68,14 @@ count = 1
 
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 2
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
 code = "mixed-operand"
 message = "Casting `mixed` to `bool`."
 count = 1
 
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\Differ\ChangedLinesRange::create` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Webmozart\Assert\Assert::natural` has type `never`, meaning it cannot produce a value.'
-count = 2
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
-code = "no-value"
-message = 'Argument #2 passed to method `Infection\Differ\ChangedLinesRange::create` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
 code = "possibly-false-argument"
 message = 'Argument #1 of method `Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
-code = "redundant-type-comparison"
-message = "Redundant type assertion: `$endLine` of type `never` is always not `int(0)|positive-int`."
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
-code = "redundant-type-comparison"
-message = "Redundant type assertion: `$startLine` of type `never` is always not `int(0)|positive-int`."
 count = 1
 
 [[issues]]
@@ -1406,8 +1370,8 @@ count = 1
 
 [[issues]]
 file = "src/Framework/Iterable/GeneratorFactory.php"
-code = "mixed-argument"
-message = '''Invalid argument type for argument #1 of `Infection\Framework\Iterable\GeneratorFactory::fromIterable`: expected `iterable<('TKey.infection\framework\iterable\generatorfactory::fromiterable() extends mixed), ('TValue.infection\framework\iterable\generatorfactory::fromiterable() extends mixed)>`, but found `mixed`.'''
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Exception` in `Infection\Framework\Iterable\GeneratorFactory::fromIterable`.'
 count = 1
 
 [[issues]]
@@ -1976,18 +1940,6 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/NodeMutationGenerator.php"
-code = "less-specific-nested-return-statement"
-message = '''Returned type `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>|list<mixed>` is less specific than the declared return type `array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation>` for function `Infection\Mutator\NodeMutationGenerator::getAllTestsForCurrentNode` due to nested 'mixed'.'''
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
-code = "mixed-property-type-coercion"
-message = 'A value with a less specific type `iterable<mixed, Infection\AbstractTestFramework\Coverage\TestLocation>|list<mixed>` is being assigned to property `$$testsMemoized` (array<array-key, Infection\AbstractTestFramework\Coverage\TestLocation>|null).'
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\Mutator\NodeMutationGenerator::isInsideFunction`. Saw type `mixed`.'
 count = 1
@@ -1996,12 +1948,6 @@ count = 1
 file = "src/Mutator/NodeMutationGenerator.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\Mutator\NodeMutationGenerator::isOnFunctionSignature`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
-code = "no-value"
-message = "Argument #1 passed to function `iterator_to_array` has type `never`, meaning it cannot produce a value."
 count = 1
 
 [[issues]]
@@ -2615,12 +2561,6 @@ file = "src/Process/Runner/MutationTestingRunner.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Process\Runner\MutationTestingRunner::mutantToContainer`.'
 count = 1
-
-[[issues]]
-file = "src/Process/Runner/ParallelProcessRunner.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\Process\Runner\ProcessQueue::enqueueFrom`: expected `Iterator<mixed, Infection\Process\MutantProcessContainer>`, but possibly received `Generator<mixed, Infection\Process\MutantProcessContainer, mixed, mixed>`.'
-count = 3
 
 [[issues]]
 file = "src/Process/Runner/ParallelProcessRunner.php"
@@ -3488,20 +3428,14 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/XML/SafeDOMXPath.php"
-code = "invalid-array-access"
-message = "Cannot access array index on object `DOMNodeList<DOMNameSpaceNode|DOMNode>` that does not implement `ArrayAccess`."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/XML/SafeDOMXPath.php"
-code = "invalid-array-index"
-message = "Invalid index type `int(0)` used for array access on `DOMNodeList<DOMNameSpaceNode|DOMNode>`."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/XML/SafeDOMXPath.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\TestFramework\XML\SafeDOMXPath::queryCount`: expected `non-negative-int`, but found `int`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/XML/SafeDOMXPath.php"
+code = "less-specific-return-statement"
+message = 'Returned type `DOMNameSpaceNode|DOMNode|null` is less specific than the declared return type `DOMAttr|null` for function `Infection\TestFramework\XML\SafeDOMXPath::queryAttribute`.'
 count = 1
 
 [[issues]]
@@ -3512,21 +3446,9 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/XML/SafeDOMXPath.php"
-code = "never-return"
-message = "Cannot return value with type 'never' from this function."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/XML/SafeDOMXPath.php"
 code = "possibly-null-property-access"
 message = "Attempting to access a property on a possibly `null` value."
 count = 2
-
-[[issues]]
-file = "src/TestFramework/XML/SafeDOMXPath.php"
-code = "redundant-null-coalesce"
-message = "Redundant null coalesce: left-hand side can never be `null` or undefined."
-count = 1
 
 [[issues]]
 file = "src/Testing/BaseMutatorTestCase.php"
@@ -5606,12 +5528,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/Git/GitBaseReferenceCommandTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitBaseReferenceCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitBaseReferenceCommandTest::test_it_outputs_the_base_reference_with_provided_base`.'
 count = 1
@@ -5624,12 +5540,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 3
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitChangedFilesCommandTest::test_it_outputs_changed_files`.'
 count = 1
@@ -5639,12 +5549,6 @@ file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `commandExecutionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 3
 
 [[issues]]
 file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
@@ -5669,12 +5573,6 @@ file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `successfulCommandExecutionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 8
 
 [[issues]]
 file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
@@ -5855,12 +5753,6 @@ file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::tearDown`.'
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Config/ValueProvider/SourceDirsProviderTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 5
 
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationBuilder.php"
@@ -7159,12 +7051,6 @@ message = "Type `iterable` in return type of `provideBlankOrEmptyString` is impr
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Environment/BuildContextResolverTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 17
-
-[[issues]]
 file = "tests/phpunit/Environment/StrykerApiKeyResolverTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `Infection\Environment\StrykerApiKeyResolver::resolve`: expected `array<string, string>`, but possibly received `array{'API_KEY': string('foo'), 'INFECTION_DASHBOARD_API_KEY': int(9000), 'STRYKER_DASHBOARD_API_KEY': stdClass}`.'''
@@ -7269,12 +7155,6 @@ count = 4
 [[issues]]
 file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
 code = "no-value"
-message = "Argument #1 passed to function `iterator_to_array` has type `never`, meaning it cannot produce a value."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Event/Subscriber/ChainSubscriberFactoryTest.php"
-code = "no-value"
 message = 'Argument #1 passed to method `Infection\Event\Subscriber\ChainSubscriberFactory::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
@@ -7364,12 +7244,6 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/FileSystem/FileStoreTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/FileStoreTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\FileStoreTest::test_it_reads_file_contents_from_a_path_and_caches_it_until_a_new_file_is_requested`.'
 count = 1
@@ -7448,12 +7322,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
 code = "possibly-false-argument"
 message = "Argument #1 of function `strlen` is possibly `false`, but parameter type `string` does not accept it."
 count = 2
@@ -7480,12 +7348,6 @@ count = 1
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesMockSetup` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -7862,12 +7724,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 7
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_get_the_changed_lines_ranges_by_files_relative_paths`.'
 count = 1
@@ -7885,33 +7741,15 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Logger/ArtefactCollection/ConsoleProgressBarLoggerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 5
-
-[[issues]]
 file = "tests/phpunit/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `debugProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Logger/ArtefactCollection/InitialStaticAnalysisExecution/InitialStaticAnalysisExecutionLoggerFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `debugProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/ArtefactCollection/InitialTestsExecution/InitialTestsExecutionLoggerFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -7954,12 +7792,6 @@ count = 1
 file = "tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `loggerProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -8008,12 +7840,6 @@ count = 1
 file = "tests/phpunit/Logger/MutationAnalysis/TeamCity/TestTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `caseProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Logger/MutationGeneration/MutationGenerationLoggerFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -8197,12 +8023,6 @@ message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::mat
 count = 6
 
 [[issues]]
-file = "tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 18
-
-[[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
 code = "redundant-type-comparison"
 message = 'Redundant type assertion: `$mutations` of type `list<Infection\Mutation\Mutation>` is always not `iterable<mixed, Infection\Mutation\Mutation>`.'
@@ -8225,12 +8045,6 @@ file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.p
 code = "imprecise-type"
 message = "Type `iterable` in return type of `scenarioProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 7
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
@@ -9176,12 +8990,6 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
-code = "no-value"
-message = 'Argument #2 passed to method `Infection\Tests\Mutator\MutatorFactoryTest::assertSameMutatorsByClass` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutator/MutatorFactoryTest.php"
 code = "non-existent-method"
 message = 'Method `expects` does not exist on type `Infection\Reflection\ClassReflection`.'
 count = 1
@@ -10070,12 +9878,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::invokeMethod`.'
 count = 1
@@ -10132,12 +9934,6 @@ count = 1
 file = "tests/phpunit/PhpParser/FileParserTest.php"
 code = "invalid-throw"
 message = "Cannot throw type `null` because it is not an instance of Throwable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -10423,12 +10219,6 @@ message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\Poten
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Visitor/MutationCollectorVisitorTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
-
-[[issues]]
 file = "tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesMutationCases` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -10513,12 +10303,6 @@ message = 'Redundant type assertion: `$nodesById` of type `array<int(0)|positive
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/Factory/InitialTestsRunProcessFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
-
-[[issues]]
 file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
@@ -10535,12 +10319,6 @@ file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `timeoutDataProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
 
 [[issues]]
 file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
@@ -10586,12 +10364,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `array_map`: expected `array<('K.array_map() extends array-key), object>`, but found `mixed`."
 count = 1
@@ -10618,12 +10390,6 @@ count = 1
 file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
 code = "invalid-method-access"
 message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`).'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 2
 
 [[issues]]
@@ -10697,12 +10463,6 @@ file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "less-specific-nested-argument-type"
 message = 'Argument type mismatch for argument #1 of `PHPUnit\Framework\Assert::callback`: expected `(callable(iterable<mixed, mixed>): bool)`, but provided type `(closure(iterable<mixed, mixed>): mixed)` is less specific.'
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 8
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
@@ -10793,18 +10553,6 @@ file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "less-specific-nested-argument-type"
 message = 'Argument type mismatch for argument #1 of `Infection\Process\Runner\ParallelProcessRunner::run`: expected `iterable<mixed, Infection\Process\MutantProcessContainer>`, but provided type `iterable<mixed, mixed>` is less specific.'
 count = 6
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #1 of `iterator_count`: expected `Traversable<mixed, mixed>|array<array-key, mixed>`, but provided type `iterable<mixed, Infection\Process\MutantProcessContainer>` is less specific.'
-count = 7
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 3
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
@@ -11215,21 +10963,9 @@ message = "Type `iterable` in return type of `metricsProvider` is imprecise, equ
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Reporter/ShowMetricsReporter/ShowMetricsReporterTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 13
-
-[[issues]]
 file = "tests/phpunit/Reporter/ShowMutationsReporterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `resultsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/ShowMutationsReporterTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 1
 
 [[issues]]
@@ -11267,12 +11003,6 @@ file = "tests/phpunit/Reporter/StrykerReporterFactoryTest.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #1 of `PHPUnit\Framework\Assert::assertInstanceOf`: expected `class-string<'ExpectedType.phpunit\framework\assert::assertinstanceof() extends object>`, but possibly received `string`.'''
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Reporter/StrykerReporterTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 4
 
 [[issues]]
 file = "tests/phpunit/Reporter/SummaryFileReporterTest.php"
@@ -11510,12 +11240,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Source/Matcher/GitDiffSourceLineMatcherTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Source/Matcher/GitDiffSourceLineMatcherTest.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$git`."
 count = 1
@@ -11593,12 +11317,6 @@ message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::mat
 count = 5
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 18
-
-[[issues]]
 file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
@@ -11617,21 +11335,9 @@ message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::mat
 count = 4
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 12
-
-[[issues]]
 file = "tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/CoverageChecker/CoverageCheckerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
 count = 3
 
 [[issues]]
@@ -12482,12 +12188,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/PhpUnitXmlCoverageTraceProviderTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/XmlReport/PhpUnitXmlCoverageTraceProviderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProviderTest::test_it_can_parse_coverage_data`.'
 count = 1
@@ -12680,12 +12380,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/XmlCoverageParserTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/XmlCoverageParserTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidXml` in `Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\XmlCoverageParserTest::lineCoverageProvider`.'
 count = 1
@@ -12728,42 +12422,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$cacheResult` of type `null` can never be `string('false')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$colors` of type `null` can never be `string('false')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$executionOrder[0]->value` of type `null` can never be `string('reverse')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$failOnRisky[0]->value` of type `null` can never be `string('false')`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$stdErr` of type `null` can never be `string('false')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$stopOnFailure` of type `null` can never be `string('true')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `executionOrderProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
@@ -12776,26 +12434,20 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "invalid-array-access"
-message = "Cannot access array index on object `DOMNodeList<DOMNameSpaceNode|DOMNode>` that does not implement `ArrayAccess`."
-count = 9
+code = "non-existent-property"
+message = "Property `$value` does not exist on class `DOMNameSpaceNode`."
+count = 3
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "invalid-array-index"
-message = "Invalid index type `int(0)` used for array access on `DOMNodeList<DOMNameSpaceNode|DOMNode>`."
-count = 9
+code = "non-existent-property"
+message = "Property `$value` does not exist on class `DOMNode`."
+count = 3
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "invalid-property-access"
-message = "Attempting to access a property on a non-object type (`never`)."
-count = 9
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
-code = "null-argument"
-message = 'Argument #1 of method `Symfony\Component\Filesystem\Path::normalize` is `null`, but parameter type `string` does not accept it.'
+code = "possibly-null-argument"
+message = 'Argument #1 of method `Symfony\Component\Filesystem\Path::normalize` is possibly `null`, but parameter type `string` does not accept it.'
 count = 2
 
 [[issues]]
@@ -12974,54 +12626,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$colors` of type `null` can never be `string('false')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$executionOrder` of type `null` can never be `string('.phpunit.result.cache.a1b2c3')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$executionOrder` of type `null` can never be `string('default')`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$executionOrder` of type `null` can never be `string('defects')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$executionOrder` of type `null` can never be `string('true')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$failOnRisky[0]->value` of type `null` can never be `string('false')`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$resultAutoLoaderFilePath` of type `null` can never be `string('/tmp/infection/interceptor.autoload.a1b2c3.infection.php')`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "impossible-type-comparison"
-message = "Impossible type assertion: `$stopOnFailure` of type `null` can never be `string('true')`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `failOnProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
@@ -13031,24 +12635,6 @@ file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder
 code = "imprecise-type"
 message = "Type `iterable` in return type of `locationsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "invalid-array-access"
-message = "Cannot access array index on object `DOMNodeList<DOMNameSpaceNode|DOMNode>` that does not implement `ArrayAccess`."
-count = 11
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "invalid-array-index"
-message = "Invalid index type `int(0)` used for array access on `DOMNodeList<DOMNameSpaceNode|DOMNode>`."
-count = 11
-
-[[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
-code = "invalid-property-access"
-message = "Attempting to access a property on a non-object type (`never`)."
-count = 11
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
@@ -13067,6 +12653,18 @@ file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\exec`: expected `int|null`, but found `mixed`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "non-existent-property"
+message = "Property `$value` does not exist on class `DOMNameSpaceNode`."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
+code = "non-existent-property"
+message = "Property `$value` does not exist on class `DOMNode`."
+count = 2
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php"
@@ -13460,12 +13058,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 4
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `Infection\Tests\TestFramework\Tracing\TraceProviderAdapterTracerTest::test_it_can_trace_files`.'
 count = 1
@@ -13535,12 +13127,6 @@ file = "tests/phpunit/TestFramework/Tracing/Tracer/TracerIntegrationTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `traceProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Tracing/Tracer/TracerIntegrationTest.php"
-code = "missing-magic-method"
-message = "Call to documented magic method `method()` on a class that cannot handle it."
-count = 4
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/Tracer/TracerIntegrationTest.php"
@@ -13882,6 +13468,12 @@ count = 8
 file = "tests/phpunit/TestingUtility/Iterable/YieldOnceIteratorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `valuesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestingUtility/PHPUnit/DataProviderFactory.php"
+code = "mixed-operand"
+message = "Invalid right operand: template parameter `Key` is unconstrained (effectively `mixed`) and cannot be reliably used in string concatenation."
 count = 1
 
 [[issues]]
