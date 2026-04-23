@@ -33,67 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Testing\PhpDoc;
 
-use DomainException;
-use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\Testing\FileSystem\MockSplFileInfo;
-use SplFileInfo;
+use function array_unique;
+use function array_values;
+use function Safe\preg_match_all;
+use function Safe\preg_replace;
+use const SORT_STRING;
 
 /**
- * Represents a Trace state with any dynamic behaviour or laziness of any kind.
- * This is mostly useful for testing purposes where we want to declare an
- * expected Trace state.
+ * @internal
  */
-final readonly class SyntheticTrace implements Trace
+final class PHPDocParser
 {
-    public function __construct(
-        public SplFileInfo $sourceFileInfo,
-        public string $realPath,
-        public bool $hasTest,
-        public TestLocations $tests,
-    ) {
-    }
-
-    public static function forSource(
-        string $realPath,
-        bool $hasTest,
-        TestLocations $tests,
-    ): self {
-        return new self(
-            MockSplFileInfo::create($realPath),
-            $realPath,
-            $hasTest,
-            $tests,
+    /**
+     * Parses the given PHP doc and returns the list of tags found.
+     *
+     * @return string[]
+     */
+    public function parse(string $phpDoc): array
+    {
+        $escapedPhpDoc = preg_replace(
+            '/\p{L}@[\p{L}\\\\]+/u',
+            '',
+            $phpDoc,
         );
-    }
 
-    public function getSourceFileInfo(): SplFileInfo
-    {
-        return $this->sourceFileInfo;
-    }
+        preg_match_all(
+            '/@[\p{L}\\\\]+/u',
+            $escapedPhpDoc,
+            $matches,
+        );
 
-    public function getRealPath(): string
-    {
-        return $this->realPath;
-    }
-
-    public function hasTests(): bool
-    {
-        return $this->hasTest;
-    }
-
-    public function getTests(): TestLocations
-    {
-        return $this->tests;
-    }
-
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        throw new DomainException('Not implemented.');
+        return array_values(array_unique($matches[0], SORT_STRING));
     }
 }
