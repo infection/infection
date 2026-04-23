@@ -35,18 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TestFileNameNotFoundException::class)]
-final class TestFileNameNotFoundExceptionTest extends TestCase
+#[CoversClass(TestNotFound::class)]
+final class TestNotFoundTest extends TestCase
 {
-    public function test_from_fqn(): void
+    public function test_it_can_be_created_for_a_test_id_of_a_junit_report(): void
     {
-        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
+        $exception = TestNotFound::forTestId(
+            'calculator:Dividing two numbers',
+            '/path/to/codeception-bdd-junit.xml',
+        );
 
-        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
-        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
+        $expected = new TestNotFound(
+            'Could not find any information for the test "calculator:Dividing two numbers" in the coverage file "/path/to/codeception-bdd-junit.xml".',
+        );
+
+        $this->assertEquals($expected, $exception);
     }
 }

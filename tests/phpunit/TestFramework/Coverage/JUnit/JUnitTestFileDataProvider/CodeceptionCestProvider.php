@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Path;
 
@@ -84,7 +84,7 @@ final class CodeceptionCestProvider
         yield 'test method of a simple test' => [
             $junitXml,
             'testIsPositive',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         // Codeception does not understand PHPUnit data providers.

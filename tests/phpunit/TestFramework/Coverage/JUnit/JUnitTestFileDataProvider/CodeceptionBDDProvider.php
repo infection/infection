@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use InvalidArgumentException;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Path;
@@ -73,7 +73,7 @@ final class CodeceptionBDDProvider
         yield 'test ID of a simple test (ID found in a JUnit report)' => [
             $junitXml,
             'Calculator: Dividing two numbers',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a simple test (ID found in a CoverageXML report)' => [
@@ -88,13 +88,13 @@ final class CodeceptionBDDProvider
         yield 'test method of a simple test' => [
             $junitXml,
             'Dividing two numbers',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a scenario outline (ID found in a JUnit report)' => [
             $junitXml,
             'Calculator: Checking if numbers are positive | 5, true',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a scenario outline (ID found in a CoverageXML report)' => [
@@ -109,13 +109,13 @@ final class CodeceptionBDDProvider
         yield 'test method of a test with a scenario outline' => [
             $junitXml,
             'Checking if numbers are positive',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a scenario outline with a placeholder in the scenario title (ID found in a JUnit report)' => [
             $junitXml,
             'Calculator: Computing absolute value with label &quot;&lt;label&gt;&quot; | 42, 5, 5',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a scenario outline with a placeholder in the scenario title (ID found in a CoverageXML report)' => [
@@ -130,19 +130,19 @@ final class CodeceptionBDDProvider
         yield 'test ID of a test with a scenario outline with a placeholder in the scenario title with special characters (ID found in a JUnit report)' => [
             $junitXml,
             'Calculator: Computing absolute value with label &quot;&lt;label&gt;&quot; | with special chars (\'&quot;#::&amp;), -15, 15',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test ID of a test with a scenario outline with a placeholder in the scenario title with special characters (ID found in a CoverageXML report)' => [
             $junitXml,
             'calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | with special chars (\'&quot;#::&amp;), -15, 15',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         yield 'test method of a test with a scenario outline with a placeholder in the scenario title' => [
             $junitXml,
             'Computing absolute value with label &quot;&lt;label&gt;&quot;',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
     }
 }
