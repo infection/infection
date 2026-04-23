@@ -39,7 +39,7 @@ use DomainException;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use SplFileInfo;
 
 /**

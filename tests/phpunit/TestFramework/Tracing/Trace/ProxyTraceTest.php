@@ -41,7 +41,7 @@ use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

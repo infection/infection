@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\PhpDoc;
+namespace Infection\Tests\Testing\PhpDoc;
 
+use Infection\Testing\PhpDoc\PHPDocParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

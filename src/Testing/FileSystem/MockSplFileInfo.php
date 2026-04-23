@@ -33,10 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\FileSystem;
+namespace Infection\Testing\FileSystem;
 
 use SplFileInfo;
 
+/**
+ * @internal
+ */
 final class MockSplFileInfo extends SplFileInfo
 {
     public function __construct(

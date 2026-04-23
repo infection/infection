@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\PhpDoc;
+namespace Infection\Testing\PhpDoc;
 
 use function array_unique;
 use function array_values;
@@ -41,6 +41,9 @@ use function Safe\preg_match_all;
 use function Safe\preg_replace;
 use const SORT_STRING;
 
+/**
+ * @internal
+ */
 final class PHPDocParser
 {
     /**
