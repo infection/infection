@@ -41,16 +41,18 @@ namespace Infection\TestFramework\Coverage\JUnit;
 interface TestFileDataProvider
 {
     /**
-     * Provides 1) file name of the test file that contains passed as a parameter test class
-     *          2) Time test was executed with
+     * Provides the test location and time information for a given test ID.
      *
-     * Example for file name:
-     *      param:  '\NameSpace\Sub\TestClass'
-     *      return: '/path/to/NameSpace/Sub/TestClass.php'
+     * Examples for PHPUnit:
+     * - 'Infection\E2ETests\PHPUnit_12_0\Tests\Covered\CalculatorTest'
+     * - 'Infection\E2ETests\PHPUnit_12_0\Tests\Covered\CalculatorTest::test_multiply'
      *
-     * @throws TestFileNameNotFoundException
+     * Examples for Codeception:
+     * - 'Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest'
+     * - 'Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testMultiplication'
+     * - 'calculator:Dividing two numbers'
      *
-     * @return TestFileTimeData file path and time
+     * @throws TestNotFound
      */
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData;
+    public function getTestFileInfo(string $testId): TestFileTimeData;
 }

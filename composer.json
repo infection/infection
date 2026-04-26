@@ -81,6 +81,7 @@
         "carthage-software/mago": "^1.20",
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
+        "phpat/phpat": "^0.12.4",
         "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",

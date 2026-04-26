@@ -33,20 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\DevTools\PHPat;
 
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-#[CoversClass(TestFileNameNotFoundException::class)]
-final class TestFileNameNotFoundExceptionTest extends TestCase
+final class SrcShouldNotDependOnTestsTest
 {
-    public function test_from_fqn(): void
+    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
     {
-        $exception = TestFileNameNotFoundException::notFoundFromFQN('Foo\Bar', '/path/to/junit/xml');
-
-        $this->assertInstanceOf(TestFileNameNotFoundException::class, $exception);
-        $this->assertSame('For FQCN: Foo\Bar. Junit report: /path/to/junit/xml', $exception->getMessage());
+        return PHPat::rule()
+            ->classes(Selector::inNamespace('Infection'))
+            ->excluding(
+                Selector::inNamespace('Infection\\Tests'),
+                Selector::inNamespace('Infection\\Benchmark'),
+                Selector::inNamespace('Infection\\DevTools'),
+            )
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                Selector::AnyOf(
+                    Selector::inNamespace('Infection\\Tests'),
+                    Selector::inNamespace('Infection\\Benchmark'),
+                ),
+            )
+            ->because('Production code under src/ must not depend on tests/ or benchmarks.');
     }
 }

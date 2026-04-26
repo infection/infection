@@ -33,26 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\FileSystem;
+namespace Infection\TestFramework\Tracing;
 
-use SplFileInfo;
+use function array_key_exists;
+use function array_sum;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use function strpos;
+use function substr;
 
-final class MockSplFileInfo extends SplFileInfo
+/**
+ * @internal
+ */
+final readonly class TestTotalTimeCalculator
 {
+    /**
+     * @param TestLocation[] $tests
+     */
     public function __construct(
-        string $pathname = 'file.txt',
-        private readonly string|false $realPath = false,
+        private array $tests,
     ) {
-        parent::__construct($pathname);
     }
 
-    public static function create(string $pathname): self
+    public function getTotalTestTime(): float
     {
-        return new self($pathname, $pathname);
+        return array_sum(
+            $this->uniqueTestLocations(),
+        );
     }
 
-    public function getRealPath(): false|string
+    /**
+     * Returns unique test cases with timings. Timings are per test suite, not per test, therefore, we have to unique by test suite name.
+     *
+     * @return array<float|null>
+     */
+    private function uniqueTestLocations(): array
     {
-        return $this->realPath;
+        $seenTestSuites = [];
+
+        foreach ($this->tests as $testLocation) {
+            $methodName = $testLocation->getMethod();
+            $methodSeparatorPos = strpos($methodName, '::');
+
+            if ($methodSeparatorPos === false) {
+                // Just for the off case where we have rubbish in the test method name
+                continue;
+            }
+
+            // For each test we discard method name, and return a single timing for an entire suite
+            $testSuiteName = substr($methodName, 0, $methodSeparatorPos);
+
+            if (array_key_exists($testSuiteName, $seenTestSuites)) {
+                continue;
+            }
+
+            $seenTestSuites[$testSuiteName] = $testLocation->getExecutionTime();
+        }
+
+        return $seenTestSuites;
     }
 }

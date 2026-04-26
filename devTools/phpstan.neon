@@ -5,6 +5,12 @@ includes:
 rules:
     - Infection\DevTools\PHPStan\Rules\InfectionContainerRule
 
+services:
+    -
+        class: Infection\DevTools\PHPat\SrcShouldNotDependOnTestsTest
+        tags:
+            - phpat.test
+
 parameters:
     tmpDir: ../var/cache/phpstan
     inferPrivatePropertyTypeFromConstructor: true
@@ -115,6 +121,12 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
 
+        # PHPat test methods are invoked by the PHPStan container via the phpat.test tag,
+        # so shipmonk's dead-code detector cannot see the call sites.
+        -
+            identifier: shipmonk.deadMethod
+            path: ./PHPat/*
+
         # Test enum fixtures have cases that exist as test data, not all are used
         -
             identifier: shipmonk.deadEnumCase
@@ -205,6 +217,7 @@ parameters:
         - ../tests/phpunit
         - ../tests/benchmark
         - ./PHPStan/
+        - ./PHPat/
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__.php

@@ -33,62 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use function array_key_exists;
-use function array_sum;
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function strpos;
-use function substr;
+use Infection\TestFramework\Coverage\JUnit\TestNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class JUnitTestCaseTimeAdder
+#[CoversClass(TestNotFound::class)]
+final class TestNotFoundTest extends TestCase
 {
-    /**
-     * @param TestLocation[] $tests
-     */
-    public function __construct(
-        private array $tests,
-    ) {
-    }
-
-    public function getTotalTestTime(): float
+    public function test_it_can_be_created_for_a_test_id_of_a_junit_report(): void
     {
-        return array_sum(
-            $this->uniqueTestLocations(),
+        $exception = TestNotFound::forTestId(
+            'calculator:Dividing two numbers',
+            '/path/to/codeception-bdd-junit.xml',
         );
-    }
 
-    /**
-     * Returns unique'd test cases with timings. Timings are per test suite, not per test, therefore we have to unique by test suite name.
-     *
-     * @return array<float|null>
-     */
-    private function uniqueTestLocations(): array
-    {
-        $seenTestSuites = [];
+        $expected = new TestNotFound(
+            'Could not find any information for the test "calculator:Dividing two numbers" in the coverage file "/path/to/codeception-bdd-junit.xml".',
+        );
 
-        foreach ($this->tests as $testLocation) {
-            $methodName = $testLocation->getMethod();
-            $methodSeparatorPos = strpos($methodName, '::');
-
-            if ($methodSeparatorPos === false) {
-                // Just for the off case where we have rubbish in the test method name
-                continue;
-            }
-
-            // For each test we discard method name, and return a single timing for an entire suite
-            $testSuiteName = substr($methodName, 0, $methodSeparatorPos);
-
-            if (array_key_exists($testSuiteName, $seenTestSuites)) {
-                continue;
-            }
-
-            $seenTestSuites[$testSuiteName] = $testLocation->getExecutionTime();
-        }
-
-        return $seenTestSuites;
+        $this->assertEquals($expected, $exception);
     }
 }

@@ -35,16 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use Exception;
+use RuntimeException;
 use function sprintf;
 
 /**
  * @internal
  */
-final class TestFileNameNotFoundException extends Exception
+final class TestNotFound extends RuntimeException
 {
-    public static function notFoundFromFQN(string $fqn, string $jUnitFilePath): self
-    {
-        return new self(sprintf('For FQCN: %s. Junit report: %s', $fqn, $jUnitFilePath));
+    public static function forTestId(
+        string $testId,
+        string $reportPathname,
+    ): self {
+        return new self(
+            sprintf(
+                'Could not find any information for the test "%s" in the coverage file "%s".',
+                $testId,
+                $reportPathname,
+            ),
+        );
     }
 }

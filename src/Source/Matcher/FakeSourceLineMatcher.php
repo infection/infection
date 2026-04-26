@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Matcher;
 
-use Infection\Tests\UnsupportedMethod;
+use DomainException;
 
 /**
  * @internal
@@ -44,6 +44,6 @@ final readonly class FakeSourceLineMatcher implements SourceLineMatcher
 {
     public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        throw UnsupportedMethod::method(self::class, __METHOD__);
+        throw new DomainException('Not implemented');
     }
 }

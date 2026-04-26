@@ -24,6 +24,10 @@ excludes = [
     "tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php",
     "tests/phpunit/Mutation/FileMutationGenerator/Fixtures",
     "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures",
+    # Rector or PHPStan stubs can pollute Mago's Reflection inference
+    # https://github.com/carthage-software/mago/issues/1676
+    "vendor/rector/rector",
+    "vendor/phpstan",
 ]
 
 [source.glob]
