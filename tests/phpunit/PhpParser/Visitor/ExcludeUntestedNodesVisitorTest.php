@@ -163,8 +163,8 @@ final class ExcludeUntestedNodesVisitorTest extends VisitorTestCase
 
         yield 'all eligible and tested node' => [
             $phpCode,
-            [],
-            [],
+            null,
+            null,
             $untouchedAst,
         ];
 
