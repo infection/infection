@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function array_fill_keys;
 use function array_keys;
+use function array_replace;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
@@ -46,7 +48,6 @@ use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function sprintf;
 
 #[CoversClass(FullyQualifiedClassNameManipulator::class)]
 final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
@@ -54,14 +55,14 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
     /**
      * This test is to ensure the integration of NameResolver works as expected.
      *
-     * @param array<int, FullyQualified> $expectedFqcns
+     * @param array<int, Name|FullyQualified|null> $partialExpectedFqcns
      */
     #[CoversNothing]
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_resolved_node_names(
         string $code,
         string $expectedDump,
-        array $expectedFqcns,
+        array $partialExpectedFqcns,
     ): void {
         $nodes = $this->parse($code);
 
@@ -74,12 +75,10 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
 
         $this->assertSame($expectedDump, $actual);
 
-        $actualFqcns = $this->getFqcns(
-            array_keys($expectedFqcns),
-            $nodesById,
-        );
+        $expected = self::completeExpectedFqcns($nodesById, $partialExpectedFqcns);
+        $actualFqcns = $this->getFqcns($nodesById);
 
-        $this->assertEquals($expectedFqcns, $actualFqcns);
+        $this->assertEquals($expected, $actualFqcns);
     }
 
     public static function nodeProvider(): iterable
@@ -113,6 +112,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                 )
                 AST,
             [
+                0 => new Name('calculate'),
                 4 => new FullyQualified('calculate'),
             ],
         ];
@@ -157,6 +157,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                 )
                 AST,
             [
+                2 => new Name('Infection\Tests\Virtual\calculate'),
                 6 => new FullyQualified('Infection\Tests\Virtual\calculate'),
             ],
         ];
@@ -203,6 +204,7 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                 )
                 AST,
             [
+                0 => new Name('Calculator'),
                 6 => new FullyQualified('Calculator'),
             ],
         ];
@@ -260,40 +262,77 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
                 )
                 AST,
             [
+                2 => new Name('Infection\Tests\Virtual\Calculator'),
                 8 => new FullyQualified('Infection\Tests\Virtual\Calculator'),
             ],
+        ];
+
+        yield 'code without names' => [
+            <<<'PHP'
+                <?php
+
+                $x = 'Hello World!';
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_String(
+                                kind: KIND_SINGLE_QUOTED (1)
+                                nodeId: 3
+                                rawValue: 'Hello World!'
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                    )
+                )
+                AST,
+            [],
         ];
     }
 
     /**
-     * @param int[] $nodeIds
+     * @param array<int, Node> $nodesById
+     * @param array<int, Name|FullyQualified|null> $partialExpectedFqcns
+     *
+     * @return array<int, Name|FullyQualified|null>
+     */
+    private static function completeExpectedFqcns(
+        array $nodesById,
+        array $partialExpectedFqcns,
+    ): array {
+        return array_replace(
+            array_fill_keys(
+                array_keys($nodesById),
+                null,
+            ),
+            $partialExpectedFqcns,
+        );
+    }
+
+    /**
      * @param array<int, Node> $nodesById
      *
-     * @return array<int, Name>
+     * @return array<int, Name|FullyQualified|null>
      */
-    private function getFqcns(array $nodeIds, array $nodesById): array
+    private function getFqcns(array $nodesById): array
     {
         $fqcns = [];
 
-        foreach ($nodeIds as $nodeId) {
+        foreach ($nodesById as $nodeId => $node) {
             $this->assertArrayHasKey(
                 $nodeId,
                 $nodesById,
                 'No node with the node ID %s was found.',
             );
 
-            $node = $nodesById[$nodeId];
             $actual = FullyQualifiedClassNameManipulator::getFqcn($node);
-            $this->assertNotNull(
-                $actual,
-                sprintf(
-                    'Expected node to have a FQCN attribute, none found. Node:%s%s',
-                    "\n",
-                    $this->dumper->dump($node, onlyVisitedNodes: false),
-                ),
-            );
-
-            $actual->setAttributes([]);
+            $actual?->setAttributes([]);
 
             $fqcns[$nodeId] = $actual;
         }

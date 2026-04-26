@@ -33,46 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+namespace Infection\Tests\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 
-use PhpParser\Node;
-
-final class ConcreteVisitorTestCase extends VisitorTestCase
+final class Scenario
 {
-    /**
-     * @return Node\Stmt[]
-     */
-    public function parseCode(string $code): array
-    {
-        return $this->parse($code);
+    public function __construct(
+        public ?bool $isEligible,
+        public ?bool $isOnFunctionSignature,
+        public ?bool $isInsideFunctionSignature,
+        public bool $expected,
+    ) {
     }
 
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     *
-     * @return array<positive-int|0, Node>
-     */
-    public function addIdsToNodesPublic(array|Node $nodeOrNodes): array
+    public function withIsEligible(?bool $isEligible): self
     {
-        return $this->addIdsToNodes($nodeOrNodes);
+        $clone = clone $this;
+        $clone->isEligible = $isEligible;
+
+        return $clone;
     }
 
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
-     */
-    public function markNodeAsEligiblePublic(array $nodesById, array $eligibleNodeIds): void
+    public function withIsOnFunctionSignature(?bool $isOnFunctionSignature): self
     {
-        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
+        $clone = clone $this;
+        $clone->isOnFunctionSignature = $isOnFunctionSignature;
+
+        return $clone;
     }
 
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    public function keepOnlyDesiredAttributesPublic(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $this->keepOnlyDesiredAttributes($nodeOrNodes, ...$attributes);
+    public function withIsInsideFunctionSignature(?bool $isInsideFunctionSignature): self
+    {
+        $clone = clone $this;
+        $clone->isInsideFunctionSignature = $isInsideFunctionSignature;
+
+        return $clone;
+    }
+
+    public function withExpected(bool $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
     }
 }

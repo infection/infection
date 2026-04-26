@@ -33,46 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+namespace Infection\PhpParser\Visitor;
 
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-final class ConcreteVisitorTestCase extends VisitorTestCase
+/**
+ * @internal
+ */
+final class ExcludeUntestedNodesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @return Node\Stmt[]
-     */
-    public function parseCode(string $code): array
+    public function enterNode(Node $node): null
     {
-        return $this->parse($code);
-    }
+        if (
+            LabelNodesAsEligibleVisitor::isEligible($node)
+            && !AddTestsVisitor::hasTests($node)
+        ) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
 
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     *
-     * @return array<positive-int|0, Node>
-     */
-    public function addIdsToNodesPublic(array|Node $nodeOrNodes): array
-    {
-        return $this->addIdsToNodes($nodeOrNodes);
-    }
-
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
-     */
-    public function markNodeAsEligiblePublic(array $nodesById, array $eligibleNodeIds): void
-    {
-        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    public function keepOnlyDesiredAttributesPublic(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $this->keepOnlyDesiredAttributes($nodeOrNodes, ...$attributes);
+        return null;
     }
 }

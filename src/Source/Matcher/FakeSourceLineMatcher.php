@@ -33,46 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+namespace Infection\Source\Matcher;
 
-use PhpParser\Node;
+use DomainException;
 
-final class ConcreteVisitorTestCase extends VisitorTestCase
+/**
+ * @internal
+ */
+final readonly class FakeSourceLineMatcher implements SourceLineMatcher
 {
-    /**
-     * @return Node\Stmt[]
-     */
-    public function parseCode(string $code): array
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
-        return $this->parse($code);
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     *
-     * @return array<positive-int|0, Node>
-     */
-    public function addIdsToNodesPublic(array|Node $nodeOrNodes): array
-    {
-        return $this->addIdsToNodes($nodeOrNodes);
-    }
-
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
-     */
-    public function markNodeAsEligiblePublic(array $nodesById, array $eligibleNodeIds): void
-    {
-        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    public function keepOnlyDesiredAttributesPublic(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $this->keepOnlyDesiredAttributes($nodeOrNodes, ...$attributes);
+        throw new DomainException('Not implemented');
     }
 }

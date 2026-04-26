@@ -188,7 +188,7 @@ parameters:
         -
             message: '#^.*(start|end)Line.*SourceLineMatcher::touches\(\) expects int\<1\, max\>\, -1\|int\<1\, max\> given\.$#'
             identifier: argument.type
-            path: ../src/Mutator/NodeMutationGenerator.php
+            path: ../src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php
 
         # This class is copy/pasted from PhpParser so we don't want to change it too much
         -

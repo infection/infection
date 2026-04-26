@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 
-use function array_flip;
 use function array_intersect;
-use function array_intersect_key;
 use function array_keys;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -250,21 +246,5 @@ final class MarkAllButIneligibleNodesAsVisitedVisitorTest extends VisitorTestCas
             array_intersect($eligibleNodeIds, $ineligibleNodeIds),
             'Did not expect to find nodes to be marked as both eligible and ineligible.',
         );
-    }
-
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $ineligibleNodeIds
-     */
-    private static function markNodesAsIneligible(array $nodesById, array $ineligibleNodeIds): void
-    {
-        $eligibleNodes = array_intersect_key(
-            $nodesById,
-            array_flip($ineligibleNodeIds),
-        );
-
-        foreach ($eligibleNodes as $node) {
-            LabelNodesAsEligibleVisitor::markAsIneligible($node);
-        }
     }
 }

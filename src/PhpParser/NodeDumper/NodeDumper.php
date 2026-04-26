@@ -41,7 +41,6 @@ use function in_array;
 use Infection\Framework\ClassName;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
@@ -343,15 +342,7 @@ final class NodeDumper
             }
 
             if ($this->decorateNodes) {
-                $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
-                $isMutationCandidate = LabelMutationCandidatesVisitor::isAMutationCandidate($node);
-
-                if ($isMutationCandidate) {
-                    $result .= sprintf(
-                        '<mutation-candidate>%s</mutation-candidate>',
-                        $node->getType(),
-                    );
-                } elseif ($isEligible) {
+                if (LabelNodesAsEligibleVisitor::isEligible($node)) {
                     $result .= sprintf(
                         '<eligible>%s</eligible>',
                         $node->getType(),

@@ -454,10 +454,13 @@ final class Container extends DIContainer
             FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
                 $container->getFileParser(),
                 $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
-                $container->getSourceLineMatcher(),
                 $container->getTracer(),
                 $container->getFileStore(),
+            ),
+            NodeTraverserFactory::class => static fn (self $container) => new NodeTraverserFactory(
+                $container->getSourceLineMatcher(),
+                $container->getLineRangeCalculator(),
+                $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();

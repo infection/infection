@@ -36,14 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
 use function current;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestFramework\Tracing\DummyTracer;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -58,13 +59,20 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
     public function test_it_generates_mutations_for_a_given_file(): void
     {
         $fileInfoMock = new MockSplFileInfo(realPath: self::FIXTURES_DIR . '/TwoAdditions.php');
+        $traceMock = $this->createTraceMock();
+
+        $tracerMock = $this->createMock(Tracer::class);
+        $tracerMock
+            ->method('trace')
+            ->with($fileInfoMock)
+            ->willReturn($traceMock);
 
         $mutators = [new Plus()];
 
         $mutationGenerator = SingletonContainer::getContainer()
             ->cloneWithService(
                 Tracer::class,
-                new DummyTracer(),
+                $tracerMock,
             )
             ->getFileMutationGenerator();
 
@@ -88,5 +96,21 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
             MutatorName::getName(Plus::class),
             $mutation->getMutatorName(),
         );
+    }
+
+    private function createTraceMock(): Trace
+    {
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->method('getAllTestsForMutation')
+            ->willReturn([
+                new TestLocation(
+                    'someMethod',
+                    '/path/to/test.php',
+                    0.23,
+                ),
+            ]);
+
+        return $traceMock;
     }
 }
