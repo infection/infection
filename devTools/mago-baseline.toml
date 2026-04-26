@@ -10052,12 +10052,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `visitorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
@@ -10071,31 +10065,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "no-value"
-message = 'Argument #1 passed to method `Infection\PhpParser\NodeTraverserFactory::createEnrichmentTraverser` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
-code = "no-value"
 message = 'Argument #1 passed to method `Infection\PhpParser\NodeTraverserFactory::createMutationTraverser` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\TestFramework\Tracing\Trace\EmptyTrace::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeVisitor` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo` not found.'
 count = 1
 
 [[issues]]
@@ -10142,18 +10118,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\PhpParser\NodeTraverserFactory::createEnrichmentTraverser` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\EnrichmentTraverse\EnrichmentTraverseIntegrationTest::test_it_creates_a_rich_ast`.'
 count = 1
@@ -10189,15 +10153,15 @@ message = "Type `iterable` in return type of `scenarioProvider` is imprecise, eq
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitorTest.php"
+file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitor/ExcludeUnchangedLinesVisitorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitorTest.php"
+file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitor/ExcludeUnchangedLinesVisitorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitorTest::test_it_marks_nodes_belonging_to_unchanged_lines_as_ineligible`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitor\ExcludeUnchangedLinesVisitorTest::test_it_marks_nodes_belonging_to_unchanged_lines_as_ineligible`.'
 count = 1
 
 [[issues]]
