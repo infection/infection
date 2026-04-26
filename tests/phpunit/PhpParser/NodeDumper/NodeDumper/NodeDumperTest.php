@@ -40,7 +40,6 @@ use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
@@ -453,72 +452,6 @@ final class NodeDumperTest extends TestCase
                                 expr: Scalar_String
                             )
                             1: <eligible>Expr_Assign</eligible>(
-                                var: Expr_Variable
-                                expr: Scalar_String
-                            )
-                        )
-                        AST,
-                )
-                ->build();
-        })();
-
-        yield 'mutation candidate nodes can be decorated' => (static function () {
-            $node = new Assign(
-                new Variable('x'),
-                new String_('value'),
-            );
-            $mutationCandidateNode = new Assign(
-                new Variable('x'),
-                new String_('value'),
-            );
-
-            LabelMutationCandidatesVisitor::markAsAMutationCandidate($mutationCandidateNode);
-
-            return NodeDumperScenario::forNode([$node, $mutationCandidateNode])
-                ->withShowAllNodes()
-                ->withDecorateNodes()
-                ->withExpected(
-                    <<<'AST'
-                        array(
-                            0: Expr_Assign(
-                                var: Expr_Variable
-                                expr: Scalar_String
-                            )
-                            1: <mutation-candidate>Expr_Assign</mutation-candidate>(
-                                var: Expr_Variable
-                                expr: Scalar_String
-                            )
-                        )
-                        AST,
-                )
-                ->build();
-        })();
-
-        // This is because a mutation candidate is necessarily an eligible node in practice.
-        yield 'mutation candidate trumps over eligible' => (static function () {
-            $node = new Assign(
-                new Variable('x'),
-                new String_('value'),
-            );
-            $mutationCandidateNode = new Assign(
-                new Variable('x'),
-                new String_('value'),
-            );
-
-            LabelNodesAsEligibleVisitor::markAsEligible($mutationCandidateNode);
-            LabelMutationCandidatesVisitor::markAsAMutationCandidate($mutationCandidateNode);
-
-            return NodeDumperScenario::forNode([$node, $mutationCandidateNode])
-                ->withShowAllNodes()
-                ->withDecorateNodes()
-                ->withExpected(
-                    <<<'AST'
-                        array(
-                            0: Expr_Assign(
-                                var: Expr_Variable
-                                expr: Scalar_String
-                            )
-                            1: <mutation-candidate>Expr_Assign</mutation-candidate>(
                                 var: Expr_Variable
                                 expr: Scalar_String
                             )

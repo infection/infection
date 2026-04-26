@@ -218,6 +218,7 @@ final readonly class Engine
     private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(
+            // TODO: inject it in the constructor instead
             $this->config->mutateOnlyCoveredCode(),
         );
 

@@ -44,10 +44,8 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
@@ -65,8 +63,6 @@ class FileMutationGenerator
     public function __construct(
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
-        private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
     ) {
@@ -93,14 +89,15 @@ class FileMutationGenerator
             return;
         }
 
-        [$initialStatements, $originalFileTokens] = $this->createAst($sourceFile);
+        [$initialStatements, $originalFileTokens] = $this->createAst(
+            $sourceFile,
+            $trace,
+        );
 
         yield from $this->generateMutations(
             $mutators,
             $sourceFile,
             $initialStatements,
-            $trace,
-            $onlyCovered,
             $originalFileTokens,
         );
     }
@@ -112,11 +109,10 @@ class FileMutationGenerator
      *
      * @return iterable<Mutation>
      */
-    private function generateMutations(array $mutators,
+    private function generateMutations(
+        array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
-        Trace $trace,
-        bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
         $mutationCollectorVisitor = new MutationCollectorVisitor(
@@ -124,10 +120,6 @@ class FileMutationGenerator
                 mutators: $mutators,
                 filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
-                trace: $trace,
-                onlyCovered: $onlyCovered,
-                lineRangeCalculator: $this->lineRangeCalculator,
-                sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $this->fileStore->getContents($sourceFile),
             ),
@@ -148,12 +140,15 @@ class FileMutationGenerator
      *
      * @return array{Stmt[], Token[]}
      */
-    private function createAst(SplFileInfo $sourceFile): array
-    {
+    private function createAst(
+        SplFileInfo $sourceFile,
+        Trace $trace,
+    ): array {
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        $traverser = $this->traverserFactory->createEnrichmentTraverser();
-        $traverser->traverse($initialStatements);
+        $this->traverserFactory
+            ->createEnrichmentTraverser($sourceFile, $trace)
+            ->traverse($initialStatements);
 
         return [$initialStatements, $originalFileTokens];
     }

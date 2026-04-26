@@ -89,6 +89,7 @@ use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
+use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -145,6 +146,7 @@ final class ProjectCodeProvider
         FakeLocator::class,
         FakeSourceCollector::class,
         FakeSourceFilter::class,
+        FakeSourceLineMatcher::class,
         FileSystem::class,
         FilterOption::class,
         FixedSourceCollector::class,

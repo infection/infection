@@ -33,46 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+namespace Infection\Tests\PhpParser\Visitor\AddTestsVisitor;
 
-use PhpParser\Node;
+use function count;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 
-final class ConcreteVisitorTestCase extends VisitorTestCase
+final class Scenario
 {
+    public bool $expectedHasTests;
+
     /**
-     * @return Node\Stmt[]
+     * @param list<TestLocation> $traceTests
+     * @param list<TestLocation> $expectedTests
      */
-    public function parseCode(string $code): array
+    public function __construct(
+        public ?bool $isEligible,
+        public ?bool $isOnFunctionSignature,
+        public array $traceTests,
+        public int $expectedTraceCallCount,
+        public array $expectedTests,
+    ) {
+        $this->expectedHasTests = count($this->expectedTests) > 0;
+    }
+
+    public function withIsEligible(?bool $isEligible): self
     {
-        return $this->parse($code);
+        $clone = clone $this;
+        $clone->isEligible = $isEligible;
+
+        return $clone;
+    }
+
+    public function withIsOnFunctionSignature(?bool $isOnFunctionSignature): self
+    {
+        $clone = clone $this;
+        $clone->isOnFunctionSignature = $isOnFunctionSignature;
+
+        return $clone;
+    }
+
+    public function withExpectedTraceCallCount(int $expectedTraceCallCount): self
+    {
+        $clone = clone $this;
+        $clone->expectedTraceCallCount = $expectedTraceCallCount;
+
+        return $clone;
     }
 
     /**
-     * @param Node[]|Node $nodeOrNodes
-     *
-     * @return array<positive-int|0, Node>
+     * @param list<TestLocation> $traceTests
      */
-    public function addIdsToNodesPublic(array|Node $nodeOrNodes): array
+    public function withTraceTests(array $traceTests): self
     {
-        return $this->addIdsToNodes($nodeOrNodes);
+        $clone = clone $this;
+        $clone->traceTests = $traceTests;
+
+        return $clone;
     }
 
     /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
+     * @param list<TestLocation> $expectedTests
      */
-    public function markNodeAsEligiblePublic(array $nodesById, array $eligibleNodeIds): void
+    public function withExpectedTests(array $expectedTests): self
     {
-        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
-    }
+        $clone = clone $this;
+        $clone->expectedTests = $expectedTests;
+        $clone->expectedHasTests = count($expectedTests) > 0;
 
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    public function keepOnlyDesiredAttributesPublic(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $this->keepOnlyDesiredAttributes($nodeOrNodes, ...$attributes);
+        return $clone;
     }
 }

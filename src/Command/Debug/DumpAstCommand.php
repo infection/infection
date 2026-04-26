@@ -47,9 +47,10 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
+use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Source\Matcher\SimpleSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use Psr\Log\LoggerInterface;
@@ -127,7 +128,12 @@ final class DumpAstCommand extends BaseCommand
         $logger = new ConsoleLogger($io);
         self::configureFormatter($io);
 
-        $container = $this->createContainer($logger, $io, $configFile, $changedLinesRanges);
+        $container = $this->createContainer(
+            $logger,
+            $io,
+            $configFile,
+            $changedLinesRanges,
+        );
 
         $nodes = $this->createAst($container, $file);
 
@@ -160,15 +166,15 @@ final class DumpAstCommand extends BaseCommand
         self::addIdsToNodes($initialStatements);
 
         $traverserFactory
-            ->createEnrichmentTraverser()
+            ->createEnrichmentTraverser(
+                $file,
+                new EmptyTrace($file),
+            )
             ->traverse($initialStatements);
 
         return $traverserFactory
             ->createMutationTraverser(
-                new LabelMutationCandidatesVisitor(
-                    $file->getRealPath(),
-                    $container->getSourceLineMatcher(),
-                ),
+                new MarkTraversedNodesAsVisitedVisitor(),
             )
             ->traverse($initialStatements);
     }
@@ -278,6 +284,7 @@ final class DumpAstCommand extends BaseCommand
                 logger: $logger,
                 output: $io->getOutput(),
                 configFile: $configFile,
+                withUncovered: true,
                 sourceFilter: SourceFilterOptions::get($io),
             );
 
@@ -298,10 +305,6 @@ final class DumpAstCommand extends BaseCommand
         $formatter->setStyle(
             'eligible',
             new OutputFormatterStyle(background: 'green'),
-        );
-        $formatter->setStyle(
-            'mutation-candidate',
-            new OutputFormatterStyle(background: 'red'),
         );
     }
 }

@@ -37,11 +37,19 @@ namespace Infection\Tests\PhpParser;
 
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
@@ -50,6 +58,7 @@ use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -59,34 +68,58 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
-    private NodeTraverserFactory $factory;
+    /**
+     * @param list<class-string<NodeVisitor>> $expected
+     */
+    #[DataProvider('visitorProvider')]
+    public function test_it_can_create_a_traverser_for_enriching_the_ast(
+        bool $onlyCovered,
+        array $expected,
+    ): void {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
-    protected function setUp(): void
-    {
-        $this->factory = new NodeTraverserFactory();
+        $factory = self::createTraverserFactory($onlyCovered);
+
+        $traverser = $factory->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
+        );
+
+        $this->assertTraverserVisitorsAre($traverser, $expected);
     }
 
-    public function test_it_can_create_a_traverser_for_enriching_the_ast(): void
+    public static function visitorProvider(): iterable
     {
-        $traverser = $this->factory->createEnrichmentTraverser();
+        $baseVisitors = [
+            NextConnectingVisitor::class,
+            LabelNodesAsEligibleVisitor::class,
+            ExcludeIgnoredNodesVisitor::class,
+            SkipIgnoredNodesVisitor::class,
+            NameResolver::class,
+            ParentConnectingVisitor::class,
+            ReflectionVisitor::class,
+            ExcludeNonMutableCodeVisitor::class,
+            ExcludeUnchangedLinesVisitor::class,
+            AddTestsVisitor::class,
+        ];
 
-        $this->assertTraverserVisitorsAre(
-            $traverser,
+        yield 'without only covered' => [
+            false,
+            $baseVisitors,
+        ];
+
+        yield 'with only covered' => [
+            true,
             [
-                NextConnectingVisitor::class,
-                LabelNodesAsEligibleVisitor::class,
-                ExcludeIgnoredNodesVisitor::class,
-                SkipIgnoredNodesVisitor::class,
-                NameResolver::class,
-                ParentConnectingVisitor::class,
-                ReflectionVisitor::class,
+                ...$baseVisitors,
+                ExcludeUntestedNodesVisitor::class,
             ],
-        );
+        ];
     }
 
     public function test_it_can_create_a_traverser_for_generating_mutations(): void
     {
-        $traverser = $this->factory->createMutationTraverser(
+        $traverser = self::createTraverserFactory(true)->createMutationTraverser(
             new FakeVisitor(),
         );
 
@@ -132,5 +165,14 @@ final class NodeTraverserFactoryTest extends TestCase
     private static function getVisitorReflection(): ReflectionProperty
     {
         return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
+    }
+
+    private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
+    {
+        return new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: $onlyCovered,
+        );
     }
 }

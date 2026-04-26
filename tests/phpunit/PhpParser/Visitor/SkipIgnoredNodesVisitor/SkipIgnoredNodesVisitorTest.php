@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 
+use function array_keys;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
@@ -46,17 +48,25 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
 {
     /**
+     * @param list<int> $eligibleNodeIds
      * @param array<positive-int|0> $ignoredNodeIds
      */
     #[DataProvider('nodeProvider')]
-    public function test_it_annotates_the_next_nodes(
+    public function test_it_skips_the_traversal_of_ignored_nodes_and_its_children(
         string $code,
+        ?array $eligibleNodeIds,
         array $ignoredNodeIds,
         string $expected,
     ): void {
         $nodes = $this->parse($code);
 
-        $this->addIdsToNodes($nodes);
+        $nodesById = $this->addIdsToNodes($nodes);
+
+        $this->markNodesAsEligible(
+            $nodesById,
+            $eligibleNodeIds ?? array_keys($nodesById),
+        );
+
         (new NodeTraverser(
             new SkipIgnoredNodesVisitor([
                 new IdNodeIgnorer($ignoredNodeIds),
@@ -67,6 +77,12 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
         $actual = $this->dumper->dump($nodes);
 
         $this->assertSame($expected, $actual);
+
+        foreach ($ignoredNodeIds as $ignoredNodeId) {
+            $this->assertFalse(
+                LabelNodesAsEligibleVisitor::isEligible($nodesById[$ignoredNodeId]),
+            );
+        }
     }
 
     public static function nodeProvider(): iterable
@@ -97,8 +113,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
             PHP;
 
         // Sanity check
-        yield 'no code ignored' => [
+        yield 'no eligible nodes and no code ignored' => [
             $codeSample,
+            [],
             [],
             <<<'AST'
                 array(
@@ -220,8 +237,9 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'ignore some code' => [
+        yield 'no eligible nodes and some ignored code' => [
             $codeSample,
+            [],
             [
                 10, // method greet()
             ],
@@ -302,6 +320,115 @@ final class SkipIgnoredNodesVisitorTest extends VisitorTestCase
                                 nodeId: 20
                             )
                         )
+                        nodeId: 4
+                    )
+                )
+                AST,
+        ];
+
+        yield 'eligible nodes and some nodes ignored' => [
+            $codeSample,
+            null,
+            [
+                10, // method greet()
+            ],
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                eligible: true
+                                nodeId: 2
+                            )
+                            expr: Scalar_Int(
+                                eligible: true
+                                kind: KIND_DEC (10)
+                                nodeId: 3
+                                rawValue: 1
+                            )
+                            eligible: true
+                            nodeId: 1
+                        )
+                        eligible: true
+                        nodeId: 0
+                    )
+                    1: Stmt_Class(
+                        name: Identifier(
+                            eligible: true
+                            nodeId: 5
+                        )
+                        stmts: array(
+                            0: Stmt_Property(
+                                props: array(
+                                    0: PropertyItem(
+                                        name: VarLikeIdentifier(
+                                            eligible: true
+                                            nodeId: 8
+                                        )
+                                        default: Scalar_Int(
+                                            eligible: true
+                                            kind: KIND_DEC (10)
+                                            nodeId: 9
+                                            rawValue: 2
+                                        )
+                                        eligible: true
+                                        nodeId: 7
+                                    )
+                                )
+                                eligible: true
+                                nodeId: 6
+                            )
+                            1: <skipped>
+                            2: Stmt_ClassMethod(
+                                name: Identifier(
+                                    eligible: true
+                                    nodeId: 21
+                                )
+                                params: array(
+                                    0: Param(
+                                        var: Expr_Variable(
+                                            eligible: true
+                                            nodeId: 23
+                                        )
+                                        default: Scalar_Int(
+                                            eligible: true
+                                            kind: KIND_DEC (10)
+                                            nodeId: 24
+                                            rawValue: 5
+                                        )
+                                        eligible: true
+                                        nodeId: 22
+                                    )
+                                )
+                                returnType: Identifier(
+                                    eligible: true
+                                    nodeId: 25
+                                )
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                eligible: true
+                                                nodeId: 28
+                                            )
+                                            expr: Scalar_Int(
+                                                eligible: true
+                                                kind: KIND_DEC (10)
+                                                nodeId: 29
+                                                rawValue: 6
+                                            )
+                                            eligible: true
+                                            nodeId: 27
+                                        )
+                                        eligible: true
+                                        nodeId: 26
+                                    )
+                                )
+                                eligible: true
+                                nodeId: 20
+                            )
+                        )
+                        eligible: true
                         nodeId: 4
                     )
                 )

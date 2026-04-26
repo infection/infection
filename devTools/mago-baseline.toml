@@ -74,12 +74,6 @@ count = 1
 
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of method `Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "src/Command/Debug/DumpAstCommand.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Command\Debug\DumpAstCommand::executeCommand`.'
 count = 1
@@ -1940,30 +1934,6 @@ count = 1
 
 [[issues]]
 file = "src/Mutator/NodeMutationGenerator.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\Mutator\NodeMutationGenerator::isInsideFunction`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\Mutator\NodeMutationGenerator::isOnFunctionSignature`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/NodeMutationGenerator.php"
 code = "redundant-type-comparison"
 message = 'Redundant type assertion: `$mutators` of type `array<array-key, Infection\Mutator\Mutator<PhpParser\Node>>` is always not `iterable<mixed, Infection\Mutator\Mutator<PhpParser\Node>>`.'
 count = 1
@@ -2407,9 +2377,63 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\PhpP
 count = 1
 
 [[issues]]
+file = "src/PhpParser/NodeTraverserFactory.php"
+code = "possibly-false-argument"
+message = 'Argument #2 of method `Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
 file = "src/PhpParser/Visitor/AddIdToTraversedNodesVisitor/AddIdToTraversedNodesVisitor.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor::getNodeId`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/AddTestsVisitor.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `(closure(): nonnull)` is less specific than the declared return type `(closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation>)` for function `Infection\PhpParser\Visitor\AddTestsVisitor::createAllTestsForNodeLocator` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/AddTestsVisitor.php"
+code = "mixed-return-statement"
+message = "Could not infer a precise return type for function `16684525231735625562:3151`. Saw type `nonnull`."
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/AddTestsVisitor.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\AddTestsVisitor::isOnFunctionSignature`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeNonMutableCodeVisitor.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor::isInsideFunction`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeNonMutableCodeVisitor.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor::isOnFunctionSignature`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor::excludeUntouchedNodes`.'
 count = 1
 
 [[issues]]
@@ -2422,36 +2446,6 @@ count = 1
 file = "src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php"
 code = "non-existent-property"
 message = 'Property `$namespacedName` does not exist on interface `PhpParser\Node`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor::isInsideFunction`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor::isOnFunctionSignature`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #2 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #3 of `Infection\Source\Matcher\SourceLineMatcher::touches`: expected `positive-int`, but possibly received `int(-1)|positive-int`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor::enterNode`.'
 count = 1
 
 [[issues]]
@@ -10058,6 +10052,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `visitorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorClassNames`: expected `list<class-string<PhpParser\NodeVisitor>>`, but found `list<string>`.'
 count = 1
@@ -10105,6 +10105,12 @@ message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\Poten
 count = 1
 
 [[issues]]
+file = "tests/phpunit/PhpParser/Visitor/AddTestsVisitor/AddTestsVisitorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `scenarioProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/EnrichmentTraverseIntegrationTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -10138,6 +10144,36 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/ExcludeIgnoredNodesVisitor/MarkAllButIneligibleNodesAsVisitedVisitorTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeIgnoredNodesVisitor\MarkAllButIneligibleNodesAsVisitedVisitorTest::test_it_labels_visited_nodes_as_visited_and_eligible_nodes_as_mutation_candidates`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/ExcludeNonMutableCodeVisitor/ExcludeNonMutableCodeVisitorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `scenarioProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitor/ExcludeUnchangedLinesVisitorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitor/ExcludeUnchangedLinesVisitorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitor\ExcludeUnchangedLinesVisitorTest::test_it_marks_nodes_belonging_to_unchanged_lines_as_ineligible`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/ExcludeUntestedNodesVisitorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/ExcludeUntestedNodesVisitorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\ExcludeUntestedNodesVisitorTest::test_it_marks_eligible_untested_nodes_as_ineligible`.'
 count = 1
 
 [[issues]]
@@ -10180,18 +10216,6 @@ count = 1
 file = "tests/phpunit/PhpParser/Visitor/IgnoreNode/InterfaceIgnorerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\IgnoreNode\InterfaceIgnorerTest::test_it_ignores_interfaces`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/LabelMutationCandidatesVisitorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `nodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/LabelMutationCandidatesVisitorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\LabelMutationCandidatesVisitorTest::test_it_labels_visited_nodes_as_visited_and_eligible_nodes_as_mutation_candidates`.'
 count = 1
 
 [[issues]]
@@ -10269,7 +10293,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/SkipIgnoredNodesVisitorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\SkipIgnoredNodesVisitorTest::test_it_annotates_the_next_nodes`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\SkipIgnoredNodesVisitorTest::test_it_skips_the_traversal_of_ignored_nodes_and_its_children`.'
 count = 1
 
 [[issues]]

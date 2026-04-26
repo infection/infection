@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
@@ -43,28 +47,41 @@ use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use SplFileInfo;
 
 /**
  * @internal
  * @final
  */
-class NodeTraverserFactory
+readonly class NodeTraverserFactory
 {
+    public function __construct(
+        private SourceLineMatcher $sourceLineMatcher,
+        private LineRangeCalculator $lineRangeCalculator,
+        private bool $onlyCovered,
+    ) {
+    }
+
     /**
      * @see /doc/nomenclature.md#ast-enrichment
      */
-    public function createEnrichmentTraverser(): NodeTraverserInterface
-    {
+    public function createEnrichmentTraverser(
+        SplFileInfo $sourceFile,
+        Trace $trace,
+    ): NodeTraverserInterface {
         $nodeIgnorers = [
             new InterfaceIgnorer(),
             new AbstractMethodIgnorer(),
         ];
 
-        return new NodeTraverser(
+        $visitors = [
             new NextConnectingVisitor(),
             new LabelNodesAsEligibleVisitor(),
             new ExcludeIgnoredNodesVisitor(),
@@ -72,7 +89,22 @@ class NodeTraverserFactory
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new ReflectionVisitor(),
-        );
+            new ExcludeNonMutableCodeVisitor(),
+            new ExcludeUnchangedLinesVisitor(
+                $this->sourceLineMatcher,
+                $sourceFile->getRealPath(),
+            ),
+            new AddTestsVisitor(
+                $trace,
+                $this->lineRangeCalculator,
+            ),
+        ];
+
+        if ($this->onlyCovered) {
+            $visitors[] = new ExcludeUntestedNodesVisitor();
+        }
+
+        return new NodeTraverser(...$visitors);
     }
 
     public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface

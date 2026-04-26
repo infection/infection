@@ -40,69 +40,35 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * This mutator aims at reflecting the behaviour of NodeMutationGenerator to
- * give a visual of the nodes it is look at.
- *
- * This is different from "visited" and "eligible". Indeed, at the time of
- * writing a node may be:
- * - Visited without being eligible or a mutation candidate (e.g. a namespace statement).
- * - Eligible without being a mutation candidate (as NodeMutationGenerator
- *   currently has additional checks on top of the eligibility).
- *
- * @see NodeMutationGenerator
- *
  * @internal
  */
-final class LabelMutationCandidatesVisitor extends NodeVisitorAbstract
+final class ExcludeUnchangedLinesVisitor extends NodeVisitorAbstract
 {
-    public const string MUTATION_CANDIDATE = 'mutationCandidate';
-
     public function __construct(
-        private readonly string $filePath,
         private readonly SourceLineMatcher $sourceLineMatcher,
+        private readonly string $filePath,
     ) {
     }
 
     public function enterNode(Node $node): null
     {
-        MarkTraversedNodesAsVisitedVisitor::markAsVisited($node);
-
-        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
-            return null;
+        if (LabelNodesAsEligibleVisitor::isEligible($node)) {
+            $this->excludeUntouchedNodes($node);
         }
-
-        if (!$this->isOnFunctionSignature($node)
-            && !$this->isInsideFunction($node)
-        ) {
-            return null;
-        }
-
-        if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
-            return null;
-        }
-
-        self::markAsAMutationCandidate($node);
 
         return null;
     }
 
-    public static function markAsAMutationCandidate(Node $node): void
+    private function excludeUntouchedNodes(Node $node): void
     {
-        $node->setAttribute(self::MUTATION_CANDIDATE, true);
-    }
+        $touches = $this->sourceLineMatcher->touches(
+            $this->filePath,
+            $node->getStartLine(),
+            $node->getEndLine(),
+        );
 
-    public static function isAMutationCandidate(Node $node): bool
-    {
-        return $node->hasAttribute(self::MUTATION_CANDIDATE);
-    }
-
-    private function isOnFunctionSignature(Node $node): bool
-    {
-        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-    }
-
-    private function isInsideFunction(Node $node): bool
-    {
-        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
+        if (!$touches) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
     }
 }

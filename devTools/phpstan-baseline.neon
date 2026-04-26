@@ -268,22 +268,16 @@ parameters:
 			path: ../src/Mutator/Util/AbstractSingleSubExprNegation.php
 
 		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\AddTestsVisitor::createAllTestsForNodeLocator() should return Closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation> but returns Closure(): array.'
+			identifier: return.type
+			count: 1
+			path: ../src/PhpParser/Visitor/AddTestsVisitor.php
+
+		-
 			rawMessage: Access to an undefined property PhpParser\Node::$namespacedName.
 			identifier: property.notFound
 			count: 1
 			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
-
-		-
-			rawMessage: 'Parameter #2 $startLine of method Infection\Source\Matcher\SourceLineMatcher::touches() expects int<1, max>, -1|int<1, max> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php
-
-		-
-			rawMessage: 'Parameter #3 $endLine of method Infection\Source\Matcher\SourceLineMatcher::touches() expects int<1, max>, -1|int<1, max> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/PhpParser/Visitor/LabelMutationCandidatesVisitor.php
 
 		-
 			rawMessage: 'Method Infection\PhpParser\Visitor\ReflectionVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
@@ -296,18 +290,6 @@ parameters:
 			identifier: return.unusedType
 			count: 1
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
-
-		-
-			rawMessage: 'Method Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/PhpParser/Visitor/SkipIgnoredNodesVisitor.php
-
-		-
-			rawMessage: 'Method Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor::enterNode() never returns array<PhpParser\Node> so it can be removed from the return type.'
-			identifier: return.unusedType
-			count: 1
-			path: ../src/PhpParser/Visitor/SkipIgnoredNodesVisitor.php
 
 		-
 			rawMessage: 'Parameter #2 $env (array<bool|string>|null) of method Infection\Process\OriginalPhpProcess::start() should be contravariant with parameter $env (array) of method Symfony\Component\Process\Process::start()'

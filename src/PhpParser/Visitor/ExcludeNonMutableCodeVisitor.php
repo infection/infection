@@ -33,46 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+namespace Infection\PhpParser\Visitor;
 
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-final class ConcreteVisitorTestCase extends VisitorTestCase
+/**
+ * @internal
+ */
+final class ExcludeNonMutableCodeVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @return Node\Stmt[]
-     */
-    public function parseCode(string $code): array
+    public function enterNode(Node $node): null
     {
-        return $this->parse($code);
+        if (!$this->isOnFunctionSignature($node)
+            && !$this->isInsideFunction($node)
+        ) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
+
+        return null;
     }
 
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     *
-     * @return array<positive-int|0, Node>
-     */
-    public function addIdsToNodesPublic(array|Node $nodeOrNodes): array
+    private function isOnFunctionSignature(Node $node): bool
     {
-        return $this->addIdsToNodes($nodeOrNodes);
+        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, default: false);
     }
 
-    /**
-     * @param array<positive-int|0, Node> $nodesById
-     * @param list<int> $eligibleNodeIds
-     */
-    public function markNodeAsEligiblePublic(array $nodesById, array $eligibleNodeIds): void
+    private function isInsideFunction(Node $node): bool
     {
-        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    public function keepOnlyDesiredAttributesPublic(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $this->keepOnlyDesiredAttributes($nodeOrNodes, ...$attributes);
+        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, default: false);
     }
 }
