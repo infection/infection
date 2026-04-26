@@ -40,7 +40,6 @@ integrations = ["symfony", "phpunit"]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
-assertion-style = { enabled = true, style = "this" }
 
 [analyzer]
 baseline = "devTools/mago-baseline.toml"

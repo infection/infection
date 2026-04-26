@@ -119,6 +119,22 @@ abstract class VisitorTestCase extends TestCase
     }
 
     /**
+     * @param array<positive-int|0, Node> $nodesById
+     * @param list<int> $ineligibleNodeIds
+     */
+    final protected function markNodesAsIneligible(array $nodesById, array $ineligibleNodeIds): void
+    {
+        $eligibleNodes = array_intersect_key(
+            $nodesById,
+            array_flip($ineligibleNodeIds),
+        );
+
+        foreach ($eligibleNodes as $node) {
+            LabelNodesAsEligibleVisitor::markAsIneligible($node);
+        }
+    }
+
+    /**
      * @param Node[]|Node $nodeOrNodes
      */
     final protected function keepOnlyDesiredAttributes(

@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser\Visitor;
 use function array_flip;
 use function array_intersect_key;
 use function array_keys;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
@@ -214,7 +215,19 @@ final class ExcludeUntestedNodesVisitorTest extends VisitorTestCase
         foreach ($testedNodes as $node) {
             $node->setAttribute(
                 AddTestsVisitor::TESTS,
-                static fn () => ['test0', 'test1'], // The values do not really matter
+                // The values do not really matter
+                static fn () => [
+                    new TestLocation(
+                        method: 'test0',
+                        filePath: '/path/to/SourceTest.php',
+                        executionTime: null,
+                    ),
+                    new TestLocation(
+                        method: 'test2',
+                        filePath: '/path/to/SourceTest.php',
+                        executionTime: null,
+                    ),
+                ],
             );
         }
     }

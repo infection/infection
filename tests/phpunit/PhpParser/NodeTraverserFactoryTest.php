@@ -90,35 +90,28 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public static function visitorProvider(): iterable
     {
+        $baseVisitors = [
+            NextConnectingVisitor::class,
+            LabelNodesAsEligibleVisitor::class,
+            ExcludeIgnoredNodesVisitor::class,
+            SkipIgnoredNodesVisitor::class,
+            NameResolver::class,
+            ParentConnectingVisitor::class,
+            ReflectionVisitor::class,
+            ExcludeNonMutableCodeVisitor::class,
+            ExcludeUnchangedLinesVisitor::class,
+            AddTestsVisitor::class,
+        ];
+
         yield 'without only covered' => [
             false,
-            [
-                NextConnectingVisitor::class,
-                LabelNodesAsEligibleVisitor::class,
-                ExcludeIgnoredNodesVisitor::class,
-                SkipIgnoredNodesVisitor::class,
-                NameResolver::class,
-                ParentConnectingVisitor::class,
-                ReflectionVisitor::class,
-                ExcludeNonMutableCodeVisitor::class,
-                ExcludeUnchangedLinesVisitor::class,
-                AddTestsVisitor::class,
-            ],
+            $baseVisitors,
         ];
 
         yield 'with only covered' => [
             true,
             [
-                NextConnectingVisitor::class,
-                LabelNodesAsEligibleVisitor::class,
-                ExcludeIgnoredNodesVisitor::class,
-                SkipIgnoredNodesVisitor::class,
-                NameResolver::class,
-                ParentConnectingVisitor::class,
-                ReflectionVisitor::class,
-                ExcludeNonMutableCodeVisitor::class,
-                ExcludeUnchangedLinesVisitor::class,
-                AddTestsVisitor::class,
+                ...$baseVisitors,
                 ExcludeUntestedNodesVisitor::class,
             ],
         ];
