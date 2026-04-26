@@ -890,8 +890,8 @@ final class ExcludeUnchangedLinesVisitorTest extends VisitorTestCase
         ?array $eligibleNodeIds,
         ?array $ineligibleNodeIds,
     ): void {
-        $eligibleNodeIds = $eligibleNodeIds ?? array_keys($nodesById);
-        $ineligibleNodeIds = $ineligibleNodeIds ?? array_keys($nodesById);
+        $eligibleNodeIds ??= array_keys($nodesById);
+        $ineligibleNodeIds ??= array_keys($nodesById);
 
         $this->assertNoEligibilityOverlap(
             $eligibleNodeIds,
