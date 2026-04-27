@@ -40,7 +40,6 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use Infection\Reporter\GitLabCodeQualityReporter;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,21 +52,12 @@ use function Safe\json_decode;
 #[CoversClass(GitLabCodeQualityReporter::class)]
 final class GitLabCodeQualityReporterTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
-
-    protected function setUp(): void
-    {
-        $this->backupEnvironmentVariables();
-
-        parent::setUp();
-    }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        $this->restoreEnvironmentVariables();
         self::resetOriginalFilePrefix();
     }
 
@@ -79,7 +69,10 @@ final class GitLabCodeQualityReporterTest extends TestCase
         ResultsCollector $resultsCollector,
         array $expectedContents,
     ): void {
-        $reporter = new GitLabCodeQualityReporter($resultsCollector, null);
+        $reporter = new GitLabCodeQualityReporter(
+            $resultsCollector,
+            '/path/to/project',
+        );
 
         $this->assertReportedContentIs($expectedContents, $reporter);
     }
@@ -155,21 +148,8 @@ final class GitLabCodeQualityReporterTest extends TestCase
         ];
     }
 
-    public function test_it_reports_correctly_with_ci_project_dir(): void
-    {
-        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
-        self::setOriginalFilePrefix('/my/project/dir/');
-
-        $resultsCollector = self::createCompleteResultsCollector();
-
-        $reporter = new GitLabCodeQualityReporter($resultsCollector, null);
-
-        $this->assertStringContainsString('"path":"foo\/bar"', $reporter->getLines()[0]);
-    }
-
     public function test_it_reports_correctly_with_custom_project_dir(): void
     {
-        \Safe\putenv('CI_PROJECT_DIR=/my/project/dir');
         self::setOriginalFilePrefix('/custom/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();

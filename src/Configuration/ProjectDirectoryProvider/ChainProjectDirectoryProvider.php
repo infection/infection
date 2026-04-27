@@ -33,50 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Configuration\ProjectDirectoryProvider;
 
-use DomainException;
-use Infection\Git\Git;
-use function sprintf;
-
-final readonly class ConfigurationFactoryGit implements Git
+/**
+ * @internal
+ */
+final readonly class ChainProjectDirectoryProvider implements ProjectDirectoryProvider
 {
     /**
-     * @param non-empty-string $defaultBaseBranch
+     * @var array<ProjectDirectoryProvider>
      */
+    private array $providers;
+
     public function __construct(
-        private string $defaultBaseBranch,
+        ProjectDirectoryProvider ...$providers,
     ) {
+        $this->providers = $providers;
     }
 
-    public function getDefaultBase(): string
+    public function provide(): ?string
     {
-        return $this->defaultBaseBranch;
-    }
+        foreach ($this->providers as $provider) {
+            $projectDirectory = $provider->provide();
 
-    public function getChangedFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): string {
-        throw new DomainException('Not implemented.');
-    }
+            if ($projectDirectory !== null) {
+                return $projectDirectory;
+            }
+        }
 
-    public function getChangedLinesRangesByFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): never {
-        throw new DomainException('Not implemented.');
-    }
-
-    public function getBaseReference(string $base): string
-    {
-        return sprintf('reference(%s)', $base);
-    }
-
-    public function getProjectDirectory(): string
-    {
-        throw new DomainException('Not implemented.');
+        return null;
     }
 }

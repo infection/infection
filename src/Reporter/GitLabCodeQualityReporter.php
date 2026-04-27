@@ -35,30 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
-use function getenv;
 use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
-use function Safe\shell_exec;
 use Symfony\Component\Filesystem\Path;
-use function trim;
 
 /**
  * @internal
  */
-final class GitLabCodeQualityReporter implements LineMutationTestingResultsReporter
+final readonly class GitLabCodeQualityReporter implements LineMutationTestingResultsReporter
 {
     public function __construct(
-        private readonly ResultsCollector $resultsCollector,
-        private ?string $loggerProjectRootDirectory,
+        private ResultsCollector $resultsCollector,
+        private string $projectDirectory,
     ) {
-        if ($loggerProjectRootDirectory === null) {
-            if (($projectRootDirectory = getenv('CI_PROJECT_DIR')) === false) {
-                $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));
-            }
-            $this->loggerProjectRootDirectory = $projectRootDirectory;
-        }
     }
 
     public function getLines(): array
@@ -76,8 +67,7 @@ final class GitLabCodeQualityReporter implements LineMutationTestingResultsRepor
                 ),
                 'categories' => ['Escaped Mutant'],
                 'location' => [
-                    /* @phpstan-ignore-next-line expects string, string|null given */
-                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
+                    'path' => Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->projectDirectory),
                     'lines' => [
                         'begin' => $escapedExecutionResult->getOriginalStartingLine(),
                     ],

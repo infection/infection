@@ -70,6 +70,9 @@ use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Filesystem\Path;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -114,6 +117,7 @@ final class RunCommand extends BaseCommand
 
     private const string OPTION_LOGGER_GITLAB = 'logger-gitlab';
 
+    // TODO: to rename to projectDirectory?
     private const string OPTION_LOGGER_PROJECT_ROOT_DIRECTORY = 'logger-project-root-directory';
 
     private const string OPTION_LOGGER_HTML = 'logger-html';
@@ -479,7 +483,7 @@ final class RunCommand extends BaseCommand
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
-            loggerProjectRootDirectory: $commandHelper->getStringOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY),
+            projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
@@ -603,5 +607,38 @@ final class RunCommand extends BaseCommand
                     Container::DEFAULT_FORMATTER_NAME->value,
                 ),
             );
+    }
+
+    /**
+     * @return non-empty-string|null Absolute path.
+     */
+    private function getProjectDirectory(IO $io): ?string
+    {
+        $directory = trim((string) $io->getInput()->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY));
+
+        if ($directory === '') {
+            return null;
+        }
+
+        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
+        $canonicalDirectory = Path::canonicalize($directory);
+
+        Assert::true(
+            $fileSystem->isAbsolutePath($canonicalDirectory),
+            sprintf(
+                'Expected the path "%s" to be an absolute path.',
+                $canonicalDirectory,
+            ),
+        );
+        Assert::true(
+            $fileSystem->isReadableDirectory($canonicalDirectory),
+            sprintf(
+                'Expected the path "%s" to point to a readable directory.',
+                $canonicalDirectory,
+            ),
+        );
+        Assert::stringNotEmpty($canonicalDirectory);
+
+        return $canonicalDirectory;
     }
 }

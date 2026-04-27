@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -43,6 +44,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -68,6 +70,7 @@ use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -79,6 +82,8 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     private const string GIT_DEFAULT_BASE = 'test/default';
+
+    private const string DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
 
     /**
      * @var array<string, Mutator>|null
@@ -95,19 +100,24 @@ final class ConfigurationFactoryTest extends TestCase
         ConfigurationFactoryScenario $scenario,
     ): void {
         $schema = $scenario->schemaBuilder->build();
-
-        $actual = $this
-            ->createConfigurationFactory(
-                $scenario->ciDetected,
-                $scenario->githubActionsDetected,
-            )
-            ->create(...$scenario->inputBuilder->build($schema))
-        ;
-
-        $this->assertEquals(
-            $scenario->expected,
-            $actual,
+        $factory = $this->createConfigurationFactory(
+            $scenario->ciDetected,
+            $scenario->githubActionsDetected,
+            $scenario->resolvedProjectDirectory,
         );
+
+        if ($scenario->expected instanceof Exception) {
+            $this->expectExceptionObject($scenario->expected);
+        }
+
+        $actual = $factory->create(...$scenario->inputBuilder->build($schema));
+
+        if (!$scenario->expected instanceof Exception) {
+            $this->assertEquals(
+                $scenario->expected,
+                $actual,
+            );
+        }
     }
 
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
@@ -142,6 +152,7 @@ final class ConfigurationFactoryTest extends TestCase
             ->createConfigurationFactory(
                 ciDetected: false,
                 githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             )
             ->create(
                 schema: $schema,
@@ -174,7 +185,7 @@ final class ConfigurationFactoryTest extends TestCase
                 useNoopMutators: false,
                 executeOnlyCoveringTestCases: false,
                 mapSourceClassToTestStrategy: null,
-                loggerProjectRootDirectory: null,
+                projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
             )
@@ -242,7 +253,7 @@ final class ConfigurationFactoryTest extends TestCase
             useNoopMutators: false,
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: null,
+            projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
         );
@@ -281,7 +292,7 @@ final class ConfigurationFactoryTest extends TestCase
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: null,
+            projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
@@ -291,6 +302,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultScenario = ConfigurationFactoryScenario::create(
             ciDetected: false,
             githubActionsDetected: false,
+            projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             schemaBuilder: $defaultSchemaBuilder,
             inputBuilder: $defaultInputBuilder,
             expected: $defaultConfiguration,
@@ -1154,10 +1166,53 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'with project directory input' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: '/path/to/project',
+                resolvedProjectDirectory: null,
+                expected: '/path/to/project',
+            ),
+        ];
+
+        yield 'with relative project directory input' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: 'relative-path/to/project',
+                resolvedProjectDirectory: null,
+                expected: 'relative-path/to/project',
+            ),
+        ];
+
+        yield 'without project directory input and with a resolved project directory' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: null,
+                resolvedProjectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                expected: self::DEFAULT_PROJECT_DIRECTORY,
+            ),
+        ];
+
+        yield 'without project directory input nor resolved project directory' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: null,
+                resolvedProjectDirectory: null,
+                expected: new InvalidArgumentException(
+                    'Could not resolve the project directory.',
+                ),
+            ),
+        ];
+
+        yield 'with project directory input & resolved project directory' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: '/path/to/project',
+                resolvedProjectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                expected: '/path/to/project',
+            ),
+        ];
+
         yield 'complete' => [
             ConfigurationFactoryScenario::create(
                 ciDetected: false,
                 githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
                 schemaBuilder: SchemaConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10.0)
                     ->withSource(new Source(['src/'], ['vendor/']))
@@ -1220,7 +1275,7 @@ final class ConfigurationFactoryTest extends TestCase
                     useNoopMutators: false,
                     executeOnlyCoveringTestCases: false,
                     mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-                    loggerProjectRootDirectory: null,
+                    projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
                 ),
@@ -1277,7 +1332,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withIgnoreSourceCodeMutatorsMap([])
                     ->withExecuteOnlyCoveringTestCases(false)
                     ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
-                    ->withLoggerProjectRootDirectory(null)
+                    ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
                     ->withConfigPathname('/path/to/infection.json')
@@ -1330,10 +1385,19 @@ final class ConfigurationFactoryTest extends TestCase
         return self::$mutators;
     }
 
+    /**
+     * @param non-empty-string|null $projectDirectory
+     */
     private function createConfigurationFactory(
         bool $ciDetected,
         bool $githubActionsDetected,
+        ?string $projectDirectory,
     ): ConfigurationFactory {
+        $projectDirectoryProviderMock = $this->createMock(ProjectDirectoryProvider::class);
+        $projectDirectoryProviderMock
+            ->method('provide')
+            ->willReturn($projectDirectory);
+
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
@@ -1343,6 +1407,7 @@ final class ConfigurationFactoryTest extends TestCase
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
             ),
+            $projectDirectoryProviderMock,
         );
     }
 }
