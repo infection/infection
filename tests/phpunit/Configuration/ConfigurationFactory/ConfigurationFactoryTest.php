@@ -1174,6 +1174,14 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'with relative project directory input' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: 'relative-path/to/project',
+                resolvedProjectDirectory: null,
+                expected: 'relative-path/to/project',
+            ),
+        ];
+
         yield 'without project directory input and with a resolved project directory' => [
             $defaultScenario->forProjectDirectory(
                 projectDirectoryInput: null,

@@ -215,6 +215,13 @@ final class CommandLineGitIntegrationTest extends TestCase
         $this->assertNotSame($originalBase, $refinedBase);
     }
 
+    public function test_it_gets_the_project_directory(): void
+    {
+        $projectDirectory = $this->git->getProjectDirectory();
+
+        $this->assertNotSame('', $projectDirectory);
+    }
+
     private function skipIfCommitReferenceIsNotAvailable(): void
     {
         if (!isset(self::$commitReferenceExists)) {
