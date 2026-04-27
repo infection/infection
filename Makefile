@@ -69,10 +69,12 @@ compile-docker: $(DOCKER_FILE_IMAGE)
 sbx-image-build:	## Builds the PHP sbx image
 sbx-image-build:
 	./devTools/sbx/build-image.sh
+	./devTools/sbx/load-template.sh
 
 .PHONY: _sbx-image-build
 _sbx-image-build:
 	FORCE_REBUILD=1 ./devTools/sbx/build-image.sh
+	./devTools/sbx/load-template.sh
 
 .PHONY: sbx-image-smoke-test
 sbx-image-smoke-test:	## Verifies the PHP sbx image contains the expected tooling

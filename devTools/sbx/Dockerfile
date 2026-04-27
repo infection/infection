@@ -1,4 +1,4 @@
-FROM docker/sandbox-templates:codex
+FROM docker/sandbox-templates:codex-docker
 
 ARG PHP_VERSION=8.4
 
