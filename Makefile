@@ -73,7 +73,8 @@ compile-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_82) make compile
 
 .PHONY: sbx-image-build
-sbx-image-build:		## Builds the PHP sbx image
+sbx-image-build:	## Builds the PHP sbx image
+sbx-image-build:
 	IMAGE_NAME=$(SBX_IMAGE_NAME) \
 	IMAGE_TAG=$(SBX_IMAGE_TAG) \
 	IMAGE_REF=$(SBX_IMAGE_REF) \
@@ -85,6 +86,7 @@ sbx-image-build:		## Builds the PHP sbx image
 
 .PHONY: sbx-image-smoke-test
 sbx-image-smoke-test:	## Verifies the PHP sbx image contains the expected tooling
+sbx-image-smoke-test:
 	container-structure-test test --image=$(SBX_IMAGE_REF) --config=./devTools/sbx//test.yaml
 
 .PHONY: check_trailing_whitespaces
@@ -99,7 +101,7 @@ cs: $(PHP_CS_FIXER)
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: cs-docker
-cs-docker:	  	 	## Runs PHP-CS-Fixer in docker
+cs-docker:		## Runs PHP-CS-Fixer in docker
 cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
 	$(DOCKER_RUN_82) $(PHP_CS_FIXER) fix -v --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
