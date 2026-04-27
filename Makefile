@@ -37,13 +37,6 @@ INFECTION=./dist/infection.phar
 DOCKER_RUN=docker compose run --rm
 DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
-SBX_PHP_VERSION ?= 8.4
-SBX_IMAGE_NAME ?= infection-sbx-php-$(SBX_PHP_VERSION)
-SBX_IMAGE_TAG ?= latest
-SBX_IMAGE_REF ?= $(SBX_IMAGE_NAME):$(SBX_IMAGE_TAG)
-SBX_IMAGE_PLATFORM ?=
-SBX_IMAGE_CACHE_FROM ?=
-SBX_IMAGE_CACHE_TO ?=
 
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
@@ -75,19 +68,16 @@ compile-docker: $(DOCKER_FILE_IMAGE)
 .PHONY: sbx-image-build
 sbx-image-build:	## Builds the PHP sbx image
 sbx-image-build:
-	IMAGE_NAME=$(SBX_IMAGE_NAME) \
-	IMAGE_TAG=$(SBX_IMAGE_TAG) \
-	IMAGE_REF=$(SBX_IMAGE_REF) \
-	IMAGE_PLATFORM=$(SBX_IMAGE_PLATFORM) \
-	IMAGE_CACHE_FROM=$(SBX_IMAGE_CACHE_FROM) \
-	IMAGE_CACHE_TO=$(SBX_IMAGE_CACHE_TO) \
-	PHP_VERSION=$(SBX_PHP_VERSION) \
 	./devTools/sbx/build-image.sh
+
+.PHONY: _sbx-image-build
+_sbx-image-build:
+	FORCE_REBUILD=1 ./devTools/sbx/build-image.sh
 
 .PHONY: sbx-image-smoke-test
 sbx-image-smoke-test:	## Verifies the PHP sbx image contains the expected tooling
 sbx-image-smoke-test:
-	container-structure-test test --image=$(SBX_IMAGE_REF) --config=./devTools/sbx//test.yaml
+	container-structure-test test --image=infection-sbx-php-8.4:latest --config=./devTools/sbx/test.yaml
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:

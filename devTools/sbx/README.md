@@ -12,18 +12,24 @@ Build the image:
 
 ```shell
 make sbx-image-build
-# builds an image e.g. infection-sbx-php-8.4:latest
 ```
 
-Docker sandbox requires an image from a registry, so you will need to push it
-first:
+This builds `infection-sbx-php-8.4:latest`, runs `container-structure-test`,
+saves the image as a tar file under `var/cache/sbx`, then loads it into `sbx`
+with `sbx template load`.
+
+The build is cached by Dockerfile content and build inputs. Re-running the
+command reloads the cached tar into `sbx` without rebuilding the Docker image.
+To rebuild unconditionally:
 
 ```shell
-# Tag it under your own username
-docker tag infection-sbx-php-8.4:latest <your-dockerhub-username>/infection-sbx-php-8.4:latest
-docker push <your-dockerhub-username>/docker tag infection-sbx-php-8.4:latest <your-dockerhub-username>/infection-sbx-php-8.4:latest
+make _sbx-image-build
+```
 
-sbx run --template=<your-dockerhub-username>/infection-sbx-php-8.4:latest codex
+Run a sandbox with the loaded template:
+
+```shell
+sbx run --template=infection-sbx-php-8.4:latest codex
 ```
 
 [docker sandbox]: https://www.docker.com/products/docker-sandboxes/
