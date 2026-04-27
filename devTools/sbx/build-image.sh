@@ -53,5 +53,5 @@ EOF
 fi
 
 set -x
-container-structure-test test --image=${IMAGE_REF} --config=${SCRIPT_DIR}/test.yaml
+container-structure-test test --image="${IMAGE_REF}" --config="${SCRIPT_DIR}/test.yaml"
 set +x

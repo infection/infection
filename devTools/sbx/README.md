@@ -19,7 +19,7 @@ Docker sandbox requires an image from a registry, so you will need to push it
 first:
 
 ```shell
-# Tag it under you own username
+# Tag it under your own username
 docker tag infection-sbx-php-8.4:latest <your-dockerhub-username>/infection-sbx-php-8.4:latest
 docker push <your-dockerhub-username>/docker tag infection-sbx-php-8.4:latest <your-dockerhub-username>/infection-sbx-php-8.4:latest
 

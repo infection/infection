@@ -85,11 +85,7 @@ sbx-image-build:		## Builds the PHP sbx image
 
 .PHONY: sbx-image-smoke-test
 sbx-image-smoke-test:	## Verifies the PHP sbx image contains the expected tooling
-	IMAGE_NAME=$(SBX_IMAGE_NAME) \
-	IMAGE_TAG=$(SBX_IMAGE_TAG) \
-	IMAGE_REF=$(SBX_IMAGE_REF) \
-	PHP_VERSION=$(SBX_PHP_VERSION) \
-	./devTools/sbx/smoke-test.sh
+	container-structure-test test --image=$(SBX_IMAGE_REF) --config=./devTools/sbx//test.yaml
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
