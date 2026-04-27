@@ -6,10 +6,36 @@ set -euo pipefail
 
 mkdir -p "${CACHE_DIR}"
 
-if [[ "${FORCE_REBUILD:-}" != "1" && -f "${IMAGE_TAR}" ]]; then
+tar_matches_cache() {
+    [[ -f "${IMAGE_TAR}" && -f "${STAMP}" && "$(cat "${STAMP}")" == "${CACHE_KEY}" ]]
+}
+
+if [[ "${FORCE_REBUILD:-}" != "1" ]] && tar_matches_cache; then
     printf 'Using cached sbx image tar: %s\n' "${IMAGE_TAR}"
     exit 0
 fi
+
+save_image() {
+    set -x
+    container-structure-test test --image="${IMAGE_REF}" --config="${TEST_CONFIG}"
+    rm -f "${IMAGE_TAR_TMP}"
+    docker save --output="${IMAGE_TAR_TMP}" "${IMAGE_REF}"
+    mv "${IMAGE_TAR_TMP}" "${IMAGE_TAR}"
+    set +x
+
+    printf '%s\n' "${CACHE_KEY}" > "${STAMP}"
+    printf 'Saved sbx image tar: %s\n' "${IMAGE_TAR}"
+}
+
+image_matches_cache() {
+    local image_cache_key
+
+    image_cache_key="$(docker image inspect \
+        --format='{{ index .Config.Labels "org.infection.sbx.cache-key" }}' \
+        "${IMAGE_REF}" 2>/dev/null || true)"
+
+    [[ "${image_cache_key}" == "${CACHE_KEY}" ]]
+}
 
 DOCKER_BUILD_COMMAND=(
     docker build
@@ -39,17 +65,6 @@ if [[ -n "${IMAGE_CACHE_TO:-}" ]]; then
     )
 fi
 
-set -x
-"${DOCKER_BUILD_COMMAND[@]}" \
-    "${DOCKER_BUILD_CACHE_OPTIONS[@]}" \
-    --build-arg="PHP_VERSION=${PHP_VERSION}" \
-    --file="${DOCKERFILE}" \
-    --tag="${IMAGE_REF}" \
-    "${SCRIPT_DIR}"
-set +x
-
-printf '%s\n' "${IMAGE_REF}"
-
 if ! command -v container-structure-test >/dev/null 2>&1; then
     cat >&2 <<'EOF'
 container-structure-test is required to verify the Docker sandbox image, but it was not found in PATH.
@@ -59,11 +74,22 @@ EOF
     exit 1
 fi
 
+if [[ "${FORCE_REBUILD:-}" != "1" ]] && image_matches_cache; then
+    printf 'Using cached sbx image: %s\n' "${IMAGE_REF}"
+    save_image
+    exit 0
+fi
+
 set -x
-container-structure-test test --image="${IMAGE_REF}" --config="${TEST_CONFIG}"
-rm -f "${IMAGE_TAR_TMP}"
-docker save --output="${IMAGE_TAR_TMP}" "${IMAGE_REF}"
-mv "${IMAGE_TAR_TMP}" "${IMAGE_TAR}"
+"${DOCKER_BUILD_COMMAND[@]}" \
+    "${DOCKER_BUILD_CACHE_OPTIONS[@]}" \
+    --build-arg="PHP_VERSION=${PHP_VERSION}" \
+    --file="${DOCKERFILE}" \
+    --label="org.infection.sbx.cache-key=${CACHE_KEY}" \
+    --tag="${IMAGE_REF}" \
+    "${SCRIPT_DIR}"
 set +x
 
-printf 'Saved sbx image tar: %s\n' "${IMAGE_TAR}"
+printf '%s\n' "${IMAGE_REF}"
+
+save_image

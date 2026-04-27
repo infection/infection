@@ -76,9 +76,9 @@ _sbx-image-build:
 	FORCE_REBUILD=1 ./devTools/sbx/build-image.sh
 	./devTools/sbx/load-template.sh
 
-.PHONY: sbx-image-smoke-test
-sbx-image-smoke-test:	## Verifies the PHP sbx image contains the expected tooling
-sbx-image-smoke-test:
+.PHONY: sbx-image-test
+sbx-image-test:	## Verifies the PHP sbx image contains the expected tooling
+sbx-image-test:
 	container-structure-test test --image=infection-sbx-php-8.4:latest --config=./devTools/sbx/test.yaml
 
 .PHONY: check_trailing_whitespaces

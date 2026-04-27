@@ -44,6 +44,6 @@ EOF
 
 CACHE_KEY="$(cache_hash)"
 CACHE_IMAGE_REF="$(printf '%s' "${IMAGE_REF}" | tr '/:' '__')"
-IMAGE_TAR="${CACHE_DIR}/${CACHE_IMAGE_REF}-${CACHE_KEY}.tar"
+IMAGE_TAR="${CACHE_DIR}/${CACHE_IMAGE_REF}.tar"
 IMAGE_TAR_TMP="${IMAGE_TAR}.tmp"
 STAMP="${CACHE_DIR}/${CACHE_IMAGE_REF}.sha256"

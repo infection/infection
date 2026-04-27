@@ -32,9 +32,9 @@ jobs:
     env:
       CONTAINER_STRUCTURE_TEST_VERSION: 1.22.1
       DOCKER_BUILDKIT: 1
-      SBX_IMAGE_PLATFORM: ${{ matrix.platform }}
-      SBX_IMAGE_CACHE_FROM: type=gha,scope=${{ matrix.cache-scope }}
-      SBX_IMAGE_CACHE_TO: type=gha,mode=max,ignore-error=true,scope=${{ matrix.cache-scope }}
+      IMAGE_PLATFORM: ${{ matrix.platform }}
+      IMAGE_CACHE_FROM: type=gha,scope=${{ matrix.cache-scope }}
+      IMAGE_CACHE_TO: type=gha,mode=max,ignore-error=true,scope=${{ matrix.cache-scope }}
 
     steps:
       - name: Checkout code
@@ -76,7 +76,7 @@ jobs:
         run: container-structure-test version
 
       - name: Build and test the Docker sandbox image
-        run: make sbx-image-build
+        run: ./devTools/sbx/build-image.sh
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
