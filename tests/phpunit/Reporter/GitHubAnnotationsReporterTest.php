@@ -37,7 +37,6 @@ namespace Infection\Tests\Reporter;
 
 use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\GitHubAnnotationsReporter;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -47,21 +46,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(GitHubAnnotationsReporter::class)]
 final class GitHubAnnotationsReporterTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
-
-    protected function setUp(): void
-    {
-        $this->backupEnvironmentVariables();
-
-        parent::setUp();
-    }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        $this->restoreEnvironmentVariables();
         self::resetOriginalFilePrefix();
     }
 

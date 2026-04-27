@@ -40,7 +40,6 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use Infection\Reporter\GitLabCodeQualityReporter;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,21 +52,12 @@ use function Safe\json_decode;
 #[CoversClass(GitLabCodeQualityReporter::class)]
 final class GitLabCodeQualityReporterTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
-
-    protected function setUp(): void
-    {
-        $this->backupEnvironmentVariables();
-
-        parent::setUp();
-    }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        $this->restoreEnvironmentVariables();
         self::resetOriginalFilePrefix();
     }
 
