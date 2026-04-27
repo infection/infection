@@ -62,15 +62,15 @@ use Webmozart\Assert\Assert;
 final readonly class CommandLineGit implements Git
 {
     // https://github.com/infection/infection/issues/2611
-    private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
+    private const string DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
-    private const DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
+    private const string DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
 
-    private const DIFF_LINE_PATH_KEY = 'filePath';
+    private const string DIFF_LINE_PATH_KEY = 'filePath';
 
-    private const DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
+    private const string DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
 
-    private const DIFF_LINE_RANGE_KEY = 'range';
+    private const string DIFF_LINE_RANGE_KEY = 'range';
 
     public function __construct(
         private ShellCommandLineExecutor $shellCommandLineExecutor,

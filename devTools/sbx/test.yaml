@@ -1,0 +1,21 @@
+schemaVersion: 2.0.0
+
+commandTests:
+    -   name: "php 8.4 is installed"
+        command: "php"
+        args: ["--version"]
+        expectedOutput: ['^PHP 8\.4\.\d+ \(cli\) ']
+        exitCode: 0
+
+    -   name: "composer is executable"
+        command: "composer"
+        args: ["--version"]
+        exitCode: 0
+
+    - name: "Container runs as agent user"
+      command: "whoami"
+      expectedOutput: ["(?m)^agent$"]
+
+globalEnvVars:
+    -   key: "SHELL"
+        value: "/bin/bash"

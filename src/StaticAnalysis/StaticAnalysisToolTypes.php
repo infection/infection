@@ -46,13 +46,16 @@ use Webmozart\Assert\Assert;
  */
 final class StaticAnalysisToolTypes
 {
-    public const PHPSTAN = 'phpstan';
+    public const string PHPSTAN = 'phpstan';
+
+    public const string MAGO = 'mago';
 
     /**
      * @var string[]
      */
     private static array $defaultTypes = [
         self::PHPSTAN,
+        self::MAGO,
     ];
 
     /**

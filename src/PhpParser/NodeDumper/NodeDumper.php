@@ -37,7 +37,11 @@ namespace Infection\PhpParser\NodeDumper;
 
 use function get_debug_type;
 use function implode;
+use function in_array;
+use Infection\Framework\ClassName;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;
@@ -45,6 +49,7 @@ use function is_float;
 use function is_int;
 use function is_object;
 use function is_string;
+use function ksort;
 use Later\Interfaces\Deferred;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -52,6 +57,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\List_;
+use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\InterpolatedString;
 use PhpParser\Node\Scalar\String_;
@@ -117,6 +123,11 @@ final class NodeDumper
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
     ];
 
+    /**
+     * @var array<string, true>
+     */
+    private array $ignoredAttributesByKey = [];
+
     // Removed instance properties for stateless refactor
     /**
      * @param bool $dumpComments whether comments should be dumped
@@ -128,9 +139,11 @@ final class NodeDumper
         private readonly bool $dumpProperties = false,
         private readonly bool $dumpComments = false,
         private bool $dumpPositions = false,
-        private readonly bool $dumpOtherAttributes = true,
+        private bool $dumpOtherAttributes = true,
         // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
+        private bool $decorateNodes = false,
+        private bool $showLineNumbers = false,
     ) {
     }
 
@@ -148,15 +161,45 @@ final class NodeDumper
         array|Node $node,
         ?string $code = null,
         ?bool $dumpPositions = null,
+        ?bool $dumpOtherAttributes = null,
         // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
+        ?bool $decorateNodes = null,
+        ?bool $showLineNumbers = null,
     ): string {
         $result = '';
         $newLine = "\n";
 
+        if ($dumpOtherAttributes !== null) {
+            $originalDumpOtherAttributes = $this->dumpOtherAttributes;
+            $this->dumpOtherAttributes = $dumpOtherAttributes;
+        }
+
         if ($onlyVisitedNodes !== null) {
             $originalOnlyVisitedNodes = $this->onlyVisitedNodes;
             $this->onlyVisitedNodes = $onlyVisitedNodes;
+        }
+
+        if ($decorateNodes !== null) {
+            $originalHighlightMutationCandidates = $this->decorateNodes;
+            $this->decorateNodes = $decorateNodes;
+        }
+
+        if ($showLineNumbers !== null) {
+            $originalShowLineNumbers = $this->showLineNumbers;
+            $this->showLineNumbers = $showLineNumbers;
+        }
+
+        $this->ignoredAttributesByKey = self::IGNORE_ATTRIBUTES;
+
+        if ($this->showLineNumbers) {
+            Assert::notFalse(
+                $this->dumpOtherAttributes,
+                'The NodeDumper cannot display line numbers if the attributes cannot be shown.',
+            );
+
+            unset($this->ignoredAttributesByKey['startLine']);
+            unset($this->ignoredAttributesByKey['endLine']);
         }
 
         if ($dumpPositions !== null) {
@@ -173,6 +216,18 @@ final class NodeDumper
             $newLine,
             indent: false,
         );
+
+        if ($dumpOtherAttributes !== null) {
+            $this->dumpOtherAttributes = $originalDumpOtherAttributes;
+        }
+
+        if ($decorateNodes !== null) {
+            $this->decorateNodes = $originalHighlightMutationCandidates;
+        }
+
+        if ($showLineNumbers !== null) {
+            $this->showLineNumbers = $originalShowLineNumbers;
+        }
 
         if ($onlyVisitedNodes !== null) {
             $this->onlyVisitedNodes = $originalOnlyVisitedNodes;
@@ -286,7 +341,18 @@ final class NodeDumper
                 return;
             }
 
-            $result .= $node->getType();
+            if ($this->decorateNodes) {
+                if (LabelNodesAsEligibleVisitor::isEligible($node)) {
+                    $result .= sprintf(
+                        '<eligible>%s</eligible>',
+                        $node->getType(),
+                    );
+                } else {
+                    $result .= $node->getType();
+                }
+            } else {
+                $result .= $node->getType();
+            }
 
             if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
                 $result .= $p;
@@ -338,8 +404,11 @@ final class NodeDumper
             }
 
             if ($this->dumpOtherAttributes) {
-                foreach ($node->getAttributes() as $key => $value) {
-                    if (isset(self::IGNORE_ATTRIBUTES[$key])) {
+                $attributes = $node->getAttributes();
+                ksort($attributes);
+
+                foreach ($attributes as $key => $value) {
+                    if (isset($this->ignoredAttributesByKey[$key])) {
                         continue;
                     }
 
@@ -372,6 +441,20 @@ final class NodeDumper
                                 continue;
                             }
                         }
+                    }
+
+                    if (in_array($key, [FullyQualifiedClassNameManipulator::RESOLVED_NAME, FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME], true)) {
+                        Assert::isInstanceOf($value, Name::class);
+
+                        $shortClassName = ClassName::getShortClassName($value::class);
+
+                        $nodeDetails .= sprintf(
+                            '%s(%s)',
+                            $shortClassName,
+                            (string) $value,
+                        );
+
+                        continue;
                     }
 
                     // This was added: add native support for Node ids. This removes

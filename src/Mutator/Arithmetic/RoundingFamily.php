@@ -53,7 +53,7 @@ final class RoundingFamily implements Mutator
 {
     use GetMutatorName;
 
-    private const MUTATORS_MAP = [
+    private const array MUTATORS_MAP = [
         'floor',
         'ceil',
         'round',
@@ -86,7 +86,6 @@ final class RoundingFamily implements Mutator
     {
         /** @var Node\Name $name */
         $name = $node->name;
-        /** @psalm-suppress ImpureMethodCall */
         $currentFunctionName = $name->toLowerString();
 
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);

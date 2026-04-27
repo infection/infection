@@ -91,78 +91,78 @@ final class LabelNodesAsEligibleVisitorTest extends VisitorTestCase
                 array(
                     0: Stmt_Namespace(
                         name: Name(
-                            nodeId: 1
                             eligible: true
+                            nodeId: 1
                         )
                         stmts: array(
                             0: Stmt_Expression(
                                 expr: Expr_Assign(
                                     var: Expr_Variable(
-                                        nodeId: 4
                                         eligible: true
+                                        nodeId: 4
                                     )
                                     expr: Expr_New(
                                         class: Name(
-                                            nodeId: 6
                                             eligible: true
+                                            nodeId: 6
                                         )
                                         args: array(
                                             0: Arg(
                                                 value: Expr_ArrowFunction(
                                                     expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'first'
-                                                        nodeId: 9
                                                         eligible: true
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        nodeId: 9
+                                                        rawValue: 'first'
                                                     )
-                                                    nodeId: 8
                                                     eligible: true
+                                                    nodeId: 8
                                                 )
-                                                nodeId: 7
                                                 eligible: true
+                                                nodeId: 7
                                             )
                                             1: Arg(
                                                 value: Expr_ArrowFunction(
                                                     expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'second'
-                                                        nodeId: 12
                                                         eligible: true
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        nodeId: 12
+                                                        rawValue: 'second'
                                                     )
-                                                    nodeId: 11
                                                     eligible: true
+                                                    nodeId: 11
                                                 )
-                                                nodeId: 10
                                                 eligible: true
+                                                nodeId: 10
                                             )
                                             2: Arg(
                                                 value: Expr_ArrowFunction(
                                                     expr: Scalar_String(
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'third'
-                                                        nodeId: 15
                                                         eligible: true
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        nodeId: 15
+                                                        rawValue: 'third'
                                                     )
-                                                    nodeId: 14
                                                     eligible: true
+                                                    nodeId: 14
                                                 )
-                                                nodeId: 13
                                                 eligible: true
+                                                nodeId: 13
                                             )
                                         )
-                                        nodeId: 5
                                         eligible: true
+                                        nodeId: 5
                                     )
-                                    nodeId: 3
                                     eligible: true
+                                    nodeId: 3
                                 )
-                                nodeId: 2
                                 eligible: true
+                                nodeId: 2
                             )
                         )
+                        eligible: true
                         kind: 1
                         nodeId: 0
-                        eligible: true
                     )
                 )
                 AST,
@@ -186,51 +186,51 @@ final class LabelNodesAsEligibleVisitorTest extends VisitorTestCase
                 array(
                     0: Stmt_Namespace(
                         name: Name(
-                            nodeId: 1
                             eligible: true
+                            nodeId: 1
                         )
                         stmts: array(
                             0: Stmt_Expression(
                                 expr: Expr_Assign(
                                     var: Expr_Variable(
-                                        nodeId: 4
                                         eligible: true
+                                        nodeId: 4
                                     )
                                     expr: Expr_New(
                                         class: Name(
-                                            nodeId: 6
                                             eligible: true
+                                            nodeId: 6
                                         )
                                         args: array(
                                             0: <skipped>
                                             1: Arg(
                                                 value: <skipped>
-                                                nodeId: 10
                                                 eligible: true
+                                                nodeId: 10
                                             )
                                             2: Arg(
                                                 value: Expr_ArrowFunction(
                                                     expr: <skipped>
-                                                    nodeId: 14
                                                     eligible: true
+                                                    nodeId: 14
                                                 )
-                                                nodeId: 13
                                                 eligible: true
+                                                nodeId: 13
                                             )
                                         )
-                                        nodeId: 5
                                         eligible: true
+                                        nodeId: 5
                                     )
-                                    nodeId: 3
                                     eligible: true
+                                    nodeId: 3
                                 )
-                                nodeId: 2
                                 eligible: true
+                                nodeId: 2
                             )
                         )
+                        eligible: true
                         kind: 1
                         nodeId: 0
-                        eligible: true
                     )
                 )
                 AST,

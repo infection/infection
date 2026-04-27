@@ -37,6 +37,7 @@ namespace Infection\CI;
 
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
+use Override;
 
 /**
  * @internal
@@ -51,6 +52,7 @@ final class MemoizedCiDetector extends CiDetector
      */
     private $ci = false;
 
+    #[Override]
     protected function detectCurrentCiServer(): ?CiInterface
     {
         if ($this->ci === false) {

@@ -26,7 +26,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PHP_VERSION: '8.2'
+  PHP_VERSION: '8.3'
   MIN_MSI: 77.0
   MIN_COVERED_MSI: 86.00
 
@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup PHP for coverage
-        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
           # Any supported PHP version is fine
           php-version: ${{ env.PHP_VERSION }}
@@ -57,7 +57,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
@@ -78,7 +78,7 @@ jobs:
             --log-junit=var/coverage/junit.xml
 
       - name: Setup PHP for mutation testing
-        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none

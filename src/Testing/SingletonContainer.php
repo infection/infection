@@ -37,9 +37,9 @@ namespace Infection\Testing;
 
 use Infection\Container\Container;
 use Infection\Mutant\MutantCodePrinter;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use Infection\PhpParser\InfectionPrettyPrinter;
+use Infection\Testing\PhpDoc\PHPDocParser;
 use PhpParser\NodeDumper;
-use PhpParser\PrettyPrinter\Standard;
 
 /**
  * Singleton for the container and a few services (used for tests). The goal is to avoid
@@ -70,7 +70,7 @@ final class SingletonContainer
 
     public static function getPrinter(): MutantCodePrinter
     {
-        return self::$printer ??= new MutantCodePrinter(new Standard());
+        return self::$printer ??= new MutantCodePrinter(new InfectionPrettyPrinter());
     }
 
     public static function getPHPDocParser(): PHPDocParser

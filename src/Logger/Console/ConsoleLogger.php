@@ -56,11 +56,11 @@ use Webmozart\Assert\Assert;
  */
 final class ConsoleLogger extends AbstractLogger
 {
-    private const INFO = 'info';
+    private const string INFO = 'info';
 
-    private const ERROR = 'error';
+    private const string ERROR = 'error';
 
-    private const VERBOSITY_LEVEL_MAP = [
+    private const array VERBOSITY_LEVEL_MAP = [
         LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
@@ -71,7 +71,7 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
     ];
 
-    private const FORMAT_LEVEL_MAP = [
+    private const array FORMAT_LEVEL_MAP = [
         LogLevel::EMERGENCY => self::ERROR,
         LogLevel::ALERT => self::ERROR,
         LogLevel::CRITICAL => self::ERROR,
@@ -82,7 +82,7 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::DEBUG => self::INFO,
     ];
 
-    private const IO_MAP = [
+    private const array IO_MAP = [
         LogLevel::ERROR => 'error',
         LogLevel::WARNING => 'warning',
         LogLevel::NOTICE => 'note',

@@ -53,9 +53,9 @@ final class MsiParser
 {
     use CannotBeInstantiated;
 
-    public const DEFAULT_PRECISION = 2;
+    public const int DEFAULT_PRECISION = 2;
 
-    private const EXPLODE_PARTS = 2;
+    private const int EXPLODE_PARTS = 2;
 
     public static function detectPrecision(?string ...$values): int
     {

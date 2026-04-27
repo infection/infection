@@ -50,7 +50,7 @@ use function Safe\file_get_contents;
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends VisitorTestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../autoloaded/mutator-fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/../../../autoloaded/mutator-fixtures';
 
     /**
      * @param list<string>|null $desiredAttributes
@@ -107,163 +107,163 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 5
-                                            parent: nodeId(4)
+                                            functionName: foo
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 5
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: foo
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
                                                     nodeId: 7
                                                     parent: nodeId(6)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: false
-                                                    functionScope: nodeId(4)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
                                                 var: Expr_Variable(
-                                                    nodeId: 8
-                                                    parent: nodeId(6)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 8
+                                                    parent: nodeId(6)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
-                                                nodeId: 6
-                                                parent: nodeId(4)
+                                                functionName: foo
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 6
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                             1: Param(
                                                 var: Expr_Variable(
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
                                                     nodeId: 10
                                                     parent: nodeId(9)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: false
-                                                    functionScope: nodeId(4)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
                                                 default: Scalar_Float(
-                                                    rawValue: 2.0
-                                                    nodeId: 11
-                                                    parent: nodeId(9)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 11
+                                                    parent: nodeId(9)
+                                                    rawValue: 2.0
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
-                                                nodeId: 9
-                                                parent: nodeId(4)
+                                                functionName: foo
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 9
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                         )
                                         returnType: Identifier(
-                                            nodeId: 12
-                                            parent: nodeId(4)
+                                            functionName: foo
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 12
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: foo
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
                                                 expr: Expr_BinaryOp_Identical(
                                                     left: Expr_FuncCall(
                                                         name: Name(
-                                                            nodeId: 16
-                                                            namespacedName: nodeId(16)
-                                                            parent: nodeId(15)
+                                                            functionName: foo
+                                                            functionScope: nodeId(4)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
-                                                            functionScope: nodeId(4)
+                                                            namespacedName: FullyQualified(InfectionReflectionPartOfSignature\count)
+                                                            nodeId: 16
+                                                            parent: nodeId(15)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: foo
                                                         )
                                                         args: array(
                                                             0: Arg(
                                                                 value: Expr_Array(
+                                                                    functionName: foo
+                                                                    functionScope: nodeId(4)
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: false
                                                                     kind: KIND_SHORT (2)
                                                                     nodeId: 18
                                                                     parent: nodeId(17)
-                                                                    isInsideFunction: true
-                                                                    isStrictTypes: false
-                                                                    functionScope: nodeId(4)
                                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                    functionName: foo
                                                                 )
-                                                                nodeId: 17
-                                                                parent: nodeId(15)
+                                                                functionName: foo
+                                                                functionScope: nodeId(4)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: false
-                                                                functionScope: nodeId(4)
+                                                                nodeId: 17
+                                                                parent: nodeId(15)
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: foo
                                                             )
                                                         )
-                                                        nodeId: 15
-                                                        parent: nodeId(14)
+                                                        functionName: foo
+                                                        functionScope: nodeId(4)
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        nodeId: 15
+                                                        parent: nodeId(14)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: foo
                                                     )
                                                     right: Scalar_Int(
-                                                        rawValue: 1
+                                                        functionName: foo
+                                                        functionScope: nodeId(4)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
                                                         kind: KIND_DEC (10)
                                                         nodeId: 19
                                                         parent: nodeId(14)
-                                                        isInsideFunction: true
-                                                        isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        rawValue: 1
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: foo
                                                     )
-                                                    nodeId: 14
-                                                    parent: nodeId(13)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 14
+                                                    parent: nodeId(13)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
-                                                nodeId: 13
-                                                parent: nodeId(4)
+                                                functionName: foo
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 13
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                         )
-                                        nodeId: 4
-                                        parent: nodeId(2)
+                                        functionName: foo
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 4
+                                        parent: nodeId(2)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: foo
                                     )
                                 )
                                 nodeId: 2
@@ -298,44 +298,44 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 5
-                                            parent: nodeId(4)
+                                            functionName: foo
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 5
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: foo
                                         )
                                         params: array(
                                             0: Param(
                                                 type: Identifier(
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
                                                     nodeId: 7
                                                     parent: nodeId(6)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: false
-                                                    functionScope: nodeId(4)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
                                                 var: Expr_Variable(
-                                                    nodeId: 8
-                                                    parent: nodeId(6)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 8
+                                                    parent: nodeId(6)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
-                                                nodeId: 6
-                                                parent: nodeId(4)
+                                                functionName: foo
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 6
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                             1: Param(
                                                 attrGroups: array(
@@ -343,186 +343,186 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                         attrs: array(
                                                             0: Attribute(
                                                                 name: Name(
-                                                                    nodeId: 12
-                                                                    resolvedName: nodeId(12)
-                                                                    parent: nodeId(11)
+                                                                    functionName: foo
+                                                                    functionScope: nodeId(4)
                                                                     isInsideFunction: true
                                                                     isOnFunctionSignature: true
                                                                     isStrictTypes: false
-                                                                    functionScope: nodeId(4)
+                                                                    nodeId: 12
+                                                                    parent: nodeId(11)
                                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                    functionName: foo
+                                                                    resolvedName: FullyQualified(InfectionReflectionPartOfSignatureWithAttributes\CustomAttribute)
                                                                 )
                                                                 args: array(
                                                                     0: Arg(
                                                                         value: Expr_ConstFetch(
                                                                             name: Name(
-                                                                                nodeId: 15
-                                                                                namespacedName: nodeId(15)
-                                                                                parent: nodeId(14)
+                                                                                functionName: foo
+                                                                                functionScope: nodeId(4)
                                                                                 isInsideFunction: true
                                                                                 isOnFunctionSignature: true
                                                                                 isStrictTypes: false
-                                                                                functionScope: nodeId(4)
+                                                                                namespacedName: FullyQualified(InfectionReflectionPartOfSignatureWithAttributes\false)
+                                                                                nodeId: 15
+                                                                                parent: nodeId(14)
                                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                                functionName: foo
                                                                             )
-                                                                            nodeId: 14
-                                                                            parent: nodeId(13)
+                                                                            functionName: foo
+                                                                            functionScope: nodeId(4)
                                                                             isInsideFunction: true
                                                                             isOnFunctionSignature: true
                                                                             isStrictTypes: false
-                                                                            functionScope: nodeId(4)
+                                                                            nodeId: 14
+                                                                            parent: nodeId(13)
                                                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                            functionName: foo
                                                                         )
-                                                                        nodeId: 13
-                                                                        parent: nodeId(11)
+                                                                        functionName: foo
+                                                                        functionScope: nodeId(4)
                                                                         isInsideFunction: true
                                                                         isOnFunctionSignature: true
                                                                         isStrictTypes: false
-                                                                        functionScope: nodeId(4)
+                                                                        nodeId: 13
+                                                                        parent: nodeId(11)
                                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                        functionName: foo
                                                                     )
                                                                 )
-                                                                nodeId: 11
-                                                                parent: nodeId(10)
+                                                                functionName: foo
+                                                                functionScope: nodeId(4)
                                                                 isInsideFunction: true
                                                                 isOnFunctionSignature: true
                                                                 isStrictTypes: false
-                                                                functionScope: nodeId(4)
+                                                                nodeId: 11
+                                                                parent: nodeId(10)
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: foo
                                                             )
                                                         )
-                                                        nodeId: 10
-                                                        parent: nodeId(9)
+                                                        functionName: foo
+                                                        functionScope: nodeId(4)
                                                         isInsideFunction: true
                                                         isOnFunctionSignature: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        nodeId: 10
+                                                        parent: nodeId(9)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: foo
                                                     )
                                                 )
                                                 var: Expr_Variable(
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
                                                     nodeId: 16
                                                     parent: nodeId(9)
-                                                    isInsideFunction: true
-                                                    isOnFunctionSignature: true
-                                                    isStrictTypes: false
-                                                    functionScope: nodeId(4)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
                                                 default: Scalar_Float(
-                                                    rawValue: 2.0
-                                                    nodeId: 17
-                                                    parent: nodeId(9)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 17
+                                                    parent: nodeId(9)
+                                                    rawValue: 2.0
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
-                                                nodeId: 9
-                                                parent: nodeId(4)
+                                                functionName: foo
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 9
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                         )
                                         returnType: Identifier(
-                                            nodeId: 18
-                                            parent: nodeId(4)
+                                            functionName: foo
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 18
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: foo
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
                                                 expr: Expr_BinaryOp_Identical(
                                                     left: Expr_FuncCall(
                                                         name: Name(
-                                                            nodeId: 22
-                                                            namespacedName: nodeId(22)
-                                                            parent: nodeId(21)
+                                                            functionName: foo
+                                                            functionScope: nodeId(4)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
-                                                            functionScope: nodeId(4)
+                                                            namespacedName: FullyQualified(InfectionReflectionPartOfSignatureWithAttributes\count)
+                                                            nodeId: 22
+                                                            parent: nodeId(21)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: foo
                                                         )
                                                         args: array(
                                                             0: Arg(
                                                                 value: Expr_Array(
+                                                                    functionName: foo
+                                                                    functionScope: nodeId(4)
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: false
                                                                     kind: KIND_SHORT (2)
                                                                     nodeId: 24
                                                                     parent: nodeId(23)
-                                                                    isInsideFunction: true
-                                                                    isStrictTypes: false
-                                                                    functionScope: nodeId(4)
                                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                    functionName: foo
                                                                 )
-                                                                nodeId: 23
-                                                                parent: nodeId(21)
+                                                                functionName: foo
+                                                                functionScope: nodeId(4)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: false
-                                                                functionScope: nodeId(4)
+                                                                nodeId: 23
+                                                                parent: nodeId(21)
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: foo
                                                             )
                                                         )
-                                                        nodeId: 21
-                                                        parent: nodeId(20)
+                                                        functionName: foo
+                                                        functionScope: nodeId(4)
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        nodeId: 21
+                                                        parent: nodeId(20)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: foo
                                                     )
                                                     right: Scalar_Int(
-                                                        rawValue: 1
+                                                        functionName: foo
+                                                        functionScope: nodeId(4)
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
                                                         kind: KIND_DEC (10)
                                                         nodeId: 25
                                                         parent: nodeId(20)
-                                                        isInsideFunction: true
-                                                        isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        rawValue: 1
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: foo
                                                     )
-                                                    nodeId: 20
-                                                    parent: nodeId(19)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 20
+                                                    parent: nodeId(19)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
-                                                nodeId: 19
-                                                parent: nodeId(4)
+                                                functionName: foo
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 19
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                         )
-                                        nodeId: 4
-                                        parent: nodeId(2)
+                                        functionName: foo
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 4
+                                        parent: nodeId(2)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: foo
                                     )
                                 )
                                 nodeId: 2
@@ -557,42 +557,42 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 5
-                                            parent: nodeId(4)
+                                            functionName: test
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 5
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: test
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
                                                 expr: Scalar_Int(
-                                                    rawValue: 1
+                                                    functionName: test
+                                                    functionScope: nodeId(4)
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
                                                     kind: KIND_DEC (10)
                                                     nodeId: 7
                                                     parent: nodeId(6)
-                                                    isInsideFunction: true
-                                                    isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    rawValue: 1
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: test
                                                 )
-                                                nodeId: 6
-                                                parent: nodeId(4)
+                                                functionName: test
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 6
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: test
                                             )
                                         )
-                                        nodeId: 4
-                                        parent: nodeId(2)
+                                        functionName: test
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 4
+                                        parent: nodeId(2)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: test
                                     )
                                 )
                                 nodeId: 2
@@ -640,10 +640,10 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                             stmts: array(
                                                 0: Stmt_Return(
                                                     expr: Scalar_Int(
-                                                        rawValue: 1
                                                         kind: KIND_DEC (10)
                                                         nodeId: 9
                                                         parent: nodeId(8)
+                                                        rawValue: 1
                                                     )
                                                     nodeId: 8
                                                     parent: nodeId(5)
@@ -656,9 +656,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                         parent: nodeId(2)
                                     )
                                 )
+                                isStrictTypes: false
                                 nodeId: 2
                                 parent: nodeId(0)
-                                isStrictTypes: false
                             )
                         )
                         kind: 1
@@ -689,91 +689,91 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 5
-                                            parent: nodeId(4)
+                                            functionName: foo
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 5
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: foo
                                         )
                                         stmts: array(
                                             0: Stmt_Function(
                                                 name: Identifier(
-                                                    nodeId: 7
-                                                    parent: nodeId(6)
+                                                    functionName: foo
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 7
+                                                    parent: nodeId(6)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: foo
                                                 )
                                                 stmts: array(
                                                     0: Stmt_Expression(
                                                         expr: Expr_FuncCall(
                                                             name: Name(
-                                                                nodeId: 10
-                                                                namespacedName: nodeId(10)
-                                                                parent: nodeId(9)
+                                                                functionName: foo
+                                                                functionScope: nodeId(4)
                                                                 isInsideFunction: true
                                                                 isStrictTypes: false
-                                                                functionScope: nodeId(4)
+                                                                namespacedName: FullyQualified(InfectionReflectionPlainFunctionInClass\count)
+                                                                nodeId: 10
+                                                                parent: nodeId(9)
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: foo
                                                             )
                                                             args: array(
                                                                 0: Arg(
                                                                     value: Expr_Array(
+                                                                        functionName: foo
+                                                                        functionScope: nodeId(4)
+                                                                        isInsideFunction: true
+                                                                        isStrictTypes: false
                                                                         kind: KIND_SHORT (2)
                                                                         nodeId: 12
                                                                         parent: nodeId(11)
-                                                                        isInsideFunction: true
-                                                                        isStrictTypes: false
-                                                                        functionScope: nodeId(4)
                                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                        functionName: foo
                                                                     )
-                                                                    nodeId: 11
-                                                                    parent: nodeId(9)
+                                                                    functionName: foo
+                                                                    functionScope: nodeId(4)
                                                                     isInsideFunction: true
                                                                     isStrictTypes: false
-                                                                    functionScope: nodeId(4)
+                                                                    nodeId: 11
+                                                                    parent: nodeId(9)
                                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                    functionName: foo
                                                                 )
                                                             )
-                                                            nodeId: 9
-                                                            parent: nodeId(8)
+                                                            functionName: foo
+                                                            functionScope: nodeId(4)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
-                                                            functionScope: nodeId(4)
+                                                            nodeId: 9
+                                                            parent: nodeId(8)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: foo
                                                         )
-                                                        nodeId: 8
-                                                        parent: nodeId(6)
+                                                        functionName: foo
+                                                        functionScope: nodeId(4)
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        nodeId: 8
+                                                        parent: nodeId(6)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                                        functionName: foo
                                                     )
                                                 )
+                                                functionName: foo
+                                                functionScope: nodeId(4)
+                                                isInsideFunction: true
+                                                isStrictTypes: false
                                                 nodeId: 6
                                                 parent: nodeId(4)
-                                                isStrictTypes: false
-                                                isInsideFunction: true
-                                                functionScope: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: foo
                                             )
                                         )
-                                        nodeId: 4
-                                        parent: nodeId(2)
+                                        functionName: foo
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 4
+                                        parent: nodeId(2)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: foo
                                     )
                                 )
                                 nodeId: 2
@@ -831,8 +831,8 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     0: Stmt_Expression(
                                                         expr: Expr_FuncCall(
                                                             name: Name(
+                                                                namespacedName: FullyQualified(InfectionReflectionPlainFunctionInClosure\count)
                                                                 nodeId: 13
-                                                                namespacedName: nodeId(13)
                                                                 parent: nodeId(12)
                                                             )
                                                             args: array(
@@ -853,9 +853,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                         parent: nodeId(9)
                                                     )
                                                 )
+                                                isStrictTypes: false
                                                 nodeId: 9
                                                 parent: nodeId(5)
-                                                isStrictTypes: false
                                             )
                                         )
                                         nodeId: 5
@@ -896,13 +896,13 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 5
-                                            parent: nodeId(4)
+                                            functionName: bar
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 5
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: bar
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -910,48 +910,48 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     stmts: array(
                                                         0: Stmt_Return(
                                                             expr: Scalar_Int(
-                                                                rawValue: 1
+                                                                functionName: bar
+                                                                functionScope: nodeId(7)
+                                                                isInsideFunction: true
+                                                                isStrictTypes: false
                                                                 kind: KIND_DEC (10)
                                                                 nodeId: 9
                                                                 parent: nodeId(8)
-                                                                isInsideFunction: true
-                                                                isStrictTypes: false
-                                                                functionScope: nodeId(7)
+                                                                rawValue: 1
                                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                                functionName: bar
                                                             )
-                                                            nodeId: 8
-                                                            parent: nodeId(7)
+                                                            functionName: bar
+                                                            functionScope: nodeId(7)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
-                                                            functionScope: nodeId(7)
+                                                            nodeId: 8
+                                                            parent: nodeId(7)
                                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                                            functionName: bar
                                                         )
                                                     )
-                                                    nodeId: 7
-                                                    parent: nodeId(6)
+                                                    functionName: bar
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
+                                                    nodeId: 7
+                                                    parent: nodeId(6)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: bar
                                                 )
-                                                nodeId: 6
-                                                parent: nodeId(4)
+                                                functionName: bar
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 6
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: bar
                                             )
                                         )
-                                        nodeId: 4
-                                        parent: nodeId(2)
+                                        functionName: bar
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 4
+                                        parent: nodeId(2)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: bar
                                     )
                                 )
                                 nodeId: 2
@@ -996,8 +996,8 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 expr: Expr_New(
                                     class: Name(
                                         nodeId: 7
-                                        resolvedName: nodeId(7)
                                         parent: nodeId(6)
+                                        resolvedName: FullyQualified(stdClass)
                                     )
                                     nodeId: 6
                                     parent: nodeId(5)
@@ -1008,16 +1008,16 @@ final class ReflectionVisitorTest extends VisitorTestCase
                             2: Stmt_Return(
                                 expr: Expr_BinaryOp_Minus(
                                     left: Scalar_Int(
-                                        rawValue: 1
                                         kind: KIND_DEC (10)
                                         nodeId: 10
                                         parent: nodeId(9)
+                                        rawValue: 1
                                     )
                                     right: Scalar_Int(
-                                        rawValue: 3
                                         kind: KIND_DEC (10)
                                         nodeId: 11
                                         parent: nodeId(9)
+                                        rawValue: 3
                                     )
                                     nodeId: 9
                                     parent: nodeId(8)
@@ -1052,42 +1052,42 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                         stmts: array(
                                             0: Stmt_ClassMethod(
                                                 name: Identifier(
-                                                    nodeId: 6
-                                                    parent: nodeId(5)
+                                                    functionName: test
+                                                    functionScope: nodeId(5)
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(5)
+                                                    nodeId: 6
+                                                    parent: nodeId(5)
                                                     reflectionClass: Infection\Reflection\NullReflection
-                                                    functionName: test
                                                 )
                                                 stmts: array(
                                                     0: Stmt_Return(
                                                         expr: Scalar_Int(
-                                                            rawValue: 1
+                                                            functionName: test
+                                                            functionScope: nodeId(5)
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
                                                             kind: KIND_DEC (10)
                                                             nodeId: 8
                                                             parent: nodeId(7)
-                                                            isInsideFunction: true
-                                                            isStrictTypes: false
-                                                            functionScope: nodeId(5)
+                                                            rawValue: 1
                                                             reflectionClass: Infection\Reflection\NullReflection
-                                                            functionName: test
                                                         )
-                                                        nodeId: 7
-                                                        parent: nodeId(5)
+                                                        functionName: test
+                                                        functionScope: nodeId(5)
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(5)
+                                                        nodeId: 7
+                                                        parent: nodeId(5)
                                                         reflectionClass: Infection\Reflection\NullReflection
-                                                        functionName: test
                                                     )
                                                 )
-                                                nodeId: 5
-                                                parent: nodeId(4)
+                                                functionName: test
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
+                                                nodeId: 5
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\NullReflection
-                                                functionName: test
                                             )
                                         )
                                         nodeId: 4
@@ -1128,13 +1128,13 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 5
-                                            parent: nodeId(4)
+                                            functionName: createAnonymousClass
+                                            functionScope: nodeId(4)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(4)
+                                            nodeId: 5
+                                            parent: nodeId(4)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: createAnonymousClass
                                         )
                                         stmts: array(
                                             0: Stmt_Expression(
@@ -1143,54 +1143,54 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                         stmts: array(
                                                             0: Stmt_ClassMethod(
                                                                 name: Identifier(
-                                                                    nodeId: 10
-                                                                    parent: nodeId(9)
+                                                                    functionName: foo
+                                                                    functionScope: nodeId(9)
                                                                     isInsideFunction: true
                                                                     isStrictTypes: false
-                                                                    functionScope: nodeId(9)
+                                                                    nodeId: 10
+                                                                    parent: nodeId(9)
                                                                     reflectionClass: Infection\Reflection\NullReflection
-                                                                    functionName: foo
                                                                 )
-                                                                nodeId: 9
-                                                                parent: nodeId(8)
+                                                                functionName: foo
                                                                 isInsideFunction: true
                                                                 isOnFunctionSignature: true
                                                                 isStrictTypes: false
+                                                                nodeId: 9
+                                                                parent: nodeId(8)
                                                                 reflectionClass: Infection\Reflection\NullReflection
-                                                                functionName: foo
                                                             )
                                                         )
-                                                        nodeId: 8
-                                                        parent: nodeId(7)
+                                                        functionName: createAnonymousClass
+                                                        functionScope: nodeId(4)
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(4)
+                                                        nodeId: 8
+                                                        parent: nodeId(7)
                                                         reflectionClass: Infection\Reflection\NullReflection
-                                                        functionName: createAnonymousClass
                                                     )
-                                                    nodeId: 7
-                                                    parent: nodeId(6)
+                                                    functionName: createAnonymousClass
+                                                    functionScope: nodeId(4)
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(4)
+                                                    nodeId: 7
+                                                    parent: nodeId(6)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: createAnonymousClass
                                                 )
-                                                nodeId: 6
-                                                parent: nodeId(4)
+                                                functionName: createAnonymousClass
+                                                functionScope: nodeId(4)
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(4)
+                                                nodeId: 6
+                                                parent: nodeId(4)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: createAnonymousClass
                                             )
                                         )
-                                        nodeId: 4
-                                        parent: nodeId(2)
+                                        functionName: createAnonymousClass
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 4
+                                        parent: nodeId(2)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: createAnonymousClass
                                     )
                                 )
                                 nodeId: 2
@@ -1233,79 +1233,79 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
-                                            nodeId: 7
-                                            parent: nodeId(6)
+                                            functionName: createAnonymousClass
+                                            functionScope: nodeId(6)
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            functionScope: nodeId(6)
+                                            nodeId: 7
+                                            parent: nodeId(6)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: createAnonymousClass
                                         )
                                         stmts: array(
                                             0: Stmt_Expression(
                                                 expr: Expr_New(
                                                     class: Stmt_Class(
                                                         extends: Name(
-                                                            nodeId: 11
-                                                            resolvedName: nodeId(11)
-                                                            parent: nodeId(10)
+                                                            functionName: createAnonymousClass
+                                                            functionScope: nodeId(6)
                                                             isInsideFunction: true
                                                             isStrictTypes: false
-                                                            functionScope: nodeId(6)
+                                                            nodeId: 11
+                                                            parent: nodeId(10)
                                                             reflectionClass: Infection\Reflection\AnonymousClassReflection
-                                                            functionName: createAnonymousClass
+                                                            resolvedName: FullyQualified(InfectionReflectionAnonymousClass\A)
                                                         )
                                                         stmts: array(
                                                             0: Stmt_ClassMethod(
                                                                 name: Identifier(
-                                                                    nodeId: 13
-                                                                    parent: nodeId(12)
+                                                                    functionName: foo
+                                                                    functionScope: nodeId(12)
                                                                     isInsideFunction: true
                                                                     isStrictTypes: false
-                                                                    functionScope: nodeId(12)
+                                                                    nodeId: 13
+                                                                    parent: nodeId(12)
                                                                     reflectionClass: Infection\Reflection\AnonymousClassReflection
-                                                                    functionName: foo
                                                                 )
-                                                                nodeId: 12
-                                                                parent: nodeId(10)
+                                                                functionName: foo
                                                                 isInsideFunction: true
                                                                 isOnFunctionSignature: true
                                                                 isStrictTypes: false
+                                                                nodeId: 12
+                                                                parent: nodeId(10)
                                                                 reflectionClass: Infection\Reflection\AnonymousClassReflection
-                                                                functionName: foo
                                                             )
                                                         )
-                                                        nodeId: 10
-                                                        parent: nodeId(9)
+                                                        functionName: createAnonymousClass
+                                                        functionScope: nodeId(6)
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        functionScope: nodeId(6)
+                                                        nodeId: 10
+                                                        parent: nodeId(9)
                                                         reflectionClass: Infection\Reflection\AnonymousClassReflection
-                                                        functionName: createAnonymousClass
                                                     )
-                                                    nodeId: 9
-                                                    parent: nodeId(8)
+                                                    functionName: createAnonymousClass
+                                                    functionScope: nodeId(6)
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    functionScope: nodeId(6)
+                                                    nodeId: 9
+                                                    parent: nodeId(8)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: createAnonymousClass
                                                 )
-                                                nodeId: 8
-                                                parent: nodeId(6)
+                                                functionName: createAnonymousClass
+                                                functionScope: nodeId(6)
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                functionScope: nodeId(6)
+                                                nodeId: 8
+                                                parent: nodeId(6)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: createAnonymousClass
                                             )
                                         )
-                                        nodeId: 6
-                                        parent: nodeId(4)
+                                        functionName: createAnonymousClass
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
+                                        nodeId: 6
+                                        parent: nodeId(4)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: createAnonymousClass
                                     )
                                 )
                                 nodeId: 4

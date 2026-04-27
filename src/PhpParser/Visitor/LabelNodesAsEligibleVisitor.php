@@ -47,11 +47,16 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 {
-    private const ELIGIBLE = 'eligible';
+    public const string ELIGIBLE = 'eligible';
 
     public static function isEligible(Node $node): bool
     {
-        return $node->hasAttribute(self::ELIGIBLE);
+        return $node->getAttribute(self::ELIGIBLE, default: false);
+    }
+
+    public static function isExplicitlyIneligible(Node $node): bool
+    {
+        return $node->getAttribute(self::ELIGIBLE, default: true) === false;
     }
 
     public function enterNode(Node $node): ?int
@@ -61,8 +66,13 @@ final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    private static function markAsEligible(Node $node): void
+    public static function markAsEligible(Node $node): void
     {
         $node->setAttribute(self::ELIGIBLE, true);
+    }
+
+    public static function markAsIneligible(Node $node): void
+    {
+        $node->setAttribute(self::ELIGIBLE, false);
     }
 }

@@ -51,7 +51,7 @@ final class InitialTestsPhpOptionsOption implements CommandOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'initial-tests-php-options';
+    public const string NAME = 'initial-tests-php-options';
 
     /**
      * @template T of Command

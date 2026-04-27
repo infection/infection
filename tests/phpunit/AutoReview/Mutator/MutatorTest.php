@@ -64,7 +64,7 @@ use function sprintf;
 #[CoversNothing]
 final class MutatorTest extends TestCase
 {
-    private const KNOWN_MUTATOR_PUBLIC_METHODS = [
+    private const array KNOWN_MUTATOR_PUBLIC_METHODS = [
         'getDefinition',
         'getName',
         'mutate',
@@ -110,7 +110,7 @@ final class MutatorTest extends TestCase
         $definition = $mutator::getDefinition();
 
         if ($definition !== null) {
-            $this->addToAssertionCount(1);
+            $this->expectNotToPerformAssertions();
 
             return;
         }

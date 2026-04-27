@@ -57,7 +57,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(IndexXmlCoverageLocator::class)]
 final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
-    private const TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/test-index.xml';
+    private const string TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/test-index.xml';
 
     private FileSystem $fileSystem;
 

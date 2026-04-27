@@ -54,7 +54,7 @@ use Symfony\Component\Process\Process;
 #[CoversNothing]
 final class BenchmarkSmokeTest extends TestCase
 {
-    private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
+    private const string BENCHMARK_DIR = __DIR__ . '/../benchmark';
 
     /**
      * @param non-empty-list<string> $command

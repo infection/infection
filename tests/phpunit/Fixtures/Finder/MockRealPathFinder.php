@@ -26,6 +26,7 @@ class MockRealPathFinder extends Finder
         return $this;
     }
 
+    #[\Override]
     public function getIterator(): Iterator
     {
         $iterator = parent::getIterator();

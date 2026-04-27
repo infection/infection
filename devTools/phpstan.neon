@@ -5,6 +5,12 @@ includes:
 rules:
     - Infection\DevTools\PHPStan\Rules\InfectionContainerRule
 
+services:
+    -
+        class: Infection\DevTools\PHPat\SrcShouldNotDependOnTestsTest
+        tags:
+            - phpat.test
+
 parameters:
     tmpDir: ../var/cache/phpstan
     inferPrivatePropertyTypeFromConstructor: true
@@ -75,7 +81,7 @@ parameters:
             message: "#queryCount#"
             identifier: return.type
             count: 1
-            path: ../src/TestFramework/SafeDOMXPath.php
+            path: ../src/TestFramework/XML/SafeDOMXPath.php
 
         # We are explicitly testing the guards here
         -
@@ -89,6 +95,12 @@ parameters:
         -
             identifier: missingType.iterableValue
             path: ../src/FileSystem/FakeFileSystem.php
+        -
+            message: "#Do not use magic number as default parameter#"
+            path: ../src/FileSystem/InMemoryFileSystem.php
+        -
+            identifier: missingType.iterableValue
+            path: ../src/FileSystem/InMemoryFileSystem.php
 
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -
@@ -108,6 +120,12 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
+
+        # PHPat test methods are invoked by the PHPStan container via the phpat.test tag,
+        # so shipmonk's dead-code detector cannot see the call sites.
+        -
+            identifier: shipmonk.deadMethod
+            path: ./PHPat/*
 
         # Test enum fixtures have cases that exist as test data, not all are used
         -
@@ -170,7 +188,7 @@ parameters:
         -
             message: '#^.*(start|end)Line.*SourceLineMatcher::touches\(\) expects int\<1\, max\>\, -1\|int\<1\, max\> given\.$#'
             identifier: argument.type
-            path: ../src/Mutator/NodeMutationGenerator.php
+            path: ../src/PhpParser/Visitor/ExcludeUnchangedLinesVisitor.php
 
         # This class is copy/pasted from PhpParser so we don't want to change it too much
         -
@@ -199,6 +217,7 @@ parameters:
         - ../tests/phpunit
         - ../tests/benchmark
         - ./PHPStan/
+        - ./PHPat/
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__.php
@@ -206,6 +225,7 @@ parameters:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
+        - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
         - ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)

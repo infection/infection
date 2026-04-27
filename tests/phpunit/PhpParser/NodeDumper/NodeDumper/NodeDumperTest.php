@@ -39,6 +39,8 @@ use Exception;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
@@ -53,6 +55,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
+use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -63,7 +66,10 @@ use PHPUnit\Framework\TestCase;
 final class NodeDumperTest extends TestCase
 {
     #[DataProvider('codeWithDefaultConfigurationProvider')]
+    #[DataProvider('decoratedNodesProvider')]
     #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
+    #[DataProvider('resolvedNameAttributeProvider')]
+    #[DataProvider('showLineNumbersProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
         $node = $scenario->node;
@@ -83,6 +89,8 @@ final class NodeDumperTest extends TestCase
             $scenario->dumpPositions,
             $scenario->dumpOtherAttributes,
             $scenario->onlyVisitedNodes,
+            $scenario->decorateNodes,
+            $scenario->showLineNumbers,
         );
 
         if ($expected instanceof Exception) {
@@ -397,6 +405,63 @@ final class NodeDumperTest extends TestCase
             ->build();
     }
 
+    public static function decoratedNodesProvider(): iterable
+    {
+        yield 'eligible nodes are not decorated by default' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            LabelNodesAsEligibleVisitor::markAsEligible($node);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'eligible nodes can be decorated' => (static function () {
+            $node = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+            $eligibleNode = new Assign(
+                new Variable('x'),
+                new String_('value'),
+            );
+
+            LabelNodesAsEligibleVisitor::markAsEligible($eligibleNode);
+
+            return NodeDumperScenario::forNode([$node, $eligibleNode])
+                ->withShowAllNodes()
+                ->withDecorateNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Expr_Assign(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                            1: <eligible>Expr_Assign</eligible>(
+                                var: Expr_Variable
+                                expr: Scalar_String
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+    }
+
     public static function nodesWithAttributesWhichMayCauseCircularDependenciesProvider(): iterable
     {
         yield 'next attribute' => (static function () {
@@ -635,13 +700,341 @@ final class NodeDumperTest extends TestCase
                                         value: value1
                                     )
                                 )
-                                nodeId: 10
                                 functionScope: nodeId(10)
+                                nodeId: 10
                             )
                         )
                         AST,
                 )
                 ->build();
         })();
+    }
+
+    public static function resolvedNameAttributeProvider(): iterable
+    {
+        yield 'resolvedName with FullyQualified name' => (static function () {
+            $node = new Name('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                resolvedName: FullyQualified(App\Foo)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName with identified FullyQualified name' => (static function () {
+            $node = new Name('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new FullyQualified('App\\Foo'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                nodeId: 10
+                                resolvedName: FullyQualified(App\Foo)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName with plain Name' => (static function () {
+            $node = new Name('Bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new Name('Bar'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                resolvedName: Name(Bar)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName with plain identified Name' => (static function () {
+            $node = new Name('Bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new Name('Bar'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name(
+                                nodeId: 10
+                                resolvedName: Name(Bar)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'resolvedName is not shown without dumpOtherAttributes' => (static function () {
+            $node = new Name('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Name
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with FullyQualified name' => (static function () {
+            $node = new Node\Stmt\Class_('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                namespacedName: FullyQualified(App\Foo)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with identified FullyQualified name' => (static function () {
+            $node = new Node\Stmt\Class_('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new FullyQualified('App\\Foo'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                namespacedName: FullyQualified(App\Foo)
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with plain Name' => (static function () {
+            $node = new Node\Stmt\Function_('bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new Name('bar'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Function(
+                                name: Identifier
+                                namespacedName: Name(bar)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName with plain identified Name' => (static function () {
+            $node = new Node\Stmt\Function_('bar');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new Name('bar'));
+            $node->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Function(
+                                name: Identifier
+                                namespacedName: Name(bar)
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'namespacedName is not shown without dumpOtherAttributes' => (static function () {
+            $node = new Node\Stmt\Class_('Foo');
+            $node->setAttribute(FullyQualifiedClassNameManipulator::RESOLVED_NAMESPACE_NAME, new FullyQualified('App\\Foo'));
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Class(
+                                name: Identifier
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+    }
+
+    public static function showLineNumbersProvider(): iterable
+    {
+        yield 'line numbers are shown when enabled' => NodeDumperScenario::forCode(
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                PHP,
+        )
+            ->withShowAllNodes()
+            ->withDumpProperties()
+            ->withDumpOtherAttributes()
+            ->withShowLineNumbers()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                    endLine: 3
+                                    startLine: 3
+                                )
+                                expr: Scalar_Int(
+                                    value: 1
+                                    endLine: 3
+                                    kind: KIND_DEC (10)
+                                    rawValue: 1
+                                    startLine: 3
+                                )
+                                endLine: 3
+                                startLine: 3
+                            )
+                            endLine: 3
+                            startLine: 3
+                        )
+                    )
+                    AST,
+            )
+            ->build();
+
+        yield 'line numbers are hidden by default' => NodeDumperScenario::forCode(
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                PHP,
+        )
+            ->withShowAllNodes()
+            ->withDumpProperties()
+            ->withDumpOtherAttributes()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                )
+                                expr: Scalar_Int(
+                                    value: 1
+                                    kind: KIND_DEC (10)
+                                    rawValue: 1
+                                )
+                            )
+                        )
+                    )
+                    AST,
+            )
+            ->build();
+
+        yield 'line numbers with multi-line code' => NodeDumperScenario::forCode(
+            <<<'PHP'
+                <?php
+
+                $a = [
+                    'hello',
+                ];
+                PHP,
+        )
+            ->withShowAllNodes()
+            ->withDumpProperties()
+            ->withDumpOtherAttributes()
+            ->withShowLineNumbers()
+            ->withExpected(
+                <<<'AST'
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                    endLine: 3
+                                    startLine: 3
+                                )
+                                expr: Expr_Array(
+                                    items: array(
+                                        0: ArrayItem(
+                                            key: null
+                                            value: Scalar_String(
+                                                value: hello
+                                                endLine: 4
+                                                kind: KIND_SINGLE_QUOTED (1)
+                                                rawValue: 'hello'
+                                                startLine: 4
+                                            )
+                                            byRef: false
+                                            unpack: false
+                                            endLine: 4
+                                            startLine: 4
+                                        )
+                                    )
+                                    endLine: 5
+                                    kind: KIND_SHORT (2)
+                                    startLine: 3
+                                )
+                                endLine: 5
+                                startLine: 3
+                            )
+                            endLine: 5
+                            startLine: 3
+                        )
+                    )
+                    AST,
+            )
+            ->build();
     }
 }

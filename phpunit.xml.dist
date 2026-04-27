@@ -30,6 +30,7 @@
 
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>
+            <exclude>tests/phpunit/TestFramework/Coverage/Fixtures</exclude>
         </testsuite>
     </testsuites>
 

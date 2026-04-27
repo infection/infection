@@ -65,9 +65,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
-    private const COVERAGE_DIR_PATH = __DIR__ . '/Fixtures';
+    private const string COVERAGE_DIR_PATH = __DIR__ . '/Fixtures';
 
-    private const JUNIT_PATH = __DIR__ . '/Fixtures/junit.xml';
+    private const string JUNIT_PATH = __DIR__ . '/Fixtures/junit.xml';
 
     public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_junit_report(): void
     {
@@ -146,6 +146,8 @@ final class CoverageCheckerTest extends TestCase
 
     public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_with_junit_report(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $checker = new CoverageChecker(
             false,
             false,
@@ -158,8 +160,6 @@ final class CoverageCheckerTest extends TestCase
         );
 
         $checker->checkCoverageExists();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with_lambda_test_framework_adapter(): void
@@ -250,6 +250,8 @@ final class CoverageCheckerTest extends TestCase
 
     public function test_it_passes_existence_check_if_xml_index_is_present_and_junit_file_is_missing_without_junit_report(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $checker = new CoverageChecker(
             false,
             false,
@@ -262,8 +264,6 @@ final class CoverageCheckerTest extends TestCase
         );
 
         $checker->checkCoverageExists();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_lambda_test_framework_adapter(): void
@@ -360,6 +360,8 @@ final class CoverageCheckerTest extends TestCase
 
     public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_after_tests_run_with_junit_report(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $checker = new CoverageChecker(
             false,
             false,
@@ -375,12 +377,12 @@ final class CoverageCheckerTest extends TestCase
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
             'Ok!',
         );
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_after_tests_run_without_junit_report(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $checker = new CoverageChecker(
             false,
             false,
@@ -396,8 +398,6 @@ final class CoverageCheckerTest extends TestCase
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
             'Ok!',
         );
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_after_tests_run(): void
@@ -472,6 +472,8 @@ final class CoverageCheckerTest extends TestCase
 
     public function test_it_passes_existence_check_if_xml_index_is_found_and_junit_file_is_missing_after_tests_run_without_junit_report(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $checker = new CoverageChecker(
             false,
             false,
@@ -487,8 +489,6 @@ final class CoverageCheckerTest extends TestCase
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
             'Ok!',
         );
-
-        $this->addToAssertionCount(1);
     }
 
     private function requireNoPhpDbg(): void

@@ -39,9 +39,9 @@ use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\file_put_contents;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -61,6 +61,7 @@ class InitialConfigBuilder implements ConfigBuilder
         string $originalXmlConfigContent,
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly XmlConfigurationVersionProvider $versionProvider,
+        private readonly Filesystem $filesystem,
         private readonly array $srcDirs,
         private readonly array $filteredSourceFilesToMutate,
     ) {
@@ -94,7 +95,10 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        file_put_contents($path, $xPath->document->saveXML());
+        $this->filesystem->dumpFile(
+            $path,
+            $xPath->document->saveXML(),
+        );
 
         return $path;
     }
@@ -106,6 +110,22 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
+        if (version_compare($version, '12.0', '>=')) {
+            // For PHPUnit 12.0+, preserve the original coverage configuration as-is.
+            // Otherwise, if the initial tests executed cover code that is outside
+            // configured sources, PHPUnit will fail with a warning.
+            // Historically, this was done for performance reasons, but since then
+            // PHPUnit coverage was reworked and optimised, and there are no more
+            // benefits to doing this.
+            $this->configManipulator->addOrUpdateSourceIncludeNodes(
+                xPath: $xPath,
+                srcDirs: $this->srcDirs,
+                filteredSourceFilesToMutate: [],
+            );
+
+            return;
+        }
+
         if (version_compare($version, '10.1', '>=')) {
             $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 

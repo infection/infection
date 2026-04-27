@@ -39,6 +39,7 @@ use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -80,7 +81,7 @@ use function sys_get_temp_dir;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
-    private const GIT_DEFAULT_BASE = 'test/default';
+    private const string GIT_DEFAULT_BASE = 'test/default';
 
     private const DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
 
@@ -129,6 +130,7 @@ final class ConfigurationFactoryTest extends TestCase
             tmpDir: '',
             phpUnit: new PhpUnit(null, null),
             phpStan: new PhpStan(null, null),
+            mago: new Mago(null, null),
             ignoreMsiWithNoMutations: null,
             minMsi: null,
             minCoveredMsi: null,
@@ -144,7 +146,7 @@ final class ConfigurationFactoryTest extends TestCase
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
 
-        $this->expectExceptionMessage('Expected one of: "phpstan". Got: "non-supported-static-analysis-tool"');
+        $this->expectExceptionMessage('Expected one of: "phpstan", "mago". Got: "non-supported-static-analysis-tool"');
 
         $this
             ->createConfigurationFactory(
@@ -204,6 +206,7 @@ final class ConfigurationFactoryTest extends TestCase
             tmpDir: '',
             phpUnit: new PhpUnit(null, null),
             phpStan: new PhpStan(null, null),
+            mago: new Mago(null, null),
             ignoreMsiWithNoMutations: null,
             minMsi: null,
             minCoveredMsi: null,
@@ -264,6 +267,7 @@ final class ConfigurationFactoryTest extends TestCase
             tmpDir: sys_get_temp_dir() . '/infection',
             phpUnit: new PhpUnit('/path/to', null),
             phpStan: new PhpStan('/path/to', null),
+            mago: new Mago('/path/to', null),
             mutators: self::getDefaultMutators(),
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: null,
@@ -1221,6 +1225,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withTmpDir('config/tmp')
                     ->withPhpUnit(new PhpUnit('config/phpunit-dir', '/path/to/config/phpunit'))
                     ->withPhpStan(new PhpStan('config/phpstan-dir', '/path/to/bin/phpstan'))
+                    ->withMago(new Mago('config/mago-dir', '/path/to/bin/mago'))
                     ->withMutators(['@default' => true])
                     ->withTestFramework('phpunit')
                     ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
@@ -1294,6 +1299,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withTmpDir('/path/to/config/tmp/infection')
                     ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', '/path/to/config/phpunit'))
                     ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'))
+                    ->withMago(new Mago('/path/to/config/mago-dir', '/path/to/bin/mago'))
                     ->withMutators([
                         'TrueValue' => new TrueValue(new TrueValueConfig([])),
                     ])

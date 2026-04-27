@@ -61,11 +61,11 @@ use function str_replace;
 final readonly class TeamCity
 {
     // `|` must be escaped FIRST to avoid double-escaping.
-    private const CHARACTERS_TO_ESCAPE = ['|', "'", "\n", "\r", '[', ']'];
+    private const array CHARACTERS_TO_ESCAPE = ['|', "'", "\n", "\r", '[', ']'];
 
-    private const ESCAPED_CHARACTERS = ['||', "|'", '|n', '|r', '|[', '|]'];
+    private const array ESCAPED_CHARACTERS = ['||', "|'", '|n', '|r', '|[', '|]'];
 
-    private const UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
+    private const string UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
 
     public function __construct(
         private bool $timeoutsAsEscaped,
@@ -138,7 +138,6 @@ final readonly class TeamCity
             $attributes['expected'] = $to;
         }
 
-        /** @psalm-suppress InvalidArgument */
         return $this->write($messageName, $attributes);
     }
 
@@ -164,8 +163,6 @@ final readonly class TeamCity
     }
 
     /**
-     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
-     *
      * @return TestClosingMessage
      */
     private function mapExecutionResultToTestStatus(MutantExecutionResult $executionResult): MessageName
@@ -214,8 +211,6 @@ final readonly class TeamCity
     }
 
     /**
-     * @psalm-suppress InvalidReturnType
-     *
      * @return non-empty-string
      */
     private static function escapeValue(string|int|float $value): string
@@ -237,7 +232,6 @@ final readonly class TeamCity
             );
         }
 
-        /** @psalm-suppress InvalidReturnStatement */
         return $escapedValue;
     }
 }

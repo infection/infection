@@ -37,6 +37,7 @@ namespace Infection\Tests\Testing;
 
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Fixtures\Mutator\CustomNameMutator;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -52,6 +53,7 @@ final class BaseMutatorTestCaseIntegrationTest extends BaseMutatorTestCase
         $this->assertSame('CustomNameMutator', $mutator->getName());
     }
 
+    #[Override]
     protected function getTestedMutatorClassName(): string
     {
         return CustomNameMutator::class;

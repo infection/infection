@@ -52,7 +52,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 #[CoversClass(ConsoleDotLogger::class)]
 final class ConsoleDotLoggerTest extends TestCase
 {
-    private const ANY_PRIME_NUMBER = 127;
+    private const int ANY_PRIME_NUMBER = 127;
 
     public function test_begins_by_displaying_a_legend(): void
     {

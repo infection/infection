@@ -40,6 +40,7 @@ use function array_slice;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 
 /**
@@ -47,7 +48,7 @@ use PhpParser\Node;
  */
 final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
 {
-    private const NON_MUTABLE_ARGS_COUNT = 2;
+    private const int NON_MUTABLE_ARGS_COUNT = 2;
 
     public static function getDefinition(): Definition
     {
@@ -102,6 +103,7 @@ final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_slice(

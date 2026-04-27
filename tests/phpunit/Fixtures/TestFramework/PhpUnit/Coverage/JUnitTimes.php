@@ -37,7 +37,7 @@ namespace Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage;
 
 final class JUnitTimes
 {
-    public const JUNIT_TIMES = [
+    public const array JUNIT_TIMES = [
         670.332214,
         0.219290,
         0.007056,

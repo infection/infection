@@ -47,31 +47,31 @@ final class LogVerbosity
 {
     use CannotBeInstantiated;
 
-    public const DEBUG = 'all';
+    public const string DEBUG = 'all';
 
-    public const NORMAL = 'default';
+    public const string NORMAL = 'default';
 
-    public const NONE = 'none';
-
-    /**
-     * @deprecated
-     */
-    public const DEBUG_INTEGER = 1;
+    public const string NONE = 'none';
 
     /**
      * @deprecated
      */
-    public const NORMAL_INTEGER = 2;
+    public const int DEBUG_INTEGER = 1;
 
     /**
      * @deprecated
      */
-    public const NONE_INTEGER = 3;
+    public const int NORMAL_INTEGER = 2;
+
+    /**
+     * @deprecated
+     */
+    public const int NONE_INTEGER = 3;
 
     /**
      * @var array<int, string>
      */
-    public const ALLOWED_OPTIONS = [
+    public const array ALLOWED_OPTIONS = [
         self::DEBUG_INTEGER => self::DEBUG,
         self::NORMAL_INTEGER => self::NORMAL,
         self::NONE_INTEGER => self::NONE,

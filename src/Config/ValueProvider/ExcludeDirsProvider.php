@@ -58,7 +58,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final readonly class ExcludeDirsProvider
 {
-    public const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
+    public const array EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
 
     public function __construct(
         private ConsoleHelper $consoleHelper,

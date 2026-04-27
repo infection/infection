@@ -42,7 +42,7 @@ use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -288,6 +288,66 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     <include>
                       <directory>src/</directory>
                       <directory>examples/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_keeps_existing_source_include_directories_when_all_files_are_mutated(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <directory>custom-src/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes($xPath, ['src/', 'examples/'], []);
+            },
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <directory>custom-src/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_replaces_existing_source_include_directories_with_files_when_filtered_sources_are_provided(): void
+    {
+        $this->assertItChangesXML(
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <directory>src/</directory>
+                      <directory>examples/</directory>
+                    </include>
+                  </source>
+                </phpunit>
+                XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->addOrUpdateSourceIncludeNodes(
+                    $xPath,
+                    ['src/', 'examples/'],
+                    ['src/File1.php', 'example/File2.php'],
+                );
+            },
+            <<<'XML'
+                <phpunit cacheTokens="true">
+                  <source>
+                    <include>
+                      <file>src/File1.php</file>
+                      <file>example/File2.php</file>
                     </include>
                   </source>
                 </phpunit>
@@ -911,6 +971,8 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(new Filesystem()),
             __DIR__ . '/../../../../..',
@@ -927,8 +989,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
 
         $configManipulator->validate('/path/to/phpunit.xml', $xPath);
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_removes_default_test_suite(): void

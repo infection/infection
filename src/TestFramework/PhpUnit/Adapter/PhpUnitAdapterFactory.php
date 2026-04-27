@@ -40,13 +40,13 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
@@ -97,6 +97,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
+                new Filesystem(),
                 $sourceDirectories,
                 array_map(
                     static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
@@ -108,7 +109,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $testFrameworkConfigContent,
                 $configManipulator,
                 $projectDir,
-                new JUnitTestCaseSorter(),
+                new TestRunOrderResolver(),
+                new Filesystem(),
             ),
             new ArgumentsAndOptionsBuilder(
                 $executeOnlyCoveringTestCases,

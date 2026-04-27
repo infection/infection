@@ -44,9 +44,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CommandLineBuilder::class)]
 final class CommandLineBuilderTest extends TestCase
 {
-    private const PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];
+    private const array PHP_EXTRA_ARGS = ['-d zend_extension=xdebug.so'];
 
-    private const TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=integration'];
+    private const array TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=integration'];
 
     private CommandLineBuilder $commandLineBuilder;
 

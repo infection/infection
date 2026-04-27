@@ -61,7 +61,7 @@ use Symfony\Component\Process\Process;
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {
-    private const SIMULATED_TIME_MICROSECONDS = 1_000;
+    private const int SIMULATED_TIME_MICROSECONDS = 1_000;
 
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
@@ -72,8 +72,6 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(4, 0, $clock);
 
         $runner->run([]);
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_starts_the_given_processes(): void
@@ -631,10 +629,10 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             ),
             [
-                new class($this->createStub(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new readonly class($this->createStub(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
-                        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-                        private readonly Process $nextProcessMock,
+                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+                        private Process $nextProcessMock,
                     ) {
                     }
 

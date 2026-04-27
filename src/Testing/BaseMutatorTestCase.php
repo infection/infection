@@ -45,19 +45,18 @@ use Infection\Framework\Str;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
-use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
+use Psr\Log\NullLogger;
 use function sprintf;
+use Symfony\Component\Console\Output\NullOutput;
 use Throwable;
 use function token_get_all;
 use const TOKEN_PARSE;
@@ -65,7 +64,7 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
-    private const WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
+    private const string WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
 
     protected Mutator $mutator;
 
@@ -240,21 +239,26 @@ abstract class BaseMutatorTestCase extends TestCase
                 mutators: [$this->createMutator($settings)],
                 filePath: '/path/to/test-file.php',
                 fileNodes: $nodes,
-                trace: new EmptyTrace(
-                    new MockSplFileInfo('/path/to/test-file.php'),
-                ),
-                onlyCovered: false,
-                lineRangeCalculator: new LineRangeCalculator(),
-                sourceLineMatcher: new NullSourceLineMatcher(),
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $code,
             ),
         );
 
-        $factory = new NodeTraverserFactory();
+        $factory = SingletonContainer::getContainer()
+            ->withValues(
+                logger: new NullLogger(),
+                output: new NullOutput(),
+                withUncovered: true,
+            )
+            ->getNodeTraverserFactory();
+
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
         $factory
-            ->createEnrichmentTraverser()
+            ->createEnrichmentTraverser(
+                $sourceFile,
+                new EmptyTrace($sourceFile),
+            )
             ->traverse($nodes);
 
         $factory

@@ -41,11 +41,11 @@ use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\file_put_contents;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /**
@@ -62,7 +62,8 @@ class MutationConfigBuilder extends ConfigBuilder
         private readonly string $originalXmlConfigContent,
         private readonly XmlConfigurationManipulator $configManipulator,
         private readonly string $projectDir,
-        private readonly JUnitTestCaseSorter $jUnitTestCaseSorter,
+        private readonly TestRunOrderResolver $testRunOrderResolver,
+        private readonly Filesystem $filesystem,
     ) {
     }
 
@@ -105,7 +106,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
         $this->setFilteredTestsToRun($tests, $xPath);
 
-        file_put_contents(
+        $this->filesystem->dumpFile(
             $customAutoloadFilePath,
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
@@ -116,7 +117,10 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $path = $this->buildPath($mutationHash);
 
-        file_put_contents($path, $xPath->document->saveXML());
+        $this->filesystem->dumpFile(
+            $path,
+            $xPath->document->saveXML(),
+        );
 
         return $path;
     }
@@ -124,7 +128,6 @@ class MutationConfigBuilder extends ConfigBuilder
     private function getXPath(): SafeDOMXPath
     {
         if ($this->xPath === null) {
-            /** @psalm-suppress InaccessibleProperty */
             $this->xPath = SafeDOMXPath::fromString(
                 $this->originalXmlConfigContent,
                 preserveWhiteSpace: false,
@@ -235,12 +238,12 @@ class MutationConfigBuilder extends ConfigBuilder
         $testSuite = $xPath->document->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
-        $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($tests);
+        $orderedTestFilePaths = $this->testRunOrderResolver->resolve($tests);
 
-        foreach ($uniqueTestFilePaths as $testFilePath) {
-            $file = $xPath->document->createElement('file', $testFilePath);
+        foreach ($orderedTestFilePaths as $testFilePath) {
+            $fileElement = $xPath->document->createElement('file', $testFilePath);
 
-            $testSuite->appendChild($file);
+            $testSuite->appendChild($fileElement);
         }
 
         Assert::isInstanceOf($nodeToAppendTestSuite, DOMNode::class);

@@ -44,7 +44,7 @@ use Symfony\Component\Filesystem\Path;
  */
 final readonly class GitHubAnnotationsReporter implements LineMutationTestingResultsReporter
 {
-    public const DEFAULT_OUTPUT = 'php://stdout';
+    public const string DEFAULT_OUTPUT = 'php://stdout';
 
     public function __construct(
         private ResultsCollector $resultsCollector,

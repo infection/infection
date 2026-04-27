@@ -46,9 +46,9 @@ use PhpParser\Node\Name;
  */
 final readonly class ReturnTypeHelper
 {
-    private const VOID = 'void';
+    private const string VOID = 'void';
 
-    private const NULL = 'null';
+    private const string NULL = 'null';
 
     private Identifier|Name|ComplexType|null $returnType;
 

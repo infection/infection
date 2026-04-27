@@ -1,0 +1,25 @@
+FROM docker/sandbox-templates:codex-docker
+
+ARG PHP_VERSION=8.4
+
+# The base image runs as the non-root `agent` user by default.
+# Switch to root for all system-level package installations.
+USER root
+
+# PHP
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    set -o errexit -o nounset -o pipefail \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        # CLI SAPI
+        php${PHP_VERSION}-cli \
+        # Extensions used by infection to not have to rely on polyfills
+        php${PHP_VERSION}-mbstring \
+        php${PHP_VERSION}-xml \
+        php${PHP_VERSION}-zip \
+    && rm -rf /tmp/*
+
+COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
+
+# Restore the default non-root user that the sandbox agent runs as.
+USER agent
