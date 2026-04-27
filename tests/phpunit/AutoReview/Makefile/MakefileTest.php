@@ -261,8 +261,10 @@ final class MakefileTest extends BaseMakefileTestCase
 
             [33mcompile:[0m	 	 Bundles Infection into a PHAR
             [33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
+            [33msbx-image-build:[0m	 Builds the PHP sbx image
+            [33msbx-image-test:[0m	 Verifies the PHP sbx image contains the expected tooling
             [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
-            [33mcs-docker:[0m	  	 	 Runs PHP-CS-Fixer in docker
+            [33mcs-docker:[0m		 Runs PHP-CS-Fixer in docker
             [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
             [33mprofile:[0m 	 	 Runs Blackfire
             [33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)

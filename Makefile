@@ -65,6 +65,22 @@ compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_82) make compile
 
+.PHONY: sbx-image-build
+sbx-image-build:	## Builds the PHP sbx image
+sbx-image-build:
+	./devTools/sbx/build-image.sh
+	./devTools/sbx/load-template.sh
+
+.PHONY: _sbx-image-build
+_sbx-image-build:
+	FORCE_REBUILD=1 ./devTools/sbx/build-image.sh
+	./devTools/sbx/load-template.sh
+
+.PHONY: sbx-image-test
+sbx-image-test:	## Verifies the PHP sbx image contains the expected tooling
+sbx-image-test:
+	container-structure-test test --image=infection-sbx-php-8.4:latest --config=./devTools/sbx/test.yaml
+
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
@@ -77,7 +93,7 @@ cs: $(PHP_CS_FIXER)
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: cs-docker
-cs-docker:	  	 	## Runs PHP-CS-Fixer in docker
+cs-docker:		## Runs PHP-CS-Fixer in docker
 cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
 	$(DOCKER_RUN_82) $(PHP_CS_FIXER) fix -v --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
