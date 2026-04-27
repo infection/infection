@@ -2599,18 +2599,6 @@ message = "Invalid key type yielded; expected `string`, but found `null|string`.
 count = 8
 
 [[issues]]
-file = "src/Reporter/GitHubAnnotationsReporter.php"
-code = "possibly-null-argument"
-message = 'Argument #2 of method `Symfony\Component\Filesystem\Path::makeRelative` is possibly `null`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "src/Reporter/GitLabCodeQualityReporter.php"
-code = "possibly-null-argument"
-message = 'Argument #2 of method `Symfony\Component\Filesystem\Path::makeRelative` is possibly `null`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
 file = "src/Reporter/Html/StrykerHtmlReportBuilder.php"
 code = "imprecise-type"
 message = "Type `array` in return type of `build` is imprecise, equivalent to `array<array-key, mixed>`."
@@ -5842,6 +5830,18 @@ count = 1
 file = "tests/phpunit/Configuration/Entry/StrykerConfigTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `branch_names_to_be_matched` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ProjectDirectoryProvider/ChainProjectDirectoryProviderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `providerProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ProjectDirectoryProvider/EnvironmentVariableBasedProjectDirectoryProviderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `directoryProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -10185,12 +10185,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/PhpParser/Visitor/FullyQualifiedClassNameManipulatorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\FullyQualifiedClassNameManipulatorTest::getFqcns`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Visitor/FullyQualifiedClassNameManipulatorTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\PotentialCircularDependencyDetected` in `Infection\Tests\PhpParser\Visitor\FullyQualifiedClassNameManipulatorTest::test_it_annotates_the_resolved_node_names`.'
 count = 1
 
@@ -10869,7 +10863,7 @@ count = 2
 [[issues]]
 file = "tests/phpunit/Reporter/FileReporterFactoryTest.php"
 code = "mixed-return-statement"
-message = "Could not infer a precise return type for function `4956218244184757662:10498`. Saw type `mixed`."
+message = "Could not infer a precise return type for function `4956218244184757662:10512`. Saw type `mixed`."
 count = 1
 
 [[issues]]

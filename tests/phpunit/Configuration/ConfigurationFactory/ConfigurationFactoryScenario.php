@@ -696,7 +696,7 @@ final class ConfigurationFactoryScenario
     /**
      * @param non-empty-string|null $projectDirectoryInput
      * @param non-empty-string|null $resolvedProjectDirectory
-     * @param non-empty-string $expected
+     * @param non-empty-string|Exception $expected
      */
     public function forProjectDirectory(
         ?string $projectDirectoryInput,

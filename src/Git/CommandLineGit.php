@@ -52,6 +52,7 @@ use function Safe\preg_split;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -149,6 +150,12 @@ final readonly class CommandLineGit implements Git
         return $base;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
+     */
     public function getProjectDirectory(): string
     {
         // An error here should really not happen, so we are fine to let it

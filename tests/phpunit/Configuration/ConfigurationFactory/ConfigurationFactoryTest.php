@@ -83,7 +83,7 @@ final class ConfigurationFactoryTest extends TestCase
 {
     private const string GIT_DEFAULT_BASE = 'test/default';
 
-    private const DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
+    private const string DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
 
     /**
      * @var array<string, Mutator>|null
