@@ -2,10 +2,14 @@ name: Docker
 
 on:
   pull_request:
+    paths:
+      - Makefile
+      - devTools/sbx/**
   push:
     branches:
       - main
       - master
+  release:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

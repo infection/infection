@@ -16,8 +16,18 @@ if [[ "${FORCE_REBUILD:-}" != "1" ]] && tar_matches_cache; then
 fi
 
 save_image() {
+    local container_structure_test_options
+
+    container_structure_test_options=()
+
+    if [[ -n "${IMAGE_PLATFORM:-}" ]]; then
+        container_structure_test_options+=(
+            --platform="${IMAGE_PLATFORM}"
+        )
+    fi
+
     set -x
-    container-structure-test test --image="${IMAGE_REF}" --config="${TEST_CONFIG}"
+    container-structure-test test "${container_structure_test_options[@]}" --image="${IMAGE_REF}" --config="${TEST_CONFIG}"
     rm -f "${IMAGE_TAR_TMP}"
     docker save --output="${IMAGE_TAR_TMP}" "${IMAGE_REF}"
     mv "${IMAGE_TAR_TMP}" "${IMAGE_TAR}"
