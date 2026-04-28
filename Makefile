@@ -142,6 +142,7 @@ validate:
 profile: 	 	## Runs Blackfire
 profile:
 	$(MAKE) profile_mutation_generator
+	$(MAKE) profile_ast_processing
 	$(MAKE) profile_parse_git_diff
 	$(MAKE) profile_tracing
 
@@ -164,10 +165,25 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 		php tests/benchmark/MutationGenerator/profile.php
 	composer dump
 
+.PHONY: profile_ast_processing
+profile_ast_processing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	blackfire run \
+		--title="AstProcessing" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/AstProcessing/profile.php
+	composer dump
+
 .PHONY: benchmark_mutation_generator
 benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
 	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: benchmark_ast_processing
+benchmark_ast_processing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/AstProcessing $(PHPBENCH_REPORTS)
 	composer dump
 
 .PHONY: profile_parse_git_diff

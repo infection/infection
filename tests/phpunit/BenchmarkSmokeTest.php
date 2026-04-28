@@ -107,6 +107,19 @@ final class BenchmarkSmokeTest extends TestCase
                 STDOUT,
         ];
 
+        yield 'AstProcessing' => [
+            [
+                Path::canonicalize(self::BENCHMARK_DIR . '/AstProcessing/profile.php'),
+                '--max-node-count=1',
+                '--debug',
+            ],
+            self::BENCHMARK_DIR . '/Tracing/coverage',
+            <<<'STDOUT'
+                1 node(s) entered.
+
+                STDOUT,
+        ];
+
         yield 'ParseGitDiff' => [
             [
                 Path::canonicalize(self::BENCHMARK_DIR . '/ParseGitDiff/profile.php'),
