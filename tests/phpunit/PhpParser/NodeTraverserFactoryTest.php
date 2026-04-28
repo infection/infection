@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ContainsEligibleNodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
@@ -46,6 +47,7 @@ use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\SkipNodesWithoutEligibleNodeVisitor;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
@@ -105,7 +107,10 @@ final class NodeTraverserFactoryTest extends TestCase
 
         yield 'without only covered' => [
             false,
-            $baseVisitors,
+            [
+                ...$baseVisitors,
+                ContainsEligibleNodeVisitor::class,
+            ],
         ];
 
         yield 'with only covered' => [
@@ -113,6 +118,7 @@ final class NodeTraverserFactoryTest extends TestCase
             [
                 ...$baseVisitors,
                 ExcludeUntestedNodesVisitor::class,
+                ContainsEligibleNodeVisitor::class,
             ],
         ];
     }
@@ -126,6 +132,7 @@ final class NodeTraverserFactoryTest extends TestCase
         $this->assertTraverserVisitorsAre(
             $traverser,
             [
+                SkipNodesWithoutEligibleNodeVisitor::class,
                 CloningVisitor::class,
                 FakeVisitor::class,
             ],

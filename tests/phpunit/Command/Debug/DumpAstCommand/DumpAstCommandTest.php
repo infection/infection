@@ -74,9 +74,43 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
     public static function astProvider(): iterable
     {
+        yield 'hides ineligible nodes by default' => [
+            __DIR__ . '/EchoGreeter.php',
+            [],
+            <<<'AST'
+                array(
+                    0: <skipped>
+                    1: Stmt_Namespace(
+                        name: <skipped>
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: <skipped>
+                                implements: array(
+                                    0: <skipped>
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                        returnType: Identifier
+                                        stmts: array(
+                                            0: Stmt_Echo(
+                                                exprs: array(
+                                                    0: Scalar_String
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+                AST,
+        ];
+
         yield [
             __DIR__ . '/Greeter.php',
-            [],
+            ['--show-ineligible-nodes' => null],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -107,7 +141,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
         yield [
             __DIR__ . '/EchoGreeter.php',
-            [],
+            ['--show-ineligible-nodes' => null],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
@@ -148,57 +182,60 @@ final class DumpAstCommandTest extends FileSystemTestCase
 
         yield 'with attributes' => [
             __DIR__ . '/EchoGreeter.php',
-            ['--show-attributes' => null],
+            [
+                '--show-attributes' => null,
+                '--show-ineligible-nodes' => null,
+            ],
             <<<'AST'
                 array(
                     0: Stmt_Declare(
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
+                                    containsEligibleNode: false
                                     eligible: false
                                     nodeId: 2
-                                    origNode: nodeId(2)
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
+                                    containsEligibleNode: false
                                     eligible: false
                                     kind: KIND_DEC (10)
                                     nodeId: 3
-                                    origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                 )
+                                containsEligibleNode: false
                                 eligible: false
                                 nodeId: 1
-                                origNode: nodeId(1)
                                 parent: nodeId(0)
                             )
                         )
+                        containsEligibleNode: false
                         eligible: false
                         next: nodeId(4)
                         nodeId: 0
-                        origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
+                            containsEligibleNode: false
                             eligible: false
                             nodeId: 5
-                            origNode: nodeId(5)
                             parent: nodeId(4)
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
+                                    containsEligibleNode: false
                                     eligible: false
                                     nodeId: 7
-                                    origNode: nodeId(7)
                                     parent: nodeId(6)
                                 )
                                 implements: array(
                                     0: Name(
+                                        containsEligibleNode: false
                                         eligible: false
                                         nodeId: 8
-                                        origNode: nodeId(8)
                                         parent: nodeId(6)
                                         resolvedName: FullyQualified(Infection\Tests\Command\Debug\DumpAstCommand\Greeter)
                                     )
@@ -206,6 +243,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
+                                            containsEligibleNode: true
                                             eligible: true
                                             functionName: greet
                                             functionScope: nodeId(9)
@@ -218,6 +256,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             tests: Closure
                                         )
                                         returnType: Identifier(
+                                            containsEligibleNode: true
                                             eligible: true
                                             functionName: greet
                                             functionScope: nodeId(9)
@@ -233,6 +272,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             0: Stmt_Echo(
                                                 exprs: array(
                                                     0: Scalar_String(
+                                                        containsEligibleNode: true
                                                         eligible: true
                                                         functionName: greet
                                                         functionScope: nodeId(9)
@@ -247,6 +287,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                         tests: Closure
                                                     )
                                                 )
+                                                containsEligibleNode: true
                                                 eligible: true
                                                 functionName: greet
                                                 functionScope: nodeId(9)
@@ -259,6 +300,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                 tests: Closure
                                             )
                                         )
+                                        containsEligibleNode: true
                                         eligible: true
                                         functionName: greet
                                         isOnFunctionSignature: true
@@ -270,12 +312,14 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                         tests: Closure
                                     )
                                 )
+                                containsEligibleNode: true
                                 eligible: false
                                 nodeId: 6
                                 origNode: nodeId(6)
                                 parent: nodeId(4)
                             )
                         )
+                        containsEligibleNode: true
                         eligible: false
                         kind: 1
                         next: nodeId(6)
@@ -290,6 +334,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
             __DIR__ . '/EchoGreeter.php',
             [
                 '--changed-lines-ranges' => null,
+                '--show-ineligible-nodes' => null,
             ],
             <<<'AST'
                 array(
@@ -297,63 +342,63 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
+                                    containsEligibleNode: false
                                     eligible: false
                                     endLine: 34
                                     nodeId: 2
-                                    origNode: nodeId(2)
                                     parent: nodeId(1)
                                     startLine: 34
                                 )
                                 value: Scalar_Int(
+                                    containsEligibleNode: false
                                     eligible: false
                                     endLine: 34
                                     kind: KIND_DEC (10)
                                     nodeId: 3
-                                    origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                     startLine: 34
                                 )
+                                containsEligibleNode: false
                                 eligible: false
                                 endLine: 34
                                 nodeId: 1
-                                origNode: nodeId(1)
                                 parent: nodeId(0)
                                 startLine: 34
                             )
                         )
+                        containsEligibleNode: false
                         eligible: false
                         endLine: 34
                         next: nodeId(4)
                         nodeId: 0
-                        origNode: nodeId(0)
                         startLine: 34
                     )
                     1: Stmt_Namespace(
                         name: Name(
+                            containsEligibleNode: false
                             eligible: false
                             endLine: 36
                             nodeId: 5
-                            origNode: nodeId(5)
                             parent: nodeId(4)
                             startLine: 36
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
+                                    containsEligibleNode: false
                                     eligible: false
                                     endLine: 38
                                     nodeId: 7
-                                    origNode: nodeId(7)
                                     parent: nodeId(6)
                                     startLine: 38
                                 )
                                 implements: array(
                                     0: Name(
+                                        containsEligibleNode: false
                                         eligible: false
                                         endLine: 38
                                         nodeId: 8
-                                        origNode: nodeId(8)
                                         parent: nodeId(6)
                                         resolvedName: FullyQualified(Infection\Tests\Command\Debug\DumpAstCommand\Greeter)
                                         startLine: 38
@@ -362,6 +407,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
+                                            containsEligibleNode: false
                                             eligible: false
                                             endLine: 40
                                             functionName: greet
@@ -369,12 +415,12 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             nodeId: 10
-                                            origNode: nodeId(10)
                                             parent: nodeId(9)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             startLine: 40
                                         )
                                         returnType: Identifier(
+                                            containsEligibleNode: false
                                             eligible: false
                                             endLine: 40
                                             functionName: greet
@@ -382,7 +428,6 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             nodeId: 11
-                                            origNode: nodeId(11)
                                             parent: nodeId(9)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             startLine: 40
@@ -391,6 +436,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             0: Stmt_Echo(
                                                 exprs: array(
                                                     0: Scalar_String(
+                                                        containsEligibleNode: false
                                                         eligible: false
                                                         endLine: 42
                                                         functionName: greet
@@ -399,13 +445,13 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                         isStrictTypes: true
                                                         kind: KIND_SINGLE_QUOTED (1)
                                                         nodeId: 13
-                                                        origNode: nodeId(13)
                                                         parent: nodeId(12)
                                                         rawValue: 'Hello world!'
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         startLine: 42
                                                     )
                                                 )
+                                                containsEligibleNode: false
                                                 eligible: false
                                                 endLine: 42
                                                 functionName: greet
@@ -413,38 +459,37 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                 isInsideFunction: true
                                                 isStrictTypes: true
                                                 nodeId: 12
-                                                origNode: nodeId(12)
                                                 parent: nodeId(9)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 startLine: 42
                                             )
                                         )
+                                        containsEligibleNode: false
                                         eligible: false
                                         endLine: 43
                                         functionName: greet
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
                                         nodeId: 9
-                                        origNode: nodeId(9)
                                         parent: nodeId(6)
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         startLine: 40
                                     )
                                 )
+                                containsEligibleNode: false
                                 eligible: false
                                 endLine: 44
                                 nodeId: 6
-                                origNode: nodeId(6)
                                 parent: nodeId(4)
                                 startLine: 38
                             )
                         )
+                        containsEligibleNode: false
                         eligible: false
                         endLine: 44
                         kind: 1
                         next: nodeId(6)
                         nodeId: 4
-                        origNode: nodeId(4)
                         startLine: 36
                     )
                 )
@@ -455,6 +500,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
             __DIR__ . '/EchoGreeter.php',
             [
                 '--changed-lines-ranges' => '42:42,40:42',
+                '--show-ineligible-nodes' => null,
             ],
             <<<'AST'
                 array(
@@ -462,63 +508,63 @@ final class DumpAstCommandTest extends FileSystemTestCase
                         declares: array(
                             0: DeclareItem(
                                 key: Identifier(
+                                    containsEligibleNode: false
                                     eligible: false
                                     endLine: 34
                                     nodeId: 2
-                                    origNode: nodeId(2)
                                     parent: nodeId(1)
                                     startLine: 34
                                 )
                                 value: Scalar_Int(
+                                    containsEligibleNode: false
                                     eligible: false
                                     endLine: 34
                                     kind: KIND_DEC (10)
                                     nodeId: 3
-                                    origNode: nodeId(3)
                                     parent: nodeId(1)
                                     rawValue: 1
                                     startLine: 34
                                 )
+                                containsEligibleNode: false
                                 eligible: false
                                 endLine: 34
                                 nodeId: 1
-                                origNode: nodeId(1)
                                 parent: nodeId(0)
                                 startLine: 34
                             )
                         )
+                        containsEligibleNode: false
                         eligible: false
                         endLine: 34
                         next: nodeId(4)
                         nodeId: 0
-                        origNode: nodeId(0)
                         startLine: 34
                     )
                     1: Stmt_Namespace(
                         name: Name(
+                            containsEligibleNode: false
                             eligible: false
                             endLine: 36
                             nodeId: 5
-                            origNode: nodeId(5)
                             parent: nodeId(4)
                             startLine: 36
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
+                                    containsEligibleNode: false
                                     eligible: false
                                     endLine: 38
                                     nodeId: 7
-                                    origNode: nodeId(7)
                                     parent: nodeId(6)
                                     startLine: 38
                                 )
                                 implements: array(
                                     0: Name(
+                                        containsEligibleNode: false
                                         eligible: false
                                         endLine: 38
                                         nodeId: 8
-                                        origNode: nodeId(8)
                                         parent: nodeId(6)
                                         resolvedName: FullyQualified(Infection\Tests\Command\Debug\DumpAstCommand\Greeter)
                                         startLine: 38
@@ -527,6 +573,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
+                                            containsEligibleNode: true
                                             eligible: true
                                             endLine: 40
                                             functionName: greet
@@ -541,6 +588,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             tests: Closure
                                         )
                                         returnType: Identifier(
+                                            containsEligibleNode: true
                                             eligible: true
                                             endLine: 40
                                             functionName: greet
@@ -558,6 +606,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                             0: Stmt_Echo(
                                                 exprs: array(
                                                     0: Scalar_String(
+                                                        containsEligibleNode: true
                                                         eligible: true
                                                         endLine: 42
                                                         functionName: greet
@@ -574,6 +623,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                         tests: Closure
                                                     )
                                                 )
+                                                containsEligibleNode: true
                                                 eligible: true
                                                 endLine: 42
                                                 functionName: greet
@@ -588,6 +638,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                                 tests: Closure
                                             )
                                         )
+                                        containsEligibleNode: true
                                         eligible: true
                                         endLine: 43
                                         functionName: greet
@@ -601,6 +652,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                         tests: Closure
                                     )
                                 )
+                                containsEligibleNode: true
                                 eligible: false
                                 endLine: 44
                                 nodeId: 6
@@ -609,6 +661,7 @@ final class DumpAstCommandTest extends FileSystemTestCase
                                 startLine: 38
                             )
                         )
+                        containsEligibleNode: true
                         eligible: false
                         endLine: 44
                         kind: 1

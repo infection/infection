@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ContainsEligibleNodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
 use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
@@ -47,6 +48,7 @@ use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\SkipNodesWithoutEligibleNodeVisitor;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -104,12 +106,15 @@ readonly class NodeTraverserFactory
             $visitors[] = new ExcludeUntestedNodesVisitor();
         }
 
+        $visitors[] = new ContainsEligibleNodeVisitor();
+
         return new NodeTraverser(...$visitors);
     }
 
     public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
         return new NodeTraverser(
+            new SkipNodesWithoutEligibleNodeVisitor(),
             new NodeVisitor\CloningVisitor(),
             $mutationVisitor,
         );

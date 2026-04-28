@@ -72,6 +72,8 @@ final class DumpAstCommand extends BaseCommand
 
     private const string SHOW_ATTRIBUTES = 'show-attributes';
 
+    private const string SHOW_INELIGIBLE_NODES = 'show-ineligible-nodes';
+
     private const string CHANGED_LINES_RANGES = 'changed-lines-ranges';
 
     private const int CHANGED_LINES_PARTS_COUNT = 2;
@@ -106,6 +108,12 @@ final class DumpAstCommand extends BaseCommand
             'Show all the attributes',
         );
         $this->addOption(
+            self::SHOW_INELIGIBLE_NODES,
+            null,
+            InputOption::VALUE_NONE,
+            'Show AST branches that do not contain eligible nodes.',
+        );
+        $this->addOption(
             self::CHANGED_LINES_RANGES,
             null,
             InputOption::VALUE_OPTIONAL,
@@ -122,6 +130,7 @@ final class DumpAstCommand extends BaseCommand
     {
         $file = $this->getFile($io);
         $shouldShowAttributes = self::shouldShowAttributes($io);
+        $shouldShowIneligibleNodes = self::shouldShowIneligibleNodes($io);
         $changedLinesRanges = self::getChangedLinesRanges($io);
         $hasChangedLines = $changedLinesRanges !== null;
         $configFile = ConfigurationOption::get($io);
@@ -141,6 +150,7 @@ final class DumpAstCommand extends BaseCommand
             $container->getNodeDumper()->dump(
                 $nodes,
                 dumpOtherAttributes: $shouldShowAttributes || $hasChangedLines,
+                onlyVisitedNodes: !$shouldShowIneligibleNodes,
                 decorateNodes: $io->isDecorated(),
                 showLineNumbers: $hasChangedLines,
             ),
@@ -207,6 +217,11 @@ final class DumpAstCommand extends BaseCommand
     private static function shouldShowAttributes(IO $io): bool
     {
         return (bool) $io->getInput()->getOption(self::SHOW_ATTRIBUTES);
+    }
+
+    private static function shouldShowIneligibleNodes(IO $io): bool
+    {
+        return (bool) $io->getInput()->getOption(self::SHOW_INELIGIBLE_NODES);
     }
 
     /**
