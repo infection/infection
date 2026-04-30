@@ -13,7 +13,6 @@
 /.tools/
 /build/
 /devTools/Docker*.json
-/devTools/sbx/codex-config.toml
 /dist/
 /infection-cache
 /infection.log
