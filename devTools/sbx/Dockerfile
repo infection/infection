@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
 
-ENV NO_PROXY='host.docker.internal,169.254.1.1,localhost,127.0.0.1,::1,gateway.docker.internal'
+ENV NO_PROXY="${NO_PROXY:+${NO_PROXY},}host.docker.internal,169.254.1.1,localhost,127.0.0.1,::1,gateway.docker.internal"
 ENV no_proxy="$NO_PROXY"
 
 # Restore the default non-root user that the sandbox agent runs as.

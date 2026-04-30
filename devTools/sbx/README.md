@@ -17,9 +17,9 @@ cp devTools/sbx/config.toml.dist .codex/config.toml
 
 The provided template assumes the OTLP gRPC collector is reachable from
 the sandbox at `http://host.docker.internal:4317`. If it runs elsewhere,
-update `codex-config.toml`.
+update `.codex/config.toml`.
 
-Note that depending of the port used or your network policies, the connection
+Note that depending on the port used or your network policies, the connection
 to the host may be denied. For example, with the value above, you will need to
 execute:
 
