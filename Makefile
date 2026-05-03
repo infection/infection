@@ -37,7 +37,6 @@ INFECTION=./dist/infection.phar
 DOCKER_RUN=docker compose run --rm
 DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
-SBX_IMAGE=infection-sbx-php-8.4:latest
 
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
@@ -80,12 +79,7 @@ _sbx-image-build:
 .PHONY: sbx-image-test
 sbx-image-test:	## Verifies the PHP sbx image contains the expected tooling
 sbx-image-test:
-	docker run --rm \
-		--user=root \
-		--volume=/var/run/docker.sock:/var/run/docker.sock \
-		--volume="$$(pwd)/devTools/sbx/test.yaml:/tmp/container-structure-test.yaml:ro" \
-		$(SBX_IMAGE) \
-		container-structure-test test --image=$(SBX_IMAGE) --config=/tmp/container-structure-test.yaml
+	container-structure-test test --image=infection-sbx-php-8.4:latest --config=./devTools/sbx/test.yaml
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
