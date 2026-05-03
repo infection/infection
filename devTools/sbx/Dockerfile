@@ -17,10 +17,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         php${PHP_VERSION}-mbstring \
         php${PHP_VERSION}-xml \
         php${PHP_VERSION}-zip \
+        # Coverage driver
+        php${PHP_VERSION}-xdebug \
         # CA bundle used by curl/PIE for HTTPS downloads
         ca-certificates \
         # Downloads the PIE PHAR during image build
         curl \
+    && echo 'xdebug.mode=coverage' > /etc/php/${PHP_VERSION}/cli/conf.d/xdebug.ini \
     && rm -rf /tmp/*
 
 COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
