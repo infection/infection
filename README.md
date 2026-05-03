@@ -29,6 +29,8 @@ Want your logo here? [Learn more »](https://infection.github.io/guide/github-sp
 <a href="https://github.com/wwwoda" target="_blank"><img src="https://avatars.githubusercontent.com/u/37436231?s=200&v=4" style="vertical-align: middle;" width="45" height="45" /></a>
 <a href="https://github.com/Enrise" target="_blank"><img src="https://github.com/enrise/.github/raw/master/images/logo.png?raw=true" style="vertical-align: middle;" width="90" height="45" /></a>
 <a href="https://jetbrains.com" target="_blank"><img title="JetBrains - free licenses for core developers" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.png" style="vertical-align: middle;" width="209" height="45" /></a>
+<a href="https://sentry.io" target="_blank"><img src="doc/assets/sentry.png" style="vertical-align: middle;" width="151" height="45" /></a>
+<a href="https://tideways.com" target="_blank"><img src="doc/assets/tideways-logo.png" style="vertical-align: middle;" width="149" height="45" /></a>
 
 #### Individuals
 

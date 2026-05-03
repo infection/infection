@@ -2587,6 +2587,18 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\R
 count = 1
 
 [[issues]]
+file = "src/Report/Framework/Writer/StreamWriter.php"
+code = "match-arm-always-true"
+message = "This match arm is always true, making subsequent arms unreachable."
+count = 1
+
+[[issues]]
+file = "src/Report/Framework/Writer/StreamWriter.php"
+code = "unreachable-match-default-arm"
+message = "This default arm is unreachable."
+count = 1
+
+[[issues]]
 file = "src/Reporter/BaseTextFileReporter.php"
 code = "less-specific-argument"
 message = 'Argument type mismatch for argument #1 of `Infection\Reporter\BaseTextFileReporter::getMutatorLine`: expected `int`, but provided type `array-key` is less specific.'
@@ -10786,6 +10798,30 @@ count = 1
 file = "tests/phpunit/Reflection/ContainerReflection.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Reflection\ContainerReflection::iterateExpectedConcreteServices`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Report/Framework/Writer/FileWriterTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `contentsOrLinesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Report/Framework/Writer/FileWriterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Report\Framework\Writer\FileWriterTest::test_it_can_write_contents_or_lines_to_the_file`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Report/Framework/Writer/StreamWriterTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `streamProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Report/Framework/Writer/StreamWriterTest.php"
+code = "invalid-argument"
+message = '''Invalid argument type for argument #1 of `Infection\Report\Framework\Writer\StreamWriter::createForStream`: expected `string('php://stderr')|string('php://stdout')`, but found `string('/path/to/file.log')`.'''
 count = 1
 
 [[issues]]
