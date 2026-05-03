@@ -54,31 +54,6 @@ jobs:
       - name: Expose GitHub runtime for Buildx cache
         uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
 
-      - name: Cache container-structure-test
-        id: container-structure-test-cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: .tools/container-structure-test
-          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
-
-      - name: Install container-structure-test
-        if: steps.container-structure-test-cache.outputs.cache-hit != 'true'
-        run: |
-          curl --location --fail --show-error --silent \
-            --output .tools/container-structure-test \
-            "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-amd64"
-          chmod +x .tools/container-structure-test
-
-      - name: Register container-structure-test
-        run: echo "${GITHUB_WORKSPACE}/.tools" >> "${GITHUB_PATH}"
-
-        # This needs to be done even on cache hit as the permissions are not preserved.
-      - name: Ensures container-structure-test is executable
-        run: chmod +x .tools/container-structure-test
-
-      - name: Ensures container-structure-test works
-        run: container-structure-test version
-
       - name: Build and test the Docker sandbox image
         run: ./devTools/sbx/build-image.sh
 

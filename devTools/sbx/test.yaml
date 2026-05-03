@@ -17,9 +17,14 @@ commandTests:
         args: ["--version"]
         exitCode: 0
 
-    - name: "Container runs as agent user"
-      command: "whoami"
-      expectedOutput: ["(?m)^agent$"]
+    -   name: "container-structure-test is executable"
+        command: "container-structure-test"
+        args: ["version"]
+        exitCode: 0
+
+    -   name: "Container runs as agent user"
+        command: "whoami"
+        expectedOutput: ["(?m)^agent$"]
 
 globalEnvVars:
     -   key: "SHELL"

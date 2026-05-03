@@ -17,17 +17,28 @@ fi
 
 save_image() {
     local container_structure_test_options
+    local docker_run_options
 
     container_structure_test_options=()
+    docker_run_options=(
+        --rm
+        --user=root
+        --volume=/var/run/docker.sock:/var/run/docker.sock
+        --volume="${TEST_CONFIG}:/tmp/container-structure-test.yaml:ro"
+    )
 
     if [[ -n "${IMAGE_PLATFORM:-}" ]]; then
+        docker_run_options+=(
+            --platform="${IMAGE_PLATFORM}"
+        )
         container_structure_test_options+=(
             --platform="${IMAGE_PLATFORM}"
         )
     fi
 
     set -x
-    container-structure-test test "${container_structure_test_options[@]}" --image="${IMAGE_REF}" --config="${TEST_CONFIG}"
+    docker run "${docker_run_options[@]}" "${IMAGE_REF}" \
+        container-structure-test test "${container_structure_test_options[@]}" --image="${IMAGE_REF}" --config=/tmp/container-structure-test.yaml
     rm -f "${IMAGE_TAR_TMP}"
     docker save --output="${IMAGE_TAR_TMP}" "${IMAGE_REF}"
     mv "${IMAGE_TAR_TMP}" "${IMAGE_TAR}"
@@ -75,15 +86,6 @@ if [[ -n "${IMAGE_CACHE_TO:-}" ]]; then
     )
 fi
 
-if ! command -v container-structure-test >/dev/null 2>&1; then
-    cat >&2 <<'EOF'
-container-structure-test is required to verify the Docker sandbox image, but it was not found in PATH.
-
-https://github.com/GoogleContainerTools/container-structure-test
-EOF
-    exit 1
-fi
-
 if [[ "${FORCE_REBUILD:-}" != "1" ]] && image_matches_cache; then
     printf 'Using cached sbx image: %s\n' "${IMAGE_REF}"
     save_image
@@ -94,6 +96,7 @@ set -x
 "${DOCKER_BUILD_COMMAND[@]}" \
     "${DOCKER_BUILD_CACHE_OPTIONS[@]}" \
     --build-arg="PHP_VERSION=${PHP_VERSION}" \
+    --build-arg="CONTAINER_STRUCTURE_TEST_VERSION=${CONTAINER_STRUCTURE_TEST_VERSION}" \
     --file="${DOCKERFILE}" \
     --label="org.infection.sbx.cache-key=${CACHE_KEY}" \
     --tag="${IMAGE_REF}" \
