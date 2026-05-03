@@ -7,6 +7,13 @@ commandTests:
         expectedOutput: ['^PHP 8\.4\.\d+ \(cli\) ']
         exitCode: 0
 
+    -   name: "Xdebug coverage mode is enabled"
+        command: "bash"
+        # The pipe needs a shell; "-c" asks bash to execute this string.
+        args: ["-c", "php -i | grep 'xdebug.mode'"]
+        expectedOutput: ['(?m)^xdebug\.mode => coverage => coverage$']
+        exitCode: 0
+
     -   name: "composer is executable"
         command: "composer"
         args: ["--version"]
