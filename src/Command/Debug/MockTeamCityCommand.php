@@ -58,13 +58,13 @@ use Webmozart\Assert\Assert;
  */
 final class MockTeamCityCommand extends BaseCommand
 {
-    private const MILLISECONDS_IN_MICROSECONDS = 1000;
+    private const int MILLISECONDS_IN_MICROSECONDS = 1000;
 
-    private const LOG_FILE_PATH_ARGUMENT = 'log';
+    private const string LOG_FILE_PATH_ARGUMENT = 'log';
 
-    private const TIME_IN_MICRO_SECONDS_OPTION = 'time';
+    private const string TIME_IN_MICRO_SECONDS_OPTION = 'time';
 
-    private const DEFAULT_TIME_IN_MILLISECONDS = 500;  // 0.5s
+    private const int DEFAULT_TIME_IN_MILLISECONDS = 500;  // 0.5s
 
     private readonly Closure $sleep;
 

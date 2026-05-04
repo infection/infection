@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class InvalidMutator extends RuntimeException
 {
-    private const GITHUB_BUG_LINK = 'https://github.com/infection/infection/issues/new?template=Bug_report.md';
+    private const string GITHUB_BUG_LINK = 'https://github.com/infection/infection/issues/new?template=Bug_report.md';
 
     public static function create(string $filePath, string $mutatorName, Throwable $previous): self
     {

@@ -50,7 +50,7 @@ final class BaseOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'base';
+    public const string NAME = 'base';
 
     /**
      * @template T of Command

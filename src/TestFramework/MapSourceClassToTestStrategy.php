@@ -40,7 +40,7 @@ namespace Infection\TestFramework;
  */
 final class MapSourceClassToTestStrategy
 {
-    public const SIMPLE = 'simple';
+    public const string SIMPLE = 'simple';
 
     /**
      * @return list<string>

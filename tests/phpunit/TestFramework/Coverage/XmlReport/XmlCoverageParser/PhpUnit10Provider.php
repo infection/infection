@@ -37,16 +37,16 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use Symfony\Component\Filesystem\Path;
 
 final class PhpUnit10Provider
 {
     use CannotBeInstantiated;
 
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/../../Fixtures';
 
     public static function infoProvider(): iterable
     {

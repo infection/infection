@@ -64,9 +64,9 @@ final class CommandLineGitIntegrationTest extends TestCase
     // - tests/phpunit/Git/CommandLineGitIntegrationTest.php
     // - tests/phpunit/Git/CommandLineGitTest.php
     // - tests/phpunit/Process/ShellCommandLineExecutorTest.php
-    private const COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
+    private const string COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
-    private const BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
+    private const string BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
     private static bool $commitReferenceExists;
 
@@ -213,6 +213,13 @@ final class CommandLineGitIntegrationTest extends TestCase
         $refinedBase = $this->git->getBaseReference($originalBase);
 
         $this->assertNotSame($originalBase, $refinedBase);
+    }
+
+    public function test_it_gets_the_project_directory(): void
+    {
+        $projectDirectory = $this->git->getProjectDirectory();
+
+        $this->assertNotSame('', $projectDirectory);
     }
 
     private function skipIfCommitReferenceIsNotAvailable(): void

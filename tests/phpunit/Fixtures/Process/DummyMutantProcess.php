@@ -21,11 +21,13 @@ final class DummyMutantProcess extends MutantProcess
         parent::__construct($process, $mutant, $mutantExecutionResultFactory);
     }
 
+    #[\Override]
     public function getProcess(): Process
     {
         return $this->process;
     }
 
+    #[\Override]
     public function markAsTimedOut(): void
     {
         if (!$this->expectTimeOut) {

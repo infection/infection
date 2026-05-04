@@ -50,7 +50,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 class CommandLineBuilder
 {
-    private const BAT_EXTENSION_LENGTH = 4;
+    private const int BAT_EXTENSION_LENGTH = 4;
 
     /** @var string[]|null */
     private ?array $cachedPhpCmdLine = null;

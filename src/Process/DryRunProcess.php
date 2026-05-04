@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Override;
 use Symfony\Component\Process\Process;
 
 /**
@@ -52,38 +53,44 @@ final class DryRunProcess extends Process
      * Output that TestFrameworkAdapter::testsPass() recognizes as passing tests.
      * The pattern "OK (" triggers testsPass() to return true, causing ESCAPED status.
      */
-    public const PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
+    public const string PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
 
     public static function fromProcess(Process $process): self
     {
         return self::fromShellCommandline($process->getCommandLine());
     }
 
+    #[Override]
     public function isTerminated(): bool
     {
         return true;
     }
 
+    #[Override]
     public function isStarted(): bool
     {
         return true;
     }
 
+    #[Override]
     public function getOutput(): string
     {
         return self::PASSING_TEST_OUTPUT;
     }
 
+    #[Override]
     public function getStartTime(): float
     {
         return 0.0;
     }
 
+    #[Override]
     public function getExitCode(): int
     {
         return 0;
     }
 
+    #[Override]
     public function getStatus(): string
     {
         return Process::STATUS_TERMINATED;

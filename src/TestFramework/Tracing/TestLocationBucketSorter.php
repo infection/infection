@@ -50,7 +50,7 @@ final readonly class TestLocationBucketSorter
      * Pre-sort first buckets, optimistically assuming that most projects
      * won't have tests longer than a second.
      */
-    private const INIT_BUCKETS = [
+    private const array INIT_BUCKETS = [
         0 => [],
         1 => [],
         2 => [],

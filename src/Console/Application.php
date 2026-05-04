@@ -52,6 +52,7 @@ use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container\Container;
 use OutOfBoundsException;
+use Override;
 use function preg_quote;
 use function Safe\preg_match;
 use function sprintf;
@@ -65,11 +66,11 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    public const PACKAGE_NAME = 'infection/infection';
+    public const string PACKAGE_NAME = 'infection/infection';
 
-    private const NAME = 'Infection - PHP Mutation Testing Framework';
+    private const string NAME = 'Infection - PHP Mutation Testing Framework';
 
-    private const LOGO = '
+    private const string LOGO = '
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
@@ -92,6 +93,7 @@ final class Application extends BaseApplication
         return $this->container;
     }
 
+    #[Override]
     public function getLongVersion(): string
     {
         return trim(sprintf(
@@ -101,11 +103,13 @@ final class Application extends BaseApplication
         ));
     }
 
+    #[Override]
     public function getHelp(): string
     {
         return self::LOGO . parent::getHelp();
     }
 
+    #[Override]
     protected function getDefaultCommands(): array
     {
         $fileSystem = Container::create()->getFileSystem();
@@ -129,6 +133,7 @@ final class Application extends BaseApplication
         );
     }
 
+    #[Override]
     protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);

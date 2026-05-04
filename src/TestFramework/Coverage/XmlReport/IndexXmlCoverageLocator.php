@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Override;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -52,9 +53,9 @@ use Symfony\Component\Finder\Finder;
  */
 final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportLocator
 {
-    public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
+    public const string INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 
-    private const DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
+    private const string DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
 
     public static function create(
         FileSystem $filesystem,
@@ -70,6 +71,7 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
         );
     }
 
+    #[Override]
     protected function createInvalidReportSource(string $coverageDirectory): InvalidReportSource
     {
         return new InvalidReportSource(
@@ -80,6 +82,7 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
         );
     }
 
+    #[Override]
     protected function createTooManyReportsFound(
         string $coverageDirectory,
         array $reportPathnames,
@@ -98,6 +101,7 @@ final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportL
         );
     }
 
+    #[Override]
     protected function createNoReportFound(string $coverageDirectory): NoReportFound
     {
         return new NoReportFound(

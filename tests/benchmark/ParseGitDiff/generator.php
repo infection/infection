@@ -412,7 +412,6 @@ final readonly class Generator
      */
     private static function sampleGPD(Randomizer $randomizer, float $k, float $sigma, float $theta): float
     {
-        // @phpstan-ignore method.notFound
         $probability = $randomizer->nextFloat();
 
         // Handle shape parameter close to 0 (exponential distribution case)

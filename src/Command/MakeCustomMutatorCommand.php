@@ -54,7 +54,7 @@ use function ucfirst;
  */
 final class MakeCustomMutatorCommand extends BaseCommand
 {
-    private const MUTATOR_NAME_ARGUMENT = 'Mutator name';
+    private const string MUTATOR_NAME_ARGUMENT = 'Mutator name';
 
     protected function configure(): void
     {

@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 
+use function in_array;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -85,6 +87,33 @@ final class VisitorTestCaseTest extends TestCase
             $this->assertGreaterThanOrEqual(0, $id);
             $this->assertInstanceOf(Node::class, $node);
             $this->assertSame($id, AddIdToTraversedNodesVisitor::getNodeId($node));
+        }
+    }
+
+    public function test_can_mark_the_given_nodes_as_eligible(): void
+    {
+        $code = <<<'PHP'
+            <?php
+
+            $a = 1;
+            $b = 2;
+            PHP;
+        $eligibleNodeIds = [2, 3];
+
+        $nodes = $this->testCase->parseCode($code);
+
+        $nodesById = $this->testCase->addIdsToNodesPublic($nodes);
+
+        $this->testCase->markNodeAsEligiblePublic($nodesById, $eligibleNodeIds);
+
+        foreach ($nodesById as $id => $node) {
+            $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
+
+            if (in_array($id, $eligibleNodeIds, true)) {
+                $this->assertTrue($isEligible);
+            } else {
+                $this->assertFalse($isEligible);
+            }
         }
     }
 

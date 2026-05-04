@@ -43,6 +43,7 @@ use function array_merge;
 use function array_values;
 use function implode;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -67,9 +68,9 @@ use stdClass;
 #[CoversClass(SchemaConfigurationFactory::class)]
 final class SchemaConfigurationFactoryTest extends TestCase
 {
-    private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
+    private const string SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/schema.json';
 
-    private const PROFILES = [
+    private const array PROFILES = [
         '@arithmetic',
         '@boolean',
         '@cast',
@@ -709,6 +710,61 @@ final class SchemaConfigurationFactoryTest extends TestCase
             self::createConfig([
                 'source' => new Source(['src'], []),
                 'tmpDir' => 'custom-tmp',
+            ]),
+        ];
+
+        yield '[mago] no property' => [
+            <<<'JSON'
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mago": {}
+                }
+                JSON,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mago' => new Mago(null, null),
+            ]),
+        ];
+
+        yield '[mago][configDir] nominal' => [
+            <<<'JSON'
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mago": {
+                        "configDir": "mago.toml"
+                    }
+                }
+                JSON,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mago' => new Mago(
+                    'mago.toml',
+                    null,
+                ),
+            ]),
+        ];
+
+        yield '[mago][customPath] nominal' => [
+            <<<'JSON'
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "mago": {
+                        "customPath": "path/to/mago"
+                    }
+                }
+                JSON,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'mago' => new Mago(
+                    null,
+                    'path/to/mago',
+                ),
             ]),
         ];
 
@@ -2658,6 +2714,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
             'phpStan' => new PhpStan(null, null),
+            'mago' => new Mago(null, null),
             'ignoreMsiWithNoMutations' => null,
             'minMsi' => null,
             'minCoveredMsi' => null,

@@ -43,7 +43,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class DemoReportLocator extends BaseReportLocator
 {
-    public const FILENAME_REGEX = '/^.+\.demo$/';
+    public const string FILENAME_REGEX = '/^.+\.demo$/';
 
     protected function configureFinder(Finder $finder): void
     {

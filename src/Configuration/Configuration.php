@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use function array_map;
 use function explode;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -55,7 +56,7 @@ use Webmozart\Assert\Assert;
  */
 readonly class Configuration
 {
-    private const LOG_VERBOSITY = [
+    private const array LOG_VERBOSITY = [
         'all',
         'none',
         'default',
@@ -65,6 +66,7 @@ readonly class Configuration
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string $configurationPathname
+     * @param non-empty-string $projectDirectory Absolute path.
      */
     public function __construct(
         public float $processTimeout,
@@ -75,6 +77,7 @@ readonly class Configuration
         public string $tmpDir,
         public PhpUnit $phpUnit,
         public PhpStan $phpStan,
+        public Mago $mago,
         public array $mutators,
         public string $testFramework,
         public ?string $bootstrap,
@@ -99,7 +102,7 @@ readonly class Configuration
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
         public ?string $mapSourceClassToTestStrategy,
-        public ?string $loggerProjectRootDirectory,
+        public string $projectDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
         public string $configurationPathname,

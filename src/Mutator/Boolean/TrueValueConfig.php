@@ -44,7 +44,7 @@ use Webmozart\Assert\Assert;
  */
 final class TrueValueConfig implements MutatorConfig
 {
-    private const KNOWN_FUNCTIONS = [
+    private const array KNOWN_FUNCTIONS = [
         'array_search',
         'in_array',
     ];

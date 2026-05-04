@@ -59,7 +59,7 @@ class FileReporterFactory
         private readonly bool $onlyCoveredCode,
         private readonly LoggerInterface $logger,
         private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
-        private readonly ?string $loggerProjectRootDirectory,
+        private readonly string $projectDirectory,
         private readonly float $processTimeout,
     ) {
     }
@@ -176,12 +176,12 @@ class FileReporterFactory
 
     private function createGitlabLogger(): LineMutationTestingResultsReporter
     {
-        return new GitLabCodeQualityReporter($this->resultsCollector, $this->loggerProjectRootDirectory);
+        return new GitLabCodeQualityReporter($this->resultsCollector, $this->projectDirectory);
     }
 
     private function createGitHubAnnotationsLogger(): LineMutationTestingResultsReporter
     {
-        return new GitHubAnnotationsReporter($this->resultsCollector, $this->loggerProjectRootDirectory);
+        return new GitHubAnnotationsReporter($this->resultsCollector, $this->projectDirectory);
     }
 
     private function createDebugLogger(): LineMutationTestingResultsReporter

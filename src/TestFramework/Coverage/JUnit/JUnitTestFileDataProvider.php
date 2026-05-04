@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\JUnit;
 
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\preg_replace;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -53,14 +53,14 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     ) {
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function getTestFileInfo(string $testId): TestFileTimeData
     {
         $xPath = $this->getXPath();
 
         $node = null;
         $testFound = false;
 
-        foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
+        foreach (self::testCaseMapGenerator($testId) as $queryString => $placeholder) {
             $node = $xPath->queryElement(sprintf($queryString, $placeholder));
 
             if ($node !== null) {
@@ -71,8 +71,8 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         }
 
         if (!$testFound) {
-            throw TestFileNameNotFoundException::notFoundFromFQN(
-                $fullyQualifiedClassName,
+            throw TestNotFound::forTestId(
+                $testId,
                 $this->jUnitLocator->locate(),
             );
         }
@@ -88,19 +88,19 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     /**
      * @return iterable<string, string>
      */
-    private static function testCaseMapGenerator(string $fullyQualifiedClassName): iterable
+    private static function testCaseMapGenerator(string $testId): iterable
     {
         // A default format for <testsuite>
-        yield '//testsuite[@name="%s"][1]' => $fullyQualifiedClassName;
+        yield '//testsuite[@name="%s"][1]' => $testId;
 
         // A format where the class name is inside `class` attribute of `testcase` tag
-        yield '//testcase[@class="%s"][1]' => $fullyQualifiedClassName;
+        yield '//testcase[@class="%s"][1]' => $testId;
 
         // A format where the class name is inside `file` attribute of `testcase` tag
-        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
+        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $testId);
 
         // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
-        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $fullyQualifiedClassName);
+        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $testId);
     }
 
     private function getXPath(): SafeDOMXPath

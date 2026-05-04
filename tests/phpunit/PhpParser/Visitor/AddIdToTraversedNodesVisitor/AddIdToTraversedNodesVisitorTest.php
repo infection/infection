@@ -99,8 +99,8 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
                                                 value: Expr_ArrowFunction(
                                                     expr: Scalar_String(
                                                         kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'first'
                                                         nodeId: 9
+                                                        rawValue: 'first'
                                                     )
                                                     nodeId: 8
                                                 )
@@ -110,8 +110,8 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
                                                 value: Expr_ArrowFunction(
                                                     expr: Scalar_String(
                                                         kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'second'
                                                         nodeId: 12
+                                                        rawValue: 'second'
                                                     )
                                                     nodeId: 11
                                                 )
@@ -121,8 +121,8 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
                                                 value: Expr_ArrowFunction(
                                                     expr: Scalar_String(
                                                         kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'third'
                                                         nodeId: 15
+                                                        rawValue: 'third'
                                                     )
                                                     nodeId: 14
                                                 )
@@ -174,8 +174,8 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
                             )
                             expr: Scalar_String(
                                 kind: KIND_SINGLE_QUOTED (1)
-                                rawValue: 'a'
                                 nodeId: 3
+                                rawValue: 'a'
                             )
                             nodeId: 1
                         )
@@ -188,8 +188,8 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
                             )
                             expr: Scalar_String(
                                 kind: KIND_SINGLE_QUOTED (1)
-                                rawValue: 'b'
                                 nodeId: 7
+                                rawValue: 'b'
                             )
                             nodeId: 5
                         )

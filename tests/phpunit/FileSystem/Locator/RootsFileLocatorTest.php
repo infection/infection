@@ -55,7 +55,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(RootsFileLocator::class)]
 final class RootsFileLocatorTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
+    private const string FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
 
     private Filesystem $filesystem;
 

@@ -53,7 +53,7 @@ use Webmozart\Assert\Assert;
  */
 final class Tokens
 {
-    private const CONTEXT_LINES = 3;
+    private const int CONTEXT_LINES = 3;
 
     private int $lastIndex = -1;
 

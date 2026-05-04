@@ -53,10 +53,12 @@ final class SkipIgnoredNodesVisitor extends NodeVisitorAbstract
     ) {
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): ?int
     {
         foreach ($this->nodeIgnorers as $nodeIgnorer) {
             if ($nodeIgnorer->ignores($node)) {
+                LabelNodesAsEligibleVisitor::markAsIneligible($node);
+
                 return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
             }
         }

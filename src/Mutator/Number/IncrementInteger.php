@@ -52,7 +52,7 @@ final class IncrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    private const FUNCTIONS_RETURNING_MAX_INTEGER = [
+    private const array FUNCTIONS_RETURNING_MAX_INTEGER = [
         'preg_match' => 1,
     ];
 

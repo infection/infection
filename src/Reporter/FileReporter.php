@@ -50,7 +50,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final readonly class FileReporter implements Reporter
 {
-    public const ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
+    public const array ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
 
     public function __construct(
         private string $filePath,

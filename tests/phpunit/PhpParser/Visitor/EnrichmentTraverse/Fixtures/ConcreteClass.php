@@ -43,6 +43,11 @@ class ConcreteClass
 
     public function concreteMethod(mixed $param): void
     {
+        if ($param === null) {
+            echo 'nothing to do';
+        } else {
+            $param();
+        }
     }
 
     public function abstractMethod(mixed $param): void

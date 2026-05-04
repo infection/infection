@@ -93,7 +93,6 @@ final class BCMath implements ConfigurableMutator
 
     /**
      * @psalm-mutation-free
-     * @psalm-suppress ImpureMethodCall
      *
      * @return iterable<Node\Expr>
      */

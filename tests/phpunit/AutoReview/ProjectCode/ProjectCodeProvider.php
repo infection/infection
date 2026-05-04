@@ -89,6 +89,7 @@ use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
+use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -128,7 +129,7 @@ final class ProjectCodeProvider
      * This array contains all classes that don't have tests yet, due to legacy
      * reasons. This list should never be added to, only removed from.
      */
-    public const NON_TESTED_CONCRETE_CLASSES = [
+    public const array NON_TESTED_CONCRETE_CLASSES = [
         AdapterInstaller::class,
         Application::class,
         BaseMutatorTestCase::class,
@@ -145,6 +146,7 @@ final class ProjectCodeProvider
         FakeLocator::class,
         FakeSourceCollector::class,
         FakeSourceFilter::class,
+        FakeSourceLineMatcher::class,
         FileSystem::class,
         FilterOption::class,
         FixedSourceCollector::class,
@@ -184,7 +186,7 @@ final class ProjectCodeProvider
      * does not follow the pattern "Acme\Service\Foo" -> "Acme\Tests\FooTest".
      * For example, test cases that are in a child directory.
      */
-    public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+    public const array CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
     ];
 
@@ -192,7 +194,7 @@ final class ProjectCodeProvider
      * This array contains all classes that are not extension points, but not final due to legacy
      * reasons. This list should never be added to, only removed from.
      */
-    public const NON_FINAL_EXTENSION_CLASSES = [
+    public const array NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
         FileSystem::class,
         MetricsCalculator::class,
@@ -206,7 +208,7 @@ final class ProjectCodeProvider
     /**
      * This array contains all classes that can be extended by our users.
      */
-    public const EXTENSION_POINTS = [
+    public const array EXTENSION_POINTS = [
         BaseMutatorTestCase::class,
         Definition::class,
         Mutator::class,

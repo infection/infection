@@ -61,7 +61,7 @@ use Webmozart\Assert\Assert;
  */
 class StaticAnalysisToolExecutableFinder
 {
-    private const BAT_EXTENSION_LENGTH = 4;
+    private const int BAT_EXTENSION_LENGTH = 4;
 
     /**
      * @var array<string, string>

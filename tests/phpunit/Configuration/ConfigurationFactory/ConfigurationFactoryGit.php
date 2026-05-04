@@ -74,4 +74,9 @@ final readonly class ConfigurationFactoryGit implements Git
     {
         return sprintf('reference(%s)', $base);
     }
+
+    public function getProjectDirectory(): string
+    {
+        throw new DomainException('Not implemented.');
+    }
 }

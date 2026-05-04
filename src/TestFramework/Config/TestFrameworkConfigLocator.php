@@ -45,7 +45,7 @@ use function sprintf;
  */
 final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
 {
-    private const DEFAULT_EXTENSIONS = [
+    private const array DEFAULT_EXTENSIONS = [
         'xml',
         'yml',
         'xml.dist',

@@ -43,7 +43,7 @@ use Infection\Console\ConsoleOutput;
  */
 class MinMsiChecker
 {
-    private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
+    private const int VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
     public function __construct(
         private readonly bool $ignoreMsiWithNoMutations,

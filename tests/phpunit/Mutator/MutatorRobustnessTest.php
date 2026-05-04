@@ -59,7 +59,7 @@ use Throwable;
 #[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-code-samples';
+    private const string FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-code-samples';
 
     /**
      * @var array<string, SplFileInfo>|null

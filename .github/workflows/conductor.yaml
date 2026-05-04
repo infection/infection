@@ -24,7 +24,7 @@ jobs:
       - name: Install PHP
         uses: "shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f" # master
         with:
-          php-version: "8.2"
+          php-version: "8.3"
 
       - name: "Running Conductor"
-        uses: packagist/conductor-github-action@9f06e0b595f87422b21cb853a5ae2ffd4f9e06b8 # 1.5.3
+        uses: packagist/conductor-github-action@e19c62f9d97caff6166604942962597e412e01d8 # 1.6.0

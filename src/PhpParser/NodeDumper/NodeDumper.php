@@ -41,7 +41,6 @@ use function in_array;
 use Infection\Framework\ClassName;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use Infection\PhpParser\Visitor\LabelMutationCandidatesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
@@ -50,6 +49,7 @@ use function is_float;
 use function is_int;
 use function is_object;
 use function is_string;
+use function ksort;
 use Later\Interfaces\Deferred;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -123,6 +123,11 @@ final class NodeDumper
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
     ];
 
+    /**
+     * @var array<string, true>
+     */
+    private array $ignoredAttributesByKey = [];
+
     // Removed instance properties for stateless refactor
     /**
      * @param bool $dumpComments whether comments should be dumped
@@ -138,6 +143,7 @@ final class NodeDumper
         // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
         private bool $decorateNodes = false,
+        private bool $showLineNumbers = false,
     ) {
     }
 
@@ -159,6 +165,7 @@ final class NodeDumper
         // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
         ?bool $decorateNodes = null,
+        ?bool $showLineNumbers = null,
     ): string {
         $result = '';
         $newLine = "\n";
@@ -176,6 +183,23 @@ final class NodeDumper
         if ($decorateNodes !== null) {
             $originalHighlightMutationCandidates = $this->decorateNodes;
             $this->decorateNodes = $decorateNodes;
+        }
+
+        if ($showLineNumbers !== null) {
+            $originalShowLineNumbers = $this->showLineNumbers;
+            $this->showLineNumbers = $showLineNumbers;
+        }
+
+        $this->ignoredAttributesByKey = self::IGNORE_ATTRIBUTES;
+
+        if ($this->showLineNumbers) {
+            Assert::notFalse(
+                $this->dumpOtherAttributes,
+                'The NodeDumper cannot display line numbers if the attributes cannot be shown.',
+            );
+
+            unset($this->ignoredAttributesByKey['startLine']);
+            unset($this->ignoredAttributesByKey['endLine']);
         }
 
         if ($dumpPositions !== null) {
@@ -199,6 +223,10 @@ final class NodeDumper
 
         if ($decorateNodes !== null) {
             $this->decorateNodes = $originalHighlightMutationCandidates;
+        }
+
+        if ($showLineNumbers !== null) {
+            $this->showLineNumbers = $originalShowLineNumbers;
         }
 
         if ($onlyVisitedNodes !== null) {
@@ -314,15 +342,7 @@ final class NodeDumper
             }
 
             if ($this->decorateNodes) {
-                $isEligible = LabelNodesAsEligibleVisitor::isEligible($node);
-                $isMutationCandidate = LabelMutationCandidatesVisitor::isAMutationCandidate($node);
-
-                if ($isMutationCandidate) {
-                    $result .= sprintf(
-                        '<mutation-candidate>%s</mutation-candidate>',
-                        $node->getType(),
-                    );
-                } elseif ($isEligible) {
+                if (LabelNodesAsEligibleVisitor::isEligible($node)) {
                     $result .= sprintf(
                         '<eligible>%s</eligible>',
                         $node->getType(),
@@ -384,8 +404,11 @@ final class NodeDumper
             }
 
             if ($this->dumpOtherAttributes) {
-                foreach ($node->getAttributes() as $key => $value) {
-                    if (isset(self::IGNORE_ATTRIBUTES[$key])) {
+                $attributes = $node->getAttributes();
+                ksort($attributes);
+
+                foreach ($attributes as $key => $value) {
+                    if (isset($this->ignoredAttributesByKey[$key])) {
                         continue;
                     }
 

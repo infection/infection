@@ -75,7 +75,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MutationTestingRunner::class)]
 final class MutationTestingRunnerTest extends TestCase
 {
-    private const TIMEOUT = 100.0;
+    private const float TIMEOUT = 100.0;
 
     private MockObject&MutantProcessContainerFactory $processFactoryMock;
 

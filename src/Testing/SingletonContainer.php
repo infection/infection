@@ -38,7 +38,7 @@ namespace Infection\Testing;
 use Infection\Container\Container;
 use Infection\Mutant\MutantCodePrinter;
 use Infection\PhpParser\InfectionPrettyPrinter;
-use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
+use Infection\Testing\PhpDoc\PHPDocParser;
 use PhpParser\NodeDumper;
 
 /**

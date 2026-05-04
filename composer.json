@@ -42,7 +42,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-dom": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -78,8 +78,10 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
+        "carthage-software/mago": "^1.20",
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
+        "phpat/phpat": "^0.12.4",
         "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
@@ -97,7 +99,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.0"
+            "php": "8.3.0"
         },
         "sort-packages": true,
         "allow-plugins": {

@@ -45,7 +45,7 @@ use function Safe\preg_match;
  */
 final class PregMatchRemoveDollar extends AbstractPregMatch
 {
-    public const ANALYSE_REGEX = '/^([^\w\s\\\\])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/';
+    public const string ANALYSE_REGEX = '/^([^\w\s\\\\])([^$]*)([$]?)\1([gmixXsuUAJD]*)$/';
 
     public static function getDefinition(): Definition
     {

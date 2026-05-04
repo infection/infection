@@ -55,7 +55,7 @@ use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 #[CoversClass(BasicSourceCollector::class)]
 final class BasicSourceCollectorTest extends FileSystemTestCase
 {
-    private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
+    private const string FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
     private Filesystem $filesystem;
 

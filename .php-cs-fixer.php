@@ -154,7 +154,7 @@ return (new Config())
         ],
         // This rule is buggy and does not only apply to phpdoc annotation...
         'phpdoc_annotation_without_dot' => false,
-        // Allow inline Psalm suppress statements
+        // Allow inline static analysis suppress statements
         'phpdoc_to_comment' => false,
         'php_unit_dedicate_assert' => true,
         'php_unit_method_casing' => [

@@ -104,10 +104,10 @@ final class ParentConnectorTest extends VisitorTestCase
                                     parent: nodeId(1)
                                 )
                                 value: Scalar_Int(
-                                    rawValue: 1
                                     kind: KIND_DEC (10)
                                     nodeId: 3
                                     parent: nodeId(1)
+                                    rawValue: 1
                                 )
                                 nodeId: 1
                                 parent: nodeId(0)
@@ -125,9 +125,9 @@ final class ParentConnectorTest extends VisitorTestCase
                                 cond: Expr_BinaryOp_Identical(
                                     left: Scalar_String(
                                         kind: KIND_SINGLE_QUOTED (1)
-                                        rawValue: 'mock'
                                         nodeId: 8
                                         parent: nodeId(7)
+                                        rawValue: 'mock'
                                     )
                                     right: Expr_ArrayDimFetch(
                                         var: Expr_Variable(
@@ -136,9 +136,9 @@ final class ParentConnectorTest extends VisitorTestCase
                                         )
                                         dim: Scalar_String(
                                             kind: KIND_SINGLE_QUOTED (1)
-                                            rawValue: 'mode'
                                             nodeId: 11
                                             parent: nodeId(9)
+                                            rawValue: 'mode'
                                         )
                                         nodeId: 9
                                         parent: nodeId(7)
@@ -175,9 +175,9 @@ final class ParentConnectorTest extends VisitorTestCase
                                                 exprs: array(
                                                     0: Scalar_String(
                                                         kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: 'Hello world!'
                                                         nodeId: 19
                                                         parent: nodeId(18)
+                                                        rawValue: 'Hello world!'
                                                     )
                                                 )
                                                 nodeId: 18

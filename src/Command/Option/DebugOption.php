@@ -48,7 +48,7 @@ final class DebugOption implements CommandOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'debug';
+    public const string NAME = 'debug';
 
     /**
      * @template T of Command

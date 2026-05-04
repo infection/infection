@@ -41,6 +41,9 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 
 final class ConfigurationFactoryInputBuilder
 {
+    /**
+     * @param non-empty-string|null $projectDirectory
+     */
     public function __construct(
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
@@ -71,7 +74,7 @@ final class ConfigurationFactoryInputBuilder
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
-        private ?string $loggerProjectRootDirectory,
+        private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
     ) {
@@ -309,10 +312,13 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    /**
+     * @param non-empty-string|null $projectDirectory
+     */
+    public function withProjectDirectory(?string $projectDirectory): self
     {
         $clone = clone $this;
-        $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;
+        $clone->projectDirectory = $projectDirectory;
 
         return $clone;
     }
@@ -365,7 +371,7 @@ final class ConfigurationFactoryInputBuilder
      *     27: bool,
      *     28: bool,
      *     29: string|null,
-     *     30: string|null,
+     *     30: non-empty-string|null,
      *     31: string|null,
      *     32: string|null
      * }
@@ -403,7 +409,7 @@ final class ConfigurationFactoryInputBuilder
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,
-            $this->loggerProjectRootDirectory,
+            $this->projectDirectory,
             $this->staticAnalysisTool,
             $this->mutantId,
         ];

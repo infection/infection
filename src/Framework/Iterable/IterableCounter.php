@@ -48,7 +48,7 @@ final class IterableCounter
     use CannotBeInstantiated;
 
     // Follows the Symfony ProgressBar convention: 0 indicates an unknown number of steps.
-    public const UNKNOWN_COUNT = 0;
+    public const int UNKNOWN_COUNT = 0;
 
     /**
      * @param iterable<mixed> $subjects

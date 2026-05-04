@@ -58,6 +58,15 @@ final class ConcreteVisitorTestCase extends VisitorTestCase
     }
 
     /**
+     * @param array<positive-int|0, Node> $nodesById
+     * @param list<int> $eligibleNodeIds
+     */
+    public function markNodeAsEligiblePublic(array $nodesById, array $eligibleNodeIds): void
+    {
+        $this->markNodesAsEligible($nodesById, $eligibleNodeIds);
+    }
+
+    /**
      * @param Node[]|Node $nodeOrNodes
      */
     public function keepOnlyDesiredAttributesPublic(

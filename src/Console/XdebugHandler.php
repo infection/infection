@@ -46,7 +46,7 @@ final class XdebugHandler
 {
     use CannotBeInstantiated;
 
-    private const PREFIX = 'INFECTION';
+    private const string PREFIX = 'INFECTION';
 
     public static function check(LoggerInterface $logger): void
     {

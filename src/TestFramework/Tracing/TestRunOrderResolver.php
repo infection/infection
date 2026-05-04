@@ -50,16 +50,14 @@ final readonly class TestRunOrderResolver
 {
     /**
      * Expected average number of buckets. Exposed for testing purposes.
-     *
-     * @var int
      */
-    public const BUCKETS_COUNT = 25;
+    public const int BUCKETS_COUNT = 25;
 
     /**
      * For 25 buckets QS becomes theoretically less efficient on average at and after 15 elements.
      * Exposed for testing purposes.
      */
-    public const USE_BUCKET_SORT_AFTER = 15;
+    public const int USE_BUCKET_SORT_AFTER = 15;
 
     /**
      * Returns unique test file paths ordered by execution time (fastest first).
@@ -119,8 +117,6 @@ final readonly class TestRunOrderResolver
      * @param iterable<TestLocation> $sortedTestLocations
      *
      * @return iterable<string>
-     *
-     * @psalm-suppress InvalidReturnType
      */
     private static function sortedLocationsGenerator(iterable $sortedTestLocations): iterable
     {

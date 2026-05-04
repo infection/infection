@@ -45,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ProcessQueue::class)]
 final class ProcessQueueTest extends TestCase
 {
-    private const SIMULATED_TIME_MICROSECONDS = 1_000_000;
+    private const int SIMULATED_TIME_MICROSECONDS = 1_000_000;
 
     public function test_new_queue_is_empty(): void
     {

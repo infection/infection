@@ -54,7 +54,7 @@ use Webmozart\Assert\Assert;
  */
 class ParallelProcessRunner implements ProcessRunner
 {
-    private const POLL_WAIT_IN_MS = 1000;
+    private const int POLL_WAIT_IN_MS = 1000;
 
     /**
      * @var array<int, IndexedMutantProcessContainer>

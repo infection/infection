@@ -49,7 +49,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 {
-    public const NODE_ID_ATTRIBUTE = 'nodeId';
+    public const string NODE_ID_ATTRIBUTE = 'nodeId';
 
     /**
      * @var array<positive-int|0, Node>

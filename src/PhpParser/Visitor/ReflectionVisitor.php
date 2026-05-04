@@ -52,17 +52,17 @@ use Webmozart\Assert\Assert;
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
-    public const STRICT_TYPES_KEY = 'isStrictTypes';
+    public const string STRICT_TYPES_KEY = 'isStrictTypes';
 
-    public const REFLECTION_CLASS_KEY = 'reflectionClass';
+    public const string REFLECTION_CLASS_KEY = 'reflectionClass';
 
-    public const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
+    public const string IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
 
-    public const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
+    public const string IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
 
-    public const FUNCTION_SCOPE_KEY = 'functionScope';
+    public const string FUNCTION_SCOPE_KEY = 'functionScope';
 
-    public const FUNCTION_NAME = 'functionName';
+    public const string FUNCTION_NAME = 'functionName';
 
     /** @var array<int, Node> */
     private array $functionScopeStack = [];

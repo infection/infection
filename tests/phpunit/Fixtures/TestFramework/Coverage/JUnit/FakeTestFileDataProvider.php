@@ -10,7 +10,7 @@ use Infection\Tests\UnsupportedMethod;
 
 final class FakeTestFileDataProvider implements TestFileDataProvider
 {
-    public function getTestFileInfo(string $fullyQualifiedClassName): never
+    public function getTestFileInfo(string $testId): never
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }

@@ -31,7 +31,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
-          php-version: 8.2
+          php-version: 8.3
           tools: composer
         env:
           # This is necessary when installing a tool with a specific version
@@ -42,12 +42,12 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-8.2-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-8.3-${{ hashFiles('composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-8.2-
+            composer-${{ runner.os }}-8.3-
             composer-${{ runner.os }}-
             composer-
 

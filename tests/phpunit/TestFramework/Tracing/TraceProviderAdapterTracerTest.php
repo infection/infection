@@ -40,7 +40,7 @@ use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
-use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\TrackableIterator;
 use Infection\Tests\TestingUtility\Iterable\YieldOnceIterator;

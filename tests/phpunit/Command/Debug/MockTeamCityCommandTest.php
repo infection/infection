@@ -55,7 +55,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(MockTeamCityCommand::class)]
 final class MockTeamCityCommandTest extends FileSystemTestCase
 {
-    private const LOG_EXAMPLE = <<<'TEAMCITY'
+    private const string LOG_EXAMPLE = <<<'TEAMCITY'
         ##teamcity[testSuiteStarted name='MySuite']
         ##teamcity[testStarted name='testExample']
         ##teamcity[testFinished name='testExample' duration='100']

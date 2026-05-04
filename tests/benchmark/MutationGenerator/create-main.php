@@ -43,7 +43,9 @@ use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
+use Psr\Log\NullLogger;
 use SplFileInfo;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\Finder;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
@@ -83,7 +85,16 @@ if (!class_exists(EmptyTraceTracer::class, false)) {
  * @return Closure():(positive-int|0)
  */
 return static function (int $maxCount): Closure {
-    $container = Container::create();
+    $container = Container::create()
+        ->withValues(
+            logger: new NullLogger(),
+            output: new NullOutput(),
+            withUncovered: true,
+        )
+        ->cloneWithService(
+            Tracer::class,
+            new EmptyTraceTracer(),
+        );
 
     $sources = iterator_to_array(
         collectSources(),
@@ -95,12 +106,7 @@ return static function (int $maxCount): Closure {
         true,
     );
 
-    $fileMutationGenerator = Container::create()
-        ->cloneWithService(
-            Tracer::class,
-            new EmptyTraceTracer(),
-        )
-        ->getFileMutationGenerator();
+    $fileMutationGenerator = $container->getFileMutationGenerator();
 
     return static function () use ($sources, $fileMutationGenerator, $mutators, $maxCount): int {
         $count = 0;

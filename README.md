@@ -1,4 +1,4 @@
-[![Minimum PHP version: 8.2.0](https://img.shields.io/badge/php-8.2.0%2B-blue.svg)](https://packagist.org/packages/infection/infection)
+[![Minimum PHP version: 8.3.0](https://img.shields.io/badge/php-8.3.0%2B-blue.svg)](https://packagist.org/packages/infection/infection)
 [![Latest Stable Version](https://poser.pugx.org/infection/infection/v/stable)](https://packagist.org/packages/infection/infection)
 [![Unit & Integration Tests](https://github.com/infection/infection/actions/workflows/tests.yaml/badge.svg)](https://github.com/infection/infection/actions/workflows/tests.yaml)
 [![Infection MSI](https://img.shields.io/endpoint?url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Finfection%2Finfection%2Fmaster)](https://infection.github.io)
@@ -29,6 +29,8 @@ Want your logo here? [Learn more »](https://infection.github.io/guide/github-sp
 <a href="https://github.com/wwwoda" target="_blank"><img src="https://avatars.githubusercontent.com/u/37436231?s=200&v=4" style="vertical-align: middle;" width="45" height="45" /></a>
 <a href="https://github.com/Enrise" target="_blank"><img src="https://github.com/enrise/.github/raw/master/images/logo.png?raw=true" style="vertical-align: middle;" width="90" height="45" /></a>
 <a href="https://jetbrains.com" target="_blank"><img title="JetBrains - free licenses for core developers" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.png" style="vertical-align: middle;" width="209" height="45" /></a>
+<a href="https://sentry.io" target="_blank"><img src="doc/assets/sentry.png" style="vertical-align: middle;" width="151" height="45" /></a>
+<a href="https://tideways.com" target="_blank"><img src="doc/assets/tideways-logo.png" style="vertical-align: middle;" width="149" height="45" /></a>
 
 #### Individuals
 

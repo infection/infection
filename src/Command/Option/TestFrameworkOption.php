@@ -52,7 +52,7 @@ final class TestFrameworkOption implements CommandOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'test-framework';
+    public const string NAME = 'test-framework';
 
     /**
      * @template T of Command

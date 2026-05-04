@@ -48,7 +48,7 @@ use function sprintf;
 #[CoversClass(MutatorCategory::class)]
 final class MutatorCategoryTest extends TestCase
 {
-    private const ALL_CONSTANT_KEY = 'ALL';
+    private const string ALL_CONSTANT_KEY = 'ALL';
 
     public function test_it_cannot_be_instantiated(): void
     {

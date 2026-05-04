@@ -53,20 +53,17 @@ final class Str
 {
     use CannotBeInstantiated;
 
-    private const SYSTEM_LINE_ENDINGS_REPLACEMENT = [
+    private const array SYSTEM_LINE_ENDINGS_REPLACEMENT = [
         "\r\n" => PHP_EOL,
         "\n" => PHP_EOL,
         "\r" => PHP_EOL,
     ];
 
-    private const UNIX_LINE_ENDINGS_REPLACEMENT = [
+    private const array UNIX_LINE_ENDINGS_REPLACEMENT = [
         "\r\n" => "\n",
         "\r" => "\n",
     ];
 
-    /**
-     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
-     */
     public static function toSystemLineEndings(string $value): string
     {
         return strtr(
@@ -75,9 +72,6 @@ final class Str
         );
     }
 
-    /**
-     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
-     */
     public static function toUnixLineEndings(string $value): string
     {
         return strtr(
@@ -183,8 +177,6 @@ final class Str
     }
 
     /**
-     * @psalm-suppress InvalidArrayOffset,InvalidReturnStatement,InvalidReturnType
-     *
      * @param list<string> $lines
      * @param int<0,max> $firstNonEmptyLineIndex
      *

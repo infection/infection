@@ -35,30 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
-use function getenv;
 use Infection\Metrics\ResultsCollector;
-use function Safe\shell_exec;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
-use function trim;
 
 /**
  * @internal
  */
-final class GitHubAnnotationsReporter implements LineMutationTestingResultsReporter
+final readonly class GitHubAnnotationsReporter implements LineMutationTestingResultsReporter
 {
-    public const DEFAULT_OUTPUT = 'php://stdout';
+    public const string DEFAULT_OUTPUT = 'php://stdout';
 
     public function __construct(
-        private readonly ResultsCollector $resultsCollector,
-        private ?string $loggerProjectRootDirectory,
+        private ResultsCollector $resultsCollector,
+        private string $projectDirectory,
     ) {
-        if ($loggerProjectRootDirectory === null) {
-            if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
-                $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));
-            }
-            $this->loggerProjectRootDirectory = $projectRootDirectory;
-        }
     }
 
     public function getLines(): array
@@ -76,8 +67,7 @@ final class GitHubAnnotationsReporter implements LineMutationTestingResultsRepor
             ];
 
             $lines[] = $this->buildAnnotation(
-                /* @phpstan-ignore-next-line expects string, string|null given */
-                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
+                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->projectDirectory),
                 $error,
             );
         }

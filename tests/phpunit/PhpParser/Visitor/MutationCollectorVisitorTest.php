@@ -46,7 +46,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(MutationCollectorVisitor::class)]
 final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
-    private const CODE = <<<'PHP'
+    private const string CODE = <<<'PHP'
         <?php
 
         class Foo {}

@@ -21,8 +21,8 @@ jobs:
 
     strategy:
       matrix:
-        # Should use the latest supported PHP version
-        php-version: ['8.2']
+        # Should use the oldest supported PHP version
+        php-version: ['8.3']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
 
@@ -42,39 +42,32 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure PHP-CS-Fixer GitHub Actions cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ./var/cache/php-cs-fixer
           key: "${{ matrix.php-version }}-php-cs-fixer-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-php-cs-fixer"
 
       - name: Configure Rector GitHub Actions cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ./var/cache/rector
           key: "${{ matrix.php-version }}-rector-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-rector"
 
       - name: Configure PHPStan GitHub Actions cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ./var/cache/phpstan
           key: "${{ matrix.php-version }}-phpstan-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-phpstan"
-
-      - name: Configure Psalm GitHub Actions cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-        with:
-          path: ./var/cache/psalm
-          key: "${{ matrix.php-version }}-psalm-${{ github.run_id }}"
-          restore-keys: "${{ matrix.php-version }}-psalm"
 
       - name: Get composer cache directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
@@ -86,6 +79,11 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Download Mago
+        run: vendor/bin/mago --version
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run auto-review tests
         # Ensures we see all the errors

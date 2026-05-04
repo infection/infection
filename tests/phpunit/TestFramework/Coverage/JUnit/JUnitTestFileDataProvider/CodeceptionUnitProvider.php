@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Path;
 
@@ -45,7 +45,7 @@ final class CodeceptionUnitProvider
 {
     use CannotBeInstantiated;
 
-    private const FIXTURES_DIR = __DIR__ . '/../../Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . '/../../Fixtures';
 
     public static function infoProvider(): iterable
     {
@@ -84,7 +84,7 @@ final class CodeceptionUnitProvider
         yield 'test method of a simple test' => [
             $junitXml,
             'testMultiplication',
-            TestFileNameNotFoundException::class,
+            TestNotFound::class,
         ];
 
         // Codeception does not understand PHPUnit data providers.

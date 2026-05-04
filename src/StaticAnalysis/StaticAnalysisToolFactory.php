@@ -39,6 +39,7 @@ use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
+use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use InvalidArgumentException;
 use function sprintf;
@@ -72,7 +73,22 @@ final readonly class StaticAnalysisToolFactory
             );
         }
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
+        if ($adapterName === StaticAnalysisToolTypes::MAGO) {
+            $magoConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::MAGO);
+
+            return MagoAdapterFactory::create(
+                $magoConfigPath,
+                $this->staticAnalysisToolExecutableFiner->find(
+                    StaticAnalysisToolTypes::MAGO,
+                    (string) $this->infectionConfig->mago->customPath,
+                ),
+                $timeout,
+                $this->infectionConfig->tmpDir,
+                $this->infectionConfig->getStaticAnalysisToolOptions(),
+            );
+        }
+
+        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN, StaticAnalysisToolTypes::MAGO];
 
         throw new InvalidArgumentException(sprintf(
             'Invalid name of static analysis tool "%s". Available names are: %s',

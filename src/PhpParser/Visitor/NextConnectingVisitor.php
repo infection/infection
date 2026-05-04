@@ -48,7 +48,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class NextConnectingVisitor extends NodeVisitorAbstract
 {
-    public const NEXT_ATTRIBUTE = 'next';
+    public const string NEXT_ATTRIBUTE = 'next';
 
     private ?Node $previous = null;
 

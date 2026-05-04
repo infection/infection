@@ -39,6 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
@@ -59,6 +60,9 @@ class SchemaConfigurationFactory
      */
     public function create(string $pathname, stdClass $rawConfig): SchemaConfiguration
     {
+        /** @var stdClass $mago */
+        $mago = $rawConfig->mago ?? new stdClass();
+
         return new SchemaConfiguration(
             pathname: $pathname,
             timeout: self::getTimeout($rawConfig),
@@ -67,6 +71,7 @@ class SchemaConfigurationFactory
             tmpDir: self::normalizeString($rawConfig->tmpDir ?? null),
             phpUnit: self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
             phpStan: self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
+            mago: self::createMago($mago),
             ignoreMsiWithNoMutations: $rawConfig->ignoreMsiWithNoMutations ?? null,
             minMsi: $rawConfig->minMsi ?? null,
             minCoveredMsi: $rawConfig->minCoveredMsi ?? null,
@@ -182,6 +187,25 @@ class SchemaConfigurationFactory
         return new PhpStan(
             self::normalizeString($phpStan->configDir ?? null),
             self::normalizeString($phpStan->customPath ?? null),
+        );
+    }
+
+    private static function createMago(stdClass $mago): Mago
+    {
+        /**
+         * Based on the schema validation this is guaranteed to be a string if it exists
+         * @var string|null $customPath
+         */
+        $customPath = $mago->customPath ?? null;
+        /**
+         * Based on the schema validation this is guaranteed to be a string if it exists
+         * @var string|null $configDir
+         */
+        $configDir = $mago->configDir ?? null;
+
+        return new Mago(
+            self::normalizeString($configDir),
+            self::normalizeString($customPath),
         );
     }
 

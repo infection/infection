@@ -38,6 +38,7 @@ namespace Infection\Mutator\Unwrap;
 use function array_keys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 
 /**
@@ -78,6 +79,7 @@ final class UnwrapArrayReplaceRecursive extends AbstractFunctionUnwrapMutator
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_keys($node->args);

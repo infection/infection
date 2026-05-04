@@ -52,6 +52,7 @@ use function Safe\preg_split;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -62,15 +63,15 @@ use Webmozart\Assert\Assert;
 final readonly class CommandLineGit implements Git
 {
     // https://github.com/infection/infection/issues/2611
-    private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
+    private const string DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
-    private const DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
+    private const string DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
 
-    private const DIFF_LINE_PATH_KEY = 'filePath';
+    private const string DIFF_LINE_PATH_KEY = 'filePath';
 
-    private const DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
+    private const string DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
 
-    private const DIFF_LINE_RANGE_KEY = 'range';
+    private const string DIFF_LINE_RANGE_KEY = 'range';
 
     public function __construct(
         private ShellCommandLineExecutor $shellCommandLineExecutor,
@@ -147,6 +148,28 @@ final readonly class CommandLineGit implements Git
         }
 
         return $base;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
+     */
+    public function getProjectDirectory(): string
+    {
+        // An error here should really not happen, so we are fine to let it
+        // bubble up instead of throwing a dedicated exception or providing a
+        // fallback.
+        $directory = $this->shellCommandLineExecutor->execute([
+            'git',
+            'rev-parse',
+            '--show-toplevel',
+        ]);
+
+        Assert::stringNotEmpty($directory);
+
+        return $directory;
     }
 
     /**

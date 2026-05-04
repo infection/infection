@@ -51,7 +51,7 @@ final class MapSourceClassToTestOption implements CommandOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'map-source-class-to-test';
+    public const string NAME = 'map-source-class-to-test';
 
     /**
      * @template T of Command

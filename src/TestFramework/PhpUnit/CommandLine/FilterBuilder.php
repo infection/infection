@@ -51,18 +51,18 @@ use function version_compare;
  */
 final class FilterBuilder
 {
-    private const MAX_EXPLODE_PARTS = 2;
+    private const int MAX_EXPLODE_PARTS = 2;
 
     // The real limit is likely higher, but it is better to be safe than sorry.
-    private const PCRE_LIMIT = 30_000;
+    private const int PCRE_LIMIT = 30_000;
 
-    private const NO_OPTIMIZATION_LEVEL = 0;
+    private const int NO_OPTIMIZATION_LEVEL = 0;
 
-    private const DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
+    private const int DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
 
-    private const DROP_TEST_CASE_OPTIMIZATION_LEVEL = 2;
+    private const int DROP_TEST_CASE_OPTIMIZATION_LEVEL = 2;
 
-    private const BAILOUT_OPTIMIZATION_LEVEL = 3;
+    private const int BAILOUT_OPTIMIZATION_LEVEL = 3;
 
     /**
      * @param non-empty-array<TestLocation> $tests
@@ -168,8 +168,6 @@ final class FilterBuilder
     }
 
     /**
-     * @psalm-suppress InvalidReturnType, InvalidReturnStatement
-     *
      * @return array{string, string}
      */
     private static function splitMethodNameFromProviderKey(

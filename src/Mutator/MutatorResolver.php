@@ -52,13 +52,13 @@ use stdClass;
  */
 final class MutatorResolver
 {
-    private const IGNORE_SETTING = 'ignore';
+    private const string IGNORE_SETTING = 'ignore';
 
-    private const IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'ignoreSourceCodeByRegex';
+    private const string IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'ignoreSourceCodeByRegex';
 
-    private const GLOBAL_IGNORE_SETTING = 'global-ignore';
+    private const string GLOBAL_IGNORE_SETTING = 'global-ignore';
 
-    private const GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'global-ignoreSourceCodeByRegex';
+    private const string GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'global-ignoreSourceCodeByRegex';
 
     /**
      * Resolves the given hashmap of enabled, disabled or configured mutators

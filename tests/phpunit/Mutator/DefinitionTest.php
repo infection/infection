@@ -52,7 +52,7 @@ use function sprintf;
 final class DefinitionTest extends TestCase
 {
     // TODO: address those
-    private const MUTATORS_WITHOUT_REMEDIES = [
+    private const array MUTATORS_WITHOUT_REMEDIES = [
         'Assignment',
         'AssignmentEqual',
         'BitwiseAnd',
