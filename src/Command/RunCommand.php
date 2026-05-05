@@ -63,6 +63,7 @@ use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -504,8 +505,8 @@ final class RunCommand extends BaseCommand
 
         $io->newLine();
         $io->writeln(sprintf(
-            'Installing <comment>infection/%s-adapter</comment>...',
-            $adapterName,
+            'Installing <comment>%s</comment>...',
+            AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName],
         ));
 
         $container->getAdapterInstaller()->install($adapterName);
