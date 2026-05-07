@@ -151,8 +151,6 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\Telemetry\OpenTelemetryTracer;
-use Infection\Telemetry\OpenTelemetryTracerFactory;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
@@ -428,7 +426,6 @@ final class Container extends DIContainer
                 );
             },
             InitialTestsExecutionLogger::class => static fn (self $container): InitialTestsExecutionLogger => $container->get(InitialTestsExecutionLoggerFactory::class)->create(),
-            OpenTelemetryTracer::class => static fn (self $container): OpenTelemetryTracer => $container->get(OpenTelemetryTracerFactory::class)->createRequired(),
             InitialStaticAnalysisExecutionLoggerFactory::class => static function (self $container): InitialStaticAnalysisExecutionLoggerFactory {
                 $config = $container->getConfiguration();
 
