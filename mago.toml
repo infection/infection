@@ -30,6 +30,8 @@ excludes = [
     # https://github.com/carthage-software/mago/issues/1676
     "vendor/rector/rector",
     "vendor/phpstan",
+    # Contains files that have invalid UTF-8 which mago issues a warning about
+    "vendor/open-telemetry/gen-otlp-protobuf/GPBMetadata/Opentelemetry/Proto"
 ]
 
 [source.glob]
