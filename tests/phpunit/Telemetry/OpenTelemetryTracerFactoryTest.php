@@ -39,6 +39,7 @@ use Exception;
 use function getenv;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\OpenTelemetryTracerFactory;
+use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -48,10 +49,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
+use UnexpectedValueException;
 
 #[BackupGlobals(true)]
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerFactory::class)]
+#[CoversClass(FailingTracerProviderFactory::class)]
 final class OpenTelemetryTracerFactoryTest extends TestCase
 {
     use BacksUpEnvironmentVariables;
@@ -126,6 +129,43 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
             $expectTracer,
         ];
 
+        yield 'OTLP traces exporter' => [
+            [
+                Variables::OTEL_TRACES_EXPORTER => 'otlp',
+            ],
+            $expectTracer,
+        ];
+
+        yield 'OTLP exporter endpoint' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
+            ],
+            $expectTracer,
+        ];
+
+        yield 'OTLP traces exporter endpoint' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://localhost:4318/v1/traces',
+            ],
+            $expectTracer,
+        ];
+
+        yield 'OTLP exporter endpoint with unsupported OTLP protocol' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
+                Variables::OTEL_EXPORTER_OTLP_PROTOCOL => 'foo',
+            ],
+            new UnexpectedValueException('Unknown protocol: foo'),
+        ];
+
+        yield 'OTLP traces exporter endpoint with unsupported OTLP traces protocol' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://localhost:4318/v1/traces',
+                Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => 'foo',
+            ],
+            new UnexpectedValueException('Unknown protocol: foo'),
+        ];
+
         yield 'console traces exporter with OpenTelemetry PHP autoload disabled' => [
             [
                 Variables::OTEL_TRACES_EXPORTER => 'console',
@@ -136,10 +176,10 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
 
         yield 'unsupported traces exporter' => [
             [
-                Variables::OTEL_TRACES_EXPORTER => 'otlp',
+                Variables::OTEL_TRACES_EXPORTER => 'http',
             ],
             new InvalidArgumentException(
-                'Unsupported OpenTelemetry exporter configured via OTEL_TRACES_EXPORTER="otlp". Supported values: console, none.',
+                'Unsupported OpenTelemetry exporter configured via OTEL_TRACES_EXPORTER="http". Supported values: otlp, console, none.',
             ),
         ];
 
