@@ -92,6 +92,8 @@ use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Telemetry\SpanHandle;
+use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
@@ -171,10 +173,12 @@ final class ProjectCodeProvider
         NonExecutableFinder::class,
         NullSourceLineMatcher::class,
         NullSubscriber::class,
+        OpenTelemetryTracerSubscriberFactory::class,
         OperatingSystem::class,
         SchemaConfiguration::class,
         SingletonContainer::class,
         Source::class,
+        SpanHandle::class,
         StopInfectionOnSigintSignalSubscriber::class,
         StrykerCurlClient::class,
         Tokens::class,
