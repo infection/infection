@@ -345,6 +345,7 @@ final class ProjectCodeProvider
             ->files()
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
+            ->notName('bootstrap.php')
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
             ->exclude([
