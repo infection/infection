@@ -152,7 +152,6 @@ use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\Telemetry\OpenTelemetryTracer;
-use Infection\Telemetry\OpenTelemetryTracerFactory;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;

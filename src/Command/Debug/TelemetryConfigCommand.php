@@ -38,6 +38,7 @@ namespace Infection\Command\Debug;
 use Infection\Command\BaseCommand;
 use Infection\Console\IO;
 use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Telemetry\OpenTelemetryTracerFactory;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
@@ -58,7 +59,7 @@ final class TelemetryConfigCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         VarDumper::dump(
-            $this->getApplication()->getContainer()->get(OpenTelemetryTracer::class),
+            $this->getApplication()->getContainer()->get(OpenTelemetryTracerFactory::class)->create(),
             OpenTelemetryTracer::class,
         );
 
