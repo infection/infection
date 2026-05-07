@@ -83,27 +83,6 @@ final readonly class OpenTelemetryTracerFactory
         );
     }
 
-    /**
-     * @throws RuntimeException
-     */
-    public function createRequired(): OpenTelemetryTracer
-    {
-        $tracer = $this->create();
-
-        if ($tracer === null) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'OpenTelemetry tracer is not enabled. Set %s=console, %s, or %s to create it.',
-                    Variables::OTEL_TRACES_EXPORTER,
-                    Variables::OTEL_EXPORTER_OTLP_ENDPOINT,
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT,
-                ),
-            );
-        }
-
-        return $tracer;
-    }
-
     private function isSdkDisabled(): bool
     {
         return self::isBoolVariableEnabled(Variables::OTEL_SDK_DISABLED);

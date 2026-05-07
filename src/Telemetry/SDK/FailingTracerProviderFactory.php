@@ -76,6 +76,8 @@ final readonly class FailingTracerProviderFactory
             return new NoopTracerProvider();
         }
 
+        // No exception is caught (unlike TracerProviderFactory) when creating
+        // those services.
         $exporter = $this->createExporter();
         $sampler = $this->samplerFactory->create();
         $spanProcessor = $this->spanProcessorFactory->create($exporter);
