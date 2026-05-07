@@ -70,6 +70,7 @@ final class TestTest extends TestCase
             new Test(
                 'fb9282c1c4fec68667212fb805238bc9',
                 'Infection\Mutator\Boolean\LogicalOr (fb9282c1c4fec68667212fb805238bc9)',
+                'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php::7-42',
                 '2b4aa030e4a6eead',
                 'a93f8006e20d02d1',
             ),
@@ -85,6 +86,8 @@ final class TestTest extends TestCase
             ->withOriginalFilePath($sourceFilePath)
             ->withMutatorClass($mutatorClassName)
             ->withHash($hash)
+            ->withAttribute('startFilePos', 7)
+            ->withAttribute('endFilePos', 42)
             ->build();
     }
 }

@@ -2,37 +2,116 @@
 
 ## Table of Contents
 
-- [A](#a)
-    - [Arid Node][arid-node]
-    - [Artefact Collection][artefact-collection]
-    - [AST][ast]
-    - [AST Enrichment][ast-enrichment]
-    - [AST Processing][ast-processing]
-- [E](#e)
-    - [Eligible Node][eligible-node]
-- [H](#h)
-    - [Heuristic Suppression][heuristic-suppression]
-- [M](#m)
-    - [Mutagenesis][mutagenesis]
-    - [Mutant][mutant]
-    - [Mutant Analysis][mutant-analysis]
-    - [Mutant Evaluation][mutant-evaluation]
-    - [Mutant Generation][mutant-generation]
-    - [Mutant Materialisation][mutant-materialisation]
-    - [Mutation][mutation]
-    - [Mutation Analysis][mutation-analysis]
-    - [Mutator][mutator]
-- [P](#p)
-    - [Parsing][parsing]
-- [R](#r)
-    - [Reporting][reporting]
-- [S](#s)
-    - [Source Collection][source-collection]
-    - [Subject][subject]
-- [T](#t)
-    - [Tracer][tracer]
-    - [Trace][trace]
+- [Execution Phases](#execution-phases)
+- Index
+    - [A](#a)
+        - [Arid Node][arid-node]
+        - [Artefact Collection][artefact-collection]
+        - [AST][ast]
+        - [AST Enrichment][ast-enrichment]
+        - [AST Parsing][ast-parsing]
+        - [AST Processing][ast-processing]
+    - [E](#e)
+        - [Eligible Node][eligible-node]
+    - [H](#h)
+        - [Heuristic Suppression][heuristic-suppression]
+    - [M](#m)
+        - [Mutagenesis][mutagenesis]
+        - [Mutant][mutant]
+        - [Mutant Analysis][mutant-analysis]
+        - [Mutant Evaluation][mutant-evaluation]
+        - [Mutant Materialisation][mutant-materialisation]
+        - [Mutation][mutation]
+        - [Mutation Analysis][mutation-analysis]
+        - [Mutation Generation][mutation-generation]
+        - [Mutator][mutator]
+    - [R](#r)
+        - [Reporting][reporting]
+    - [S](#s)
+        - [Source Collection][source-collection]
+        - [Subject][subject]
+    - [T](#t)
+        - [Tracer][tracer]
+        - [Trace][trace]
 - [References](#references)
+
+
+## Execution Phases
+
+The following diagram shows how the execution phases relate to one another:
+
+```mermaid
+---
+config:
+    layout: elk
+---
+flowchart TB
+%% Blocks
+    SourceCollection["Source Collection"]
+    ArtefactCollection["Artefact Collection"]
+
+    AstParsing["AST Parsing"]
+    AstEnrichment["AST Enrichment"]
+
+    MutationGeneration["Mutation Generation"]
+    HeuristicSuppression["Heuristic Suppression"]
+    MutantMaterialisation["Mutant Materialisation"]
+    MutantEvaluation["Mutant Evaluation"]
+
+    Reporting["Reporting"]
+
+%% Flow
+    SourceCollection --> ArtefactCollection
+    ArtefactCollection --> AstParsing
+    AstParsing --> AstEnrichment
+    AstEnrichment --> MutationGeneration
+    MutationGeneration --> HeuristicSuppression
+    HeuristicSuppression --> MutantMaterialisation
+    MutantMaterialisation --> MutantEvaluation
+    MutantEvaluation --> Reporting
+
+%% Groups
+    subgraph MutationAnalysis["Mutation Analysis"]
+        AstProcessing
+        MutationGeneration
+        MutationEvaluation
+    end
+
+    subgraph AstProcessing["AST Processing"]
+        AstParsing
+        AstEnrichment
+    end
+
+    subgraph MutationEvaluation["Mutation Evaluation"]
+        HeuristicSuppression
+        MutantAnalysis
+    end
+
+    subgraph MutantAnalysis["Mutant Analysis"]
+        MutantMaterialisation
+        MutantEvaluation
+    end
+
+%% Styling
+    style SourceCollection fill:#f1f5f9,stroke:#64748b
+    style ArtefactCollection fill:#f1f5f9,stroke:#64748b
+    style Reporting fill:#f1f5f9,stroke:#64748b
+
+    style MutationAnalysis fill:#f8fafc,stroke:#cbd5e1
+
+    style AstProcessing fill:#eef2ff,stroke:#6366f1
+    style AstParsing fill:#c7d2fe,stroke:#4f46e5
+    style AstEnrichment fill:#c7d2fe,stroke:#4f46e5
+
+    style MutationGeneration fill:#99f6e4,stroke:#0d9488
+
+    style MutationEvaluation fill:#fff7ed,stroke:#ea580c
+    style HeuristicSuppression fill:#fed7aa,stroke:#c2410c
+
+    style MutantAnalysis fill:#fff1f2,stroke:#e11d48
+    style MutantMaterialisation fill:#fecdd3,stroke:#be123c
+    style MutantEvaluation fill:#fecdd3,stroke:#be123c
+```
 
 
 ## A
@@ -60,9 +139,14 @@ syntactic structure of source code. Infection parses source files into this repr
 The traversal of the [AST][ast] to add context, mark [arid nodes][arid-node], identify [eligible nodes][eligible-node], and similar preparatory tasks.
 
 
+### AST Parsing
+
+The creation of an [AST][ast] for each source file.
+
+
 ### AST Processing
 
-The building and enriching of the program representation. Encompasses [parsing][parsing] and
+The building and enriching of the program representation. Encompasses [AST parsing][ast-parsing] and
 [AST enrichment][ast-enrichment].
 
 
@@ -103,11 +187,6 @@ The phase encompassing [mutant materialisation][mutant-materialisation] and [mut
 The execution of tests against the mutant process(es) and recording of the outcome.
 
 
-### Mutant Generation
-
-The traversal of the [AST][ast] to yield [mutations][mutation] for each [eligible node][eligible-node].
-
-
 ### Mutant Materialisation
 
 The writing of mutated code to disc and spawning of an isolated process in which the mutation is applied.
@@ -123,8 +202,13 @@ In the mutation testing literature, the terms "mutant" and "mutation" are often 
 ### Mutation Analysis
 
 The core mutation testing cycle: generate, filter, instantiate, evaluate. Encompasses
-[mutant generation][mutant-generation], [heuristic suppression][heuristic-suppression],
+[mutation generation][mutation-generation], [heuristic suppression][heuristic-suppression],
 [mutant materialisation][mutant-materialisation] and [mutant evaluation][mutant-evaluation]. [\[3\]][ref-3]
+
+
+### Mutation Generation
+
+The traversal of the [AST][ast] to yield [mutations][mutation] for each [eligible node][eligible-node].
 
 
 ### Mutator
@@ -132,13 +216,6 @@ The core mutation testing cycle: generate, filter, instantiate, evaluate. Encomp
 A definition of a possible transformation which, when applied to the [AST][ast] of a [subject][subject], produces a [mutation][mutation]. [\[2\]][ref-2]
 
 In the mutation testing literature, mutators are also known as "mutant operator", "mutagenic operator", "mutagen", and "mutation rule".
-
-
-## P
-
-### Parsing
-
-The creation of an [AST][ast] for each source file.
 
 
 ## R
@@ -197,12 +274,12 @@ _Note: These references indicate where a term is used or defined, not necessaril
 [mutant]: #mutant
 [mutant-analysis]: #mutant-analysis
 [mutant-evaluation]: #mutant-evaluation
-[mutant-generation]: #mutant-generation
+[mutation-generation]: #mutation-generation
 [mutant-materialisation]: #mutant-materialisation
 [mutation]: #mutation
 [mutation-analysis]: #mutation-analysis
 [mutator]: #mutator
-[parsing]: #parsing
+[ast-parsing]: #ast-parsing
 [ref-1]: #references
 [ref-2]: #references
 [ref-3]: #references
