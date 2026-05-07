@@ -92,6 +92,7 @@ use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Telemetry\SpanHandle;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstaller;
@@ -150,6 +151,7 @@ final class ProjectCodeProvider
         FakeSourceCollector::class,
         FakeSourceFilter::class,
         FakeSourceLineMatcher::class,
+        FailingTracerProviderFactory::class,
         FileSystem::class,
         FilterOption::class,
         FixedSourceCollector::class,
@@ -345,6 +347,7 @@ final class ProjectCodeProvider
             ->files()
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
+            ->notName('bootstrap.php')
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
             ->exclude([

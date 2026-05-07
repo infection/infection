@@ -109,6 +109,12 @@ message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Excepti
 count = 1
 
 [[issues]]
+file = "src/Command/Debug/TelemetryConfigCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Command\Debug\TelemetryConfigCommand::executeCommand`.'
+count = 1
+
+[[issues]]
 file = "src/Command/DescribeCommand.php"
 code = "impossible-condition"
 message = "This condition (type `false`) will always evaluate to false."
@@ -2800,6 +2806,18 @@ count = 1
 file = "src/StaticAnalysis/StaticAnalysisToolTypes.php"
 code = "unused-parameter"
 message = "Parameter `$installedExtensions` is never used."
+count = 1
+
+[[issues]]
+file = "src/Telemetry/SDK/FailingTracerProviderFactory.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Telemetry\SDK\FailingTracerProviderFactory::createExporter`.'
+count = 1
+
+[[issues]]
+file = "src/Telemetry/Subscriber/OpenTelemetryTracerSubscriberFactory.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory::create`.'
 count = 1
 
 [[issues]]
@@ -11653,6 +11671,24 @@ message = "Type `iterable` in return type of `tracerProvider` is imprecise, equi
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_creates_a_tracer`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_keeps_the_existing_service_name_when_creating_a_tracer`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_sets_the_default_service_name_when_creating_a_tracer`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/CoveredTraceProviderTest.php"
 code = "impossible-type-comparison"
 message = 'Impossible type assertion: `$traces` of type `array<array-key, Infection\TestFramework\Tracing\Trace\Trace>` can never be `list{int(1), int(2), int(3)}`.'
@@ -13894,4 +13930,10 @@ count = 1
 file = "tests/phpunit/WithConsecutive.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\WithConsecutive::create`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/bootstrap.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 1
