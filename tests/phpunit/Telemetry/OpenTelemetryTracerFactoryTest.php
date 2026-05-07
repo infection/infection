@@ -39,6 +39,7 @@ use Exception;
 use function getenv;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\OpenTelemetryTracerFactory;
+use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -48,10 +49,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
+use UnexpectedValueException;
 
 #[BackupGlobals(true)]
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerFactory::class)]
+#[CoversClass(FailingTracerProviderFactory::class)]
 final class OpenTelemetryTracerFactoryTest extends TestCase
 {
     use BacksUpEnvironmentVariables;
@@ -126,10 +129,9 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
             $expectTracer,
         ];
 
-        yield 'console traces exporter with OpenTelemetry PHP autoload disabled' => [
+        yield 'OTLP traces exporter' => [
             [
-                Variables::OTEL_TRACES_EXPORTER => 'console',
-                Variables::OTEL_PHP_AUTOLOAD_ENABLED => 'false',
+                Variables::OTEL_TRACES_EXPORTER => 'otlp',
             ],
             $expectTracer,
         ];
@@ -148,9 +150,46 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
             $expectNoTracer,
         ];
 
+        yield 'OTLP exporter endpoint' => [
+        yield 'Infection telemetry enabled' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
+                'INFECTION_TELEMETRY_ENABLED' => 'true',
+            ],
+            $expectTracer,
+        ];
+
+        yield 'OTLP traces exporter endpoint' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://localhost:4318/v1/traces',
+            ],
+            $expectTracer,
+        ];
+
+        yield 'OTLP exporter endpoint with unsupported OTLP protocol' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
+                Variables::OTEL_EXPORTER_OTLP_PROTOCOL => 'foo',
+            ],
+            new UnexpectedValueException('Unknown protocol: foo'),
+        ];
+
+        yield 'OTLP traces exporter endpoint with unsupported OTLP traces protocol' => [
+        yield 'Infection telemetry explicitly not enabled' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://localhost:4318/v1/traces',
+                Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => 'foo',
+                'INFECTION_TELEMETRY_ENABLED' => 'false',
+            ],
+            new UnexpectedValueException('Unknown protocol: foo'),
+            $expectNoTracer,
+        ];
+
+        yield 'console traces exporter with OpenTelemetry PHP autoload disabled' => [
         yield 'console traces exporter with Infection telemetry enabled' => [
             [
                 Variables::OTEL_TRACES_EXPORTER => 'console',
+                Variables::OTEL_PHP_AUTOLOAD_ENABLED => 'false',
                 'INFECTION_TELEMETRY_ENABLED' => 'true',
             ],
             $expectTracer,
@@ -158,9 +197,11 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
 
         yield 'unsupported traces exporter' => [
             [
+                Variables::OTEL_TRACES_EXPORTER => 'http',
                 Variables::OTEL_TRACES_EXPORTER => 'otlp',
             ],
             new InvalidArgumentException(
+                'Unsupported OpenTelemetry exporter configured via OTEL_TRACES_EXPORTER="http". Supported values: otlp, console, none.',
                 'Unsupported OpenTelemetry exporter configured via OTEL_TRACES_EXPORTER="otlp". Supported values: console, none.',
             ),
         ];
@@ -214,21 +255,6 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
         $this->assertSame('infection', getenv(Variables::OTEL_SERVICE_NAME));
         $this->assertSame('infection', $_SERVER[Variables::OTEL_SERVICE_NAME]);
         $this->assertSame('infection', $_ENV[Variables::OTEL_SERVICE_NAME]);
-    }
-
-    public function test_it_sets_the_default_traces_exporter_when_infection_telemetry_is_enabled(): void
-    {
-        $this->setEnvVariables([
-            'INFECTION_TELEMETRY_ENABLED' => 'true',
-        ]);
-
-        $tracer = (new OpenTelemetryTracerFactory())->create();
-
-        $tracer?->shutdown();
-
-        $this->assertSame('console', getenv(Variables::OTEL_TRACES_EXPORTER));
-        $this->assertSame('console', $_SERVER[Variables::OTEL_TRACES_EXPORTER]);
-        $this->assertSame('console', $_ENV[Variables::OTEL_TRACES_EXPORTER]);
     }
 
     public function test_it_keeps_the_existing_service_name_when_creating_a_tracer(): void

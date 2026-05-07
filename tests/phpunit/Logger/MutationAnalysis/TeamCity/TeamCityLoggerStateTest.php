@@ -57,6 +57,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $testA = new Test(
             'mutationId1',
             'MutatorName (mutationId1)',
+            'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:1-3',
             'TA',
             $testSuite->nodeId,
         );
@@ -85,6 +86,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $testA = new Test(
             'mutationId1',
             'MutatorName (mutationId1)',
+            'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:1-3',
             'TA',
             $testSuite->nodeId,
         );
@@ -92,6 +94,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $testB = new Test(
             'mutationId2',
             'MutatorName (mutationId2)',
+            'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:7-13',
             'T2',
             $testSuite->nodeId,
         );
@@ -124,6 +127,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $testA = new Test(
             'mutationId1',
             'MutatorName (mutationId1)',
+            'infection:///path/to/project/src/source.php:1-3',
             'TA',
             $testSuite->nodeId,
         );
@@ -131,6 +135,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $testB = new Test(
             'mutationId2',
             'MutatorName (mutationId2)',
+            'infection:///path/to/project/src/source.php:1-3',
             'T2',
             $testSuite->nodeId,
         );
@@ -200,6 +205,7 @@ final class TeamCityLoggerStateTest extends TestCase
         $testA = new Test(
             'mutationId1',
             'MutatorName (mutationId1)',
+            'infection:///path/to/project/src/Infrastructure/Http/Action/Greet.php:1-3',
             'TA',
             $testSuite->nodeId,
         );

@@ -41,9 +41,10 @@ use function filter_var;
 use function getenv;
 use function implode;
 use function in_array;
+use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Trace\TracerProviderFactory;
+use RuntimeException;
 use function Safe\putenv;
 use function sprintf;
 use function strtolower;
@@ -60,6 +61,9 @@ final readonly class OpenTelemetryTracerFactory
      */
     private const string TRACER_NAME = 'infection';
 
+    /**
+     * @throws RuntimeException
+     */
     public function create(): ?OpenTelemetryTracer
     {
         self::guardSupportedExporters();
@@ -78,7 +82,7 @@ final readonly class OpenTelemetryTracerFactory
         // However, it's a lot of boilerplate, so not worth it, at least at
         // the time of writing.
         self::setDefaultServiceName();
-        $tracerProvider = (new TracerProviderFactory())->create();
+        $tracerProvider = (new FailingTracerProviderFactory())->create();
 
         return new OpenTelemetryTracer(
             $tracerProvider->getTracer(self::TRACER_NAME),
@@ -115,8 +119,12 @@ final readonly class OpenTelemetryTracerFactory
     {
         $tracesExporter = getenv(Variables::OTEL_TRACES_EXPORTER);
 
-        return $tracesExporter !== false
-            && strtolower($tracesExporter) !== 'none';
+        if ($tracesExporter !== false) {
+            return strtolower($tracesExporter) !== 'none';
+        }
+
+        return getenv(Variables::OTEL_EXPORTER_OTLP_ENDPOINT) !== false
+            || getenv(Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) !== false;
     }
 
     private static function setDefaultServiceName(): void
@@ -143,7 +151,7 @@ final readonly class OpenTelemetryTracerFactory
 
     private static function guardSupportedExporters(): void
     {
-        self::guardExporter(Variables::OTEL_TRACES_EXPORTER, ['console', 'none']);
+        self::guardExporter(Variables::OTEL_TRACES_EXPORTER, ['otlp', 'console', 'none']);
         self::guardExporter(Variables::OTEL_METRICS_EXPORTER, ['none']);
         self::guardExporter(Variables::OTEL_LOGS_EXPORTER, ['none']);
         self::guardAutoload();

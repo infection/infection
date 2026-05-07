@@ -1,7 +1,25 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
+language: en-GB
+
+chat:
+    allow_non_org_members: false
+    art: false
+    auto_reply: false
+
 reviews:
+    abort_on_close: true
     auto_review:
-        enabled: false
         auto_incremental_review: false
+        enabled: false
+    finishing_touches:
+        docstrings:
+            enabled: false
+    high_level_summary_in_walkthrough: true
+    high_level_summary_instructions: |
+        Prefer British English over American English.
+        Use a neutral, collaborative, and professional tone appropriate for peer review.
+    in_progress_fortune: false
+    poem: false
+    profile: chill
     review_status: false

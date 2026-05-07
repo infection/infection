@@ -33,36 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Debug;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 
-use Infection\Command\BaseCommand;
-use Infection\Console\IO;
-use Infection\Telemetry\OpenTelemetryTracer;
-use Infection\Telemetry\OpenTelemetryTracerFactory;
-use Symfony\Component\VarDumper\VarDumper;
+$loader = require __DIR__ . '/../../vendor/autoload.php';
 
-/**
- * @internal
- */
-final class TelemetryConfigCommand extends BaseCommand
-{
-    public function __construct()
-    {
-        parent::__construct('debug:telemetry');
-    }
+Logging::setLogWriter(new NoopLogWriter());
 
-    protected function configure(): void
-    {
-        $this->setDescription('Dumps the configured OpenTelemetry tracer service.');
-    }
-
-    protected function executeCommand(IO $io): bool
-    {
-        VarDumper::dump(
-            $this->getApplication()->getContainer()->get(OpenTelemetryTracerFactory::class)->create(),
-            OpenTelemetryTracer::class,
-        );
-
-        return true;
-    }
-}
+return $loader;

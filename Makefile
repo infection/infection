@@ -306,13 +306,23 @@ $(MAGO): vendor
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
-	composer require infection/codeception-adapter infection/phpspec-adapter
+	# Backup the composer files
+	cp composer.json var/phar/composer.json.bak
+	cp composer.lock var/phar/composer.lock.bak
+
+	composer require \
+		guzzlehttp/guzzle \
+		infection/codeception-adapter \
+		infection/phpspec-adapter
+
 	# Workaround for https://github.com/box-project/box/issues/580
 	composer install --no-dev
 	$(BOX) --version
 	$(BOX) validate
 	$(BOX) compile
-	composer remove infection/codeception-adapter infection/phpspec-adapter
+
+	mv -f var/phar/composer.json.bak composer.json
+	mv -f var/phar/composer.lock.bak composer.lock
 	composer install
 	touch -c $@
 
