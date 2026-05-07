@@ -1,0 +1,35 @@
+
+    ____      ____          __  _
+   /  _/___  / __/__  _____/ /_(_)___  ____
+   / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
+ _/ // / / / __/  __/ /__/ /_/ / /_/ / / / /
+/___/_/ /_/_/  \___/\___/\__/_/\____/_/ /_/
+
+#StandWithUkraine
+
+Infection - PHP Mutation Testing Framework version dev-master
+
+[notice] You are running Infection with Xdebug enabled.
+
+Running initial tests with PHPUnit version 12.5.24
+
+
+
+Generate mutants...
+
+
+.: killed by tests, A: killed by SA, M: escaped, U: uncovered
+E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+
+..                                                   (2 / 2)
+
+2 mutations were generated:
+       2 mutants were killed by Test Framework
+
+Metrics:
+         Mutation Code Coverage: 100%
+         Covered Code MSI: 100%
+
+Please note that some mutants will inevitably be harmless (i.e. false positives).
+
+Time: 0s. Memory: 18.00MB. Threads: 1
