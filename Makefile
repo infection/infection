@@ -320,7 +320,12 @@ $(MAGO): vendor
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
+	# Backup the composer files
+	cp composer.json var/phar/composer.json.bak
+	cp composer.lock var/phar/composer.lock.bak
+
 	composer require --no-interaction \
+		guzzlehttp/guzzle \
 		infection/codeception-adapter \
 		infection/phpspec-adapter \
 		testo/bridge-infection
@@ -330,7 +335,9 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	$(BOX) --version
 	$(BOX) validate --no-interaction
 	$(BOX) compile --no-interaction
-	composer remove infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
+
+	mv -f var/phar/composer.json.bak composer.json
+	mv -f var/phar/composer.lock.bak composer.lock
 	composer install --no-interaction
 	touch -c $@
 

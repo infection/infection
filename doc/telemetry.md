@@ -4,27 +4,28 @@ Infection can emit [OpenTelemetry][opentelemetry] data about its execution,
 allowing you to observe how a run progresses, where time is spent, and which
 mutants are evaluated.
 
-Telemetry is **off by default** and only activates once the standard `OTEL_*`
-environment variables are set. Infection exposes no telemetry-specific
-configuration in `infection.json5`; configuration flows entirely through the
-official OpenTelemetry environment variables, as with any other instrumented
-application.
+Telemetry is **off by default** and only activates once tracing is requested
+through the standard `OTEL_*` environment variables. Infection exposes no
+telemetry-specific configuration in `infection.json5`; configuration flows
+entirely through the official OpenTelemetry environment variables, as with any
+other instrumented application.
 
 ## Current support
 
-OpenTelemetry support is being rolled out incrementally. The currently
+OpenTelemetry support is being delivered incrementally. The currently
 supported surface is:
 
-| Signal  | Status                                  |
-| ------- | --------------------------------------- |
-| Traces  | Supported, `console` exporter only      |
-| Metrics | Not yet supported                       |
-| Logs    | Not yet supported                       |
+| Signal  | Status                                          |
+| ------- | ----------------------------------------------- |
+| Traces  | Supported with `console` and OTLP HTTP exporters |
+| Metrics | Not yet supported                               |
+| Logs    | Not yet supported                               |
 
-Configuring an unsupported exporter (for example, a metrics or logs exporter,
-or a trace exporter other than `console`) is rejected at startup rather than
-silently producing no output. OTLP export and additional signals will be
-added in later increments.
+Unsupported exporters (for example, a metrics or logs exporter, or a trace
+exporter other than `console` or `otlp`) are rejected at startup rather than
+silently producing no output. Unsupported OTLP protocols are likewise
+reported at startup. Additional signals and exporters will be added in later
+increments.
 
 ## Quick start
 
@@ -39,7 +40,7 @@ The `--quiet` flag suppresses Infection's regular console output so that only
 the spans remain on stdout.
 
 To inspect the OpenTelemetry tracer service that Infection assembles from the
-current environment, without running mutation testing, use:
+current environment without running mutation testing, use:
 
 ```bash
 OTEL_TRACES_EXPORTER=console vendor/bin/infection debug:telemetry
@@ -59,18 +60,22 @@ Infection records the following lifecycle spans for every run:
 ## Configuration
 
 Infection reads the standard OpenTelemetry environment variables. The most
-relevant today are:
+relevant at present are:
 
-| Variable               | Purpose                                                                    | Default                  |
-| ---------------------- | -------------------------------------------------------------------------- | ------------------------ |
-| `OTEL_TRACES_EXPORTER` | Trace exporter to use. Only `console` is currently accepted.               | unset (telemetry is off) |
-| `OTEL_SERVICE_NAME`    | Service name attached to all spans.                                        | `infection`              |
-| `OTEL_SDK_DISABLED`    | When `true`, forces the SDK off regardless of any other `OTEL_*` variable. | `false`                  |
+| Variable                             | Purpose                                                                    | Default                  |
+|--------------------------------------|----------------------------------------------------------------------------|--------------------------|
+| `OTEL_TRACES_EXPORTER`               | Trace exporter to use. Accepted values are `console`, `otlp`, and `none`.  | unset (telemetry is off) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`        | Base OTLP endpoint. Setting it also enables OTLP trace export.             | unset                    |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | OTLP endpoint for traces. Setting it also enables OTLP trace export.       | unset                    |
+| `OTEL_EXPORTER_OTLP_PROTOCOL`        | OTLP protocol. Use `http/protobuf` for HTTP export.                        | SDK default              |
+| `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL` | OTLP traces protocol. Use `http/protobuf` for HTTP export.                 | SDK default              |
+| `OTEL_SERVICE_NAME`                  | Service name attached to all spans.                                        | `infection`              |
+| `OTEL_SDK_DISABLED`                  | When `true`, forces the SDK off regardless of any other `OTEL_*` variable. | `false`                  |
 
 For the full list of variables the OpenTelemetry SDK recognises, see the
 official [environment variable reference][otel-env-vars]. Variables that
-target signals or exporters Infection does not yet support are either ignored
-or rejected, depending on what they configure.
+target signals, exporters, or protocols Infection does not yet support are
+either ignored or rejected, depending on what they configure.
 
 ## How-to
 
@@ -92,8 +97,24 @@ output:
 OTEL_TRACES_EXPORTER=console vendor/bin/infection --quiet > traces.log
 ```
 
-The `--quiet` flag is important here; without it, Infection's normal stdout
+The `--quiet` flag is important here; without it, Infection's regular stdout
 output would be interleaved with the spans in the resulting file.
+
+### Export traces to an OTLP Collector
+
+Use the OTLP exporter with the HTTP/protobuf transport:
+
+```bash
+OTEL_TRACES_EXPORTER=otlp \
+OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf \
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://127.0.0.1:4318/v1/traces \
+OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip \
+vendor/bin/infection
+```
+
+Setting `OTEL_EXPORTER_OTLP_ENDPOINT` or
+`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is also sufficient to enable OTLP tracing,
+even when `OTEL_TRACES_EXPORTER` is not set.
 
 ### Capture traces from CI
 
@@ -111,7 +132,7 @@ Upload `infection-traces.log` as a build artefact for later inspection.
 ### Force telemetry off
 
 Even when `OTEL_*` variables are present in the environment (for example,
-injected by a CI platform), telemetry can be forced off:
+when injected by a CI platform), telemetry can be forced off:
 
 ```bash
 OTEL_SDK_DISABLED=true vendor/bin/infection
