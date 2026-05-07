@@ -108,125 +108,152 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
             $expectNoTracer,
         ];
 
-        yield 'traces exporter disabled' => [
-            [
-                Variables::OTEL_TRACES_EXPORTER => 'none',
-            ],
-            $expectNoTracer,
-        ];
-
-        yield 'traces exporter disabled case-insensitively' => [
-            [
-                Variables::OTEL_TRACES_EXPORTER => 'NONE',
-            ],
-            $expectNoTracer,
-        ];
-
-        yield 'console traces exporter' => [
+        yield 'traces exporter requested without Infection telemetry' => [
             [
                 Variables::OTEL_TRACES_EXPORTER => 'console',
             ],
+            $expectNoTracer,
+        ];
+
+        yield 'OTLP endpoint requested without Infection telemetry' => [
+            [
+                Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
+            ],
+            $expectNoTracer,
+        ];
+
+        yield 'unsupported traces exporter without Infection telemetry' => [
+            [
+                Variables::OTEL_TRACES_EXPORTER => 'http',
+            ],
+            $expectNoTracer,
+        ];
+
+        yield 'traces exporter disabled with Infection telemetry' => [
+            [
+                Variables::OTEL_TRACES_EXPORTER => 'none',
+                'INFECTION_TELEMETRY' => 'true',
+            ],
+            $expectNoTracer,
+        ];
+
+        yield 'traces exporter disabled case-insensitively with Infection telemetry' => [
+            [
+                Variables::OTEL_TRACES_EXPORTER => 'NONE',
+                'INFECTION_TELEMETRY' => 'true',
+            ],
+            $expectNoTracer,
+        ];
+
+        yield 'console traces exporter with Infection telemetry' => [
+            [
+                Variables::OTEL_TRACES_EXPORTER => 'console',
+                'INFECTION_TELEMETRY' => 'true',
+            ],
             $expectTracer,
         ];
 
-        yield 'OTLP traces exporter' => [
+        yield 'OTLP traces exporter with Infection telemetry' => [
             [
                 Variables::OTEL_TRACES_EXPORTER => 'otlp',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             $expectTracer,
         ];
 
         yield 'Infection telemetry enabled' => [
             [
-                'INFECTION_TELEMETRY_ENABLED' => 'true',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             $expectTracer,
         ];
 
         yield 'Infection telemetry explicitly not enabled' => [
             [
-                'INFECTION_TELEMETRY_ENABLED' => 'false',
+                'INFECTION_TELEMETRY' => 'false',
             ],
             $expectNoTracer,
         ];
 
-        yield 'OTLP exporter endpoint' => [
-        yield 'Infection telemetry enabled' => [
+        yield 'OTLP exporter endpoint with Infection telemetry' => [
             [
                 Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
-                'INFECTION_TELEMETRY_ENABLED' => 'true',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             $expectTracer,
         ];
 
-        yield 'OTLP traces exporter endpoint' => [
+        yield 'OTLP traces exporter endpoint with Infection telemetry' => [
             [
                 Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://localhost:4318/v1/traces',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             $expectTracer,
         ];
 
-        yield 'OTLP exporter endpoint with unsupported OTLP protocol' => [
+        yield 'OTLP exporter endpoint with unsupported OTLP protocol and Infection telemetry' => [
             [
+                Variables::OTEL_TRACES_EXPORTER => 'otlp',
                 Variables::OTEL_EXPORTER_OTLP_ENDPOINT => 'http://localhost:4318',
                 Variables::OTEL_EXPORTER_OTLP_PROTOCOL => 'foo',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             new UnexpectedValueException('Unknown protocol: foo'),
         ];
 
-        yield 'OTLP traces exporter endpoint with unsupported OTLP traces protocol' => [
-        yield 'Infection telemetry explicitly not enabled' => [
+        yield 'OTLP traces exporter endpoint with unsupported OTLP traces protocol and Infection telemetry' => [
             [
+                Variables::OTEL_TRACES_EXPORTER => 'otlp',
                 Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://localhost:4318/v1/traces',
                 Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => 'foo',
-                'INFECTION_TELEMETRY_ENABLED' => 'false',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             new UnexpectedValueException('Unknown protocol: foo'),
-            $expectNoTracer,
         ];
 
-        yield 'console traces exporter with OpenTelemetry PHP autoload disabled' => [
         yield 'console traces exporter with Infection telemetry enabled' => [
             [
                 Variables::OTEL_TRACES_EXPORTER => 'console',
                 Variables::OTEL_PHP_AUTOLOAD_ENABLED => 'false',
-                'INFECTION_TELEMETRY_ENABLED' => 'true',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             $expectTracer,
         ];
 
-        yield 'unsupported traces exporter' => [
+        yield 'unsupported traces exporter with Infection telemetry' => [
             [
                 Variables::OTEL_TRACES_EXPORTER => 'http',
-                Variables::OTEL_TRACES_EXPORTER => 'otlp',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             new InvalidArgumentException(
                 'Unsupported OpenTelemetry exporter configured via OTEL_TRACES_EXPORTER="http". Supported values: otlp, console, none.',
-                'Unsupported OpenTelemetry exporter configured via OTEL_TRACES_EXPORTER="otlp". Supported values: console, none.',
             ),
         ];
 
-        yield 'unsupported metrics exporter' => [
+        yield 'unsupported metrics exporter with Infection telemetry' => [
             [
                 Variables::OTEL_METRICS_EXPORTER => 'console',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             new InvalidArgumentException(
                 'Unsupported OpenTelemetry exporter configured via OTEL_METRICS_EXPORTER="console". Supported values: none.',
             ),
         ];
 
-        yield 'unsupported logs exporter' => [
+        yield 'unsupported logs exporter with Infection telemetry' => [
             [
                 Variables::OTEL_LOGS_EXPORTER => 'console',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             new InvalidArgumentException(
                 'Unsupported OpenTelemetry exporter configured via OTEL_LOGS_EXPORTER="console". Supported values: none.',
             ),
         ];
 
-        yield 'OpenTelemetry PHP autoload enabled' => [
+        yield 'OpenTelemetry PHP autoload enabled with Infection telemetry' => [
             [
                 Variables::OTEL_PHP_AUTOLOAD_ENABLED => 'true',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             new InvalidArgumentException(
                 'Unsupported OpenTelemetry autoload configured via OTEL_PHP_AUTOLOAD_ENABLED="true". Supported values: false.',
@@ -237,6 +264,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
             [
                 Variables::OTEL_TRACES_EXPORTER => 'console',
                 Variables::OTEL_SDK_DISABLED => 'true',
+                'INFECTION_TELEMETRY' => 'true',
             ],
             $expectNoTracer,
         ];
@@ -246,6 +274,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
     {
         $this->setEnvVariables([
             Variables::OTEL_TRACES_EXPORTER => 'console',
+            'INFECTION_TELEMETRY' => 'true',
         ]);
 
         $tracer = (new OpenTelemetryTracerFactory())->create();
@@ -262,6 +291,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
         $this->setEnvVariables([
             Variables::OTEL_TRACES_EXPORTER => 'console',
             Variables::OTEL_SERVICE_NAME => 'custom-service',
+            'INFECTION_TELEMETRY' => 'true',
         ]);
 
         $tracer = (new OpenTelemetryTracerFactory())->create();

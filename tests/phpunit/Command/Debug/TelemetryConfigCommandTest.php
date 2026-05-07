@@ -68,6 +68,7 @@ final class TelemetryConfigCommandTest extends TestCase
 
     public function test_it_dumps_the_configured_open_telemetry_tracer_service(): void
     {
+        $this->setEnv('INFECTION_TELEMETRY', 'true');
         $this->setEnv(Variables::OTEL_TRACES_EXPORTER, 'console');
 
         $dumpedValue = null;

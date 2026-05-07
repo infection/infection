@@ -54,7 +54,7 @@ use function strtolower;
  */
 final readonly class OpenTelemetryTracerFactory
 {
-    private const INFECTION_TELEMETRY = 'INFECTION_TELEMETRY_ENABLED';
+    private const string INFECTION_TELEMETRY = 'INFECTION_TELEMETRY';
 
     /**
      * See https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/api.md#get-a-tracer
@@ -66,12 +66,16 @@ final readonly class OpenTelemetryTracerFactory
      */
     public function create(): ?OpenTelemetryTracer
     {
-        self::guardSupportedExporters();
-
         if (
             self::isSdkDisabled()
-            || (!self::isInfectionTelemetryEnabled() && !self::isRequested())
+            || !self::isInfectionTelemetryEnabled()
         ) {
+            return null;
+        }
+
+        self::guardSupportedExporters();
+
+        if (self::isTracingDisabled()) {
             return null;
         }
 
@@ -90,21 +94,6 @@ final readonly class OpenTelemetryTracerFactory
         );
     }
 
-    public function createRequired(): OpenTelemetryTracer
-    {
-        $tracer = $this->create();
-
-        if ($tracer === null) {
-            throw new InvalidArgumentException(sprintf(
-                'OpenTelemetry tracer is not enabled. Set %s=true or %s=console to create it.',
-                self::INFECTION_TELEMETRY,
-                Variables::OTEL_TRACES_EXPORTER,
-            ));
-        }
-
-        return $tracer;
-    }
-
     private function isInfectionTelemetryEnabled(): bool
     {
         return self::isBoolVariableEnabled(self::INFECTION_TELEMETRY);
@@ -115,16 +104,15 @@ final readonly class OpenTelemetryTracerFactory
         return self::isBoolVariableEnabled(Variables::OTEL_SDK_DISABLED);
     }
 
-    private function isRequested(): bool
+    private function isTracingDisabled(): bool
     {
         $tracesExporter = getenv(Variables::OTEL_TRACES_EXPORTER);
 
         if ($tracesExporter !== false) {
-            return strtolower($tracesExporter) !== 'none';
+            return strtolower($tracesExporter) === 'none';
         }
 
-        return getenv(Variables::OTEL_EXPORTER_OTLP_ENDPOINT) !== false
-            || getenv(Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT) !== false;
+        return false;
     }
 
     private static function setDefaultServiceName(): void
