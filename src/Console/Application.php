@@ -41,6 +41,7 @@ use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
+use Infection\Command\Debug\TelemetryConfigCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
@@ -120,6 +121,7 @@ final class Application extends BaseApplication
                 new ConfigureCommand(),
                 new MockTeamCityCommand($fileSystem),
                 new DumpAstCommand($fileSystem),
+                new TelemetryConfigCommand(),
                 new GitBaseReferenceCommand(),
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),

@@ -1,0 +1,12 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "mutators": {
+        "Plus": true,
+        "PublicVisibility": true
+    },
+    "tmpDir": "var/infection"
+}
