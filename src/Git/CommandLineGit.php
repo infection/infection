@@ -52,6 +52,7 @@ use function Safe\preg_split;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
@@ -150,22 +151,20 @@ final readonly class CommandLineGit implements Git
         return $base;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessException
-     */
     public function getProjectDirectory(): string
     {
         // An error here should really not happen, so we are fine to let it
         // bubble up instead of throwing a dedicated exception or providing a
         // fallback.
-        $directory = $this->shellCommandLineExecutor->execute([
-            'git',
-            'rev-parse',
-            '--show-toplevel',
-        ]);
+        try {
+            $directory = $this->shellCommandLineExecutor->execute([
+                'git',
+                'rev-parse',
+                '--show-toplevel',
+            ]);
+        } catch (ProcessTimedOutException|ProcessFailedException|ProcessException $exception) {
+            throw NoGitProjectFound::create($exception);
+        }
 
         Assert::stringNotEmpty($directory);
 
