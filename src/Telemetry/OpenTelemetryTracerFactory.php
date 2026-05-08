@@ -54,7 +54,7 @@ use function strtolower;
  */
 final readonly class OpenTelemetryTracerFactory
 {
-    private const string INFECTION_TELEMETRY = 'INFECTION_TELEMETRY';
+    public const string INFECTION_TELEMETRY = 'INFECTION_TELEMETRY';
 
     /**
      * See https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/api.md#get-a-tracer
