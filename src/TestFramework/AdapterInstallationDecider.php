@@ -50,7 +50,6 @@ final readonly class AdapterInstallationDecider
     private const array ADAPTER_NAME_TO_CLASS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'Infection\TestFramework\Codeception\CodeceptionAdapter',
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
-        TestFrameworkTypes::TESTO => 'Testo\Bridge\Infection\TestoAdapter',
     ];
 
     public function __construct(
