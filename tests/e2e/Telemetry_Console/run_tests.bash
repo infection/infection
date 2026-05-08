@@ -57,7 +57,7 @@ assert_contains "Mutation Code Coverage: 100%" var/execution-no-env-variable.std
 assert_contains "Covered Code MSI: 100%" var/execution-no-env-variable.stdout
 assert_not_contains '"name": "infection.' var/execution-no-env-variable.stdout
 
-OTEL_TRACES_EXPORTER=console php $INFECTION --no-interaction --quiet --no-progress \
+INFECTION_TELEMETRY=true OTEL_TRACES_EXPORTER=console php $INFECTION --no-interaction --quiet --no-progress \
     1> var/execution-with-trace-exporter.stdout \
     2> var/execution-with-trace-exporter.stderr
 
