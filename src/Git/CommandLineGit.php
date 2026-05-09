@@ -52,8 +52,6 @@ use function Safe\preg_split;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -162,7 +160,7 @@ final readonly class CommandLineGit implements Git
                 'rev-parse',
                 '--show-toplevel',
             ]);
-        } catch (ProcessTimedOutException|ProcessFailedException|ProcessException $exception) {
+        } catch (ProcessException $exception) {
             throw NoGitProjectFound::create($exception);
         }
 
