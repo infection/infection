@@ -48,6 +48,7 @@ final readonly class AdapterInstaller
     public const array OFFICIAL_ADAPTERS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
         TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
+        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
     ];
 
     // 2 minutes
