@@ -149,7 +149,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         MutantExecutionResult $executionResult,
     ): void {
         $this->write(
-            $this->teamcity->testFinished($test, $executionResult),
+            ...$this->teamcity->testFinished($test, $executionResult),
         );
 
         $this->state->closeTest($test);
@@ -162,8 +162,10 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         }
     }
 
-    private function write(string $messsage): void
+    private function write(string ...$messages): void
     {
-        $this->logger->warning($messsage);
+        foreach ($messages as $message) {
+            $this->logger->warning($message);
+        }
     }
 }

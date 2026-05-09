@@ -52,4 +52,5 @@ enum MessageName: string
     case TEST_FINISHED = 'testFinished';
     case TEST_FAILED = 'testFailed';
     case TEST_IGNORED = 'testIgnored';
+    case TEST_STDOUT = 'testStdOut';
 }
