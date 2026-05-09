@@ -33,34 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\ProjectDirectoryProvider;
+namespace Infection\Git;
 
-use Infection\Git\Git;
-use Infection\Git\NoGitProjectFound;
-use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Throwable;
 
 /**
  * @internal
  */
-final readonly class GitProjectDirectoryProvider implements ProjectDirectoryProvider
+final class NoGitProjectFound extends RuntimeException
 {
-    public function __construct(
-        private Git $git,
-        private LoggerInterface $logger,
-    ) {
-    }
-
-    public function provide(): ?string
+    public static function create(?Throwable $previous): self
     {
-        try {
-            return $this->git->getProjectDirectory();
-        } catch (NoGitProjectFound $exception) {
-            $this->logger->info(
-                'Could not determine the project directory from Git.',
-                ['exception' => $exception],
-            );
-
-            return null;
-        }
+        return new self(
+            'Could not find a git project.',
+            previous: $previous,
+        );
     }
 }

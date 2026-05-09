@@ -142,6 +142,8 @@ interface Git
      * execute this method from the working directory `/home/user/projects/my-app/src/components`,
      * it will output `/home/user/projects/my-app`.
      *
+     * @throws NoGitProjectFound
+     *
      * @return non-empty-string
      */
     public function getProjectDirectory(): string;
