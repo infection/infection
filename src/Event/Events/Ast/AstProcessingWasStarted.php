@@ -33,24 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Events\MutationAnalysis;
+namespace Infection\Event\Events\Ast;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
-use Infection\Process\Runner\ProcessRunner;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(MutationTestingWasStarted::class)]
-final class MutationTestingWasStartedTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class AstProcessingWasStarted
 {
-    public function test_it_exposes_its_mutation_count_and_process_runner(): void
-    {
-        $count = 5;
-        $processRunner = $this->createStub(ProcessRunner::class);
-
-        $event = new MutationTestingWasStarted($count, $processRunner);
-
-        $this->assertSame($count, $event->mutationCount);
-        $this->assertSame($processRunner, $event->processRunner);
-    }
 }

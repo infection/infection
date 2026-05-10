@@ -36,6 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
@@ -116,10 +122,13 @@ final class MutationGeneratorTest extends TestCase
     {
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
-            ->expects($this->exactly(4))
+            ->expects($this->exactly(10))
             ->method('dispatch')
             ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(2)],
+                [new AstProcessingWasStarted()],
+                [new AstParsingWasStarted()],
+                [new AstEnrichmentWasStarted()],
                 [new MutableFileWasProcessed(
                     'path/to/fileA',
                     [],
@@ -128,6 +137,9 @@ final class MutationGeneratorTest extends TestCase
                     'path/to/fileB',
                     [],
                 )],
+                [new AstEnrichmentWasFinished()],
+                [new AstParsingWasFinished()],
+                [new AstProcessingWasFinished()],
                 [new MutationGenerationWasFinished()],
             ))
         ;

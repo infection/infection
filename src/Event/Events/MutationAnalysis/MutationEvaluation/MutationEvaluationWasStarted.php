@@ -35,15 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use Infection\Mutation\Mutation;
+use Infection\Framework\Iterable\IterableCounter;
+use Infection\Process\Runner\ProcessRunner;
 
 /**
  * @internal
  */
 final readonly class MutationEvaluationWasStarted
 {
+    /**
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
+     */
     public function __construct(
-        public Mutation $mutation,
+        public int $mutationCount,
+        public ProcessRunner $processRunner,
     ) {
     }
 }

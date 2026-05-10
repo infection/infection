@@ -33,22 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis;
-
-use Infection\Framework\Iterable\IterableCounter;
-use Infection\Process\Runner\ProcessRunner;
+namespace Infection\Event\Events\Ast;
 
 /**
  * @internal
  */
-final readonly class MutationTestingWasStarted
+final readonly class AstProcessingWasFinished
 {
-    /**
-     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
-     */
-    public function __construct(
-        public int $mutationCount,
-        public ProcessRunner $processRunner,
-    ) {
-    }
 }

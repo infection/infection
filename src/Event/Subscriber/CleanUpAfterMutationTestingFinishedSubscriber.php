@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 /**
  * @internal
  */
-final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
+final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
     private const string PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
 
@@ -53,7 +53,7 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements Mu
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
         $finder = Finder::create()
             ->in($this->tmpDir)

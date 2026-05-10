@@ -62,7 +62,6 @@ use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
@@ -176,7 +175,6 @@ final class ProjectCodeProvider
         MessageName::class,
         MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
-        MutationEvaluationWasStarted::class,
         MutatorName::class,
         NameResolverFactory::class,
         NoGitProjectFound::class,

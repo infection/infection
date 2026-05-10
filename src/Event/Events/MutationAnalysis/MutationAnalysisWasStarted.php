@@ -33,27 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use function function_exists;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
-use function Safe\pcntl_signal;
-use const SIGINT;
+namespace Infection\Event\Events\MutationAnalysis;
 
 /**
  * @internal
  */
-final class StopInfectionOnSigintSignalSubscriber implements MutationEvaluationWasStartedSubscriber
+final readonly class MutationAnalysisWasStarted
 {
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
-    {
-        if (!function_exists('pcntl_signal')) {
-            return;
-        }
-
-        pcntl_signal(SIGINT, static function () use ($event): void {
-            $event->processRunner->stop();
-        });
-    }
 }

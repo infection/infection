@@ -38,10 +38,10 @@ namespace Infection\Process\Runner;
 use function array_key_exists;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
@@ -81,7 +81,7 @@ class MutationTestingRunner
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
+        $this->eventDispatcher->dispatch(new MutationEvaluationWasStarted($numberOfMutants, $this->processRunner));
 
         $processContainers = take($mutations)
             ->stream()
@@ -101,7 +101,7 @@ class MutationTestingRunner
             ->each($this->eventDispatcher->dispatch(...))
         ;
 
-        $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+        $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished());
     }
 
     private function mutationToMutant(Mutation $mutation): Mutant
@@ -112,7 +112,7 @@ class MutationTestingRunner
     private function emitEvaluationStarted(Mutation $mutation): void
     {
         $this->eventDispatcher->dispatch(
-            new MutationEvaluationWasStarted($mutation),
+            new MutantEvaluationWasStarted($mutation),
         );
     }
 

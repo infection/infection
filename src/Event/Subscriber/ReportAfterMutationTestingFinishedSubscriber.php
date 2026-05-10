@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
 use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Reporter\Reporter;
@@ -45,7 +45,7 @@ use Infection\Reporter\Reporter;
 /**
  * @internal
  */
-final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
+final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
     public function __construct(
         private Reporter $reporter,
@@ -53,7 +53,7 @@ final readonly class ReportAfterMutationTestingFinishedSubscriber implements Mut
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
         $this->eventDispatcher->dispatch(
             new ReportingWasStarted(),

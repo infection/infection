@@ -33,22 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Events\MutationAnalysis;
+namespace Infection\Event\Events\Ast\AstParsing;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(MutationTestingWasFinished::class)]
-final class MutationTestingWasFinishedTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class AstParsingWasFinished
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
-    {
-        $class = new MutationTestingWasFinished();
-
-        $this->assertInstanceOf(MutationTestingWasFinished::class, $class);
-    }
 }

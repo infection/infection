@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis;
+namespace Infection\Event\Events\Ast;
 
 use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-interface MutationTestingWasStartedSubscriber extends EventSubscriber
+interface AstProcessingWasStartedSubscriber extends EventSubscriber
 {
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void;
+    public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void;
 }

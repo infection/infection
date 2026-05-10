@@ -37,6 +37,12 @@ namespace Infection\Mutation;
 
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
@@ -93,6 +99,9 @@ class MutationGenerator
         $numberOfFiles = count($sources);
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
+        $this->eventDispatcher->dispatch(new AstProcessingWasStarted());
+        $this->eventDispatcher->dispatch(new AstParsingWasStarted());
+        $this->eventDispatcher->dispatch(new AstEnrichmentWasStarted());
 
         foreach ($sources as $source) {
             $sourceFileMutationIds = [];
@@ -117,6 +126,9 @@ class MutationGenerator
             );
         }
 
+        $this->eventDispatcher->dispatch(new AstEnrichmentWasFinished());
+        $this->eventDispatcher->dispatch(new AstParsingWasFinished());
+        $this->eventDispatcher->dispatch(new AstProcessingWasFinished());
         $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
     }
 }

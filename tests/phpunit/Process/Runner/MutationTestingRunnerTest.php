@@ -42,9 +42,9 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
@@ -128,8 +128,8 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0, $this->processRunnerMock),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasStarted(0, $this->processRunnerMock),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -204,18 +204,18 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(4, $this->processRunnerMock),
-                new MutationEvaluationWasStarted($mutation0),
-                new MutationEvaluationWasStarted($mutation1),
-                new MutationEvaluationWasStarted($mutation2),
+                new MutationEvaluationWasStarted(4, $this->processRunnerMock),
+                new MutantEvaluationWasStarted($mutation0),
+                new MutantEvaluationWasStarted($mutation1),
+                new MutantEvaluationWasStarted($mutation2),
                 new MutantProcessWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
-                new MutationEvaluationWasStarted($mutation3),
+                new MutantEvaluationWasStarted($mutation3),
                 new MutantProcessWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -296,12 +296,12 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(4, $this->processRunnerMock),
-                new MutationEvaluationWasStarted($mutation0),
+                new MutationEvaluationWasStarted(4, $this->processRunnerMock),
+                new MutantEvaluationWasStarted($mutation0),
                 new MutantProcessWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -379,10 +379,10 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0, $this->processRunnerMock),
-                new MutationEvaluationWasStarted($mutation0),
-                new MutationEvaluationWasStarted($mutation1),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasStarted(0, $this->processRunnerMock),
+                new MutantEvaluationWasStarted($mutation0),
+                new MutantEvaluationWasStarted($mutation1),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -445,10 +445,10 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0, $this->processRunnerMock),
-                new MutationEvaluationWasStarted($mutation0),
+                new MutationEvaluationWasStarted(0, $this->processRunnerMock),
+                new MutantEvaluationWasStarted($mutation0),
                 new MutantProcessWasFinished(MutantExecutionResult::createFromNonCoveredMutant($mutant)),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -512,8 +512,8 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0, $this->processRunnerMock),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasStarted(0, $this->processRunnerMock),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -613,8 +613,8 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(0, $this->processRunnerMock),
-                new MutationTestingWasFinished(),
+                new MutationEvaluationWasStarted(0, $this->processRunnerMock),
+                new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -672,15 +672,15 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationTestingWasStarted|MutationEvaluationWasStarted|MutationTestingWasFinished|MutantProcessWasFinished> $expectedEvents
-     * @param array<MutationTestingWasStarted|MutationEvaluationWasStarted|MutationTestingWasFinished|MutantProcessWasFinished> $actualEvents
+     * @param array<MutationEvaluationWasStarted|MutantEvaluationWasStarted|MutationEvaluationWasFinished|MutantProcessWasFinished> $expectedEvents
+     * @param array<MutationEvaluationWasStarted|MutantEvaluationWasStarted|MutationEvaluationWasFinished|MutantProcessWasFinished> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
         $expectedClasses = [
-            MutationTestingWasStarted::class,
             MutationEvaluationWasStarted::class,
-            MutationTestingWasFinished::class,
+            MutantEvaluationWasStarted::class,
+            MutationEvaluationWasFinished::class,
             MutantProcessWasFinished::class,
         ];
 
@@ -710,8 +710,8 @@ final class MutationTestingRunnerTest extends TestCase
                 $assertionErrorMessage,
             );
 
-            if ($expectedEvent instanceof MutationTestingWasStarted) {
-                /* @var MutationTestingWasStarted $event */
+            if ($expectedEvent instanceof MutationEvaluationWasStarted) {
+                /* @var MutationEvaluationWasStarted $event */
                 $this->assertSame(
                     $expectedEvent->mutationCount,
                     // @phpstan-ignore property.notFound

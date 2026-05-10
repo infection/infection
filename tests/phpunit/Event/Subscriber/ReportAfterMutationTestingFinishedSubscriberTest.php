@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
@@ -65,7 +65,7 @@ final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
             ),
         );
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationEvaluationWasFinished());
 
         $this->assertEquals(
             [

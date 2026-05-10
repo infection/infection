@@ -33,27 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\Ast;
 
-use function function_exists;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
-use function Safe\pcntl_signal;
-use const SIGINT;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final class StopInfectionOnSigintSignalSubscriber implements MutationEvaluationWasStartedSubscriber
+interface AstProcessingWasFinishedSubscriber extends EventSubscriber
 {
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
-    {
-        if (!function_exists('pcntl_signal')) {
-            return;
-        }
-
-        pcntl_signal(SIGINT, static function () use ($event): void {
-            $event->processRunner->stop();
-        });
-    }
+    public function onAstProcessingWasFinished(AstProcessingWasFinished $event): void;
 }
