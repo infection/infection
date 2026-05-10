@@ -24,6 +24,21 @@ commandTests:
         args: ["--version"]
         exitCode: 0
 
+    # https://github.com/php/pie/issues/604
+    -   name: "PIE extension build tools are installed"
+        command: "bash"
+        args: ["-c", "command -v gcc && command -v make && command -v autoconf && command -v bison && command -v re2c && command -v pkg-config && command -v libtoolize && command -v phpize"]
+        expectedOutput:
+            - "/usr/bin/gcc"
+            - "/usr/bin/make"
+            - "/usr/bin/autoconf"
+            - "/usr/bin/bison"
+            - "/usr/bin/re2c"
+            - "/usr/bin/pkg-config"
+            - "/usr/bin/libtoolize"
+            - "/usr/bin/phpize"
+        exitCode: 0
+
     -   name: "container-structure-test is executable"
         command: "container-structure-test"
         args: ["version"]
