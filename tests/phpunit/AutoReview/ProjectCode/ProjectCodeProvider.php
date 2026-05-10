@@ -49,6 +49,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
@@ -70,6 +71,7 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
+use Infection\Git\NoGitProjectFound;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
@@ -142,6 +144,7 @@ final class ProjectCodeProvider
         ConfigurationOption::class,
         ConsoleProgressBarLogger::class,
         CpuCoresCountProvider::class,
+        CurrentWorkingDirectoryProvider::class,
         DispatchPcntlSignalSubscriber::class,
         DummyFileSystem::class,
         EmptyTrace::class,
@@ -168,6 +171,7 @@ final class ProjectCodeProvider
         MutationEvaluationWasStarted::class,
         MutatorName::class,
         NameResolverFactory::class,
+        NoGitProjectFound::class,
         NodeMutationGenerator::class,
         NoReportFound::class,
         NonExecutableFinder::class,

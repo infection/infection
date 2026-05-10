@@ -641,7 +641,8 @@
             "anyOf": [
                 "phpunit",
                 "phpspec",
-                "codeception"
+                "codeception",
+                "testo"
             ]
         },
         "staticAnalysisTool": {

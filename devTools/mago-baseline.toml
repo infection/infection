@@ -7701,6 +7701,18 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Git\NoGitProjectFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_cannot_the_project_directory_when_there_is_not_git_project`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Git\NoGitProjectFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_project_directory`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly`.'
 count = 1
 
@@ -7750,6 +7762,12 @@ count = 1
 file = "tests/phpunit/Git/CommandLineGitTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `gitChangedLinesRangesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Git\NoGitProjectFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_gets_the_project_directory`.'
 count = 1
 
 [[issues]]

@@ -37,26 +37,69 @@ namespace Infection\Tests\Configuration\ProjectDirectoryProvider;
 
 use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
 use Infection\Git\Git;
+use Infection\Git\NoGitProjectFound;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
 #[CoversClass(GitProjectDirectoryProvider::class)]
 final class GitProjectDirectoryProviderTest extends TestCase
 {
+    private Git&MockObject $gitMock;
+
+    private TestLogger $logger;
+
+    private GitProjectDirectoryProvider $provider;
+
+    protected function setUp(): void
+    {
+        $this->gitMock = $this->createMock(Git::class);
+        $this->logger = new TestLogger();
+
+        $this->provider = new GitProjectDirectoryProvider(
+            $this->gitMock,
+            $this->logger,
+        );
+    }
+
     public function test_it_provides_the_project_directory(): void
     {
         $expected = '/path/to/project/directory';
 
-        $gitMock = $this->createMock(Git::class);
-        $gitMock
+        $this->gitMock
             ->expects($this->once())
             ->method('getProjectDirectory')
             ->willReturn($expected);
 
-        $provider = new GitProjectDirectoryProvider($gitMock);
-
-        $actual = $provider->provide();
+        $actual = $this->provider->provide();
 
         $this->assertSame($expected, $actual);
+        $this->assertSame([], $this->logger->records);
+    }
+
+    public function test_it_returns_null_and_logs_when_no_git_project_is_found(): void
+    {
+        $exception = NoGitProjectFound::create(null);
+
+        $this->gitMock
+            ->expects($this->once())
+            ->method('getProjectDirectory')
+            ->willThrowException($exception);
+
+        $actual = $this->provider->provide();
+
+        $this->assertNull($actual);
+        $this->assertEquals(
+            [
+                [
+                    'level' => LogLevel::INFO,
+                    'message' => 'Could not determine the project directory from Git.',
+                    'context' => ['exception' => $exception],
+                ],
+            ],
+            $this->logger->records,
+        );
     }
 }

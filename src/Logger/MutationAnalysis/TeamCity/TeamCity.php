@@ -120,26 +120,42 @@ final readonly class TeamCity
         );
     }
 
+    /**
+     * @return list<string>
+     */
     public function testFinished(
         Test $test,
         MutantExecutionResult $executionResult,
-    ): string {
+    ): array {
         $messageName = $this->mapExecutionResultToTestStatus($executionResult);
         $attributes = $test->toFinishedAttributes($executionResult);
 
-        if ($messageName !== MessageName::TEST_FINISHED) {
-            unset($attributes['details']);
-            [$from, $to] = $this->differ->diffToArray(
-                from: $executionResult->getOriginalCode(),
-                to: $executionResult->getMutatedCode(),
+        $logs = [];
+
+        if ($messageName === MessageName::TEST_FINISHED) {
+            // Emit a standard `##teamcity[testStdOut]` service message before the closing `testFinished`
+            // event for the same name.
+            // IntelliJ collects out=… into the test's stdout buffer and renders it in the output tab of
+            // the selected test node. This works in any TeamCity consumer (TeamCity CI, PhpStorm, etc.).
+            $logs[] = $this->write(
+                MessageName::TEST_STDOUT,
+                [
+                    'name' => $attributes['name'],
+                    'out' => $attributes['message'],
+                ],
             );
 
-            $attributes['type'] = 'comparisonFailure';
-            $attributes['actual'] = $from;
-            $attributes['expected'] = $to;
+            unset($attributes['message']);
+            unset($attributes['details']);
+        } elseif ($messageName === MessageName::TEST_FAILED) {
+            $attributes = $this->replaceDetailsWithComparisonFailure($attributes, $executionResult);
+        } else {
+            unset($attributes['details']);
         }
 
-        return $this->write($messageName, $attributes);
+        $logs[] = $this->write($messageName, $attributes);
+
+        return $logs;
     }
 
     /**
@@ -161,6 +177,29 @@ final readonly class TeamCity
                 ],
             ),
         );
+    }
+
+    /**
+     * @param MessageAttributes $attributes
+     *
+     * @return MessageAttributes
+     */
+    private function replaceDetailsWithComparisonFailure(
+        array $attributes,
+        MutantExecutionResult $executionResult,
+    ): array {
+        unset($attributes['details']);
+
+        [$from, $to] = $this->differ->diffToArray(
+            from: $executionResult->getOriginalCode(),
+            to: $executionResult->getMutatedCode(),
+        );
+
+        $attributes['type'] = 'comparisonFailure';
+        $attributes['actual'] = $from;
+        $attributes['expected'] = $to;
+
+        return $attributes;
     }
 
     /**

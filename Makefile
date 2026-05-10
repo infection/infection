@@ -313,7 +313,8 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	composer require \
 		guzzlehttp/guzzle \
 		infection/codeception-adapter \
-		infection/phpspec-adapter
+		infection/phpspec-adapter \
+		testo/bridge-infection
 
 	# Workaround for https://github.com/box-project/box/issues/580
 	composer install --no-dev
