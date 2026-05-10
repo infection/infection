@@ -39,6 +39,11 @@ commandTests:
             - "/usr/bin/phpize"
         exitCode: 0
 
+    -   name: "protobuf extension is loaded"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('protobuf') ? 0 : 1);"]
+        exitCode: 0
+
     -   name: "container-structure-test is executable"
         command: "container-structure-test"
         args: ["version"]

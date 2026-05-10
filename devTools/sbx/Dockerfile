@@ -44,6 +44,13 @@ RUN set -o errexit -o nounset -o pipefail \
     && mv /tmp/pie.phar /usr/local/bin/pie \
     && chmod +x /usr/local/bin/pie
 
+RUN set -o errexit -o nounset -o pipefail \
+    && COMPOSER_ALLOW_SUPERUSER=1 pie install --no-interaction \
+        --with-php-config="/usr/bin/php-config${PHP_VERSION}" \
+        --with-phpize-path="/usr/bin/phpize${PHP_VERSION}" \
+        pie-extensions/protobuf \
+    && rm -rf /tmp/* /root/.cache
+
 ARG CONTAINER_STRUCTURE_TEST_VERSION=1.22.1
 ARG TARGET_ARCH
 
