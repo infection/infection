@@ -92,6 +92,12 @@ jobs:
       - name: Run Infection on the full codebase
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
+          INFECTION_TELEMETRY: true
+          OTEL_TRACES_EXPORTER: otlp
+          OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
+          OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${{ secrets.SENTRY_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT }}
+          OTEL_EXPORTER_OTLP_TRACES_HEADERS: ${{ secrets.SENTRY_OTEL_EXPORTER_OTLP_TRACES_HEADERS }}
+          OTEL_EXPORTER_OTLP_TRACES_COMPRESSION: gzip
         run: |
           php bin/infection \
             --skip-initial-tests \
