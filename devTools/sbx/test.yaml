@@ -27,7 +27,7 @@ commandTests:
     # https://github.com/php/pie/issues/604
     -   name: "PIE extension build tools are installed"
         command: "bash"
-        args: ["-c", "for bin in gcc make autoconf bison re2c pkg-config libtoolize phpize; do command -v \"$bin\"; done"]
+        args: ["-c", "command -v gcc && command -v make && command -v autoconf && command -v bison && command -v re2c && command -v pkg-config && command -v libtoolize && command -v phpize"]
         expectedOutput:
             - "/usr/bin/gcc"
             - "/usr/bin/make"
