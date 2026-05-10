@@ -33,46 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Source\Collector;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
-use Infection\Reporter\Reporter;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Source\Collector\EventDispatchingSourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ReportAfterMutationTestingFinishedSubscriber::class)]
-final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
+#[CoversClass(EventDispatchingSourceCollector::class)]
+final class EventDispatchingSourceCollectorTest extends TestCase
 {
-    public function test_it_reacts_on_mutation_testing_finished(): void
+    public function test_it_dispatches_source_collection_events_around_the_decorated_collector(): void
     {
-        $reporter = $this->createMock(Reporter::class);
-        $reporter
-            ->expects($this->once())
-            ->method('report');
+        $files = [
+            new MockSplFileInfo('src/File1.php'),
+            new MockSplFileInfo('src/File2.php'),
+        ];
+        $eventDispatcher = new EventDispatcherCollector();
 
-        $reportingEventDispatcher = new EventDispatcherCollector();
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(
-            new ReportAfterMutationTestingFinishedSubscriber(
-                $reporter,
-                $reportingEventDispatcher,
-            ),
+        $collector = new EventDispatchingSourceCollector(
+            new FixedSourceCollector($files),
+            $eventDispatcher,
         );
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $this->assertSame($files, $collector->collect());
 
         $this->assertEquals(
             [
-                new ReportingWasStarted(),
-                new ReportingWasFinished(),
+                new SourceCollectionWasStarted(),
+                new SourceCollectionWasFinished(2),
             ],
-            $reportingEventDispatcher->getEvents(),
+            $eventDispatcher->getEvents(),
         );
     }
 }

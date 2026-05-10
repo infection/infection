@@ -77,7 +77,7 @@ use Infection\Telemetry\SpanHandle;
 /**
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, ArtefactCollectionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ReportingWasStartedSubscriber, ReportingWasFinishedSubscriber, SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
 
@@ -211,6 +211,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $this->end($this->initialTestsSpan);
         $this->end($this->initialStaticAnalysisSpan);
+        $this->end($this->artefactCollectionSpan);
+        $this->end($this->sourceCollectionSpan);
         $this->end($this->mutationGenerationSpan);
 
         foreach ($this->mutationEvaluationSpans as $span) {
@@ -218,8 +220,45 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         }
 
         $this->end($this->mutationTestingSpan);
+        $this->end($this->reportingSpan);
         $this->end($this->rootSpan);
         $this->telemetry->shutdown();
+    }
+
+    public function onArtefactCollectionWasFinished(ArtefactCollectionWasFinished $event): void
+    {
+        $this->end($this->artefactCollectionSpan);
+        $this->artefactCollectionSpan = null;
+    }
+
+    public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
+    {
+        $this->artefactCollectionSpan = $this->startChild('infection.artefact_collection');
+    }
+
+    public function onReportingWasFinished(ReportingWasFinished $event): void
+    {
+        $this->end($this->reportingSpan);
+        $this->reportingSpan = null;
+    }
+
+    public function onReportingWasStarted(ReportingWasStarted $event): void
+    {
+        $this->reportingSpan = $this->startChild('infection.reporting');
+    }
+
+    public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
+    {
+        $this->end(
+            $this->sourceCollectionSpan,
+            ['infection.source_file.count' => $event->sourcesCount],
+        );
+        $this->sourceCollectionSpan = null;
+    }
+
+    public function onSourceCollectionWasStarted(SourceCollectionWasStarted $event): void
+    {
+        $this->sourceCollectionSpan = $this->startChild('infection.source_collection');
     }
 
     /**
@@ -243,35 +282,5 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if ($span !== null) {
             $this->telemetry->end($span, $attributes);
         }
-    }
-
-    public function onArtefactCollectionWasFinished(ArtefactCollectionWasFinished $event): void
-    {
-        $this->end($this->artefactCollectionSpan);
-    }
-
-    public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
-    {
-        $this->artefactCollectionSpan = $this->startChild('infection.artefact_collection');
-    }
-
-    public function onReportingWasFinished(ReportingWasFinished $event): void
-    {
-        $this->end($this->reportingSpan);
-    }
-
-    public function onReportingWasStarted(ReportingWasStarted $event): void
-    {
-        $this->reportingSpan = $this->startChild('infection.reporting');
-    }
-
-    public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
-    {
-        $this->end($this->sourceCollectionSpan);
-    }
-
-    public function onSourceCollectionWasStarted(SourceCollectionWasStarted $event): void
-    {
-        $this->sourceCollectionSpan = $this->startChild('infection.source_collection');
     }
 }

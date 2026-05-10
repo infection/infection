@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
-use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -140,7 +140,7 @@ final readonly class Engine
      * @throws InitialStaticAnalysisRunFailed
      * @throws InitialTestsFailed
      */
-    private function collectArtefacts(): string
+    private function collectArtefacts(): ?string
     {
         $this->eventDispatcher->dispatch(new ArtefactCollectionWasStarted());
 
