@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_shift;
+use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -57,6 +61,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -85,7 +90,10 @@ final class EngineTest extends TestCase
         $coverageChecker->expects($this->never())->method($this->anything());
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher->expects($this->never())->method($this->anything());
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+        );
 
         $process = $this->createMock(Process::class);
         $process
@@ -187,10 +195,12 @@ final class EngineTest extends TestCase
         ;
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+            ArtefactCollectionWasFinished::class,
+            ApplicationExecutionWasFinished::class,
+        );
 
         $process = $this->createMock(Process::class);
         $process
@@ -307,10 +317,12 @@ final class EngineTest extends TestCase
         ;
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+            ArtefactCollectionWasFinished::class,
+            ApplicationExecutionWasFinished::class,
+        );
 
         $initialTestProcess = $this->createMock(Process::class);
         $initialTestProcess
@@ -453,10 +465,12 @@ final class EngineTest extends TestCase
         ;
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+            ArtefactCollectionWasFinished::class,
+            ApplicationExecutionWasFinished::class,
+        );
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner->expects($this->never())->method($this->anything());
@@ -547,10 +561,12 @@ final class EngineTest extends TestCase
         ;
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+            ArtefactCollectionWasFinished::class,
+            ApplicationExecutionWasFinished::class,
+        );
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner->expects($this->never())->method($this->anything());
@@ -651,10 +667,12 @@ final class EngineTest extends TestCase
         ;
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+            ArtefactCollectionWasFinished::class,
+            ApplicationExecutionWasFinished::class,
+        );
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner->expects($this->never())->method($this->anything());
@@ -740,10 +758,12 @@ final class EngineTest extends TestCase
         ;
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->callback(static fn (ApplicationExecutionWasFinished $event): bool => true));
+        $this->expectDispatchedEvents(
+            $eventDispatcher,
+            ArtefactCollectionWasStarted::class,
+            ArtefactCollectionWasFinished::class,
+            ApplicationExecutionWasFinished::class,
+        );
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
         $initialTestsRunner->expects($this->never())->method($this->anything());
@@ -830,5 +850,26 @@ final class EngineTest extends TestCase
         $this->expectException(MinMsiCheckFailed::class);
 
         $engine->execute();
+    }
+
+    /**
+     * @param class-string ...$expectedEventClasses
+     */
+    private function expectDispatchedEvents(
+        EventDispatcher&MockObject $eventDispatcher,
+        string ...$expectedEventClasses,
+    ): void {
+        $eventDispatcher
+            ->expects($this->exactly(count($expectedEventClasses)))
+            ->method('dispatch')
+            ->willReturnCallback(static function (object $event) use (&$expectedEventClasses): void {
+                self::assertNotSame([], $expectedEventClasses);
+
+                $expectedEventClass = array_shift($expectedEventClasses);
+                self::assertNotNull($expectedEventClass);
+
+                self::assertInstanceOf($expectedEventClass, $event);
+            })
+        ;
     }
 }
