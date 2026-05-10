@@ -40,6 +40,9 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 
+/**
+ * @internal
+ */
 final readonly class EventDispatchingSourceCollector implements SourceCollector
 {
     public function __construct(

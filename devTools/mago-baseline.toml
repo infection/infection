@@ -7219,6 +7219,24 @@ message = 'Class `Infection\Tests\Fixtures\Event\IONullSubscriber` not found.'
 count = 3
 
 [[issues]]
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Event/Subscriber/SubscriberRegistererTest.php"
 code = "invalid-method-access"
 message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher)`).'
@@ -11290,6 +11308,30 @@ count = 1
 file = "tests/phpunit/Source/Collector/CachedSourceCollectorTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Source\Collector\CachedSourceCollectorTest::test_it_caches_the_collected_files`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Source/Collector/EventDispatchingSourceCollectorTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Source/Collector/EventDispatchingSourceCollectorTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `Infection\Source\Collector\EventDispatchingSourceCollector::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Source/Collector/EventDispatchingSourceCollectorTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Source/Collector/EventDispatchingSourceCollectorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Source\Collector\EventDispatchingSourceCollectorTest::test_it_dispatches_source_collection_events_around_the_decorated_collector`.'
 count = 1
 
 [[issues]]
