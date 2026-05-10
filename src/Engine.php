@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -105,8 +107,7 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $initialTestSuiteOutput = $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $initialTestSuiteOutput = $this->collectArtefacts();
 
         /*
          * Limit the memory used for the mutation processes based on the memory
@@ -133,6 +134,22 @@ final readonly class Engine
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
         }
+    }
+
+    /**
+     * @throws InitialStaticAnalysisRunFailed
+     * @throws InitialTestsFailed
+     */
+    private function collectArtefacts(): string
+    {
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasStarted());
+
+        $initialTestSuiteOutput = $this->runInitialTestSuite();
+        $this->runInitialStaticAnalysis();
+
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasFinished());
+
+        return $initialTestSuiteOutput;
     }
 
     private function runInitialTestSuite(): ?string

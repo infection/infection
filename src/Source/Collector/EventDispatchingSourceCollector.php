@@ -33,36 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Source\Collector;
 
+use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Reporter\Reporter;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 
-/**
- * @internal
- */
-final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
+final readonly class EventDispatchingSourceCollector implements SourceCollector
 {
     public function __construct(
-        private Reporter $reporter,
+        private SourceCollector $decoratedSourceCollector,
         private EventDispatcher $eventDispatcher,
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function collect(): array
     {
         $this->eventDispatcher->dispatch(
-            new ReportingWasStarted(),
+            new SourceCollectionWasStarted(),
         );
 
-        $this->reporter->report();
+        $sources = $this->decoratedSourceCollector->collect();
 
         $this->eventDispatcher->dispatch(
-            new ReportingWasFinished(),
+            new SourceCollectionWasFinished(
+                count($sources),
+            ),
         );
+
+        return $sources;
     }
 }

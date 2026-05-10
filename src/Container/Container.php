@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
+use Infection\Source\Collector\EventDispatchingSourceCollector;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
@@ -625,18 +626,21 @@ final class Container extends DIContainer
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
             ),
-            SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
-                static function () use ($container): SourceCollector {
-                    $configuration = $container->getConfiguration();
+            SourceCollector::class => static fn (self $container): SourceCollector => new EventDispatchingSourceCollector(
+                new LazySourceCollector(
+                    static function () use ($container): SourceCollector {
+                        $configuration = $container->getConfiguration();
 
-                    return new CachedSourceCollector(
-                        $container->get(SourceCollectorFactory::class)->create(
-                            $configuration->configurationPathname,
-                            $configuration->source,
-                            $configuration->sourceFilter,
-                        ),
-                    );
-                },
+                        return new CachedSourceCollector(
+                            $container->get(SourceCollectorFactory::class)->create(
+                                $configuration->configurationPathname,
+                                $configuration->source,
+                                $configuration->sourceFilter,
+                            ),
+                        );
+                    },
+                ),
+                $container->getEventDispatcher(),
             ),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,

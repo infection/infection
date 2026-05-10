@@ -39,6 +39,10 @@ use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Event\Events\Application\ApplicationExecutionWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStartedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
@@ -59,15 +63,27 @@ use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\Reporting\ReportingWasStartedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\SpanHandle;
 
 /**
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber, ArtefactCollectionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ReportingWasStartedSubscriber, ReportingWasFinishedSubscriber, SourceCollectionWasStartedSubscriber, SourceCollectionWasFinishedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
+
+    private ?SpanHandle $sourceCollectionSpan = null;
+
+    private ?SpanHandle $artefactCollectionSpan = null;
 
     private ?SpanHandle $initialTestsSpan = null;
 
@@ -76,6 +92,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     private ?SpanHandle $mutationGenerationSpan = null;
 
     private ?SpanHandle $mutationTestingSpan = null;
+
+    private ?SpanHandle $reportingSpan = null;
 
     /** @var array<string, SpanHandle> */
     private array $mutationEvaluationSpans = [];
@@ -92,7 +110,10 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        $this->initialTestsSpan = $this->startChild('infection.initial_tests');
+        $this->initialTestsSpan = $this->startChild(
+            'infection.initial_tests',
+            parent: $this->artefactCollectionSpan,
+        );
     }
 
     public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
@@ -103,7 +124,10 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        $this->initialStaticAnalysisSpan = $this->startChild('infection.initial_static_analysis');
+        $this->initialStaticAnalysisSpan = $this->startChild(
+            'infection.initial_static_analysis',
+            parent: $this->artefactCollectionSpan,
+        );
     }
 
     public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
@@ -219,5 +243,35 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if ($span !== null) {
             $this->telemetry->end($span, $attributes);
         }
+    }
+
+    public function onArtefactCollectionWasFinished(ArtefactCollectionWasFinished $event): void
+    {
+        $this->end($this->artefactCollectionSpan);
+    }
+
+    public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
+    {
+        $this->artefactCollectionSpan = $this->startChild('infection.artefact_collection');
+    }
+
+    public function onReportingWasFinished(ReportingWasFinished $event): void
+    {
+        $this->end($this->reportingSpan);
+    }
+
+    public function onReportingWasStarted(ReportingWasStarted $event): void
+    {
+        $this->reportingSpan = $this->startChild('infection.reporting');
+    }
+
+    public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
+    {
+        $this->end($this->sourceCollectionSpan);
+    }
+
+    public function onSourceCollectionWasStarted(SourceCollectionWasStarted $event): void
+    {
+        $this->sourceCollectionSpan = $this->startChild('infection.source_collection');
     }
 }
