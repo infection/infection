@@ -40,7 +40,4 @@ namespace Infection\Event\Events\Reporting;
  */
 final readonly class ReportingWasStarted
 {
-    public function __construct()
-    {
-    }
 }

@@ -171,9 +171,6 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         );
 
         $process = new Process($testFrameworkVersionExecutable);
-        $process->setEnv([
-            'SHELL_VERBOSITY' => '0',
-        ]);
         $process->mustRun();
 
         return $this->versionParser->parse($process->getOutput());
