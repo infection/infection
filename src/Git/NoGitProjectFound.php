@@ -33,58 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Git;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use function is_a;
-use Webmozart\Assert\Assert;
+use RuntimeException;
+use Throwable;
 
 /**
  * @internal
  */
-final class TestFrameworkTypes
+final class NoGitProjectFound extends RuntimeException
 {
-    public const string PHPUNIT = 'phpunit';
-
-    public const string PHPSPEC = 'phpspec';
-
-    public const string CODECEPTION = 'codeception';
-
-    public const string TESTO = 'testo';
-
-    /**
-     * @var string[]
-     */
-    private static array $defaultTypes = [
-        self::PHPUNIT,
-        self::PHPSPEC,
-        self::CODECEPTION,
-        self::TESTO,
-    ];
-
-    /**
-     * @param mixed[] $installedExtensions
-     *
-     * @return string[]
-     */
-    public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
-    ): array {
-        $types = self::$defaultTypes;
-
-        foreach ($installedExtensions as $installedExtension) {
-            $factory = $installedExtension['extra']['class'];
-
-            Assert::classExists($factory);
-
-            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-                continue;
-            }
-
-            $types[] = $factory::getAdapterName();
-        }
-
-        return $types;
+    public static function create(?Throwable $previous): self
+    {
+        return new self(
+            'Could not find a git project.',
+            previous: $previous,
+        );
     }
 }
