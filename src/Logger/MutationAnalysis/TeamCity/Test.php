@@ -89,7 +89,6 @@ final readonly class Test
     public function toFinishedAttributes(MutantExecutionResult $executionResult): array
     {
         return $this->toAttributes() + [
-            // TODO: looks like this information is not used when the test is marked as successful or ignored :/
             'message' => self::createMutationMessage($executionResult),
             'details' => $executionResult->getMutantDiff(),
             'duration' => self::getExecutionDurationInMs($executionResult),
