@@ -43,6 +43,8 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -234,6 +236,10 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
+        $this->eventDispatcher->dispatch(
+            new MutationAnalysisWasStarted(),
+        );
+
         $mutations = $this->mutationGenerator->generate(
             // TODO: inject it in the constructor instead
             $this->config->mutateOnlyCoveredCode(),
@@ -242,6 +248,10 @@ final readonly class Engine
         $this->mutationTestingRunner->run(
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
+        );
+
+        $this->eventDispatcher->dispatch(
+            new MutationAnalysisWasFinished(),
         );
     }
 
