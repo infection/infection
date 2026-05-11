@@ -53,8 +53,8 @@ INFECTION_TELEMETRY=false php $INFECTION --no-interaction --no-progress \
     2> var/execution-no-env-variable.stderr
 
 diff -u --ignore-all-space expected.stderr var/execution-no-env-variable.stderr
-assert_contains "3 mutations were generated:" var/execution-no-env-variable.stdout
-assert_contains "3 mutants were killed by Test Framework" var/execution-no-env-variable.stdout
+assert_contains "6 mutations were generated:" var/execution-no-env-variable.stdout
+assert_contains "6 mutants were killed by Test Framework" var/execution-no-env-variable.stdout
 assert_contains "Mutation Code Coverage: 100%" var/execution-no-env-variable.stdout
 assert_contains "Covered Code MSI: 100%" var/execution-no-env-variable.stdout
 assert_not_contains '"name": "infection.' var/execution-no-env-variable.stdout
@@ -74,7 +74,7 @@ assert_line_count 1 '"name": "infection.ast_parsing"' var/execution-with-trace-e
 assert_line_count 1 '"name": "infection.ast_enrichment"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_generation"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_evaluation"' var/execution-with-trace-exporter.stdout
-assert_line_count 3 '"name": "infection.mutant_evaluation"' var/execution-with-trace-exporter.stdout
+assert_line_count 6 '"name": "infection.mutant_evaluation"' var/execution-with-trace-exporter.stdout
 assert_not_contains '"name": "infection.mutation_testing"' var/execution-with-trace-exporter.stdout
 assert_contains '"service.name": "infection"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout
