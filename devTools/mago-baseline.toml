@@ -7213,19 +7213,19 @@ message = 'Class `Infection\Tests\Fixtures\Event\IONullSubscriber` not found.'
 count = 3
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "no-value"
 message = 'Argument #2 passed to method `Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
 count = 1
