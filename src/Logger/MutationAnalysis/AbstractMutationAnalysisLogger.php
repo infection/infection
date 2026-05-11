@@ -47,7 +47,7 @@ abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
 {
     protected int $callsCount = 0;
 
-    public function startAnalysis(int $mutationCount): void
+    public function startEvaluation(int $mutationCount): void
     {
         $this->callsCount = 0;
     }
@@ -59,17 +59,17 @@ abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
         // Do nothing.
     }
 
-    public function startEvaluation(Mutation $mutation): void
+    public function startEvaluationForMutation(Mutation $mutation): void
     {
         // Do nothing.
     }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    public function finishEvaluationForMutation(MutantExecutionResult $executionResult): void
     {
         ++$this->callsCount;
     }
 
-    public function finishAnalysis(): void
+    public function finishEvaluation(): void
     {
     }
 }
