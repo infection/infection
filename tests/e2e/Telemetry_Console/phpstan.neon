@@ -1,0 +1,22 @@
+parameters:
+    tmpDir: var/cache-phpstan
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: missingType.return
+          path: tests/SourceClassTest.php
+        - identifier: staticMethod.dynamicCall
+          path: tests/SourceClassTest.php
+        - message: "/Do not use magic number as a function argument. Move to constant with a suitable name./"
+          path: tests/SourceClassTest.php
+        - identifier: missingType.return
+          path: tests/AnotherSourceClassTest.php
+        - identifier: staticMethod.dynamicCall
+          path: tests/AnotherSourceClassTest.php
+        - message: "/Do not use magic number as a function argument. Move to constant with a suitable name./"
+          path: tests/AnotherSourceClassTest.php
+
+    level: 8
+    paths:
+        - src
+        - tests
+    treatPhpDocTypesAsCertain: false
