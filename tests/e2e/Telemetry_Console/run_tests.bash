@@ -68,6 +68,7 @@ INFECTION_TELEMETRY=true OTEL_TRACES_EXPORTER=console php $INFECTION --no-intera
 diff -u --ignore-all-space expected.stderr var/execution-with-trace-exporter.stderr
 assert_line_count 1 '"name": "infection.run"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.initial_tests"' var/execution-with-trace-exporter.stdout
+assert_line_count 1 '"name": "infection.mutation_analysis"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_generation"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_evaluation"' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"name": "infection.mutation_evaluation.mutation"' var/execution-with-trace-exporter.stdout
