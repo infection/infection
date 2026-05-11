@@ -38,10 +38,10 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Process\Runner\ProcessRunner;
@@ -78,7 +78,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
             ->with(1);
 
         $this->dispatcher->dispatch(
-            new MutationTestingWasStarted(
+            new MutationEvaluationWasStarted(
                 1,
                 $this->createStub(ProcessRunner::class),
             ),
@@ -95,7 +95,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         ->with($this->identicalTo($mutation));
 
         $this->dispatcher->dispatch(
-            new MutationEvaluationWasStarted($mutation),
+            new MutationEvaluationForMutationWasStarted($mutation),
         );
     }
 
@@ -153,6 +153,6 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('finishAnalysis');
 
-        $this->dispatcher->dispatch(new MutationTestingWasFinished());
+        $this->dispatcher->dispatch(new MutationEvaluationWasFinished());
     }
 }

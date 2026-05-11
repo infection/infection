@@ -33,28 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
 use Symfony\Component\Filesystem\Filesystem;
-use function sys_get_temp_dir;
+use Symfony\Component\Finder\Finder;
 
-#[Group('integration')]
-#[CoversClass(CleanUpAfterMutationTestingFinishedSubscriber::class)]
-final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class CleanUpAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
-    public function test_it_execute_remove_on_mutation_testing_finished(): void
+    private const string PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
+
+    public function __construct(
+        private Filesystem $filesystem,
+        private string $tmpDir,
+    ) {
+    }
+
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->exactly(2))
-            ->method('remove');
+        $finder = Finder::create()
+            ->in($this->tmpDir)
+            // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
+            ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN);
 
-        $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
+        $this->filesystem->remove($finder);
 
-        $subscriber->onMutationTestingWasFinished(new MutationTestingWasFinished());
+        // delete old result cache files, so we don't keep them forever
+        $finder = Finder::create()
+            ->in($this->tmpDir)
+            ->date('before 30 days ago')
+            ->name(self::PHPUNIT_RESULT_CACHE_PATTERN)
+        ;
+
+        $this->filesystem->remove($finder);
     }
 }

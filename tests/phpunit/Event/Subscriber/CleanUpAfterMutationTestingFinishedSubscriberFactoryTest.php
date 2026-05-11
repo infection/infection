@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
+use Infection\Event\Subscriber\CleanUpAfterMutationEvaluationFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -69,7 +69,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
 
         $subscriber = $factory->create();
 
-        $this->assertInstanceOf(CleanUpAfterMutationTestingFinishedSubscriber::class, $subscriber);
+        $this->assertInstanceOf(CleanUpAfterMutationEvaluationFinishedSubscriber::class, $subscriber);
     }
 
     public function test_it_creates_an_null_subscriber_if_debug_is_enabled(): void

@@ -35,12 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Event\Events\MutationAnalysis;
 
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Framework\Iterable\IterableCounter;
+use Infection\Process\Runner\ProcessRunner;
 
 /**
  * @internal
  */
-interface MutationTestingWasStartedSubscriber extends EventSubscriber
+final readonly class MutationEvaluationWasStarted
 {
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void;
+    /**
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
+     */
+    public function __construct(
+        public int $mutationCount,
+        public ProcessRunner $processRunner,
+    ) {
+    }
 }

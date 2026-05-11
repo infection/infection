@@ -33,46 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Tests\Event\Events\MutationAnalysis;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
-use Infection\Reporter\Reporter;
-use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ReportAfterMutationTestingFinishedSubscriber::class)]
-final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
+#[CoversClass(MutationEvaluationWasFinished::class)]
+final class MutationEvaluationWasFinishedTest extends TestCase
 {
-    public function test_it_reacts_on_mutation_testing_finished(): void
+    /**
+     * This class is only used to fire events, and the only functionality it needs is being instantiated
+     */
+    public function test_it_can_be_instantiated(): void
     {
-        $reporter = $this->createMock(Reporter::class);
-        $reporter
-            ->expects($this->once())
-            ->method('report');
+        $class = new MutationEvaluationWasFinished();
 
-        $reportingEventDispatcher = new EventDispatcherCollector();
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(
-            new ReportAfterMutationTestingFinishedSubscriber(
-                $reporter,
-                $reportingEventDispatcher,
-            ),
-        );
-
-        $dispatcher->dispatch(new MutationTestingWasFinished());
-
-        $this->assertEquals(
-            [
-                new ReportingWasStarted(),
-                new ReportingWasFinished(),
-            ],
-            $reportingEventDispatcher->getEvents(),
-        );
+        $this->assertInstanceOf(MutationEvaluationWasFinished::class, $class);
     }
 }
