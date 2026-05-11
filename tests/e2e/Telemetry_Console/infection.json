@@ -1,12 +1,20 @@
 {
+    "$schema": "../../../resources/schema.json",
     "source": {
         "directories": [
             "src"
         ]
     },
+    "staticAnalysisTool": "phpstan",
     "mutators": {
         "Plus": true,
         "PublicVisibility": true
+    },
+    "logs": {
+        "html": "var/report/infection.html",
+        "summary": "var/report/summary.txt",
+        "debug": "var/report/debug.log",
+        "perMutator": "var/report/per-mutator.log",
     },
     "tmpDir": "var/infection"
 }
