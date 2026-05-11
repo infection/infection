@@ -51,7 +51,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 /**
  * @internal
  */
-final readonly class MutationAnalysisLoggerSubscriberForMutation implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
 {
     public function __construct(
         private MutationAnalysisLogger $logger,

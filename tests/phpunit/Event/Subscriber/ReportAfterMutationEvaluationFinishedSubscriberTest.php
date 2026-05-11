@@ -46,7 +46,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ReportAfterMutationEvaluationFinishedSubscriber::class)]
-final class ReportAfterMutationTestingFinishedSubscriberTest extends TestCase
+final class ReportAfterMutationEvaluationFinishedSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_testing_finished(): void
     {

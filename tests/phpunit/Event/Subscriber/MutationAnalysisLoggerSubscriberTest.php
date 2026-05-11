@@ -42,7 +42,7 @@ use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluatio
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
-use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriberForMutation;
+use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -51,7 +51,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationAnalysisLoggerSubscriberForMutation::class)]
+#[CoversClass(MutationAnalysisLoggerSubscriber::class)]
 final class MutationAnalysisLoggerSubscriberTest extends TestCase
 {
     private MockObject&MutationAnalysisLogger $loggerMock;
@@ -62,7 +62,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
     {
         $this->loggerMock = $this->createMock(MutationAnalysisLogger::class);
 
-        $subscriber = new MutationAnalysisLoggerSubscriberForMutation(
+        $subscriber = new MutationAnalysisLoggerSubscriber(
             $this->loggerMock,
         );
 

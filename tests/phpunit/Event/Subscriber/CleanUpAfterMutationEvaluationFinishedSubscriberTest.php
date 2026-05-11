@@ -45,7 +45,7 @@ use function sys_get_temp_dir;
 
 #[Group('integration')]
 #[CoversClass(CleanUpAfterMutationEvaluationFinishedSubscriber::class)]
-final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
+final class CleanUpAfterMutationEvaluationFinishedSubscriberTest extends TestCase
 {
     public function test_it_execute_remove_on_mutation_testing_finished(): void
     {
