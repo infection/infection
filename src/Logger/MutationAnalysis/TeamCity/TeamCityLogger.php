@@ -57,7 +57,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
     ) {
     }
 
-    public function startAnalysis(int $mutationCount): void
+    public function startEvaluation(int $mutationCount): void
     {
         if ($mutationCount !== IterableCounter::UNKNOWN_COUNT) {
             $this->write(
@@ -66,7 +66,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         }
     }
 
-    public function startEvaluation(Mutation $mutation): void
+    public function startEvaluationForMutation(Mutation $mutation): void
     {
         $sourceFilePath = $mutation->getOriginalFilePath();
 
@@ -75,7 +75,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         $this->startTest($mutation, $testSuiteNodeId);
     }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    public function finishEvaluationForMutation(MutantExecutionResult $executionResult): void
     {
         $sourceFilePath = $executionResult->getOriginalFilePath();
 
@@ -98,7 +98,7 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
         $this->finishTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
     }
 
-    public function finishAnalysis(): void
+    public function finishEvaluation(): void
     {
         $this->state->assertAllTestSuitesAreClosed();
     }

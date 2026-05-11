@@ -42,7 +42,7 @@ use Infection\Tests\UnsupportedMethod;
 
 final class FakeMutationAnalysisLogger implements MutationAnalysisLogger
 {
-    public function startAnalysis(int $mutationCount): void
+    public function startEvaluation(int $mutationCount): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
@@ -54,17 +54,17 @@ final class FakeMutationAnalysisLogger implements MutationAnalysisLogger
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function startEvaluation(Mutation $mutation): void
+    public function startEvaluationForMutation(Mutation $mutation): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    public function finishEvaluationForMutation(MutantExecutionResult $executionResult): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function finishAnalysis(): void
+    public function finishEvaluation(): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
