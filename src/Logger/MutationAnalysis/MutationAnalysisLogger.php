@@ -44,8 +44,6 @@ use Infection\Mutation\Mutation;
  */
 interface MutationAnalysisLogger
 {
-    public function startAnalysis(): void;
-
     /**
      * Records the start of the process.
      *
@@ -72,6 +70,4 @@ interface MutationAnalysisLogger
      * Records the end of the mutation evaluation process.
      */
     public function finishEvaluation(): void;
-
-    public function finishAnalysis(): void;
 }
