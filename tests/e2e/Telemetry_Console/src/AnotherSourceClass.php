@@ -2,7 +2,7 @@
 
 namespace Ignore_All_Mutations;
 
-class SourceClass
+class AnotherSourceClass
 {
     public function hello(int $foo): string
     {
