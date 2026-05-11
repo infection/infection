@@ -35,6 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -62,17 +71,7 @@ use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
-use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
-use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
-use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
-use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
-use Infection\Event\Events\Ast\AstProcessingWasFinished;
-use Infection\Event\Events\Ast\AstProcessingWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
@@ -196,8 +195,6 @@ final class ProjectCodeProvider
         MutantEvaluationWasStarted::class,
         MutantExecutionResult::class,
         MutatorName::class,
-        MutationEvaluationWasFinished::class,
-        MutationEvaluationWasStarted::class,
         NameResolverFactory::class,
         NoGitProjectFound::class,
         NodeMutationGenerator::class,

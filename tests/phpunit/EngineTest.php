@@ -44,6 +44,8 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -194,6 +196,8 @@ final class EngineTest extends TestCase
         $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
+            MutationAnalysisWasStarted::class,
+            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -314,6 +318,8 @@ final class EngineTest extends TestCase
         $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
+            MutationAnalysisWasStarted::class,
+            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -460,6 +466,8 @@ final class EngineTest extends TestCase
         $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
+            MutationAnalysisWasStarted::class,
+            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -554,6 +562,8 @@ final class EngineTest extends TestCase
         $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
+            MutationAnalysisWasStarted::class,
+            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -658,6 +668,8 @@ final class EngineTest extends TestCase
         $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
+            MutationAnalysisWasStarted::class,
+            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -747,6 +759,8 @@ final class EngineTest extends TestCase
         $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
+            MutationAnalysisWasStarted::class,
+            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 

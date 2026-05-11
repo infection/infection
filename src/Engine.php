@@ -51,7 +51,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\PhpParser\Parser\UnparsableFile;
+use Infection\PhpParser\UnparsableFile;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -236,21 +236,23 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
-        $this->eventDispatcher->dispatch(new MutationAnalysisWasStarted());
+        $this->eventDispatcher->dispatch(
+            new MutationAnalysisWasStarted(),
+        );
 
         $mutations = $this->mutationGenerator->generate(
             // TODO: inject it in the constructor instead
             $this->config->mutateOnlyCoveredCode(),
         );
 
-        try {
-            $this->mutationTestingRunner->run(
-                $mutations,
-                $this->getFilteredExtraOptionsForMutant(),
-            );
-        } finally {
-            $this->eventDispatcher->dispatch(new MutationAnalysisWasFinished());
-        }
+        $this->mutationTestingRunner->run(
+            $mutations,
+            $this->getFilteredExtraOptionsForMutant(),
+        );
+
+        $this->eventDispatcher->dispatch(
+            new MutationAnalysisWasFinished(),
+        );
     }
 
     private function getFilteredExtraOptionsForMutant(): string

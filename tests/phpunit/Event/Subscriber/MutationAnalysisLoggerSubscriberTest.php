@@ -37,10 +37,12 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -70,11 +72,22 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         $this->dispatcher->addSubscriber($subscriber);
     }
 
-    public function test_it_reacts_on_mutation_testing_started(): void
+    public function test_it_reacts_on_mutation_analysis_started(): void
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('startAnalysis')
+            ->method('startAnalysis');
+
+        $this->dispatcher->dispatch(
+            new MutationAnalysisWasStarted(),
+        );
+    }
+
+    public function test_it_reacts_on_mutation_evaluation_started(): void
+    {
+        $this->loggerMock
+            ->expects($this->once())
+            ->method('startEvaluation')
             ->with(1);
 
         $this->dispatcher->dispatch(
@@ -91,11 +104,11 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
 
         $this->loggerMock
             ->expects($this->once())
-            ->method('startEvaluation')
-            ->with($this->identicalTo($mutation));
+            ->method('startEvaluationForMutation')
+        ->with($this->identicalTo($mutation));
 
         $this->dispatcher->dispatch(
-            new MutantEvaluationWasStarted($mutation),
+            new MutationEvaluationForMutationWasStarted($mutation),
         );
     }
 
@@ -137,7 +150,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
 
         $this->loggerMock
             ->expects($this->once())
-            ->method('finishEvaluation')
+            ->method('finishEvaluationForMutation')
             ->with($this->identicalTo($executionResult));
 
         $this->dispatcher->dispatch(
@@ -147,12 +160,21 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         );
     }
 
-    public function test_it_reacts_on_mutation_testing_finished(): void
+    public function test_it_reacts_on_mutation_evaluation_finished(): void
+    {
+        $this->loggerMock
+            ->expects($this->once())
+            ->method('finishEvaluation');
+
+        $this->dispatcher->dispatch(new MutationEvaluationWasFinished());
+    }
+
+    public function test_it_reacts_on_mutation_analysis_finished(): void
     {
         $this->loggerMock
             ->expects($this->once())
             ->method('finishAnalysis');
 
-        $this->dispatcher->dispatch(new MutationEvaluationWasFinished());
+        $this->dispatcher->dispatch(new MutationAnalysisWasFinished());
     }
 }

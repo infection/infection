@@ -38,10 +38,6 @@ namespace Infection\Event\Events\MutationAnalysis;
 /**
  * @internal
  */
-<<<<<<<< HEAD:src/Event/Events/MutationAnalysis/MutationAnalysisWasStarted.php
 final readonly class MutationAnalysisWasStarted
-========
-final readonly class MutationEvaluationWasFinished
->>>>>>>> upstream/feature/telemetry:src/Event/Events/MutationAnalysis/MutationEvaluationWasFinished.php
 {
 }

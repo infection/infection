@@ -36,14 +36,18 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function count;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -51,21 +55,26 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 /**
  * @internal
  */
-final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantEvaluationWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
 {
     public function __construct(
         private MutationAnalysisLogger $logger,
     ) {
     }
 
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
+    public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
     {
-        $this->logger->startAnalysis($event->mutationCount);
+        $this->logger->startAnalysis();
     }
 
-    public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void
+    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
     {
-        $this->logger->startEvaluation($event->mutation);
+        $this->logger->startEvaluation($event->mutationCount);
+    }
+
+    public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void
+    {
+        $this->logger->startEvaluationForMutation($event->mutation);
     }
 
     public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
@@ -82,10 +91,15 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
     {
         $executionResult = $event->executionResult;
 
-        $this->logger->finishEvaluation($executionResult);
+        $this->logger->finishEvaluationForMutation($executionResult);
     }
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    {
+        $this->logger->finishEvaluation();
+    }
+
+    public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
     {
         $this->logger->finishAnalysis();
     }
