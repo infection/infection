@@ -62,6 +62,17 @@ use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
 use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
@@ -144,6 +155,12 @@ final class ProjectCodeProvider
         Application::class,
         ArtefactCollectionWasStarted::class,
         ArtefactCollectionWasFinished::class,
+        AstEnrichmentWasFinished::class,
+        AstEnrichmentWasStarted::class,
+        AstParsingWasFinished::class,
+        AstParsingWasStarted::class,
+        AstProcessingWasFinished::class,
+        AstProcessingWasStarted::class,
         BaseMutatorTestCase::class,
         BaseOption::class,
         ConcreteComposerExecutableFinder::class,
@@ -174,8 +191,13 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MessageName::class,
         MutationAnalysisLoggerName::class,
+        MutationAnalysisWasFinished::class,
+        MutationAnalysisWasStarted::class,
+        MutantEvaluationWasStarted::class,
         MutantExecutionResult::class,
         MutatorName::class,
+        MutationEvaluationWasFinished::class,
+        MutationEvaluationWasStarted::class,
         NameResolverFactory::class,
         NoGitProjectFound::class,
         NodeMutationGenerator::class,

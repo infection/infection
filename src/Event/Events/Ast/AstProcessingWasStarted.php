@@ -40,4 +40,8 @@ namespace Infection\Event\Events\Ast;
  */
 final readonly class AstProcessingWasStarted
 {
+    public function __construct(
+        public string $sourceFilePath,
+    ) {
+    }
 }

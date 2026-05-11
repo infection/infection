@@ -33,27 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser;
+namespace Infection\PhpParser\Parser;
 
-use Exception;
-use Infection\PhpParser\UnparsableFile;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use SplFileInfo;
 
-#[CoversClass(UnparsableFile::class)]
-final class UnparsableFileTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class EventDispatchingFileParser implements FileParser
 {
-    public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
+    public function __construct(
+        private FileParser $decoratedParser,
+        private EventDispatcher $eventDispatcher,
+    ) {
+    }
+
+    public function parse(SplFileInfo $fileInfo): array
     {
-        $previous = new Exception('Unintentional thing');
+        $sourceFilePath = self::getSourceFilePath($fileInfo);
 
-        $exception = UnparsableFile::fromInvalidFile('/path/to/file', $previous);
-
-        $this->assertSame(
-            'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
-            $exception->getMessage(),
+        $this->eventDispatcher->dispatch(
+            new AstParsingWasStarted($sourceFilePath),
         );
-        $this->assertSame(0, $exception->getCode());
-        $this->assertSame($previous, $exception->getPrevious());
+
+        try {
+            return $this->decoratedParser->parse($fileInfo);
+        } finally {
+            $this->eventDispatcher->dispatch(
+                new AstParsingWasFinished($sourceFilePath),
+            );
+        }
+    }
+
+    private static function getSourceFilePath(SplFileInfo $fileInfo): string
+    {
+        return $fileInfo->getRealPath() === false
+            ? $fileInfo->getPathname()
+            : $fileInfo->getRealPath();
     }
 }

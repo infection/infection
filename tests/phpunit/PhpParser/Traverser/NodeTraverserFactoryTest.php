@@ -33,10 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser;
+namespace Infection\Tests\PhpParser\Traverser;
 
 use function array_map;
-use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Traverser\EnrichmentNodeTraverser;
+use Infection\PhpParser\Traverser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
@@ -50,6 +51,7 @@ use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\FileSystem\MockSplFileInfo;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
@@ -68,6 +70,8 @@ final class NodeTraverserFactoryTest extends TestCase
 {
     private static ?ReflectionProperty $visitorsReflection = null;
 
+    private static ?ReflectionProperty $decoratedTraverserReflection = null;
+
     /**
      * @param list<class-string<NodeVisitor>> $expected
      */
@@ -85,7 +89,8 @@ final class NodeTraverserFactoryTest extends TestCase
             new EmptyTrace($sourceFile),
         );
 
-        $this->assertTraverserVisitorsAre($traverser, $expected);
+        $this->assertInstanceOf(EnrichmentNodeTraverser::class, $traverser);
+        $this->assertTraverserVisitorsAre(self::getDecoratedTraverser($traverser), $expected);
     }
 
     public static function visitorProvider(): iterable
@@ -167,12 +172,24 @@ final class NodeTraverserFactoryTest extends TestCase
         return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
     }
 
+    private static function getDecoratedTraverser(EnrichmentNodeTraverser $traverser): NodeTraverserInterface
+    {
+        /** @var NodeTraverserInterface */
+        return self::getDecoratedTraverserReflection()->getValue($traverser);
+    }
+
+    private static function getDecoratedTraverserReflection(): ReflectionProperty
+    {
+        return self::$decoratedTraverserReflection ??= (new ReflectionClass(EnrichmentNodeTraverser::class))->getProperty('decoratedTraverser');
+    }
+
     private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
     {
         return new NodeTraverserFactory(
             sourceLineMatcher: new NullSourceLineMatcher(),
             lineRangeCalculator: new LineRangeCalculator(),
             onlyCovered: $onlyCovered,
+            eventDispatcher: new EventDispatcherCollector(),
         );
     }
 }

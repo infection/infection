@@ -40,4 +40,8 @@ namespace Infection\Event\Events\Ast\AstParsing;
  */
 final readonly class AstParsingWasStarted
 {
+    public function __construct(
+        public string $sourceFilePath,
+    ) {
+    }
 }

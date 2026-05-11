@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Command\Debug\DumpAstCommand;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\FileParser;
-use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\UnparsableFile;
+use Infection\PhpParser\Parser\FileParser;
+use Infection\PhpParser\Parser\UnparsableFile;
+use Infection\PhpParser\Traverser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
@@ -55,6 +58,8 @@ use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
+ * @phpstan-import-type StatementsAndTokens from FileParser
+ *
  * @internal
  * @final
  */
@@ -65,6 +70,7 @@ class FileMutationGenerator
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -138,17 +144,27 @@ class FileMutationGenerator
      *
      * @throws UnparsableFile
      *
-     * @return array{Stmt[], Token[]}
+     * @return StatementsAndTokens
      */
     private function createAst(
         SplFileInfo $sourceFile,
         Trace $trace,
     ): array {
+        $sourceFilePath = $sourceFile->getRealPath();
+
+        $this->eventDispatcher->dispatch(
+            new AstProcessingWasStarted($sourceFilePath),
+        );
+
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         $this->traverserFactory
             ->createEnrichmentTraverser($sourceFile, $trace)
             ->traverse($initialStatements);
+
+        $this->eventDispatcher->dispatch(
+            new AstProcessingWasFinished($sourceFilePath),
+        );
 
         return [$initialStatements, $originalFileTokens];
     }

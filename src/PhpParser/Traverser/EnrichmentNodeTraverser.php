@@ -33,15 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\Ast\AstParsing;
+namespace Infection\PhpParser\Traverser;
+
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
+use SplFileInfo;
 
 /**
  * @internal
  */
-final readonly class AstParsingWasFinished
+final readonly class EnrichmentNodeTraverser implements NodeTraverserInterface
 {
     public function __construct(
-        public string $sourceFilePath,
+        private SplFileInfo $sourceFile,
+        private NodeTraverserInterface $decoratedTraverser,
+        private EventDispatcher $eventDispatcher,
     ) {
+    }
+
+    public function addVisitor(NodeVisitor $visitor): void
+    {
+        $this->decoratedTraverser->addVisitor($visitor);
+    }
+
+    public function removeVisitor(NodeVisitor $visitor): void
+    {
+        $this->decoratedTraverser->removeVisitor($visitor);
+    }
+
+    public function traverse(array $nodes): array
+    {
+        $sourceFilePath = self::getSourceFilePath($this->sourceFile);
+
+        $this->eventDispatcher->dispatch(
+            new AstEnrichmentWasStarted($sourceFilePath),
+        );
+
+        try {
+            return $this->decoratedTraverser->traverse($nodes);
+        } finally {
+            $this->eventDispatcher->dispatch(
+                new AstEnrichmentWasFinished($sourceFilePath),
+            );
+        }
+    }
+
+    private static function getSourceFilePath(SplFileInfo $fileInfo): string
+    {
+        return $fileInfo->getRealPath() === false
+            ? $fileInfo->getPathname()
+            : $fileInfo->getRealPath();
     }
 }

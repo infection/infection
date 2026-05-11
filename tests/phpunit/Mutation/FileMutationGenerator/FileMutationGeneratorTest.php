@@ -35,15 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\PhpParser\FileParser;
-use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Parser\PhpParserFileParser;
+use Infection\PhpParser\Traverser\NodeTraverserFactory;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use Infection\Testing\FileSystem\MockSplFileInfo;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
@@ -65,6 +68,8 @@ final class FileMutationGeneratorTest extends TestCase
 
     private MockObject&Tracer $tracerMock;
 
+    private EventDispatcherCollector $eventDispatcher;
+
     private FileMutationGenerator $mutationGenerator;
 
     protected function setUp(): void
@@ -72,6 +77,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->phpParserMock = $this->createMock(Parser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
+        $this->eventDispatcher = new EventDispatcherCollector();
 
         $fileSystemStub = $this->createStub(FileSystem::class);
         $fileSystemStub
@@ -84,13 +90,14 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
         $this->mutationGenerator = new FileMutationGenerator(
-            new FileParser(
+            new PhpParserFileParser(
                 $this->phpParserMock,
                 new FileStore($fileSystemStub),
             ),
             $this->traverserFactoryMock,
             $this->tracerMock,
             new FileStore($fileSystemStub),
+            $this->eventDispatcher,
         );
     }
 
@@ -186,6 +193,8 @@ final class FileMutationGeneratorTest extends TestCase
             0,
             iterator_to_array($mutations, false),
         );
+
+        $this->assertCount(2, $this->eventDispatcher->getEvents());
     }
 
     /**
@@ -263,9 +272,18 @@ final class FileMutationGeneratorTest extends TestCase
             $mutators,
         );
 
+        $mutations = iterator_to_array($mutations, false);
+
+        $expectedEvents = $scenario->expected
+            ? [
+                new AstProcessingWasStarted('/path/to/file'),
+                new AstProcessingWasFinished('/path/to/file'),
+            ]
+            : [];
+
+        $this->assertEquals($expectedEvents, $this->eventDispatcher->getEvents());
         // See the test description: we do not check the result itself only the mocks
         // expectations.
-        $mutations = iterator_to_array($mutations, false);
         $this->assertSame([], $mutations);
     }
 

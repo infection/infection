@@ -40,4 +40,8 @@ namespace Infection\Event\Events\Ast\AstEnrichment;
  */
 final readonly class AstEnrichmentWasFinished
 {
+    public function __construct(
+        public string $sourceFilePath,
+    ) {
+    }
 }

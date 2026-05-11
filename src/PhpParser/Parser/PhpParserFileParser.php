@@ -33,15 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\Ast\AstParsing;
+namespace Infection\PhpParser\Parser;
+
+use Infection\FileSystem\FileStore;
+use PhpParser\Parser;
+use SplFileInfo;
+use Throwable;
 
 /**
  * @internal
  */
-final readonly class AstParsingWasFinished
+final readonly class PhpParserFileParser implements FileParser
 {
     public function __construct(
-        public string $sourceFilePath,
+        private Parser $parser,
+        private FileStore $fileStore,
     ) {
+    }
+
+    public function parse(SplFileInfo $fileInfo): array
+    {
+        try {
+            return [
+                $this->parser->parse(
+                    $this->fileStore->getContents($fileInfo),
+                ) ?? [],
+                $this->parser->getTokens(),
+            ];
+        } catch (Throwable $throwable) {
+            $filePath = $fileInfo->getRealPath() === false
+                ? $fileInfo->getPathname()
+                : $fileInfo->getRealPath()
+            ;
+
+            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
+        }
     }
 }
