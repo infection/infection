@@ -44,8 +44,6 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -63,7 +61,6 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -91,9 +88,7 @@ final class EngineTest extends TestCase
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker->expects($this->never())->method($this->anything());
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
         );
 
@@ -196,13 +191,9 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
         ;
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
-            MutationAnalysisWasStarted::class,
-            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -320,13 +311,9 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
         ;
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
-            MutationAnalysisWasStarted::class,
-            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -470,13 +457,9 @@ final class EngineTest extends TestCase
             ->method('checkCoverageExists')
         ;
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
-            MutationAnalysisWasStarted::class,
-            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -568,13 +551,9 @@ final class EngineTest extends TestCase
             ->method('checkCoverageExists')
         ;
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
-            MutationAnalysisWasStarted::class,
-            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -676,13 +655,9 @@ final class EngineTest extends TestCase
             ->method('checkCoverageExists')
         ;
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
-            MutationAnalysisWasStarted::class,
-            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -769,13 +744,9 @@ final class EngineTest extends TestCase
             ->method('checkCoverageExists')
         ;
 
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->expectDispatchedEvents(
-            $eventDispatcher,
+        $eventDispatcher = $this->createEventDispatcherMock(
             ArtefactCollectionWasStarted::class,
             ArtefactCollectionWasFinished::class,
-            MutationAnalysisWasStarted::class,
-            MutationAnalysisWasFinished::class,
             ApplicationExecutionWasFinished::class,
         );
 
@@ -869,21 +840,30 @@ final class EngineTest extends TestCase
     /**
      * @param class-string ...$expectedEventClasses
      */
-    private function expectDispatchedEvents(
-        EventDispatcher&MockObject $eventDispatcher,
+    private function createEventDispatcherMock(
         string ...$expectedEventClasses,
-    ): void {
-        $eventDispatcher
-            ->expects($this->exactly(count($expectedEventClasses)))
-            ->method('dispatch')
-            ->willReturnCallback(static function (object $event) use (&$expectedEventClasses): void {
-                self::assertNotSame([], $expectedEventClasses);
+    ): EventDispatcher {
+        $expectedEventClassesCount = count($expectedEventClasses);
+        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
 
-                $expectedEventClass = array_shift($expectedEventClasses);
-                self::assertNotNull($expectedEventClass);
+        if ($expectedEventClassesCount === 0) {
+            $eventDispatcherMock
+                ->expects($this->never())
+                ->method($this->anything());
+        } else {
+            $eventDispatcherMock
+                ->expects($this->exactly($expectedEventClassesCount))
+                ->method('dispatch')
+                ->willReturnCallback(static function (object $event) use (&$expectedEventClasses): void {
+                    self::assertNotSame([], $expectedEventClasses);
 
-                self::assertInstanceOf($expectedEventClass, $event);
-            })
-        ;
+                    $expectedEventClass = array_shift($expectedEventClasses);
+                    self::assertNotNull($expectedEventClass);
+
+                    self::assertInstanceOf($expectedEventClass, $event);
+                });
+        }
+
+        return $eventDispatcherMock;
     }
 }
