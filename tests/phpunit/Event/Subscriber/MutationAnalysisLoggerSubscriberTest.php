@@ -70,11 +70,11 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         $this->dispatcher->addSubscriber($subscriber);
     }
 
-    public function test_it_reacts_on_mutation_testing_started(): void
+    public function test_it_reacts_on_mutation_evaluation_started(): void
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('startAnalysis')
+            ->method('startEvaluation')
             ->with(1);
 
         $this->dispatcher->dispatch(
@@ -91,7 +91,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
 
         $this->loggerMock
             ->expects($this->once())
-            ->method('startEvaluation')
+            ->method('startEvaluationForMutation')
         ->with($this->identicalTo($mutation));
 
         $this->dispatcher->dispatch(
@@ -137,7 +137,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
 
         $this->loggerMock
             ->expects($this->once())
-            ->method('finishEvaluation')
+            ->method('finishEvaluationForMutation')
             ->with($this->identicalTo($executionResult));
 
         $this->dispatcher->dispatch(
@@ -147,11 +147,11 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
         );
     }
 
-    public function test_it_reacts_on_mutation_testing_finished(): void
+    public function test_it_reacts_on_mutation_evaluation_finished(): void
     {
         $this->loggerMock
             ->expects($this->once())
-            ->method('finishAnalysis');
+            ->method('finishEvaluation');
 
         $this->dispatcher->dispatch(new MutationEvaluationWasFinished());
     }
