@@ -33,45 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Event\Events\MutationAnalysis;
 
-use Infection\Framework\Iterable\IterableCounter;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
- * Logger for the mutation analysis phase (mutation generation + heuristics + evaluation).
+ * @internal
  */
-interface MutationAnalysisLogger
+interface MutationAnalysisWasStartedSubscriber extends EventSubscriber
 {
-    public function startAnalysis(): void;
-
-    /**
-     * Records the start of the process.
-     *
-     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
-     */
-    public function startEvaluation(int $mutationCount): void;
-
-    /**
-     * @param list<string> $mutationIds
-     */
-    public function finishMutationGenerationForFile(
-        string $sourceFilePath,
-        array $mutationIds,
-    ): void;
-
-    public function startEvaluationForMutation(Mutation $mutation): void;
-
-    /**
-     * Records the result of the evaluation of a mutation.
-     */
-    public function finishEvaluationForMutation(MutantExecutionResult $executionResult): void;
-
-    /**
-     * Records the end of the mutation evaluation process.
-     */
-    public function finishEvaluation(): void;
-
-    public function finishAnalysis(): void;
+    public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void;
 }

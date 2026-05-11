@@ -36,6 +36,10 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function count;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
@@ -51,11 +55,16 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 /**
  * @internal
  */
-final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
 {
     public function __construct(
         private MutationAnalysisLogger $logger,
     ) {
+    }
+
+    public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
+    {
+        $this->logger->startAnalysis();
     }
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
@@ -88,5 +97,10 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
         $this->logger->finishEvaluation();
+    }
+
+    public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
+    {
+        $this->logger->finishAnalysis();
     }
 }
