@@ -33,24 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Events\MutationAnalysis;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
-use Infection\Process\Runner\ProcessRunner;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Reporter\Reporter;
 
-#[CoversClass(MutationTestingWasStarted::class)]
-final class MutationTestingWasStartedTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
-    public function test_it_exposes_its_mutation_count_and_process_runner(): void
+    public function __construct(
+        private Reporter $reporter,
+        private EventDispatcher $eventDispatcher,
+    ) {
+    }
+
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $count = 5;
-        $processRunner = $this->createStub(ProcessRunner::class);
+        $this->eventDispatcher->dispatch(
+            new ReportingWasStarted(),
+        );
 
-        $event = new MutationTestingWasStarted($count, $processRunner);
+        $this->reporter->report();
 
-        $this->assertSame($count, $event->mutationCount);
-        $this->assertSame($processRunner, $event->processRunner);
+        $this->eventDispatcher->dispatch(
+            new ReportingWasFinished(),
+        );
     }
 }

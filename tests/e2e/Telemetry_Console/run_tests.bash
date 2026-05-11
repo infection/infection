@@ -69,8 +69,8 @@ diff -u --ignore-all-space expected.stderr var/execution-with-trace-exporter.std
 assert_line_count 1 '"name": "infection.run"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.initial_tests"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_generation"' var/execution-with-trace-exporter.stdout
-assert_line_count 1 '"name": "infection.mutation_testing"' var/execution-with-trace-exporter.stdout
-assert_line_count 6 '"name": "infection.mutation_evaluation"' var/execution-with-trace-exporter.stdout
+assert_line_count 1 '"name": "infection.mutation_evaluation"' var/execution-with-trace-exporter.stdout
+assert_line_count 6 '"name": "infection.mutation_evaluation.mutation"' var/execution-with-trace-exporter.stdout
 assert_contains '"service.name": "infection"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.count":' var/execution-with-trace-exporter.stdout

@@ -33,22 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Events\MutationAnalysis;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber;
+use Infection\Reporter\Reporter;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingWasFinished::class)]
-final class MutationTestingWasFinishedTest extends TestCase
+#[CoversClass(ReportAfterMutationEvaluationFinishedSubscriber::class)]
+final class ReportAfterMutationEvaluationFinishedSubscriberTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
+    public function test_it_reacts_on_mutation_testing_finished(): void
     {
-        $class = new MutationTestingWasFinished();
+        $reporter = $this->createMock(Reporter::class);
+        $reporter
+            ->expects($this->once())
+            ->method('report');
 
-        $this->assertInstanceOf(MutationTestingWasFinished::class, $class);
+        $reportingEventDispatcher = new EventDispatcherCollector();
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(
+            new ReportAfterMutationEvaluationFinishedSubscriber(
+                $reporter,
+                $reportingEventDispatcher,
+            ),
+        );
+
+        $dispatcher->dispatch(new MutationEvaluationWasFinished());
+
+        $this->assertEquals(
+            [
+                new ReportingWasStarted(),
+                new ReportingWasFinished(),
+            ],
+            $reportingEventDispatcher->getEvents(),
+        );
     }
 }
