@@ -35,20 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Events\MutationAnalysis;
 
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
+use Infection\Process\Runner\ProcessRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationEvaluationWasFinished::class)]
-final class MutationTestingWasFinishedTest extends TestCase
+#[CoversClass(MutationEvaluationWasStarted::class)]
+final class MutationEvaluationWasStartedTest extends TestCase
 {
-    /**
-     * This class is only used to fire events, and the only functionality it needs is being instantiated
-     */
-    public function test_it_can_be_instantiated(): void
+    public function test_it_exposes_its_mutation_count_and_process_runner(): void
     {
-        $class = new MutationEvaluationWasFinished();
+        $count = 5;
+        $processRunner = $this->createStub(ProcessRunner::class);
 
-        $this->assertInstanceOf(MutationEvaluationWasFinished::class, $class);
+        $event = new MutationEvaluationWasStarted($count, $processRunner);
+
+        $this->assertSame($count, $event->mutationCount);
+        $this->assertSame($processRunner, $event->processRunner);
     }
 }
