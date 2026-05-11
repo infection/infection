@@ -33,36 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Source\Collector;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Reporter\Reporter;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Source\Collector\EventDispatchingSourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
+use Infection\Testing\FileSystem\MockSplFileInfo;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
+#[CoversClass(EventDispatchingSourceCollector::class)]
+final class EventDispatchingSourceCollectorTest extends TestCase
 {
-    public function __construct(
-        private Reporter $reporter,
-        private EventDispatcher $eventDispatcher,
-    ) {
-    }
-
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function test_it_dispatches_source_collection_events_around_the_decorated_collector(): void
     {
-        $this->eventDispatcher->dispatch(
-            new ReportingWasStarted(),
+        $files = [
+            new MockSplFileInfo('src/File1.php'),
+            new MockSplFileInfo('src/File2.php'),
+        ];
+        $eventDispatcher = new EventDispatcherCollector();
+
+        $collector = new EventDispatchingSourceCollector(
+            new FixedSourceCollector($files),
+            $eventDispatcher,
         );
 
-        $this->reporter->report();
+        $this->assertSame($files, $collector->collect());
 
-        $this->eventDispatcher->dispatch(
-            new ReportingWasFinished(),
+        $this->assertEquals(
+            [
+                new SourceCollectionWasStarted(),
+                new SourceCollectionWasFinished(2),
+            ],
+            $eventDispatcher->getEvents(),
         );
     }
 }

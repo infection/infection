@@ -41,6 +41,8 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -105,8 +107,7 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $initialTestSuiteOutput = $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $initialTestSuiteOutput = $this->collectArtefacts();
 
         /*
          * Limit the memory used for the mutation processes based on the memory
@@ -133,6 +134,22 @@ final readonly class Engine
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
         }
+    }
+
+    /**
+     * @throws InitialStaticAnalysisRunFailed
+     * @throws InitialTestsFailed
+     */
+    private function collectArtefacts(): ?string
+    {
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasStarted());
+
+        $initialTestSuiteOutput = $this->runInitialTestSuite();
+        $this->runInitialStaticAnalysis();
+
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasFinished());
+
+        return $initialTestSuiteOutput;
     }
 
     private function runInitialTestSuite(): ?string

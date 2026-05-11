@@ -39,6 +39,8 @@ use function array_map;
 use function array_values;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
@@ -49,6 +51,10 @@ use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGeneratio
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\Runner\ProcessRunner;
@@ -107,10 +113,14 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             ->build();
 
         $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
+        $this->subscriber->onArtefactCollectionWasStarted(new ArtefactCollectionWasStarted());
         $this->subscriber->onInitialTestSuiteWasStarted(new InitialTestSuiteWasStarted());
         $this->subscriber->onInitialTestSuiteWasFinished(new InitialTestSuiteWasFinished('Test suite output'));
         $this->subscriber->onInitialStaticAnalysisRunWasStarted(new InitialStaticAnalysisRunWasStarted());
         $this->subscriber->onInitialStaticAnalysisRunWasFinished(new InitialStaticAnalysisRunWasFinished('Static analysis output'));
+        $this->subscriber->onArtefactCollectionWasFinished(new ArtefactCollectionWasFinished());
+        $this->subscriber->onSourceCollectionWasStarted(new SourceCollectionWasStarted());
+        $this->subscriber->onSourceCollectionWasFinished(new SourceCollectionWasFinished(1));
         $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
         $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished());
         $this->subscriber->onMutationTestingWasStarted(new MutationTestingWasStarted(1, $this->createStub(ProcessRunner::class)));
@@ -122,6 +132,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 ->withProcessRuntime(0.123)
                 ->build(),
         ));
+        $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
+        $this->subscriber->onReportingWasFinished(new ReportingWasFinished());
         $this->subscriber->onMutationTestingWasFinished(new MutationTestingWasFinished());
         $this->subscriber->onApplicationExecutionWasFinished(new ApplicationExecutionWasFinished());
 
@@ -129,8 +141,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             [
                 'infection.initial_tests',
                 'infection.initial_static_analysis',
+                'infection.artefact_collection',
+                'infection.source_collection',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation',
+                'infection.reporting',
                 'infection.mutation_testing',
                 'infection.run',
             ],
@@ -138,19 +153,26 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         );
 
         $run = $this->getSpanFromExporter('infection.run');
+        $artefactCollection = $this->getSpanFromExporter('infection.artefact_collection');
+        $sourceCollection = $this->getSpanFromExporter('infection.source_collection');
         $initialTests = $this->getSpanFromExporter('infection.initial_tests');
         $initialStaticAnalysis = $this->getSpanFromExporter('infection.initial_static_analysis');
         $mutationGeneration = $this->getSpanFromExporter('infection.mutation_generation');
         $mutationTesting = $this->getSpanFromExporter('infection.mutation_testing');
         $mutationEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation');
+        $reporting = $this->getSpanFromExporter('infection.reporting');
 
         $this->assertSame(self::ROOT_SPAN_PARENT_ID, $run->getParentSpanId());
-        $this->assertSame($run->getSpanId(), $initialTests->getParentSpanId());
-        $this->assertSame($run->getSpanId(), $initialStaticAnalysis->getParentSpanId());
+        $this->assertSame($run->getSpanId(), $artefactCollection->getParentSpanId());
+        $this->assertSame($artefactCollection->getSpanId(), $initialTests->getParentSpanId());
+        $this->assertSame($artefactCollection->getSpanId(), $initialStaticAnalysis->getParentSpanId());
+        $this->assertSame($run->getSpanId(), $sourceCollection->getParentSpanId());
         $this->assertSame($run->getSpanId(), $mutationGeneration->getParentSpanId());
         $this->assertSame($run->getSpanId(), $mutationTesting->getParentSpanId());
         $this->assertSame($mutationTesting->getSpanId(), $mutationEvaluation->getParentSpanId());
+        $this->assertSame($run->getSpanId(), $reporting->getParentSpanId());
 
+        $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $mutationTesting->getAttributes()->get('infection.mutation.count'));
         $this->assertSame('mutation-A', $mutationEvaluation->getAttributes()->get('infection.mutation.id'));
@@ -170,20 +192,26 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutation = MutationBuilder::withMinimalTestData()->build();
 
         $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
+        $this->subscriber->onArtefactCollectionWasStarted(new ArtefactCollectionWasStarted());
         $this->subscriber->onInitialTestSuiteWasStarted(new InitialTestSuiteWasStarted());
         $this->subscriber->onInitialStaticAnalysisRunWasStarted(new InitialStaticAnalysisRunWasStarted());
+        $this->subscriber->onSourceCollectionWasStarted(new SourceCollectionWasStarted());
         $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
         $this->subscriber->onMutationTestingWasStarted(new MutationTestingWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted($mutation));
+        $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
         $this->subscriber->onApplicationExecutionWasFinished(new ApplicationExecutionWasFinished());
 
         $this->assertSame(
             [
                 'infection.initial_tests',
                 'infection.initial_static_analysis',
+                'infection.artefact_collection',
+                'infection.source_collection',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation',
                 'infection.mutation_testing',
+                'infection.reporting',
                 'infection.run',
             ],
             $this->getExportedSpanNames(),
