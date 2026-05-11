@@ -33,42 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\MutationAnalysis;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements MutationTestingWasFinishedSubscriber
+interface MutationEvaluationWasFinishedSubscriber extends EventSubscriber
 {
-    private const string PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
-
-    public function __construct(
-        private Filesystem $filesystem,
-        private string $tmpDir,
-    ) {
-    }
-
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
-    {
-        $finder = Finder::create()
-            ->in($this->tmpDir)
-            // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
-            ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN);
-
-        $this->filesystem->remove($finder);
-
-        // delete old result cache files, so we don't keep them forever
-        $finder = Finder::create()
-            ->in($this->tmpDir)
-            ->date('before 30 days ago')
-            ->name(self::PHPUNIT_RESULT_CACHE_PATTERN)
-        ;
-
-        $this->filesystem->remove($finder);
-    }
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void;
 }

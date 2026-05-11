@@ -53,7 +53,7 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriberFactory implem
     {
         return $this->debug
             ? new NullSubscriber()
-            : new CleanUpAfterMutationTestingFinishedSubscriber(
+            : new CleanUpAfterMutationEvaluationFinishedSubscriber(
                 $this->fileSystem,
                 $this->tmpDir,
             )
