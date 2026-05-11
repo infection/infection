@@ -1087,9 +1087,9 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\E
 count = 1
 
 [[issues]]
-file = "src/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriber.php"
+file = "src/Event/Subscriber/CleanUpAfterMutationEvaluationFinishedSubscriber.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber::onMutationTestingWasFinished`.'
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationEvaluationFinishedSubscriber::onMutationEvaluationWasFinished`.'
 count = 1
 
 [[issues]]
@@ -7053,12 +7053,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unused-parameter"
-message = "Parameter `$event` is never used."
-count = 6
-
-[[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "unused-parameter"
 message = "Parameter `$input` is never used."
 count = 6
 
@@ -7219,19 +7213,19 @@ message = 'Class `Infection\Tests\Fixtures\Event\IONullSubscriber` not found.'
 count = 3
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "no-value"
-message = 'Argument #2 passed to method `Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
+message = 'Argument #2 passed to method `Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
 count = 1
@@ -10557,7 +10551,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished|Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted>`, but found `mixed`.'
+message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted>`, but found `mixed`.'
 count = 7
 
 [[issues]]
@@ -10599,19 +10593,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "non-existent-property"
+message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "non-existent-property"
 message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished`.'
+message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted`.'
 count = 1
 
 [[issues]]
