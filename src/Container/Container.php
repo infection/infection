@@ -142,6 +142,7 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\CachedSourceCollector;
+use Infection\Source\Collector\EventDispatchingSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
@@ -625,18 +626,21 @@ final class Container extends DIContainer
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
             ),
-            SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
-                static function () use ($container): SourceCollector {
-                    $configuration = $container->getConfiguration();
+            SourceCollector::class => static fn (self $container): SourceCollector => new EventDispatchingSourceCollector(
+                new LazySourceCollector(
+                    static function () use ($container): SourceCollector {
+                        $configuration = $container->getConfiguration();
 
-                    return new CachedSourceCollector(
-                        $container->get(SourceCollectorFactory::class)->create(
-                            $configuration->configurationPathname,
-                            $configuration->source,
-                            $configuration->sourceFilter,
-                        ),
-                    );
-                },
+                        return new CachedSourceCollector(
+                            $container->get(SourceCollectorFactory::class)->create(
+                                $configuration->configurationPathname,
+                                $configuration->source,
+                                $configuration->sourceFilter,
+                            ),
+                        );
+                    },
+                ),
+                $container->getEventDispatcher(),
             ),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
