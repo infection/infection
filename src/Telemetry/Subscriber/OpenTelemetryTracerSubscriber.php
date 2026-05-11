@@ -51,6 +51,10 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
@@ -77,7 +81,7 @@ use Infection\Telemetry\SpanHandle;
 /**
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
 
@@ -88,6 +92,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     private ?SpanHandle $initialTestsSpan = null;
 
     private ?SpanHandle $initialStaticAnalysisSpan = null;
+
+    private ?SpanHandle $mutationAnalysisSpan = null;
 
     private ?SpanHandle $mutationGenerationSpan = null;
 
@@ -141,6 +147,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->mutationGenerationSpan = $this->startChild(
             'infection.mutation_generation',
             ['infection.source_file.count' => $event->mutableFilesCount],
+            $this->mutationAnalysisSpan,
         );
     }
 
@@ -155,7 +162,19 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->mutationEvaluationSpan = $this->startChild(
             'infection.mutation_evaluation',
             ['infection.mutation.count' => $event->mutationCount],
+            $this->mutationAnalysisSpan,
         );
+    }
+
+    public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
+    {
+        $this->mutationAnalysisSpan = $this->startChild('infection.mutation_analysis');
+    }
+
+    public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
+    {
+        $this->end($this->mutationAnalysisSpan);
+        $this->mutationAnalysisSpan = null;
     }
 
     public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void
@@ -220,6 +239,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         }
 
         $this->end($this->mutationEvaluationSpan);
+        $this->end($this->mutationAnalysisSpan);
         $this->end($this->reportingSpan);
         $this->end($this->rootSpan);
         $this->telemetry->shutdown();

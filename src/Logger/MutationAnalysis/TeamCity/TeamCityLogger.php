@@ -57,6 +57,11 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
     ) {
     }
 
+    public function startAnalysis(): void
+    {
+        // Do nothing.
+    }
+
     public function startEvaluation(int $mutationCount): void
     {
         if ($mutationCount !== IterableCounter::UNKNOWN_COUNT) {
@@ -101,6 +106,11 @@ final readonly class TeamCityLogger implements MutationAnalysisLogger
     public function finishEvaluation(): void
     {
         $this->state->assertAllTestSuitesAreClosed();
+    }
+
+    public function finishAnalysis(): void
+    {
+        // Do nothing.
     }
 
     private function startTestSuiteIfNotStarted(string $sourceFilePath): string
