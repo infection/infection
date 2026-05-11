@@ -46,7 +46,7 @@ assert_line_count() {
     fi
 }
 
-php $INFECTION --no-interaction --no-progress \
+INFECTION_TELEMETRY=false php $INFECTION --no-interaction --no-progress \
     1> var/execution-no-env-variable.stdout \
     2> var/execution-no-env-variable.stderr
 
