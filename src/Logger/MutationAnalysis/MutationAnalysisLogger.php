@@ -49,7 +49,7 @@ interface MutationAnalysisLogger
      *
      * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
-    public function startAnalysis(int $mutationCount): void;
+    public function startEvaluation(int $mutationCount): void;
 
     /**
      * @param list<string> $mutationIds
@@ -59,15 +59,15 @@ interface MutationAnalysisLogger
         array $mutationIds,
     ): void;
 
-    public function startEvaluation(Mutation $mutation): void;
+    public function startEvaluationForMutation(Mutation $mutation): void;
 
     /**
      * Records the result of the evaluation of a mutation.
      */
-    public function finishEvaluation(MutantExecutionResult $executionResult): void;
+    public function finishEvaluationForMutation(MutantExecutionResult $executionResult): void;
 
     /**
      * Records the end of the mutation evaluation process.
      */
-    public function finishAnalysis(): void;
+    public function finishEvaluation(): void;
 }

@@ -60,12 +60,12 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
     {
-        $this->logger->startAnalysis($event->mutationCount);
+        $this->logger->startEvaluation($event->mutationCount);
     }
 
     public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void
     {
-        $this->logger->startEvaluation($event->mutation);
+        $this->logger->startEvaluationForMutation($event->mutation);
     }
 
     public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
@@ -82,11 +82,11 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
     {
         $executionResult = $event->executionResult;
 
-        $this->logger->finishEvaluation($executionResult);
+        $this->logger->finishEvaluationForMutation($executionResult);
     }
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $this->logger->finishAnalysis();
+        $this->logger->finishEvaluation();
     }
 }
