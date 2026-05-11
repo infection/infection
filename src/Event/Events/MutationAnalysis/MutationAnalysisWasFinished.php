@@ -33,11 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
+<<<<<<<< HEAD:src/Event/Events/MutationAnalysis/MutationAnalysisWasFinished.php
 /**
  * @internal
  */
 final readonly class MutationAnalysisWasFinished
 {
+========
+use Infection\Mutation\Mutation;
+
+/**
+ * @internal
+ */
+final readonly class MutationEvaluationForMutationWasStarted
+{
+    public function __construct(
+        public Mutation $mutation,
+    ) {
+    }
+>>>>>>>> upstream/feature/telemetry:src/Event/Events/MutationAnalysis/MutationEvaluation/MutationEvaluationForMutationWasStarted.php
 }

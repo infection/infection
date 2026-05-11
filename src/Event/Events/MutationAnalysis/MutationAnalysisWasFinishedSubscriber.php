@@ -40,7 +40,13 @@ use Infection\Event\Subscriber\EventSubscriber;
 /**
  * @internal
  */
+<<<<<<<< HEAD:src/Event/Events/MutationAnalysis/MutationAnalysisWasFinishedSubscriber.php
 interface MutationAnalysisWasFinishedSubscriber extends EventSubscriber
 {
     public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void;
+========
+interface MutationEvaluationWasFinishedSubscriber extends EventSubscriber
+{
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void;
+>>>>>>>> upstream/feature/telemetry:src/Event/Events/MutationAnalysis/MutationEvaluationWasFinishedSubscriber.php
 }

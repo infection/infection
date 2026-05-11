@@ -33,36 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Reporter\Reporter;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class ReportAfterMutationTestingFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
+interface MutationEvaluationForMutationWasStartedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private Reporter $reporter,
-        private EventDispatcher $eventDispatcher,
-    ) {
-    }
-
-    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
-    {
-        $this->eventDispatcher->dispatch(
-            new ReportingWasStarted(),
-        );
-
-        $this->reporter->report();
-
-        $this->eventDispatcher->dispatch(
-            new ReportingWasFinished(),
-        );
-    }
+    public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void;
 }

@@ -33,22 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Framework\Iterable\IterableCounter;
-use Infection\Process\Runner\ProcessRunner;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Subscriber\CleanUpAfterMutationEvaluationFinishedSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use function sys_get_temp_dir;
 
-/**
- * @internal
- */
-final readonly class MutationEvaluationWasStarted
+#[Group('integration')]
+#[CoversClass(CleanUpAfterMutationEvaluationFinishedSubscriber::class)]
+final class CleanUpAfterMutationEvaluationFinishedSubscriberTest extends TestCase
 {
-    /**
-     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
-     */
-    public function __construct(
-        public int $mutationCount,
-        public ProcessRunner $processRunner,
-    ) {
+    public function test_it_execute_remove_on_mutation_testing_finished(): void
+    {
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->exactly(2))
+            ->method('remove');
+
+        $subscriber = new CleanUpAfterMutationEvaluationFinishedSubscriber($filesystem, sys_get_temp_dir());
+
+        $subscriber->onMutationEvaluationWasFinished(new MutationEvaluationWasFinished());
     }
 }

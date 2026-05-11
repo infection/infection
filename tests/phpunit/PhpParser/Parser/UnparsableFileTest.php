@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Parser;
 
+<<<<<<<< HEAD:tests/phpunit/PhpParser/Parser/UnparsableFileTest.php
 use Exception;
 use Infection\PhpParser\Parser\UnparsableFile;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -42,12 +43,25 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(UnparsableFile::class)]
 final class UnparsableFileTest extends TestCase
+========
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
+use Infection\Process\Runner\ProcessRunner;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(MutationEvaluationWasStarted::class)]
+final class MutationEvaluationWasStartedTest extends TestCase
+>>>>>>>> upstream/feature/telemetry:tests/phpunit/Event/Events/MutationAnalysis/MutationEvaluationWasStartedTest.php
 {
     public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
     {
         $previous = new Exception('Unintentional thing');
 
+<<<<<<<< HEAD:tests/phpunit/PhpParser/Parser/UnparsableFileTest.php
         $exception = UnparsableFile::fromInvalidFile('/path/to/file', $previous);
+========
+        $event = new MutationEvaluationWasStarted($count, $processRunner);
+>>>>>>>> upstream/feature/telemetry:tests/phpunit/Event/Events/MutationAnalysis/MutationEvaluationWasStartedTest.php
 
         $this->assertSame(
             'Could not parse the file "/path/to/file". Check if it is a valid PHP file',

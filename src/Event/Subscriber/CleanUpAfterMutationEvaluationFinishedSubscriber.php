@@ -33,14 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @internal
  */
-interface MutationEvaluationWasStartedSubscriber extends EventSubscriber
+final readonly class CleanUpAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void;
+    private const string PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
+
+    public function __construct(
+        private Filesystem $filesystem,
+        private string $tmpDir,
+    ) {
+    }
+
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    {
+        $finder = Finder::create()
+            ->in($this->tmpDir)
+            // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
+            ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN);
+
+        $this->filesystem->remove($finder);
+
+        // delete old result cache files, so we don't keep them forever
+        $finder = Finder::create()
+            ->in($this->tmpDir)
+            ->date('before 30 days ago')
+            ->name(self::PHPUNIT_RESULT_CACHE_PATTERN)
+        ;
+
+        $this->filesystem->remove($finder);
+    }
 }

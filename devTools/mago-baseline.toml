@@ -81,7 +81,7 @@ count = 1
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Command\Debug\DumpAstCommand::createAst`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Command\Debug\DumpAstCommand::createAst`.'
 count = 1
 
 [[issues]]
@@ -417,7 +417,7 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Command\RunCommand::executeCommand`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -1087,9 +1087,9 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\E
 count = 1
 
 [[issues]]
-file = "src/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriber.php"
+file = "src/Event/Subscriber/CleanUpAfterMutationEvaluationFinishedSubscriber.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber::onMutationEvaluationWasFinished`.'
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Event\Subscriber\CleanUpAfterMutationEvaluationFinishedSubscriber::onMutationEvaluationWasFinished`.'
 count = 1
 
 [[issues]]
@@ -1582,18 +1582,6 @@ count = 1
 file = "src/Mutant/TestFrameworkMutantExecutionResultFactory.php"
 code = "possibly-null-operand"
 message = "Left operand in `>` comparison might be `null` (type `int|null`)."
-count = 1
-
-[[issues]]
-file = "src/Mutation/FileMutationGenerator.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of method `Infection\Event\Events\Ast\AstProcessingWasFinished::__construct` is possibly `false`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "src/Mutation/FileMutationGenerator.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of method `Infection\Event\Events\Ast\AstProcessingWasStarted::__construct` is possibly `false`, but parameter type `string` does not accept it.'
 count = 1
 
 [[issues]]
@@ -2269,6 +2257,12 @@ message = 'Could not infer a precise return type for function `Infection\Mutator
 count = 1
 
 [[issues]]
+file = "src/PhpParser/FileParser.php"
+code = "possibly-false-argument"
+message = 'Argument #1 of method `Infection\PhpParser\UnparsableFile::fromInvalidFile` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
 file = "src/PhpParser/InfectionPrettyPrinter.php"
 code = "array-to-string-conversion"
 message = "Potential array in middle operand of string concatenation."
@@ -2389,37 +2383,7 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\PhpP
 count = 1
 
 [[issues]]
-file = "src/PhpParser/Parser/EventDispatchingFileParser.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\PhpParser\Parser\EventDispatchingFileParser::getSourceFilePath` is declared to return `string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Parser/EventDispatchingFileParser.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\PhpParser\Parser\EventDispatchingFileParser::getSourceFilePath`: expected `string`, but found `false|string`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Parser/PhpParserFileParser.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of method `Infection\PhpParser\Parser\UnparsableFile::fromInvalidFile` is possibly `false`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Traverser/EnrichmentNodeTraverser.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\PhpParser\Traverser\EnrichmentNodeTraverser::getSourceFilePath` is declared to return `string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Traverser/EnrichmentNodeTraverser.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\PhpParser\Traverser\EnrichmentNodeTraverser::getSourceFilePath`: expected `string`, but found `false|string`.'
-count = 1
-
-[[issues]]
-file = "src/PhpParser/Traverser/NodeTraverserFactory.php"
+file = "src/PhpParser/NodeTraverserFactory.php"
 code = "possibly-false-argument"
 message = 'Argument #2 of method `Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
 count = 1
@@ -6753,43 +6717,43 @@ count = 1
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_fails`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_fails`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_succeeds`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_succeeds`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_max_timeouts_checker_receives_correct_timed_out_count`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_max_timeouts_checker_receives_correct_timed_out_count`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_applied_after_static_analysis_when_enabled`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_applied_after_static_analysis_when_enabled`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_not_applied_when_initial_tests_are_skipped`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_not_applied_when_initial_tests_are_skipped`.'
 count = 1
 
 [[issues]]
@@ -7249,19 +7213,19 @@ message = 'Class `Infection\Tests\Fixtures\Event\IONullSubscriber` not found.'
 count = 3
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "no-value"
-message = 'Argument #2 passed to method `Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
+message = 'Argument #2 passed to method `Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Event/Subscriber/ReportAfterMutationTestingFinishedSubscriberTest.php"
+file = "tests/phpunit/Event/Subscriber/ReportAfterMutationEvaluationFinishedSubscriberTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
 count = 1
@@ -8127,7 +8091,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest::test_it_generates_mutations_for_a_given_file`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest::test_it_generates_mutations_for_a_given_file`.'
 count = 1
 
 [[issues]]
@@ -8144,24 +8108,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "invalid-method-access"
-message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`).'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertCount`: expected `Countable|iterable<mixed, mixed>`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Mutator\FakeMutator` not found.'
 count = 4
@@ -8174,26 +8120,14 @@ count = 4
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "non-existent-class-like"
-message = 'Cannot find class, interface, enum, or type alias `Infection\Tests\Fixtures\Event\EventDispatcherCollector`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #5 of `Infection\Mutation\FileMutationGenerator::__construct`: expected `Infection\Event\EventDispatcher\EventDispatcher`, but possibly received `unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`.'
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_parses_the_source_file_and_yields_the_generated_mutations`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_parses_the_source_file_and_yields_the_generated_mutations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_traverses_the_source_statements`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_traverses_the_source_statements`.'
 count = 1
 
 [[issues]]
@@ -8253,13 +8187,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_dispatches_events`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_dispatches_events`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_returns_all_the_mutations_generated_for_each_files`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_returns_all_the_mutations_generated_for_each_files`.'
 count = 1
 
 [[issues]]
@@ -9273,7 +9207,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutator\MutatorRobustnessTest::mutatesCode`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutator\MutatorRobustnessTest::mutatesCode`.'
 count = 1
 
 [[issues]]
@@ -10051,6 +9985,48 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `fileToParserProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "invalid-throw"
+message = "Cannot throw type `null` because it is not an instance of Throwable."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "redundant-type-comparison"
+message = "Redundant type assertion: `$fileRealPath` of type `non-empty-string` is always not `false`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "redundant-type-comparison"
+message = 'Redundant type assertion: `$statements` of type `array<array-key, PhpParser\Node\Stmt>` is always not `iterable<mixed, PhpParser\Node>`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\PhpParser\FileParserTest::test_it_can_parse_a_file`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\PhpParser\FileParserTest::test_it_parses_the_given_file_only_once`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/FileParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Throwable` in `Infection\Tests\PhpParser\FileParserTest::test_it_throws_upon_failure`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/PhpParser/MutatedNodeTest.php"
 code = "deprecated-class"
 message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
@@ -10141,189 +10117,39 @@ message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\Poten
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Parser/EventDispatchingFileParserTest.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/EventDispatchingFileParserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `sourceFileProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/EventDispatchingFileParserTest.php"
-code = "no-value"
-message = 'Argument #2 passed to method `Infection\PhpParser\Parser\EventDispatchingFileParser::__construct` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/EventDispatchingFileParserTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/EventDispatchingFileParserTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeNode` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/EventDispatchingFileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\PhpParser\Parser\EventDispatchingFileParserTest::test_it_dispatches_parsing_events_around_the_decorated_parser`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `fileToParserProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "invalid-throw"
-message = "Cannot throw type `null` because it is not an instance of Throwable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "redundant-type-comparison"
-message = "Redundant type assertion: `$fileRealPath` of type `non-empty-string` is always not `false`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "redundant-type-comparison"
-message = 'Redundant type assertion: `$statements` of type `array<array-key, PhpParser\Node\Stmt>` is always not `iterable<mixed, PhpParser\Node>`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\PhpParser\Parser\PhpParserFileParserTest::test_it_can_parse_a_file`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\PhpParser\Parser\PhpParserFileParserTest::test_it_parses_the_given_file_only_once`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Throwable` in `Infection\Tests\PhpParser\Parser\PhpParserFileParserTest::test_it_throws_upon_failure`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 3
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `sourceFileProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\PhpParser\Traverser\EnrichmentNodeTraverser::addVisitor` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `Infection\PhpParser\Traverser\EnrichmentNodeTraverser::removeVisitor` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "no-value"
-message = 'Argument #1 passed to method `PHPUnit\Framework\MockObject\Builder\InvocationMocker::with` has type `never`, meaning it cannot produce a value.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "no-value"
-message = 'Argument #3 passed to method `Infection\PhpParser\Traverser\EnrichmentNodeTraverser::__construct` has type `never`, meaning it cannot produce a value.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeNode` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/EnrichmentNodeTraverserTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeVisitor` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `visitorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\PhpParser\Traverser\NodeTraverserFactoryTest::getVisitorClassNames`: expected `list<class-string<PhpParser\NodeVisitor>>`, but found `list<string>`.'
+message = 'Invalid return type for function `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorClassNames`: expected `list<class-string<PhpParser\NodeVisitor>>`, but found `list<string>`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "no-value"
-message = 'Argument #1 passed to method `Infection\PhpParser\Traverser\NodeTraverserFactory::createMutationTraverser` has type `never`, meaning it cannot produce a value.'
+message = 'Argument #1 passed to method `Infection\PhpParser\NodeTraverserFactory::createMutationTraverser` has type `never`, meaning it cannot produce a value.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
-code = "no-value"
-message = 'Argument #4 passed to method `Infection\PhpParser\Traverser\NodeTraverserFactory::__construct` has type `never`, meaning it cannot produce a value.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\PhpParser\FakeVisitor` not found.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #2 of `Infection\Tests\PhpParser\Traverser\NodeTraverserFactoryTest::assertTraverserVisitorsAre`: expected `list<class-string<PhpParser\NodeVisitor>>`, but possibly received `list{class-string('PhpParser\NodeVisitor\CloningVisitor'), class-string('Infection\Tests\Fixtures\PhpParser\FakeVisitor')}`.'''
+message = '''Possible argument type mismatch for argument #2 of `Infection\Tests\PhpParser\NodeTraverserFactoryTest::assertTraverserVisitorsAre`: expected `list<class-string<PhpParser\NodeVisitor>>`, but possibly received `list{class-string('PhpParser\NodeVisitor\CloningVisitor'), class-string('Infection\Tests\Fixtures\PhpParser\FakeVisitor')}`.'''
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
+file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\PhpParser\Traverser\NodeTraverserFactoryTest::getDecoratedTraverserReflection`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/Traverser/NodeTraverserFactoryTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\PhpParser\Traverser\NodeTraverserFactoryTest::getVisitorReflection`.'
+message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorReflection`.'
 count = 1
 
 [[issues]]
@@ -10725,7 +10551,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted>`, but found `mixed`.'
+message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted>`, but found `mixed`.'
 count = 7
 
 [[issues]]
@@ -10767,7 +10593,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted`.'
+message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished`.'
 count = 1
 
 [[issues]]
@@ -10779,7 +10605,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished`.'
+message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted`.'
 count = 1
 
 [[issues]]

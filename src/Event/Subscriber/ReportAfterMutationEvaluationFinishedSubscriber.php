@@ -35,40 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Reporter\Reporter;
 
 /**
  * @internal
  */
-final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
+final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
-    private const string PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
-
     public function __construct(
-        private Filesystem $filesystem,
-        private string $tmpDir,
+        private Reporter $reporter,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $finder = Finder::create()
-            ->in($this->tmpDir)
-            // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
-            ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN);
+        $this->eventDispatcher->dispatch(
+            new ReportingWasStarted(),
+        );
 
-        $this->filesystem->remove($finder);
+        $this->reporter->report();
 
-        // delete old result cache files, so we don't keep them forever
-        $finder = Finder::create()
-            ->in($this->tmpDir)
-            ->date('before 30 days ago')
-            ->name(self::PHPUNIT_RESULT_CACHE_PATTERN)
-        ;
-
-        $this->filesystem->remove($finder);
+        $this->eventDispatcher->dispatch(
+            new ReportingWasFinished(),
+        );
     }
 }
