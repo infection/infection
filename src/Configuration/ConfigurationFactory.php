@@ -55,7 +55,6 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
-use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
@@ -65,7 +64,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_int;
 use function is_numeric;
 use function max;
 use OndraM\CiDetector\CiDetector;
@@ -88,6 +86,8 @@ class ConfigurationFactory
      */
     private const int DEFAULT_TIMEOUT = 10;
 
+    private const int DEFAULT_DOTS_PER_ROW = 50;
+
     public function __construct(
         private readonly TmpDirProvider $tmpDirProvider,
         private readonly MutatorResolver $mutatorResolver,
@@ -101,6 +101,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
@@ -474,21 +475,13 @@ class ConfigurationFactory
     }
 
     /**
+     * @param positive-int|'max'|null $dotsPerRow
+     *
      * @return positive-int|'max'
      */
     private static function retrieveDotsPerRow(string|int|null $dotsPerRow, SchemaConfiguration $schema): int|string
     {
-        $value = $dotsPerRow ?? $schema->dotsPerRow ?? ConsoleDotLogger::DEFAULT_DOTS_PER_ROW;
-
-        if (is_int($value)) {
-            Assert::positiveInteger($value, sprintf('The value of `dotsPerRow` must be a positive integer or string "max". %d provided.', $value));
-
-            return $value;
-        }
-
-        Assert::same($value, 'max', sprintf('The value of `dotsPerRow` must be a positive integer or string "max". String "%s" provided.', $value));
-
-        return 'max';
+        return $dotsPerRow ?? $schema->dotsPerRow ?? self::DEFAULT_DOTS_PER_ROW;
     }
 
     /**

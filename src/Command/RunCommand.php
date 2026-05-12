@@ -180,7 +180,7 @@ final class RunCommand extends BaseCommand
             )
             ->addOption(
                 self::OPTION_DOTS_PER_ROW,
-                'r',
+                null,
                 InputOption::VALUE_REQUIRED,
                 'Number of dots per row in the dot progress formatter. Use "max" to fit the terminal width.',
                 Container::DEFAULT_DOTS_PER_ROW,

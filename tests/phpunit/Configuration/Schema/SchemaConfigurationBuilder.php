@@ -51,6 +51,7 @@ final class SchemaConfigurationBuilder
      * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
+     * @param positive-int|'max'|null $dotsPerRow
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     private function __construct(
@@ -343,6 +344,9 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param positive-int|'max'|null $dotsPerRow
+     */
     public function withDotsPerRow(string|int|null $dotsPerRow): self
     {
         $clone = clone $this;

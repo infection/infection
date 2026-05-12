@@ -42,6 +42,7 @@ use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLoggerState;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 
 /**
  * @internal
@@ -60,13 +61,13 @@ final readonly class MutationAnalysisLoggerFactory
      */
     public function create(
         MutationAnalysisLoggerName $name,
-        int|string $dotsPerRow = ConsoleDotLogger::DEFAULT_DOTS_PER_ROW,
+        int|string $dotsPerRow,
     ): MutationAnalysisLogger {
         return match ($name) {
             MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
                 new ProgressBar($this->output),
             ),
-            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output, $dotsPerRow),
+            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output, $dotsPerRow, new Terminal()),
             MutationAnalysisLoggerName::TEAMCITY => new TeamCityLogger(
                 $this->teamCity,
                 new TeamCityLoggerState(),

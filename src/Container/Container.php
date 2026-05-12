@@ -676,6 +676,7 @@ final class Container extends DIContainer
     /**
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
      */
     public function withValues(
         LoggerInterface $logger,
