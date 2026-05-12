@@ -42,8 +42,7 @@ use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
 use Infection\Event\Events\Ast\AstProcessingWasFinished;
 use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -192,7 +191,7 @@ final class ProjectCodeProvider
         MutationAnalysisLoggerName::class,
         MutationAnalysisWasFinished::class,
         MutationAnalysisWasStarted::class,
-        MutantEvaluationWasStarted::class,
+        MutationEvaluationForMutationWasStarted::class,
         MutantExecutionResult::class,
         MutatorName::class,
         NameResolverFactory::class,

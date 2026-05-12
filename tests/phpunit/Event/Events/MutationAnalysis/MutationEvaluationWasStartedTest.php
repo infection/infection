@@ -33,14 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Tests\Event\Events\MutationAnalysis;
 
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
+use Infection\Process\Runner\ProcessRunner;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-interface MutantEvaluationWasStartedSubscriber extends EventSubscriber
+#[CoversClass(MutationEvaluationWasStarted::class)]
+final class MutationEvaluationWasStartedTest extends TestCase
 {
-    public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void;
+    public function test_it_exposes_its_mutation_count_and_process_runner(): void
+    {
+        $count = 5;
+        $processRunner = $this->createStub(ProcessRunner::class);
+
+        $event = new MutationEvaluationWasStarted($count, $processRunner);
+
+        $this->assertSame($count, $event->mutationCount);
+        $this->assertSame($processRunner, $event->processRunner);
+    }
 }

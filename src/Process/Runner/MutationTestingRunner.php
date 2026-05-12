@@ -38,7 +38,6 @@ namespace Infection\Process\Runner;
 use function array_key_exists;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
@@ -113,7 +112,7 @@ class MutationTestingRunner
     private function emitEvaluationStarted(Mutation $mutation): void
     {
         $this->eventDispatcher->dispatch(
-            new MutantEvaluationWasStarted($mutation),
+            new MutationEvaluationForMutationWasStarted($mutation),
         );
     }
 
