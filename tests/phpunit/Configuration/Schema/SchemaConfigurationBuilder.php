@@ -74,6 +74,7 @@ final class SchemaConfigurationBuilder
         private ?string $testFrameworkExtraOptions,
         private ?string $staticAnalysisToolOptions,
         private string|int|null $threads,
+        private string|int|null $dotsPerRow,
         private ?string $staticAnalysisTool,
     ) {
     }
@@ -101,6 +102,7 @@ final class SchemaConfigurationBuilder
             testFrameworkExtraOptions: $schema->testFrameworkExtraOptions,
             staticAnalysisToolOptions: $schema->staticAnalysisToolOptions,
             threads: $schema->threads,
+            dotsPerRow: $schema->dotsPerRow,
             staticAnalysisTool: $schema->staticAnalysisTool,
         );
     }
@@ -128,6 +130,7 @@ final class SchemaConfigurationBuilder
             testFrameworkExtraOptions: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: null,
         );
     }
@@ -166,6 +169,7 @@ final class SchemaConfigurationBuilder
             testFrameworkExtraOptions: '--verbose',
             staticAnalysisToolOptions: '--level=max',
             threads: 4,
+            dotsPerRow: 80,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
     }
@@ -339,6 +343,14 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    public function withDotsPerRow(string|int|null $dotsPerRow): self
+    {
+        $clone = clone $this;
+        $clone->dotsPerRow = $dotsPerRow;
+
+        return $clone;
+    }
+
     /**
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
@@ -373,6 +385,7 @@ final class SchemaConfigurationBuilder
             testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
             staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
             threads: $this->threads,
+            dotsPerRow: $this->dotsPerRow,
             staticAnalysisTool: $this->staticAnalysisTool,
         );
     }

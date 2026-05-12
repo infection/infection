@@ -76,6 +76,7 @@ final readonly class SchemaConfiguration
         public ?string $testFrameworkExtraOptions,
         public ?string $staticAnalysisToolOptions,
         public string|int|null $threads,
+        public string|int|null $dotsPerRow,
         public ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);

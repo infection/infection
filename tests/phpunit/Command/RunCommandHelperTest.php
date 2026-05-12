@@ -96,6 +96,33 @@ final class RunCommandHelperTest extends TestCase
         yield [5, '5'];
     }
 
+    /**
+     * @param int|'max'|null $expected
+     */
+    #[DataProvider('providesDotsPerRow')]
+    public function test_dots_per_row_from_option(string|int|null $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_DOTS_PER_ROW)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getDotsPerRow());
+    }
+
+    /**
+     * @return iterable<string, array{0: int|'max'|null, 1: string|null}>
+     */
+    public static function providesDotsPerRow(): iterable
+    {
+        yield 'not provided' => [null, null];
+
+        yield 'provided as numeric string' => [20, '20'];
+
+        yield 'provided as max' => ['max', 'max'];
+    }
+
     #[DataProvider('providesNumberOfShownMutations')]
     public function test_it_returns_number_of_shown_mutations(?int $expected, mixed $optionValue): void
     {

@@ -55,13 +55,18 @@ final readonly class MutationAnalysisLoggerFactory
     ) {
     }
 
-    public function create(MutationAnalysisLoggerName $name): MutationAnalysisLogger
-    {
+    /**
+     * @param positive-int|'max' $dotsPerRow
+     */
+    public function create(
+        MutationAnalysisLoggerName $name,
+        int|string $dotsPerRow = ConsoleDotLogger::DEFAULT_DOTS_PER_ROW,
+    ): MutationAnalysisLogger {
         return match ($name) {
             MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
                 new ProgressBar($this->output),
             ),
-            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),
+            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output, $dotsPerRow),
             MutationAnalysisLoggerName::TEAMCITY => new TeamCityLogger(
                 $this->teamCity,
                 new TeamCityLoggerState(),

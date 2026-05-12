@@ -39,11 +39,15 @@ use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
+use function is_string;
+use function max;
+use function min;
 use Override;
 use function sprintf;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 use Webmozart\Assert\Assert;
 
 /**
@@ -51,13 +55,34 @@ use Webmozart\Assert\Assert;
  */
 final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
 {
-    private const int DOTS_PER_ROW = 50;
+    public const int DEFAULT_DOTS_PER_ROW = 50;
+
+    private const int UNKNOWN_COUNT_SUFFIX_LENGTH = 10;
+
+    /**
+     * Fixed characters in the known-count row suffix `   (<n> / <total>)`:
+     * three spaces, parens, slash with surrounding spaces. The `<n>` and
+     * `<total>` widths are added on top of this.
+     */
+    private const int KNOWN_COUNT_SUFFIX_FIXED_LENGTH = 8;
 
     private ?int $mutationCount = null;
 
+    private int $dotsPerRow = self::DEFAULT_DOTS_PER_ROW;
+
+    /**
+     * @param int|'max' $dotsPerRowSetting
+     */
     public function __construct(
         private readonly OutputInterface $output,
+        private readonly int|string $dotsPerRowSetting = self::DEFAULT_DOTS_PER_ROW,
+        private readonly ?Terminal $terminal = null,
     ) {
+        if (is_string($dotsPerRowSetting)) {
+            Assert::same($dotsPerRowSetting, 'max');
+        } else {
+            Assert::greaterThanEq($dotsPerRowSetting, 1);
+        }
     }
 
     #[Override]
@@ -66,6 +91,7 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         parent::startAnalysis($mutationCount);
 
         $this->mutationCount = $mutationCount;
+        $this->dotsPerRow = $this->resolveDotsPerRow($mutationCount);
 
         $this->output->writeln([
             '',
@@ -100,12 +126,12 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
             self::getCharacter($executionResult),
         );
 
-        $remainder = $this->callsCount % self::DOTS_PER_ROW;
+        $remainder = $this->callsCount % $this->dotsPerRow;
         $endOfRow = $remainder === 0;
         $lastDot = $mutationCount === $this->callsCount;
 
         if ($lastDot && !$endOfRow) {
-            $this->output->write(str_repeat(' ', self::DOTS_PER_ROW - $remainder));
+            $this->output->write(str_repeat(' ', $this->dotsPerRow - $remainder));
         }
 
         if ($lastDot || $endOfRow) {
@@ -122,6 +148,33 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
                 $this->output->writeln('');
             }
         }
+    }
+
+    private function resolveDotsPerRow(int $mutationCount): int
+    {
+        if (!is_string($this->dotsPerRowSetting)) {
+            return $this->dotsPerRowSetting;
+        }
+
+        $terminalWidth = ($this->terminal ?? new Terminal())->getWidth();
+        $resolved = max(1, $terminalWidth - self::suffixLength($mutationCount));
+
+        if ($mutationCount === IterableCounter::UNKNOWN_COUNT) {
+            return $resolved;
+        }
+
+        return min($resolved, $mutationCount);
+    }
+
+    private static function suffixLength(int $mutationCount): int
+    {
+        if ($mutationCount === IterableCounter::UNKNOWN_COUNT) {
+            return self::UNKNOWN_COUNT_SUFFIX_LENGTH;
+        }
+
+        $countWidth = strlen((string) $mutationCount);
+
+        return self::KNOWN_COUNT_SUFFIX_FIXED_LENGTH + $countWidth + $countWidth;
     }
 
     private static function getCharacter(MutantExecutionResult $executionResult): string

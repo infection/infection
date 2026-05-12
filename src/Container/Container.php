@@ -260,6 +260,8 @@ final class Container extends DIContainer
 
     public const null DEFAULT_THREAD_COUNT = null;
 
+    public const null DEFAULT_DOTS_PER_ROW = null;
+
     public const bool DEFAULT_DRY_RUN = false;
 
     public const null DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
@@ -701,6 +703,7 @@ final class Container extends DIContainer
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
@@ -749,7 +752,10 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             MutationAnalysisLogger::class,
-            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($loggerName),
+            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create(
+                $loggerName,
+                $container->getConfiguration()->dotsPerRow,
+            ),
         );
 
         $clone->offsetSet(
@@ -780,6 +786,7 @@ final class Container extends DIContainer
                 staticAnalysisToolOptions: $staticAnalysisToolOptions,
                 sourceFilter: $sourceFilter,
                 threadCount: $threadCount,
+                dotsPerRow: $dotsPerRow,
                 dryRun: $dryRun,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,

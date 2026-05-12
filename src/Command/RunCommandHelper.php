@@ -126,6 +126,33 @@ final readonly class RunCommandHelper
         return max(1, CpuCoresCountProvider::provide() - 1);
     }
 
+    /**
+     * @return positive-int|'max'|null
+     */
+    public function getDotsPerRow(): string|int|null
+    {
+        $dotsPerRow = $this->input->getOption(RunCommand::OPTION_DOTS_PER_ROW);
+
+        // user didn't pass `--dots-per-row` option
+        if ($dotsPerRow === null) {
+            return null;
+        }
+
+        // user passed `--dots-per-row=<int>` option
+        if (is_numeric($dotsPerRow)) {
+            $value = (int) $dotsPerRow;
+
+            Assert::positiveInteger($value, sprintf('The value of option `--dots-per-row` must be a positive integer or string "max". %d provided.', $value));
+
+            return $value;
+        }
+
+        // user passed `--dots-per-row=max` option
+        Assert::same($dotsPerRow, 'max', sprintf('The value of option `--dots-per-row` must be a positive integer or string "max". String "%s" provided.', $dotsPerRow));
+
+        return 'max';
+    }
+
     public function getNumberOfShownMutations(): ?int
     {
         $shownMutations = $this->input->getOption(RunCommand::OPTION_SHOW_MUTATIONS);

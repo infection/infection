@@ -84,6 +84,7 @@ class SchemaConfigurationFactory
             testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
             staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
             threads: $rawConfig->threads ?? null,
+            dotsPerRow: $rawConfig->dotsPerRow ?? null,
             staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
         );
     }

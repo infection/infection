@@ -55,6 +55,7 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
+use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
@@ -64,6 +65,7 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_int;
 use function is_numeric;
 use function max;
 use OndraM\CiDetector\CiDetector;
@@ -125,6 +127,7 @@ class ConfigurationFactory
         ?string $staticAnalysisToolOptions,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?int $threadCount,
+        string|int|null $dotsPerRow,
         bool $dryRun,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
@@ -192,6 +195,7 @@ class ConfigurationFactory
             maxTimeouts: self::retrieveMaxTimeouts($maxTimeouts, $schema),
             msiPrecision: $msiPrecision,
             threadCount: $this->retrieveThreadCount($threadCount, $schema),
+            dotsPerRow: self::retrieveDotsPerRow($dotsPerRow, $schema),
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
@@ -467,6 +471,24 @@ class ConfigurationFactory
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    /**
+     * @return positive-int|'max'
+     */
+    private static function retrieveDotsPerRow(string|int|null $dotsPerRow, SchemaConfiguration $schema): int|string
+    {
+        $value = $dotsPerRow ?? $schema->dotsPerRow ?? ConsoleDotLogger::DEFAULT_DOTS_PER_ROW;
+
+        if (is_int($value)) {
+            Assert::positiveInteger($value, sprintf('The value of `dotsPerRow` must be a positive integer or string "max". %d provided.', $value));
+
+            return $value;
+        }
+
+        Assert::same($value, 'max', sprintf('The value of `dotsPerRow` must be a positive integer or string "max". String "%s" provided.', $value));
+
+        return 'max';
     }
 
     /**

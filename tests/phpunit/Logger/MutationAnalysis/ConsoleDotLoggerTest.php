@@ -48,6 +48,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Terminal;
 
 #[CoversClass(ConsoleDotLogger::class)]
 final class ConsoleDotLoggerTest extends TestCase
@@ -232,10 +233,155 @@ final class ConsoleDotLoggerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function test_it_honors_a_custom_dots_per_row(): void
+    {
+        $totalMutations = 23;
+
+        $output = new BufferedOutput();
+        $logger = new ConsoleDotLogger($output, dotsPerRowSetting: 10);
+        $logger->startAnalysis($totalMutations);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $logger->finishEvaluation(
+                $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
+            );
+        }
+
+        $expected = Str::toSystemLineEndings(
+            <<<'TXT'
+
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered
+                E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+
+                ..........   (10 / 23)
+                ..........   (20 / 23)
+                ...          (23 / 23)
+                TXT,
+        );
+
+        $actual = strip_tags($output->fetch());
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_resolves_max_to_terminal_width_minus_suffix(): void
+    {
+        // With a 30-column terminal and a 2-digit total, the (NN / NN) suffix
+        // takes 12 characters, leaving 18 columns for dots.
+        $totalMutations = 25;
+
+        $output = new BufferedOutput();
+        $logger = new ConsoleDotLogger(
+            $output,
+            dotsPerRowSetting: 'max',
+            terminal: $this->terminalWithWidth(30),
+        );
+        $logger->startAnalysis($totalMutations);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $logger->finishEvaluation(
+                $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
+            );
+        }
+
+        $expected = Str::toSystemLineEndings(
+            <<<'TXT'
+
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered
+                E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+
+                ..................   (18 / 25)
+                .......              (25 / 25)
+                TXT,
+        );
+
+        $actual = strip_tags($output->fetch());
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_falls_back_to_one_dot_per_row_when_the_terminal_is_narrower_than_the_suffix(): void
+    {
+        // Width 5 is below the 10-character (n / total) suffix length for a
+        // 1-digit total, so the resolved row width is floored at 1.
+        $totalMutations = 3;
+
+        $output = new BufferedOutput();
+        $logger = new ConsoleDotLogger(
+            $output,
+            dotsPerRowSetting: 'max',
+            terminal: $this->terminalWithWidth(5),
+        );
+        $logger->startAnalysis($totalMutations);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $logger->finishEvaluation(
+                $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
+            );
+        }
+
+        $expected = Str::toSystemLineEndings(
+            <<<'TXT'
+
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered
+                E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+
+                .   (1 / 3)
+                .   (2 / 3)
+                .   (3 / 3)
+                TXT,
+        );
+
+        $actual = strip_tags($output->fetch());
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_caps_max_at_the_total_mutation_count(): void
+    {
+        $totalMutations = 7;
+
+        $output = new BufferedOutput();
+        $logger = new ConsoleDotLogger(
+            $output,
+            dotsPerRowSetting: 'max',
+            terminal: $this->terminalWithWidth(500),
+        );
+        $logger->startAnalysis($totalMutations);
+
+        for ($i = 0; $i < $totalMutations; ++$i) {
+            $logger->finishEvaluation(
+                $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
+            );
+        }
+
+        $expected = Str::toSystemLineEndings(
+            <<<'TXT'
+
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered
+                E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+
+                .......   (7 / 7)
+                TXT,
+        );
+
+        $actual = strip_tags($output->fetch());
+
+        $this->assertSame($expected, $actual);
+    }
+
     private function createMutantExecutionResultOfType(DetectionStatus $detectionStatus): MutantExecutionResult
     {
         return MutantExecutionResultBuilder::withMinimalTestData()
             ->withDetectionStatus($detectionStatus)
             ->build();
+    }
+
+    private function terminalWithWidth(int $width): Terminal
+    {
+        $terminal = $this->createMock(Terminal::class);
+        $terminal->method('getWidth')->willReturn($width);
+
+        return $terminal;
     }
 }
