@@ -670,7 +670,7 @@
         },
         "testFrameworkExtraArgs": {
             "type": "string",
-            "description": "Specify raw additional arguments to pass to PHPUnit. --test-framework-extra-args will override this option."
+            "description": "Specify raw additional arguments to pass to PHPUnit."
         }
     },
     "definitions": {

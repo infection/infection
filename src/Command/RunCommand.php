@@ -161,9 +161,10 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
             );
 
-        TestFrameworkExtraArgsOption::addOption(
-            TestFrameworkOptionsOption::addOption($this),
-        )
+        TestFrameworkExtraArgsOption::addOption($this);
+        TestFrameworkOptionsOption::addOption($this);
+
+        $this
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS,
                 null,
@@ -443,6 +444,14 @@ final class RunCommand extends BaseCommand
             );
         }
 
+        $testFrameworkOptionsWasProvided = TestFrameworkOptionsOption::isProvided($io);
+        $testFrameworkExtraArgsWasProvided = TestFrameworkExtraArgsOption::isProvided($io);
+
+        self::assertTestFrameworkOptionsAreNotBothProvided(
+            $testFrameworkOptionsWasProvided,
+            $testFrameworkExtraArgsWasProvided,
+        );
+
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
@@ -472,9 +481,9 @@ final class RunCommand extends BaseCommand
             maxTimeouts: $commandHelper->getMaxTimeouts(),
             msiPrecision: $msiPrecision,
             testFramework: TestFrameworkOption::get($io),
-            testFrameworkOptionsWasProvided: TestFrameworkOptionsOption::isProvided($io),
+            testFrameworkOptionsWasProvided: $testFrameworkOptionsWasProvided,
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
-            testFrameworkExtraArgsWasProvided: TestFrameworkExtraArgsOption::isProvided($io),
+            testFrameworkExtraArgsWasProvided: $testFrameworkExtraArgsWasProvided,
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io),
@@ -493,6 +502,17 @@ final class RunCommand extends BaseCommand
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
+    }
+
+    private static function assertTestFrameworkOptionsAreNotBothProvided(
+        bool $testFrameworkOptionsWasProvided,
+        bool $testFrameworkExtraArgsWasProvided,
+    ): void {
+        if ($testFrameworkOptionsWasProvided && $testFrameworkExtraArgsWasProvided) {
+            throw new InvalidArgumentException(
+                'Cannot pass both the legacy option "--test-framework-options" and "--test-framework-extra-args".',
+            );
+        }
     }
 
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void

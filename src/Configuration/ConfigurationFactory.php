@@ -72,7 +72,6 @@ use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
@@ -317,10 +316,6 @@ class ConfigurationFactory
     ): string {
         $testFrameworkOptionsWasProvided = $testFrameworkOptionsWasProvided || $testFrameworkExtraOptions !== null;
         $testFrameworkExtraArgsWasProvided = $testFrameworkExtraArgsWasProvided || $testFrameworkExtraArgs !== null;
-
-        if ($testFrameworkOptionsWasProvided && $testFrameworkExtraArgsWasProvided) {
-            throw new InvalidArgumentException('Cannot pass both `--test-framework-options` and `--test-framework-extra-args`: use only `--test-framework-extra-args`.');
-        }
 
         if ($testFrameworkOptionsWasProvided || $schema->testFrameworkOptionsWasConfigured) {
             $this->logger->notice('The `--test-framework-options` option and `testFrameworkOptions` configuration key are deprecated. Use `--test-framework-extra-args` or `testFrameworkExtraArgs` instead.');

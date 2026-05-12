@@ -61,7 +61,6 @@ final class TestFrameworkOptionsOption implements CommandOption
             null,
             InputOption::VALUE_REQUIRED,
             'Deprecated. Use --test-framework-extra-args instead.',
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         );
     }
 
@@ -77,6 +76,6 @@ final class TestFrameworkOptionsOption implements CommandOption
 
     public static function isProvided(IO $io): bool
     {
-        return $io->getInput()->hasParameterOption('--' . self::NAME);
+        return null !== $io->getInput()->getOption(self::NAME);
     }
 }

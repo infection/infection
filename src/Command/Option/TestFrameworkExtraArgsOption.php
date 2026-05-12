@@ -58,7 +58,6 @@ final class TestFrameworkExtraArgsOption implements CommandOption
             null,
             InputOption::VALUE_REQUIRED,
             'Raw PHPUnit arguments to pass before Infection-generated arguments',
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         );
     }
 
@@ -71,6 +70,6 @@ final class TestFrameworkExtraArgsOption implements CommandOption
 
     public static function isProvided(IO $io): bool
     {
-        return $io->getInput()->hasParameterOption('--' . self::NAME);
+        return null !== $io->getInput()->getOption(self::NAME);
     }
 }

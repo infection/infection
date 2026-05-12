@@ -77,7 +77,7 @@ final class RunCommandTest extends TestCase
     public function test_it_fails_when_both_test_framework_option_names_are_passed(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot pass both `--test-framework-options` and `--test-framework-extra-args`: use only `--test-framework-extra-args`.');
+        $this->expectExceptionMessage('Cannot pass both the legacy option "--test-framework-options" and "--test-framework-extra-args".');
 
         $app = new Application(SingletonContainer::getContainer());
 

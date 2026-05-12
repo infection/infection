@@ -111,7 +111,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
     public function test_it_rejects_configuring_both_test_framework_option_names(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot configure both `testFrameworkOptions` and `testFrameworkExtraArgs`: use only `testFrameworkExtraArgs`.');
+        $this->expectExceptionMessage('Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".');
 
         (new SchemaConfigurationFactory())->create(
             '/path/to/config',

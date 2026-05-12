@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
+use InvalidArgumentException;
 use function array_filter;
 use function array_map;
 use function array_values;
@@ -64,9 +65,7 @@ class SchemaConfigurationFactory
         /** @var stdClass $mago */
         $mago = $rawConfig->mago ?? new stdClass();
 
-        if (property_exists($rawConfig, 'testFrameworkOptions') && property_exists($rawConfig, 'testFrameworkExtraArgs')) {
-            throw new \InvalidArgumentException('Cannot configure both `testFrameworkOptions` and `testFrameworkExtraArgs`: use only `testFrameworkExtraArgs`.');
-        }
+        self::assertTestFrameworkOptionsAreNotBothConfigured($rawConfig);
 
         return new SchemaConfiguration(
             pathname: $pathname,
@@ -103,6 +102,18 @@ class SchemaConfigurationFactory
         Assert::nullOrGreaterThanEq($timeout, 0);
 
         return $timeout;
+    }
+
+    private static function assertTestFrameworkOptionsAreNotBothConfigured(stdClass $rawConfig): void
+    {
+        if (
+            property_exists($rawConfig, 'testFrameworkOptions')
+            && property_exists($rawConfig, 'testFrameworkExtraArgs')
+        ) {
+            throw new InvalidArgumentException(
+                'Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".',
+            );
+        }
     }
 
     /**

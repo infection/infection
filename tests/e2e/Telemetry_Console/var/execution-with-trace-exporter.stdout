@@ -1,0 +1,314 @@
+[
+    {
+        "name": "infection.initial_tests",
+        "context": {
+            "trace_id": "c5be7ce48d024d69b88e92f44d9c3be2",
+            "span_id": "b92fdc0a8726b553",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "infection",
+            "host.name": "Theos-MacBook-Pro-4.local",
+            "host.arch": "arm64",
+            "host.id": "3F7448FF-FD3C-51F3-AB52-6E9CE5097E7F",
+            "os.type": "darwin",
+            "os.description": "25.4.0",
+            "os.name": "Darwin",
+            "os.version": "Darwin Kernel Version 25.4.0: Thu Mar 19 19:31:56 PDT 2026; root:xnu-12377.101.15~1\/RELEASE_ARM64_T6030",
+            "process.runtime.name": "cli",
+            "process.runtime.version": "8.3.30",
+            "process.pid": 62199,
+            "process.executable.path": "\/Users\/tfidry\/.phpbrew\/php\/php-8.3.30\/bin\/php",
+            "process.command": "..\/..\/..\/bin\/infection",
+            "process.command_args": [
+                "..\/..\/..\/bin\/infection",
+                "--no-interaction",
+                "--quiet",
+                "--no-progress"
+            ],
+            "process.owner": "tfidry",
+            "project": "infection-src",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.14.0"
+        },
+        "parent_span_id": "bb92b4a26a869d18",
+        "kind": "KIND_INTERNAL",
+        "start": 1778188350415363921,
+        "end": 1778188350509700254,
+        "attributes": [],
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": ""
+    }
+]
+[
+    {
+        "name": "infection.mutation_generation",
+        "context": {
+            "trace_id": "c5be7ce48d024d69b88e92f44d9c3be2",
+            "span_id": "b91b52055054be5a",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "infection",
+            "host.name": "Theos-MacBook-Pro-4.local",
+            "host.arch": "arm64",
+            "host.id": "3F7448FF-FD3C-51F3-AB52-6E9CE5097E7F",
+            "os.type": "darwin",
+            "os.description": "25.4.0",
+            "os.name": "Darwin",
+            "os.version": "Darwin Kernel Version 25.4.0: Thu Mar 19 19:31:56 PDT 2026; root:xnu-12377.101.15~1\/RELEASE_ARM64_T6030",
+            "process.runtime.name": "cli",
+            "process.runtime.version": "8.3.30",
+            "process.pid": 62199,
+            "process.executable.path": "\/Users\/tfidry\/.phpbrew\/php\/php-8.3.30\/bin\/php",
+            "process.command": "..\/..\/..\/bin\/infection",
+            "process.command_args": [
+                "..\/..\/..\/bin\/infection",
+                "--no-interaction",
+                "--quiet",
+                "--no-progress"
+            ],
+            "process.owner": "tfidry",
+            "project": "infection-src",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.14.0"
+        },
+        "parent_span_id": "bb92b4a26a869d18",
+        "kind": "KIND_INTERNAL",
+        "start": 1778188350511447046,
+        "end": 1778188350527534004,
+        "attributes": {
+            "infection.source_file.count": 1
+        },
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": ""
+    }
+]
+[
+    {
+        "name": "infection.mutation_evaluation",
+        "context": {
+            "trace_id": "c5be7ce48d024d69b88e92f44d9c3be2",
+            "span_id": "d4e5ca5d49e066fe",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "infection",
+            "host.name": "Theos-MacBook-Pro-4.local",
+            "host.arch": "arm64",
+            "host.id": "3F7448FF-FD3C-51F3-AB52-6E9CE5097E7F",
+            "os.type": "darwin",
+            "os.description": "25.4.0",
+            "os.name": "Darwin",
+            "os.version": "Darwin Kernel Version 25.4.0: Thu Mar 19 19:31:56 PDT 2026; root:xnu-12377.101.15~1\/RELEASE_ARM64_T6030",
+            "process.runtime.name": "cli",
+            "process.runtime.version": "8.3.30",
+            "process.pid": 62199,
+            "process.executable.path": "\/Users\/tfidry\/.phpbrew\/php\/php-8.3.30\/bin\/php",
+            "process.command": "..\/..\/..\/bin\/infection",
+            "process.command_args": [
+                "..\/..\/..\/bin\/infection",
+                "--no-interaction",
+                "--quiet",
+                "--no-progress"
+            ],
+            "process.owner": "tfidry",
+            "project": "infection-src",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.14.0"
+        },
+        "parent_span_id": "5ace3d4c4fd4a816",
+        "kind": "KIND_INTERNAL",
+        "start": 1778188350517141129,
+        "end": 1778188350745972629,
+        "attributes": {
+            "infection.mutation.id": "58678361774a5e17e9ee7ffa86c3c641",
+            "infection.mutator.name": "Plus",
+            "code.file.path": "\/Users\/tfidry\/Project\/Humbug\/infection\/tests\/e2e\/Telemetry_Console\/src\/SourceClass.php",
+            "code.line.start": 19,
+            "code.line.end": 19,
+            "infection.mutation.status": "killed by tests",
+            "infection.mutation.runtime": 0.2184889316558838
+        },
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": ""
+    }
+]
+[
+    {
+        "name": "infection.mutation_evaluation",
+        "context": {
+            "trace_id": "c5be7ce48d024d69b88e92f44d9c3be2",
+            "span_id": "34bebe013171d0aa",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "infection",
+            "host.name": "Theos-MacBook-Pro-4.local",
+            "host.arch": "arm64",
+            "host.id": "3F7448FF-FD3C-51F3-AB52-6E9CE5097E7F",
+            "os.type": "darwin",
+            "os.description": "25.4.0",
+            "os.name": "Darwin",
+            "os.version": "Darwin Kernel Version 25.4.0: Thu Mar 19 19:31:56 PDT 2026; root:xnu-12377.101.15~1\/RELEASE_ARM64_T6030",
+            "process.runtime.name": "cli",
+            "process.runtime.version": "8.3.30",
+            "process.pid": 62199,
+            "process.executable.path": "\/Users\/tfidry\/.phpbrew\/php\/php-8.3.30\/bin\/php",
+            "process.command": "..\/..\/..\/bin\/infection",
+            "process.command_args": [
+                "..\/..\/..\/bin\/infection",
+                "--no-interaction",
+                "--quiet",
+                "--no-progress"
+            ],
+            "process.owner": "tfidry",
+            "project": "infection-src",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.14.0"
+        },
+        "parent_span_id": "5ace3d4c4fd4a816",
+        "kind": "KIND_INTERNAL",
+        "start": 1778188350522952171,
+        "end": 1778188350948284046,
+        "attributes": {
+            "infection.mutation.id": "cf8fdb178bc0cb691402de79b1b26534",
+            "infection.mutator.name": "PublicVisibility",
+            "code.file.path": "\/Users\/tfidry\/Project\/Humbug\/infection\/tests\/e2e\/Telemetry_Console\/src\/SourceClass.php",
+            "code.line.start": 17,
+            "code.line.end": 20,
+            "infection.mutation.status": "killed by tests",
+            "infection.mutation.runtime": 0.20218396186828613
+        },
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": ""
+    }
+]
+[
+    {
+        "name": "infection.mutation_testing",
+        "context": {
+            "trace_id": "c5be7ce48d024d69b88e92f44d9c3be2",
+            "span_id": "5ace3d4c4fd4a816",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "infection",
+            "host.name": "Theos-MacBook-Pro-4.local",
+            "host.arch": "arm64",
+            "host.id": "3F7448FF-FD3C-51F3-AB52-6E9CE5097E7F",
+            "os.type": "darwin",
+            "os.description": "25.4.0",
+            "os.name": "Darwin",
+            "os.version": "Darwin Kernel Version 25.4.0: Thu Mar 19 19:31:56 PDT 2026; root:xnu-12377.101.15~1\/RELEASE_ARM64_T6030",
+            "process.runtime.name": "cli",
+            "process.runtime.version": "8.3.30",
+            "process.pid": 62199,
+            "process.executable.path": "\/Users\/tfidry\/.phpbrew\/php\/php-8.3.30\/bin\/php",
+            "process.command": "..\/..\/..\/bin\/infection",
+            "process.command_args": [
+                "..\/..\/..\/bin\/infection",
+                "--no-interaction",
+                "--quiet",
+                "--no-progress"
+            ],
+            "process.owner": "tfidry",
+            "project": "infection-src",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.14.0"
+        },
+        "parent_span_id": "bb92b4a26a869d18",
+        "kind": "KIND_INTERNAL",
+        "start": 1778188350510252463,
+        "end": 1778188350950600213,
+        "attributes": {
+            "infection.mutation.count": 0
+        },
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": ""
+    }
+]
+[
+    {
+        "name": "infection.run",
+        "context": {
+            "trace_id": "c5be7ce48d024d69b88e92f44d9c3be2",
+            "span_id": "bb92b4a26a869d18",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "infection",
+            "host.name": "Theos-MacBook-Pro-4.local",
+            "host.arch": "arm64",
+            "host.id": "3F7448FF-FD3C-51F3-AB52-6E9CE5097E7F",
+            "os.type": "darwin",
+            "os.description": "25.4.0",
+            "os.name": "Darwin",
+            "os.version": "Darwin Kernel Version 25.4.0: Thu Mar 19 19:31:56 PDT 2026; root:xnu-12377.101.15~1\/RELEASE_ARM64_T6030",
+            "process.runtime.name": "cli",
+            "process.runtime.version": "8.3.30",
+            "process.pid": 62199,
+            "process.executable.path": "\/Users\/tfidry\/.phpbrew\/php\/php-8.3.30\/bin\/php",
+            "process.command": "..\/..\/..\/bin\/infection",
+            "process.command_args": [
+                "..\/..\/..\/bin\/infection",
+                "--no-interaction",
+                "--quiet",
+                "--no-progress"
+            ],
+            "process.owner": "tfidry",
+            "project": "infection-src",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.14.0"
+        },
+        "parent_span_id": "",
+        "kind": "KIND_INTERNAL",
+        "start": 1778188350253276713,
+        "end": 1778188350950703713,
+        "attributes": [],
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": ""
+    }
+]

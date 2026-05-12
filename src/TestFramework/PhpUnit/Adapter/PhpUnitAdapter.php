@@ -111,11 +111,13 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
                     ...$generatedOptions,
                 ]);
             } else {
-                $extraOptions = trim(sprintf(
-                    '%s %s',
-                    $extraOptions,
-                    implode(' ', $generatedOptions),
-                ));
+                $extraOptions = trim(
+                    sprintf(
+                        '%s %s',
+                        $extraOptions,
+                        implode(' ', $generatedOptions),
+                    ),
+                );
             }
 
             if ($this->pcovDirectoryProvider->shallProvide()) {
