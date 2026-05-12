@@ -33,13 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser;
+namespace Infection\Tests\PhpParser\Parser;
 
 use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\Str;
-use Infection\PhpParser\FileParser;
-use Infection\PhpParser\UnparsableFile;
+use Infection\PhpParser\Parser\PhpParserFileParser;
+use Infection\PhpParser\Parser\UnparsableFile;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Error;
@@ -56,12 +56,12 @@ use function Safe\realpath;
 use function sprintf;
 
 #[Group('integration')]
-#[CoversClass(FileParser::class)]
-final class FileParserTest extends TestCase
+#[CoversClass(PhpParserFileParser::class)]
+final class PhpParserFileParserTest extends TestCase
 {
     private FileSystem&MockObject $fileSystemMock;
 
-    private FileParser $parser;
+    private PhpParserFileParser $parser;
 
     private NodeDumper $nodeDumper;
 
@@ -69,7 +69,7 @@ final class FileParserTest extends TestCase
     {
         $this->fileSystemMock = $this->createMock(FileSystem::class);
 
-        $this->parser = new FileParser(
+        $this->parser = new PhpParserFileParser(
             SingletonContainer::getContainer()->getParser(),
             new FileStore($this->fileSystemMock),
         );
@@ -96,7 +96,7 @@ final class FileParserTest extends TestCase
             ->method('getTokens')
             ->willReturn($expectedReturnedTokens = []);
 
-        $parser = new FileParser(
+        $parser = new PhpParserFileParser(
             $phpParserMock,
             new FileStore($this->fileSystemMock),
         );

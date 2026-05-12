@@ -38,8 +38,8 @@ namespace Infection\Tests\Mutation\FileMutationGenerator;
 use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Parser\FileParser;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
@@ -49,7 +49,6 @@ use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
-use PhpParser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -59,7 +58,7 @@ use function sprintf;
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
 {
-    private MockObject&Parser $phpParserMock;
+    private MockObject&FileParser $fileParserMock;
 
     private MockObject&NodeTraverserFactory $traverserFactoryMock;
 
@@ -69,7 +68,7 @@ final class FileMutationGeneratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->phpParserMock = $this->createMock(Parser::class);
+        $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
 
@@ -84,10 +83,7 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
         $this->mutationGenerator = new FileMutationGenerator(
-            new FileParser(
-                $this->phpParserMock,
-                new FileStore($fileSystemStub),
-            ),
+            $this->fileParserMock,
             $this->traverserFactoryMock,
             $this->tracerMock,
             new FileStore($fileSystemStub),
@@ -113,15 +109,11 @@ final class FileMutationGeneratorTest extends TestCase
             FakeToken::create(),
         ];
 
-        $this->phpParserMock
+        $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with('contents(/path/to/file)')
-            ->willReturn($initialStatements);
-        $this->phpParserMock
-            ->expects($this->once())
-            ->method('getTokens')
-            ->willReturn($originalFileTokens);
+            ->with($fileInfoMock)
+            ->willReturn([$initialStatements, $originalFileTokens]);
 
         $preTraverserCalled = false;
 
@@ -219,20 +211,16 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn([]);
 
         if ($scenario->expected) {
-            $this->phpParserMock
+            $this->fileParserMock
                 ->expects($this->once())
                 ->method('parse')
-                ->willReturn($initialStatements);
-            $this->phpParserMock
-                ->expects($this->once())
-                ->method('getTokens')
-                ->willReturn($originalFileTokens);
+                ->willReturn([$initialStatements, $originalFileTokens]);
 
             $this->traverserFactoryMock
                 ->method('createEnrichmentTraverser')
                 ->willReturn($traverserStub);
         } else {
-            $this->phpParserMock
+            $this->fileParserMock
                 ->expects($this->never())
                 ->method('parse');
 
