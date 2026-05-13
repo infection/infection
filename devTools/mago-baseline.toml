@@ -12481,31 +12481,43 @@ message = 'Potentially unhandled exception `Infection\TestFramework\XML\InvalidX
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php"
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `coverageWithoutSourceProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php"
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `executionOrderProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php"
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `initialTestRunProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `memoryReportProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php"
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `mutantCommandLineProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `passOutputProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php"
+file = "tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `syntaxErrorOutputProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
