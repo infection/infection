@@ -86,6 +86,8 @@ class ConfigurationFactory
      */
     private const int DEFAULT_TIMEOUT = 10;
 
+    private const int DEFAULT_DOTS_PER_ROW = 50;
+
     public function __construct(
         private readonly TmpDirProvider $tmpDirProvider,
         private readonly MutatorResolver $mutatorResolver,
@@ -99,6 +101,7 @@ class ConfigurationFactory
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
      *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
@@ -125,6 +128,7 @@ class ConfigurationFactory
         ?string $staticAnalysisToolOptions,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?int $threadCount,
+        string|int|null $dotsPerRow,
         bool $dryRun,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
@@ -192,6 +196,7 @@ class ConfigurationFactory
             maxTimeouts: self::retrieveMaxTimeouts($maxTimeouts, $schema),
             msiPrecision: $msiPrecision,
             threadCount: $this->retrieveThreadCount($threadCount, $schema),
+            dotsPerRow: self::retrieveDotsPerRow($dotsPerRow, $schema),
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
@@ -467,6 +472,16 @@ class ConfigurationFactory
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    /**
+     * @param positive-int|'max'|null $dotsPerRow
+     *
+     * @return positive-int|'max'
+     */
+    private static function retrieveDotsPerRow(string|int|null $dotsPerRow, SchemaConfiguration $schema): int|string
+    {
+        return $dotsPerRow ?? $schema->dotsPerRow ?? self::DEFAULT_DOTS_PER_ROW;
     }
 
     /**

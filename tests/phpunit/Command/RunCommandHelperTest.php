@@ -38,6 +38,7 @@ namespace Infection\Tests\Command;
 use Infection\Command\RunCommand;
 use Infection\Command\RunCommandHelper;
 use Infection\Container\Container;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -94,6 +95,56 @@ final class RunCommandHelperTest extends TestCase
         yield [null, null];
 
         yield [5, '5'];
+    }
+
+    #[DataProvider('providesDotsPerRow')]
+    public function test_dots_per_row_from_option(string|int|InvalidArgumentException|null $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_DOTS_PER_ROW)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+
+        if ($expected instanceof InvalidArgumentException) {
+            $this->expectExceptionObject($expected);
+        }
+
+        $actual = $commandHelper->getDotsPerRow();
+
+        if (!$expected instanceof InvalidArgumentException) {
+            $this->assertSame($expected, $actual);
+        }
+    }
+
+    public static function providesDotsPerRow(): iterable
+    {
+        yield 'not provided' => [null, null];
+
+        yield 'provided as numeric string' => [20, '20'];
+
+        yield 'provided as max' => ['max', 'max'];
+
+        yield 'provided as negative integer string' => [
+            new InvalidArgumentException('The value of option `--dots-per-row` must be a positive integer or string "max". "-1" provided.'),
+            '-1',
+        ];
+
+        yield 'provided as float string' => [
+            new InvalidArgumentException('The value of option `--dots-per-row` must be a positive integer or string "max". "1.5" provided.'),
+            '1.5',
+        ];
+
+        yield 'provided as random string' => [
+            new InvalidArgumentException('The value of option `--dots-per-row` must be a positive integer or string "max". "foo" provided.'),
+            'foo',
+        ];
+
+        yield 'provided as empty string' => [
+            new InvalidArgumentException('The value of option `--dots-per-row` must be a positive integer or string "max". "" provided.'),
+            '',
+        ];
     }
 
     #[DataProvider('providesNumberOfShownMutations')]

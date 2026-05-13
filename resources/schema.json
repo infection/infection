@@ -26,6 +26,19 @@
                 }
             ]
         },
+        "dotsPerRow": {
+            "description": "Number of dots per row in the dot progress formatter. Use \"max\" to fit the terminal width.",
+            "oneOf": [
+                {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                {
+                    "type": "string",
+                    "enum": ["max"]
+                }
+            ]
+        },
         "source": {
             "type": "object",
             "required": [

@@ -375,7 +375,7 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #37 of `Infection\Container\Container::withValues`: expected `null|string`, but found `mixed`.'
+message = 'Invalid argument type for argument #38 of `Infection\Container\Container::withValues`: expected `null|string`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -478,13 +478,13 @@ count = 1
 file = "src/Command/RunCommandHelper.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `nonnull`."
-count = 3
+count = 4
 
 [[issues]]
 file = "src/Command/RunCommandHelper.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 4
+count = 5
 
 [[issues]]
 file = "src/Command/RunCommandHelper.php"
@@ -784,6 +784,12 @@ count = 1
 file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #20 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `int|null|string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Configuration/Schema/SchemaConfigurationFactory.php"
+code = "mixed-argument"
+message = '''Invalid argument type for argument #21 of `Infection\Configuration\Schema\SchemaConfiguration::__construct`: expected `null|positive-int|string('max')`, but found `mixed`.'''
 count = 1
 
 [[issues]]
@@ -5631,6 +5637,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/RunCommandHelperTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `providesDotsPerRow` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/RunCommandHelperTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `providesGetStringOption` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -5889,13 +5901,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
-message = '''Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), mixed>`, but found `array{'bootstrap': null, 'ignoreMsiWithNoMutations': null, 'initialTestsPhpOptions': null, 'logs': infection\configuration\entry\logs, 'mago': Infection\Configuration\Entry\Mago, 'maxTimeouts': null, 'minCoveredMsi': null, 'minMsi': null, 'mutators': array{}, 'path': string('/path/to/config'), 'phpStan': Infection\Configuration\Entry\PhpStan, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'staticAnalysisTool': null, 'staticAnalysisToolOptions': null, 'testFramework': null, 'testFrameworkOptions': null, 'threadCount': null, 'timeout': null, 'timeoutsAsEscaped': null, 'tmpDir': null, ...<array<string, mixed>, mixed>}`.'''
+message = '''Invalid argument type for argument #1 of `array_values`: expected `array<('K.array_values() extends array-key), mixed>`, but found `array{'bootstrap': null, 'dotsPerRow': null, 'ignoreMsiWithNoMutations': null, 'initialTestsPhpOptions': null, 'logs': infection\configuration\entry\logs, 'mago': Infection\Configuration\Entry\Mago, 'maxTimeouts': null, 'minCoveredMsi': null, 'minMsi': null, 'mutators': array{}, 'path': string('/path/to/config'), 'phpStan': Infection\Configuration\Entry\PhpStan, 'phpunit': Infection\Configuration\Entry\PhpUnit, 'source': Infection\Configuration\Entry\Source, 'staticAnalysisTool': null, 'staticAnalysisToolOptions': null, 'testFramework': null, 'testFrameworkOptions': null, 'threadCount': null, 'timeout': null, 'timeoutsAsEscaped': null, 'tmpDir': null, ...<array<string, mixed>, mixed>}`.'''
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php"
 code = "invalid-argument"
-message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('mago')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
+message = "Invalid argument type for argument #2 of `array_merge`: expected `array<string('bootstrap')|string('dotsPerRow')|string('ignoreMsiWithNoMutations')|string('initialTestsPhpOptions')|string('logs')|string('mago')|string('maxTimeouts')|string('minCoveredMsi')|string('minMsi')|string('mutators')|string('path')|string('phpStan')|string('phpunit')|string('source')|string('staticAnalysisTool')|string('staticAnalysisToolOptions')|string('testFramework')|string('testFrameworkOptions')|string('threadCount')|string('timeout')|string('timeoutsAsEscaped')|string('tmpDir'), mixed>`, but found `array<array<string, mixed>, mixed>`."
 count = 1
 
 [[issues]]
@@ -7810,6 +7822,18 @@ count = 1
 file = "tests/phpunit/Logger/MutationAnalysis/ConsoleDotLoggerTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `detectionStatusProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Logger/MutationAnalysis/ConsoleDotLoggerTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `totalMutationsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Logger/MutationAnalysis/ConsoleDotLoggerTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `unknownTotalProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]

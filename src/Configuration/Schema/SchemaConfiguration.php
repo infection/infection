@@ -53,6 +53,7 @@ final readonly class SchemaConfiguration
      * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
+     * @param positive-int|'max'|null $dotsPerRow
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function __construct(
@@ -76,6 +77,7 @@ final readonly class SchemaConfiguration
         public ?string $testFrameworkExtraOptions,
         public ?string $staticAnalysisToolOptions,
         public string|int|null $threads,
+        public string|int|null $dotsPerRow,
         public ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
