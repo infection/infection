@@ -33,47 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\PhpParser\Parser;
 
-use Infection\FileSystem\FileStore;
-use PhpParser\Node\Stmt;
-use PhpParser\Parser;
-use PhpParser\Token;
-use SplFileInfo;
+use RuntimeException;
+use function sprintf;
 use Throwable;
 
 /**
  * @internal
  */
-final readonly class FileParser
+final class UnparsableFile extends RuntimeException
 {
-    public function __construct(
-        private Parser $parser,
-        private FileStore $fileStore,
-    ) {
-    }
-
-    /**
-     * @throws UnparsableFile
-     *
-     * @return array{Stmt[], Token[]}
-     */
-    public function parse(SplFileInfo $fileInfo): array
+    public static function fromInvalidFile(string $filePath, Throwable $original): self
     {
-        try {
-            return [
-                $this->parser->parse(
-                    $this->fileStore->getContents($fileInfo),
-                ) ?? [],
-                $this->parser->getTokens(),
-            ];
-        } catch (Throwable $throwable) {
-            $filePath = $fileInfo->getRealPath() === false
-                ? $fileInfo->getPathname()
-                : $fileInfo->getRealPath()
-            ;
-
-            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
-        }
+        return new self(
+            sprintf(
+                'Could not parse the file "%s". Check if it is a valid PHP file',
+                $filePath,
+            ),
+            0,
+            $original,
+        );
     }
 }

@@ -81,7 +81,7 @@ count = 1
 [[issues]]
 file = "src/Command/Debug/DumpAstCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Command\Debug\DumpAstCommand::createAst`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Command\Debug\DumpAstCommand::createAst`.'
 count = 1
 
 [[issues]]
@@ -417,7 +417,7 @@ count = 1
 [[issues]]
 file = "src/Command/RunCommand.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Command\RunCommand::executeCommand`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Command\RunCommand::executeCommand`.'
 count = 1
 
 [[issues]]
@@ -2257,12 +2257,6 @@ message = 'Could not infer a precise return type for function `Infection\Mutator
 count = 1
 
 [[issues]]
-file = "src/PhpParser/FileParser.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of method `Infection\PhpParser\UnparsableFile::fromInvalidFile` is possibly `false`, but parameter type `string` does not accept it.'
-count = 1
-
-[[issues]]
 file = "src/PhpParser/InfectionPrettyPrinter.php"
 code = "array-to-string-conversion"
 message = "Potential array in middle operand of string concatenation."
@@ -2386,6 +2380,12 @@ count = 1
 file = "src/PhpParser/NodeTraverserFactory.php"
 code = "possibly-false-argument"
 message = 'Argument #2 of method `Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor::__construct` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
+file = "src/PhpParser/Parser/PhpParserFileParser.php"
+code = "possibly-false-argument"
+message = 'Argument #1 of method `Infection\PhpParser\Parser\UnparsableFile::fromInvalidFile` is possibly `false`, but parameter type `string` does not accept it.'
 count = 1
 
 [[issues]]
@@ -6909,43 +6909,43 @@ count = 1
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_fails`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_fails`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_succeeds`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_initial_test_run_succeeds`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_max_timeouts_checker_receives_correct_timed_out_count`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_max_timeouts_checker_receives_correct_timed_out_count`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_applied_after_static_analysis_when_enabled`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_applied_after_static_analysis_when_enabled`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_not_applied_when_initial_tests_are_skipped`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\EngineTest::test_memory_limiter_is_not_applied_when_initial_tests_are_skipped`.'
 count = 1
 
 [[issues]]
@@ -8301,7 +8301,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest::test_it_generates_mutations_for_a_given_file`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest::test_it_generates_mutations_for_a_given_file`.'
 count = 1
 
 [[issues]]
@@ -8331,13 +8331,13 @@ count = 4
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_parses_the_source_file_and_yields_the_generated_mutations`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_parses_the_source_file_and_yields_the_generated_mutations`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_traverses_the_source_statements`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest::test_it_traverses_the_source_statements`.'
 count = 1
 
 [[issues]]
@@ -8397,13 +8397,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_dispatches_events`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_dispatches_events`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/MutationGeneratorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_returns_all_the_mutations_generated_for_each_files`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutation\MutationGeneratorTest::test_it_returns_all_the_mutations_generated_for_each_files`.'
 count = 1
 
 [[issues]]
@@ -9417,7 +9417,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/MutatorRobustnessTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\Mutator\MutatorRobustnessTest::mutatesCode`.'
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\Mutator\MutatorRobustnessTest::mutatesCode`.'
 count = 1
 
 [[issues]]
@@ -10195,48 +10195,6 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `fileToParserProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "invalid-throw"
-message = "Cannot throw type `null` because it is not an instance of Throwable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "redundant-type-comparison"
-message = "Redundant type assertion: `$fileRealPath` of type `non-empty-string` is always not `false`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "redundant-type-comparison"
-message = 'Redundant type assertion: `$statements` of type `array<array-key, PhpParser\Node\Stmt>` is always not `iterable<mixed, PhpParser\Node>`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\PhpParser\FileParserTest::test_it_can_parse_a_file`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\PhpParser\FileParserTest::test_it_parses_the_given_file_only_once`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Throwable` in `Infection\Tests\PhpParser\FileParserTest::test_it_throws_upon_failure`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/PhpParser/MutatedNodeTest.php"
 code = "deprecated-class"
 message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
@@ -10360,6 +10318,48 @@ count = 1
 file = "tests/phpunit/PhpParser/NodeTraverserFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\PhpParser\NodeTraverserFactoryTest::getVisitorReflection`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `fileToParserProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "invalid-throw"
+message = "Cannot throw type `null` because it is not an instance of Throwable."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "redundant-type-comparison"
+message = "Redundant type assertion: `$fileRealPath` of type `non-empty-string` is always not `false`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "redundant-type-comparison"
+message = 'Redundant type assertion: `$statements` of type `array<array-key, PhpParser\Node\Stmt>` is always not `iterable<mixed, PhpParser\Node>`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\PhpParser\Parser\PhpParserFileParserTest::test_it_can_parse_a_file`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\Parser\UnparsableFile` in `Infection\Tests\PhpParser\Parser\PhpParserFileParserTest::test_it_parses_the_given_file_only_once`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Parser/PhpParserFileParserTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Throwable` in `Infection\Tests\PhpParser\Parser\PhpParserFileParserTest::test_it_throws_upon_failure`.'
 count = 1
 
 [[issues]]

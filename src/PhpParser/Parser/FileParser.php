@@ -33,27 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser;
+namespace Infection\PhpParser\Parser;
 
-use Exception;
-use Infection\PhpParser\UnparsableFile;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node\Stmt;
+use PhpParser\Token;
+use SplFileInfo;
 
-#[CoversClass(UnparsableFile::class)]
-final class UnparsableFileTest extends TestCase
+/**
+ * @internal
+ */
+interface FileParser
 {
-    public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
-    {
-        $previous = new Exception('Unintentional thing');
-
-        $exception = UnparsableFile::fromInvalidFile('/path/to/file', $previous);
-
-        $this->assertSame(
-            'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
-            $exception->getMessage(),
-        );
-        $this->assertSame(0, $exception->getCode());
-        $this->assertSame($previous, $exception->getPrevious());
-    }
+    /**
+     * @throws UnparsableFile
+     *
+     * @return array{Stmt[], Token[]}
+     */
+    public function parse(SplFileInfo $fileInfo): array;
 }
