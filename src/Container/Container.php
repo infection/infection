@@ -114,9 +114,10 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
-use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Parser\EventDispatchingFileParser;
 use Infection\PhpParser\Parser\FileParser;
 use Infection\PhpParser\Parser\PhpParserFileParser;
+use Infection\PhpParser\Traverser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -467,15 +468,20 @@ final class Container extends DIContainer
                 $container->getNodeTraverserFactory(),
                 $container->getTracer(),
                 $container->getFileStore(),
+                $container->getEventDispatcher(),
             ),
             NodeTraverserFactory::class => static fn (self $container) => new NodeTraverserFactory(
                 $container->getSourceLineMatcher(),
                 $container->getLineRangeCalculator(),
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
+                $container->getEventDispatcher(),
             ),
-            FileParser::class => static fn (self $container) => new PhpParserFileParser(
-                $container->getParser(),
-                $container->getFileStore(),
+            FileParser::class => static fn (self $container) => new EventDispatchingFileParser(
+                new PhpParserFileParser(
+                    $container->getParser(),
+                    $container->getFileStore(),
+                ),
+                $container->getEventDispatcher(),
             ),
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
