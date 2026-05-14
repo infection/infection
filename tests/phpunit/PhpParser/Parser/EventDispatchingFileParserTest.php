@@ -61,6 +61,10 @@ final class EventDispatchingFileParserTest extends TestCase
             [new FakeNode()],
             [FakeToken::create()],
         ];
+        $expectedEvents = [
+            new AstParsingWasStarted($expectedSourceFilePath),
+            new AstParsingWasFinished($expectedSourceFilePath),
+        ];
 
         $decoratedParserMock = $this->createMock(FileParser::class);
         $decoratedParserMock
@@ -69,14 +73,14 @@ final class EventDispatchingFileParserTest extends TestCase
             ->with($sourceFile)
             ->willReturn($expectedStatementsAndTokens);
 
-        $parser = new EventDispatchingFileParser($decoratedParserMock, $eventDispatcher);
+        $parser = new EventDispatchingFileParser(
+            $decoratedParserMock,
+            $eventDispatcher,
+        );
 
         $this->assertSame($expectedStatementsAndTokens, $parser->parse($sourceFile));
         $this->assertEquals(
-            [
-                new AstParsingWasStarted($expectedSourceFilePath),
-                new AstParsingWasFinished($expectedSourceFilePath),
-            ],
+            $expectedEvents,
             $eventDispatcher->getEvents(),
         );
     }

@@ -58,6 +58,10 @@ final class EnrichmentNodeTraverserTest extends TestCase
         $eventDispatcher = new EventDispatcherCollector();
         $nodes = [];
         $enrichedNodes = [new FakeNode()];
+        $expectedEvents = [
+            new AstEnrichmentWasStarted($expectedSourceFilePath),
+            new AstEnrichmentWasFinished($expectedSourceFilePath),
+        ];
 
         $decoratedTraverserMock = $this->createMock(NodeTraverserInterface::class);
         $decoratedTraverserMock
@@ -66,16 +70,16 @@ final class EnrichmentNodeTraverserTest extends TestCase
             ->with($nodes)
             ->willReturn($enrichedNodes);
 
-        $traverser = new EnrichmentNodeTraverser($sourceFile, $decoratedTraverserMock, $eventDispatcher);
-
-        $this->assertSame($enrichedNodes, $traverser->traverse($nodes));
-        $this->assertEquals(
-            [
-                new AstEnrichmentWasStarted($expectedSourceFilePath),
-                new AstEnrichmentWasFinished($expectedSourceFilePath),
-            ],
-            $eventDispatcher->getEvents(),
+        $traverser = new EnrichmentNodeTraverser(
+            $sourceFile,
+            $decoratedTraverserMock,
+            $eventDispatcher,
         );
+
+        $traversedNodes = $traverser->traverse($nodes);
+
+        $this->assertSame($enrichedNodes, $traversedNodes);
+        $this->assertEquals($expectedEvents, $eventDispatcher->getEvents());
     }
 
     public function test_it_delegates_visitor_management_to_the_decorated_traverser(): void

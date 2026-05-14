@@ -83,8 +83,10 @@ final readonly class EnrichmentNodeTraverser implements NodeTraverserInterface
 
     private static function getSourceFilePath(SplFileInfo $fileInfo): string
     {
-        return $fileInfo->getRealPath() === false
+        $realPath = $fileInfo->getRealPath();
+
+        return $realPath === false
             ? $fileInfo->getPathname()
-            : $fileInfo->getRealPath();
+            : $realPath;
     }
 }
