@@ -61,6 +61,12 @@ use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
@@ -145,6 +151,12 @@ final class ProjectCodeProvider
         AdapterInstaller::class,
         ArtefactCollectionWasStarted::class,
         ArtefactCollectionWasFinished::class,
+        AstEnrichmentWasFinished::class,
+        AstEnrichmentWasStarted::class,
+        AstParsingWasFinished::class,
+        AstParsingWasStarted::class,
+        AstProcessingWasFinished::class,
+        AstProcessingWasStarted::class,
         BaseMutatorTestCase::class,
         BaseOption::class,
         ConcreteComposerExecutableFinder::class,
@@ -177,8 +189,8 @@ final class ProjectCodeProvider
         MutationAnalysisLoggerName::class,
         MutationAnalysisWasFinished::class,
         MutationAnalysisWasStarted::class,
-        MutantExecutionResult::class,
         MutationEvaluationForMutationWasStarted::class,
+        MutantExecutionResult::class,
         MutatorName::class,
         NameResolverFactory::class,
         NoGitProjectFound::class,

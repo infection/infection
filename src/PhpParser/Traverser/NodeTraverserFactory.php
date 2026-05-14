@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\PhpParser\Traverser;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\PhpParser\Visitor\AddTestsVisitor;
 use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
 use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
@@ -66,6 +67,7 @@ readonly class NodeTraverserFactory
         private SourceLineMatcher $sourceLineMatcher,
         private LineRangeCalculator $lineRangeCalculator,
         private bool $onlyCovered,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -104,7 +106,11 @@ readonly class NodeTraverserFactory
             $visitors[] = new ExcludeUntestedNodesVisitor();
         }
 
-        return new NodeTraverser(...$visitors);
+        return new EnrichmentNodeTraverser(
+            $sourceFile,
+            new NodeTraverser(...$visitors),
+            $this->eventDispatcher,
+        );
     }
 
     public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface

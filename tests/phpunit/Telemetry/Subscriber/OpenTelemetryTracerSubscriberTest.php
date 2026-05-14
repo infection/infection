@@ -45,6 +45,12 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
@@ -124,6 +130,12 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onSourceCollectionWasStarted(new SourceCollectionWasStarted());
         $this->subscriber->onSourceCollectionWasFinished(new SourceCollectionWasFinished(1));
         $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
+        $this->subscriber->onAstProcessingWasStarted(new AstProcessingWasStarted('/path/to/src/Foo.php'));
+        $this->subscriber->onAstParsingWasStarted(new AstParsingWasStarted('/path/to/src/Foo.php'));
+        $this->subscriber->onAstParsingWasFinished(new AstParsingWasFinished('/path/to/src/Foo.php'));
+        $this->subscriber->onAstEnrichmentWasStarted(new AstEnrichmentWasStarted('/path/to/src/Foo.php'));
+        $this->subscriber->onAstEnrichmentWasFinished(new AstEnrichmentWasFinished('/path/to/src/Foo.php'));
+        $this->subscriber->onAstProcessingWasFinished(new AstProcessingWasFinished('/path/to/src/Foo.php'));
         $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
         $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished());
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)));
@@ -147,6 +159,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.initial_static_analysis',
                 'infection.artefact_collection',
                 'infection.source_collection',
+                'infection.ast_parsing',
+                'infection.ast_enrichment',
+                'infection.ast_processing',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation.mutation',
                 'infection.reporting',
@@ -163,6 +178,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $initialTests = $this->getSpanFromExporter('infection.initial_tests');
         $initialStaticAnalysis = $this->getSpanFromExporter('infection.initial_static_analysis');
         $mutationAnalysis = $this->getSpanFromExporter('infection.mutation_analysis');
+        $astProcessing = $this->getSpanFromExporter('infection.ast_processing');
+        $astParsing = $this->getSpanFromExporter('infection.ast_parsing');
+        $astEnrichment = $this->getSpanFromExporter('infection.ast_enrichment');
         $mutationGeneration = $this->getSpanFromExporter('infection.mutation_generation');
         $mutationEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation');
         $mutationEvaluationForMutation = $this->getSpanFromExporter('infection.mutation_evaluation.mutation');
@@ -174,12 +192,18 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($artefactCollection->getSpanId(), $initialStaticAnalysis->getParentSpanId());
         $this->assertSame($run->getSpanId(), $sourceCollection->getParentSpanId());
         $this->assertSame($run->getSpanId(), $mutationAnalysis->getParentSpanId());
+        $this->assertSame($mutationAnalysis->getSpanId(), $astProcessing->getParentSpanId());
+        $this->assertSame($astProcessing->getSpanId(), $astParsing->getParentSpanId());
+        $this->assertSame($astProcessing->getSpanId(), $astEnrichment->getParentSpanId());
         $this->assertSame($mutationAnalysis->getSpanId(), $mutationGeneration->getParentSpanId());
         $this->assertSame($mutationAnalysis->getSpanId(), $mutationEvaluation->getParentSpanId());
         $this->assertSame($mutationEvaluation->getSpanId(), $mutationEvaluationForMutation->getParentSpanId());
         $this->assertSame($run->getSpanId(), $reporting->getParentSpanId());
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
+        $this->assertSame('/path/to/src/Foo.php', $astProcessing->getAttributes()->get('code.file.path'));
+        $this->assertSame('/path/to/src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
+        $this->assertSame('/path/to/src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
         $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $mutationEvaluation->getAttributes()->get('infection.mutation.count'));
         $this->assertSame('mutation-A', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.id'));
@@ -204,6 +228,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onInitialStaticAnalysisRunWasStarted(new InitialStaticAnalysisRunWasStarted());
         $this->subscriber->onSourceCollectionWasStarted(new SourceCollectionWasStarted());
         $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
+        $this->subscriber->onAstProcessingWasStarted(new AstProcessingWasStarted('/path/to/src/Foo.php'));
+        $this->subscriber->onAstParsingWasStarted(new AstParsingWasStarted('/path/to/src/Foo.php'));
+        $this->subscriber->onAstEnrichmentWasStarted(new AstEnrichmentWasStarted('/path/to/src/Foo.php'));
         $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
@@ -216,6 +243,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.initial_static_analysis',
                 'infection.artefact_collection',
                 'infection.source_collection',
+                'infection.ast_parsing',
+                'infection.ast_enrichment',
+                'infection.ast_processing',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation.mutation',
                 'infection.mutation_evaluation',
@@ -230,11 +260,12 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertTracerProviderWasShutdown();
     }
 
-    public function test_it_ends_open_mutation_evaluation_spans_on_mutation_evaluation_finish(): void
+    public function test_it_ends_open_mutation_evaluation_for_mutation_spans_on_mutation_evaluation_finish(): void
     {
         $mutation = MutationBuilder::withMinimalTestData()->build();
 
         $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
+        $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
         $this->subscriber->onMutationEvaluationWasFinished(new MutationEvaluationWasFinished());
