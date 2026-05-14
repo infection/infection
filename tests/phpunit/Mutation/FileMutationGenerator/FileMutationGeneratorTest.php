@@ -123,17 +123,16 @@ final class FileMutationGeneratorTest extends TestCase
             ->method('getTokens')
             ->willReturn($originalFileTokens);
 
-        $preTraverserCalled = false;
+        $enrichmentTraverserCalled = false;
 
-        // Pre-traverser should be created and called first
-        $preTraverserMock = $this->createMock(NodeTraverserInterface::class);
-        $preTraverserMock
+        $enrichmentTraverserMock = $this->createMock(NodeTraverserInterface::class);
+        $enrichmentTraverserMock
             ->expects($this->once())
             ->method('traverse')
             ->with($initialStatements)
             ->willReturnCallback(
-                static function () use (&$preTraverserCalled) {
-                    $preTraverserCalled = true;
+                static function () use (&$enrichmentTraverserCalled) {
+                    $enrichmentTraverserCalled = true;
 
                     // The return value is not used. In practice, we directly mutate the
                     // original value, but this cannot be mimicked with mocks.
@@ -142,14 +141,14 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
         // Main traverser should be created and called after
-        $traverserMock = $this->createMock(NodeTraverserInterface::class);
-        $traverserMock
+        $mutationTraverserMock = $this->createMock(NodeTraverserInterface::class);
+        $mutationTraverserMock
             ->expects($this->once())
             ->method('traverse')
             ->with($initialStatements)
             ->willReturnCallback(
-                static function () use (&$preTraverserCalled) {
-                    self::assertTrue($preTraverserCalled);
+                static function () use (&$enrichmentTraverserCalled) {
+                    self::assertTrue($enrichmentTraverserCalled);
 
                     // The return value is not used. In practice, we directly mutate the
                     // original value, but this cannot be mimicked with mocks.
@@ -161,7 +160,10 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock
             ->expects($this->exactly(2))
             ->method($this->anything())
-            ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock);
+            ->willReturnOnConsecutiveCalls(
+                $enrichmentTraverserMock,
+                $mutationTraverserMock,
+            );
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
