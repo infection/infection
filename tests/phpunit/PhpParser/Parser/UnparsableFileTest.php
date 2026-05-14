@@ -33,26 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\Tests\PhpParser\Parser;
 
-use RuntimeException;
-use function sprintf;
-use Throwable;
+use Exception;
+use Infection\PhpParser\Parser\UnparsableFile;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class UnparsableFile extends RuntimeException
+#[CoversClass(UnparsableFile::class)]
+final class UnparsableFileTest extends TestCase
 {
-    public static function fromInvalidFile(string $filePath, Throwable $original): self
+    public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
     {
-        return new self(
-            sprintf(
-                'Could not parse the file "%s". Check if it is a valid PHP file',
-                $filePath,
-            ),
-            0,
-            $original,
+        $previous = new Exception('Unintentional thing');
+
+        $exception = UnparsableFile::fromInvalidFile('/path/to/file', $previous);
+
+        $this->assertSame(
+            'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
+            $exception->getMessage(),
         );
+        $this->assertSame(0, $exception->getCode());
+        $this->assertSame($previous, $exception->getPrevious());
     }
 }

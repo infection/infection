@@ -41,7 +41,7 @@ use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasPro
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\UnparsableFile;
+use Infection\PhpParser\Parser\UnparsableFile;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
