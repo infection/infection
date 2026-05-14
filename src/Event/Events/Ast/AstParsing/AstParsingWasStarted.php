@@ -33,23 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Parser;
-
-use PhpParser\Node\Stmt;
-use PhpParser\Token;
-use SplFileInfo;
+namespace Infection\Event\Events\Ast\AstParsing;
 
 /**
  * @internal
  */
-interface FileParser
+final readonly class AstParsingWasStarted
 {
-    /**
-     * Parses a source file into PHP-Parser statements and tokens.
-     *
-     * @throws UnparsableFile
-     *
-     * @return array{Stmt[], Token[]}
-     */
-    public function parse(SplFileInfo $fileInfo): array;
+    public function __construct(
+        public string $sourceFilePath,
+    ) {
+    }
 }

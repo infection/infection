@@ -33,23 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Parser;
+namespace Infection\Event\Events\Ast\AstEnrichment;
 
-use PhpParser\Node\Stmt;
-use PhpParser\Token;
-use SplFileInfo;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-interface FileParser
+interface AstEnrichmentWasStartedSubscriber extends EventSubscriber
 {
-    /**
-     * Parses a source file into PHP-Parser statements and tokens.
-     *
-     * @throws UnparsableFile
-     *
-     * @return array{Stmt[], Token[]}
-     */
-    public function parse(SplFileInfo $fileInfo): array;
+    public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void;
 }
