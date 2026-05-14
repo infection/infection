@@ -35,21 +35,45 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Parser;
 
-use PhpParser\Node\Stmt;
-use PhpParser\Token;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
 use SplFileInfo;
 
 /**
  * @internal
  */
-interface FileParser
+final readonly class EventDispatchingFileParser implements FileParser
 {
-    /**
-     * Parses a source file into PHP-Parser statements and tokens.
-     *
-     * @throws UnparsableFile
-     *
-     * @return array{Stmt[], Token[]}
-     */
-    public function parse(SplFileInfo $fileInfo): array;
+    public function __construct(
+        private FileParser $decoratedParser,
+        private EventDispatcher $eventDispatcher,
+    ) {
+    }
+
+    public function parse(SplFileInfo $fileInfo): array
+    {
+        $sourceFilePath = self::getSourceFilePath($fileInfo);
+
+        $this->eventDispatcher->dispatch(
+            new AstParsingWasStarted($sourceFilePath),
+        );
+
+        try {
+            return $this->decoratedParser->parse($fileInfo);
+        } finally {
+            $this->eventDispatcher->dispatch(
+                new AstParsingWasFinished($sourceFilePath),
+            );
+        }
+    }
+
+    private static function getSourceFilePath(SplFileInfo $fileInfo): string
+    {
+        $realPath = $fileInfo->getRealPath();
+
+        return $realPath === false
+            ? $fileInfo->getPathname()
+            : $realPath;
+    }
 }

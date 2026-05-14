@@ -51,6 +51,18 @@ use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSu
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
@@ -81,7 +93,7 @@ use Infection\Telemetry\SpanHandle;
 /**
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
 
@@ -100,6 +112,15 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     private ?SpanHandle $mutationEvaluationSpan = null;
 
     private ?SpanHandle $reportingSpan = null;
+
+    /** @var array<string, SpanHandle> */
+    private array $astProcessingSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $astParsingSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $astEnrichmentSpans = [];
 
     /** @var array<string, SpanHandle> */
     private array $mutationEvaluationSpans = [];
@@ -147,7 +168,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->mutationGenerationSpan = $this->startChild(
             'infection.mutation_generation',
             ['infection.source_file.count' => $event->mutableFilesCount],
-            $this->mutationAnalysisSpan,
+            parent: $this->mutationAnalysisSpan,
         );
     }
 
@@ -157,15 +178,6 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->mutationGenerationSpan = null;
     }
 
-    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
-    {
-        $this->mutationEvaluationSpan = $this->startChild(
-            'infection.mutation_evaluation',
-            ['infection.mutation.count' => $event->mutationCount],
-            $this->mutationAnalysisSpan,
-        );
-    }
-
     public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
     {
         $this->mutationAnalysisSpan = $this->startChild('infection.mutation_analysis');
@@ -173,8 +185,94 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
     {
+        $this->endAstSpans();
+        $this->end($this->mutationGenerationSpan);
+        $this->mutationGenerationSpan = null;
+
+        foreach ($this->mutationEvaluationSpans as $span) {
+            $this->end($span);
+        }
+
+        $this->mutationEvaluationSpans = [];
+        $this->end($this->mutationEvaluationSpan);
+        $this->mutationEvaluationSpan = null;
         $this->end($this->mutationAnalysisSpan);
         $this->mutationAnalysisSpan = null;
+    }
+
+    public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
+    {
+        $span = $this->startChild(
+            'infection.ast_processing',
+            ['code.file.path' => $event->sourceFilePath],
+            parent: $this->mutationAnalysisSpan,
+        );
+
+        if ($span !== null) {
+            $this->astProcessingSpans[$event->sourceFilePath] = $span;
+        }
+    }
+
+    public function onAstProcessingWasFinished(AstProcessingWasFinished $event): void
+    {
+        $span = $this->astProcessingSpans[$event->sourceFilePath] ?? null;
+
+        unset($this->astProcessingSpans[$event->sourceFilePath]);
+
+        $this->end($span);
+    }
+
+    public function onAstParsingWasStarted(AstParsingWasStarted $event): void
+    {
+        $span = $this->startChild(
+            'infection.ast_parsing',
+            ['code.file.path' => $event->sourceFilePath],
+            parent: $this->astProcessingSpans[$event->sourceFilePath] ?? null,
+        );
+
+        if ($span !== null) {
+            $this->astParsingSpans[$event->sourceFilePath] = $span;
+        }
+    }
+
+    public function onAstParsingWasFinished(AstParsingWasFinished $event): void
+    {
+        $span = $this->astParsingSpans[$event->sourceFilePath] ?? null;
+
+        unset($this->astParsingSpans[$event->sourceFilePath]);
+
+        $this->end($span);
+    }
+
+    public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void
+    {
+        $span = $this->startChild(
+            'infection.ast_enrichment',
+            ['code.file.path' => $event->sourceFilePath],
+            parent: $this->astProcessingSpans[$event->sourceFilePath] ?? null,
+        );
+
+        if ($span !== null) {
+            $this->astEnrichmentSpans[$event->sourceFilePath] = $span;
+        }
+    }
+
+    public function onAstEnrichmentWasFinished(AstEnrichmentWasFinished $event): void
+    {
+        $span = $this->astEnrichmentSpans[$event->sourceFilePath] ?? null;
+
+        unset($this->astEnrichmentSpans[$event->sourceFilePath]);
+
+        $this->end($span);
+    }
+
+    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
+    {
+        $this->mutationEvaluationSpan = $this->startChild(
+            'infection.mutation_evaluation',
+            ['infection.mutation.count' => $event->mutationCount],
+            parent: $this->mutationAnalysisSpan,
+        );
     }
 
     public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void
@@ -232,6 +330,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->end($this->initialStaticAnalysisSpan);
         $this->end($this->artefactCollectionSpan);
         $this->end($this->sourceCollectionSpan);
+        $this->endAstSpans();
         $this->end($this->mutationGenerationSpan);
 
         foreach ($this->mutationEvaluationSpans as $span) {
@@ -302,5 +401,24 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if ($span !== null) {
             $this->telemetry->end($span, $attributes);
         }
+    }
+
+    private function endAstSpans(): void
+    {
+        foreach ($this->astParsingSpans as $span) {
+            $this->end($span);
+        }
+
+        foreach ($this->astEnrichmentSpans as $span) {
+            $this->end($span);
+        }
+
+        foreach ($this->astProcessingSpans as $span) {
+            $this->end($span);
+        }
+
+        $this->astParsingSpans = [];
+        $this->astEnrichmentSpans = [];
+        $this->astProcessingSpans = [];
     }
 }
