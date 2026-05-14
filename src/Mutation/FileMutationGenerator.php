@@ -58,8 +58,6 @@ use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
- * @phpstan-import-type StatementsAndTokens from FileParser
- *
  * @internal
  * @final
  */
@@ -144,7 +142,7 @@ class FileMutationGenerator
      *
      * @throws UnparsableFile
      *
-     * @return StatementsAndTokens
+     * @return array{Stmt[], Token[]}
      */
     private function createAst(
         SplFileInfo $sourceFile,

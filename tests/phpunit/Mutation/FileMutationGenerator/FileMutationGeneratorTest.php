@@ -40,7 +40,7 @@ use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\PhpParser\Parser\PhpParserFileParser;
+use Infection\PhpParser\Parser\FileParser;
 use Infection\PhpParser\Traverser\NodeTraverserFactory;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -52,7 +52,6 @@ use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
-use PhpParser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -62,7 +61,7 @@ use function sprintf;
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
 {
-    private MockObject&Parser $phpParserMock;
+    private MockObject&FileParser $fileParserMock;
 
     private MockObject&NodeTraverserFactory $traverserFactoryMock;
 
@@ -74,7 +73,7 @@ final class FileMutationGeneratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->phpParserMock = $this->createMock(Parser::class);
+        $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
         $this->eventDispatcher = new EventDispatcherCollector();
@@ -90,10 +89,7 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
         $this->mutationGenerator = new FileMutationGenerator(
-            new PhpParserFileParser(
-                $this->phpParserMock,
-                new FileStore($fileSystemStub),
-            ),
+            $this->fileParserMock,
             $this->traverserFactoryMock,
             $this->tracerMock,
             new FileStore($fileSystemStub),
@@ -120,27 +116,22 @@ final class FileMutationGeneratorTest extends TestCase
             FakeToken::create(),
         ];
 
-        $this->phpParserMock
+        $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with('contents(/path/to/file)')
-            ->willReturn($initialStatements);
-        $this->phpParserMock
-            ->expects($this->once())
-            ->method('getTokens')
-            ->willReturn($originalFileTokens);
+            ->with($fileInfoMock)
+            ->willReturn([$initialStatements, $originalFileTokens]);
 
-        $preTraverserCalled = false;
+        $enrichmentTraverserCalled = false;
 
-        // Pre-traverser should be created and called first
-        $preTraverserMock = $this->createMock(NodeTraverserInterface::class);
-        $preTraverserMock
+        $enrichmentTraverserMock = $this->createMock(NodeTraverserInterface::class);
+        $enrichmentTraverserMock
             ->expects($this->once())
             ->method('traverse')
             ->with($initialStatements)
             ->willReturnCallback(
-                static function () use (&$preTraverserCalled) {
-                    $preTraverserCalled = true;
+                static function () use (&$enrichmentTraverserCalled) {
+                    $enrichmentTraverserCalled = true;
 
                     // The return value is not used. In practice, we directly mutate the
                     // original value, but this cannot be mimicked with mocks.
@@ -149,14 +140,14 @@ final class FileMutationGeneratorTest extends TestCase
             );
 
         // Main traverser should be created and called after
-        $traverserMock = $this->createMock(NodeTraverserInterface::class);
-        $traverserMock
+        $mutationTraverserMock = $this->createMock(NodeTraverserInterface::class);
+        $mutationTraverserMock
             ->expects($this->once())
             ->method('traverse')
             ->with($initialStatements)
             ->willReturnCallback(
-                static function () use (&$preTraverserCalled) {
-                    self::assertTrue($preTraverserCalled);
+                static function () use (&$enrichmentTraverserCalled) {
+                    self::assertTrue($enrichmentTraverserCalled);
 
                     // The return value is not used. In practice, we directly mutate the
                     // original value, but this cannot be mimicked with mocks.
@@ -168,7 +159,10 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock
             ->expects($this->exactly(2))
             ->method($this->anything())
-            ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock);
+            ->willReturnOnConsecutiveCalls(
+                $enrichmentTraverserMock,
+                $mutationTraverserMock,
+            );
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
@@ -228,20 +222,16 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn([]);
 
         if ($scenario->expected) {
-            $this->phpParserMock
+            $this->fileParserMock
                 ->expects($this->once())
                 ->method('parse')
-                ->willReturn($initialStatements);
-            $this->phpParserMock
-                ->expects($this->once())
-                ->method('getTokens')
-                ->willReturn($originalFileTokens);
+                ->willReturn([$initialStatements, $originalFileTokens]);
 
             $this->traverserFactoryMock
                 ->method('createEnrichmentTraverser')
                 ->willReturn($traverserStub);
         } else {
-            $this->phpParserMock
+            $this->fileParserMock
                 ->expects($this->never())
                 ->method('parse');
 

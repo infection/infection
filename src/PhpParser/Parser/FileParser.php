@@ -35,13 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Parser;
 
-use PhpParser\Node\Stmt;
-use PhpParser\Token;
 use SplFileInfo;
 
 /**
- * @phpstan-type StatementsAndTokens = array{Stmt[], Token[]}
- *
  * @internal
  */
 interface FileParser
@@ -50,8 +46,6 @@ interface FileParser
      * Parses a source file into PHP-Parser statements and tokens.
      *
      * @throws UnparsableFile
-     *
-     * @return StatementsAndTokens
      */
     public function parse(SplFileInfo $fileInfo): array;
 }
