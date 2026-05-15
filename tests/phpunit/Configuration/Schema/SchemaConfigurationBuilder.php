@@ -399,14 +399,14 @@ final class SchemaConfigurationBuilder
             testFramework: $this->testFramework,
             bootstrap: $this->bootstrap,
             initialTestsPhpOptions: $this->initialTestsPhpOptions,
-            testFrameworkOptionsWasConfigured: $this->testFrameworkOptionsWasConfigured,
             testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
-            testFrameworkExtraArgsWasConfigured: $this->testFrameworkExtraArgsWasConfigured,
             testFrameworkExtraArgs: $this->testFrameworkExtraArgs,
             staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
             threads: $this->threads,
             dotsPerRow: $this->dotsPerRow,
             staticAnalysisTool: $this->staticAnalysisTool,
+            testFrameworkOptionsWasConfigured: $this->testFrameworkOptionsWasConfigured,
+            testFrameworkExtraArgsWasConfigured: $this->testFrameworkExtraArgsWasConfigured,
         );
     }
 }

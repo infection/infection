@@ -221,6 +221,124 @@ final class PhpUnitAdapterTest extends TestCase
         );
     }
 
+    #[DataProvider('mutantCommandLineProvider')]
+    public function test_it_provides_mutant_command_line(
+        MutantCommandLineScenario $scenario,
+    ): void {
+        $this->fileSystemMock
+            ->expects($this->exactly(2))
+            // Checking the content of the dumped XML and generated autoload file is out of the scope of this test.
+            ->method('dumpFile');
+
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method('shallProvide');
+
+        $adapter = $this->createAdapter(
+            testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
+            version: $scenario->version,
+            executeOnlyCoveringTestCases: $scenario->executeOnlyCoveringTestCases,
+        );
+
+        $actual = $adapter->getMutantCommandLine(
+            coverageTests: $scenario->coverageTests,
+            mutatedFilePath: $scenario->mutatedFilePath,
+            mutationHash: $scenario->mutationHash,
+            mutationOriginalFilePath: $scenario->mutationOriginalFilePath,
+            extraOptions: $scenario->extraOptions,
+        );
+
+        $this->assertSame(
+            $scenario->expected,
+            $actual,
+        );
+    }
+
+    public static function passOutputProvider(): iterable
+    {
+        yield ['OK, but incomplete, skipped, or risky tests!', true];
+
+        yield ['OK (5 tests, 3 assertions)', true];
+
+        yield ['FAILURES!', false];
+
+        yield ['ERRORS!', false];
+
+        yield ['No tests executed!', true];
+    }
+
+    public static function syntaxErrorOutputProvider(): iterable
+    {
+        yield ['OK, but incomplete, skipped, or risky tests!', false];
+
+        yield ['ParseError: syntax error, unexpected ">"', true];
+    }
+
+    public static function memoryReportProvider(): iterable
+    {
+        yield ['Memory: 8.00MB', 8.0];
+
+        yield ['Memory: 68.00MB', 68.0];
+
+        yield ['Memory: 68.00 MB', 68.0];
+
+        yield ['Time: 2.51 seconds', -1.0];
+    }
+
+    #[DataProvider('executionOrderProvider')]
+    public function test_supports_execution_order_defects_random(bool $expected, string $version): void
+    {
+        $this->assertSame($expected, PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version));
+    }
+
+    public static function executionOrderProvider(): iterable
+    {
+        yield [false, '10.0'];
+
+        yield [false, '10.5.47'];
+
+        yield [true, '10.5.48'];
+
+        yield [true, '10.5.999'];
+
+        yield [false, '11.0'];
+
+        yield [false, '11.5.26'];
+
+        yield [true, '11.5.27'];
+
+        yield [true, '11.5.599'];
+
+        yield [false, '12.0'];
+
+        yield [false, '12.1'];
+
+        yield [false, '12.2.6'];
+
+        yield [true, '12.2.7'];
+
+        yield [true, '12.2.99'];
+
+        yield [true, '13.0'];
+    }
+
+    #[DataProvider('coverageWithoutSourceProvider')]
+    public function test_supports_coverage_without_source(string $version, bool $expected): void
+    {
+        $this->assertSame($expected, PhpUnitAdapter::supportsExcludingSourceFromCoverage($version));
+    }
+
+    public static function coverageWithoutSourceProvider(): iterable
+    {
+        yield ['11.5.599', false];
+
+        yield ['12.0', false];
+
+        yield ['12.5', true];
+
+        yield ['13.0', true];
+    }
+
     public static function initialTestRunProvider(): iterable
     {
         $default = new InitialTestRunScenario(
@@ -283,10 +401,40 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with extra PHPUnit args' => [
+            $default
+                ->withExtraArgs('--group=default --filter="Mailer"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--group=default',
+                    '--filter=Mailer',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         // Correctness is ensured upstream – within reason; we can't guard against all bad input
         yield 'with extra PHPUnit options missing the leading dashes' => [
             $default
                 ->withExtraOptions('group=default filter="Mailer"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    'group=default',
+                    'filter=Mailer',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with extra PHPUnit args missing the leading dashes' => [
+            $default
+                ->withExtraArgs('group=default filter="Mailer"')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -314,9 +462,39 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with short extra PHPUnit arg' => [
+            $default
+                ->withExtraArgs('-v --group=default')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '-v',
+                    '--group=default',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with option value separated by a space' => [
             $default
                 ->withExtraOptions('--filter "a test with spaces"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter',
+                    'a test with spaces',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with arg value separated by a space' => [
+            $default
+                ->withExtraArgs('--filter "a test with spaces"')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -343,6 +521,20 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with arg value requiring shell escaping' => [
+            $default
+                ->withExtraArgs('--filter="a test with spaces"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter=a test with spaces',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with single-quoted option value requiring shell escaping' => [
             $default
                 ->withExtraOptions("--filter='a test with spaces'")
@@ -357,9 +549,38 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with single-quoted arg value requiring shell escaping' => [
+            $default
+                ->withExtraArgs("--filter='a test with spaces'")
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter=a test with spaces',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with option value containing option-like text' => [
             $default
                 ->withExtraOptions('--filter="a test -- with option-like text" --group=default')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter=a test -- with option-like text',
+                    '--group=default',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with arg value containing arg-like text' => [
+            $default
+                ->withExtraArgs('--filter="a test -- with option-like text" --group=default')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -387,9 +608,38 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with positional test file argument with extra args' => [
+            $default
+                ->withExtraArgs('tests/FooTest.php --filter=Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    'tests/FooTest.php',
+                    '--filter=Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with positional test file argument requiring shell escaping' => [
             $default
                 ->withExtraOptions('"tests/Foo Test.php"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    'tests/Foo Test.php',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with positional test file argument requiring shell escaping with extra args' => [
+            $default
+                ->withExtraArgs('"tests/Foo Test.php"')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -413,10 +663,38 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'without generated coverage args when coverage is skipped' => [
+            $default
+                ->withExtraArgs('')
+                ->withSkipCoverage(true)
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                ]),
+        ];
+
         yield 'with coverage report excluding source for PHPUnit 12.5 and above' => [
             $default
                 ->withVersion('12.5')
                 ->withExtraOptions('--group=default')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--group=default',
+                    '--exclude-source-from-xml-coverage',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with coverage report excluding source for PHPUnit 12.5 and above with extra args' => [
+            $default
+                ->withVersion('12.5')
+                ->withExtraArgs('--group=default')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -504,6 +782,26 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with filtered source files and exact filter arg' => [
+            $default
+                ->withFilteredSourceFilesToMutate([
+                    new SplFileInfo('src/Foo.php'),
+                    new SplFileInfo('src/bar/Baz.php'),
+                ])
+                ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
+                ->withExtraArgs('--filter --group=default')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter',
+                    '--group=default',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with filtered source files and separated filter option value' => [
             $default
                 ->withFilteredSourceFilesToMutate([
@@ -512,6 +810,26 @@ final class PhpUnitAdapterTest extends TestCase
                 ])
                 ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                 ->withExtraOptions('--filter Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--filter',
+                    'Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with filtered source files and separated filter arg value' => [
+            $default
+                ->withFilteredSourceFilesToMutate([
+                    new SplFileInfo('src/Foo.php'),
+                    new SplFileInfo('src/bar/Baz.php'),
+                ])
+                ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
+                ->withExtraArgs('--filter Foo')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -546,9 +864,45 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with filtered source files and equals filter arg value' => [
+            $default
+                ->withFilteredSourceFilesToMutate([
+                    new SplFileInfo('src/Foo.php'),
+                    new SplFileInfo('src/bar/Baz.php'),
+                ])
+                ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
+                ->withExtraArgs('--filter=Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: "--filter=Foo" does not prevent the generated filter from being appended.
+                    '--filter=Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                    '--filter',
+                    'FooTest|BazTest',
+                ]),
+        ];
+
         yield 'with testsuite option' => [
             $default
                 ->withExtraOptions('--testsuite=unit')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--testsuite=unit',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with testsuite arg' => [
+            $default
+                ->withExtraArgs('--testsuite=unit')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -575,6 +929,21 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with testsuite arg value requiring shell escaping' => [
+            $default
+                ->withExtraArgs('--testsuite "Unit Tests"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--testsuite',
+                    'Unit Tests',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with configuration option' => [
             $default
                 ->withExtraOptions('--configuration=custom-phpunit.xml')
@@ -589,9 +958,38 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with configuration arg' => [
+            $default
+                ->withExtraArgs('--configuration=custom-phpunit.xml')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--configuration=custom-phpunit.xml',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with configuration option value separated by a space' => [
             $default
                 ->withExtraOptions('--configuration custom-phpunit.xml')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--configuration',
+                    'custom-phpunit.xml',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with configuration arg value separated by a space' => [
+            $default
+                ->withExtraArgs('--configuration custom-phpunit.xml')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -681,9 +1079,40 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with path arg containing spaces' => [
+            $default
+                ->withExtraArgs('--path=/a path/with spaces')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--path=/a',
+                    'path/with',
+                    'spaces',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with repeated spaces between extra options' => [
             $default
                 ->withExtraOptions('--group=default  --filter=Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--group=default',
+                    '--filter=Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
+        yield 'with repeated spaces between extra args' => [
+            $default
+                ->withExtraArgs('--group=default  --filter=Foo')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -711,6 +1140,21 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with newline between extra args' => [
+            $default
+                ->withExtraArgs("--group=default\n--filter=Foo")
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--group=default',
+                    '--filter=Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
+
         yield 'with tab between extra options' => [
             $default
                 ->withExtraOptions("--group=default\t--filter=Foo")
@@ -725,39 +1169,21 @@ final class PhpUnitAdapterTest extends TestCase
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
         ];
-    }
 
-    #[DataProvider('mutantCommandLineProvider')]
-    public function test_it_provides_mutant_command_line(
-        MutantCommandLineScenario $scenario,
-    ): void {
-        $this->fileSystemMock
-            ->expects($this->exactly(2))
-            // Checking the content of the dumped XML and generated autoload file is out of the scope of this test.
-            ->method('dumpFile');
-
-        $this->pcovDirectoryProvider
-            ->expects($this->never())
-            ->method('shallProvide');
-
-        $adapter = $this->createAdapter(
-            testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
-            version: $scenario->version,
-            executeOnlyCoveringTestCases: $scenario->executeOnlyCoveringTestCases,
-        );
-
-        $actual = $adapter->getMutantCommandLine(
-            coverageTests: $scenario->coverageTests,
-            mutatedFilePath: $scenario->mutatedFilePath,
-            mutationHash: $scenario->mutationHash,
-            mutationOriginalFilePath: $scenario->mutationOriginalFilePath,
-            extraOptions: $scenario->extraOptions,
-        );
-
-        $this->assertSame(
-            $scenario->expected,
-            $actual,
-        );
+        yield 'with tab between extra args' => [
+            $default
+                ->withExtraArgs("--group=default\t--filter=Foo")
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.initial.infection.xml',
+                    '--group=default',
+                    '--filter=Foo',
+                    '--coverage-xml=/tmp/coverage-xml',
+                    '--log-junit=/tmp/infection/junit.xml',
+                ]),
+        ];
     }
 
     public static function mutantCommandLineProvider(): iterable
@@ -799,9 +1225,35 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with extra PHPUnit args' => [
+            $default
+                ->withExtraArgs('--group=default --filter="Mailer"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--group=default',
+                    '--filter=Mailer',
+                ]),
+        ];
+
         yield 'with short extra PHPUnit option' => [
             $default
                 ->withExtraOptions('-v --group=default')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '-v',
+                    '--group=default',
+                ]),
+        ];
+
+        yield 'with short extra PHPUnit arg' => [
+            $default
+                ->withExtraArgs('-v --group=default')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -825,9 +1277,35 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with arg value separated by a space' => [
+            $default
+                ->withExtraArgs('--filter "a test with spaces"')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--filter',
+                    'a test with spaces',
+                ]),
+        ];
+
         yield 'with option value containing option-like text' => [
             $default
                 ->withExtraOptions('--filter="a test -- with option-like text" --group=default')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--filter=a test -- with option-like text',
+                    '--group=default',
+                ]),
+        ];
+
+        yield 'with arg value containing arg-like text' => [
+            $default
+                ->withExtraArgs('--filter="a test -- with option-like text" --group=default')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -851,9 +1329,34 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with positional test file argument with extra args' => [
+            $default
+                ->withExtraArgs('tests/FooTest.php --filter=Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    'tests/FooTest.php',
+                    '--filter=Foo',
+                ]),
+        ];
+
         yield 'with configuration option' => [
             $default
                 ->withExtraOptions('--configuration=custom-phpunit.xml')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--configuration=custom-phpunit.xml',
+                ]),
+        ];
+
+        yield 'with configuration arg' => [
+            $default
+                ->withExtraArgs('--configuration=custom-phpunit.xml')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -1008,9 +1511,41 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        yield 'with extra args and generated covering test filter' => [
+            $default
+                ->withExecuteOnlyCoveringTestCases(true)
+                ->withExtraArgs('--group=default')
+                ->withCoverageTests([
+                    new TestLocation('App\ServiceTest::test_case1', '/path/to/tests/ServiceTest.php', 0.1),
+                ])
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--group=default',
+                    '--filter',
+                    '/ServiceTest\:\:test_case1/',
+                ]),
+        ];
+
         yield 'with path option containing spaces' => [
             $default
                 ->withExtraOptions('--path=/a path/with spaces')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--path=/a',
+                    'path/with',
+                    'spaces',
+                ]),
+        ];
+
+        yield 'with path arg containing spaces' => [
+            $default
+                ->withExtraArgs('--path=/a path/with spaces')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
@@ -1034,91 +1569,19 @@ final class PhpUnitAdapterTest extends TestCase
                     '--filter=Foo',
                 ]),
         ];
-    }
 
-    public static function passOutputProvider(): iterable
-    {
-        yield ['OK, but incomplete, skipped, or risky tests!', true];
-
-        yield ['OK (5 tests, 3 assertions)', true];
-
-        yield ['FAILURES!', false];
-
-        yield ['ERRORS!', false];
-
-        yield ['No tests executed!', true];
-    }
-
-    public static function syntaxErrorOutputProvider(): iterable
-    {
-        yield ['OK, but incomplete, skipped, or risky tests!', false];
-
-        yield ['ParseError: syntax error, unexpected ">"', true];
-    }
-
-    public static function memoryReportProvider(): iterable
-    {
-        yield ['Memory: 8.00MB', 8.0];
-
-        yield ['Memory: 68.00MB', 68.0];
-
-        yield ['Memory: 68.00 MB', 68.0];
-
-        yield ['Time: 2.51 seconds', -1.0];
-    }
-
-    #[DataProvider('executionOrderProvider')]
-    public function test_supports_execution_order_defects_random(bool $expected, string $version): void
-    {
-        $this->assertSame($expected, PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version));
-    }
-
-    public static function executionOrderProvider(): iterable
-    {
-        yield [false, '10.0'];
-
-        yield [false, '10.5.47'];
-
-        yield [true, '10.5.48'];
-
-        yield [true, '10.5.999'];
-
-        yield [false, '11.0'];
-
-        yield [false, '11.5.26'];
-
-        yield [true, '11.5.27'];
-
-        yield [true, '11.5.599'];
-
-        yield [false, '12.0'];
-
-        yield [false, '12.1'];
-
-        yield [false, '12.2.6'];
-
-        yield [true, '12.2.7'];
-
-        yield [true, '12.2.99'];
-
-        yield [true, '13.0'];
-    }
-
-    #[DataProvider('coverageWithoutSourceProvider')]
-    public function test_supports_coverage_without_source(string $version, bool $expected): void
-    {
-        $this->assertSame($expected, PhpUnitAdapter::supportsExcludingSourceFromCoverage($version));
-    }
-
-    public static function coverageWithoutSourceProvider(): iterable
-    {
-        yield ['11.5.599', false];
-
-        yield ['12.0', false];
-
-        yield ['12.5', true];
-
-        yield ['13.0', true];
+        yield 'with repeated spaces between extra args' => [
+            $default
+                ->withExtraArgs('--group=default  --filter=Foo')
+                ->withExpected([
+                    self::PHP_EXECUTABLE,
+                    '/path/to/phpunit',
+                    '--configuration',
+                    '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    '--group=default',
+                    '--filter=Foo',
+                ]),
+        ];
     }
 
     /**

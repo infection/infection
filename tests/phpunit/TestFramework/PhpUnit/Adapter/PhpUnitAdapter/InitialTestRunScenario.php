@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use Infection\TestFramework\MapSourceClassToTestStrategy;
+use Infection\TestFramework\TestFrameworkExtraArgs;
 use SplFileInfo;
 
 final class InitialTestRunScenario
@@ -110,6 +111,14 @@ final class InitialTestRunScenario
     {
         $clone = clone $this;
         $clone->extraOptions = $extraOptions;
+
+        return $clone;
+    }
+
+    public function withExtraArgs(string $extraArgs): self
+    {
+        $clone = clone $this;
+        $clone->extraOptions = TestFrameworkExtraArgs::raw($extraArgs, true)->serializeForAdapter();
 
         return $clone;
     }

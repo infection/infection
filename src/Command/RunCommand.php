@@ -454,13 +454,7 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $testFrameworkOptionsWasProvided = TestFrameworkOptionsOption::isProvided($io);
-        $testFrameworkExtraArgsWasProvided = TestFrameworkExtraArgsOption::isProvided($io);
-
-        self::assertTestFrameworkOptionsAreNotBothProvided(
-            $testFrameworkOptionsWasProvided,
-            $testFrameworkExtraArgsWasProvided,
-        );
+        self::assertTestFrameworkOptionsAreNotBothProvided($io);
 
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
@@ -513,13 +507,18 @@ final class RunCommand extends BaseCommand
         );
     }
 
-    private static function assertTestFrameworkOptionsAreNotBothProvided(
-        bool $testFrameworkOptionsWasProvided,
-        bool $testFrameworkExtraArgsWasProvided,
-    ): void {
-        if ($testFrameworkOptionsWasProvided && $testFrameworkExtraArgsWasProvided) {
+    private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
+    {
+        if (
+            TestFrameworkOptionsOption::isProvided($io)
+            && TestFrameworkExtraArgsOption::isProvided($io)
+        ) {
             throw new InvalidArgumentException(
-                'Cannot pass both the legacy option "--test-framework-options" and "--test-framework-extra-args".',
+                sprintf(
+                    'Cannot pass both the legacy option "--%s" and "--%s".',
+                    TestFrameworkOptionsOption::NAME,
+                    TestFrameworkExtraArgsOption::NAME,
+                ),
             );
         }
     }
