@@ -188,10 +188,10 @@ class ConfigurationFactory
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
             testFrameworkExtraOptions: $this->retrieveTestFrameworkExtraArgs(
-                $testFramework,
                 $testFrameworkExtraOptions,
                 $testFrameworkExtraArgs,
                 $schema,
+                $testFramework,
             ),
             staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
             coveragePath: $coverageBasePath,
@@ -311,10 +311,10 @@ class ConfigurationFactory
     }
 
     private function retrieveTestFrameworkExtraArgs(
-        string $testFramework,
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         SchemaConfiguration $schema,
+        string $testFramework,
     ): string {
         $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
 
