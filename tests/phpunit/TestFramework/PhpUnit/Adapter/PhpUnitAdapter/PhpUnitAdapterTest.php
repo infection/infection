@@ -283,7 +283,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with extra PHPUnit options missing the slashes' => [
+        yield 'with extra PHPUnit options missing the leading dashes' => [
             $default
                 ->withExtraOptions('group=default filter="Mailer"')
                 ->withExpected([
@@ -291,7 +291,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    '--group=default filter="Mailer"',
+                    'group=default filter="Mailer"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -305,8 +305,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: the splitter normalises all options to long options.
-                    '--v',
+                    '-v',
                     '--group=default',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
@@ -383,8 +382,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: positional arguments are treated as long options.
-                    '--tests/FooTest.php',
+                    'tests/FooTest.php',
                     '--filter=Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
@@ -399,8 +397,8 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: positional arguments are treated as long options and quotes are preserved.
-                    '--"tests/Foo Test.php"',
+                    // Incorrect current behaviour: shell quotes are preserved in the argv token.
+                    '"tests/Foo Test.php"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -813,8 +811,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    // Incorrect current behaviour: the splitter normalises all options to long options.
-                    '--v',
+                    '-v',
                     '--group=default',
                 ]),
         ];
@@ -855,8 +852,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    // Incorrect current behaviour: positional arguments are treated as long options.
-                    '--tests/FooTest.php',
+                    'tests/FooTest.php',
                     '--filter=Foo',
                 ]),
         ];

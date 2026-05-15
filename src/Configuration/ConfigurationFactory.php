@@ -37,10 +37,13 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function explode;
 use function file_exists;
+use function implode;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
@@ -65,6 +68,7 @@ use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
+use function ltrim;
 use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -180,7 +184,7 @@ class ConfigurationFactory
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
-            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
             staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
             coveragePath: $coverageBasePath,
             skipCoverage: $skipCoverage,
@@ -301,8 +305,21 @@ class ConfigurationFactory
     private static function retrieveTestFrameworkExtraOptions(
         ?string $testFrameworkExtraOptions,
         SchemaConfiguration $schema,
+        string $testFramework,
     ): string {
-        return $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
+
+        if ($extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT) {
+            return $extraOptions;
+        }
+
+        return implode(
+            ' ',
+            array_map(
+                static fn ($option): string => '--' . $option,
+                explode(' --', ltrim($extraOptions, '-')),
+            ),
+        );
     }
 
     private static function retrieveStaticAnalysisToolOptions(

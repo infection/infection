@@ -82,6 +82,22 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
+    public function test_it_does_not_normalize_extra_options(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '-v',
+                '--debug',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '-v --debug'),
+        );
+    }
+
     public function test_it_can_build_the_command_with_filtered_files_for_initial_tests_run(): void
     {
         $builder = new ArgumentsAndOptionsBuilder(false,

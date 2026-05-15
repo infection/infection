@@ -982,12 +982,30 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'test framework PHP options from config are normalized for phpunit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                'debug --stop-on-failure',
+                null,
+                '--debug --stop-on-failure',
+            ),
+        ];
+
         yield 'test framework PHP options from input' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 null,
                 '--debug',
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for phpunit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                'debug --stop-on-failure',
+                '--debug --stop-on-failure',
             ),
         ];
 
@@ -1006,6 +1024,24 @@ final class ConfigurationFactoryTest extends TestCase
                 '--debug',
                 null,
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from config are not normalized for phpspec framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                'debug --stop-on-failure',
+                null,
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are not normalized for phpspec framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug --stop-on-failure',
+                'debug --stop-on-failure',
             ),
         ];
 
