@@ -37,7 +37,6 @@ namespace Infection\Tests\Configuration\Schema;
 
 use function array_diff_key;
 use function array_fill_keys;
-use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_merge;
@@ -2760,9 +2759,6 @@ final class SchemaConfigurationFactoryTest extends TestCase
      */
     private static function createConfig(array $args): SchemaConfiguration
     {
-        $testFrameworkOptionsWasConfigured = array_key_exists('testFrameworkOptions', $args);
-        $testFrameworkExtraArgsWasConfigured = array_key_exists('testFrameworkExtraArgs', $args);
-
         $defaultArgs = [
             'path' => '/path/to/config',
             'timeout' => null,
@@ -2781,9 +2777,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'testFramework' => null,
             'bootstrap' => null,
             'initialTestsPhpOptions' => null,
-            'testFrameworkOptionsWasConfigured' => $testFrameworkOptionsWasConfigured,
             'testFrameworkOptions' => null,
-            'testFrameworkExtraArgsWasConfigured' => $testFrameworkExtraArgsWasConfigured,
             'testFrameworkExtraArgs' => null,
             'staticAnalysisToolOptions' => null,
             'threadCount' => null,

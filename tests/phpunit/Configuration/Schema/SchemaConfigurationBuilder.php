@@ -72,9 +72,7 @@ final class SchemaConfigurationBuilder
         private ?string $testFramework,
         private ?string $bootstrap,
         private ?string $initialTestsPhpOptions,
-        private bool $testFrameworkOptionsWasConfigured,
         private ?string $testFrameworkExtraOptions,
-        private bool $testFrameworkExtraArgsWasConfigured,
         private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
         private string|int|null $threads,
@@ -103,9 +101,7 @@ final class SchemaConfigurationBuilder
             testFramework: $schema->testFramework,
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $schema->initialTestsPhpOptions,
-            testFrameworkOptionsWasConfigured: $schema->testFrameworkOptionsWasConfigured,
             testFrameworkExtraOptions: $schema->testFrameworkExtraOptions,
-            testFrameworkExtraArgsWasConfigured: $schema->testFrameworkExtraArgsWasConfigured,
             testFrameworkExtraArgs: $schema->testFrameworkExtraArgs,
             staticAnalysisToolOptions: $schema->staticAnalysisToolOptions,
             threads: $schema->threads,
@@ -134,9 +130,7 @@ final class SchemaConfigurationBuilder
             testFramework: null,
             bootstrap: null,
             initialTestsPhpOptions: null,
-            testFrameworkOptionsWasConfigured: false,
             testFrameworkExtraOptions: null,
-            testFrameworkExtraArgsWasConfigured: false,
             testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             threads: null,
@@ -176,9 +170,7 @@ final class SchemaConfigurationBuilder
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: 'bootstrap.php',
             initialTestsPhpOptions: '-d memory_limit=1G',
-            testFrameworkOptionsWasConfigured: true,
             testFrameworkExtraOptions: '--verbose',
-            testFrameworkExtraArgsWasConfigured: false,
             testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: '--level=max',
             threads: 4,
@@ -335,7 +327,6 @@ final class SchemaConfigurationBuilder
     public function withTestFrameworkExtraOptions(?string $testFrameworkExtraOptions): self
     {
         $clone = clone $this;
-        $clone->testFrameworkOptionsWasConfigured = true;
         $clone->testFrameworkExtraOptions = $testFrameworkExtraOptions;
 
         return $clone;
@@ -405,8 +396,6 @@ final class SchemaConfigurationBuilder
             threads: $this->threads,
             dotsPerRow: $this->dotsPerRow,
             staticAnalysisTool: $this->staticAnalysisTool,
-            testFrameworkOptionsWasConfigured: $this->testFrameworkOptionsWasConfigured,
-            testFrameworkExtraArgsWasConfigured: $this->testFrameworkExtraArgsWasConfigured,
         );
     }
 }

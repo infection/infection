@@ -146,8 +146,6 @@ final class ConfigurationFactoryTest extends TestCase
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
-            testFrameworkOptionsWasConfigured: false,
-            testFrameworkExtraArgsWasConfigured: false,
         );
 
         $this->expectExceptionMessage('Expected one of: "phpstan", "mago". Got: "non-supported-static-analysis-tool"');
@@ -228,8 +226,6 @@ final class ConfigurationFactoryTest extends TestCase
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: null,
-            testFrameworkOptionsWasConfigured: false,
-            testFrameworkExtraArgsWasConfigured: false,
         );
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
 
