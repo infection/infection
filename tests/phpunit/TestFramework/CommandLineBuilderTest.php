@@ -37,10 +37,12 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+#[Group('integration')]
 #[CoversClass(CommandLineBuilder::class)]
 final class CommandLineBuilderTest extends TestCase
 {
