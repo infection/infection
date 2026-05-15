@@ -35,12 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function base64_decode;
 use function base64_encode;
-use function json_decode;
+use const JSON_THROW_ON_ERROR;
+use function Safe\base64_decode;
+use function Safe\json_decode;
 use function Safe\json_encode;
-use function str_starts_with;
 use function str_split;
+use function str_starts_with;
 use function strlen;
 use function substr;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -66,12 +67,6 @@ final readonly class TestFrameworkExtraArgs
         public string $value,
         public array $argvTokens,
     ) {
-        Assert::allString($argvTokens);
-    }
-
-    public static function absent(): self
-    {
-        return new self(false, false, '', []);
     }
 
     public static function legacy(?string $value, bool $isPresent): self
@@ -118,16 +113,11 @@ final readonly class TestFrameworkExtraArgs
     {
         Assert::true(self::isSerializedRaw($value));
 
-        $tokens = json_decode(
+        return self::assertRawTokens(json_decode(
             base64_decode(substr($value, strlen(self::RAW_PREFIX)), true),
             true,
             flags: JSON_THROW_ON_ERROR,
-        );
-
-        Assert::isList($tokens);
-        Assert::allString($tokens);
-
-        return $tokens;
+        ));
     }
 
     public function serializeForAdapter(): string
@@ -137,6 +127,17 @@ final readonly class TestFrameworkExtraArgs
         }
 
         return $this->isLegacy ? $this->value : self::serializeRawTokens($this->argvTokens);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function assertRawTokens(mixed $tokens): array
+    {
+        Assert::isList($tokens);
+        Assert::allString($tokens);
+
+        return $tokens;
     }
 
     private static function assertNoUnclosedQuote(string $value): void

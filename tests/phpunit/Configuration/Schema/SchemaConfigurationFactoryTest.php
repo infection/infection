@@ -37,6 +37,7 @@ namespace Infection\Tests\Configuration\Schema;
 
 use function array_diff_key;
 use function array_fill_keys;
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_merge;
@@ -52,6 +53,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Mutator\ProfileList;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
 use JsonSchema\Validator;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -110,20 +112,23 @@ final class SchemaConfigurationFactoryTest extends TestCase
 
     public function test_it_rejects_configuring_both_test_framework_option_names(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".');
+
+        $rawConfig = json_decode(<<<'JSON'
+            {
+                "source": {
+                    "directories": ["src"]
+                },
+                "testFrameworkOptions": "",
+                "testFrameworkExtraArgs": ""
+            }
+            JSON);
+        $this->assertInstanceOf(stdClass::class, $rawConfig);
 
         (new SchemaConfigurationFactory())->create(
             '/path/to/config',
-            json_decode(<<<'JSON'
-                {
-                    "source": {
-                        "directories": ["src"]
-                    },
-                    "testFrameworkOptions": "",
-                    "testFrameworkExtraArgs": ""
-                }
-                JSON),
+            $rawConfig,
         );
     }
 
@@ -2751,7 +2756,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @param array<array<string, mixed>, mixed> $args
+     * @param array<string, mixed> $args
      */
     private static function createConfig(array $args): SchemaConfiguration
     {
@@ -2791,11 +2796,17 @@ final class SchemaConfigurationFactoryTest extends TestCase
         return new SchemaConfiguration(...$args);
     }
 
-    private function assertJsonIsSchemaValid(stdClass $decodedJson): void
+    private function assertJsonIsSchemaValid(mixed $decodedJson): void
     {
         $validator = new Validator();
+        $validationTarget = new class($decodedJson) {
+            public function __construct(
+                public mixed $value,
+            ) {
+            }
+        };
 
-        $validator->validate($decodedJson, (object) ['$ref' => self::SCHEMA_FILE]);
+        $validator->validate($validationTarget->value, (object) ['$ref' => self::SCHEMA_FILE]);
 
         $normalizedErrors = array_map(
             static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),

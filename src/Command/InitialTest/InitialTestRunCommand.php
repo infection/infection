@@ -91,9 +91,7 @@ final class InitialTestRunCommand extends BaseCommand
             debug: DebugOption::get($io),
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
-            testFrameworkOptionsWasProvided: TestFrameworkOptionsOption::isProvided($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
-            testFrameworkExtraArgsWasProvided: TestFrameworkExtraArgsOption::isProvided($io),
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );

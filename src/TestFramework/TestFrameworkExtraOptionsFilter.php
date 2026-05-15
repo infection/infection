@@ -39,6 +39,7 @@ use Safe\Exceptions\PcreException;
 use Safe\Exceptions\StringsException;
 use function Safe\preg_replace;
 use function sprintf;
+use function str_starts_with;
 use function trim;
 use Webmozart\Assert\Assert;
 

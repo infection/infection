@@ -38,7 +38,6 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 use function array_map;
 use function array_merge;
 use function count;
-use function explode;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -132,7 +131,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
 
             $options = array_merge(
                 $options,
-                explode(' ', $extraOptions),
+                TestFrameworkExtraArgs::raw($extraOptions, true)->argvTokens,
             );
         }
 

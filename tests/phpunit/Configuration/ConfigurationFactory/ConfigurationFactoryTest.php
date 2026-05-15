@@ -68,7 +68,6 @@ use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
-use Psr\Log\NullLogger;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
 use InvalidArgumentException;
@@ -177,9 +176,7 @@ final class ConfigurationFactoryTest extends TestCase
                 msiPrecision: 2,
                 mutatorsInput: '',
                 testFramework: TestFrameworkTypes::PHPUNIT,
-                testFrameworkOptionsWasProvided: false,
                 testFrameworkExtraOptions: null,
-                testFrameworkExtraArgsWasProvided: false,
                 testFrameworkExtraArgs: null,
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
@@ -253,9 +250,7 @@ final class ConfigurationFactoryTest extends TestCase
             msiPrecision: 2,
             mutatorsInput: '',
             testFramework: null,
-            testFrameworkOptionsWasProvided: false,
             testFrameworkExtraOptions: null,
-            testFrameworkExtraArgsWasProvided: false,
             testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             sourceFilter: new IncompleteGitDiffFilter('AM', 'master'),
@@ -1408,9 +1403,7 @@ final class ConfigurationFactoryTest extends TestCase
                     msiPrecision: 2,
                     mutatorsInput: 'TrueValue',
                     testFramework: 'phpspec',
-                    testFrameworkOptionsWasProvided: true,
                     testFrameworkExtraOptions: '--stop-on-failure',
-                    testFrameworkExtraArgsWasProvided: false,
                     testFrameworkExtraArgs: null,
                     staticAnalysisToolOptions: null,
                     sourceFilter: new PlainFilter([
@@ -1561,7 +1554,6 @@ final class ConfigurationFactoryTest extends TestCase
                 self::GIT_DEFAULT_BASE,
             ),
             $projectDirectoryProviderMock,
-            new NullLogger(),
         );
     }
 }

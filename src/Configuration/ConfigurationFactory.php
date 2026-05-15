@@ -66,7 +66,6 @@ use Infection\Mutator\MutatorResolver;
 use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\TestFrameworkExtraArgs;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function ltrim;
@@ -75,7 +74,6 @@ use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
-use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
@@ -318,7 +316,7 @@ class ConfigurationFactory
     ): string {
         $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
 
-        if ('' !== $extraArgs) {
+        if ($extraArgs !== '') {
             return $extraArgs;
         }
 

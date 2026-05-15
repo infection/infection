@@ -491,9 +491,7 @@ final class RunCommand extends BaseCommand
             maxTimeouts: $commandHelper->getMaxTimeouts(),
             msiPrecision: $msiPrecision,
             testFramework: TestFrameworkOption::get($io),
-            testFrameworkOptionsWasProvided: $testFrameworkOptionsWasProvided,
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
-            testFrameworkExtraArgsWasProvided: $testFrameworkExtraArgsWasProvided,
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io),
@@ -511,7 +509,7 @@ final class RunCommand extends BaseCommand
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
-            mutantId: $input->getOption(self::OPTION_MUTANT_ID),
+            mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
         );
     }
 

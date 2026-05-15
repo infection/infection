@@ -37,7 +37,6 @@ namespace Infection\Command\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use Infection\Container\Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
@@ -76,6 +75,6 @@ final class TestFrameworkOptionsOption implements CommandOption
 
     public static function isProvided(IO $io): bool
     {
-        return null !== $io->getInput()->getOption(self::NAME);
+        return $io->getInput()->getOption(self::NAME) !== null;
     }
 }
