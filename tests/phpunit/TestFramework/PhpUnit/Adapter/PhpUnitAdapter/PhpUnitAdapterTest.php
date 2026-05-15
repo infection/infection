@@ -283,6 +283,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
+        // Correctness is ensured upstream – within reason; we can't guard against all bad input
         yield 'with extra PHPUnit options missing the leading dashes' => [
             $default
                 ->withExtraOptions('group=default filter="Mailer"')
