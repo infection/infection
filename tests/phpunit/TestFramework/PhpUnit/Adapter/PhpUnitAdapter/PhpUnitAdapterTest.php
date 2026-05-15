@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use function array_map;
-use const DIRECTORY_SEPARATOR;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
@@ -52,21 +51,19 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\VersionParser;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\putenv;
 use SplFileInfo;
-use function sprintf;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
-
     private const string DEFAULT_PHPUNIT_VERSION = '9.0';
+
+    private const string PHP_EXECUTABLE = '/path/to/php';
 
     private PhpUnitAdapter $adapter;
 
@@ -74,19 +71,16 @@ final class PhpUnitAdapterTest extends TestCase
 
     private MockObject&FileSystem $fileSystemMock;
 
+    private MockObject&PhpExecutableFinder $phpExecutableFinderMock;
+
     protected function setUp(): void
     {
-        $this->backupEnvironmentVariables();
-
-        putenv(
-            sprintf(
-                'PHP_BINARY=%s',
-                self::fakePhpBinary(),
-            ),
-        );
-
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
         $this->fileSystemMock = $this->createMock(FileSystem::class);
+        $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
+        $this->phpExecutableFinderMock
+            ->method('find')
+            ->willReturn(self::PHP_EXECUTABLE);
 
         $this->adapter = $this->createAdapter(
             <<<'XML'
@@ -94,11 +88,6 @@ final class PhpUnitAdapterTest extends TestCase
                 <phpunit/>
                 XML,
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_has_a_name(): void
@@ -248,7 +237,7 @@ final class PhpUnitAdapterTest extends TestCase
             skipCoverage: false,
             pcovDirectory: '',
             expected: [
-                self::fakePhpBinary(),
+                self::PHP_EXECUTABLE,
                 '/path/to/phpunit',
                 '--configuration',
                 '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -267,7 +256,7 @@ final class PhpUnitAdapterTest extends TestCase
                     'memory_limit=-1',
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '-dxdebug.mode=coverage',
                     '-d',
                     'memory_limit=-1',
@@ -283,7 +272,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--group=default --filter="Mailer"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -298,7 +287,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('group=default filter="Mailer"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -312,7 +301,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('-v --group=default')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -328,7 +317,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--filter "a test with spaces"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -343,7 +332,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--filter="a test with spaces"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -358,7 +347,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions("--filter='a test with spaces'")
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -373,7 +362,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--filter="a test -- with option-like text" --group=default')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -390,7 +379,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('tests/FooTest.php --filter=Foo')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -406,7 +395,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('"tests/Foo Test.php"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -422,7 +411,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withExtraOptions('')
                 ->withSkipCoverage(true)
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -434,7 +423,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withVersion('12.5')
                 ->withExtraOptions('--group=default')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -450,7 +439,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withPhpExtraArgs(['-d', 'memory_limit=-1'])
                 ->withPcovDirectory('.')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '-d',
                     'memory_limit=-1',
                     '-d',
@@ -473,7 +462,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ])
                 ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -491,7 +480,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new SplFileInfo('src/bar/Baz.php'),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -509,7 +498,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                 ->withExtraOptions('--filter --group=default')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -529,7 +518,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                 ->withExtraOptions('--filter Foo')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -551,7 +540,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                 ->withExtraOptions('--filter=Foo')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -568,7 +557,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--testsuite=unit')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -582,7 +571,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--testsuite "Unit Tests"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -597,7 +586,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--configuration=custom-phpunit.xml')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -611,7 +600,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--configuration custom-phpunit.xml')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -631,7 +620,7 @@ final class PhpUnitAdapterTest extends TestCase
                     'memory_limit=-1',
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '-d',
                     'memory_limit=-1',
                     '/path/to/phpunit',
@@ -647,7 +636,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withSkipCoverage(true)
                 ->withPcovDirectory('.')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -659,7 +648,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withVersion('12.5')
                 ->withSkipCoverage(true)
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -670,7 +659,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withPcovDirectory('/path with spaces/src')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '-d',
                     OperatingSystem::isWindows()
                         ? 'pcov.directory="/path with spaces/src"'
@@ -687,7 +676,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--path=/a path/with spaces')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -701,7 +690,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--group=default  --filter=Foo')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -717,7 +706,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions("--group=default\n--filter=Foo")
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -732,7 +721,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions("--group=default\t--filter=Foo")
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -794,7 +783,7 @@ final class PhpUnitAdapterTest extends TestCase
             mutationOriginalFilePath: '/path/to/project/src/Service.php',
             extraOptions: '',
             expected: [
-                self::fakePhpBinary(),
+                self::PHP_EXECUTABLE,
                 '/path/to/phpunit',
                 '--configuration',
                 '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -807,7 +796,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--group=default --filter="Mailer"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -820,7 +809,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('-v --group=default')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -834,7 +823,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--filter "a test with spaces"')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -847,7 +836,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--filter="a test -- with option-like text" --group=default')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -862,7 +851,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('tests/FooTest.php --filter=Foo')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -876,7 +865,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--configuration=custom-phpunit.xml')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -889,7 +878,7 @@ final class PhpUnitAdapterTest extends TestCase
                 ->withExecuteOnlyCoveringTestCases(true)
                 ->withCoverageTests([])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -903,7 +892,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case1', '/path/to/tests/ServiceTest.php', 0.1),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -917,7 +906,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case1', '/path/to/tests/ServiceTest.php', 0.1),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -935,7 +924,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceIntegrationTest::test_case1', '/path/to/tests/ServiceIntegrationTest.php', 0.3),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -952,7 +941,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case1', '/path/to/tests/ServiceTest.php', 0.2),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -968,7 +957,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case1 with data set "#1"', '/path/to/tests/ServiceTest.php', 0.1),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -985,7 +974,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case1##1', '/path/to/tests/ServiceTest.php', 0.1),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -1002,7 +991,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case2', '/path/to/tests/ServiceTest.php', 0.2),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -1019,7 +1008,7 @@ final class PhpUnitAdapterTest extends TestCase
                     new TestLocation('App\ServiceTest::test_case1', '/path/to/tests/ServiceTest.php', 0.1),
                 ])
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -1033,7 +1022,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--path=/a path/with spaces')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -1045,7 +1034,7 @@ final class PhpUnitAdapterTest extends TestCase
             $default
                 ->withExtraOptions('--group=default  --filter=Foo')
                 ->withExpected([
-                    self::fakePhpBinary(),
+                    self::PHP_EXECUTABLE,
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
@@ -1141,15 +1130,6 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['13.0', true];
     }
 
-    private static function fakePhpBinary(): string
-    {
-        return __DIR__ . (
-            DIRECTORY_SEPARATOR === '\\'
-                ? '/fake-php-executable.bat'
-                : '/fake-php-executable'
-        );
-    }
-
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      * @param MapSourceClassToTestStrategy::*|null $mapSourceClassToTestStrategy
@@ -1205,7 +1185,7 @@ final class PhpUnitAdapterTest extends TestCase
                 $mapSourceClassToTestStrategy,
             ),
             new VersionParser(),    // won't be used since we pass the version
-            new CommandLineBuilder(),
+            new CommandLineBuilder($this->phpExecutableFinderMock),
             $version,
         );
     }
