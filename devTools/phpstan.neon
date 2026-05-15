@@ -121,6 +121,11 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
 
+        # Test scenarios provide fluent API methods that may not be used immediately
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/phpunit/**/*Scenario.php
+
         # PHPat test methods are invoked by the PHPStan container via the phpat.test tag,
         # so shipmonk's dead-code detector cannot see the call sites.
         -
