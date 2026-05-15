@@ -37,7 +37,6 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_map;
 use function array_merge;
-use function array_slice;
 use function count;
 use function explode;
 use function implode;
@@ -126,17 +125,9 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         ];
 
         if ($extraOptions !== '') {
-            $extraOptionsParts = explode(' --', $extraOptions);
-
             $options = array_merge(
                 $options,
-                [
-                    $extraOptionsParts[0],
-                    ...array_map(
-                        static fn ($option): string => '--' . $option,
-                        array_slice($extraOptionsParts, 1),
-                    ),
-                ],
+                explode(' ', $extraOptions),
             );
         }
 

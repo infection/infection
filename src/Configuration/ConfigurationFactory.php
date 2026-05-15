@@ -184,7 +184,11 @@ class ConfigurationFactory
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
-            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema, $testFramework),
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions(
+                $testFrameworkExtraOptions,
+                $schema,
+                $testFramework,
+            ),
             staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
             coveragePath: $coverageBasePath,
             skipCoverage: $skipCoverage,
