@@ -711,7 +711,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
                     '--group=default',
-                    6 => '--filter=Foo',
+                    '--filter=Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -1062,7 +1062,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     '--group=default',
-                    6 => '--filter=Foo',
+                    '--filter=Foo',
                 ]),
         ];
     }
