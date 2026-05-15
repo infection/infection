@@ -38,7 +38,9 @@ namespace Infection\Tests\TestFramework;
 use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[Group('integration')]
 #[CoversClass(CommandLineBuilder::class)]
@@ -48,30 +50,86 @@ final class CommandLineBuilderTest extends TestCase
 
     private const array TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=integration'];
 
+    private MockObject&PhpExecutableFinder $phpExecutableFinderMock;
+
     private CommandLineBuilder $commandLineBuilder;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->commandLineBuilder = new CommandLineBuilder();
+        $this->phpExecutableFinderMock = $this->createMock(PhpExecutableFinder::class);
+        $this->commandLineBuilder = new CommandLineBuilder($this->phpExecutableFinderMock);
     }
 
     public function test_it_builds_command_line_for_batch_file(): void
     {
-        $commandLine = $this->commandLineBuilder->build('phpunit.bat', self::PHP_EXTRA_ARGS, self::TEST_FRAMEWORK_ARGS);
+        $this->phpExecutableFinderMock
+            ->expects($this->never())
+            ->method('find');
 
-        $this->assertContains('phpunit.bat', $commandLine);
-        $this->assertContains('--filter XYZ', $commandLine);
-        $this->assertContains('--exclude-group=integration', $commandLine);
+        $commandLine = $this->commandLineBuilder->build(
+            'phpunit.bat',
+            self::PHP_EXTRA_ARGS,
+            self::TEST_FRAMEWORK_ARGS,
+        );
+
+        $this->assertSame(
+            [
+                'phpunit.bat',
+                '--filter XYZ',
+                '--exclude-group=integration',
+            ],
+            $commandLine,
+        );
     }
 
     public function test_it_builds_command_line_with_empty_php_args(): void
     {
-        $commandLine = $this->commandLineBuilder->build('vendor/bin/phpunit', [], self::TEST_FRAMEWORK_ARGS);
+        $this->phpExecutableFinderMock
+            ->expects($this->once())
+            ->method('find')
+            ->with(false)
+            ->willReturn('/custom/php');
 
-        $this->assertContains('vendor/bin/phpunit', $commandLine);
-        $this->assertContains('--filter XYZ', $commandLine);
-        $this->assertContains('--exclude-group=integration', $commandLine);
+        $commandLine = $this->commandLineBuilder->build(
+            testFrameworkExecutable: 'non-executable-phpunit',
+            phpExtraArgs: [],
+            frameworkArgs: self::TEST_FRAMEWORK_ARGS,
+        );
+
+        $this->assertSame(
+            ['/custom/php', 'non-executable-phpunit', '--filter XYZ', '--exclude-group=integration'],
+            $commandLine,
+        );
+    }
+
+    public function test_it_uses_the_injected_php_executable_finder_and_caches_its_result(): void
+    {
+        $this->phpExecutableFinderMock
+            ->expects($this->once())
+            ->method('find')
+            ->with(false)
+            ->willReturn('/custom/php');
+
+        $firstCommandLine = $this->commandLineBuilder->build(
+            'vendor/bin/phpunit',
+            self::PHP_EXTRA_ARGS,
+            self::TEST_FRAMEWORK_ARGS,
+        );
+        $secondCommandLine = $this->commandLineBuilder->build(
+            'vendor/bin/phpunit',
+            self::PHP_EXTRA_ARGS,
+            self::TEST_FRAMEWORK_ARGS,
+        );
+
+        $expectedCommandLine = [
+            '/custom/php',
+            '-d zend_extension=xdebug.so',
+            'vendor/bin/phpunit',
+            '--filter XYZ',
+            '--exclude-group=integration',
+        ];
+
+        $this->assertSame($expectedCommandLine, $firstCommandLine);
+        $this->assertSame($expectedCommandLine, $secondCommandLine);
     }
 }

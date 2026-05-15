@@ -55,6 +55,11 @@ class CommandLineBuilder
     /** @var string[]|null */
     private ?array $cachedPhpCmdLine = null;
 
+    public function __construct(
+        private readonly PhpExecutableFinder $phpExecutableFinder,
+    ) {
+    }
+
     /**
      * @param string[] $frameworkArgs
      * @param string[] $phpExtraArgs
@@ -106,7 +111,7 @@ class CommandLineBuilder
             return $cachedPhpCmdLine;
         }
 
-        $phpExec = (new PhpExecutableFinder())->find(false);
+        $phpExec = $this->phpExecutableFinder->find(false);
 
         if ($phpExec === false) {
             throw FinderException::phpExecutableNotFound();

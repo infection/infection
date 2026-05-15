@@ -3159,7 +3159,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "falsable-return-statement"
-message = "Function `38891935849420780:4236` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
+message = "Function `38891935849420780:4287` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
 count = 1
 
 [[issues]]
@@ -3171,7 +3171,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `38891935849420780:4236`: expected `string`, but found `false|string`."
+message = "Invalid return type for function `38891935849420780:4287`: expected `string`, but found `false|string`."
 count = 1
 
 [[issues]]

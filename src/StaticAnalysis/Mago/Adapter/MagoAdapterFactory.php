@@ -40,6 +40,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
@@ -60,7 +61,9 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
             new MagoMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,
-            new CommandLineBuilder(),
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
             new VersionParser(),
             $timeout,
             $staticAnalysisToolOptions,
