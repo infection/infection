@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\TestFrameworkExtraArgs;
 
 final class MutantCommandLineScenario
 {
@@ -95,7 +94,7 @@ final class MutantCommandLineScenario
     public function withExtraArgs(string $extraArgs): self
     {
         $clone = clone $this;
-        $clone->extraOptions = TestFrameworkExtraArgs::raw($extraArgs, true)->serializeForAdapter();
+        $clone->extraOptions = $extraArgs;
 
         return $clone;
     }

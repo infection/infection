@@ -39,7 +39,6 @@ use Safe\Exceptions\PcreException;
 use Safe\Exceptions\StringsException;
 use function Safe\preg_replace;
 use function sprintf;
-use function str_starts_with;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -57,56 +56,11 @@ class TestFrameworkExtraOptionsFilter
      */
     public function filterForMutantProcess(string $actualExtraOptions, array $initialRunOnlyOptions): string
     {
-        if (TestFrameworkExtraArgs::isSerializedRaw($actualExtraOptions)) {
-            return TestFrameworkExtraArgs::serializeRawTokens(
-                self::filterRawTokens(
-                    TestFrameworkExtraArgs::unserializeRawTokens($actualExtraOptions),
-                    $initialRunOnlyOptions,
-                ),
-            );
-        }
-
         foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
             $actualExtraOptions = preg_replace(sprintf('/%s[\=| ](?:\"[^\"]*\"|\'[^\']*\'|[^\ ]*)/', $initialRunOnlyOption), '', $actualExtraOptions);
             Assert::notNull($actualExtraOptions);
         }
 
         return preg_replace('/\s+/', ' ', trim($actualExtraOptions));
-    }
-
-    /**
-     * @param list<string> $tokens
-     * @param string[] $initialRunOnlyOptions
-     *
-     * @return list<string>
-     */
-    private static function filterRawTokens(array $tokens, array $initialRunOnlyOptions): array
-    {
-        $filteredTokens = [];
-        $skipNext = false;
-
-        foreach ($tokens as $token) {
-            if ($skipNext) {
-                $skipNext = false;
-
-                continue;
-            }
-
-            foreach ($initialRunOnlyOptions as $initialRunOnlyOption) {
-                if ($token === $initialRunOnlyOption) {
-                    $skipNext = true;
-
-                    continue 2;
-                }
-
-                if (str_starts_with($token, $initialRunOnlyOption . '=')) {
-                    continue 2;
-                }
-            }
-
-            $filteredTokens[] = $token;
-        }
-
-        return $filteredTokens;
     }
 }

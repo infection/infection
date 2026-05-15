@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework;
 
-use Infection\TestFramework\TestFrameworkExtraArgs;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TestFrameworkExtraOptionsFilter::class)]
-#[CoversClass(TestFrameworkExtraArgs::class)]
 final class TestFrameworkExtraOptionsFilterTest extends TestCase
 {
     #[DataProvider('mutantProcessProvider')]
@@ -53,21 +51,6 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         $filteredOptions = $filter->filterForMutantProcess($actualExtraOptions, ['--configuration', '--filter', '--testsuite']);
 
         $this->assertSame($expectedExtraOptions, $filteredOptions);
-    }
-
-    public function test_it_skips_raw_filter_for_mutant_process(): void
-    {
-        $filter = new TestFrameworkExtraOptionsFilter();
-
-        $filteredOptions = $filter->filterForMutantProcess(
-            TestFrameworkExtraArgs::raw('--configuration phpunit.xml --filter="a test" tests/FooTest.php --colors=always', true)->serializeForAdapter(),
-            ['--configuration', '--filter', '--testsuite'],
-        );
-
-        $this->assertSame(
-            ['tests/FooTest.php', '--colors=always'],
-            TestFrameworkExtraArgs::unserializeRawTokens($filteredOptions),
-        );
     }
 
     public static function mutantProcessProvider(): iterable
@@ -101,5 +84,7 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         yield ['--a --configuration="some Test#2" --b=value', '--a --b=value'];
 
         yield ['--a --configuration=\'some Test#2\' --b=value', '--a --b=value'];
+
+        yield ['--configuration phpunit.xml --filter="a test" tests/FooTest.php --colors=always', 'tests/FooTest.php --colors=always'];
     }
 }

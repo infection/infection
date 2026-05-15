@@ -125,13 +125,9 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         ];
 
         if ($extraOptions !== '') {
-            if (TestFrameworkExtraArgs::isSerializedRaw($extraOptions)) {
-                return array_merge($options, TestFrameworkExtraArgs::unserializeRawTokens($extraOptions));
-            }
-
             $options = array_merge(
                 $options,
-                TestFrameworkExtraArgs::raw($extraOptions, true)->argvTokens,
+                TestFrameworkExtraArgs::raw($extraOptions)->argvTokens,
             );
         }
 

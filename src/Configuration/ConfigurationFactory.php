@@ -185,7 +185,7 @@ class ConfigurationFactory
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
-            testFrameworkExtraOptions: $this->retrieveTestFrameworkExtraArgs(
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
                 $testFrameworkExtraOptions,
                 $testFrameworkExtraArgs,
                 $schema,
@@ -308,7 +308,7 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $existingCoveragePath);
     }
 
-    private function retrieveTestFrameworkExtraArgs(
+    private static function retrieveTestFrameworkExtraArgs(
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         SchemaConfiguration $schema,

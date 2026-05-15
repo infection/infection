@@ -35,142 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function base64_encode;
-use const JSON_THROW_ON_ERROR;
-use function Safe\base64_decode;
-use function Safe\json_decode;
-use function Safe\json_encode;
-use function str_split;
-use function str_starts_with;
-use function strlen;
-use function substr;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\StringInput;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final readonly class TestFrameworkExtraArgs
 {
-    public const string RAW_PREFIX = '@@infection-raw-test-framework-extra-args:';
-
     private const string PARSE_ERROR_PREFIX = 'Cannot parse `testFrameworkExtraArgs` / `--test-framework-extra-args`: ';
 
     /**
      * @param list<string> $argvTokens
      */
     private function __construct(
-        public bool $isPresent,
-        public bool $isLegacy,
-        public string $value,
         public array $argvTokens,
     ) {
     }
 
-    public static function legacy(?string $value, bool $isPresent): self
-    {
-        return new self($isPresent, true, trim($value ?? ''), []);
-    }
-
-    public static function raw(?string $value, bool $isPresent): self
+    public static function raw(?string $value): self
     {
         $value = trim($value ?? '');
 
         if ($value === '') {
-            return new self($isPresent, false, '', []);
+            return new self([]);
         }
 
         try {
-            self::assertNoUnclosedQuote($value);
-
             $tokens = (new StringInput($value))->getRawTokens();
         } catch (InvalidArgumentException $exception) {
             throw new InvalidArgumentException(self::PARSE_ERROR_PREFIX . $exception->getMessage(), 0, $exception);
         }
 
-        return new self($isPresent, false, $value, $tokens);
-    }
-
-    /**
-     * @param list<string> $tokens
-     */
-    public static function serializeRawTokens(array $tokens): string
-    {
-        return self::RAW_PREFIX . base64_encode(json_encode($tokens));
-    }
-
-    public static function isSerializedRaw(string $value): bool
-    {
-        return str_starts_with($value, self::RAW_PREFIX);
-    }
-
-    /**
-     * @return list<string>
-     */
-    public static function unserializeRawTokens(string $value): array
-    {
-        Assert::true(self::isSerializedRaw($value));
-
-        return self::assertRawTokens(json_decode(
-            base64_decode(substr($value, strlen(self::RAW_PREFIX)), true),
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        ));
-    }
-
-    public function serializeForAdapter(): string
-    {
-        if (!$this->isPresent || $this->value === '') {
-            return '';
-        }
-
-        return $this->isLegacy ? $this->value : self::serializeRawTokens($this->argvTokens);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function assertRawTokens(mixed $tokens): array
-    {
-        Assert::isList($tokens);
-        Assert::allString($tokens);
-
-        return $tokens;
-    }
-
-    private static function assertNoUnclosedQuote(string $value): void
-    {
-        $quote = null;
-        $escaped = false;
-
-        foreach (str_split($value) as $character) {
-            if ($escaped) {
-                $escaped = false;
-
-                continue;
-            }
-
-            if ($character === '\\') {
-                $escaped = true;
-
-                continue;
-            }
-
-            if ($quote === null && ($character === '"' || $character === '\'')) {
-                $quote = $character;
-
-                continue;
-            }
-
-            if ($character === $quote) {
-                $quote = null;
-            }
-        }
-
-        if ($quote !== null) {
-            throw new InvalidArgumentException('Unclosed quote.');
-        }
+        return new self($tokens);
     }
 }

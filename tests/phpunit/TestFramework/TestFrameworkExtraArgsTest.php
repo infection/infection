@@ -38,34 +38,27 @@ namespace Infection\Tests\TestFramework;
 use Infection\TestFramework\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 #[CoversClass(TestFrameworkExtraArgs::class)]
 final class TestFrameworkExtraArgsTest extends TestCase
 {
     public function test_it_parses_raw_args(): void
     {
-        $extraArgs = TestFrameworkExtraArgs::raw(' tests/FooTest.php --filter="a test" --colors=always ', true);
+        $extraArgs = TestFrameworkExtraArgs::raw(' tests/FooTest.php --filter="a test" --colors=always ');
 
         $this->assertSame(
             ['tests/FooTest.php', '--filter=a test', '--colors=always'],
-            TestFrameworkExtraArgs::unserializeRawTokens($extraArgs->serializeForAdapter()),
+            $extraArgs->argvTokens,
         );
     }
 
-    public function test_it_rejects_invalid_raw_args(): void
+    public function test_it_keeps_unclosed_quotes_literal(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot parse `testFrameworkExtraArgs` / `--test-framework-extra-args`: ');
+        $extraArgs = TestFrameworkExtraArgs::raw('--filter="unfinished');
 
-        TestFrameworkExtraArgs::raw('--filter="unfinished', true);
-    }
-
-    public function test_legacy_args_keep_original_string(): void
-    {
         $this->assertSame(
-            '--filter=FooTest',
-            TestFrameworkExtraArgs::legacy(' --filter=FooTest ', true)->serializeForAdapter(),
+            ['--filter="unfinished'],
+            $extraArgs->argvTokens,
         );
     }
 }

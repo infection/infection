@@ -42,7 +42,6 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\TestFramework\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -99,7 +98,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             ],
             $builder->buildForInitialTestsRun(
                 $configPath,
-                TestFrameworkExtraArgs::raw('tests/FooTest.php --filter="a test" --colors=always', true)->serializeForAdapter(),
+                'tests/FooTest.php --filter="a test" --colors=always',
             ),
         );
     }

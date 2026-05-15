@@ -37,9 +37,9 @@ namespace Infection\Command\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use function sprintf;
 use function trim;
 
 /**

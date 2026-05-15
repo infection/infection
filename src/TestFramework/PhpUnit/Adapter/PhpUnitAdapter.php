@@ -46,7 +46,6 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\TestFrameworkExtraArgs;
 use Infection\TestFramework\VersionParser;
 use Override;
 use function Safe\preg_match;
@@ -105,20 +104,13 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
             $generatedOptions[] = '--coverage-xml=' . $this->tmpDir . '/' . self::COVERAGE_DIR;
             $generatedOptions[] = '--log-junit=' . $this->jUnitFilePath; // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
 
-            if (TestFrameworkExtraArgs::isSerializedRaw($extraOptions)) {
-                $extraOptions = TestFrameworkExtraArgs::serializeRawTokens([
-                    ...TestFrameworkExtraArgs::unserializeRawTokens($extraOptions),
-                    ...$generatedOptions,
-                ]);
-            } else {
-                $extraOptions = trim(
-                    sprintf(
-                        '%s %s',
-                        $extraOptions,
-                        implode(' ', $generatedOptions),
-                    ),
-                );
-            }
+            $extraOptions = trim(
+                sprintf(
+                    '%s %s',
+                    $extraOptions,
+                    implode(' ', $generatedOptions),
+                ),
+            );
 
             if ($this->pcovDirectoryProvider->shallProvide()) {
                 $phpExtraArgs[] = '-d';

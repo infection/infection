@@ -47,8 +47,6 @@ use Infection\Configuration\Entry\StrykerConfig;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use function is_int;
-use function is_string;
 use function property_exists;
 use stdClass;
 use function trim;
@@ -90,8 +88,8 @@ class SchemaConfigurationFactory
             testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
             testFrameworkExtraArgs: self::normalizeString($rawConfig->testFrameworkExtraArgs ?? null),
             staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
-            threads: self::getThreads($rawConfig),
-            dotsPerRow: self::getDotsPerRow($rawConfig),
+            threads: $rawConfig->threads ?? null,
+            dotsPerRow: $rawConfig->dotsPerRow ?? null,
             staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
         );
     }
@@ -197,62 +195,35 @@ class SchemaConfigurationFactory
     private static function createPhpUnit(stdClass $phpUnit): PhpUnit
     {
         return new PhpUnit(
-            self::normalizeRawString($phpUnit->configDir ?? null),
-            self::normalizeRawString($phpUnit->customPath ?? null),
+            self::normalizeString($phpUnit->configDir ?? null),
+            self::normalizeString($phpUnit->customPath ?? null),
         );
     }
 
     private static function createPhpStan(stdClass $phpStan): PhpStan
     {
         return new PhpStan(
-            self::normalizeRawString($phpStan->configDir ?? null),
-            self::normalizeRawString($phpStan->customPath ?? null),
+            self::normalizeString($phpStan->configDir ?? null),
+            self::normalizeString($phpStan->customPath ?? null),
         );
-    }
-
-    private static function getThreads(stdClass $rawConfig): string|int|null
-    {
-        return self::normalizeThreads($rawConfig->threads ?? null);
-    }
-
-    private static function normalizeThreads(mixed $threads): string|int|null
-    {
-        if ($threads === null || is_string($threads) || is_int($threads)) {
-            return $threads;
-        }
-
-        throw new InvalidArgumentException('Expected threads to be a string, an integer, or null.');
-    }
-
-    /**
-     * @return positive-int|'max'|null
-     */
-    private static function getDotsPerRow(stdClass $rawConfig): string|int|null
-    {
-        return self::normalizeDotsPerRow($rawConfig->dotsPerRow ?? null);
-    }
-
-    /**
-     * @return positive-int|'max'|null
-     */
-    private static function normalizeDotsPerRow(mixed $dotsPerRow): string|int|null
-    {
-        if ($dotsPerRow === null || $dotsPerRow === 'max') {
-            return $dotsPerRow;
-        }
-
-        if (is_int($dotsPerRow) && $dotsPerRow > 0) {
-            return $dotsPerRow;
-        }
-
-        throw new InvalidArgumentException('Expected dotsPerRow to be "max", a positive integer, or null.');
     }
 
     private static function createMago(stdClass $mago): Mago
     {
+        /**
+         * Based on the schema validation this is guaranteed to be a string if it exists
+         * @var string|null $customPath
+         */
+        $customPath = $mago->customPath ?? null;
+        /**
+         * Based on the schema validation this is guaranteed to be a string if it exists
+         * @var string|null $configDir
+         */
+        $configDir = $mago->configDir ?? null;
+
         return new Mago(
-            self::normalizeRawString($mago->configDir ?? null),
-            self::normalizeRawString($mago->customPath ?? null),
+            self::normalizeString($configDir),
+            self::normalizeString($customPath),
         );
     }
 
@@ -277,14 +248,5 @@ class SchemaConfigurationFactory
         $normalizedValue = trim($value);
 
         return $normalizedValue === '' ? null : $normalizedValue;
-    }
-
-    private static function normalizeRawString(mixed $value): ?string
-    {
-        if ($value === null || is_string($value)) {
-            return self::normalizeString($value);
-        }
-
-        throw new InvalidArgumentException('Expected a string or null.');
     }
 }
