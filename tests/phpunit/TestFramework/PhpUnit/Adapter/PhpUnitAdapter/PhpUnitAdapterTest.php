@@ -283,7 +283,8 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with extra PHPUnit options missing the slashes' => [
+        // Correctness is ensured upstream – within reason; we can't guard against all bad input
+        yield 'with extra PHPUnit options missing the leading dashes' => [
             $default
                 ->withExtraOptions('group=default filter="Mailer"')
                 ->withExpected([
@@ -291,7 +292,8 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    '--group=default filter="Mailer"',
+                    'group=default',
+                    'filter="Mailer"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -305,8 +307,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: the splitter normalises all options to long options.
-                    '--v',
+                    '-v',
                     '--group=default',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
@@ -322,7 +323,11 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
                     // Incorrect current behaviour: this should be two argv tokens, and the quotes should not be preserved.
-                    '--filter "a test with spaces"',
+                    '--filter',
+                    '"a',
+                    'test',
+                    'with',
+                    'spaces"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -336,8 +341,11 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: the shell quotes are preserved in the argv token.
-                    '--filter="a test with spaces"',
+                    // Incorrect current behaviour: the shell quotes are preserved and split across argv tokens.
+                    '--filter="a',
+                    'test',
+                    'with',
+                    'spaces"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -351,8 +359,11 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: the shell quotes are preserved in the argv token.
-                    "--filter='a test with spaces'",
+                    // Incorrect current behaviour: the shell quotes are preserved and split across argv tokens.
+                    "--filter='a",
+                    'test',
+                    'with',
+                    "spaces'",
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -366,9 +377,13 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: the splitter treats " --" inside the value as an option boundary.
-                    '--filter="a test',
-                    '-- with option-like text"',
+                    // Incorrect current behaviour: the splitter treats spaces inside the value as option boundaries.
+                    '--filter="a',
+                    'test',
+                    '--',
+                    'with',
+                    'option-like',
+                    'text"',
                     '--group=default',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
@@ -383,8 +398,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: positional arguments are treated as long options.
-                    '--tests/FooTest.php',
+                    'tests/FooTest.php',
                     '--filter=Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
@@ -399,8 +413,9 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: positional arguments are treated as long options and quotes are preserved.
-                    '--"tests/Foo Test.php"',
+                    // Incorrect current behaviour: shell quotes are preserved and split across argv tokens.
+                    '"tests/Foo',
+                    'Test.php"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -522,12 +537,10 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: the user filter is not parsed as the "--filter" token, so the generated filter is also appended.
-                    '--filter Foo',
+                    '--filter',
+                    'Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
-                    '--filter',
-                    'FooTest|BazTest',
                 ]),
         ];
 
@@ -575,8 +588,10 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: this should be two argv tokens, and the quotes should not be preserved.
-                    '--testsuite "Unit Tests"',
+                    // Incorrect current behaviour: the shell quotes are preserved and split across argv tokens.
+                    '--testsuite',
+                    '"Unit',
+                    'Tests"',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -604,8 +619,8 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: this should be two argv tokens.
-                    '--configuration custom-phpunit.xml',
+                    '--configuration',
+                    'custom-phpunit.xml',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -680,7 +695,9 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    '--path=/a path/with spaces',
+                    '--path=/a',
+                    'path/with',
+                    'spaces',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
                 ]),
@@ -694,8 +711,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
-                    // Incorrect current behaviour: repeated spaces are preserved in the next option token.
-                    '--group=default ',
+                    '--group=default',
                     '--filter=Foo',
                     '--coverage-xml=/tmp/coverage-xml',
                     '--log-junit=/tmp/infection/junit.xml',
@@ -813,8 +829,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    // Incorrect current behaviour: the splitter normalises all options to long options.
-                    '--v',
+                    '-v',
                     '--group=default',
                 ]),
         ];
@@ -828,7 +843,11 @@ final class PhpUnitAdapterTest extends TestCase
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
                     // Incorrect current behaviour: this should be two argv tokens, and the quotes should not be preserved.
-                    '--filter "a test with spaces"',
+                    '--filter',
+                    '"a',
+                    'test',
+                    'with',
+                    'spaces"',
                 ]),
         ];
 
@@ -840,9 +859,13 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    // Incorrect current behaviour: the splitter treats " --" inside the value as an option boundary.
-                    '--filter="a test',
-                    '-- with option-like text"',
+                    // Incorrect current behaviour: the splitter treats spaces inside the value as option boundaries.
+                    '--filter="a',
+                    'test',
+                    '--',
+                    'with',
+                    'option-like',
+                    'text"',
                     '--group=default',
                 ]),
         ];
@@ -855,8 +878,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    // Incorrect current behaviour: positional arguments are treated as long options.
-                    '--tests/FooTest.php',
+                    'tests/FooTest.php',
                     '--filter=Foo',
                 ]),
         ];
@@ -1026,7 +1048,9 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    '--path=/a path/with spaces',
+                    '--path=/a',
+                    'path/with',
+                    'spaces',
                 ]),
         ];
 
@@ -1038,8 +1062,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
-                    // Incorrect current behaviour: repeated spaces are preserved in the next option token.
-                    '--group=default ',
+                    '--group=default',
                     '--filter=Foo',
                 ]),
         ];

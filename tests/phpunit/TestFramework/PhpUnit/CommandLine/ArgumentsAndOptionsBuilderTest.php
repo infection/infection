@@ -137,7 +137,9 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             [
                 '--configuration',
                 $configPath,
-                '--path=/a path/with spaces',
+                '--path=/a',
+                'path/with',
+                'spaces',
             ],
             $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces'),
         );
@@ -160,7 +162,9 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         $expectedArgumentsAndOptions = [
             '--configuration',
             $configPath,
-            '--path=/a path/with spaces',
+            '--path=/a',
+            'path/with',
+            'spaces',
         ];
 
         if ($executeOnlyCoveringTestCases && $expectedFilterOptionValue !== null) {

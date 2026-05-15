@@ -44,7 +44,6 @@ use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\TestFrameworkExtraArgs;
-use function ltrim;
 use SplFileInfo;
 use function sprintf;
 
@@ -133,10 +132,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
 
             $options = array_merge(
                 $options,
-                array_map(
-                    static fn ($option): string => '--' . $option,
-                    explode(' --', ltrim($extraOptions, '-')),
-                ),
+                explode(' ', $extraOptions),
             );
         }
 

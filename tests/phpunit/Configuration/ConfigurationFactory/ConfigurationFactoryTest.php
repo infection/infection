@@ -995,12 +995,58 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'test framework PHP options from config are normalized for PHPUnit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                'debug --stop-on-failure',
+                null,
+                '--debug --stop-on-failure',
+            ),
+        ];
+
         yield 'test framework PHP options from input' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 null,
                 '--debug',
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for PHPUnit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '--debug --stop-on-failure',
+                '--debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for PHPUnit (missing leading dashes)' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                'debug stop-on-failure',
+                '--debug stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for PHPUnit with short option' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+                // Incorrect current behaviour: the splitter normalises all options to long options.
+                '--v debug --stop-on-failure -c phpunit_autoreview',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for PHPUnit with spaces' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '--filter "a test with spaces"',
+                '--filter "a test with spaces"',
             ),
         ];
 
@@ -1013,12 +1059,57 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'test framework PHP options from config with phpspec framework' => [
+        yield 'test framework PHP options from config with another test framework' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpspec',
                 '--debug',
                 null,
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from config are not normalized for another test framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                'debug --stop-on-failure',
+                null,
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are not normalized for another test framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug --stop-on-failure',
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for another test framework (missing leading dashes)' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug stop-on-failure',
+                'debug stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for another test framework with short option' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for another test framework with spaces' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                '--filter "a test with spaces"',
+                '--filter "a test with spaces"',
             ),
         ];
 

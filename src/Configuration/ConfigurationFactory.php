@@ -37,10 +37,13 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function explode;
 use function file_exists;
+use function implode;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
@@ -66,6 +69,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkExtraArgs;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
+use function ltrim;
 use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -331,14 +335,18 @@ class ConfigurationFactory
         }
 
         if ($testFrameworkOptionsWasProvided) {
-            return TestFrameworkExtraArgs::legacy($testFrameworkExtraOptions, true)->serializeForAdapter();
+            return $this->retrieveLegacyTestFrameworkExtraOptions($testFramework, $testFrameworkExtraOptions, true);
         }
 
         if ($schema->testFrameworkExtraArgsWasConfigured) {
             return $this->retrieveRawTestFrameworkExtraArgs($testFramework, $schema->testFrameworkExtraArgs, true);
         }
 
-        return TestFrameworkExtraArgs::legacy($schema->testFrameworkExtraOptions, $schema->testFrameworkOptionsWasConfigured)->serializeForAdapter();
+        return $this->retrieveLegacyTestFrameworkExtraOptions(
+            $testFramework,
+            $schema->testFrameworkExtraOptions,
+            $schema->testFrameworkOptionsWasConfigured,
+        );
     }
 
     private function retrieveRawTestFrameworkExtraArgs(
@@ -353,6 +361,31 @@ class ConfigurationFactory
         }
 
         return TestFrameworkExtraArgs::raw($testFrameworkExtraArgs, $isPresent)->serializeForAdapter();
+    }
+
+    private function retrieveLegacyTestFrameworkExtraOptions(
+        string $testFramework,
+        ?string $testFrameworkExtraOptions,
+        bool $isPresent,
+    ): string {
+        $extraArgs = TestFrameworkExtraArgs::legacy($testFrameworkExtraOptions, $isPresent);
+
+        if (!$extraArgs->isPresent || $extraArgs->value === '' || $testFramework !== TestFrameworkTypes::PHPUNIT) {
+            return $extraArgs->serializeForAdapter();
+        }
+
+        return self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraArgs->value);
+    }
+
+    private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
+    {
+        return implode(
+            ' ',
+            array_map(
+                static fn ($option): string => '--' . $option,
+                explode(' --', ltrim($extraOptions, '-')),
+            ),
+        );
     }
 
     private static function retrieveStaticAnalysisToolOptions(
