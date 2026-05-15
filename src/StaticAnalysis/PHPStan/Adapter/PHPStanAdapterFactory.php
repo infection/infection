@@ -41,6 +41,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
@@ -62,7 +63,9 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,
-            new CommandLineBuilder(),
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
             new VersionParser(),
             $timeout,
             $tmpDir,
