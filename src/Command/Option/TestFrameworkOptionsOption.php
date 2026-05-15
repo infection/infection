@@ -39,6 +39,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
+use function sprintf;
 use function trim;
 
 /**
@@ -59,7 +60,10 @@ final class TestFrameworkOptionsOption implements CommandOption
             self::NAME,
             null,
             InputOption::VALUE_REQUIRED,
-            'Deprecated. Use --test-framework-extra-args instead.',
+            sprintf(
+                'Deprecated. Use --%s instead.',
+                TestFrameworkExtraArgsOption::NAME,
+            ),
         );
     }
 
