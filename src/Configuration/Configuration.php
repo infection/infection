@@ -46,6 +46,7 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_string;
 use function ltrim;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
@@ -65,6 +66,7 @@ readonly class Configuration
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configurationPathname
      * @param non-empty-string $projectDirectory Absolute path.
      */
@@ -98,6 +100,7 @@ readonly class Configuration
         public ?int $maxTimeouts,
         public int $msiPrecision,
         public int $threadCount,
+        public int|string $dotsPerRow,
         public bool $isDryRun,
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
@@ -114,6 +117,12 @@ readonly class Configuration
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
+
+        if (is_string($dotsPerRow)) {
+            Assert::same($dotsPerRow, 'max');
+        } else {
+            Assert::greaterThanEq($dotsPerRow, 1);
+        }
     }
 
     public function isStaticAnalysisEnabled(): bool

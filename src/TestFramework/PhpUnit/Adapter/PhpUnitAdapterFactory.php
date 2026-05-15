@@ -51,6 +51,7 @@ use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -118,7 +119,9 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $mapSourceClassToTestStrategy,
             ),
             new VersionParser(),
-            new CommandLineBuilder(),
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
         );
     }
 

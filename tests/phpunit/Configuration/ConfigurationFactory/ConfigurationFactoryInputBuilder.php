@@ -43,6 +43,7 @@ final class ConfigurationFactoryInputBuilder
 {
     /**
      * @param non-empty-string|null $projectDirectory
+     * @param positive-int|'max'|null $dotsPerRow
      */
     public function __construct(
         private ?string $existingCoveragePath,
@@ -68,6 +69,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $staticAnalysisToolOptions,
         private PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         private ?int $threadCount,
+        private string|int|null $dotsPerRow,
         private bool $dryRun,
         private ?bool $useGitHubLogger,
         private ?string $gitlabLogFilePath,
@@ -243,6 +245,17 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    /**
+     * @param positive-int|'max'|null $dotsPerRow
+     */
+    public function withDotsPerRow(string|int|null $dotsPerRow): self
+    {
+        $clone = clone $this;
+        $clone->dotsPerRow = $dotsPerRow;
+
+        return $clone;
+    }
+
     public function withDryRun(bool $dryRun): self
     {
         $clone = clone $this;
@@ -365,18 +378,19 @@ final class ConfigurationFactoryInputBuilder
      *     18: string|null,
      *     19: PlainFilter|IncompleteGitDiffFilter|null,
      *     20: int|null,
-     *     21: bool,
-     *     22: bool|null,
-     *     23: string|null,
+     *     21: positive-int|'max'|null,
+     *     22: bool,
+     *     23: bool|null,
      *     24: string|null,
      *     25: string|null,
      *     26: string|null,
-     *     27: bool,
+     *     27: string|null,
      *     28: bool,
-     *     29: string|null,
-     *     30: non-empty-string|null,
-     *     31: string|null,
-     *     32: string|null
+     *     29: bool,
+     *     30: string|null,
+     *     31: non-empty-string|null,
+     *     32: string|null,
+     *     33: string|null
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -406,6 +420,7 @@ final class ConfigurationFactoryInputBuilder
             $this->staticAnalysisToolOptions,
             $this->sourceFilter,
             $this->threadCount,
+            $this->dotsPerRow,
             $this->dryRun,
             $this->useGitHubLogger,
             $this->gitlabLogFilePath,

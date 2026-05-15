@@ -33,58 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
-use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use function is_a;
-use Webmozart\Assert\Assert;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 
-/**
- * @internal
- */
-final class TestFrameworkTypes
+final class MutantCommandLineScenario
 {
-    public const string PHPUNIT = 'phpunit';
+    /**
+     * @param list<TestLocation> $coverageTests
+     * @param list<string> $expected
+     */
+    public function __construct(
+        public string $testFrameworkConfigContent,
+        public string $version,
+        public bool $executeOnlyCoveringTestCases,
+        public array $coverageTests,
+        public string $mutatedFilePath,
+        public string $mutationHash,
+        public string $mutationOriginalFilePath,
+        public string $extraOptions,
+        public array $expected,
+    ) {
+    }
 
-    public const string PHPSPEC = 'phpspec';
+    public function withVersion(string $version): self
+    {
+        $clone = clone $this;
+        $clone->version = $version;
 
-    public const string CODECEPTION = 'codeception';
+        return $clone;
+    }
 
-    public const string TESTO = 'testo';
+    public function withExecuteOnlyCoveringTestCases(bool $executeOnlyCoveringTestCases): self
+    {
+        $clone = clone $this;
+        $clone->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
+
+        return $clone;
+    }
 
     /**
-     * @var string[]
+     * @param list<TestLocation> $coverageTests
      */
-    private static array $defaultTypes = [
-        self::PHPUNIT,
-        self::PHPSPEC,
-        self::CODECEPTION,
-        self::TESTO,
-    ];
+    public function withCoverageTests(array $coverageTests): self
+    {
+        $clone = clone $this;
+        $clone->coverageTests = $coverageTests;
+
+        return $clone;
+    }
+
+    public function withExtraOptions(string $extraOptions): self
+    {
+        $clone = clone $this;
+        $clone->extraOptions = $extraOptions;
+
+        return $clone;
+    }
 
     /**
-     * @param mixed[] $installedExtensions
-     *
-     * @return string[]
+     * @param list<string> $expected
      */
-    public static function getTypes(
-        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
-    ): array {
-        $types = self::$defaultTypes;
+    public function withExpected(array $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
 
-        foreach ($installedExtensions as $installedExtension) {
-            $factory = $installedExtension['extra']['class'];
-
-            Assert::classExists($factory);
-
-            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-                continue;
-            }
-
-            $types[] = $factory::getAdapterName();
-        }
-
-        return $types;
+        return $clone;
     }
 }

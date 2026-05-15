@@ -44,6 +44,7 @@ use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
@@ -256,6 +257,8 @@ final class Container extends DIContainer
     public const null DEFAULT_FILTER = null;
 
     public const null DEFAULT_THREAD_COUNT = null;
+
+    public const null DEFAULT_DOTS_PER_ROW = null;
 
     public const bool DEFAULT_DRY_RUN = false;
 
@@ -654,7 +657,11 @@ final class Container extends DIContainer
                     // See https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables
                     'CI_PROJECT_DIR',
                 ),
-                new GitProjectDirectoryProvider($container->getGit()),
+                new GitProjectDirectoryProvider(
+                    $container->getGit(),
+                    $container->getLogger(),
+                ),
+                new CurrentWorkingDirectoryProvider(),
             ),
         ]);
 
@@ -667,6 +674,7 @@ final class Container extends DIContainer
     /**
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
      */
     public function withValues(
         LoggerInterface $logger,
@@ -697,6 +705,7 @@ final class Container extends DIContainer
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
@@ -745,7 +754,10 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             MutationAnalysisLogger::class,
-            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($loggerName),
+            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create(
+                $loggerName,
+                $container->getConfiguration()->dotsPerRow,
+            ),
         );
 
         $clone->offsetSet(
@@ -779,6 +791,7 @@ final class Container extends DIContainer
                 staticAnalysisToolOptions: $staticAnalysisToolOptions,
                 sourceFilter: $sourceFilter,
                 threadCount: $threadCount,
+                dotsPerRow: $dotsPerRow,
                 dryRun: $dryRun,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,

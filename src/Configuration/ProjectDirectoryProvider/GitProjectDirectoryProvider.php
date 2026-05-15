@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Configuration\ProjectDirectoryProvider;
 
 use Infection\Git\Git;
+use Infection\Git\NoGitProjectFound;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
@@ -44,11 +46,21 @@ final readonly class GitProjectDirectoryProvider implements ProjectDirectoryProv
 {
     public function __construct(
         private Git $git,
+        private LoggerInterface $logger,
     ) {
     }
 
-    public function provide(): string
+    public function provide(): ?string
     {
-        return $this->git->getProjectDirectory();
+        try {
+            return $this->git->getProjectDirectory();
+        } catch (NoGitProjectFound $exception) {
+            $this->logger->info(
+                'Could not determine the project directory from Git.',
+                ['exception' => $exception],
+            );
+
+            return null;
+        }
     }
 }

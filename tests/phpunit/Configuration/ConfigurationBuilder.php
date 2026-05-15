@@ -61,6 +61,7 @@ final class ConfigurationBuilder
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configPathname
      * @param non-empty-string $projectDirectory
      */
@@ -94,6 +95,7 @@ final class ConfigurationBuilder
         private ?int $maxTimeouts,
         private int $msiPrecision,
         private int $threadCount,
+        private int|string $dotsPerRow,
         private bool $dryRun,
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
@@ -139,6 +141,7 @@ final class ConfigurationBuilder
             maxTimeouts: $configuration->maxTimeouts,
             msiPrecision: $configuration->msiPrecision,
             threadCount: $configuration->threadCount,
+            dotsPerRow: $configuration->dotsPerRow,
             dryRun: $configuration->isDryRun,
             ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
@@ -182,6 +185,7 @@ final class ConfigurationBuilder
             maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
+            dotsPerRow: 50,
             dryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
@@ -247,6 +251,7 @@ final class ConfigurationBuilder
             maxTimeouts: 5,
             msiPrecision: 2,
             threadCount: 4,
+            dotsPerRow: 80,
             dryRun: true,
             ignoreSourceCodeMutatorsMap: [
                 'Foo\\Bar' => ['.*test.*'],
@@ -523,6 +528,17 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param positive-int|'max' $dotsPerRow
+     */
+    public function withDotsPerRow(int|string $dotsPerRow): self
+    {
+        $clone = clone $this;
+        $clone->dotsPerRow = $dotsPerRow;
+
+        return $clone;
+    }
+
     public function withDryRun(bool $dryRun): self
     {
         $clone = clone $this;
@@ -628,6 +644,7 @@ final class ConfigurationBuilder
             maxTimeouts: $this->maxTimeouts,
             msiPrecision: $this->msiPrecision,
             threadCount: $this->threadCount,
+            dotsPerRow: $this->dotsPerRow,
             isDryRun: $this->dryRun,
             ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,

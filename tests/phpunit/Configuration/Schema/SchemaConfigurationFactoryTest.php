@@ -2782,6 +2782,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'testFrameworkExtraArgs' => null,
             'staticAnalysisToolOptions' => null,
             'threadCount' => null,
+            'dotsPerRow' => null,
             'staticAnalysisTool' => null,
         ];
 

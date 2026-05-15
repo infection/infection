@@ -19,6 +19,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         php${PHP_VERSION}-zip \
         # Coverage driver
         php${PHP_VERSION}-xdebug \
+        # Build tools required by PIE to install PHP extensions that compile locally
+        autoconf \
+        bison \
+        gcc \
+        libtool \
+        make \
+        php${PHP_VERSION}-dev \
+        pkg-config \
+        re2c \
         # CA bundle used by curl for HTTPS downloads
         ca-certificates \
         # Downloads the container-structure-test and PIE PHARs during image build

@@ -147,6 +147,7 @@ final class ConfigurationFactoryTest extends TestCase
             testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
 
@@ -183,6 +184,7 @@ final class ConfigurationFactoryTest extends TestCase
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
                 threadCount: 0,
+                dotsPerRow: null,
                 dryRun: false,
                 useGitHubLogger: false,
                 gitlabLogFilePath: null,
@@ -229,6 +231,7 @@ final class ConfigurationFactoryTest extends TestCase
             testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: null,
         );
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
@@ -257,6 +260,7 @@ final class ConfigurationFactoryTest extends TestCase
             staticAnalysisToolOptions: null,
             sourceFilter: new IncompleteGitDiffFilter('AM', 'master'),
             threadCount: 1,
+            dotsPerRow: null,
             dryRun: false,
             useGitHubLogger: true,
             gitlabLogFilePath: null,
@@ -301,6 +305,7 @@ final class ConfigurationFactoryTest extends TestCase
             maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
+            dotsPerRow: 50,
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
@@ -717,6 +722,46 @@ final class ConfigurationFactoryTest extends TestCase
                 33.3,
                 21.2,
                 21.2,
+            ),
+        ];
+
+        yield 'dotsPerRow not specified in schema and not specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                null,
+                null,
+                50,
+            ),
+        ];
+
+        yield 'dotsPerRow specified in schema and not specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                80,
+                null,
+                80,
+            ),
+        ];
+
+        yield 'dotsPerRow not specified in schema and specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                null,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'dotsPerRow specified in schema and specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                80,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'dotsPerRow set to max in schema' => [
+            $defaultScenario->forValueForDotsPerRow(
+                'max',
+                null,
+                'max',
             ),
         ];
 
@@ -1282,6 +1327,7 @@ final class ConfigurationFactoryTest extends TestCase
                         'src/Bar.php',
                     ]),
                     threadCount: 4,
+                    dotsPerRow: null,
                     dryRun: true,
                     useGitHubLogger: false,
                     gitlabLogFilePath: null,
