@@ -321,6 +321,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: this should be two argv tokens, and the quotes should not be preserved.
                     '--filter',
                     '"a',
                     'test',
@@ -339,6 +340,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: the shell quotes are preserved and split across argv tokens.
                     '--filter="a',
                     'test',
                     'with',
@@ -356,6 +358,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: the shell quotes are preserved and split across argv tokens.
                     "--filter='a",
                     'test',
                     'with',
@@ -373,6 +376,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: the splitter treats spaces inside the value as option boundaries.
                     '--filter="a',
                     'test',
                     '--',
@@ -408,6 +412,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: shell quotes are preserved and split across argv tokens.
                     '"tests/Foo',
                     'Test.php"',
                     '--coverage-xml=/tmp/coverage-xml',
@@ -582,6 +587,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
+                    // Incorrect current behaviour: the shell quotes are preserved and split across argv tokens.
                     '--testsuite',
                     '"Unit',
                     'Tests"',
@@ -835,6 +841,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    // Incorrect current behaviour: this should be two argv tokens, and the quotes should not be preserved.
                     '--filter',
                     '"a',
                     'test',
@@ -851,6 +858,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.mutation-hash.infection.xml',
+                    // Incorrect current behaviour: the splitter treats spaces inside the value as option boundaries.
                     '--filter="a',
                     'test',
                     '--',

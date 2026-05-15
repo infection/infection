@@ -313,10 +313,13 @@ class ConfigurationFactory
     ): string {
         $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
 
-        if ($extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT) {
-            return $extraOptions;
-        }
+        return $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT
+            ? $extraOptions
+            : self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraOptions);
+    }
 
+    private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
+    {
         return implode(
             ' ',
             array_map(
