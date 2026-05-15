@@ -102,7 +102,6 @@ class ConfigurationFactory
         private readonly CiDetectorInterface $ciDetector,
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
-        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -131,9 +130,7 @@ class ConfigurationFactory
         int $msiPrecision,
         string $mutatorsInput,
         ?string $testFramework,
-        bool $testFrameworkOptionsWasProvided,
         ?string $testFrameworkExtraOptions,
-        bool $testFrameworkExtraArgsWasProvided,
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
@@ -192,9 +189,7 @@ class ConfigurationFactory
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
             testFrameworkExtraOptions: $this->retrieveTestFrameworkExtraArgs(
                 $testFramework,
-                $testFrameworkOptionsWasProvided,
                 $testFrameworkExtraOptions,
-                $testFrameworkExtraArgsWasProvided,
                 $testFrameworkExtraArgs,
                 $schema,
             ),
@@ -317,64 +312,21 @@ class ConfigurationFactory
 
     private function retrieveTestFrameworkExtraArgs(
         string $testFramework,
-        bool $testFrameworkOptionsWasProvided,
         ?string $testFrameworkExtraOptions,
-        bool $testFrameworkExtraArgsWasProvided,
         ?string $testFrameworkExtraArgs,
         SchemaConfiguration $schema,
     ): string {
-        $testFrameworkOptionsWasProvided = $testFrameworkOptionsWasProvided || $testFrameworkExtraOptions !== null;
-        $testFrameworkExtraArgsWasProvided = $testFrameworkExtraArgsWasProvided || $testFrameworkExtraArgs !== null;
+        $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
 
-        if ($testFrameworkOptionsWasProvided || $schema->testFrameworkOptionsWasConfigured) {
-            $this->logger->notice('The `--test-framework-options` option and `testFrameworkOptions` configuration key are deprecated. Use `--test-framework-extra-args` or `testFrameworkExtraArgs` instead.');
+        if ('' !== $extraArgs) {
+            return $extraArgs;
         }
 
-        if ($testFrameworkExtraArgsWasProvided) {
-            return $this->retrieveRawTestFrameworkExtraArgs($testFramework, $testFrameworkExtraArgs, true);
-        }
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
 
-        if ($testFrameworkOptionsWasProvided) {
-            return $this->retrieveLegacyTestFrameworkExtraOptions($testFramework, $testFrameworkExtraOptions, true);
-        }
-
-        if ($schema->testFrameworkExtraArgsWasConfigured) {
-            return $this->retrieveRawTestFrameworkExtraArgs($testFramework, $schema->testFrameworkExtraArgs, true);
-        }
-
-        return $this->retrieveLegacyTestFrameworkExtraOptions(
-            $testFramework,
-            $schema->testFrameworkExtraOptions,
-            $schema->testFrameworkOptionsWasConfigured,
-        );
-    }
-
-    private function retrieveRawTestFrameworkExtraArgs(
-        string $testFramework,
-        ?string $testFrameworkExtraArgs,
-        bool $isPresent,
-    ): string {
-        if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
-            $this->logger->warning('`testFrameworkExtraArgs` / `--test-framework-extra-args` is only supported for PHPUnit for now; the provided value will be ignored. Continue using `testFrameworkOptions` / `--test-framework-options` for non-PHPUnit frameworks.');
-
-            return '';
-        }
-
-        return TestFrameworkExtraArgs::raw($testFrameworkExtraArgs, $isPresent)->serializeForAdapter();
-    }
-
-    private function retrieveLegacyTestFrameworkExtraOptions(
-        string $testFramework,
-        ?string $testFrameworkExtraOptions,
-        bool $isPresent,
-    ): string {
-        $extraArgs = TestFrameworkExtraArgs::legacy($testFrameworkExtraOptions, $isPresent);
-
-        if (!$extraArgs->isPresent || $extraArgs->value === '' || $testFramework !== TestFrameworkTypes::PHPUNIT) {
-            return $extraArgs->serializeForAdapter();
-        }
-
-        return self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraArgs->value);
+        return $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT
+            ? $extraOptions
+            : self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraOptions);
     }
 
     private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
