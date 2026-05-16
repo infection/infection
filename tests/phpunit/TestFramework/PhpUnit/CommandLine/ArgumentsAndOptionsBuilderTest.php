@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
+use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use function array_map;
 use function array_merge;
 use Closure;
@@ -50,6 +51,7 @@ use function sprintf;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 #[CoversClass(FilterBuilder::class)]
+#[CoversClass(TestFrameworkExtraArgs::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_can_build_the_command_without_extra_options(): void
@@ -79,6 +81,26 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--debug',
             ],
             $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
+        );
+    }
+
+    public function test_it_can_build_the_command_with_raw_extra_args(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                'tests/FooTest.php',
+                '--filter=a test',
+                '--colors=always',
+            ],
+            $builder->buildForInitialTestsRun(
+                $configPath,
+                'tests/FooTest.php --filter="a test" --colors=always',
+            ),
         );
     }
 
