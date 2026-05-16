@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
-use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use function array_map;
 use function array_merge;
 use Closure;
@@ -43,6 +42,7 @@ use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
+use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

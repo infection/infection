@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
+use Infection\CannotBeInstantiated;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\StringInput;
 use function trim;
@@ -44,30 +45,28 @@ use function trim;
  */
 final readonly class TestFrameworkExtraArgs
 {
-    private const string PARSE_ERROR_PREFIX = 'Cannot parse `testFrameworkExtraArgs` / `--test-framework-extra-args`: ';
+    use CannotBeInstantiated;
 
     /**
-     * @param list<string> $argvTokens
+     * @return list<string>
      */
-    private function __construct(
-        public array $argvTokens,
-    ) {
-    }
-
-    public static function raw(?string $value): self
+    public static function parseRawTokens(?string $value): array
     {
         $value = trim($value ?? '');
 
         if ($value === '') {
-            return new self([]);
+            return [];
         }
 
         try {
             $tokens = (new StringInput($value))->getRawTokens();
         } catch (InvalidArgumentException $exception) {
-            throw new InvalidArgumentException(self::PARSE_ERROR_PREFIX . $exception->getMessage(), 0, $exception);
+            throw new InvalidArgumentException(
+                'Could not parse `testFrameworkExtraArgs` / `--test-framework-extra-args`.',
+                previous: $exception,
+            );
         }
 
-        return new self($tokens);
+        return $tokens;
     }
 }

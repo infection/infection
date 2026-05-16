@@ -37,28 +37,42 @@ namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
 use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TestFrameworkExtraArgs::class)]
 final class TestFrameworkExtraArgsTest extends TestCase
 {
-    public function test_it_parses_raw_args(): void
-    {
-        $extraArgs = TestFrameworkExtraArgs::raw(' tests/FooTest.php --filter="a test" --colors=always ');
+    /**
+     * @param list<string> $expectedTokens
+     */
+    #[DataProvider('rawTokensProvider')]
+    public function test_it_parses_raw_tokens(
+        string $rawArgs,
+        array $expectedTokens,
+    ): void {
+        $extraArgs = TestFrameworkExtraArgs::parseRawTokens($rawArgs);
 
-        $this->assertSame(
-            ['tests/FooTest.php', '--filter=a test', '--colors=always'],
-            $extraArgs->argvTokens,
-        );
+        $this->assertSame($expectedTokens, $extraArgs);
     }
 
-    public function test_it_keeps_unclosed_quotes_literal(): void
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function rawTokensProvider(): iterable
     {
-        $extraArgs = TestFrameworkExtraArgs::raw('--filter="unfinished');
+        yield 'quoted value' => [
+            ' tests/FooTest.php --filter="a test" --colors=always ',
+            [
+                'tests/FooTest.php',
+                '--filter=a test',
+                '--colors=always',
+            ],
+        ];
 
-        $this->assertSame(
+        yield 'unclosed quote' => [
+            '--filter="unfinished',
             ['--filter="unfinished'],
-            $extraArgs->argvTokens,
-        );
+        ];
     }
 }
