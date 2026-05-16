@@ -41,11 +41,22 @@ use function count;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
@@ -54,6 +65,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\MutationEvaluationHeuristic;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Testing\MutatorName;
@@ -206,12 +218,18 @@ final class MutationTestingRunnerTest extends TestCase
             [
                 new MutationEvaluationWasStarted(4, $this->processRunnerMock),
                 new MutationEvaluationForMutationWasStarted($mutation0),
+                ...$this->createPassingHeuristicEvents($mutation0),
+                ...$this->createMaterialisedMutantEvents($mutant0),
                 new MutationEvaluationForMutationWasStarted($mutation1),
+                ...$this->createPassingHeuristicEvents($mutation1),
+                ...$this->createMaterialisedMutantEvents($mutant1),
                 new MutationEvaluationForMutationWasStarted($mutation2),
+                ...$this->createTakingTooLongHeuristicEvents($mutation2),
                 new MutationEvaluationForMutationWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
                 new MutationEvaluationForMutationWasStarted($mutation3),
+                ...$this->createUncoveredHeuristicEvents($mutation3),
                 new MutationEvaluationForMutationWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
@@ -221,7 +239,7 @@ final class MutationTestingRunnerTest extends TestCase
         );
 
         /** @var MutationEvaluationForMutationWasFinished $secondSkippedEvent */
-        $secondSkippedEvent = $this->eventDispatcher->getEvents()[6];
+        $secondSkippedEvent = $this->eventDispatcher->getEvents()[44];
 
         $this->assertSame(
             DetectionStatus::NOT_COVERED,
@@ -298,6 +316,13 @@ final class MutationTestingRunnerTest extends TestCase
             [
                 new MutationEvaluationWasStarted(4, $this->processRunnerMock),
                 new MutationEvaluationForMutationWasStarted($mutation0),
+                ...$this->createPassingHeuristicEvents($mutation0),
+                ...$this->createMaterialisedMutantEvents($mutant0),
+                ...$this->createIgnoredByMutationIdHeuristicEvents($mutations[1]),
+                ...$this->createIgnoredByMutationIdHeuristicEvents($mutations[2]),
+                ...$this->createIgnoredByMutationIdHeuristicEvents($mutations[3]),
+                new MutantEvaluationWasFinished($mutant0),
+                new MutantAnalysisWasFinished($mutant0),
                 new MutationEvaluationForMutationWasFinished(
                     MutantExecutionResultBuilder::withMinimalTestData()->build(),
                 ),
@@ -381,7 +406,11 @@ final class MutationTestingRunnerTest extends TestCase
             [
                 new MutationEvaluationWasStarted(0, $this->processRunnerMock),
                 new MutationEvaluationForMutationWasStarted($mutation0),
+                ...$this->createPassingHeuristicEvents($mutation0),
+                ...$this->createMaterialisedMutantEvents($mutant0),
                 new MutationEvaluationForMutationWasStarted($mutation1),
+                ...$this->createPassingHeuristicEvents($mutation1),
+                ...$this->createMaterialisedMutantEvents($mutant1),
                 new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
@@ -447,6 +476,7 @@ final class MutationTestingRunnerTest extends TestCase
             [
                 new MutationEvaluationWasStarted(0, $this->processRunnerMock),
                 new MutationEvaluationForMutationWasStarted($mutation0),
+                ...$this->createIgnoredByRegexHeuristicEvents($mutation0),
                 new MutationEvaluationForMutationWasFinished(MutantExecutionResult::createFromNonCoveredMutant($mutant)),
                 new MutationEvaluationWasFinished(),
             ],
@@ -513,6 +543,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationEvaluationWasStarted(0, $this->processRunnerMock),
+                ...$this->createIgnoredByMutationIdHeuristicEvents($mutation0),
                 new MutationEvaluationWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
@@ -550,7 +581,13 @@ final class MutationTestingRunnerTest extends TestCase
         $result = $this->invokeMethod('ignoredByRegex', $mutant);
 
         $this->assertTrue($result);
-        $this->assertCount(0, $this->eventDispatcher->getEvents());
+        $this->assertAreSameEvents(
+            [
+                new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            ],
+            $this->eventDispatcher->getEvents(),
+        );
     }
 
     public function test_it_passes_through_iterables_when_concurrent_execution_requested(): void
@@ -672,14 +709,24 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationEvaluationWasStarted|MutationEvaluationForMutationWasStarted|MutationEvaluationWasFinished|MutationEvaluationForMutationWasFinished> $expectedEvents
-     * @param array<MutationEvaluationWasStarted|MutationEvaluationForMutationWasStarted|MutationEvaluationWasFinished|MutationEvaluationForMutationWasFinished> $actualEvents
+     * @param list<object> $expectedEvents
+     * @param array<object> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
         $expectedClasses = [
             MutationEvaluationWasStarted::class,
             MutationEvaluationForMutationWasStarted::class,
+            HeuristicSuppressionWasStarted::class,
+            HeuristicWasStarted::class,
+            HeuristicWasFinished::class,
+            HeuristicSuppressionWasFinished::class,
+            MutantAnalysisWasStarted::class,
+            MutantMaterialisationWasStarted::class,
+            MutantMaterialisationWasFinished::class,
+            MutantEvaluationWasStarted::class,
+            MutantEvaluationWasFinished::class,
+            MutantAnalysisWasFinished::class,
             MutationEvaluationWasFinished::class,
             MutationEvaluationForMutationWasFinished::class,
         ];
@@ -766,6 +813,94 @@ final class MutationTestingRunnerTest extends TestCase
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
         return $this->createMock(MutantProcessContainer::class);
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function createPassingHeuristicEvents(Mutation $mutation): array
+    {
+        return [
+            new HeuristicSuppressionWasStarted($mutation),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
+            new HeuristicSuppressionWasFinished($mutation),
+        ];
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function createUncoveredHeuristicEvents(Mutation $mutation): array
+    {
+        return [
+            new HeuristicSuppressionWasStarted($mutation),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicSuppressionWasFinished($mutation),
+        ];
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function createTakingTooLongHeuristicEvents(Mutation $mutation): array
+    {
+        return [
+            new HeuristicSuppressionWasStarted($mutation),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
+            new HeuristicSuppressionWasFinished($mutation),
+        ];
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function createIgnoredByRegexHeuristicEvents(Mutation $mutation): array
+    {
+        return [
+            new HeuristicSuppressionWasStarted($mutation),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicSuppressionWasFinished($mutation),
+        ];
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function createIgnoredByMutationIdHeuristicEvents(Mutation $mutation): array
+    {
+        return [
+            new HeuristicSuppressionWasStarted($mutation),
+            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_MUTATION_ID),
+            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_MUTATION_ID),
+            new HeuristicSuppressionWasFinished($mutation),
+        ];
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function createMaterialisedMutantEvents(Mutant $mutant): array
+    {
+        return [
+            new MutantAnalysisWasStarted($mutant),
+            new MutantMaterialisationWasStarted($mutant),
+            new MutantMaterialisationWasFinished($mutant),
+            new MutantEvaluationWasStarted($mutant),
+        ];
     }
 
     private function someIterable(?callable $callback = null): Callback

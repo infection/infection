@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
+use function array_keys;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
@@ -67,6 +68,30 @@ use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
@@ -89,11 +114,13 @@ use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\SpanHandle;
+use function spl_object_id;
+use function str_starts_with;
 
 /**
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, HeuristicSuppressionWasFinishedSubscriber, HeuristicSuppressionWasStartedSubscriber, HeuristicWasFinishedSubscriber, HeuristicWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantAnalysisWasFinishedSubscriber, MutantAnalysisWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessExecutionWasFinishedSubscriber, MutantProcessExecutionWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
 
@@ -124,6 +151,27 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     /** @var array<string, SpanHandle> */
     private array $mutationEvaluationSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $heuristicSuppressionSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $heuristicSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $mutantAnalysisSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $mutantMaterialisationSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $mutantEvaluationSpans = [];
+
+    /** @var array<int, SpanHandle> */
+    private array $mutantProcessExecutionSpans = [];
+
+    /** @var array<int, string> */
+    private array $mutantProcessExecutionSpanMutationHashes = [];
 
     public function __construct(
         private readonly OpenTelemetryTracer $telemetry,
@@ -302,6 +350,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $hash = $result->getMutantHash();
         $span = $this->mutationEvaluationSpans[$hash] ?? null;
 
+        $this->endMutationEvaluationChildSpans($hash);
+
         unset($this->mutationEvaluationSpans[$hash]);
 
         $this->end(
@@ -313,10 +363,158 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         );
     }
 
+    public function onHeuristicSuppressionWasStarted(HeuristicSuppressionWasStarted $event): void
+    {
+        $hash = $event->mutation->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.heuristic_suppression',
+            parent: $this->mutationEvaluationSpans[$hash] ?? null,
+        );
+
+        if ($span !== null) {
+            $this->heuristicSuppressionSpans[$hash] = $span;
+        }
+    }
+
+    public function onHeuristicSuppressionWasFinished(HeuristicSuppressionWasFinished $event): void
+    {
+        $hash = $event->mutation->getHash();
+
+        $this->endHeuristicSpans($hash);
+        $this->end($this->heuristicSuppressionSpans[$hash] ?? null);
+
+        unset($this->heuristicSuppressionSpans[$hash]);
+    }
+
+    public function onHeuristicWasStarted(HeuristicWasStarted $event): void
+    {
+        $hash = $event->mutation->getHash();
+        $key = self::heuristicKey($hash, $event->heuristic->value);
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.heuristic',
+            ['infection.mutation_evaluation.heuristic.id' => $event->heuristic->value],
+            $this->heuristicSuppressionSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->heuristicSpans[$key] = $span;
+        }
+    }
+
+    public function onHeuristicWasFinished(HeuristicWasFinished $event): void
+    {
+        $key = self::heuristicKey($event->mutation->getHash(), $event->heuristic->value);
+
+        $this->end($this->heuristicSpans[$key] ?? null);
+
+        unset($this->heuristicSpans[$key]);
+    }
+
+    public function onMutantAnalysisWasStarted(MutantAnalysisWasStarted $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_analysis',
+            parent: $this->mutationEvaluationSpans[$hash] ?? null,
+        );
+
+        if ($span !== null) {
+            $this->mutantAnalysisSpans[$hash] = $span;
+        }
+    }
+
+    public function onMutantAnalysisWasFinished(MutantAnalysisWasFinished $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $this->end($this->mutantMaterialisationSpans[$hash] ?? null);
+        unset($this->mutantMaterialisationSpans[$hash]);
+
+        $this->end($this->mutantAnalysisSpans[$hash] ?? null);
+        unset($this->mutantAnalysisSpans[$hash]);
+    }
+
+    public function onMutantMaterialisationWasStarted(MutantMaterialisationWasStarted $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_materialisation',
+            parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->mutantMaterialisationSpans[$hash] = $span;
+        }
+    }
+
+    public function onMutantMaterialisationWasFinished(MutantMaterialisationWasFinished $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $this->end($this->mutantMaterialisationSpans[$hash] ?? null);
+
+        unset($this->mutantMaterialisationSpans[$hash]);
+    }
+
+    public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_evaluation',
+            parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->mutantEvaluationSpans[$hash] = $span;
+        }
+    }
+
+    public function onMutantEvaluationWasFinished(MutantEvaluationWasFinished $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $this->endMutantProcessExecutionSpans($hash);
+        $this->end($this->mutantEvaluationSpans[$hash] ?? null);
+
+        unset($this->mutantEvaluationSpans[$hash]);
+    }
+
+    public function onMutantProcessExecutionWasStarted(MutantProcessExecutionWasStarted $event): void
+    {
+        $hash = $event->mutantProcess->getMutant()->getMutation()->getHash();
+        $key = spl_object_id($event->mutantProcess);
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.process',
+            parent: $this->mutantEvaluationSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->mutantProcessExecutionSpans[$key] = $span;
+            $this->mutantProcessExecutionSpanMutationHashes[$key] = $hash;
+        }
+    }
+
+    public function onMutantProcessExecutionWasFinished(MutantProcessExecutionWasFinished $event): void
+    {
+        $key = spl_object_id($event->mutantProcess);
+
+        $this->end($this->mutantProcessExecutionSpans[$key] ?? null);
+
+        unset($this->mutantProcessExecutionSpans[$key]);
+        unset($this->mutantProcessExecutionSpanMutationHashes[$key]);
+    }
+
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        foreach ($this->mutationEvaluationSpans as $span) {
-            $this->end($span);
+        foreach (array_keys($this->mutationEvaluationSpans) as $hash) {
+            $this->endMutationEvaluationChildSpans($hash);
+            $this->end($this->mutationEvaluationSpans[$hash]);
         }
 
         $this->mutationEvaluationSpans = [];
@@ -333,8 +531,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->endAstSpans();
         $this->end($this->mutationGenerationSpan);
 
-        foreach ($this->mutationEvaluationSpans as $span) {
-            $this->end($span);
+        foreach (array_keys($this->mutationEvaluationSpans) as $hash) {
+            $this->endMutationEvaluationChildSpans($hash);
+            $this->end($this->mutationEvaluationSpans[$hash]);
         }
 
         $this->end($this->mutationEvaluationSpan);
@@ -420,5 +619,56 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->astParsingSpans = [];
         $this->astEnrichmentSpans = [];
         $this->astProcessingSpans = [];
+    }
+
+    private function endMutationEvaluationChildSpans(string $hash): void
+    {
+        $this->endHeuristicSpans($hash);
+        $this->end($this->heuristicSuppressionSpans[$hash] ?? null);
+        $this->end($this->mutantMaterialisationSpans[$hash] ?? null);
+        $this->endMutantProcessExecutionSpans($hash);
+        $this->end($this->mutantEvaluationSpans[$hash] ?? null);
+        $this->end($this->mutantAnalysisSpans[$hash] ?? null);
+
+        unset(
+            $this->heuristicSuppressionSpans[$hash],
+            $this->mutantMaterialisationSpans[$hash],
+            $this->mutantEvaluationSpans[$hash],
+            $this->mutantAnalysisSpans[$hash],
+        );
+    }
+
+    private function endHeuristicSpans(string $hash): void
+    {
+        $prefix = $hash . ':';
+
+        foreach ($this->heuristicSpans as $key => $span) {
+            if (!str_starts_with($key, $prefix)) {
+                continue;
+            }
+
+            $this->end($span);
+
+            unset($this->heuristicSpans[$key]);
+        }
+    }
+
+    private function endMutantProcessExecutionSpans(string $hash): void
+    {
+        foreach ($this->mutantProcessExecutionSpans as $key => $span) {
+            if (($this->mutantProcessExecutionSpanMutationHashes[$key] ?? null) !== $hash) {
+                continue;
+            }
+
+            $this->end($span);
+
+            unset($this->mutantProcessExecutionSpans[$key]);
+            unset($this->mutantProcessExecutionSpanMutationHashes[$key]);
+        }
+    }
+
+    private static function heuristicKey(string $mutationHash, string $heuristic): string
+    {
+        return $mutationHash . ':' . $heuristic;
     }
 }

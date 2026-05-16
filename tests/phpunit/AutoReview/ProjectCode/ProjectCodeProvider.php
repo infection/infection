@@ -70,6 +70,18 @@ use Infection\Event\Events\Ast\AstProcessingWasFinished;
 use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppressionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantMaterialisationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
@@ -99,6 +111,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
+use Infection\Process\Runner\MutationEvaluationHeuristic;
 use Infection\Reporter\Http\StrykerCurlClient;
 use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Resource\Processor\CpuCoresCountProvider;
@@ -188,11 +201,24 @@ final class ProjectCodeProvider
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MessageName::class,
+        HeuristicSuppressionWasFinished::class,
+        HeuristicSuppressionWasStarted::class,
+        HeuristicWasFinished::class,
+        HeuristicWasStarted::class,
         MutationAnalysisLoggerName::class,
         MutationAnalysisWasFinished::class,
         MutationAnalysisWasStarted::class,
-        MutationEvaluationForMutationWasStarted::class,
+        MutantAnalysisWasFinished::class,
+        MutantAnalysisWasStarted::class,
         MutantExecutionResult::class,
+        MutantEvaluationWasFinished::class,
+        MutantEvaluationWasStarted::class,
+        MutantMaterialisationWasFinished::class,
+        MutantMaterialisationWasStarted::class,
+        MutantProcessExecutionWasFinished::class,
+        MutantProcessExecutionWasStarted::class,
+        MutationEvaluationHeuristic::class,
+        MutationEvaluationForMutationWasStarted::class,
         MutatorName::class,
         NameResolverFactory::class,
         NoGitProjectFound::class,

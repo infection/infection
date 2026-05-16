@@ -39,6 +39,9 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasStarted;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
 use function max;
@@ -76,6 +79,7 @@ class ParallelProcessRunner implements ProcessRunner
         private readonly int $poll = self::POLL_WAIT_IN_MS,
         private readonly DuoClock $clock = new DuoClock(),
         private readonly ProcessQueue $queue = new ProcessQueue(),
+        private readonly ?EventDispatcher $eventDispatcher = null,
     ) {
     }
 
@@ -190,6 +194,7 @@ class ParallelProcessRunner implements ProcessRunner
             }
 
             $mutantProcess->markAsFinished();
+            $this->eventDispatcher?->dispatch(new MutantProcessExecutionWasFinished($mutantProcess));
 
             $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
 
@@ -212,7 +217,11 @@ class ParallelProcessRunner implements ProcessRunner
 
     private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
-        $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
+        $mutantProcess = $mutantProcessContainer->getCurrent();
+
+        $this->eventDispatcher?->dispatch(new MutantProcessExecutionWasStarted($mutantProcess));
+
+        $mutantProcess->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,
         ]);

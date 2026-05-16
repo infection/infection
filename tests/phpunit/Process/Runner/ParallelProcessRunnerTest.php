@@ -38,6 +38,8 @@ namespace Infection\Tests\Process\Runner;
 use function array_search;
 use function count;
 use DuoClock\TimeSpy;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessExecutionWasStarted;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
@@ -47,6 +49,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessQueue;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -122,6 +125,29 @@ final class ParallelProcessRunnerTest extends TestCase
         $executedProcesses = $runner->run($processes);
 
         $this->assertSame(1, iterator_count($executedProcesses));
+    }
+
+    public function test_it_dispatches_process_execution_events_for_each_concrete_process(): void
+    {
+        $eventDispatcher = new EventDispatcherCollector();
+        $container = $this->createMutantProcessContainerWithNextMutantProcess(1);
+        $firstProcess = $container->getCurrent();
+
+        $runner = new ParallelProcessRunner(1, 0, new TimeSpy(), new ProcessQueue(), $eventDispatcher);
+
+        $this->assertSame(1, iterator_count($runner->run([$container])));
+
+        $events = $eventDispatcher->getEvents();
+
+        $this->assertCount(4, $events);
+        $this->assertInstanceOf(MutantProcessExecutionWasStarted::class, $events[0]);
+        $this->assertSame($firstProcess, $events[0]->mutantProcess);
+        $this->assertInstanceOf(MutantProcessExecutionWasFinished::class, $events[1]);
+        $this->assertSame($firstProcess, $events[1]->mutantProcess);
+        $this->assertInstanceOf(MutantProcessExecutionWasStarted::class, $events[2]);
+        $this->assertSame($container->getCurrent(), $events[2]->mutantProcess);
+        $this->assertInstanceOf(MutantProcessExecutionWasFinished::class, $events[3]);
+        $this->assertSame($container->getCurrent(), $events[3]->mutantProcess);
     }
 
     #[DataProvider('threadCountProvider')]
