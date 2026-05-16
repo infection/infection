@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation;
 
 use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-interface HeuristicSuppressionWasFinishedSubscriber extends EventSubscriber
+interface MutantProcessExecutionWasFinishedSubscriber extends EventSubscriber
 {
-    public function onHeuristicSuppressionWasFinished(HeuristicSuppressionWasFinished $event): void;
+    public function onMutantProcessExecutionWasFinished(MutantProcessExecutionWasFinished $event): void;
 }

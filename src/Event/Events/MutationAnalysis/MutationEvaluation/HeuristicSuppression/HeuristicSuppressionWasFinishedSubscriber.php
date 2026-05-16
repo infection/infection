@@ -33,17 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression;
 
-use Infection\Mutant\Mutant;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutantMaterialisationWasStarted
+interface HeuristicSuppressionWasFinishedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        public Mutant $mutant,
-    ) {
-    }
+    public function onHeuristicSuppressionWasFinished(HeuristicSuppressionWasFinished $event): void;
 }

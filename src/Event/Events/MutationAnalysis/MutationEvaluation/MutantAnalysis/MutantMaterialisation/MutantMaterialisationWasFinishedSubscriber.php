@@ -33,17 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation;
 
-use Infection\Mutant\Mutant;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutantEvaluationWasFinished
+interface MutantMaterialisationWasFinishedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        public Mutant $mutant,
-    ) {
-    }
+    public function onMutantMaterialisationWasFinished(MutantMaterialisationWasFinished $event): void;
 }

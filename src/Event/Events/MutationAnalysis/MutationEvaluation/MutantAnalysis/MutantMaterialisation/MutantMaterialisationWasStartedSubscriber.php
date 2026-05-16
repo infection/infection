@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation;
 
 use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-interface MutantEvaluationWasFinishedSubscriber extends EventSubscriber
+interface MutantMaterialisationWasStartedSubscriber extends EventSubscriber
 {
-    public function onMutantEvaluationWasFinished(MutantEvaluationWasFinished $event): void;
+    public function onMutantMaterialisationWasStarted(MutantMaterialisationWasStarted $event): void;
 }

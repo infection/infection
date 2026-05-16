@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression;
 
 use Infection\Mutation\Mutation;
 use Infection\Process\Runner\MutationEvaluationHeuristic;

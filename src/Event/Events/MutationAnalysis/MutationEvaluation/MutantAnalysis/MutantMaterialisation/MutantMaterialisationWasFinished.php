@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation;
 
-use Infection\Process\MutantProcess;
+use Infection\Mutant\Mutant;
 
 /**
  * @internal
  */
-final readonly class MutantProcessExecutionWasStarted
+final readonly class MutantMaterialisationWasFinished
 {
     public function __construct(
-        public MutantProcess $mutantProcess,
+        public Mutant $mutant,
     ) {
     }
 }
