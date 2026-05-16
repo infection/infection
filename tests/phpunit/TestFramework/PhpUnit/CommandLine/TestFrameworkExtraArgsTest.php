@@ -39,6 +39,7 @@ use Infection\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 #[CoversClass(TestFrameworkExtraArgs::class)]
 final class TestFrameworkExtraArgsTest extends TestCase
@@ -54,6 +55,17 @@ final class TestFrameworkExtraArgsTest extends TestCase
         $extraArgs = TestFrameworkExtraArgs::parseRawTokens($rawArgs);
 
         $this->assertSame($expectedTokens, $extraArgs);
+    }
+
+    /**
+     * @param list<string> $expectedTokens
+     */
+    #[DataProvider('rawTokensProvider')]
+    public function test_it_parses_raw_tokens_with_the_fallback_tokenizer(
+        string $rawArgs,
+        array $expectedTokens,
+    ): void {
+        $this->assertSame($expectedTokens, self::parseRawTokensWithFallbackTokenizer($rawArgs));
     }
 
     /**
@@ -74,5 +86,45 @@ final class TestFrameworkExtraArgsTest extends TestCase
             '--filter="unfinished',
             ['--filter="unfinished'],
         ];
+
+        yield 'short option with quoted value' => [
+            '-a"foo bar"',
+            ['-afoo bar'],
+        ];
+
+        yield 'concatenated quoted values' => [
+            '--long-option="foo bar""another"',
+            ['--long-option=foo baranother'],
+        ];
+
+        yield 'mixed quote styles' => [
+            '--long-option=\'foo bar\'"another"',
+            ['--long-option=foo baranother'],
+        ];
+
+        yield 'escaped quotes' => [
+            "--arg=\\\"'Jenny'\''s'\\\"",
+            ['--arg="Jenny\'s"'],
+        ];
+
+        yield 'whitespace inside quoted string' => [
+            "'a\rb\nc\td'",
+            ["a\rb\nc\td"],
+        ];
+
+        yield 'whitespace between quoted strings' => [
+            "'a'\r'b'\n'c'\t'd'",
+            ['a', 'b', 'c', 'd'],
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function parseRawTokensWithFallbackTokenizer(string $rawArgs): array
+    {
+        $tokenize = new ReflectionMethod(TestFrameworkExtraArgs::class, 'tokenize');
+
+        return $tokenize->invoke(null, $rawArgs);
     }
 }
