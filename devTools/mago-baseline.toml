@@ -3194,6 +3194,12 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #2 of `Exception::__construct`: expected `int`, but possibly received `int|string`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
 code = "possibly-null-argument"
 message = "Argument #1 of function `strlen` is possibly `null`, but parameter type `string` does not accept it."
 count = 1
