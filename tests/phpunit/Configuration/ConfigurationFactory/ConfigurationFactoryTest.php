@@ -61,6 +61,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -71,6 +72,7 @@ use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
 use InvalidArgumentException;
+use function max;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -192,6 +194,83 @@ final class ConfigurationFactoryTest extends TestCase
                 mutantId: null,
             )
         ;
+    }
+
+    public function test_it_auto_detects_thread_count_when_no_threads_option_and_no_schema_threads(): void
+    {
+        $schema = new SchemaConfiguration(
+            pathname: '/path/to/infection.json',
+            timeout: null,
+            source: new Source([], []),
+            logs: Logs::createEmpty(),
+            tmpDir: '',
+            phpUnit: new PhpUnit(null, null),
+            phpStan: new PhpStan(null, null),
+            mago: new Mago(null, null),
+            ignoreMsiWithNoMutations: null,
+            minMsi: null,
+            minCoveredMsi: null,
+            timeoutsAsEscaped: null,
+            maxTimeouts: null,
+            mutators: [],
+            testFramework: TestFrameworkTypes::PHPUNIT,
+            bootstrap: null,
+            initialTestsPhpOptions: null,
+            testFrameworkExtraOptions: null,
+            staticAnalysisToolOptions: null,
+            threads: null,
+            dotsPerRow: null,
+            staticAnalysisTool: null,
+        );
+
+        $configuration = $this
+            ->createConfigurationFactory(
+                ciDetected: false,
+                githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+            )
+            ->create(
+                schema: $schema,
+                existingCoveragePath: null,
+                initialTestsPhpOptions: null,
+                skipInitialTests: false,
+                logVerbosity: 'none',
+                debug: false,
+                withUncovered: false,
+                noProgress: false,
+                ignoreMsiWithNoMutations: false,
+                minMsi: null,
+                numberOfShownMutations: 0,
+                minCoveredMsi: null,
+                timeoutsAsEscaped: false,
+                maxTimeouts: null,
+                msiPrecision: 2,
+                mutatorsInput: '',
+                testFramework: null,
+                testFrameworkExtraOptions: null,
+                staticAnalysisToolOptions: null,
+                sourceFilter: null,
+                threadCount: null,
+                dotsPerRow: null,
+                dryRun: false,
+                useGitHubLogger: false,
+                gitlabLogFilePath: null,
+                htmlLogFilePath: null,
+                textLogFilePath: null,
+                summaryJsonLogFilePath: null,
+                useNoopMutators: false,
+                executeOnlyCoveringTestCases: false,
+                mapSourceClassToTestStrategy: null,
+                projectDirectory: null,
+                staticAnalysisTool: null,
+                mutantId: null,
+            )
+        ;
+
+        $this->assertSame(
+            max(1, CpuCoresCountProvider::provide() - 1),
+            $configuration->threadCount,
+        );
     }
 
     public static function valueProvider(): iterable

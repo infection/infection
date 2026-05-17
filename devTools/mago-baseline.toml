@@ -5853,6 +5853,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_auto_detects_thread_count_when_no_threads_option_and_no_schema_threads`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_can_create_a_configuration`.'
 count = 1
 
@@ -5860,6 +5866,12 @@ count = 1
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_auto_detects_thread_count_when_no_threads_option_and_no_schema_threads`.'
 count = 1
 
 [[issues]]

@@ -565,6 +565,8 @@ final class RunCommand extends BaseCommand
 
         $config = $container->getConfiguration();
 
+        $consoleOutput->logRunningWithThreadCount($config->threadCount);
+
         if ($config->isStaticAnalysisEnabled()) {
             $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
         }

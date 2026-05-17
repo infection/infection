@@ -482,8 +482,11 @@ class ConfigurationFactory
 
         $threadsFromSchema = $schema->threads;
 
+        // we subtract 1 here to not use all the available cores by Infection
+        $maxThreads = max(1, CpuCoresCountProvider::provide() - 1);
+
         if ($threadsFromSchema === null) {
-            return 1;
+            return $maxThreads;
         }
 
         // config has numeric string or integer value
@@ -494,8 +497,7 @@ class ConfigurationFactory
         // config has `max` thread count
         Assert::same($threadsFromSchema, 'max', sprintf('The value of key `threads` in configuration file must be of type integer or string "max". String "%s" provided.', $threadsFromSchema));
 
-        // we subtract 1 here to not use all the available cores by Infection
-        return max(1, CpuCoresCountProvider::provide() - 1);
+        return $maxThreads;
     }
 
     /**
