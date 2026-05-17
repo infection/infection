@@ -46,7 +46,6 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use function property_exists;
 use stdClass;
 use function trim;
@@ -105,14 +104,11 @@ class SchemaConfigurationFactory
 
     private static function assertTestFrameworkOptionsAreNotBothConfigured(stdClass $rawConfig): void
     {
-        if (
+        Assert::false(
             property_exists($rawConfig, 'testFrameworkOptions')
-            && property_exists($rawConfig, 'testFrameworkExtraArgs')
-        ) {
-            throw new InvalidArgumentException(
-                'Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".',
-            );
-        }
+            && property_exists($rawConfig, 'testFrameworkExtraArgs'),
+            'Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".',
+        );
     }
 
     /**
