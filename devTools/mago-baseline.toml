@@ -3187,6 +3187,60 @@ message = 'Invalid return type for function `Infection\TestFramework\PhpUnit\Com
 count = 1
 
 [[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #2 of `Exception::__construct`: expected `int`, but possibly received `int|string`."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-null-argument"
+message = "Argument #1 of function `strlen` is possibly `null`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-null-argument"
+message = "Argument #1 of function `substr` is possibly `null`, but parameter type `string` does not accept it."
+count = 2
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-null-array-access"
+message = "Cannot perform array access on possibly `null` value."
+count = 6
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-null-operand"
+message = "Possibly null left operand used in string concatenation (type `null|string`)."
+count = 4
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-null-operand"
+message = "Possibly null middle operand used in string concatenation (type `null|string`)."
+count = 2
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "possibly-null-operand"
+message = "Possibly null right operand used in string concatenation (type `null|string`)."
+count = 1
+
+[[issues]]
+file = "src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php"
+code = "reference-to-undefined-variable"
+message = "Reference created from a previously undefined variable `$match`."
+count = 1
+
+[[issues]]
 file = "src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php"
 code = "possibly-false-argument"
 message = 'Argument #2 of method `Symfony\Component\Filesystem\Filesystem::dumpFile` is possibly `false`, but parameter type `resource|string` does not accept it.'
@@ -12526,6 +12580,18 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideTestCases` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgsTest.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `Infection\Tests\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgsTest::parseRawTokensWithFallbackTokenizer`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgsTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\TestFramework\PhpUnit\CommandLine\TestFrameworkExtraArgsTest::parseRawTokensWithFallbackTokenizer`.'
 count = 1
 
 [[issues]]
