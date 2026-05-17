@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fb5e26e1276edf6f961cc5b1c98e287",
+    "content-hash": "a5205bc49cbbb7b93b7150745f7799d8",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -415,21 +415,21 @@
         },
         {
             "name": "infection/include-interceptor",
-            "version": "1.0.0",
+            "version": "0.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/include-interceptor.git",
-                "reference": "c083331bc0cd1cd319ac1b7a08e3ad4a34aa7992"
+                "reference": "0cc76d95a79d9832d74e74492b0a30139904bdf7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/c083331bc0cd1cd319ac1b7a08e3ad4a34aa7992",
-                "reference": "c083331bc0cd1cd319ac1b7a08e3ad4a34aa7992",
+                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/0cc76d95a79d9832d74e74492b0a30139904bdf7",
+                "reference": "0cc76d95a79d9832d74e74492b0a30139904bdf7",
                 "shasum": ""
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.16",
-                "infection/infection": "^0.19.0",
+                "infection/infection": "^0.15.0",
                 "phan/phan": "^2.4 || ^3",
                 "php-coveralls/php-coveralls": "^2.2",
                 "phpstan/phpstan": "^0.12.8",
@@ -455,7 +455,7 @@
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
             "support": {
                 "issues": "https://github.com/infection/include-interceptor/issues",
-                "source": "https://github.com/infection/include-interceptor/tree/1.0.0"
+                "source": "https://github.com/infection/include-interceptor/tree/0.2.5"
             },
             "funding": [
                 {
@@ -467,7 +467,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-05-03T21:48:06+00:00"
+            "time": "2021-08-09T10:03:57+00:00"
         },
         {
             "name": "infection/mutator",
