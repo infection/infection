@@ -8,6 +8,7 @@ workspace = "."
 paths = [
     "src",
     "tests/autoloaded",
+    "tests/Architecture",
     "tests/benchmark",
     "tests/phpunit"
 ]

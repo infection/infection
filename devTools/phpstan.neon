@@ -3,11 +3,11 @@ includes:
     - phpstan-baseline.neon
 
 rules:
-    - Infection\DevTools\PHPStan\Rules\InfectionContainerRule
+    - Infection\Tests\Architecture\PHPStan\Rules\InfectionContainerRule
 
 services:
     -
-        class: Infection\DevTools\PHPat\SrcShouldNotDependOnTestsTest
+        class: Infection\Tests\Architecture\PHPat\SrcShouldNotDependOnTestsTest
         tags:
             - phpat.test
 
@@ -130,7 +130,7 @@ parameters:
         # so shipmonk's dead-code detector cannot see the call sites.
         -
             identifier: shipmonk.deadMethod
-            path: ./PHPat/*
+            path: ../tests/Architecture/PHPat/*
 
         # Test enum fixtures have cases that exist as test data, not all are used
         -
@@ -226,10 +226,9 @@ parameters:
     level: 8
     paths:
         - ../src
+        - ../tests/Architecture
         - ../tests/phpunit
         - ../tests/benchmark
-        - ./PHPStan/
-        - ./PHPat/
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__.php
