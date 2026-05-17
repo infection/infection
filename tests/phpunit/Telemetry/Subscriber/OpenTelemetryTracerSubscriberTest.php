@@ -75,15 +75,15 @@ use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
-use Infection\FileSystem\InMemoryFileSystem;
+use Infection\Framework\InfectionVersion;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
-use Infection\Telemetry\RunTelemetryAttributesProvider;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -123,11 +123,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 $this->tracerProvider->getTracer('infection'),
                 $this->tracerProvider,
             ),
-            new RunTelemetryAttributesProvider(
+            new RunSpanAttributesProvider(
                 ConfigurationBuilder::withMinimalTestData()
                     ->withProjectDirectory('/path/to/project')
                     ->build(),
-                new InMemoryFileSystem(),
+                new InfectionVersion(),
                 new class extends ShellCommandLineExecutor {
                     public function execute(array $command): string
                     {

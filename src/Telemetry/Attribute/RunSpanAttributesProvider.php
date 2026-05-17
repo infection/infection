@@ -37,9 +37,12 @@ namespace Infection\Telemetry\Attribute;
 
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
+use Infection\Process\ShellCommandLineExecutor;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use function trim;
 
 /**
  * @phpstan-type Attribute = bool|int|float|string
@@ -54,6 +57,7 @@ final readonly class RunSpanAttributesProvider
     public function __construct(
         private Configuration $configuration,
         private InfectionVersion $infectionVersion,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -64,7 +68,7 @@ final readonly class RunSpanAttributesProvider
      */
     public function provide(): array
     {
-        return [
+        $attributes = [
             'infection.project.name' => $this->configuration->projectName,
             'infection.project.dir' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
@@ -74,6 +78,14 @@ final readonly class RunSpanAttributesProvider
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
         ];
+
+        $gitSha = $this->getGitSha();
+
+        if ($gitSha !== null) {
+            $attributes['infection.git.sha'] = $gitSha;
+        }
+
+        return $attributes;
     }
 
     private function getConfigurationPath(): string
@@ -86,6 +98,25 @@ final readonly class RunSpanAttributesProvider
         }
 
         return $configurationPathname;
+    }
+
+    private function getGitSha(): ?string
+    {
+        try {
+            $sha = $this->shellCommandLineExecutor->execute([
+                'git',
+                '-C',
+                $this->configuration->projectDirectory,
+                'rev-parse',
+                'HEAD',
+            ]);
+        } catch (ProcessException) {
+            return null;
+        }
+
+        $sha = trim($sha);
+
+        return $sha === '' ? null : $sha;
     }
 
     private static function getDistribution(): string

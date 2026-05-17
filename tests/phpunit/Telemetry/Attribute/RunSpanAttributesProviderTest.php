@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Telemetry\Attribute;
 
 use Infection\Framework\InfectionVersion;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 
 #[CoversClass(RunSpanAttributesProvider::class)]
 final class RunSpanAttributesProviderTest extends TestCase
@@ -64,6 +67,7 @@ final class RunSpanAttributesProviderTest extends TestCase
         $provider = new RunSpanAttributesProvider(
             $configuration,
             $infectionVersionMock,
+            self::successfulShellExecutor('0123456789abcdef'),
         );
 
         $expected = [
@@ -75,10 +79,57 @@ final class RunSpanAttributesProviderTest extends TestCase
             'infection.thread.count' => 8,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,
+            'infection.git.sha' => '0123456789abcdef',
         ];
 
         $actual = $provider->provide();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_omits_the_git_sha_when_the_project_is_not_a_git_checkout(): void
+    {
+        $infectionVersionMock = $this->createMock(InfectionVersion::class);
+        $infectionVersionMock
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
+
+        $attributes = (new RunSpanAttributesProvider(
+            ConfigurationBuilder::withMinimalTestData()
+                ->withProjectDirectory('/var/www/project')
+                ->withProjectName('project')
+                ->build(),
+            $infectionVersionMock,
+            self::failingShellExecutor(),
+        ))->provide();
+
+        $this->assertSame('project', $attributes['infection.project.name']);
+        $this->assertFalse(isset($attributes['infection.git.sha']));
+    }
+
+    private static function successfulShellExecutor(string $output): ShellCommandLineExecutor
+    {
+        return new class($output) extends ShellCommandLineExecutor {
+            public function __construct(
+                private readonly string $output,
+            ) {
+            }
+
+            public function execute(array $command): string
+            {
+                return $this->output;
+            }
+        };
+    }
+
+    private static function failingShellExecutor(): ShellCommandLineExecutor
+    {
+        return new class extends ShellCommandLineExecutor {
+            public function execute(array $command): string
+            {
+                throw new class extends RuntimeException implements ProcessException {
+                };
+            }
+        };
     }
 }

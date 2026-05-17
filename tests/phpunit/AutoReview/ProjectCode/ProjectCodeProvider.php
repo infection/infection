@@ -120,7 +120,7 @@ use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
-use Infection\Telemetry\RunTelemetryAttributesProvider;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Telemetry\SpanHandle;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
@@ -229,7 +229,7 @@ final class ProjectCodeProvider
         NullSourceLineMatcher::class,
         NullSubscriber::class,
         OpenTelemetryTracerSubscriberFactory::class,
-        RunTelemetryAttributesProvider::class,
+        RunSpanAttributesProvider::class,
         OperatingSystem::class,
         ReportingWasFinished::class,
         ReportingWasStarted::class,

@@ -38,8 +38,8 @@ namespace Infection\Telemetry\Subscriber;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\SubscriberFactory;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracerFactory;
-use Infection\Telemetry\RunTelemetryAttributesProvider;
 
 /**
  * @internal
@@ -48,7 +48,7 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
 {
     public function __construct(
         private OpenTelemetryTracerFactory $telemetryTracerFactory,
-        private RunTelemetryAttributesProvider $runTelemetryAttributesProvider,
+        private RunSpanAttributesProvider $runSpanAttributesProvider,
     ) {
     }
 
@@ -58,7 +58,7 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
 
         return $tracer === null
             ? new NullSubscriber()
-            : new OpenTelemetryTracerSubscriber($tracer, $this->runTelemetryAttributesProvider)
+            : new OpenTelemetryTracerSubscriber($tracer, $this->runSpanAttributesProvider)
         ;
     }
 }
