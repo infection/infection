@@ -1,6 +1,10 @@
 !/.tools/.gitkeep
 !/dist/.gitkeep
 !/var/cache/.gitkeep
+.DS_Store
+.claude/
+.codex/
+.idea/
 .phpunit.*
 /*.phar
 /.box_dump/
@@ -8,7 +12,6 @@
 /.composer/
 /.direnv/
 /.envrc.local
-/.idea
 /.php_cs.cache
 /.tools/
 /build/
@@ -35,3 +38,6 @@
 /tests/phpunit/**/*/generated_index.xml
 /var/
 /vendor/
+Desktop.ini
+Thumbs.db
+ehthumbs.db
