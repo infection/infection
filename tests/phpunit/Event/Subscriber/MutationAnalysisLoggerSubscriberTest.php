@@ -39,7 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
@@ -154,7 +154,7 @@ final class MutationAnalysisLoggerSubscriberTest extends TestCase
             ->with($this->identicalTo($executionResult));
 
         $this->dispatcher->dispatch(
-            new MutantProcessWasFinished(
+            new MutationEvaluationForMutationWasFinished(
                 $executionResult,
             ),
         );
