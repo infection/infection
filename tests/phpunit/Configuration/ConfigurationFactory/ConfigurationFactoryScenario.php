@@ -752,6 +752,30 @@ final class ConfigurationFactoryScenario
                 );
     }
 
+    public function forValueForThreadCount(
+        string|int|null $schemaThreads,
+        ?int $inputThreadCount,
+        int $expectedThreadCount,
+    ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withThreads($schemaThreads),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withThreadCount($inputThreadCount),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($previousExpected)
+                    ->withThreadCount($expectedThreadCount)
+                    ->build(),
+            );
+    }
+
     public function forValueForTimeoutsAsEscaped(
         ?bool $timeoutsAsEscapedFromSchemaConfiguration,
         bool $timeoutsAsEscapedFromInput,
