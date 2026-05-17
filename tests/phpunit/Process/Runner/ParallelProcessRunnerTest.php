@@ -37,6 +37,7 @@ namespace Infection\Tests\Process\Runner;
 
 use function array_search;
 use DuoClock\TimeSpy;
+use Infection\Event\EventDispatcher\NullEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasStarted;
 use Infection\Mutant\DetectionStatus;
@@ -71,22 +72,32 @@ final class ParallelProcessRunnerTest extends TestCase
         $clock->expects($this->never())
             ->method($this->anything());
 
-        $runner = new ParallelProcessRunner(4, 0, $clock);
+        $runner = new ParallelProcessRunner(
+            threadCount: 4,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: $clock,
+        );
 
         $runner->run([]);
     }
 
     public function test_it_starts_the_given_processes(): void
     {
-        $threadsCount = 4;
+        $threadCount = 4;
 
-        $processes = (function () use ($threadsCount): iterable {
+        $processes = (function () use ($threadCount): iterable {
             for ($i = 0; $i < 10; ++$i) {
-                yield $this->createMutantProcessContainer(($i % $threadsCount) + 1);
+                yield $this->createMutantProcessContainer(($i % $threadCount) + 1);
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadsCount, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: $threadCount,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $executedProcesses = $runner->run($processes);
 
@@ -101,7 +112,12 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner(4, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: 4,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $runner->run($processes);
 
@@ -117,7 +133,12 @@ final class ParallelProcessRunnerTest extends TestCase
             yield $this->createMutantProcessContainerWithNextMutantProcess($threadCount);
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: $threadCount,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $runner->run($processes);
 
@@ -132,21 +153,27 @@ final class ParallelProcessRunnerTest extends TestCase
         $container = $this->createMutantProcessContainerWithNextMutantProcess(1);
         $firstProcess = $container->getCurrent();
 
-        $runner = new ParallelProcessRunner(1, 0, new TimeSpy(), new ProcessQueue(), $eventDispatcher);
+        $runner = new ParallelProcessRunner(
+            threadCount: 1,
+            eventDispatcher: $eventDispatcher,
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $this->assertSame(1, iterator_count($runner->run([$container])));
 
-        $events = $eventDispatcher->getEvents();
+        $currentMutantProcess = $container->getCurrent();
 
-        $this->assertCount(4, $events);
-        $this->assertInstanceOf(MutantProcessExecutionWasStarted::class, $events[0]);
-        $this->assertSame($firstProcess, $events[0]->mutantProcess);
-        $this->assertInstanceOf(MutantProcessExecutionWasFinished::class, $events[1]);
-        $this->assertSame($firstProcess, $events[1]->mutantProcess);
-        $this->assertInstanceOf(MutantProcessExecutionWasStarted::class, $events[2]);
-        $this->assertSame($container->getCurrent(), $events[2]->mutantProcess);
-        $this->assertInstanceOf(MutantProcessExecutionWasFinished::class, $events[3]);
-        $this->assertSame($container->getCurrent(), $events[3]->mutantProcess);
+        $expectedEvents = [
+            new MutantProcessExecutionWasStarted($firstProcess),
+            new MutantProcessExecutionWasFinished($firstProcess),
+            new MutantProcessExecutionWasStarted($currentMutantProcess),
+            new MutantProcessExecutionWasFinished($currentMutantProcess),
+        ];
+
+        $actualEvents = $eventDispatcher->getEvents();
+
+        $this->assertEquals($expectedEvents, $actualEvents);
     }
 
     #[DataProvider('threadCountProvider')]
@@ -182,7 +209,13 @@ final class ParallelProcessRunnerTest extends TestCase
                 return true; // Exit loop immediately
             });
 
-        $runner = new ParallelProcessRunner(2, 0, new TimeSpy(), $queueMock);
+        $runner = new ParallelProcessRunner(
+            threadCount: 2,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+            queue: $queueMock,
+        );
 
         iterator_count($runner->run([]));
 
@@ -216,7 +249,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: count($this->runningProcessContainers) >= $threadCount
         // Mutated: count($this->runningProcessContainers) > $threadCount
 
-        $runner = new ParallelProcessRunner(2, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: 2,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $reflection = new ReflectionClass($runner);
 
@@ -256,7 +294,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: max(-1, $this->poll - $timeSpentDoingWork)
 
         $clockMock = $this->createMock(TimeSpy::class);
-        $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
+        $runner = new ParallelProcessRunner(
+            threadCount: 2,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 10000,    // 10ms poll time
+            clock: $clockMock,
+        );
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('sleepRemaining');
@@ -280,7 +323,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: max(1, $this->poll - $timeSpentDoingWork)
 
         $clockMock = $this->createMock(TimeSpy::class);
-        $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
+        $runner = new ParallelProcessRunner(
+            threadCount: 2,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 10000,    // 10ms poll time
+            clock: $clockMock,
+        );
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('sleepRemaining');
@@ -304,7 +352,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: max(0, $this->poll + $timeSpentDoingWork)
 
         $clockMock = $this->createMock(TimeSpy::class);
-        $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
+        $runner = new ParallelProcessRunner(
+            threadCount: 2,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 5000,    // 5ms poll time
+            clock: $clockMock,
+        );
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('sleepRemaining');
@@ -327,7 +380,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: (empty)
 
         $clockMock = $this->createMock(TimeSpy::class);
-        $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
+        $runner = new ParallelProcessRunner(
+            threadCount: 2,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 5000, // 5ms poll time
+            clock: $clockMock,
+        );
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('sleepRemaining');
@@ -348,7 +406,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: $mutantProcess->markAsTimedOut();
         // Mutated: (empty)
 
-        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: 1,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $reflection = new ReflectionClass($runner);
 
@@ -394,7 +457,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: $mutantProcess->markAsFinished();
         // Mutated: (empty)
 
-        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: 1,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $reflection = new ReflectionClass($runner);
 
@@ -440,7 +508,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: while (false)
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new TimeSpy(), new ProcessQueue()])
+            ->setConstructorArgs([2, new NullEventDispatcher(), 0, new TimeSpy(), new ProcessQueue()])
             ->onlyMethods(['hasProcessesThatCouldBeFreed'])
             ->getMock();
 
@@ -496,7 +564,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false, false, false, true); // Need processes to run, then stop
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new TimeSpy(), $queueMock])
+            ->setConstructorArgs([2, new NullEventDispatcher(), 0, new TimeSpy(), $queueMock])
             ->onlyMethods(['hasProcessesThatCouldBeFreed', 'sleepRemaining'])
             ->getMock();
 
@@ -556,7 +624,12 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0, new TimeSpy());
+        $runner = new ParallelProcessRunner(
+            threadCount: $threadCount,
+            eventDispatcher: new NullEventDispatcher(),
+            poll: 0,
+            clock: new TimeSpy(),
+        );
 
         $executedProcesses = $runner->run($processes);
 

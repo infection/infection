@@ -65,7 +65,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\MutationEvaluationHeuristic;
+use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Testing\MutatorName;
@@ -583,8 +583,8 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertTrue($result);
         $this->assertAreSameEvents(
             [
-                new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-                new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
             ],
             $this->eventDispatcher->getEvents(),
         );
@@ -822,12 +822,12 @@ final class MutationTestingRunnerTest extends TestCase
     {
         return [
             new HeuristicSuppressionWasStarted($mutation),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
+            new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+            new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+            new HeuristicWasStarted($mutation, HeuristicName::TAKING_TOO_LONG),
+            new HeuristicWasFinished($mutation, HeuristicName::TAKING_TOO_LONG),
             new HeuristicSuppressionWasFinished($mutation),
         ];
     }
@@ -839,10 +839,10 @@ final class MutationTestingRunnerTest extends TestCase
     {
         return [
             new HeuristicSuppressionWasStarted($mutation),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
+            new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+            new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS),
             new HeuristicSuppressionWasFinished($mutation),
         ];
     }
@@ -854,12 +854,12 @@ final class MutationTestingRunnerTest extends TestCase
     {
         return [
             new HeuristicSuppressionWasStarted($mutation),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::TAKING_TOO_LONG),
+            new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+            new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+            new HeuristicWasStarted($mutation, HeuristicName::TAKING_TOO_LONG),
+            new HeuristicWasFinished($mutation, HeuristicName::TAKING_TOO_LONG),
             new HeuristicSuppressionWasFinished($mutation),
         ];
     }
@@ -871,8 +871,8 @@ final class MutationTestingRunnerTest extends TestCase
     {
         return [
             new HeuristicSuppressionWasStarted($mutation),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX),
+            new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+            new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
             new HeuristicSuppressionWasFinished($mutation),
         ];
     }
@@ -884,8 +884,8 @@ final class MutationTestingRunnerTest extends TestCase
     {
         return [
             new HeuristicSuppressionWasStarted($mutation),
-            new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_MUTATION_ID),
-            new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_MUTATION_ID),
+            new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_MUTATION_ID),
+            new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_MUTATION_ID),
             new HeuristicSuppressionWasFinished($mutation),
         ];
     }

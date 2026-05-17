@@ -60,6 +60,7 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
+use Infection\Event\EventDispatcher\NullEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
 use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
@@ -110,8 +111,8 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\Visitor\NameResolverFactory;
+use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\Process\Runner\MutationEvaluationHeuristic;
 use Infection\Reporter\Http\StrykerCurlClient;
 use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Resource\Processor\CpuCoresCountProvider;
@@ -217,7 +218,7 @@ final class ProjectCodeProvider
         MutantMaterialisationWasStarted::class,
         MutantProcessExecutionWasFinished::class,
         MutantProcessExecutionWasStarted::class,
-        MutationEvaluationHeuristic::class,
+        HeuristicName::class,
         MutationEvaluationForMutationWasStarted::class,
         MutatorName::class,
         NameResolverFactory::class,
@@ -225,6 +226,7 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NoReportFound::class,
         NonExecutableFinder::class,
+        NullEventDispatcher::class,
         NullSourceLineMatcher::class,
         NullSubscriber::class,
         OpenTelemetryTracerSubscriberFactory::class,

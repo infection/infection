@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression;
 
 use Infection\Mutation\Mutation;
-use Infection\Process\Runner\MutationEvaluationHeuristic;
+use Infection\Process\Runner\HeuristicName;
 
 /**
  * @internal
@@ -45,7 +45,7 @@ final readonly class HeuristicWasFinished
 {
     public function __construct(
         public Mutation $mutation,
-        public MutationEvaluationHeuristic $heuristic,
+        public HeuristicName $heuristic,
     ) {
     }
 }

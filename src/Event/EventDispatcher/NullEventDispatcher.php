@@ -33,19 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression;
+namespace Infection\Event\EventDispatcher;
 
-use Infection\Mutation\Mutation;
-use Infection\Process\Runner\HeuristicName;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class HeuristicWasStarted
+final class NullEventDispatcher implements EventDispatcher
 {
-    public function __construct(
-        public Mutation $mutation,
-        public HeuristicName $heuristic,
-    ) {
+    public function dispatch(object $event): void
+    {
+        // Do nothing.
+    }
+
+    public function addSubscriber(EventSubscriber $eventSubscriber): void
+    {
+        // Do nothing.
     }
 }

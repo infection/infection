@@ -78,7 +78,7 @@ use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
-use Infection\Process\Runner\MutationEvaluationHeuristic;
+use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
@@ -163,10 +163,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
         $this->subscriber->onHeuristicSuppressionWasStarted(new HeuristicSuppressionWasStarted($mutation));
-        $this->subscriber->onHeuristicWasStarted(new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX));
-        $this->subscriber->onHeuristicWasFinished(new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_REGEX));
-        $this->subscriber->onHeuristicWasStarted(new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS));
-        $this->subscriber->onHeuristicWasFinished(new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::UNCOVERED_BY_TESTS));
+        $this->subscriber->onHeuristicWasStarted(new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX));
+        $this->subscriber->onHeuristicWasFinished(new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX));
+        $this->subscriber->onHeuristicWasStarted(new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS));
+        $this->subscriber->onHeuristicWasFinished(new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS));
         $this->subscriber->onHeuristicSuppressionWasFinished(new HeuristicSuppressionWasFinished($mutation));
         $this->subscriber->onMutantAnalysisWasStarted(new MutantAnalysisWasStarted($mutant));
         $this->subscriber->onMutantMaterialisationWasStarted(new MutantMaterialisationWasStarted($mutant));
@@ -269,7 +269,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('/path/to/src/Foo.php', $mutationEvaluationForMutation->getAttributes()->get('code.file.path'));
         $this->assertSame(10, $mutationEvaluationForMutation->getAttributes()->get('code.line.start'));
         $this->assertSame(15, $mutationEvaluationForMutation->getAttributes()->get('code.line.end'));
-        $this->assertSame(MutationEvaluationHeuristic::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
+        $this->assertSame(HeuristicName::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
         $this->assertSame(DetectionStatus::KILLED_BY_TESTS->value, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.status'));
         $this->assertSame(0.123, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.runtime'));
 

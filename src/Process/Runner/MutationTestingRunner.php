@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use Closure;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasFinished;
@@ -131,17 +132,26 @@ class MutationTestingRunner
 
     private function ignoredByMutantId(Mutation $mutation): bool
     {
-        if ($this->mutantId === null) {
-            return true;
-        }
-
-        if ($mutation->getHash() === $this->mutantId) {
+        if (
+            $this->mutantId === null
+            || $mutation->getHash() === $this->mutantId
+        ) {
             return true;
         }
 
         $this->eventDispatcher->dispatch(new HeuristicSuppressionWasStarted($mutation));
-        $this->eventDispatcher->dispatch(new HeuristicWasStarted($mutation, MutationEvaluationHeuristic::IGNORED_BY_MUTATION_ID));
-        $this->eventDispatcher->dispatch(new HeuristicWasFinished($mutation, MutationEvaluationHeuristic::IGNORED_BY_MUTATION_ID));
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasStarted(
+                $mutation,
+                HeuristicName::IGNORED_BY_MUTATION_ID,
+            ),
+        );
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasFinished(
+                $mutation,
+                HeuristicName::IGNORED_BY_MUTATION_ID,
+            ),
+        );
         $this->eventDispatcher->dispatch(new HeuristicSuppressionWasFinished($mutation));
 
         return false;
@@ -149,78 +159,75 @@ class MutationTestingRunner
 
     private function ignoredByRegex(Mutant $mutant): bool
     {
-        $isKept = $this->evaluateHeuristic(
+        return $this->evaluateHeuristic(
             $mutant,
-            MutationEvaluationHeuristic::IGNORED_BY_REGEX,
-            function (Mutant $mutant): bool {
-                $mutatorName = $mutant->getMutation()->getMutatorName();
-
-                if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
-                    return true;
-                }
-
-                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
-                    if (!$this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
-                        continue;
-                    }
-
-                    return false;
-                }
-
-                return true;
-            },
+            HeuristicName::IGNORED_BY_REGEX,
+            $this->createIgnoredByRegexHeuristic(...),
+            fn () => $this->eventDispatcher->dispatch(
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResult::createFromIgnoredMutant($mutant),
+                ),
+            ),
         );
+    }
 
-        if (!$isKept) {
-            $this->emitHeuristicSuppressionFinished($mutant);
-            $this->eventDispatcher->dispatch(new MutationEvaluationForMutationWasFinished(
-                MutantExecutionResult::createFromIgnoredMutant($mutant),
-            ));
+    private function createIgnoredByRegexHeuristic(Mutant $mutant): bool
+    {
+        $mutatorName = $mutant->getMutation()->getMutatorName();
+
+        if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
+            return true;
         }
 
-        return $isKept;
+        foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
+            if (!$this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     private function uncoveredByTest(Mutant $mutant): bool
     {
-        $isKept = $this->evaluateHeuristic(
+        return $this->evaluateHeuristic(
             $mutant,
-            MutationEvaluationHeuristic::UNCOVERED_BY_TESTS,
-            static function (Mutant $mutant): bool {
-                // It's a proxy call to Mutation, can be done one stage up
-                return $mutant->isCoveredByTest();
-            },
+            HeuristicName::UNCOVERED_BY_TESTS,
+            $this->createUncoveredByTestHeuristic(...),
+            fn () => $this->eventDispatcher->dispatch(
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant),
+                ),
+            ),
         );
+    }
 
-        if (!$isKept) {
-            $this->emitHeuristicSuppressionFinished($mutant);
-            $this->eventDispatcher->dispatch(new MutationEvaluationForMutationWasFinished(
-                MutantExecutionResult::createFromNonCoveredMutant($mutant),
-            ));
-        }
-
-        return $isKept;
+    private function createUncoveredByTestHeuristic(Mutant $mutant): bool
+    {
+        // It's a proxy call to Mutation, can be done one stage up
+        return $mutant->isCoveredByTest();
     }
 
     private function takingTooLong(Mutant $mutant): bool
     {
-        $isKept = $this->evaluateHeuristic(
+        return $this->evaluateHeuristic(
             $mutant,
-            MutationEvaluationHeuristic::TAKING_TOO_LONG,
-            function (Mutant $mutant): bool {
-                // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
-                return $mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout;
-            },
+            HeuristicName::TAKING_TOO_LONG,
+            $this->createTakingTooLongHeuristic(...),
+            fn () => $this->eventDispatcher->dispatch(
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant),
+                ),
+            ),
         );
+    }
 
-        if (!$isKept) {
-            $this->emitHeuristicSuppressionFinished($mutant);
-            $this->eventDispatcher->dispatch(new MutationEvaluationForMutationWasFinished(
-                MutantExecutionResult::createFromTimeSkippedMutant($mutant),
-            ));
-        }
-
-        return $isKept;
+    private function createTakingTooLongHeuristic(Mutant $mutant): bool
+    {
+        // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
+        return $mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout;
     }
 
     private function mutantToContainer(Mutant $mutant, string $testFrameworkExtraOptions): MutantProcessContainer
@@ -253,22 +260,40 @@ class MutationTestingRunner
     }
 
     /**
-     * @param callable(Mutant): bool $heuristic
+     * @param Closure(Mutant): bool $heuristic
+     * @param Closure(Mutant): void $onSuppressed
      */
     private function evaluateHeuristic(
         Mutant $mutant,
-        MutationEvaluationHeuristic $heuristicName,
-        callable $heuristic,
+        HeuristicName $heuristicName,
+        Closure $heuristic,
+        Closure $onSuppressed,
     ): bool {
         $mutation = $mutant->getMutation();
 
-        $this->eventDispatcher->dispatch(new HeuristicWasStarted($mutation, $heuristicName));
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasStarted(
+                $mutation,
+                $heuristicName,
+            ),
+        );
 
-        try {
-            return $heuristic($mutant);
-        } finally {
-            $this->eventDispatcher->dispatch(new HeuristicWasFinished($mutation, $heuristicName));
+        $isKept = $heuristic($mutant);
+
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasFinished(
+                $mutation,
+                $heuristicName,
+            ),
+        );
+
+        if (!$isKept) {
+            $this->emitHeuristicSuppressionFinished($mutant);
+
+            $onSuppressed($mutant);
         }
+
+        return $isKept;
     }
 
     /**

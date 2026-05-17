@@ -38,7 +38,7 @@ namespace Infection\Process\Runner;
 /**
  * @internal
  */
-enum MutationEvaluationHeuristic: string
+enum HeuristicName: string
 {
     case IGNORED_BY_MUTATION_ID = 'ignored_by_mutation_id';
     case IGNORED_BY_REGEX = 'ignored_by_regex';
