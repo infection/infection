@@ -1,0 +1,17 @@
+schemaVersion: "1"
+kind: mixin
+name: infection-codex-otel
+displayName: Infection Codex OTEL
+description: Merge Infection OpenTelemetry settings into the generated Codex user config.
+
+commands:
+  initFiles:
+    - path: /home/agent/.config/infection-sbx/workdir
+      content: "${WORKDIR}\n"
+      mode: "0644"
+      description: Persist the sandbox workspace path for the OTEL merge script.
+  startup:
+    - command: ["/home/agent/.local/bin/infection-merge-codex-otel"]
+      user: "1000"
+      background: false
+      description: Merge Infection OTEL settings into Codex config.

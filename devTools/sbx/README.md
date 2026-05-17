@@ -8,23 +8,20 @@ It uses [container-structure-test][container-structure-test] for testing the ima
 
 ## Telemetry
 
-Codex telemetry is optional, to enable it, copy the template before launching
-Codex:
+Codex telemetry is optional. The OpenTelemetry settings live in
+`devTools/sbx/codex-otel.toml` and are merged into the Codex user-level config
+by the `devTools/sbx/codex-otel-kit` kit when the sandbox starts.
 
-```shell
-cp devTools/sbx/config.toml.dist .codex/config.toml
-```
-
-The provided template assumes the OTLP gRPC collector is reachable from
-the sandbox at `http://host.docker.internal:4317`. If it runs elsewhere,
-update `.codex/config.toml`.
+The provided template assumes the OTLP HTTP collector is reachable from
+the sandbox at `http://host.docker.internal:4318`. If it runs elsewhere,
+update `devTools/sbx/codex-otel.toml`.
 
 Note that depending on the port used or your network policies, the connection
 to the host may be denied. For example, with the value above, you will need to
 execute:
 
 ```shell
-sbx policy allow network localhost:4317
+sbx policy allow network localhost:4318
 ```
 
 ## Usage
@@ -38,11 +35,14 @@ make sbx-image-build
 make _sbx-image-build
 ```
 
-Run a sandbox with the loaded template:
+Run a sandbox with the loaded template (from the repo root):
 
 ```shell
-sbx run --template=infection-sbx-php-8.4:latest codex
+sbx run codex --template=infection-sbx-php-8.4:latest --kit=./devTools/sbx/codex-otel-kit
 ```
+
+The `--kit` flag only applies when the sandbox is created. For an existing
+sandbox, recreate it or apply the kit explicitly with `sbx kit add`.
 
 [docker sandbox]: https://www.docker.com/products/docker-sandboxes/
 [docker-sandbox-templates-codex]: https://hub.docker.com/layers/docker/sandbox-templates/codex-docker/images
