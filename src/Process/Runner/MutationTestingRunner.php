@@ -36,8 +36,19 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use Closure;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
@@ -90,13 +101,16 @@ class MutationTestingRunner
             // as the latter does not dispatch any finished event.
             ->tap($this->emitEvaluationStarted(...))
             ->cast($this->mutationToMutant(...))
+            ->tap($this->emitHeuristicSuppressionStarted(...))
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
+            ->tap($this->emitHeuristicSuppressionFinished(...))
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
-        take($this->processRunner->run($processContainers))
+        take($this->processRunner->run($this->markMutantEvaluationStarted($processContainers)))
+            ->tap($this->emitMutantEvaluationFinished(...))
             ->cast(self::containerToFinishedEvent(...))
             ->each($this->eventDispatcher->dispatch(...))
         ;
@@ -118,14 +132,46 @@ class MutationTestingRunner
 
     private function ignoredByMutantId(Mutation $mutation): bool
     {
-        if ($this->mutantId === null) {
+        if (
+            $this->mutantId === null
+            || $mutation->getHash() === $this->mutantId
+        ) {
             return true;
         }
 
-        return $mutation->getHash() === $this->mutantId;
+        $this->eventDispatcher->dispatch(new HeuristicSuppressionWasStarted($mutation));
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasStarted(
+                $mutation,
+                HeuristicName::IGNORED_BY_MUTATION_ID,
+            ),
+        );
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasFinished(
+                $mutation,
+                HeuristicName::IGNORED_BY_MUTATION_ID,
+            ),
+        );
+        $this->eventDispatcher->dispatch(new HeuristicSuppressionWasFinished($mutation));
+
+        return false;
     }
 
     private function ignoredByRegex(Mutant $mutant): bool
+    {
+        return $this->evaluateHeuristic(
+            $mutant,
+            HeuristicName::IGNORED_BY_REGEX,
+            $this->createIgnoredByRegexHeuristic(...),
+            fn () => $this->eventDispatcher->dispatch(
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResult::createFromIgnoredMutant($mutant),
+                ),
+            ),
+        );
+    }
+
+    private function createIgnoredByRegexHeuristic(Mutant $mutant): bool
     {
         $mutatorName = $mutant->getMutation()->getMutatorName();
 
@@ -138,10 +184,6 @@ class MutationTestingRunner
                 continue;
             }
 
-            $this->eventDispatcher->dispatch(new MutationEvaluationForMutationWasFinished(
-                MutantExecutionResult::createFromIgnoredMutant($mutant),
-            ));
-
             return false;
         }
 
@@ -150,41 +192,129 @@ class MutationTestingRunner
 
     private function uncoveredByTest(Mutant $mutant): bool
     {
+        return $this->evaluateHeuristic(
+            $mutant,
+            HeuristicName::UNCOVERED_BY_TESTS,
+            $this->createUncoveredByTestHeuristic(...),
+            fn () => $this->eventDispatcher->dispatch(
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant),
+                ),
+            ),
+        );
+    }
+
+    private function createUncoveredByTestHeuristic(Mutant $mutant): bool
+    {
         // It's a proxy call to Mutation, can be done one stage up
-        if ($mutant->isCoveredByTest()) {
-            return true;
-        }
-
-        $this->eventDispatcher->dispatch(new MutationEvaluationForMutationWasFinished(
-            MutantExecutionResult::createFromNonCoveredMutant($mutant),
-        ));
-
-        return false;
+        return $mutant->isCoveredByTest();
     }
 
     private function takingTooLong(Mutant $mutant): bool
     {
+        return $this->evaluateHeuristic(
+            $mutant,
+            HeuristicName::TAKING_TOO_LONG,
+            $this->createTakingTooLongHeuristic(...),
+            fn () => $this->eventDispatcher->dispatch(
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant),
+                ),
+            ),
+        );
+    }
+
+    private function createTakingTooLongHeuristic(Mutant $mutant): bool
+    {
         // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
-        if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
-            return true;
-        }
-
-        $this->eventDispatcher->dispatch(new MutationEvaluationForMutationWasFinished(
-            MutantExecutionResult::createFromTimeSkippedMutant($mutant),
-        ));
-
-        return false;
+        return $mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout;
     }
 
     private function mutantToContainer(Mutant $mutant, string $testFrameworkExtraOptions): MutantProcessContainer
     {
-        $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
+        $this->eventDispatcher->dispatch(new MutantAnalysisWasStarted($mutant));
+        $this->eventDispatcher->dispatch(new MutantMaterialisationWasStarted($mutant));
 
-        return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
+        try {
+            $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
+
+            return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
+        } finally {
+            $this->eventDispatcher->dispatch(new MutantMaterialisationWasFinished($mutant));
+        }
     }
 
     private static function containerToFinishedEvent(MutantProcessContainer $container): MutationEvaluationForMutationWasFinished
     {
         return new MutationEvaluationForMutationWasFinished($container->getCurrent()->getMutantExecutionResult());
+    }
+
+    private function emitHeuristicSuppressionStarted(Mutant $mutant): void
+    {
+        $this->eventDispatcher->dispatch(new HeuristicSuppressionWasStarted($mutant->getMutation()));
+    }
+
+    private function emitHeuristicSuppressionFinished(Mutant $mutant): void
+    {
+        $this->eventDispatcher->dispatch(new HeuristicSuppressionWasFinished($mutant->getMutation()));
+    }
+
+    /**
+     * @param Closure(Mutant): bool $heuristic
+     * @param Closure(Mutant): void $onSuppressed
+     */
+    private function evaluateHeuristic(
+        Mutant $mutant,
+        HeuristicName $heuristicName,
+        Closure $heuristic,
+        Closure $onSuppressed,
+    ): bool {
+        $mutation = $mutant->getMutation();
+
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasStarted(
+                $mutation,
+                $heuristicName,
+            ),
+        );
+
+        $isKept = $heuristic($mutant);
+
+        $this->eventDispatcher->dispatch(
+            new HeuristicWasFinished(
+                $mutation,
+                $heuristicName,
+            ),
+        );
+
+        if (!$isKept) {
+            $this->emitHeuristicSuppressionFinished($mutant);
+
+            $onSuppressed($mutant);
+        }
+
+        return $isKept;
+    }
+
+    /**
+     * @param iterable<MutantProcessContainer> $processContainers
+     *
+     * @return iterable<MutantProcessContainer>
+     */
+    private function markMutantEvaluationStarted(iterable $processContainers): iterable
+    {
+        foreach ($processContainers as $processContainer) {
+            $this->eventDispatcher->dispatch(new MutantEvaluationWasStarted($processContainer->getCurrent()->getMutant()));
+
+            yield $processContainer;
+        }
+    }
+
+    private function emitMutantEvaluationFinished(MutantProcessContainer $processContainer): void
+    {
+        $mutant = $processContainer->getCurrent()->getMutant();
+
+        $this->eventDispatcher->dispatch(new MutantEvaluationWasFinished($mutant));
+        $this->eventDispatcher->dispatch(new MutantAnalysisWasFinished($mutant));
     }
 }

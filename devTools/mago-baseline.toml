@@ -10892,6 +10892,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
+code = "ambiguous-object-property-access"
+message = "Cannot statically verify property access on a generic `object` type."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 11
@@ -10911,19 +10917,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted>`, but found `mixed`.'
-count = 7
+message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, object>`, but found `mixed`.'
+count = 8
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertHasEvent`: expected `array<array-key, object>`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertCount`: expected `Countable|iterable<mixed, mixed>`, but found `mixed`.'
 count = 1
 
 [[issues]]
@@ -10952,24 +10952,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "possibly-invalid-argument"
 message = 'Possible argument type mismatch for argument #4 of `Infection\Process\Runner\MutationTestingRunner::__construct`: expected `Infection\Event\EventDispatcher\EventDispatcher`, but possibly received `unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`.'
 count = 6
@@ -10984,7 +10966,7 @@ count = 1
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 2
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
@@ -11006,9 +10988,27 @@ count = 2
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "no-value"
 message = 'Argument #1 passed to method `Infection\Process\MutantProcessContainer::__construct` has type `never`, meaning it cannot produce a value.'
 count = 5
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `Infection\Process\Runner\ParallelProcessRunner::__construct` has type `never`, meaning it cannot produce a value.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
