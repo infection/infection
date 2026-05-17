@@ -216,6 +216,13 @@ parameters:
             message: '#TeamCity::escapeValue\(\) should return non-empty-string#'
             identifier: return.type
             path: ../src/Logger/MutationAnalysis/TeamCity/TeamCity.php
+
+        # Fallback copy of Symfony's StringInput tokenization for versions before
+        # ArgvInput::getRawTokens(). The regex matches guarantee these offsets.
+        -
+            identifier: offsetAccess.notFound
+            count: 6
+            path: ../src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php
     level: 8
     paths:
         - ../src

@@ -42,7 +42,6 @@ use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\TestFrameworkExtraArgs;
 use SplFileInfo;
 use function sprintf;
 
@@ -127,7 +126,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         if ($extraOptions !== '') {
             $options = array_merge(
                 $options,
-                TestFrameworkExtraArgs::raw($extraOptions)->argvTokens,
+                TestFrameworkExtraArgs::parseRawTokens($extraOptions),
             );
         }
 
