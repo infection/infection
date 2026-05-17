@@ -87,6 +87,13 @@ assert_line_count 6 '"name": "infection.mutation_evaluation.process"' var/execut
 assert_line_count 1 '"name": "infection.reporting"' var/execution-with-trace-exporter.stdout
 assert_contains '"service.name": "infection"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.project.name": "infection\/infection"' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.project.dir": "' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.config.path": "tests\/e2e\/Telemetry_Console\/infection.json"' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.version": "' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.distribution": "source"' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.thread.count": 1' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.initial_tests.skipped": false' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.initial_static_analysis.skipped": false' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.count":' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"infection.mutation.status": "killed by tests"' var/execution-with-trace-exporter.stdout

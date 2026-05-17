@@ -112,8 +112,8 @@ use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
-use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Telemetry\RunTelemetryAttributesProvider;
 use Infection\Telemetry\SpanHandle;
 use function spl_object_id;
 use function str_starts_with;
@@ -176,7 +176,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function __construct(
         private readonly OpenTelemetryTracer $telemetry,
-        private readonly RunSpanAttributesProvider $runSpanAttributesProvider,
+        private readonly RunTelemetryAttributesProvider $runTelemetryAttributesProvider,
     ) {
     }
 
@@ -184,7 +184,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $this->rootSpan = $this->telemetry->startRootSpan(
             'infection.run',
-            $this->runSpanAttributesProvider->provide(),
+            $this->runTelemetryAttributesProvider->provide(),
         );
     }
 
