@@ -306,13 +306,13 @@ $(MAGO): vendor
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
-	composer require infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
+	composer require infection/codeception-adapter infection/phpspec-adapter # testo/bridge-infection
 	# Workaround for https://github.com/box-project/box/issues/580
 	composer install --no-dev
 	$(BOX) --version
 	$(BOX) validate
 	$(BOX) compile
-	composer remove infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
+	composer remove infection/codeception-adapter infection/phpspec-adapter # testo/bridge-infection
 	composer install
 	touch -c $@
 
