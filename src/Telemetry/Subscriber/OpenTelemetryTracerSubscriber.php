@@ -67,8 +67,8 @@ use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
@@ -93,7 +93,7 @@ use Infection\Telemetry\SpanHandle;
 /**
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
 
@@ -296,7 +296,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         }
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutationEvaluationForMutationWasFinished(MutationEvaluationForMutationWasFinished $event): void
     {
         $result = $event->executionResult;
         $hash = $result->getMutantHash();
