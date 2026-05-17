@@ -37,6 +37,7 @@ namespace Infection\TestFramework;
 
 use function array_filter;
 use function array_merge;
+use function array_values;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function is_executable;
 use const PHP_SAPI;
@@ -55,6 +56,11 @@ class CommandLineBuilder
     /** @var string[]|null */
     private ?array $cachedPhpCmdLine = null;
 
+    public function __construct(
+        private readonly PhpExecutableFinder $phpExecutableFinder,
+    ) {
+    }
+
     /**
      * @param string[] $frameworkArgs
      * @param string[] $phpExtraArgs
@@ -70,7 +76,7 @@ class CommandLineBuilder
         /*
          * That's an empty options list by all means, we need to see it as such
          */
-        $phpExtraArgs = array_filter($phpExtraArgs);
+        $phpExtraArgs = array_values(array_filter($phpExtraArgs));
 
         /*
          * Run an executable as it is if we're using a standard CLI and
@@ -92,7 +98,7 @@ class CommandLineBuilder
             $frameworkArgs,
         );
 
-        return array_filter($commandLineArgs);
+        return array_values(array_filter($commandLineArgs));
     }
 
     /**
@@ -106,7 +112,7 @@ class CommandLineBuilder
             return $cachedPhpCmdLine;
         }
 
-        $phpExec = (new PhpExecutableFinder())->find(false);
+        $phpExec = $this->phpExecutableFinder->find(false);
 
         if ($phpExec === false) {
             throw FinderException::phpExecutableNotFound();

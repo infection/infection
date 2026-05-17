@@ -143,6 +143,7 @@ final class ConfigurationFactoryTest extends TestCase
             testFrameworkExtraOptions: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
 
@@ -176,6 +177,7 @@ final class ConfigurationFactoryTest extends TestCase
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
                 threadCount: 0,
+                dotsPerRow: null,
                 dryRun: false,
                 useGitHubLogger: false,
                 gitlabLogFilePath: null,
@@ -219,6 +221,7 @@ final class ConfigurationFactoryTest extends TestCase
             testFrameworkExtraOptions: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: null,
         );
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
@@ -244,6 +247,7 @@ final class ConfigurationFactoryTest extends TestCase
             staticAnalysisToolOptions: null,
             sourceFilter: new IncompleteGitDiffFilter('AM', 'master'),
             threadCount: 1,
+            dotsPerRow: null,
             dryRun: false,
             useGitHubLogger: true,
             gitlabLogFilePath: null,
@@ -288,6 +292,7 @@ final class ConfigurationFactoryTest extends TestCase
             maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
+            dotsPerRow: 50,
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
@@ -707,6 +712,46 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'dotsPerRow not specified in schema and not specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                null,
+                null,
+                50,
+            ),
+        ];
+
+        yield 'dotsPerRow specified in schema and not specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                80,
+                null,
+                80,
+            ),
+        ];
+
+        yield 'dotsPerRow not specified in schema and specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                null,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'dotsPerRow specified in schema and specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                80,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'dotsPerRow set to max in schema' => [
+            $defaultScenario->forValueForDotsPerRow(
+                'max',
+                null,
+                'max',
+            ),
+        ];
+
         yield 'minCoveredMsi not specified in schema and not specified in input' => [
             $defaultScenario->forValueForMinCoveredMsi(
                 null,
@@ -937,12 +982,58 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'test framework PHP options from config are normalized for PHPUnit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                'debug --stop-on-failure',
+                null,
+                '--debug --stop-on-failure',
+            ),
+        ];
+
         yield 'test framework PHP options from input' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 null,
                 '--debug',
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for PHPUnit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '--debug --stop-on-failure',
+                '--debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for PHPUnit (missing leading dashes)' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                'debug stop-on-failure',
+                '--debug stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for PHPUnit with short option' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+                // Incorrect current behaviour: the splitter normalises all options to long options.
+                '--v debug --stop-on-failure -c phpunit_autoreview',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for PHPUnit with spaces' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '--filter "a test with spaces"',
+                '--filter "a test with spaces"',
             ),
         ];
 
@@ -955,12 +1046,57 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'test framework PHP options from config with phpspec framework' => [
+        yield 'test framework PHP options from config with another test framework' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpspec',
                 '--debug',
                 null,
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from config are not normalized for another test framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                'debug --stop-on-failure',
+                null,
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are not normalized for another test framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug --stop-on-failure',
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for another test framework (missing leading dashes)' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug stop-on-failure',
+                'debug stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for another test framework with short option' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for another test framework with spaces' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                '--filter "a test with spaces"',
+                '--filter "a test with spaces"',
             ),
         ];
 
@@ -1266,6 +1402,7 @@ final class ConfigurationFactoryTest extends TestCase
                         'src/Bar.php',
                     ]),
                     threadCount: 4,
+                    dotsPerRow: null,
                     dryRun: true,
                     useGitHubLogger: false,
                     gitlabLogFilePath: null,

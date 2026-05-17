@@ -82,6 +82,8 @@ final class RunCommand extends BaseCommand
 {
     public const string OPTION_THREADS = 'threads';
 
+    public const string OPTION_DOTS_PER_ROW = 'dots-per-row';
+
     public const string OPTION_LOGGER_GITHUB = 'logger-github';
 
     public const string OPTION_SHOW_MUTATIONS = 'show-mutations';
@@ -175,6 +177,13 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Number of threads to use by the runner when executing the mutations. Use "max" to auto calculate it.',
                 Container::DEFAULT_THREAD_COUNT,
+            )
+            ->addOption(
+                self::OPTION_DOTS_PER_ROW,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Number of dots per row in the dot progress formatter. Use "max" to fit the terminal width.',
+                Container::DEFAULT_DOTS_PER_ROW,
             )
             ->addOption(
                 self::OPTION_WITH_UNCOVERED,
@@ -474,6 +483,7 @@ final class RunCommand extends BaseCommand
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io),
             threadCount: $commandHelper->getThreadCount(),
+            dotsPerRow: $commandHelper->getDotsPerRow(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),

@@ -73,7 +73,7 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
             '/path/to/project/infection.json5',
         );
 
-        $logger = $factory->create($name);
+        $logger = $factory->create($name, 50);
 
         $this->assertInstanceOf($expectedFormatterClassName, $logger);
     }

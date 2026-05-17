@@ -420,6 +420,35 @@ final class ConfigurationFactoryScenario
             );
     }
 
+    /**
+     * @param positive-int|'max'|null $dotsPerRowFromSchemaConfiguration
+     * @param positive-int|'max'|null $dotsPerRowFromInput
+     * @param positive-int|'max' $expectedDotsPerRow
+     */
+    public function forValueForDotsPerRow(
+        string|int|null $dotsPerRowFromSchemaConfiguration,
+        string|int|null $dotsPerRowFromInput,
+        string|int $expectedDotsPerRow,
+    ): self {
+        $previousExpected = $this->expected;
+        Assert::isInstanceOf($previousExpected, Configuration::class);
+
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withDotsPerRow($dotsPerRowFromSchemaConfiguration),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withDotsPerRow($dotsPerRowFromInput),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($previousExpected)
+                    ->withDotsPerRow($expectedDotsPerRow)
+                    ->build(),
+            );
+    }
+
     public function forValueForMinCoveredMsi(
         ?float $minCoveredMsiFromSchemaConfiguration,
         ?float $minCoveredMsiFromInput,

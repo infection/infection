@@ -33,47 +33,72 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 
-use function dirname;
-use Infection\Logger\Console\BasicConsoleLogger;
-use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
-use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
-use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLoggerState;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Terminal;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 
-/**
- * @internal
- */
-final readonly class MutationAnalysisLoggerFactory
+final class MutantCommandLineScenario
 {
+    /**
+     * @param list<TestLocation> $coverageTests
+     * @param list<string> $expected
+     */
     public function __construct(
-        private OutputInterface $output,
-        private TeamCity $teamCity,
-        private string $configurationPathname,
+        public string $testFrameworkConfigContent,
+        public string $version,
+        public bool $executeOnlyCoveringTestCases,
+        public array $coverageTests,
+        public string $mutatedFilePath,
+        public string $mutationHash,
+        public string $mutationOriginalFilePath,
+        public string $extraOptions,
+        public array $expected,
     ) {
     }
 
+    public function withVersion(string $version): self
+    {
+        $clone = clone $this;
+        $clone->version = $version;
+
+        return $clone;
+    }
+
+    public function withExecuteOnlyCoveringTestCases(bool $executeOnlyCoveringTestCases): self
+    {
+        $clone = clone $this;
+        $clone->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
+
+        return $clone;
+    }
+
     /**
-     * @param positive-int|'max' $dotsPerRow
+     * @param list<TestLocation> $coverageTests
      */
-    public function create(
-        MutationAnalysisLoggerName $name,
-        int|string $dotsPerRow,
-    ): MutationAnalysisLogger {
-        return match ($name) {
-            MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
-                new ProgressBar($this->output),
-            ),
-            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output, $dotsPerRow, new Terminal()),
-            MutationAnalysisLoggerName::TEAMCITY => new TeamCityLogger(
-                $this->teamCity,
-                new TeamCityLoggerState(),
-                new BasicConsoleLogger($this->output),
-                dirname($this->configurationPathname),
-            ),
-        };
+    public function withCoverageTests(array $coverageTests): self
+    {
+        $clone = clone $this;
+        $clone->coverageTests = $coverageTests;
+
+        return $clone;
+    }
+
+    public function withExtraOptions(string $extraOptions): self
+    {
+        $clone = clone $this;
+        $clone->extraOptions = $extraOptions;
+
+        return $clone;
+    }
+
+    /**
+     * @param list<string> $expected
+     */
+    public function withExpected(array $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
     }
 }
