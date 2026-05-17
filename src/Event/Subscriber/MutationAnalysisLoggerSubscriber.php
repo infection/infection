@@ -40,8 +40,8 @@ use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStartedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
@@ -55,7 +55,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 /**
  * @internal
  */
-final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutantProcessWasFinishedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
+final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber
 {
     public function __construct(
         private MutationAnalysisLogger $logger,
@@ -87,7 +87,7 @@ final readonly class MutationAnalysisLoggerSubscriber implements MutableFileWasP
         }
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutationEvaluationForMutationWasFinished(MutationEvaluationForMutationWasFinished $event): void
     {
         $executionResult = $event->executionResult;
 

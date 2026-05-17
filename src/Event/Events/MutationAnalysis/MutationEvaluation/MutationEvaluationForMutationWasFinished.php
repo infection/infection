@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
 
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
  */
-interface MutantProcessWasFinishedSubscriber extends EventSubscriber
+final readonly class MutationEvaluationForMutationWasFinished
 {
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void;
+    public function __construct(
+        public MutantExecutionResult $executionResult,
+    ) {
+    }
 }
