@@ -10929,7 +10929,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted>`, but found `mixed`.'
+message = 'Invalid argument type for argument #2 of `Infection\Tests\Process\Runner\MutationTestingRunnerTest::assertAreSameEvents`: expected `array<array-key, Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished|Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted>`, but found `mixed`.'
 count = 7
 
 [[issues]]
@@ -10977,7 +10977,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
 code = "non-existent-property"
-message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished`.'
+message = 'Property `$mutationCount` does not exist on class `Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished`.'
 count = 1
 
 [[issues]]

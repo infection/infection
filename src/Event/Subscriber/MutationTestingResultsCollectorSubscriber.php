@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinishedSubscriber;
 use Infection\Metrics\Collector;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsCollectorSubscriber implements MutantProcessWasFinishedSubscriber
+final readonly class MutationTestingResultsCollectorSubscriber implements MutationEvaluationForMutationWasFinishedSubscriber
 {
     /** @var Collector[] */
     private array $collectors;
@@ -52,7 +52,7 @@ final readonly class MutationTestingResultsCollectorSubscriber implements Mutant
         $this->collectors = $collectors;
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutationEvaluationForMutationWasFinished(MutationEvaluationForMutationWasFinished $event): void
     {
         $executionResult = $event->executionResult;
 

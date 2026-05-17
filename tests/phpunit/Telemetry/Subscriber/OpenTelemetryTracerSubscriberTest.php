@@ -53,7 +53,7 @@ use Infection\Event\Events\Ast\AstProcessingWasFinished;
 use Infection\Event\Events\Ast\AstProcessingWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
@@ -140,7 +140,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished());
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
-        $this->subscriber->onMutantProcessWasFinished(new MutantProcessWasFinished(
+        $this->subscriber->onMutationEvaluationForMutationWasFinished(new MutationEvaluationForMutationWasFinished(
             MutantExecutionResultBuilder::withMinimalTestData()
                 ->withMutantHash($mutation->getHash())
                 ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
