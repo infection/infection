@@ -37,8 +37,8 @@ jobs:
       CONTAINER_STRUCTURE_TEST_VERSION: 1.22.1
       DOCKER_BUILDKIT: 1
       IMAGE_PLATFORM: ${{ matrix.platform }}
-      IMAGE_CACHE_FROM: type=gha,scope=${{ matrix.cache-scope }}
-      IMAGE_CACHE_TO: type=gha,mode=max,ignore-error=true,scope=${{ matrix.cache-scope }}
+      IMAGE_CACHE_FROM: ${{ github.event_name != 'release' && format('type=gha,scope={0}', matrix.cache-scope) || '' }}
+      IMAGE_CACHE_TO: ${{ github.event_name != 'release' && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.cache-scope) || '' }}
 
     steps:
       - name: Checkout code
@@ -54,16 +54,9 @@ jobs:
       - name: Expose GitHub runtime for Buildx cache
         uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
 
-      - name: Cache container-structure-test
-        id: container-structure-test-cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: .tools/container-structure-test
-          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
-
       - name: Install container-structure-test
-        if: steps.container-structure-test-cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p .tools
           curl --location --fail --show-error --silent \
             --output .tools/container-structure-test \
             "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-amd64"

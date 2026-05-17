@@ -106,7 +106,7 @@ jobs:
 
       - name: Install Linux dependencies for E2E tests
         if: runner.os != 'Windows'
-        uses: awalsh128/cache-apt-pkgs-action@v1
+        uses: awalsh128/cache-apt-pkgs-action@0e3c11464a8cfae52ee6ceb2b33777bcc9187892 # v1
         with:
           packages: expect moreutils
 
