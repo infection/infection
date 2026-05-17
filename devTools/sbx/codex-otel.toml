@@ -1,0 +1,7 @@
+[otel]
+environment = "infection"
+log_user_prompt = false
+
+exporter         = { otlp-http = { endpoint = "http://host.docker.internal:4318/v1/logs",    protocol = "binary" }}
+trace_exporter   = { otlp-http = { endpoint = "http://host.docker.internal:4318/v1/traces",  protocol = "binary" }}
+metrics_exporter = { otlp-http = { endpoint = "http://host.docker.internal:4318/v1/metrics", protocol = "binary" }}
