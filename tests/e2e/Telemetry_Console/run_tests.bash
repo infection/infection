@@ -86,6 +86,7 @@ assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_evaluation"' 
 assert_line_count 6 '"name": "infection.mutation_evaluation.process"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.reporting"' var/execution-with-trace-exporter.stdout
 assert_contains '"service.name": "infection"' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.project.name": "infection\/infection"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.count":' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"infection.mutation.status": "killed by tests"' var/execution-with-trace-exporter.stdout
