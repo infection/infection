@@ -326,7 +326,9 @@ final class Container extends DIContainer
                     $config,
                     $container->get(InfectionVersion::class),
                     $container->getTestFrameworkAdapter(),
-                    $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
+                    $config->isStaticAnalysisEnabled()
+                        ? $container->getStaticAnalysisToolAdapter()
+                        : null,
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

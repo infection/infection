@@ -68,21 +68,12 @@ Infection records the following lifecycle spans for every run:
 The root `infection.run` span includes run identity, execution-context, and
 toolchain attributes that are useful for filtering dashboards:
 
-| Attribute                                     | Description                                                                 |
-|-----------------------------------------------|-----------------------------------------------------------------------------|
-| `infection.project.name`                      | Project label. Uses `INFECTION_PROJECT_NAME`, then root `composer.json` name, then project directory basename. |
-| `infection.project.dir`                       | Resolved project directory.                                                 |
-| `infection.config.path`                       | Infection configuration path, relative to `infection.project.dir` when possible. |
-| `infection.version`                           | Infection version reported by Composer metadata.                            |
-| `infection.distribution`                      | `source` or `phar`.                                                         |
-| `infection.git.sha`                           | Current `HEAD` commit SHA when the project directory is a Git checkout.     |
-| `infection.thread.count`                      | Resolved mutation runner thread count.                                      |
-| `infection.initial_tests.skipped`             | Whether the initial test run was skipped.                                   |
-| `infection.initial_static_analysis.skipped`   | Whether the initial static analysis run was skipped because no static analysis tool was enabled. |
-| `infection.test_framework.name`               | Normalized configured test framework name, for example `phpunit`.           |
-| `infection.test_framework.version`            | Version reported by the configured test framework adapter.                  |
-| `infection.static_analysis_tool.name`         | Normalized configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled. |
-| `infection.static_analysis_tool.version`      | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
+| Attribute                                | Description                                                                                                               |
+|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `infection.test_framework.name`          | Normalized configured test framework name, for example `phpunit`.                                                         |
+| `infection.test_framework.version`       | Version reported by the configured test framework adapter.                                                                |
+| `infection.static_analysis_tool.name`    | Normalized configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled.     |
+| `infection.static_analysis_tool.version` | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
 
 ## Configuration
 

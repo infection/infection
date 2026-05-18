@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Attribute;
 
-use function array_filter;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
@@ -43,6 +42,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * @phpstan-type Attribute = bool|int|float|string|null
@@ -69,7 +69,7 @@ final readonly class RunSpanAttributesProvider
      */
     public function provide(): array
     {
-        return array_filter([
+        $attributes = [
             'infection.project.name' => $this->configuration->projectName,
             'infection.project.dir' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
@@ -81,11 +81,17 @@ final readonly class RunSpanAttributesProvider
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
             'infection.test_framework.name' => $this->configuration->testFramework,
             'infection.test_framework.version' => $this->testFrameworkAdapter->getVersion(),
-            'infection.static_analysis_tool.name' => $this->configuration->staticAnalysisTool,
-            'infection.static_analysis_tool.version' => $this->configuration->isStaticAnalysisEnabled()
-                ? $this->staticAnalysisToolAdapter?->getVersion()
-                : null,
-        ], static fn (mixed $value): bool => $value !== null);
+        ];
+
+        if ($this->configuration->isStaticAnalysisEnabled()) {
+            Assert::notNull($this->configuration->staticAnalysisTool);
+            Assert::notNull($this->staticAnalysisToolAdapter);
+
+            $attributes['infection.static_analysis_tool.name'] = $this->configuration->staticAnalysisTool;
+            $attributes['infection.static_analysis_tool.version'] = $this->staticAnalysisToolAdapter->getVersion();
+        }
+
+        return $attributes;
     }
 
     private function getConfigurationPath(): string
