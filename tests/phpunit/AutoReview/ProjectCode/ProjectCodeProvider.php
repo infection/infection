@@ -346,6 +346,7 @@ final class ProjectCodeProvider
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
             ->exclude([
+                'Architecture',
                 'autoloaded',
                 'benchmark',
                 'e2e',
