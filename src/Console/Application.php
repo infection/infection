@@ -82,9 +82,15 @@ final class Application extends BaseApplication
      */
     public function __construct(
         private readonly Container $container,
-        InfectionVersion $infectionVersion = new InfectionVersion(),
+        ?InfectionVersion $infectionVersion = null,
     ) {
-        parent::__construct(self::NAME, $infectionVersion->prettyVersion());
+        $infectionVersion ??= $this->container->get(InfectionVersion::class);
+
+        parent::__construct(
+            self::NAME,
+            $infectionVersion->prettyVersion(),
+        );
+
         $this->setDefaultCommand('run');
     }
 
