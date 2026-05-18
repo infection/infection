@@ -33,8 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\DevTools\PHPStan\Rules;
+namespace Infection\Tests\Architecture\PHPStan\Rules;
 
+use function array_map;
+use function in_array;
 use Infection\Container\Container;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
@@ -42,23 +44,26 @@ use PhpParser\Node\Expr\New_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use Symfony\Component\Filesystem\Path;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @implements Rule<New_>
  */
-final class InfectionContainerRule implements Rule {
+final class InfectionContainerRule implements Rule
+{
     /**
      * @var string[]|null
      */
     private static $containerFiles;
 
-    public function getNodeType(): string {
+    public function getNodeType(): string
+    {
         return New_::class;
     }
 
-    public function processNode(Node $node, Scope $scope): array {
+    public function processNode(Node $node, Scope $scope): array
+    {
         if (
             $node->class instanceof Node\Name
             && $node->class->toString() === Container::class
@@ -80,10 +85,10 @@ final class InfectionContainerRule implements Rule {
     private function getContainerFiles(): array
     {
         return self::$containerFiles ??= array_map(
-            static fn (string $path): string => Path::canonicalize($path),
+            Path::canonicalize(...),
             [
-                __DIR__ . '/../../../tests/phpunit/Container/ContainerTest.php',
-                __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
+                __DIR__ . '/../../../phpunit/Container/ContainerTest.php',
+                __DIR__ . '/../../../phpunit/MockedContainer.php',
             ],
         );
     }

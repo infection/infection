@@ -115,8 +115,8 @@
     "autoload-dev": {
         "psr-4": {
             "Infection\\Benchmark\\": "tests/benchmark",
-            "Infection\\Tests\\": "tests/phpunit",
-            "Infection\\DevTools\\": "devTools/"
+            "Infection\\Tests\\Architecture\\": "tests/Architecture",
+            "Infection\\Tests\\": "tests/phpunit"
         },
         "classmap": [
             "tests/autoloaded"
