@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
-use function class_exists;
-use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
@@ -51,10 +49,9 @@ use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container\Container;
+use Infection\Framework\InfectionVersion;
 use OutOfBoundsException;
 use Override;
-use function preg_quote;
-use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,8 +63,6 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    public const string PACKAGE_NAME = 'infection/infection';
-
     private const string NAME = 'Infection - PHP Mutation Testing Framework';
 
     private const string LOGO = '
@@ -81,10 +76,13 @@ final class Application extends BaseApplication
 
 ';
 
+    /**
+     * @throws OutOfBoundsException
+     */
     public function __construct(
         private readonly Container $container,
     ) {
-        parent::__construct(self::NAME, self::getPrettyVersion());
+        parent::__construct(self::NAME, InfectionVersion::prettyVersion());
         $this->setDefaultCommand('run');
     }
 
@@ -143,28 +141,5 @@ final class Application extends BaseApplication
         }
 
         OutputFormatterStyleConfigurator::configure($output);
-    }
-
-    private static function getPrettyVersion(): string
-    {
-        // Pre 2.0 Composer runtime didn't have this class.
-        // @codeCoverageIgnoreStart
-        if (!class_exists(InstalledVersions::class)) {
-            return 'unknown';
-        }
-        // @codeCoverageIgnoreEnd
-
-        try {
-            return (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
-            // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $e) {
-            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {
-                throw $e;
-            }
-
-            // We have a bogus exception: how can Infection be not installed if we're here?
-            return 'not-installed';
-        }
-        // @codeCoverageIgnoreEnd
     }
 }
