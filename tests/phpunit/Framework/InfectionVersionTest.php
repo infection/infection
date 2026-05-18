@@ -47,7 +47,7 @@ final class InfectionVersionTest extends TestCase
     {
         $expected = InstalledVersions::getPrettyVersion(InfectionVersion::PACKAGE_NAME);
 
-        $actual = InfectionVersion::prettyVersion();
+        $actual = (new InfectionVersion())->prettyVersion();
 
         $this->assertSame($expected, $actual);
     }

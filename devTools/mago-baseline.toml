@@ -6595,6 +6595,12 @@ message = "Type `iterable` in return type of `valueProvider` is imprecise, equiv
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Console/ApplicationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Console\ApplicationTest::test_it_uses_the_infection_version`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Console/E2ETest.php"
 code = "implicit-to-string-cast"
 message = 'Implicit conversion to `string` for left operand via `Symfony\Component\Finder\SplFileInfo::__toString()`.'
