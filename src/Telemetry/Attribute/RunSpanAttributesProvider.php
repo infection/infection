@@ -108,15 +108,10 @@ final readonly class RunSpanAttributesProvider
             $this->metricsCalculator->getTotalMutantsCount(),
         );
 
-        $suppressedCount = max(
-            0,
-            $mutationCount - $evaluatedMutationCount,
-        );
-
         return [
             'infection.source_file.count' => $sourceFileCount,
             'infection.mutation.count' => $mutationCount,
-            'infection.mutation.suppressed.count' => $suppressedCount,
+            'infection.mutation.suppressed.count' => $mutationCount - $evaluatedMutationCount,
             'infection.mutation.evaluated.count' => $evaluatedMutationCount,
             'infection.mutation.killed_by_tests.count' => $this->metricsCalculator->getKilledByTestsCount(),
             'infection.mutation.killed_by_static_analysis.count' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
