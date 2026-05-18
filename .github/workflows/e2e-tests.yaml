@@ -136,15 +136,15 @@ jobs:
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Compile the prefixed PHAR
-        if: &prefixed-phar-condition runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
         run: make compile
 
       - name: Check the prefixed PHAR works from a subfolder
-        if: *prefixed-phar-condition
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
         run: cd dist && ./infection.phar -V
 
       - name: Run the whole set of E2E tests with prefixed PHAR
-        if: *prefixed-phar-condition
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
         env:
           TERM: xterm-256color
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
