@@ -96,6 +96,7 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Framework\InfectionVersion;
 use Infection\Framework\OperatingSystem;
 use Infection\Git\NoGitProjectFound;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
@@ -196,6 +197,7 @@ final class ProjectCodeProvider
         GitDiffFilter::class,
         GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
+        InfectionVersion::class,
         InvalidReportSource::class,
         LoggerFactory::class,
         Logs::class,
