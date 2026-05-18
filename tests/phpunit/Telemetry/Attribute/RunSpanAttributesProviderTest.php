@@ -55,14 +55,20 @@ final class RunSpanAttributesProviderTest extends TestCase
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
             ->build();
 
-        $infectionVersion = new InfectionVersion();
+        $infectionVersionMock = $this->createMock(InfectionVersion::class);
+        $infectionVersionMock
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
 
-        $provider = new RunSpanAttributesProvider($configuration, $infectionVersion);
+        $provider = new RunSpanAttributesProvider(
+            $configuration,
+            $infectionVersionMock,
+        );
 
         $expected = [
             'infection.project.dir' => '/var/www/project',
             'infection.config.path' => 'config/infection.json5',
-            'infection.version' => $infectionVersion->prettyVersion(),
+            'infection.version' => '1.2.3',
             'infection.distribution' => 'source',
             'infection.thread.count' => 8,
             'infection.initial_tests.skipped' => true,

@@ -37,6 +37,7 @@ namespace Infection\Telemetry\Attribute;
 
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
+use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
 
@@ -57,6 +58,8 @@ final readonly class RunSpanAttributesProvider
     }
 
     /**
+     * @throws OutOfBoundsException
+     *
      * @return Attributes
      */
     public function provide(): array
