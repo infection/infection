@@ -321,6 +321,7 @@ $(MAGO): vendor
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	# Backup the composer files
+	mkdir -p var/phar
 	cp composer.json var/phar/composer.json.bak
 	cp composer.lock var/phar/composer.lock.bak
 
