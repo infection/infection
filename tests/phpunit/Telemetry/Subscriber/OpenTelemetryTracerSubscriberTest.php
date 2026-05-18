@@ -75,13 +75,16 @@ use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Framework\InfectionVersion;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
@@ -118,6 +121,12 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             new OpenTelemetryTracer(
                 $this->tracerProvider->getTracer('infection'),
                 $this->tracerProvider,
+            ),
+            new RunSpanAttributesProvider(
+                ConfigurationBuilder::withMinimalTestData()
+                    ->withProjectDirectory('/path/to/project')
+                    ->build(),
+                new InfectionVersion(),
             ),
         );
     }
@@ -259,6 +268,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($run->getSpanId(), $reporting->getParentSpanId());
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
+        $this->assertSame('/path/to/project', $run->getAttributes()->get('infection.project.dir'));
+        $this->assertSame('infection.json5', $run->getAttributes()->get('infection.config.path'));
+        $this->assertSame('source', $run->getAttributes()->get('infection.distribution'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.thread.count'));
+        $this->assertFalse($run->getAttributes()->get('infection.initial_tests.skipped'));
+        $this->assertTrue($run->getAttributes()->get('infection.initial_static_analysis.skipped'));
+        $this->assertIsString($run->getAttributes()->get('infection.version'));
         $this->assertSame('/path/to/src/Foo.php', $astProcessing->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
