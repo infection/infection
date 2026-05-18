@@ -65,6 +65,7 @@ final class ConfigurationBuilder
      * @param non-empty-string $configPathname
      * @param non-empty-string $projectDirectory
      * @param non-empty-string $projectName
+     * @param non-empty-string|null $gitSha
      */
     private function __construct(
         private float $timeout,
@@ -106,6 +107,7 @@ final class ConfigurationBuilder
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
+        private ?string $gitSha,
     ) {
     }
 
@@ -153,6 +155,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
             configPathname: $configuration->configurationPathname,
+            gitSha: $configuration->gitSha,
         );
     }
 
@@ -198,6 +201,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
+            gitSha: null,
         );
     }
 
@@ -267,6 +271,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
             configPathname: '/path/to/project/infection.json5',
+            gitSha: null,
         );
     }
 
@@ -601,6 +606,17 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitSha
+     */
+    public function withGitSha(?string $gitSha): self
+    {
+        $clone = clone $this;
+        $clone->gitSha = $gitSha;
+
+        return $clone;
+    }
+
     public function withStaticAnalysisTool(?string $staticAnalysisTool): self
     {
         $clone = clone $this;
@@ -670,6 +686,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
             configurationPathname: $this->configPathname,
+            gitSha: $this->gitSha,
         );
     }
 }

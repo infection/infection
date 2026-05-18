@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry;
 
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
 /**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ *
  * @internal
  */
 final readonly class OpenTelemetryTracer
@@ -51,7 +54,7 @@ final readonly class OpenTelemetryTracer
 
     /**
      * @param non-empty-string $name
-     * @param array<non-empty-string, bool|int|float|string> $attributes
+     * @param Attributes $attributes
      */
     public function startRootSpan(string $name, array $attributes = []): SpanHandle
     {

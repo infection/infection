@@ -43,9 +43,11 @@ final readonly class ConfigurationFactoryGit implements Git
 {
     /**
      * @param non-empty-string $defaultBaseBranch
+     * @param non-empty-string|null $sha
      */
     public function __construct(
         private string $defaultBaseBranch,
+        private ?string $sha = null,
     ) {
     }
 
@@ -78,5 +80,10 @@ final readonly class ConfigurationFactoryGit implements Git
     public function getProjectDirectory(): string
     {
         throw new DomainException('Not implemented.');
+    }
+
+    public function getSha(string $projectDirectory): ?string
+    {
+        return $this->sha;
     }
 }

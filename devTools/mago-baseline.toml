@@ -6063,6 +6063,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_resolves_git_sha`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_resolves_project_name`.'
 count = 1
 
@@ -6076,6 +6082,12 @@ count = 1
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_can_create_a_configuration`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_resolves_git_sha`.'
 count = 1
 
 [[issues]]
@@ -8056,6 +8068,12 @@ count = 1
 file = "tests/phpunit/Git/CommandLineGitTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `gitChangedLinesRangesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `gitShaProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
