@@ -96,7 +96,6 @@ use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Framework\InfectionVersion;
 use Infection\Framework\OperatingSystem;
 use Infection\Git\NoGitProjectFound;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
@@ -121,7 +120,6 @@ use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
-use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Telemetry\SpanHandle;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
@@ -197,7 +195,6 @@ final class ProjectCodeProvider
         GitDiffFilter::class,
         GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
-        InfectionVersion::class,
         InvalidReportSource::class,
         LoggerFactory::class,
         Logs::class,
@@ -231,7 +228,6 @@ final class ProjectCodeProvider
         NullSourceLineMatcher::class,
         NullSubscriber::class,
         OpenTelemetryTracerSubscriberFactory::class,
-        RunSpanAttributesProvider::class,
         OperatingSystem::class,
         ReportingWasFinished::class,
         ReportingWasStarted::class,
