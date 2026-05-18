@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry;
 
+use function array_filter;
+use function array_keys;
 use Exception;
 use function getenv;
 use Infection\Telemetry\OpenTelemetryTracer;
@@ -49,6 +51,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
+use function str_starts_with;
 use UnexpectedValueException;
 
 #[BackupGlobals(true)]
@@ -62,6 +65,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->backupEnvironmentVariables();
+        self::clearTelemetryEnvironmentVariables();
     }
 
     protected function tearDown(): void
@@ -77,7 +81,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
         array $environmentVariables,
         bool|Exception $expected,
     ): void {
-        $this->setEnvVariables($environmentVariables);
+        self::setEnvVariables($environmentVariables);
         $factory = new OpenTelemetryTracerFactory();
 
         if ($expected instanceof Exception) {
@@ -272,7 +276,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
 
     public function test_it_sets_the_default_service_name_when_creating_a_tracer(): void
     {
-        $this->setEnvVariables([
+        self::setEnvVariables([
             Variables::OTEL_TRACES_EXPORTER => 'console',
             OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
         ]);
@@ -288,7 +292,7 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
 
     public function test_it_keeps_the_existing_service_name_when_creating_a_tracer(): void
     {
-        $this->setEnvVariables([
+        self::setEnvVariables([
             Variables::OTEL_TRACES_EXPORTER => 'console',
             Variables::OTEL_SERVICE_NAME => 'custom-service',
             OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
@@ -306,12 +310,34 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
     /**
      * @param array<string, string> $environmentVariables
      */
-    private function setEnvVariables(array $environmentVariables): void
+    private static function setEnvVariables(array $environmentVariables): void
     {
         foreach ($environmentVariables as $name => $value) {
             putenv($name . '=' . $value);
             $_SERVER[$name] = $value;
             $_ENV[$name] = $value;
         }
+    }
+
+    private static function clearTelemetryEnvironmentVariables(): void
+    {
+        foreach (self::getTelemetryEnvironmentVariableNames() as $name) {
+            putenv($name);
+            unset($_SERVER[$name], $_ENV[$name]);
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function getTelemetryEnvironmentVariableNames(): array
+    {
+        $names = array_filter(
+            array_keys(getenv()),
+            static fn (string $name): bool => str_starts_with($name, 'OTEL_'),
+        );
+        $names[] = OpenTelemetryTracerFactory::INFECTION_TELEMETRY;
+
+        return $names;
     }
 }
