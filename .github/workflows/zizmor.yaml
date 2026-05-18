@@ -1,4 +1,4 @@
-name: GitHub Actions Security Analysis with zizmor
+name: GitHub Actions Security Analysis
 
 on:
   pull_request:
@@ -38,4 +38,3 @@ jobs:
           advanced-security: false
           annotations: true
           inputs: .github
-          min-severity: high
