@@ -147,6 +147,11 @@ rector-check: vendor $(RECTOR)
 validate:
 	composer validate --strict
 
+.PHONY: zizmor
+zizmor:			## Runs zizmor
+zizmor:
+	$(DOCKER_RUN) zizmor
+
 .PHONY: profile
 profile: 	 	## Runs Blackfire
 profile:

@@ -37,12 +37,14 @@ jobs:
       CONTAINER_STRUCTURE_TEST_VERSION: 1.22.1
       DOCKER_BUILDKIT: 1
       IMAGE_PLATFORM: ${{ matrix.platform }}
-      IMAGE_CACHE_FROM: type=gha,scope=${{ matrix.cache-scope }}
-      IMAGE_CACHE_TO: type=gha,mode=max,ignore-error=true,scope=${{ matrix.cache-scope }}
+      IMAGE_CACHE_FROM: ${{ github.event_name != 'release' && format('type=gha,scope={0}', matrix.cache-scope) || '' }}
+      IMAGE_CACHE_TO: ${{ github.event_name != 'release' && format('type=gha,mode=max,ignore-error=true,scope={0}', matrix.cache-scope) || '' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
@@ -54,9 +56,9 @@ jobs:
       - name: Expose GitHub runtime for Buildx cache
         uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
 
-      - name: Cache container-structure-test
+      - name: Restore container-structure-test
         id: container-structure-test-cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: .tools/container-structure-test
           key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
@@ -64,10 +66,18 @@ jobs:
       - name: Install container-structure-test
         if: steps.container-structure-test-cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p .tools
           curl --location --fail --show-error --silent \
             --output .tools/container-structure-test \
             "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-amd64"
           chmod +x .tools/container-structure-test
+
+      - name: Cache container-structure-test
+        if: github.event_name == 'push' && steps.container-structure-test-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: .tools/container-structure-test
+          key: container-structure-test-${{ runner.os }}-${{ runner.arch }}-${{ env.CONTAINER_STRUCTURE_TEST_VERSION }}
 
       - name: Register container-structure-test
         run: echo "${GITHUB_WORKSPACE}/.tools" >> "${GITHUB_PATH}"

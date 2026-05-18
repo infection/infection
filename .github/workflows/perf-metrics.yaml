@@ -108,9 +108,11 @@ jobs:
           fi
 
       - name: Run Infection with timing
+        env:
+          HAS_SUMMARY_LOGGER: ${{ steps.feature-check.outputs.has_summary_logger }}
         run: |
           SUMMARY_OPT=""
-          if [[ "${{ steps.feature-check.outputs.has_summary_logger }}" == "true" ]]; then
+          if [[ "${HAS_SUMMARY_LOGGER}" == "true" ]]; then
             SUMMARY_OPT="--logger-summary-json=infection-summary.json"
           fi
 
@@ -142,6 +144,7 @@ jobs:
           TRIGGER: ${{ github.event_name }}
           CPU_MODEL: ${{ steps.runner-specs.outputs.cpu_model }}
           CPU_ARCH: ${{ steps.runner-specs.outputs.cpu_arch }}
+          REF_INPUT: ${{ github.event.inputs.ref }}
           TOTAL_MEM: ${{ steps.runner-specs.outputs.total_memory_kb }}
         run: |
           export COMMIT_DATE=$(git log -1 --format='%cI')
@@ -172,7 +175,6 @@ jobs:
           # Build commit message with tag (if provided) and short SHA
           SHORT_SHA="${{ github.sha }}"
           SHORT_SHA="${SHORT_SHA:0:7}"
-          REF_INPUT="${{ github.event.inputs.ref }}"
           if [[ -n "$REF_INPUT" ]]; then
             COMMIT_MSG="perf: Add metrics for $REF_INPUT ($SHORT_SHA)"
           else
