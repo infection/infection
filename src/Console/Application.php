@@ -50,6 +50,7 @@ use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container\Container;
 use Infection\Framework\InfectionVersion;
+use OutOfBoundsException;
 use Override;
 use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -75,6 +76,9 @@ final class Application extends BaseApplication
 
 ';
 
+    /**
+     * @throws OutOfBoundsException
+     */
     public function __construct(
         private readonly Container $container,
     ) {
