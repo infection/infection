@@ -217,7 +217,7 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions zizmor
+autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions $(if $(CI),,zizmor)
 
 .PHONY: test
 test:		 	## Runs all the tests
