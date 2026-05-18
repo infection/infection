@@ -329,6 +329,7 @@ final class Container extends DIContainer
                     $config->isStaticAnalysisEnabled()
                         ? $container->getStaticAnalysisToolAdapter()
                         : null,
+                    $container->getMetricsCalculator(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
