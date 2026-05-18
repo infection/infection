@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Console\LogVerbosity;
 
 final class ConfigurationFactoryInputBuilder
 {
@@ -80,6 +81,45 @@ final class ConfigurationFactoryInputBuilder
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
     ) {
+    }
+
+    public static function withMinimalTestData(): self
+    {
+        return new self(
+            existingCoveragePath: null,
+            initialTestsPhpOptions: null,
+            skipInitialTests: false,
+            logVerbosity: LogVerbosity::NONE,
+            debug: false,
+            withUncovered: false,
+            noProgress: false,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            numberOfShownMutations: 0,
+            minCoveredMsi: null,
+            timeoutsAsEscaped: false,
+            maxTimeouts: null,
+            msiPrecision: 2,
+            mutatorsInput: '',
+            testFramework: null,
+            testFrameworkExtraOptions: null,
+            staticAnalysisToolOptions: null,
+            sourceFilter: null,
+            threadCount: 1,
+            dotsPerRow: null,
+            dryRun: false,
+            useGitHubLogger: false,
+            gitlabLogFilePath: null,
+            htmlLogFilePath: null,
+            textLogFilePath: null,
+            summaryJsonLogFilePath: null,
+            useNoopMutators: false,
+            executeOnlyCoveringTestCases: false,
+            mapSourceClassToTestStrategy: null,
+            projectDirectory: null,
+            staticAnalysisTool: null,
+            mutantId: null,
+        );
     }
 
     public function withExistingCoveragePath(?string $existingCoveragePath): self
