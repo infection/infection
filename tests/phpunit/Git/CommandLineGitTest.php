@@ -681,42 +681,42 @@ final class CommandLineGitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_gets_the_current_git_sha(): void
-    {
-        $this->commandLineMock
+    #[DataProvider('gitShaProvider')]
+    public function test_it_gets_the_current_git_sha(
+        string|Exception $shellOutputOrException,
+        ?string $expected,
+    ): void {
+        $invocationMocker = $this->commandLineMock
             ->expects($this->once())
             ->method('execute')
-            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD'])
-            ->willReturn("0123456789abcdef\n");
+            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD']);
+
+        if (is_string($shellOutputOrException)) {
+            $invocationMocker->willReturn($shellOutputOrException);
+        } else {
+            $invocationMocker->willThrowException($shellOutputOrException);
+        }
 
         $actual = $this->git->getSha('/path/to/project');
 
-        $this->assertSame('0123456789abcdef', $actual);
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_returns_null_when_the_current_git_sha_is_empty(): void
+    public static function gitShaProvider(): iterable
     {
-        $this->commandLineMock
-            ->expects($this->once())
-            ->method('execute')
-            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD'])
-            ->willReturn('');
+        yield 'nominal' => [
+            "0123456789abcdef\n",
+            '0123456789abcdef',
+        ];
 
-        $actual = $this->git->getSha('/path/to/project');
+        yield 'empty output' => [
+            '',
+            null,
+        ];
 
-        $this->assertNull($actual);
-    }
-
-    public function test_it_returns_null_when_the_current_git_sha_cannot_be_resolved(): void
-    {
-        $this->commandLineMock
-            ->expects($this->once())
-            ->method('execute')
-            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD'])
-            ->willThrowException(new GenericProcessException('fatal!'));
-
-        $actual = $this->git->getSha('/path/to/project');
-
-        $this->assertNull($actual);
+        yield 'git command failed' => [
+            new GenericProcessException('fatal!'),
+            null,
+        ];
     }
 }
