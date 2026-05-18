@@ -692,6 +692,24 @@ count = 1
 
 [[issues]]
 file = "src/Configuration/ConfigurationFactory.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/Configuration/ConfigurationFactory.php"
+code = "redundant-type-comparison"
+message = "Redundant type assertion: `$directoryName` of type `non-empty-string` is always not `non-empty-string`."
+count = 1
+
+[[issues]]
+file = "src/Configuration/ConfigurationFactory.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Configuration\ConfigurationFactory::getRootComposerPackageName`.'
+count = 1
+
+[[issues]]
+file = "src/Configuration/ConfigurationFactory.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `UnexpectedValueException` in `Infection\Configuration\ConfigurationFactory::resolveMutators`.'
 count = 1
@@ -5991,6 +6009,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `projectNameProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `valueProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -6021,6 +6045,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_resolves_project_name`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input`.'
 count = 1
 
@@ -6033,7 +6063,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_resolves_project_name`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_resolves_project_name`.'
 count = 1
 
 [[issues]]
