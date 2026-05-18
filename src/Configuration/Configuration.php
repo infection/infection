@@ -69,6 +69,7 @@ readonly class Configuration
      * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configurationPathname
      * @param non-empty-string $projectDirectory Absolute path.
+     * @param non-empty-string $projectName
      */
     public function __construct(
         public float $processTimeout,
@@ -106,6 +107,7 @@ readonly class Configuration
         public bool $executeOnlyCoveringTestCases,
         public ?string $mapSourceClassToTestStrategy,
         public string $projectDirectory,
+        public string $projectName,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
         public string $configurationPathname,

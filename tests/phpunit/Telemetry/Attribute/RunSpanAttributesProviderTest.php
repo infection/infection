@@ -49,6 +49,7 @@ final class RunSpanAttributesProviderTest extends TestCase
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withProjectDirectory('/var/www/project')
+            ->withProjectName('acme/package')
             ->withConfigPathname('/var/www/project/config/infection.json5')
             ->withThreadCount(8)
             ->withSkipInitialTests(true)
@@ -66,6 +67,7 @@ final class RunSpanAttributesProviderTest extends TestCase
         );
 
         $expected = [
+            'infection.project.name' => 'acme/package',
             'infection.project.dir' => '/var/www/project',
             'infection.config.path' => 'config/infection.json5',
             'infection.version' => '1.2.3',

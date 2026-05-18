@@ -65,6 +65,7 @@ final readonly class RunSpanAttributesProvider
     public function provide(): array
     {
         return [
+            'infection.project.name' => $this->configuration->projectName,
             'infection.project.dir' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
             'infection.version' => $this->infectionVersion->prettyVersion(),
