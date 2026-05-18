@@ -86,6 +86,7 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
+use Infection\Framework\InfectionVersion;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -155,6 +156,7 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
@@ -315,6 +317,18 @@ final class Container extends DIContainer
                     $config,
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
+                );
+            },
+            RunSpanAttributesProvider::class => static function (self $container): RunSpanAttributesProvider {
+                $config = $container->getConfiguration();
+
+                return new RunSpanAttributesProvider(
+                    $config,
+                    $container->get(InfectionVersion::class),
+                    $container->getTestFrameworkAdapter(),
+                    $config->isStaticAnalysisEnabled()
+                        ? $container->getStaticAnalysisToolAdapter()
+                        : null,
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

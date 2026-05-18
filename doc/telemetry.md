@@ -63,6 +63,18 @@ Infection records the following lifecycle spans for every run:
 - `infection.mutation_evaluation.mutant_evaluation`
 - `infection.mutation_evaluation.process`
 
+## Run Attributes
+
+The root `infection.run` span includes run identity, execution-context, and
+toolchain attributes that are useful for filtering dashboards:
+
+| Attribute                                | Description                                                                                                               |
+|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `infection.test_framework.name`          | Normalized configured test framework name, for example `phpunit`.                                                         |
+| `infection.test_framework.version`       | Version reported by the configured test framework adapter.                                                                |
+| `infection.static_analysis_tool.name`    | Normalized configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled.     |
+| `infection.static_analysis_tool.version` | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
+
 ## Configuration
 
 `INFECTION_TELEMETRY=true` is required before Infection creates any telemetry

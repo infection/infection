@@ -37,6 +37,7 @@ namespace Infection\Tests\Telemetry\Subscriber;
 
 use function array_map;
 use function array_values;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
@@ -116,6 +117,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     {
         $this->exporter = new InMemoryExporter();
         $this->tracerProvider = new TracerProvider(new SimpleSpanProcessor($this->exporter));
+        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getVersion')
+            ->willReturn('12.3.4');
 
         $this->subscriber = new OpenTelemetryTracerSubscriber(
             new OpenTelemetryTracer(
@@ -127,6 +132,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     ->withProjectDirectory('/path/to/project')
                     ->build(),
                 new InfectionVersion(),
+                $testFrameworkAdapter,
+                null,
             ),
         );
     }
@@ -274,6 +281,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame(1, $run->getAttributes()->get('infection.thread.count'));
         $this->assertFalse($run->getAttributes()->get('infection.initial_tests.skipped'));
         $this->assertTrue($run->getAttributes()->get('infection.initial_static_analysis.skipped'));
+        $this->assertSame('phpunit', $run->getAttributes()->get('infection.test_framework.name'));
+        $this->assertSame('12.3.4', $run->getAttributes()->get('infection.test_framework.version'));
+        $this->assertFalse($run->getAttributes()->has('infection.static_analysis_tool.name'));
+        $this->assertFalse($run->getAttributes()->has('infection.static_analysis_tool.version'));
         $this->assertIsString($run->getAttributes()->get('infection.version'));
         $this->assertSame('/path/to/src/Foo.php', $astProcessing->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));

@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Attribute;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Framework\InfectionVersion;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -61,10 +63,20 @@ final class RunSpanAttributesProviderTest extends TestCase
         $infectionVersionMock
             ->method('prettyVersion')
             ->willReturn('1.2.3');
+        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getVersion')
+            ->willReturn('12.3.4');
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+        $staticAnalysisToolAdapter
+            ->method('getVersion')
+            ->willReturn('2.1.17');
 
         $provider = new RunSpanAttributesProvider(
             $configuration,
             $infectionVersionMock,
+            $testFrameworkAdapter,
+            $staticAnalysisToolAdapter,
         );
 
         $expected = [
@@ -77,10 +89,44 @@ final class RunSpanAttributesProviderTest extends TestCase
             'infection.thread.count' => 8,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,
+            'infection.test_framework.name' => 'phpunit',
+            'infection.test_framework.version' => '12.3.4',
+            'infection.static_analysis_tool.name' => 'phpstan',
+            'infection.static_analysis_tool.version' => '2.1.17',
         ];
 
         $actual = $provider->provide();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_omits_static_analysis_tool_attributes_when_static_analysis_is_disabled(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withStaticAnalysisTool(null)
+            ->build();
+
+        $infectionVersion = $this->createStub(InfectionVersion::class);
+        $infectionVersion
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
+        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getVersion')
+            ->willReturn('12.3.4');
+
+        $provider = new RunSpanAttributesProvider(
+            $configuration,
+            $infectionVersion,
+            $testFrameworkAdapter,
+            null,
+        );
+
+        $actual = $provider->provide();
+
+        $this->assertSame('phpunit', $actual['infection.test_framework.name']);
+        $this->assertSame('12.3.4', $actual['infection.test_framework.version']);
+        $this->assertArrayNotHasKey('infection.static_analysis_tool.name', $actual);
+        $this->assertArrayNotHasKey('infection.static_analysis_tool.version', $actual);
     }
 }
