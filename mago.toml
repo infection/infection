@@ -16,6 +16,7 @@ includes = ["vendor"]
 excludes = [
     "src/FileSystem/DummyFileSystem.php",
     "src/CustomMutator/templates",
+    "tests/Architecture",
     "tests/benchmark/MutationGenerator/sources",
     "tests/benchmark/Tracing/benchmark-source",
     "tests/benchmark/Tracing/coverage",
