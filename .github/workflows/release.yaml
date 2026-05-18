@@ -59,9 +59,10 @@ jobs:
               dist/infection.phar
 
       - name: Upload PHAR to release
-        uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # latest
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/infection.phar*
-          file_glob: true
-          tag: ${{ github.ref }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1 \
+            || gh release create "${GITHUB_REF_NAME}" --verify-tag --title "${GITHUB_REF_NAME}"
+
+          gh release upload "${GITHUB_REF_NAME}" dist/infection.phar*
