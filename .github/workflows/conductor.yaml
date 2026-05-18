@@ -19,7 +19,9 @@ jobs:
       COMPOSER_AUTH: ${{ secrets.CONDUCTOR_COMPOSER_AUTH }}
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Checkout
+        # zizmor: ignore[artipacked] Conductor updates dependencies and needs the checkout token persisted for repository writes.
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install PHP
         uses: "shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f" # master
