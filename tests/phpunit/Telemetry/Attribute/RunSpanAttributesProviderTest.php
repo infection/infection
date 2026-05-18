@@ -54,6 +54,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             ->withThreadCount(8)
             ->withSkipInitialTests(true)
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
+            ->withGitSha('0123456789abcdef')
             ->build();
 
         $infectionVersionMock = $this->createMock(InfectionVersion::class);
@@ -72,6 +73,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             'infection.config.path' => 'config/infection.json5',
             'infection.version' => '1.2.3',
             'infection.distribution' => 'source',
+            'infection.git.sha' => '0123456789abcdef',
             'infection.thread.count' => 8,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,

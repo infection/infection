@@ -260,6 +260,25 @@ final class ConfigurationFactoryTest extends TestCase
         $this->assertSame($expected, $actual->projectName);
     }
 
+    public function test_it_resolves_git_sha(): void
+    {
+        $schema = SchemaConfigurationBuilder::withMinimalTestData()->build();
+
+        $actual = $this
+            ->createConfigurationFactory(
+                ciDetected: false,
+                githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                gitSha: '0123456789abcdef',
+            )
+            ->create(
+                ...ConfigurationFactoryInputBuilder::withMinimalTestData()
+                    ->build($schema),
+            );
+
+        $this->assertSame('0123456789abcdef', $actual->gitSha);
+    }
+
     public static function projectNameProvider(): iterable
     {
         yield 'environment variable and no composer.json' => [
@@ -1687,6 +1706,7 @@ final class ConfigurationFactoryTest extends TestCase
 
     /**
      * @param non-empty-string|null $projectDirectory
+     * @param non-empty-string|null $gitSha
      */
     private function createConfigurationFactory(
         bool $ciDetected,
@@ -1694,6 +1714,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $projectDirectory,
         CpuCoresCountProvider $cpuCoresCountProvider,
         ?FileSystem $fileSystem = null,
+        ?string $gitSha = null,
     ): ConfigurationFactory {
         $projectDirectoryProviderMock = $this->createMock(ProjectDirectoryProvider::class);
         $projectDirectoryProviderMock
@@ -1708,6 +1729,7 @@ final class ConfigurationFactoryTest extends TestCase
             new DummyCiDetector($ciDetected, $githubActionsDetected),
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
+                $gitSha,
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
