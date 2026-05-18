@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Attribute;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * @phpstan-type Attribute = bool|int|float|string|null
@@ -54,6 +57,8 @@ final readonly class RunSpanAttributesProvider
     public function __construct(
         private Configuration $configuration,
         private InfectionVersion $infectionVersion,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+        private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
@@ -64,7 +69,7 @@ final readonly class RunSpanAttributesProvider
      */
     public function provide(): array
     {
-        return [
+        $attributes = [
             'infection.project.name' => $this->configuration->projectName,
             'infection.project.dir' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
@@ -74,7 +79,19 @@ final readonly class RunSpanAttributesProvider
             'infection.thread.count' => $this->configuration->threadCount,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
+            'infection.test_framework.name' => $this->configuration->testFramework,
+            'infection.test_framework.version' => $this->testFrameworkAdapter->getVersion(),
         ];
+
+        if ($this->configuration->isStaticAnalysisEnabled()) {
+            Assert::notNull($this->configuration->staticAnalysisTool);
+            Assert::notNull($this->staticAnalysisToolAdapter);
+
+            $attributes['infection.static_analysis_tool.name'] = $this->configuration->staticAnalysisTool;
+            $attributes['infection.static_analysis_tool.version'] = $this->staticAnalysisToolAdapter->getVersion();
+        }
+
+        return $attributes;
     }
 
     private function getConfigurationPath(): string
