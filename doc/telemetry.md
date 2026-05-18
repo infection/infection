@@ -72,7 +72,6 @@ variables. The most relevant at present are:
 | Variable                             | Purpose                                                                    | Default                  |
 |--------------------------------------|----------------------------------------------------------------------------|--------------------------|
 | `INFECTION_TELEMETRY`                | Enables Infection telemetry when set to `true`.                            | unset (telemetry is off) |
-| `INFECTION_PROJECT_NAME`             | Project name attached to Infection telemetry.                              | root `composer.json` name, then project directory basename |
 | `OTEL_TRACES_EXPORTER`               | Trace exporter to use. Accepted values are `console`, `otlp`, and `none`.  | `console`                |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`        | Base OTLP endpoint.                                                        | unset                    |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | OTLP endpoint for traces.                                                  | unset                    |
@@ -86,23 +85,6 @@ official [environment variable reference][otel-env-vars]. Variables that
 target signals, exporters, or protocols Infection does not yet support are
 either ignored or rejected, depending on what they configure.
 
-## Run Attributes
-
-The root `infection.run` span includes run identity and execution-context
-attributes that are useful for filtering dashboards:
-
-| Attribute                                     | Description                                                                 |
-|-----------------------------------------------|-----------------------------------------------------------------------------|
-| `infection.project.name`                      | Project label. Uses `INFECTION_PROJECT_NAME`, then root `composer.json` name, then project directory basename. |
-| `infection.project.dir`                       | Resolved project directory.                                                 |
-| `infection.config.path`                       | Infection configuration path, relative to `infection.project.dir` when possible. |
-| `infection.version`                           | Infection version reported by Composer metadata.                            |
-| `infection.distribution`                      | `source` or `phar`.                                                         |
-| `infection.git.sha`                           | Current `HEAD` commit SHA when the project directory is a Git checkout.     |
-| `infection.thread.count`                      | Resolved mutation runner thread count.                                      |
-| `infection.initial_tests.skipped`             | Whether the initial test run was skipped.                                   |
-| `infection.initial_static_analysis.skipped`   | Whether the initial static analysis run was skipped because no static analysis tool was enabled. |
-
 ## How-to
 
 ### Use a custom service name
@@ -113,28 +95,6 @@ projects feed traces into the same backend and need to be distinguished:
 ```bash
 INFECTION_TELEMETRY=true OTEL_SERVICE_NAME=my-project-infection vendor/bin/infection
 ```
-
-### Use a custom project name
-
-Infection attaches a project name to telemetry as `infection.project.name`. This
-attribute is always emitted. By default, it is read from the root `composer.json`
-`name` value; when that is unavailable, Infection falls back to the project
-directory basename. Override it with `INFECTION_PROJECT_NAME` when the Composer
-package name is missing or is not the label you want to use in dashboards:
-
-```bash
-INFECTION_TELEMETRY=true INFECTION_PROJECT_NAME=my-project vendor/bin/infection
-```
-
-For dashboards, filter by both `service.name` and `infection.project.name`.
-`service.name` identifies the OpenTelemetry service boundary, while
-`infection.project.name` identifies the project being mutation-tested. Using both
-keeps Infection telemetry separate from unrelated services and keeps several
-projects using Infection distinguishable in the same backend.
-
-The `infection.config.path` attribute is reported relative to
-`infection.project.dir`, so the same project can be grouped consistently across
-local and CI environments.
 
 ### Save traces to a file
 
@@ -188,33 +148,3 @@ This takes precedence over any other `OTEL_*` configuration.
 
 [opentelemetry]: https://opentelemetry.io/
 [otel-env-vars]: https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
-
-
-## Dashboard Suggestions
-
-### Run Summary
-
-Show the latest run health at the top of the dashboard:
-
-- Run status: passed, failed, errored, or interrupted.
-- Total duration from `infection.run`.
-- MSI.
-- Covered MSI.
-- Total mutants.
-- Killed mutants.
-- Escaped mutants.
-- Timed-out mutants.
-- Errored mutants.
-- Not-covered mutants.
-- Ignored or skipped mutants.
-
-This gives users a quick answer to whether the mutation testing run was useful
-and whether code quality appears to have improved or regressed.
-
-Useful charts:
-
-- MSI over time.
-- Covered MSI over time.
-- Total mutants over time.
-- Escaped mutants over time.
-- Runtime over time.
