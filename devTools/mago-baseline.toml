@@ -8054,6 +8054,12 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `gitShaProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Git\NoGitProjectFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_gets_the_project_directory`.'
 count = 1
