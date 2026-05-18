@@ -33,55 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Tests\Console;
 
-use function class_exists;
-use Composer\InstalledVersions;
-use OutOfBoundsException;
-use function preg_quote;
-use function Safe\preg_match;
+use Infection\Console\Application;
+use Infection\Framework\InfectionVersion;
+use Infection\Testing\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class InfectionVersion
+#[CoversClass(Application::class)]
+final class ApplicationTest extends TestCase
 {
-    public const string PACKAGE_NAME = 'infection/infection';
-
-    private ?string $prettyVersion = null;
-
-    /**
-     * @throws OutOfBoundsException
-     */
-    public function prettyVersion(): string
+    public function test_it_uses_the_infection_version(): void
     {
-        return $this->prettyVersion ??= $this->retrievePrettyVersion();
-    }
+        $versionMock = $this->createMock(InfectionVersion::class);
+        $versionMock
+            ->expects($this->once())
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
 
-    /**
-     * @throws OutOfBoundsException
-     */
-    private function retrievePrettyVersion(): string
-    {
-        // Pre 2.0 Composer runtime didn't have this class.
-        // @codeCoverageIgnoreStart
-        if (!class_exists(InstalledVersions::class)) {
-            return 'unknown';
-        }
-        // @codeCoverageIgnoreEnd
+        $application = new Application(
+            SingletonContainer::getContainer(),
+            $versionMock,
+        );
 
-        try {
-            return (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
-            // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $exception) {
-            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $exception->getMessage()) === 0) {
-                throw $exception;
-            }
-
-            // We have a bogus exception: how can Infection be not installed if we're here?
-            return 'not-installed';
-        }
-        // @codeCoverageIgnoreEnd
+        $this->assertSame('1.2.3', $application->getVersion());
     }
 }
