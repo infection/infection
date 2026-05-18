@@ -226,6 +226,7 @@ class ConfigurationFactory
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
             configurationPathname: $schema->pathname,
+            gitSha: $this->git->getSha($projectDirectory),
         );
     }
 

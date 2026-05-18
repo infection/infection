@@ -42,7 +42,7 @@ use Phar;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * @phpstan-type Attribute = bool|int|float|string
+ * @phpstan-type Attribute = bool|int|float|string|null
  * @phpstan-type Attributes = array<non-empty-string, Attribute>
  *
  * @see https://opentelemetry.io/docs/specs/semconv/general/naming/
@@ -70,6 +70,7 @@ final readonly class RunSpanAttributesProvider
             'infection.config.path' => $this->getConfigurationPath(),
             'infection.version' => $this->infectionVersion->prettyVersion(),
             'infection.distribution' => self::getDistribution(),
+            'infection.git.sha' => $this->configuration->gitSha,
             'infection.thread.count' => $this->configuration->threadCount,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
