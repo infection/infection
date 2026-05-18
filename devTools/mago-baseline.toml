@@ -1369,6 +1369,12 @@ message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\
 count = 1
 
 [[issues]]
+file = "src/Framework/InfectionVersion.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Framework\InfectionVersion::prettyVersion`.'
+count = 1
+
+[[issues]]
 file = "src/Framework/Iterable/GeneratorFactory.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Exception` in `Infection\Framework\Iterable\GeneratorFactory::fromIterable`.'

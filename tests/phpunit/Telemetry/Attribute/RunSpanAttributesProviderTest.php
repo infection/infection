@@ -33,32 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Subscriber;
+namespace Infection\Tests\Telemetry\Attribute;
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
+use Infection\Framework\InfectionVersion;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
-use Infection\Telemetry\OpenTelemetryTracerFactory;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberFactory
+#[CoversClass(RunSpanAttributesProvider::class)]
+final class RunSpanAttributesProviderTest extends TestCase
 {
-    public function __construct(
-        private OpenTelemetryTracerFactory $telemetryTracerFactory,
-        private RunSpanAttributesProvider $runSpanAttributesProvider,
-    ) {
-    }
-
-    public function create(): EventSubscriber
+    public function test_it_provides_run_identity_attributes_from_the_configuration(): void
     {
-        $tracer = $this->telemetryTracerFactory->create();
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withProjectDirectory('/var/www/project')
+            ->withConfigPathname('/var/www/project/config/infection.json5')
+            ->withThreadCount(8)
+            ->withSkipInitialTests(true)
+            ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
+            ->build();
 
-        return $tracer === null
-            ? new NullSubscriber()
-            : new OpenTelemetryTracerSubscriber($tracer, $this->runSpanAttributesProvider)
-        ;
+        $infectionVersion = new InfectionVersion();
+
+        $provider = new RunSpanAttributesProvider($configuration, $infectionVersion);
+
+        $expected = [
+            'infection.project.dir' => '/var/www/project',
+            'infection.config.path' => 'config/infection.json5',
+            'infection.version' => $infectionVersion->prettyVersion(),
+            'infection.distribution' => 'source',
+            'infection.thread.count' => 8,
+            'infection.initial_tests.skipped' => true,
+            'infection.initial_static_analysis.skipped' => false,
+        ];
+
+        $actual = $provider->provide();
+
+        $this->assertSame($expected, $actual);
     }
 }
