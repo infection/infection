@@ -14,10 +14,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   tests:
     runs-on: ${{ matrix.operating-system }}
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
