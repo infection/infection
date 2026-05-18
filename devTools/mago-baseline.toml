@@ -2833,6 +2833,12 @@ message = "Parameter `$installedExtensions` is never used."
 count = 1
 
 [[issues]]
+file = "src/Telemetry/Attribute/RunSpanAttributesProvider.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\Telemetry\Attribute\RunSpanAttributesProvider::provide`.'
+count = 1
+
+[[issues]]
 file = "src/Telemetry/SDK/FailingTracerProviderFactory.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Telemetry\SDK\FailingTracerProviderFactory::createExporter`.'
@@ -11501,6 +11507,12 @@ file = "tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 3
+
+[[issues]]
+file = "tests/phpunit/Telemetry/Attribute/RunSpanAttributesProviderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Telemetry\Attribute\RunSpanAttributesProviderTest::test_it_omits_static_analysis_tool_attributes_when_static_analysis_is_disabled`.'
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Telemetry/Attribute/RunSpanAttributesProviderTest.php"
