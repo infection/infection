@@ -4,7 +4,7 @@ services:
   # If you need a token, a short-lived classic token with read:packages is enough.
   zizmor:
     image: ghcr.io/zizmorcore/zizmor:1.25.2
-    command: --no-exit-codes .github
+    command: --quiet --quiet .github
     working_dir: /opt/infection
     volumes:
       - .:/opt/infection
