@@ -267,6 +267,7 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
             [33mcs-docker:[0m		 Runs PHP-CS-Fixer in docker
             [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
+            [33mzizmor:[0m			 Runs zizmor
             [33mprofile:[0m 	 	 Runs Blackfire
             [33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
             [33mtest:[0m		 	 Runs all the tests
