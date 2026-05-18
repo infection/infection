@@ -48,9 +48,9 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Console\Application;
 use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Framework\InfectionVersion;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
 use const JSON_PRETTY_PRINT;
@@ -255,7 +255,7 @@ final class ConfigureCommand extends BaseCommand
         }
 
         try {
-            $version = InstalledVersions::getPrettyVersion(Application::PACKAGE_NAME);
+            $version = InstalledVersions::getPrettyVersion(InfectionVersion::PACKAGE_NAME);
 
             if ($version === null || str_starts_with($version, 'dev-')) {
                 $version = 'master';
