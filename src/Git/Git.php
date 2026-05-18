@@ -147,4 +147,16 @@ interface Git
      * @return non-empty-string
      */
     public function getProjectDirectory(): string;
+
+    /**
+     * Gets the SHA of the current HEAD commit for the given project directory.
+     *
+     * Returns null when the directory is not a Git checkout or the SHA cannot
+     * be resolved.
+     *
+     * @param non-empty-string $projectDirectory
+     *
+     * @return non-empty-string|null
+     */
+    public function getSha(string $projectDirectory): ?string;
 }

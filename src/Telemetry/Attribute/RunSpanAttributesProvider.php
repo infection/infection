@@ -37,15 +37,12 @@ namespace Infection\Telemetry\Attribute;
 
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
-use Infection\Process\ShellCommandLineExecutor;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use function trim;
 
 /**
- * @phpstan-type Attribute = bool|int|float|string
+ * @phpstan-type Attribute = bool|int|float|string|null
  * @phpstan-type Attributes = array<non-empty-string, Attribute>
  *
  * @see https://opentelemetry.io/docs/specs/semconv/general/naming/
@@ -57,7 +54,6 @@ final readonly class RunSpanAttributesProvider
     public function __construct(
         private Configuration $configuration,
         private InfectionVersion $infectionVersion,
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -68,24 +64,17 @@ final readonly class RunSpanAttributesProvider
      */
     public function provide(): array
     {
-        $attributes = [
+        return [
             'infection.project.name' => $this->configuration->projectName,
             'infection.project.dir' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
             'infection.version' => $this->infectionVersion->prettyVersion(),
             'infection.distribution' => self::getDistribution(),
+            'infection.git.sha' => $this->configuration->gitSha,
             'infection.thread.count' => $this->configuration->threadCount,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
         ];
-
-        $gitSha = $this->getGitSha();
-
-        if ($gitSha !== null) {
-            $attributes['infection.git.sha'] = $gitSha;
-        }
-
-        return $attributes;
     }
 
     private function getConfigurationPath(): string
@@ -98,25 +87,6 @@ final readonly class RunSpanAttributesProvider
         }
 
         return $configurationPathname;
-    }
-
-    private function getGitSha(): ?string
-    {
-        try {
-            $sha = $this->shellCommandLineExecutor->execute([
-                'git',
-                '-C',
-                $this->configuration->projectDirectory,
-                'rev-parse',
-                'HEAD',
-            ]);
-        } catch (ProcessException) {
-            return null;
-        }
-
-        $sha = trim($sha);
-
-        return $sha === '' ? null : $sha;
     }
 
     private static function getDistribution(): string

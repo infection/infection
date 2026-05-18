@@ -70,6 +70,7 @@ readonly class Configuration
      * @param non-empty-string $configurationPathname
      * @param non-empty-string $projectDirectory Absolute path.
      * @param non-empty-string $projectName
+     * @param non-empty-string|null $gitSha
      */
     public function __construct(
         public float $processTimeout,
@@ -111,6 +112,7 @@ readonly class Configuration
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
         public string $configurationPathname,
+        public ?string $gitSha = null,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allIsInstanceOf($mutators, Mutator::class);

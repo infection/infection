@@ -81,7 +81,6 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
@@ -128,12 +127,6 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     ->withProjectDirectory('/path/to/project')
                     ->build(),
                 new InfectionVersion(),
-                new class extends ShellCommandLineExecutor {
-                    public function execute(array $command): string
-                    {
-                        return '';
-                    }
-                },
             ),
         );
     }

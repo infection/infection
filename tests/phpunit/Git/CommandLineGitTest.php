@@ -680,4 +680,43 @@ final class CommandLineGitTest extends TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function test_it_gets_the_current_git_sha(): void
+    {
+        $this->commandLineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD'])
+            ->willReturn("0123456789abcdef\n");
+
+        $actual = $this->git->getSha('/path/to/project');
+
+        $this->assertSame('0123456789abcdef', $actual);
+    }
+
+    public function test_it_returns_null_when_the_current_git_sha_is_empty(): void
+    {
+        $this->commandLineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD'])
+            ->willReturn('');
+
+        $actual = $this->git->getSha('/path/to/project');
+
+        $this->assertNull($actual);
+    }
+
+    public function test_it_returns_null_when_the_current_git_sha_cannot_be_resolved(): void
+    {
+        $this->commandLineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD'])
+            ->willThrowException(new GenericProcessException('fatal!'));
+
+        $actual = $this->git->getSha('/path/to/project');
+
+        $this->assertNull($actual);
+    }
 }
