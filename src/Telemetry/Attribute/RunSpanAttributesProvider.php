@@ -35,8 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Attribute;
 
+use function array_filter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
@@ -54,6 +57,8 @@ final readonly class RunSpanAttributesProvider
     public function __construct(
         private Configuration $configuration,
         private InfectionVersion $infectionVersion,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+        private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
@@ -64,7 +69,7 @@ final readonly class RunSpanAttributesProvider
      */
     public function provide(): array
     {
-        return [
+        return array_filter([
             'infection.project.name' => $this->configuration->projectName,
             'infection.project.dir' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
@@ -74,7 +79,13 @@ final readonly class RunSpanAttributesProvider
             'infection.thread.count' => $this->configuration->threadCount,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
-        ];
+            'infection.test_framework.name' => $this->configuration->testFramework,
+            'infection.test_framework.version' => $this->testFrameworkAdapter->getVersion(),
+            'infection.static_analysis_tool.name' => $this->configuration->staticAnalysisTool,
+            'infection.static_analysis_tool.version' => $this->configuration->isStaticAnalysisEnabled()
+                ? $this->staticAnalysisToolAdapter?->getVersion()
+                : null,
+        ], static fn (mixed $value): bool => $value !== null);
     }
 
     private function getConfigurationPath(): string
