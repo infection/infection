@@ -78,6 +78,7 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `vcs.ref.head.revision`                              | Current `HEAD` commit SHA when the project directory is a Git checkout.                                                   |
 | `infection.thread.count`                             | Resolved mutation runner thread count.                                                                                    |
 | `infection.run.source_filtered`                      | Whether the run used a source filter, for example `--filter`, `--git-diff-filter`, or `--git-diff-lines`.                 |
+| `infection.timeouts_as_escaped`                      | Whether timed-out mutants are treated as escaped when calculating MSI values.                                             |
 | `infection.initial_tests.skipped`                    | Whether the initial test run was skipped.                                                                                 |
 | `infection.initial_static_analysis.skipped`          | Whether the initial static analysis run was skipped because no static analysis tool was enabled.                          |
 | `infection.test_framework.name`                      | Normalised configured test framework name, for example `phpunit`.                                                         |
