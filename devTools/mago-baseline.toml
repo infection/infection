@@ -5737,6 +5737,12 @@ message = "Type `iterable` in return type of `providesUsesGitHubLogger` is impre
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Command/RunCommandHelperTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider` not found.'
+count = 3
+
+[[issues]]
 file = "tests/phpunit/Config/Guesser/PhpUnitPathGuesserTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesJsonComposerAndLocations` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -5835,6 +5841,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "no-value"
+message = 'Argument #1 passed to method `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::withCpuCoresCountProvider` has type `never`, meaning it cannot produce a value.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "no-value"
 message = 'Argument #5 passed to method `Infection\Configuration\ConfigurationFactory::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
@@ -5852,9 +5864,9 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_auto_detects_thread_count_when_no_threads_option_and_no_schema_threads`.'
-count = 1
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider` not found.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
@@ -5866,12 +5878,6 @@ count = 1
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::test_it_auto_detects_thread_count_when_no_threads_option_and_no_schema_threads`.'
 count = 1
 
 [[issues]]

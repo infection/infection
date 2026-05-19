@@ -100,6 +100,7 @@ class ConfigurationFactory
         private readonly CiDetectorInterface $ciDetector,
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
+        private readonly CpuCoresCountProvider $cpuCoresCountProvider,
     ) {
     }
 
@@ -483,7 +484,7 @@ class ConfigurationFactory
         $threadsFromSchema = $schema->threads;
 
         // we subtract 1 here to not use all the available cores by Infection
-        $maxThreads = max(1, CpuCoresCountProvider::provide() - 1);
+        $maxThreads = max(1, $this->cpuCoresCountProvider->provide() - 1);
 
         if ($threadsFromSchema === null) {
             return $maxThreads;

@@ -71,8 +71,8 @@ use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
+use Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider;
 use InvalidArgumentException;
-use function max;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -106,6 +106,7 @@ final class ConfigurationFactoryTest extends TestCase
             $scenario->ciDetected,
             $scenario->githubActionsDetected,
             $scenario->resolvedProjectDirectory,
+            $scenario->cpuCoresCountProvider,
         );
 
         if ($scenario->expected instanceof Exception) {
@@ -754,12 +755,34 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'thread count not specified in schema and not specified in input (auto-detected)' => [
-            $defaultScenario->forValueForThreadCount(
-                schemaThreads: null,
-                inputThreadCount: null,
-                expectedThreadCount: max(1, CpuCoresCountProvider::provide() - 1),
-            ),
+        yield 'thread count not specified in schema and not specified in input, auto-detected from 1 CPU core stays at minimum of 1' => [
+            $defaultScenario
+                ->forValueForThreadCount(
+                    schemaThreads: null,
+                    inputThreadCount: null,
+                    expectedThreadCount: 1,
+                )
+                ->withCpuCoresCountProvider(new FakeCpuCoresCountProvider(1)),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, auto-detected from 2 CPU cores is 1' => [
+            $defaultScenario
+                ->forValueForThreadCount(
+                    schemaThreads: null,
+                    inputThreadCount: null,
+                    expectedThreadCount: 1,
+                )
+                ->withCpuCoresCountProvider(new FakeCpuCoresCountProvider(2)),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, auto-detected from 8 CPU cores is 7' => [
+            $defaultScenario
+                ->forValueForThreadCount(
+                    schemaThreads: null,
+                    inputThreadCount: null,
+                    expectedThreadCount: 7,
+                )
+                ->withCpuCoresCountProvider(new FakeCpuCoresCountProvider(8)),
         ];
 
         yield 'thread count specified in schema and not specified in input' => [
@@ -1563,6 +1586,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $ciDetected,
         bool $githubActionsDetected,
         ?string $projectDirectory,
+        CpuCoresCountProvider $cpuCoresCountProvider = new CpuCoresCountProvider(),
     ): ConfigurationFactory {
         $projectDirectoryProviderMock = $this->createMock(ProjectDirectoryProvider::class);
         $projectDirectoryProviderMock
@@ -1579,6 +1603,7 @@ final class ConfigurationFactoryTest extends TestCase
                 self::GIT_DEFAULT_BASE,
             ),
             $projectDirectoryProviderMock,
+            $cpuCoresCountProvider,
         );
     }
 }

@@ -45,6 +45,7 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -54,6 +55,8 @@ use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
 {
+    public CpuCoresCountProvider $cpuCoresCountProvider;
+
     /**
      * @param non-empty-string|null $resolvedProjectDirectory
      */
@@ -65,6 +68,7 @@ final class ConfigurationFactoryScenario
         public ConfigurationFactoryInputBuilder $inputBuilder,
         public Configuration|Exception $expected,
     ) {
+        $this->cpuCoresCountProvider = new CpuCoresCountProvider();
     }
 
     /**
@@ -750,6 +754,14 @@ final class ConfigurationFactoryScenario
                         ->withProjectDirectory($expected)
                         ->build(),
                 );
+    }
+
+    public function withCpuCoresCountProvider(CpuCoresCountProvider $cpuCoresCountProvider): self
+    {
+        $clone = clone $this;
+        $clone->cpuCoresCountProvider = $cpuCoresCountProvider;
+
+        return $clone;
     }
 
     public function forValueForThreadCount(
