@@ -71,13 +71,13 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | Attribute                                            | Description                                                                                                               |
 |------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `infection.project.name`                             | Project label. Uses `INFECTION_PROJECT_NAME`, then root `composer.json` name, then project directory basename.            |
-| `infection.project.dir`                              | Resolved project directory.                                                                                               |
-| `infection.config.path`                              | Infection configuration path, relative to `infection.project.dir` when possible.                                          |
+| `infection.project.path`                             | Resolved project directory.                                                                                               |
+| `infection.config.path`                              | Infection configuration path, relative to `infection.project.path` when possible.                                         |
 | `infection.version`                                  | Infection version reported by Composer metadata.                                                                          |
 | `infection.distribution`                             | `source` or `phar`.                                                                                                       |
-| `infection.git.sha`                                  | Current `HEAD` commit SHA when the project directory is a Git checkout.                                                   |
+| `vcs.ref.head.revision`                              | Current `HEAD` commit SHA when the project directory is a Git checkout.                                                   |
 | `infection.thread.count`                             | Resolved mutation runner thread count.                                                                                    |
-| `infection.run.partial`                              | Whether the run used a source filter, for example `--filter`, `--git-diff-filter`, or `--git-diff-lines`.                 |
+| `infection.run.source_filtered`                      | Whether the run used a source filter, for example `--filter`, `--git-diff-filter`, or `--git-diff-lines`.                 |
 | `infection.initial_tests.skipped`                    | Whether the initial test run was skipped.                                                                                 |
 | `infection.initial_static_analysis.skipped`          | Whether the initial static analysis run was skipped because no static analysis tool was enabled.                          |
 | `infection.test_framework.name`                      | Normalised configured test framework name, for example `phpunit`.                                                         |
@@ -97,9 +97,9 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `infection.mutation.syntax_error.count`              | Number of mutation results with `syntax error` detection status.                                                          |
 | `infection.mutation.not_covered.count`               | Number of mutation results with `not covered` detection status.                                                           |
 | `infection.mutation.ignored.count`                   | Number of mutation results with `ignored` detection status.                                                               |
-| `infection.msi`                                      | Final Mutation Score Indicator percentage.                                                                                |
+| `infection.msi.value`                                | Final Mutation Score Indicator percentage.                                                                                |
 | `infection.covered_msi`                              | Final covered-code Mutation Score Indicator percentage.                                                                   |
-| `infection.msi.threshold`                            | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
+| `infection.msi.threshold.value`                      | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
 | `infection.covered_msi.threshold`                    | Effective minimum covered-code MSI threshold, or `0.0` when no threshold is configured.                                   |
 
 
