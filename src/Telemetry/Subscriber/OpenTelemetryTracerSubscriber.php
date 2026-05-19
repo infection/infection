@@ -176,8 +176,14 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     /** @var array<int, string> */
     private array $mutantProcessExecutionSpanMutationHashes = [];
 
+    /**
+     * @var positive-int|0
+     */
     private int $sourceFileCount = 0;
 
+    /**
+     * @var positive-int|IterableCounter::UNKNOWN_COUNT
+     */
     private int $mutationCount = 0;
 
     private int $evaluatedMutationCount = 0;
