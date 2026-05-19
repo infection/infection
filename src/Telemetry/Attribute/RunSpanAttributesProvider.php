@@ -98,9 +98,16 @@ final readonly class RunSpanAttributesProvider
     }
 
     /**
+     * @param positive-int|0 $sourceFileCount
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
+     *
      * @return Attributes
      */
-    public function provideSummaryAttributes(int $sourceFileCount, int $mutationCount, int $evaluatedMutationCount): array
+    public function provideSummaryAttributes(
+        int $sourceFileCount,
+        int $mutationCount,
+        int $evaluatedMutationCount,
+    ): array
     {
         $mutationCount = max(
             $mutationCount,
@@ -113,6 +120,7 @@ final readonly class RunSpanAttributesProvider
             'infection.mutation.count' => $mutationCount,
             'infection.mutation.suppressed.count' => $mutationCount - $evaluatedMutationCount,
             'infection.mutation.evaluated.count' => $evaluatedMutationCount,
+            'infection.mutation.covered.count' => $this->metricsCalculator->getKilledByTestsCount(),
             'infection.mutation.killed_by_tests.count' => $this->metricsCalculator->getKilledByTestsCount(),
             'infection.mutation.killed_by_static_analysis.count' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
             'infection.mutation.escaped.count' => $this->metricsCalculator->getEscapedCount(),
