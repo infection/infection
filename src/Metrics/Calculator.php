@@ -51,25 +51,19 @@ final class Calculator
 
     public function __construct(
         private readonly int $roundingPrecision,
-        private readonly int $killedCount,
-        private readonly int $errorCount,
-        private readonly int $timedOutCount,
-        private readonly int $notTestedCount,
-        private readonly int $totalCount,
-        private readonly bool $timeoutsAsEscaped = false,
+        private readonly int $coveredCount,
+        private readonly int $testedEligibleCount,
+        private readonly int $eligibleCount,
     ) {
     }
 
-    public static function fromMetrics(MetricsCalculator $calculator, bool $timeoutsAsEscaped = false): self
+    public static function fromMetrics(MetricsCalculator $calculator): self
     {
         return new self(
             $calculator->getRoundingPrecision(),
-            $calculator->getKilledByTestsCount() + $calculator->getKilledByStaticAnalysisCount(),
-            $calculator->getErrorCount() + $calculator->getSyntaxErrorCount(),
-            $calculator->getTimedOutCount(),
-            $calculator->getNotTestedCount(),
-            $calculator->getTestedMutantsCount(),
-            $timeoutsAsEscaped,
+            $calculator->getCoveredCount(),
+            $calculator->getTestedEligibleCount(),
+            $calculator->getEligibleCount(),
         );
     }
 
@@ -83,16 +77,9 @@ final class Calculator
         }
 
         $score = 0.;
-        $coveredTotal = $this->killedCount + $this->errorCount;
 
-        if (!$this->timeoutsAsEscaped) {
-            $coveredTotal += $this->timedOutCount;
-        }
-
-        $totalCount = $this->totalCount;
-
-        if ($totalCount !== 0) {
-            $score = 100 * $coveredTotal / $totalCount;
+        if ($this->eligibleCount !== 0) {
+            $score = 100 * $this->coveredCount / $this->eligibleCount;
         }
 
         return $this->mutationScoreIndicator = $this->round($score);
@@ -108,11 +95,9 @@ final class Calculator
         }
 
         $coveredRate = 0.;
-        $totalCount = $this->totalCount;
-        $testedTotal = $totalCount - $this->notTestedCount;
 
-        if ($totalCount !== 0) {
-            $coveredRate = 100 * $testedTotal / $totalCount;
+        if ($this->eligibleCount !== 0) {
+            $coveredRate = 100 * $this->testedEligibleCount / $this->eligibleCount;
         }
 
         return $this->coverageRate = $this->round($coveredRate);
@@ -128,15 +113,9 @@ final class Calculator
         }
 
         $score = 0.;
-        $testedTotal = $this->totalCount - $this->notTestedCount;
-        $coveredTotal = $this->killedCount + $this->errorCount;
 
-        if (!$this->timeoutsAsEscaped) {
-            $coveredTotal += $this->timedOutCount;
-        }
-
-        if ($testedTotal !== 0) {
-            $score = 100 * $coveredTotal / $testedTotal;
+        if ($this->testedEligibleCount !== 0) {
+            $score = 100 * $this->coveredCount / $this->testedEligibleCount;
         }
 
         return $this->coveredMutationScoreIndicator = $this->round($score);

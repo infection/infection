@@ -56,6 +56,12 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0, $calculator->getTimedOutCount());
         $this->assertSame(0, $calculator->getNotTestedCount());
         $this->assertSame(0, $calculator->getTotalMutantsCount());
+        $this->assertSame(0, $calculator->getIneligibleCount());
+        $this->assertSame(0, $calculator->getEligibleCount());
+        $this->assertSame(0, $calculator->getTestedEligibleCount());
+        $this->assertSame(0, $calculator->getCoveredCount());
+        $this->assertSame(0, $calculator->getTestedNotCoveredCount());
+        $this->assertSame(0, $calculator->getNotCoveredCount());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -91,17 +97,60 @@ final class MetricsCalculatorTest extends TestCase
             DetectionStatus::NOT_COVERED,
             1,
         );
+        $this->addMutantExecutionResult(
+            $calculator,
+            DetectionStatus::SKIPPED,
+            3,
+        );
+        $this->addMutantExecutionResult(
+            $calculator,
+            DetectionStatus::IGNORED,
+            4,
+        );
 
         $this->assertSame(7, $calculator->getKilledByTestsCount());
         $this->assertSame(2, $calculator->getErrorCount());
         $this->assertSame(2, $calculator->getEscapedCount());
         $this->assertSame(2, $calculator->getTimedOutCount());
         $this->assertSame(1, $calculator->getNotTestedCount());
+        $this->assertSame(3, $calculator->getSkippedCount());
+        $this->assertSame(4, $calculator->getIgnoredCount());
 
-        $this->assertSame(14, $calculator->getTotalMutantsCount());
+        $this->assertSame(21, $calculator->getTotalMutantsCount());
+        $this->assertSame(7, $calculator->getIneligibleCount());
+        $this->assertSame(14, $calculator->getEligibleCount());
+        $this->assertSame(13, $calculator->getTestedEligibleCount());
+        $this->assertSame(11, $calculator->getCoveredCount());
+        $this->assertSame(2, $calculator->getTestedNotCoveredCount());
+        $this->assertSame(3, $calculator->getNotCoveredCount());
         $this->assertSame(78.57, $calculator->getMutationScoreIndicator());
         $this->assertSame(92.86, $calculator->getCoverageRate());
         $this->assertSame(84.62, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    public function test_it_excludes_timeouts_from_the_covered_count_when_timeouts_are_escaped(): void
+    {
+        $calculator = new MetricsCalculator(2, true);
+
+        $this->addMutantExecutionResult(
+            $calculator,
+            DetectionStatus::KILLED_BY_TESTS,
+            1,
+        );
+        $this->addMutantExecutionResult(
+            $calculator,
+            DetectionStatus::ERROR,
+            1,
+        );
+        $this->addMutantExecutionResult(
+            $calculator,
+            DetectionStatus::TIMED_OUT,
+            1,
+        );
+
+        $this->assertSame(2, $calculator->getCoveredCount());
+        $this->assertSame(1, $calculator->getTestedNotCoveredCount());
+        $this->assertSame(1, $calculator->getNotCoveredCount());
     }
 
     public function test_its_metrics_are_properly_updated_when_adding_a_new_process(): void
