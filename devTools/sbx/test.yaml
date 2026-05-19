@@ -14,6 +14,11 @@ commandTests:
         expectedOutput: ['(?m)^xdebug\.mode => coverage => coverage$']
         exitCode: 0
 
+    -   name: "curl PHP extension is loaded"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('curl') ? 0 : 1);"]
+        exitCode: 0
+
     -   name: "composer is executable"
         command: "composer"
         args: ["--version"]

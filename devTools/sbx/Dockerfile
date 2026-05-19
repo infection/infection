@@ -14,6 +14,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         # CLI SAPI
         php${PHP_VERSION}-cli \
         # Extensions used by infection to not have to rely on polyfills
+        php${PHP_VERSION}-curl \
         php${PHP_VERSION}-mbstring \
         php${PHP_VERSION}-xml \
         php${PHP_VERSION}-zip \
