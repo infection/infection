@@ -80,6 +80,7 @@ final readonly class RunSpanAttributesProvider
             'infection.distribution' => self::getDistribution(),
             'infection.git.sha' => $this->configuration->gitSha,
             'infection.thread.count' => $this->configuration->threadCount,
+            'infection.run.partial' => $this->configuration->sourceFilter !== null,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
             'infection.test_framework.name' => $this->configuration->testFramework,

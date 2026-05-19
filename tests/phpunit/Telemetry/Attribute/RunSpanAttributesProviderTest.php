@@ -38,6 +38,7 @@ namespace Infection\Tests\Telemetry\Attribute;
 use Generator;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Framework\InfectionVersion;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
@@ -86,7 +87,10 @@ final class RunSpanAttributesProviderTest extends TestCase
             $infectionVersionMock,
             $testFrameworkAdapter,
             $staticAnalysisToolAdapter,
-            new MetricsCalculator($configuration->msiPrecision, $configuration->timeoutsAsEscaped),
+            new MetricsCalculator(
+                $configuration->msiPrecision,
+                $configuration->timeoutsAsEscaped,
+            ),
         );
 
         $expected = [
@@ -97,6 +101,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             'infection.distribution' => 'source',
             'infection.git.sha' => '0123456789abcdef',
             'infection.thread.count' => 8,
+            'infection.run.partial' => false,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,
             'infection.test_framework.name' => 'phpunit',
@@ -139,6 +144,34 @@ final class RunSpanAttributesProviderTest extends TestCase
         $this->assertSame('12.3.4', $actual['infection.test_framework.version']);
         $this->assertArrayNotHasKey('infection.static_analysis_tool.name', $actual);
         $this->assertArrayNotHasKey('infection.static_analysis_tool.version', $actual);
+    }
+
+    public function test_it_marks_partial_runs_when_a_source_filter_is_configured(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceFilter(new PlainFilter(['src/Foo.php']))
+            ->build();
+
+        $infectionVersion = $this->createStub(InfectionVersion::class);
+        $infectionVersion
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
+        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getVersion')
+            ->willReturn('12.3.4');
+
+        $provider = new RunSpanAttributesProvider(
+            $configuration,
+            $infectionVersion,
+            $testFrameworkAdapter,
+            null,
+            new MetricsCalculator($configuration->msiPrecision, $configuration->timeoutsAsEscaped),
+        );
+
+        $actual = $provider->provideInitialAttributes();
+
+        $this->assertTrue($actual['infection.run.partial']);
     }
 
     /**
