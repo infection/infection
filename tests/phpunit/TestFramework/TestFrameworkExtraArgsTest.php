@@ -33,52 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Option;
+namespace Infection\Tests\TestFramework;
 
-use Infection\CannotBeInstantiated;
-use Infection\Console\IO;
-use function sprintf;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
-use function trim;
+use Infection\TestFramework\TestFrameworkExtraArgs;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class TestFrameworkOptionsOption implements CommandOption
+#[CoversClass(TestFrameworkExtraArgs::class)]
+final class TestFrameworkExtraArgsTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    public const string NAME = 'test-framework-options';
-
-    /**
-     * @template T of Command
-     */
-    public static function addOption(Command $command): Command
+    public function test_it_parses_raw_args(): void
     {
-        return $command->addOption(
-            self::NAME,
-            null,
-            InputOption::VALUE_REQUIRED,
-            sprintf(
-                'Deprecated. Use --%s instead.',
-                TestFrameworkExtraArgsOption::NAME,
-            ),
+        $extraArgs = TestFrameworkExtraArgs::raw(' tests/FooTest.php --filter="a test" --colors=always ');
+
+        $this->assertSame(
+            ['tests/FooTest.php', '--filter=a test', '--colors=always'],
+            $extraArgs->argvTokens,
         );
     }
 
-    /**
-     * @return non-empty-string|null
-     */
-    public static function get(IO $io): ?string
+    public function test_it_keeps_unclosed_quotes_literal(): void
     {
-        $value = trim((string) $io->getInput()->getOption(self::NAME));
+        $extraArgs = TestFrameworkExtraArgs::raw('--filter="unfinished');
 
-        return $value === '' ? null : $value;
-    }
-
-    public static function isProvided(IO $io): bool
-    {
-        return $io->getInput()->getOption(self::NAME) !== null;
+        $this->assertSame(
+            ['--filter="unfinished'],
+            $extraArgs->argvTokens,
+        );
     }
 }

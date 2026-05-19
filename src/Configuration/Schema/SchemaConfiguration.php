@@ -75,6 +75,7 @@ final readonly class SchemaConfiguration
         public ?string $bootstrap,
         public ?string $initialTestsPhpOptions,
         public ?string $testFrameworkExtraOptions,
+        public ?string $testFrameworkExtraArgs,
         public ?string $staticAnalysisToolOptions,
         public string|int|null $threads,
         public string|int|null $dotsPerRow,

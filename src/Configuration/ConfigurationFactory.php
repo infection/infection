@@ -129,6 +129,7 @@ class ConfigurationFactory
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
+        ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?int $threadCount,
@@ -184,8 +185,9 @@ class ConfigurationFactory
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
-            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions(
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
                 $testFrameworkExtraOptions,
+                $testFrameworkExtraArgs,
                 $schema,
                 $testFramework,
             ),
@@ -306,11 +308,18 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $existingCoveragePath);
     }
 
-    private static function retrieveTestFrameworkExtraOptions(
+    private static function retrieveTestFrameworkExtraArgs(
         ?string $testFrameworkExtraOptions,
+        ?string $testFrameworkExtraArgs,
         SchemaConfiguration $schema,
         string $testFramework,
     ): string {
+        $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
+
+        if ($extraArgs !== '') {
+            return $extraArgs;
+        }
+
         $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
 
         return $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT

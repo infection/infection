@@ -37,7 +37,6 @@ namespace Infection\Command\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
@@ -45,31 +44,30 @@ use function trim;
 /**
  * @internal
  */
-final class TestFrameworkOptionsOption implements CommandOption
+final class TestFrameworkExtraArgsOption implements CommandOption
 {
     use CannotBeInstantiated;
 
-    public const string NAME = 'test-framework-options';
+    public const string NAME = 'test-framework-extra-args';
 
     /**
      * @template T of Command
+     * @param T $command
+     *
+     * @return T
      */
     public static function addOption(Command $command): Command
     {
-        return $command->addOption(
+        $command->addOption(
             self::NAME,
             null,
             InputOption::VALUE_REQUIRED,
-            sprintf(
-                'Deprecated. Use --%s instead.',
-                TestFrameworkExtraArgsOption::NAME,
-            ),
+            'Raw PHPUnit arguments to pass before Infection-generated arguments',
         );
+
+        return $command;
     }
 
-    /**
-     * @return non-empty-string|null
-     */
     public static function get(IO $io): ?string
     {
         $value = trim((string) $io->getInput()->getOption(self::NAME));

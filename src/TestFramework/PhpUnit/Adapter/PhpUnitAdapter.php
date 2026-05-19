@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
+use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -94,21 +95,22 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
+            $generatedOptions = [];
+
             if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
-                $extraOptions = trim(sprintf(
-                    '%s --exclude-source-from-xml-coverage --coverage-xml=%s --log-junit=%s',
-                    $extraOptions,
-                    $this->tmpDir . '/' . self::COVERAGE_DIR,
-                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-                ));
-            } else {
-                $extraOptions = trim(sprintf(
-                    '%s --coverage-xml=%s --log-junit=%s',
-                    $extraOptions,
-                    $this->tmpDir . '/' . self::COVERAGE_DIR,
-                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-                ));
+                $generatedOptions[] = '--exclude-source-from-xml-coverage';
             }
+
+            $generatedOptions[] = '--coverage-xml=' . $this->tmpDir . '/' . self::COVERAGE_DIR;
+            $generatedOptions[] = '--log-junit=' . $this->jUnitFilePath; // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+
+            $extraOptions = trim(
+                sprintf(
+                    '%s %s',
+                    $extraOptions,
+                    implode(' ', $generatedOptions),
+                ),
+            );
 
             if ($this->pcovDirectoryProvider->shallProvide()) {
                 $phpExtraArgs[] = '-d';

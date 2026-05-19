@@ -33,52 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Option;
+namespace Infection\TestFramework;
 
-use Infection\CannotBeInstantiated;
-use Infection\Console\IO;
-use function sprintf;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Input\StringInput;
 use function trim;
 
 /**
  * @internal
  */
-final class TestFrameworkOptionsOption implements CommandOption
+final readonly class TestFrameworkExtraArgs
 {
-    use CannotBeInstantiated;
-
-    public const string NAME = 'test-framework-options';
+    private const string PARSE_ERROR_PREFIX = 'Cannot parse `testFrameworkExtraArgs` / `--test-framework-extra-args`: ';
 
     /**
-     * @template T of Command
+     * @param list<string> $argvTokens
      */
-    public static function addOption(Command $command): Command
-    {
-        return $command->addOption(
-            self::NAME,
-            null,
-            InputOption::VALUE_REQUIRED,
-            sprintf(
-                'Deprecated. Use --%s instead.',
-                TestFrameworkExtraArgsOption::NAME,
-            ),
-        );
+    private function __construct(
+        public array $argvTokens,
+    ) {
     }
 
-    /**
-     * @return non-empty-string|null
-     */
-    public static function get(IO $io): ?string
+    public static function raw(?string $value): self
     {
-        $value = trim((string) $io->getInput()->getOption(self::NAME));
+        $value = trim($value ?? '');
 
-        return $value === '' ? null : $value;
-    }
+        if ($value === '') {
+            return new self([]);
+        }
 
-    public static function isProvided(IO $io): bool
-    {
-        return $io->getInput()->getOption(self::NAME) !== null;
+        try {
+            $tokens = (new StringInput($value))->getRawTokens();
+        } catch (InvalidArgumentException $exception) {
+            throw new InvalidArgumentException(self::PARSE_ERROR_PREFIX . $exception->getMessage(), 0, $exception);
+        }
+
+        return new self($tokens);
     }
 }

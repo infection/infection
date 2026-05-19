@@ -42,6 +42,7 @@ use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -163,7 +164,10 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
             );
 
-        TestFrameworkOptionsOption::addOption($this)
+        TestFrameworkExtraArgsOption::addOption($this);
+        TestFrameworkOptionsOption::addOption($this);
+
+        $this
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS,
                 null,
@@ -450,6 +454,8 @@ final class RunCommand extends BaseCommand
             );
         }
 
+        self::assertTestFrameworkOptionsAreNotBothProvided($io);
+
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
@@ -480,6 +486,7 @@ final class RunCommand extends BaseCommand
             msiPrecision: $msiPrecision,
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
+            testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io),
             threadCount: $commandHelper->getThreadCount(),
@@ -496,8 +503,24 @@ final class RunCommand extends BaseCommand
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
-            mutantId: $input->getOption(self::OPTION_MUTANT_ID),
+            mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
         );
+    }
+
+    private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
+    {
+        if (
+            TestFrameworkOptionsOption::isProvided($io)
+            && TestFrameworkExtraArgsOption::isProvided($io)
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass both the legacy option "--%s" and "--%s".',
+                    TestFrameworkOptionsOption::NAME,
+                    TestFrameworkExtraArgsOption::NAME,
+                ),
+            );
+        }
     }
 
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
