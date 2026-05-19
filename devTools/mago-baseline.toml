@@ -5839,6 +5839,12 @@ message = "Type `iterable` in return type of `providesUsesGitHubLogger` is impre
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Command/RunCommandHelperTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider` not found.'
+count = 3
+
+[[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_show_mutations_value_is_string_but_not_max`.'
@@ -5949,6 +5955,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "no-value"
+message = 'Argument #1 passed to method `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::withCpuCoresCountProvider` has type `never`, meaning it cannot produce a value.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "no-value"
 message = 'Argument #5 passed to method `Infection\Configuration\ConfigurationFactory::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
@@ -5963,6 +5975,12 @@ file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTes
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Mutator\CustomMutator` not found.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider` not found.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
