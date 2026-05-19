@@ -86,9 +86,16 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `infection.static_analysis_tool.name`                | Normalised configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled.     |
 | `infection.static_analysis_tool.version`             | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
 | `infection.source_file.count`                        | Number of source files collected for the run.                                                                             |
-| `infection.mutation.count`                           | Number of generated mutations selected for mutation evaluation.                                                           |
-| `infection.mutation.suppressed.count`                | Number of generated mutations suppressed before mutant evaluation, including heuristic suppression.                       |
+| `infection.mutation.generated.count`                 | Number of generated mutations selected for mutation evaluation.                                                           |
 | `infection.mutation.evaluated.count`                 | Number of mutations evaluated.                                                                                            |
+| `infection.mutation.suppressed.count`                | Number of generated mutations suppressed before mutant evaluation, including heuristic suppression.                       |
+| `infection.mutation.eligible.count`                  | Number of mutations eligible for MSI.                                                                                     |
+| `infection.mutation.ineligible.count`                | Number of mutations that do not contribute to MSI, such as skipped and ignored mutations.                                 |
+| `infection.mutation.tested_eligible.count`           | Number of mutations eligible for covered-code MSI.                                                                        |
+| `infection.mutation.covered.count`                   | Number of eligible mutations contributing positively to MSI.                                                              |
+| `infection.mutation.tested_not_covered.count`        | Number of tested eligible mutations contributing negatively to MSI.                                                       |
+| `infection.mutation.not_covered.count`               | Number of eligible mutations contributing negatively to MSI, including mutations not covered by tests.                    |
+| `infection.mutation.not_tested.count`                | Number of mutation results with `not covered` detection status.                                                           |
 | `infection.mutation.killed_by_tests.count`           | Number of mutation results with `killed by tests` detection status.                                                       |
 | `infection.mutation.killed_by_static_analysis.count` | Number of mutation results with `killed by static analysis` detection status.                                             |
 | `infection.mutation.escaped.count`                   | Number of mutation results with `escaped` detection status.                                                               |
@@ -96,9 +103,9 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `infection.mutation.timed_out.count`                 | Number of mutation results with `timed out` detection status.                                                             |
 | `infection.mutation.skipped.count`                   | Number of mutation results with `skipped` detection status.                                                               |
 | `infection.mutation.syntax_error.count`              | Number of mutation results with `syntax error` detection status.                                                          |
-| `infection.mutation.not_covered.count`               | Number of mutation results with `not covered` detection status.                                                           |
 | `infection.mutation.ignored.count`                   | Number of mutation results with `ignored` detection status.                                                               |
 | `infection.msi.value`                                | Final Mutation Score Indicator percentage.                                                                                |
+| `infection.mutation.coverage_rate.value`             | Final mutation code coverage percentage.                                                                                  |
 | `infection.covered_msi`                              | Final covered-code Mutation Score Indicator percentage.                                                                   |
 | `infection.msi.threshold.value`                      | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
 | `infection.covered_msi.threshold`                    | Effective minimum covered-code MSI threshold, or `0.0` when no threshold is configured.                                   |
