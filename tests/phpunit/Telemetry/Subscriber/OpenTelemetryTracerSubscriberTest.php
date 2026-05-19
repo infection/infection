@@ -311,6 +311,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('infection.json5', $run->getAttributes()->get('infection.config.path'));
         $this->assertSame('source', $run->getAttributes()->get('infection.distribution'));
         $this->assertSame(1, $run->getAttributes()->get('infection.thread.count'));
+        $this->assertFalse($run->getAttributes()->get('infection.run.partial'));
         $this->assertFalse($run->getAttributes()->get('infection.initial_tests.skipped'));
         $this->assertTrue($run->getAttributes()->get('infection.initial_static_analysis.skipped'));
         $this->assertSame('phpunit', $run->getAttributes()->get('infection.test_framework.name'));
