@@ -291,9 +291,16 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.suppressed.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.generated.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.evaluated.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.suppressed.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.eligible.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ineligible.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.tested_eligible.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.covered.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.tested_not_covered.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.not_covered.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.not_tested.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.killed_by_tests.count'));
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.killed_by_static_analysis.count'));
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.escaped.count'));
@@ -301,9 +308,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.timed_out.count'));
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.skipped.count'));
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.syntax_error.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.not_covered.count'));
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ignored.count'));
         $this->assertSame(100.0, $run->getAttributes()->get('infection.msi.value'));
+        $this->assertSame(100.0, $run->getAttributes()->get('infection.mutation.coverage_rate.value'));
         $this->assertSame(100.0, $run->getAttributes()->get('infection.covered_msi'));
         $this->assertSame(0.0, $run->getAttributes()->get('infection.msi.threshold.value'));
         $this->assertSame(0.0, $run->getAttributes()->get('infection.covered_msi.threshold'));
