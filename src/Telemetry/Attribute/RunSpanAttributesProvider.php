@@ -38,7 +38,9 @@ namespace Infection\Telemetry\Attribute;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Framework\InfectionVersion;
+use Infection\Metrics\MetricsCalculator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use function max;
 use OutOfBoundsException;
 use Phar;
 use Symfony\Component\Filesystem\Path;
@@ -59,6 +61,7 @@ final readonly class RunSpanAttributesProvider
         private InfectionVersion $infectionVersion,
         private TestFrameworkAdapter $testFrameworkAdapter,
         private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private MetricsCalculator $metricsCalculator,
     ) {
     }
 
@@ -67,7 +70,7 @@ final readonly class RunSpanAttributesProvider
      *
      * @return Attributes
      */
-    public function provide(): array
+    public function provideInitialAttributes(): array
     {
         $attributes = [
             'infection.project.name' => $this->configuration->projectName,
@@ -92,6 +95,38 @@ final readonly class RunSpanAttributesProvider
         }
 
         return $attributes;
+    }
+
+    /**
+     * @return Attributes
+     */
+    public function provideSummaryAttributes(int $sourceFileCount, int $mutationCount, int $evaluatedMutationCount): array
+    {
+        $mutationCount = max(
+            $mutationCount,
+            $evaluatedMutationCount,
+            $this->metricsCalculator->getTotalMutantsCount(),
+        );
+
+        return [
+            'infection.source_file.count' => $sourceFileCount,
+            'infection.mutation.count' => $mutationCount,
+            'infection.mutation.suppressed.count' => $mutationCount - $evaluatedMutationCount,
+            'infection.mutation.evaluated.count' => $evaluatedMutationCount,
+            'infection.mutation.killed_by_tests.count' => $this->metricsCalculator->getKilledByTestsCount(),
+            'infection.mutation.killed_by_static_analysis.count' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
+            'infection.mutation.escaped.count' => $this->metricsCalculator->getEscapedCount(),
+            'infection.mutation.error.count' => $this->metricsCalculator->getErrorCount(),
+            'infection.mutation.timed_out.count' => $this->metricsCalculator->getTimedOutCount(),
+            'infection.mutation.skipped.count' => $this->metricsCalculator->getSkippedCount(),
+            'infection.mutation.syntax_error.count' => $this->metricsCalculator->getSyntaxErrorCount(),
+            'infection.mutation.not_covered.count' => $this->metricsCalculator->getNotTestedCount(),
+            'infection.mutation.ignored.count' => $this->metricsCalculator->getIgnoredCount(),
+            'infection.msi' => $this->metricsCalculator->getMutationScoreIndicator(),
+            'infection.covered_msi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            'infection.msi.threshold' => $this->configuration->minMsi ?? 0.0,
+            'infection.covered_msi.threshold' => $this->configuration->minCoveredMsi ?? 0.0,
+        ];
     }
 
     private function getConfigurationPath(): string

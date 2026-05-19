@@ -83,7 +83,7 @@ final readonly class OpenTelemetryTracer
     }
 
     /**
-     * @param array<non-empty-string, bool|int|float|string> $attributes
+     * @param Attributes $attributes
      */
     public function end(SpanHandle $span, array $attributes = []): void
     {
