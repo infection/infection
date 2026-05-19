@@ -41,13 +41,17 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\PhpParser\UnparsableFile;
+use Infection\PhpParser\Parser\UnparsableFile;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -105,8 +109,7 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $initialTestSuiteOutput = $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $initialTestSuiteOutput = $this->collectArtefacts();
 
         /*
          * Limit the memory used for the mutation processes based on the memory
@@ -125,7 +128,7 @@ final readonly class Engine
             );
 
             $this->minMsiChecker->checkMetrics(
-                $this->metricsCalculator->getTestedMutantsCount(),
+                $this->metricsCalculator->getEligibleCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
                 $this->consoleOutput,
@@ -133,6 +136,22 @@ final readonly class Engine
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
         }
+    }
+
+    /**
+     * @throws InitialStaticAnalysisRunFailed
+     * @throws InitialTestsFailed
+     */
+    private function collectArtefacts(): ?string
+    {
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasStarted());
+
+        $initialTestSuiteOutput = $this->runInitialTestSuite();
+        $this->runInitialStaticAnalysis();
+
+        $this->eventDispatcher->dispatch(new ArtefactCollectionWasFinished());
+
+        return $initialTestSuiteOutput;
     }
 
     private function runInitialTestSuite(): ?string
@@ -217,6 +236,10 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
+        $this->eventDispatcher->dispatch(
+            new MutationAnalysisWasStarted(),
+        );
+
         $mutations = $this->mutationGenerator->generate(
             // TODO: inject it in the constructor instead
             $this->config->mutateOnlyCoveredCode(),
@@ -225,6 +248,10 @@ final readonly class Engine
         $this->mutationTestingRunner->run(
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
+        );
+
+        $this->eventDispatcher->dispatch(
+            new MutationAnalysisWasFinished(),
         );
     }
 

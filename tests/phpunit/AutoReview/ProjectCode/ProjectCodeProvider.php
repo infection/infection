@@ -59,7 +59,34 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\XdebugHandler;
 use Infection\Differ\Tokens;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
+use Infection\Event\EventDispatcher\NullEventDispatcher;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
@@ -83,6 +110,7 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\Visitor\NameResolverFactory;
+use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Reporter\Http\StrykerCurlClient;
 use Infection\Reporter\Http\StrykerDashboardClient;
@@ -92,6 +120,9 @@ use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Telemetry\SDK\FailingTracerProviderFactory;
+use Infection\Telemetry\SpanHandle;
+use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
@@ -132,6 +163,14 @@ final class ProjectCodeProvider
      */
     public const array NON_TESTED_CONCRETE_CLASSES = [
         AdapterInstaller::class,
+        ArtefactCollectionWasStarted::class,
+        ArtefactCollectionWasFinished::class,
+        AstEnrichmentWasFinished::class,
+        AstEnrichmentWasStarted::class,
+        AstParsingWasFinished::class,
+        AstParsingWasStarted::class,
+        AstProcessingWasFinished::class,
+        AstProcessingWasStarted::class,
         BaseMutatorTestCase::class,
         BaseOption::class,
         ConcreteComposerExecutableFinder::class,
@@ -148,6 +187,7 @@ final class ProjectCodeProvider
         FakeSourceCollector::class,
         FakeSourceFilter::class,
         FakeSourceLineMatcher::class,
+        FailingTracerProviderFactory::class,
         FileSystem::class,
         FilterOption::class,
         FixedSourceCollector::class,
@@ -160,21 +200,43 @@ final class ProjectCodeProvider
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MessageName::class,
+        HeuristicSuppressionWasFinished::class,
+        HeuristicSuppressionWasStarted::class,
+        HeuristicWasFinished::class,
+        HeuristicWasStarted::class,
         MutationAnalysisLoggerName::class,
+        MutationAnalysisWasFinished::class,
+        MutationAnalysisWasStarted::class,
+        MutantAnalysisWasFinished::class,
+        MutantAnalysisWasStarted::class,
         MutantExecutionResult::class,
-        MutationEvaluationWasStarted::class,
+        MutantEvaluationWasFinished::class,
+        MutantEvaluationWasStarted::class,
+        MutantMaterialisationWasFinished::class,
+        MutantMaterialisationWasStarted::class,
+        MutantProcessExecutionWasFinished::class,
+        MutantProcessExecutionWasStarted::class,
+        HeuristicName::class,
+        MutationEvaluationForMutationWasStarted::class,
         MutatorName::class,
         NameResolverFactory::class,
         NoGitProjectFound::class,
         NodeMutationGenerator::class,
         NoReportFound::class,
         NonExecutableFinder::class,
+        NullEventDispatcher::class,
         NullSourceLineMatcher::class,
         NullSubscriber::class,
+        OpenTelemetryTracerSubscriberFactory::class,
         OperatingSystem::class,
+        ReportingWasFinished::class,
+        ReportingWasStarted::class,
         SchemaConfiguration::class,
         SingletonContainer::class,
         Source::class,
+        SourceCollectionWasStarted::class,
+        SourceCollectionWasFinished::class,
+        SpanHandle::class,
         StopInfectionOnSigintSignalSubscriber::class,
         StrykerCurlClient::class,
         Tokens::class,
@@ -341,6 +403,7 @@ final class ProjectCodeProvider
             ->files()
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
+            ->notName('bootstrap.php')
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
             ->exclude([

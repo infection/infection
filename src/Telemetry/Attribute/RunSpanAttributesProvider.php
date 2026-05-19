@@ -1,0 +1,159 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Telemetry\Attribute;
+
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
+use Infection\Framework\InfectionVersion;
+use Infection\Metrics\MetricsCalculator;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use function max;
+use OutOfBoundsException;
+use Phar;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
+
+/**
+ * @phpstan-type Attribute = bool|int|float|string|null
+ * @phpstan-type Attributes = array<non-empty-string, Attribute>
+ *
+ * @see https://opentelemetry.io/docs/specs/semconv/general/naming/
+ *
+ * @internal
+ */
+final readonly class RunSpanAttributesProvider
+{
+    public function __construct(
+        private Configuration $configuration,
+        private InfectionVersion $infectionVersion,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+        private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private MetricsCalculator $metricsCalculator,
+    ) {
+    }
+
+    /**
+     * @throws OutOfBoundsException
+     *
+     * @return Attributes
+     */
+    public function provideInitialAttributes(): array
+    {
+        $attributes = [
+            'infection.project.name' => $this->configuration->projectName,
+            'infection.project.path' => $this->configuration->projectDirectory,
+            'infection.config.path' => $this->getConfigurationPath(),
+            'infection.version' => $this->infectionVersion->prettyVersion(),
+            'infection.distribution' => self::getDistribution(),
+            'vcs.ref.head.revision' => $this->configuration->gitSha,
+            'infection.thread.count' => $this->configuration->threadCount,
+            'infection.run.source_filtered' => $this->configuration->sourceFilter !== null,
+            'infection.timeouts_as_escaped' => $this->configuration->timeoutsAsEscaped,
+            'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
+            'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
+            'infection.test_framework.name' => $this->configuration->testFramework,
+            'infection.test_framework.version' => $this->testFrameworkAdapter->getVersion(),
+        ];
+
+        if ($this->configuration->isStaticAnalysisEnabled()) {
+            Assert::notNull($this->configuration->staticAnalysisTool);
+            Assert::notNull($this->staticAnalysisToolAdapter);
+
+            $attributes['infection.static_analysis_tool.name'] = $this->configuration->staticAnalysisTool;
+            $attributes['infection.static_analysis_tool.version'] = $this->staticAnalysisToolAdapter->getVersion();
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @return Attributes
+     */
+    public function provideSummaryAttributes(int $sourceFileCount, int $mutationCount, int $evaluatedMutationCount): array
+    {
+        $mutationCount = max(
+            $mutationCount,
+            $evaluatedMutationCount,
+            $this->metricsCalculator->getTotalMutantsCount(),
+        );
+
+        return [
+            'infection.source_file.count' => $sourceFileCount,
+            'infection.mutation.generated.count' => $mutationCount,
+            'infection.mutation.evaluated.count' => $evaluatedMutationCount,
+            'infection.mutation.suppressed.count' => $mutationCount - $evaluatedMutationCount,
+            'infection.mutation.eligible.count' => $this->metricsCalculator->getEligibleCount(),
+            'infection.mutation.ineligible.count' => $this->metricsCalculator->getIneligibleCount(),
+            'infection.mutation.tested_eligible.count' => $this->metricsCalculator->getTestedEligibleCount(),
+            'infection.mutation.covered.count' => $this->metricsCalculator->getCoveredCount(),
+            'infection.mutation.tested_not_covered.count' => $this->metricsCalculator->getTestedNotCoveredCount(),
+            'infection.mutation.not_covered.count' => $this->metricsCalculator->getNotCoveredCount(),
+            'infection.mutation.not_tested.count' => $this->metricsCalculator->getNotTestedCount(),
+            'infection.mutation.killed_by_tests.count' => $this->metricsCalculator->getKilledByTestsCount(),
+            'infection.mutation.killed_by_static_analysis.count' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
+            'infection.mutation.escaped.count' => $this->metricsCalculator->getEscapedCount(),
+            'infection.mutation.error.count' => $this->metricsCalculator->getErrorCount(),
+            'infection.mutation.timed_out.count' => $this->metricsCalculator->getTimedOutCount(),
+            'infection.mutation.skipped.count' => $this->metricsCalculator->getSkippedCount(),
+            'infection.mutation.syntax_error.count' => $this->metricsCalculator->getSyntaxErrorCount(),
+            'infection.mutation.ignored.count' => $this->metricsCalculator->getIgnoredCount(),
+            'infection.msi.value' => $this->metricsCalculator->getMutationScoreIndicator(),
+            'infection.mutation.coverage_rate.value' => $this->metricsCalculator->getCoverageRate(),
+            'infection.covered_msi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            'infection.msi.threshold.value' => $this->configuration->minMsi ?? 0.0,
+            'infection.covered_msi.threshold' => $this->configuration->minCoveredMsi ?? 0.0,
+        ];
+    }
+
+    private function getConfigurationPath(): string
+    {
+        $projectDirectory = Path::canonicalize($this->configuration->projectDirectory);
+        $configurationPathname = Path::canonicalize($this->configuration->configurationPathname);
+
+        if (Path::isBasePath($projectDirectory, $configurationPathname)) {
+            return Path::makeRelative($configurationPathname, $projectDirectory);
+        }
+
+        return $configurationPathname;
+    }
+
+    private static function getDistribution(): string
+    {
+        return Phar::running(false) === ''
+            ? 'source'
+            : 'phar';
+    }
+}

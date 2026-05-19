@@ -58,6 +58,9 @@
         "justinrainbow/json-schema": "^6.0",
         "nikic/php-parser": "^5.6.2",
         "ondram/ci-detector": "^4.1.0",
+        "open-telemetry/api": "^1.9",
+        "open-telemetry/exporter-otlp": "^1.4",
+        "open-telemetry/sdk": "^1.14",
         "psr/log": "^2.0 || ^3.0",
         "sanmai/di-container": "^0.1.12",
         "sanmai/duoclock": "^0.1.0",
@@ -69,18 +72,21 @@
         "symfony/finder": "^6.4 || ^7.0 || ^8.0",
         "symfony/polyfill-php85": "^1.33",
         "symfony/process": "^6.4 || ^7.0 || ^8.0",
+        "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0",
         "thecodingmachine/safe": "^v3.0",
         "webmozart/assert": "^1.11 || ^2.0"
     },
     "conflict": {
         "antecedent/patchwork": "<2.1.25",
-        "dg/bypass-finals": "<1.4.1"
+        "dg/bypass-finals": "<1.4.1",
+        "open-telemetry/sem-conv": "<1.38"
     },
     "require-dev": {
         "ext-simplexml": "*",
         "carthage-software/mago": "^1.20",
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
+        "guzzlehttp/guzzle": "^7.10",
         "phpat/phpat": "^0.12.4",
         "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",
@@ -103,8 +109,10 @@
         },
         "sort-packages": true,
         "allow-plugins": {
+            "infection/extension-installer": true,
+            "php-http/discovery": false,
             "phpstan/extension-installer": true,
-            "infection/extension-installer": true
+            "tbachert/spi": false
         }
     },
     "autoload": {

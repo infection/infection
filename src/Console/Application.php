@@ -39,6 +39,7 @@ use function array_merge;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
+use Infection\Command\Debug\TelemetryConfigCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
@@ -81,9 +82,15 @@ final class Application extends BaseApplication
      */
     public function __construct(
         private readonly Container $container,
-        InfectionVersion $infectionVersion = new InfectionVersion(),
+        ?InfectionVersion $infectionVersion = null,
     ) {
-        parent::__construct(self::NAME, $infectionVersion->prettyVersion());
+        $infectionVersion ??= $this->container->get(InfectionVersion::class);
+
+        parent::__construct(
+            self::NAME,
+            $infectionVersion->prettyVersion(),
+        );
+
         $this->setDefaultCommand('run');
     }
 
@@ -119,6 +126,7 @@ final class Application extends BaseApplication
                 new ConfigureCommand(),
                 new MockTeamCityCommand($fileSystem),
                 new DumpAstCommand($fileSystem),
+                new TelemetryConfigCommand(),
                 new GitBaseReferenceCommand(),
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),

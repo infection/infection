@@ -158,9 +158,71 @@ class MetricsCalculator implements Collector
         return $this->totalMutantsCount;
     }
 
-    public function getTestedMutantsCount(): int
+    /**
+     * Mutations that do not contribute to the MSI.
+     */
+    public function getIneligibleCount(): int
     {
-        return $this->getTotalMutantsCount() - $this->getSkippedCount() - $this->getIgnoredCount();
+        return $this->getSkippedCount() + $this->getIgnoredCount();
+    }
+
+    /**
+     * Mutations eligible for MSI. Excludes mutations for which there is no test,
+     * which is only relevant if allowed in the first place, in which case it is important to be able to
+     * calculate the coverage rate and covered MSI.
+     */
+    public function getTestedEligibleCount(): int
+    {
+        return $this->getEligibleCount() - $this->getNotTestedCount();
+    }
+
+    /**
+     * Mutations eligible for MSI.
+     */
+    public function getEligibleCount(): int
+    {
+        return $this->getTotalMutantsCount() - $this->getIneligibleCount();
+    }
+
+    /**
+     * Mutations eligible for MSI contributing positively.
+     */
+    public function getCoveredCount(): int
+    {
+        $coveredCount = $this->getKilledByTestsCount()
+            + $this->getKilledByStaticAnalysisCount()
+            + $this->getErrorCount()
+            + $this->getSyntaxErrorCount();
+
+        if (!$this->timeoutsAsEscaped) {
+            $coveredCount += $this->getTimedOutCount();
+        }
+
+        return $coveredCount;
+    }
+
+    /**
+     * Mutations eligible for MSI contributing negatively. Excludes mutations for which there is no test,
+     * which is only relevant if allowed in the first place, in which case it is important to be able to
+     * calculate the coverage rate and covered MSI.
+     */
+    public function getTestedNotCoveredCount(): int
+    {
+        $notCoveredCount = $this->getEscapedCount();
+
+        if ($this->timeoutsAsEscaped) {
+            $notCoveredCount += $this->getTimedOutCount();
+        }
+
+        return $notCoveredCount;
+    }
+
+    /**
+     * Mutations eligible for MSI contributing negatively.
+     */
+    public function getNotCoveredCount(): int
+    {
+        return $this->getTestedNotCoveredCount() + $this->getNotTestedCount();
     }
 
     /**
@@ -219,7 +281,7 @@ class MetricsCalculator implements Collector
 
     private function getCalculator(): Calculator
     {
-        return $this->calculator ??= Calculator::fromMetrics($this, $this->timeoutsAsEscaped);
+        return $this->calculator ??= Calculator::fromMetrics($this);
     }
 
     private static function foldToZero(float $value): float

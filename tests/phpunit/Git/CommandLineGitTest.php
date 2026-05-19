@@ -680,4 +680,43 @@ final class CommandLineGitTest extends TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    #[DataProvider('gitShaProvider')]
+    public function test_it_gets_the_current_git_sha(
+        string|Exception $shellOutputOrException,
+        ?string $expected,
+    ): void {
+        $invocationMocker = $this->commandLineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['git', '-C', '/path/to/project', 'rev-parse', 'HEAD']);
+
+        if (is_string($shellOutputOrException)) {
+            $invocationMocker->willReturn($shellOutputOrException);
+        } else {
+            $invocationMocker->willThrowException($shellOutputOrException);
+        }
+
+        $actual = $this->git->getSha('/path/to/project');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function gitShaProvider(): iterable
+    {
+        yield 'nominal' => [
+            "0123456789abcdef\n",
+            '0123456789abcdef',
+        ];
+
+        yield 'empty output' => [
+            '',
+            null,
+        ];
+
+        yield 'git command failed' => [
+            new GenericProcessException('fatal!'),
+            null,
+        ];
+    }
 }

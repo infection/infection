@@ -50,6 +50,8 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\InMemoryFileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -68,19 +70,25 @@ use Infection\Testing\SingletonContainer;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function Safe\putenv;
 use function sys_get_temp_dir;
 
+#[BackupGlobals(true)]
 #[Group('integration')]
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
+    use BacksUpEnvironmentVariables;
+
     private const string GIT_DEFAULT_BASE = 'test/default';
 
     private const string DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
@@ -93,6 +101,18 @@ final class ConfigurationFactoryTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         self::$mutators = null;
+    }
+
+    protected function setUp(): void
+    {
+        $this->backupEnvironmentVariables();
+
+        putenv(ConfigurationFactory::INFECTION_PROJECT_NAME);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
     }
 
     #[DataProvider('valueProvider')]
@@ -192,6 +212,104 @@ final class ConfigurationFactoryTest extends TestCase
                 mutantId: null,
             )
         ;
+    }
+
+    /**
+     * @param array<string, string> $environmentVariables
+     */
+    #[DataProvider('projectNameProvider')]
+    public function test_it_resolves_project_name(
+        array $environmentVariables,
+        ?string $composerJsonContent,
+        string $expected,
+    ): void {
+        foreach ($environmentVariables as $name => $value) {
+            putenv($name . '=' . $value);
+        }
+
+        $fileSystem = new InMemoryFileSystem();
+
+        if ($composerJsonContent !== null) {
+            $fileSystem
+                ->dumpFile(
+                    self::DEFAULT_PROJECT_DIRECTORY . '/composer.json',
+                    $composerJsonContent,
+                );
+        }
+
+        $schema = SchemaConfigurationBuilder::withMinimalTestData()->build();
+
+        $actual = $this
+            ->createConfigurationFactory(
+                ciDetected: false,
+                githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                fileSystem: $fileSystem,
+            )
+            ->create(
+                ...ConfigurationFactoryInputBuilder::withMinimalTestData()
+                    ->build($schema),
+            );
+
+        $this->assertSame($expected, $actual->projectName);
+    }
+
+    public function test_it_resolves_git_sha(): void
+    {
+        $schema = SchemaConfigurationBuilder::withMinimalTestData()->build();
+
+        $actual = $this
+            ->createConfigurationFactory(
+                ciDetected: false,
+                githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                gitSha: '0123456789abcdef',
+            )
+            ->create(
+                ...ConfigurationFactoryInputBuilder::withMinimalTestData()
+                    ->build($schema),
+            );
+
+        $this->assertSame('0123456789abcdef', $actual->gitSha);
+    }
+
+    public static function projectNameProvider(): iterable
+    {
+        yield 'environment variable and no composer.json' => [
+            [ConfigurationFactory::INFECTION_PROJECT_NAME => 'example/package'],
+            null,
+            'example/package',
+        ];
+
+        yield 'no environment variable; composer.json' => [
+            [],
+            '{"name": "example/package"}',
+            'example/package',
+        ];
+
+        yield 'no environment variable and no composer.json' => [
+            [],
+            null,
+            'project',
+        ];
+
+        yield 'environment variable and composer.json' => [
+            [ConfigurationFactory::INFECTION_PROJECT_NAME => 'example/package'],
+            '{"name": "example/another-package"}',
+            'example/package',
+        ];
+
+        yield 'no environment variable; composer.json without a package name' => [
+            [],
+            '{}',
+            'project',
+        ];
+
+        yield 'no environment variable; composer.json with an invalid package name' => [
+            [],
+            '{"name": 10}',
+            'project',
+        ];
     }
 
     public static function valueProvider(): iterable
@@ -298,6 +416,7 @@ final class ConfigurationFactoryTest extends TestCase
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+            projectName: 'project',
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
@@ -1524,11 +1643,14 @@ final class ConfigurationFactoryTest extends TestCase
 
     /**
      * @param non-empty-string|null $projectDirectory
+     * @param non-empty-string|null $gitSha
      */
     private function createConfigurationFactory(
         bool $ciDetected,
         bool $githubActionsDetected,
         ?string $projectDirectory,
+        ?FileSystem $fileSystem = null,
+        ?string $gitSha = null,
     ): ConfigurationFactory {
         $projectDirectoryProviderMock = $this->createMock(ProjectDirectoryProvider::class);
         $projectDirectoryProviderMock
@@ -1543,8 +1665,10 @@ final class ConfigurationFactoryTest extends TestCase
             new DummyCiDetector($ciDetected, $githubActionsDetected),
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
+                $gitSha,
             ),
             $projectDirectoryProviderMock,
+            $fileSystem ?? new InMemoryFileSystem(),
         );
     }
 }

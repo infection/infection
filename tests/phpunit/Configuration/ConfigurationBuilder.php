@@ -64,6 +64,8 @@ final class ConfigurationBuilder
      * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configPathname
      * @param non-empty-string $projectDirectory
+     * @param non-empty-string $projectName
+     * @param non-empty-string|null $gitSha
      */
     private function __construct(
         private float $timeout,
@@ -101,9 +103,11 @@ final class ConfigurationBuilder
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
         private string $projectDirectory,
+        private string $projectName,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
+        private ?string $gitSha,
     ) {
     }
 
@@ -147,9 +151,11 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
             projectDirectory: $configuration->projectDirectory,
+            projectName: $configuration->projectName,
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
             configPathname: $configuration->configurationPathname,
+            gitSha: $configuration->gitSha,
         );
     }
 
@@ -191,9 +197,11 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: false,
             mapSourceClassToTestStrategy: null,
             projectDirectory: '/var/www/project',
+            projectName: 'project',
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
+            gitSha: null,
         );
     }
 
@@ -259,9 +267,11 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             projectDirectory: '/var/www/project',
+            projectName: 'project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
             configPathname: '/path/to/project/infection.json5',
+            gitSha: null,
         );
     }
 
@@ -585,6 +595,28 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string $projectName
+     */
+    public function withProjectName(string $projectName): self
+    {
+        $clone = clone $this;
+        $clone->projectName = $projectName;
+
+        return $clone;
+    }
+
+    /**
+     * @param non-empty-string|null $gitSha
+     */
+    public function withGitSha(?string $gitSha): self
+    {
+        $clone = clone $this;
+        $clone->gitSha = $gitSha;
+
+        return $clone;
+    }
+
     public function withStaticAnalysisTool(?string $staticAnalysisTool): self
     {
         $clone = clone $this;
@@ -650,9 +682,11 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
             projectDirectory: $this->projectDirectory,
+            projectName: $this->projectName,
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
             configurationPathname: $this->configPathname,
+            gitSha: $this->gitSha,
         );
     }
 }

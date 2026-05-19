@@ -70,7 +70,7 @@ use Infection\Event\Subscriber\InitialTestsExecutionLoggerSubscriber;
 use Infection\Event\Subscriber\MutationAnalysisLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGenerationLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
-use Infection\Event\Subscriber\ReportAfterMutationTestingFinishedSubscriber;
+use Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
@@ -86,6 +86,7 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
+use Infection\Framework\InfectionVersion;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\ArtefactCollection\InitialStaticAnalysisExecution\InitialStaticAnalysisExecutionLogger;
@@ -112,10 +113,12 @@ use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
-use Infection\PhpParser\FileParser;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
-use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Parser\EventDispatchingFileParser;
+use Infection\PhpParser\Parser\FileParser;
+use Infection\PhpParser\Parser\PhpParserFileParser;
+use Infection\PhpParser\Traverser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -142,6 +145,7 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\CachedSourceCollector;
+use Infection\Source\Collector\EventDispatchingSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
@@ -152,6 +156,8 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -313,6 +319,19 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisConfigLocator(),
                 );
             },
+            RunSpanAttributesProvider::class => static function (self $container): RunSpanAttributesProvider {
+                $config = $container->getConfiguration();
+
+                return new RunSpanAttributesProvider(
+                    $config,
+                    $container->get(InfectionVersion::class),
+                    $container->getTestFrameworkAdapter(),
+                    $config->isStaticAnalysisEnabled()
+                        ? $container->getStaticAnalysisToolAdapter()
+                        : null,
+                    $container->getMetricsCalculator(),
+                );
+            },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->tmpDir,
                 $container->getDiffer(),
@@ -328,6 +347,7 @@ final class Container extends DIContainer
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,
+                $container->getEventDispatcher(),
             ),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->phpUnit->configDir,
@@ -394,11 +414,12 @@ final class Container extends DIContainer
                     $container->get(MutationGenerationLoggerSubscriber::class),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
                     $container->get(MutationAnalysisLoggerSubscriber::class),
-                    $container->get(ReportAfterMutationTestingFinishedSubscriber::class),
+                    $container->get(ReportAfterMutationEvaluationFinishedSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->get(StopInfectionOnSigintSignalSubscriber::class),
                     $container->get(DispatchPcntlSignalSubscriber::class),
+                    $container->get(OpenTelemetryTracerSubscriberFactory::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
@@ -463,11 +484,20 @@ final class Container extends DIContainer
                 $container->getNodeTraverserFactory(),
                 $container->getTracer(),
                 $container->getFileStore(),
+                $container->getEventDispatcher(),
             ),
             NodeTraverserFactory::class => static fn (self $container) => new NodeTraverserFactory(
                 $container->getSourceLineMatcher(),
                 $container->getLineRangeCalculator(),
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
+                $container->getEventDispatcher(),
+            ),
+            FileParser::class => static fn (self $container) => new EventDispatchingFileParser(
+                new PhpParserFileParser(
+                    $container->getParser(),
+                    $container->getFileStore(),
+                ),
+                $container->getEventDispatcher(),
             ),
             FileReporterFactory::class => static function (self $container): FileReporterFactory {
                 $config = $container->getConfiguration();
@@ -625,18 +655,21 @@ final class Container extends DIContainer
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
             ),
-            SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
-                static function () use ($container): SourceCollector {
-                    $configuration = $container->getConfiguration();
+            SourceCollector::class => static fn (self $container): SourceCollector => new EventDispatchingSourceCollector(
+                new LazySourceCollector(
+                    static function () use ($container): SourceCollector {
+                        $configuration = $container->getConfiguration();
 
-                    return new CachedSourceCollector(
-                        $container->get(SourceCollectorFactory::class)->create(
-                            $configuration->configurationPathname,
-                            $configuration->source,
-                            $configuration->sourceFilter,
-                        ),
-                    );
-                },
+                        return new CachedSourceCollector(
+                            $container->get(SourceCollectorFactory::class)->create(
+                                $configuration->configurationPathname,
+                                $configuration->source,
+                                $configuration->sourceFilter,
+                            ),
+                        );
+                    },
+                ),
+                $container->getEventDispatcher(),
             ),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,

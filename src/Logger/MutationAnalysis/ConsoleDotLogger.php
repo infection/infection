@@ -75,9 +75,9 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     }
 
     #[Override]
-    public function startAnalysis(int $mutationCount): void
+    public function startEvaluation(int $mutationCount): void
     {
-        parent::startAnalysis($mutationCount);
+        parent::startEvaluation($mutationCount);
 
         $this->mutationCount = $mutationCount;
         $this->resolvedDotsPerRow = null;
@@ -98,15 +98,15 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     }
 
     #[Override]
-    public function startEvaluation(Mutation $mutation): void
+    public function startEvaluationForMutation(Mutation $mutation): void
     {
         // Do nothing.
     }
 
     #[Override]
-    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    public function finishEvaluationForMutation(MutantExecutionResult $executionResult): void
     {
-        parent::finishEvaluation($executionResult);
+        parent::finishEvaluationForMutation($executionResult);
 
         $mutationCount = $this->mutationCount;
         Assert::notNull($mutationCount);
