@@ -92,5 +92,20 @@ assert_contains '"infection.test_framework.version":' var/execution-with-trace-e
 assert_contains '"infection.static_analysis_tool.name": "phpstan"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.static_analysis_tool.version":' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout
-assert_contains '"infection.mutation.count":' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.count": 6' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.suppressed.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.evaluated.count": 6' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.killed_by_tests.count": 6' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.killed_by_static_analysis.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.escaped.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.error.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.timed_out.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.skipped.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.syntax_error.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.not_covered.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.ignored.count": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.msi": 100' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.covered_msi": 100' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.msi.threshold": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.covered_msi.threshold": 0' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"infection.mutation.status": "killed by tests"' var/execution-with-trace-exporter.stdout

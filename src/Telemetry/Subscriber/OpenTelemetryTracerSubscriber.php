@@ -119,6 +119,8 @@ use function spl_object_id;
 use function str_starts_with;
 
 /**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ *
  * @internal
  */
 final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, HeuristicSuppressionWasFinishedSubscriber, HeuristicSuppressionWasStartedSubscriber, HeuristicWasFinishedSubscriber, HeuristicWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantAnalysisWasFinishedSubscriber, MutantAnalysisWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessExecutionWasFinishedSubscriber, MutantProcessExecutionWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
@@ -174,6 +176,12 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     /** @var array<int, string> */
     private array $mutantProcessExecutionSpanMutationHashes = [];
 
+    private int $sourceFileCount = 0;
+
+    private int $mutationCount = 0;
+
+    private int $evaluatedMutationCount = 0;
+
     public function __construct(
         private readonly OpenTelemetryTracer $telemetry,
         private readonly RunSpanAttributesProvider $runSpanAttributesProvider,
@@ -184,7 +192,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $this->rootSpan = $this->telemetry->startRootSpan(
             'infection.run',
-            $this->runSpanAttributesProvider->provide(),
+            $this->runSpanAttributesProvider->provideInitialAttributes(),
         );
     }
 
@@ -321,6 +329,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
     {
+        $this->mutationCount = $event->mutationCount;
+
         $this->mutationEvaluationSpan = $this->startChild(
             'infection.mutation_evaluation',
             ['infection.mutation.count' => $event->mutationCount],
@@ -469,6 +479,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $hash = $event->mutant->getMutation()->getHash();
 
+        ++$this->evaluatedMutationCount;
+
         $span = $this->startChild(
             'infection.mutation_evaluation.mutant_evaluation',
             parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
@@ -544,7 +556,14 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->end($this->mutationEvaluationSpan);
         $this->end($this->mutationAnalysisSpan);
         $this->end($this->reportingSpan);
-        $this->end($this->rootSpan);
+        $this->end(
+            $this->rootSpan,
+            $this->runSpanAttributesProvider->provideSummaryAttributes(
+                $this->sourceFileCount,
+                $this->mutationCount,
+                $this->evaluatedMutationCount,
+            ),
+        );
         $this->telemetry->shutdown();
     }
 
@@ -572,6 +591,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
     {
+        $this->sourceFileCount = $event->sourcesCount;
+
         $this->end(
             $this->sourceCollectionSpan,
             ['infection.source_file.count' => $event->sourcesCount],
@@ -598,7 +619,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     }
 
     /**
-     * @param array<non-empty-string, bool|int|float|string> $attributes
+     * @param Attributes $attributes
      */
     private function end(?SpanHandle $span, array $attributes = []): void
     {

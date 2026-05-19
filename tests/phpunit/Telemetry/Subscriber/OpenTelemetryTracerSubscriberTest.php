@@ -78,6 +78,7 @@ use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Framework\InfectionVersion;
 use Infection\Framework\Iterable\IterableCounter;
+use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
@@ -113,10 +114,22 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
     private OpenTelemetryTracerSubscriber $subscriber;
 
+    private MetricsCalculator $metricsCalculator;
+
     protected function setUp(): void
     {
         $this->exporter = new InMemoryExporter();
         $this->tracerProvider = new TracerProvider(new SimpleSpanProcessor($this->exporter));
+
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withProjectDirectory('/path/to/project')
+            ->build();
+
+        $this->metricsCalculator = new MetricsCalculator(
+            $configuration->msiPrecision,
+            $configuration->timeoutsAsEscaped,
+        );
+
         $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
         $testFrameworkAdapter
             ->method('getVersion')
@@ -128,12 +141,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 $this->tracerProvider,
             ),
             new RunSpanAttributesProvider(
-                ConfigurationBuilder::withMinimalTestData()
-                    ->withProjectDirectory('/path/to/project')
-                    ->build(),
+                $configuration,
                 new InfectionVersion(),
                 $testFrameworkAdapter,
                 null,
+                $this->metricsCalculator,
             ),
         );
     }
@@ -153,6 +165,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutation($mutation)
             ->build();
+
         $process0 = $this->createMock(MutantProcess::class);
         $process0->method('getMutant')->willReturn($mutant);
         $process1 = $this->createMock(MutantProcess::class);
@@ -194,13 +207,15 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($process1));
         $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutant));
         $this->subscriber->onMutantAnalysisWasFinished(new MutantAnalysisWasFinished($mutant));
-        $this->subscriber->onMutationEvaluationForMutationWasFinished(new MutationEvaluationForMutationWasFinished(
-            MutantExecutionResultBuilder::withMinimalTestData()
-                ->withMutantHash($mutation->getHash())
-                ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
-                ->withProcessRuntime(0.123)
-                ->build(),
-        ));
+
+        $executionResult = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withMutantHash($mutation->getHash())
+            ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
+            ->withProcessRuntime(0.123)
+            ->build();
+        $this->metricsCalculator->collect($executionResult);
+
+        $this->subscriber->onMutationEvaluationForMutationWasFinished(new MutationEvaluationForMutationWasFinished($executionResult));
         $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
         $this->subscriber->onReportingWasFinished(new ReportingWasFinished());
         $this->subscriber->onMutationEvaluationWasFinished(new MutationEvaluationWasFinished());
@@ -275,6 +290,23 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($run->getSpanId(), $reporting->getParentSpanId());
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.source_file.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.suppressed.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.evaluated.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.killed_by_tests.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.killed_by_static_analysis.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.escaped.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.error.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.timed_out.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.skipped.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.syntax_error.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.not_covered.count'));
+        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ignored.count'));
+        $this->assertSame(100.0, $run->getAttributes()->get('infection.msi'));
+        $this->assertSame(100.0, $run->getAttributes()->get('infection.covered_msi'));
+        $this->assertSame(0.0, $run->getAttributes()->get('infection.msi.threshold'));
+        $this->assertSame(0.0, $run->getAttributes()->get('infection.covered_msi.threshold'));
         $this->assertSame('/path/to/project', $run->getAttributes()->get('infection.project.dir'));
         $this->assertSame('infection.json5', $run->getAttributes()->get('infection.config.path'));
         $this->assertSame('source', $run->getAttributes()->get('infection.distribution'));
