@@ -74,13 +74,13 @@ final readonly class RunSpanAttributesProvider
     {
         $attributes = [
             'infection.project.name' => $this->configuration->projectName,
-            'infection.project.dir' => $this->configuration->projectDirectory,
+            'infection.project.path' => $this->configuration->projectDirectory,
             'infection.config.path' => $this->getConfigurationPath(),
             'infection.version' => $this->infectionVersion->prettyVersion(),
             'infection.distribution' => self::getDistribution(),
-            'infection.git.sha' => $this->configuration->gitSha,
+            'vcs.ref.head.revision' => $this->configuration->gitSha,
             'infection.thread.count' => $this->configuration->threadCount,
-            'infection.run.partial' => $this->configuration->sourceFilter !== null,
+            'infection.run.source_filtered' => $this->configuration->sourceFilter !== null,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),
             'infection.test_framework.name' => $this->configuration->testFramework,
@@ -123,9 +123,9 @@ final readonly class RunSpanAttributesProvider
             'infection.mutation.syntax_error.count' => $this->metricsCalculator->getSyntaxErrorCount(),
             'infection.mutation.not_covered.count' => $this->metricsCalculator->getNotTestedCount(),
             'infection.mutation.ignored.count' => $this->metricsCalculator->getIgnoredCount(),
-            'infection.msi' => $this->metricsCalculator->getMutationScoreIndicator(),
+            'infection.msi.value' => $this->metricsCalculator->getMutationScoreIndicator(),
             'infection.covered_msi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-            'infection.msi.threshold' => $this->configuration->minMsi ?? 0.0,
+            'infection.msi.threshold.value' => $this->configuration->minMsi ?? 0.0,
             'infection.covered_msi.threshold' => $this->configuration->minCoveredMsi ?? 0.0,
         ];
     }

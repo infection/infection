@@ -95,13 +95,13 @@ final class RunSpanAttributesProviderTest extends TestCase
 
         $expected = [
             'infection.project.name' => 'acme/package',
-            'infection.project.dir' => '/var/www/project',
+            'infection.project.path' => '/var/www/project',
             'infection.config.path' => 'config/infection.json5',
             'infection.version' => '1.2.3',
             'infection.distribution' => 'source',
-            'infection.git.sha' => '0123456789abcdef',
+            'vcs.ref.head.revision' => '0123456789abcdef',
             'infection.thread.count' => 8,
-            'infection.run.partial' => false,
+            'infection.run.source_filtered' => false,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,
             'infection.test_framework.name' => 'phpunit',
@@ -171,7 +171,7 @@ final class RunSpanAttributesProviderTest extends TestCase
 
         $actual = $provider->provideInitialAttributes();
 
-        $this->assertTrue($actual['infection.run.partial']);
+        $this->assertTrue($actual['infection.run.source_filtered']);
     }
 
     /**
@@ -240,9 +240,9 @@ final class RunSpanAttributesProviderTest extends TestCase
                 'infection.mutation.syntax_error.count' => 0,
                 'infection.mutation.not_covered.count' => 0,
                 'infection.mutation.ignored.count' => 0,
-                'infection.msi' => 0.0,
+                'infection.msi.value' => 0.0,
                 'infection.covered_msi' => 0.0,
-                'infection.msi.threshold' => 0.0,
+                'infection.msi.threshold.value' => 0.0,
                 'infection.covered_msi.threshold' => 0.0,
             ],
         ];
@@ -281,9 +281,9 @@ final class RunSpanAttributesProviderTest extends TestCase
                 'infection.mutation.syntax_error.count' => 1,
                 'infection.mutation.not_covered.count' => 1,
                 'infection.mutation.ignored.count' => 1,
-                'infection.msi' => 75.0,
+                'infection.msi.value' => 75.0,
                 'infection.covered_msi' => 85.71,
-                'infection.msi.threshold' => 72.3,
+                'infection.msi.threshold.value' => 72.3,
                 'infection.covered_msi.threshold' => 81.5,
             ],
         ];
