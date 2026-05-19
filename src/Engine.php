@@ -128,7 +128,7 @@ final readonly class Engine
             );
 
             $this->minMsiChecker->checkMetrics(
-                $this->metricsCalculator->getTestedMutantsCount(),
+                $this->metricsCalculator->getEligibleCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
                 $this->consoleOutput,

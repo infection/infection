@@ -261,7 +261,7 @@ final class EngineTest extends TestCase
         $metricsCalculator = $this->createMock(MetricsCalculator::class);
         $metricsCalculator
             ->expects($this->once())
-            ->method('getTestedMutantsCount')
+            ->method('getEligibleCount')
             ->willReturn(1000)
         ;
         $metricsCalculator
@@ -406,7 +406,7 @@ final class EngineTest extends TestCase
         $metricsCalculator = $this->createMock(MetricsCalculator::class);
         $metricsCalculator
             ->expects($this->once())
-            ->method('getTestedMutantsCount')
+            ->method('getEligibleCount')
             ->willReturn(100)
         ;
         $metricsCalculator
@@ -507,7 +507,7 @@ final class EngineTest extends TestCase
         $metricsCalculator = $this->createMock(MetricsCalculator::class);
         $metricsCalculator
             ->expects($this->once())
-            ->method('getTestedMutantsCount')
+            ->method('getEligibleCount')
             ->willReturn(0)
         ;
         $metricsCalculator
@@ -608,7 +608,7 @@ final class EngineTest extends TestCase
         ;
         $metricsCalculator
             ->expects($this->once())
-            ->method('getTestedMutantsCount')
+            ->method('getEligibleCount')
             ->willReturn(0)
         ;
         $metricsCalculator
@@ -807,7 +807,7 @@ final class EngineTest extends TestCase
         ;
         $metricsCalculator
             ->expects($this->once())
-            ->method('getTestedMutantsCount')
+            ->method('getEligibleCount')
             ->willReturn(100)
         ;
         $metricsCalculator
