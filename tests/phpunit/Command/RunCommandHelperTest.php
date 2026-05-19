@@ -38,6 +38,8 @@ namespace Infection\Tests\Command;
 use Infection\Command\RunCommand;
 use Infection\Command\RunCommandHelper;
 use Infection\Container\Container;
+use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -63,7 +65,7 @@ final class RunCommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_LOGGER_GITHUB)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getUseGitHubLogger());
     }
 
@@ -79,22 +81,28 @@ final class RunCommandHelperTest extends TestCase
     }
 
     #[DataProvider('providesThreadCount')]
-    public function test_thread_count_from_option(?int $expected, mixed $optionValue): void
+    public function test_thread_count_from_option(?int $expected, mixed $optionValue, CpuCoresCountProvider $cpuCoresCountProvider = new CpuCoresCountProvider()): void
     {
         $this->inputMock->expects($this->once())
             ->method('getOption')
             ->with(RunCommand::OPTION_THREADS)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, $cpuCoresCountProvider);
         $this->assertSame($expected, $commandHelper->getThreadCount());
     }
 
     public static function providesThreadCount(): iterable
     {
-        yield [null, null];
+        yield 'not provided' => [null, null];
 
-        yield [5, '5'];
+        yield 'numeric string' => [5, '5'];
+
+        yield 'max with 1 CPU core stays at minimum of 1' => [1, 'max', new FakeCpuCoresCountProvider(1)];
+
+        yield 'max with 2 CPU cores is 1' => [1, 'max', new FakeCpuCoresCountProvider(2)];
+
+        yield 'max with 8 CPU cores is 7' => [7, 'max', new FakeCpuCoresCountProvider(8)];
     }
 
     #[DataProvider('providesDotsPerRow')]
@@ -105,7 +113,7 @@ final class RunCommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_DOTS_PER_ROW)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
 
         if ($expected instanceof InvalidArgumentException) {
             $this->expectExceptionObject($expected);
@@ -155,7 +163,7 @@ final class RunCommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_SHOW_MUTATIONS)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getNumberOfShownMutations());
     }
 
@@ -176,7 +184,7 @@ final class RunCommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getIgnoreMsiWithNoMutations());
     }
 
@@ -199,7 +207,7 @@ final class RunCommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_WITH_TIMEOUTS)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getTimeoutsAsEscaped());
     }
 
@@ -218,7 +226,7 @@ final class RunCommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_MAX_TIMEOUTS)
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getMaxTimeouts());
     }
 
@@ -241,7 +249,7 @@ final class RunCommandHelperTest extends TestCase
             ->with('test-option')
             ->willReturn($optionValue);
 
-        $commandHelper = new RunCommandHelper($this->inputMock);
+        $commandHelper = new RunCommandHelper($this->inputMock, new CpuCoresCountProvider());
         $this->assertSame($expected, $commandHelper->getStringOption('test-option', $default));
     }
 

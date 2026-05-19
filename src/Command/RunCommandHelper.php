@@ -55,6 +55,7 @@ final readonly class RunCommandHelper
 {
     public function __construct(
         private InputInterface $input,
+        private CpuCoresCountProvider $cpuCoresCountProvider,
     ) {
     }
 
@@ -125,7 +126,7 @@ final readonly class RunCommandHelper
         Assert::same($threads, 'max', sprintf('The value of option `--threads` must be of type integer or string "max". String "%s" provided.', $threads));
 
         // we subtract 1 here to not use all the available cores by Infection
-        return max(1, CpuCoresCountProvider::provide() - 1);
+        return max(1, $this->cpuCoresCountProvider->provide() - 1);
     }
 
     /**
