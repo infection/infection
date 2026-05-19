@@ -60,6 +60,13 @@ jobs:
                   composer install --no-interaction --prefer-dist --no-progress
 
             - name: Run Infection for changed lines only
+              env:
+                  INFECTION_TELEMETRY: true
+                  OTEL_TRACES_EXPORTER: otlp
+                  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
+                  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${{ secrets.SENTRY_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT }}
+                  OTEL_EXPORTER_OTLP_TRACES_HEADERS: ${{ secrets.SENTRY_OTEL_EXPORTER_OTLP_TRACES_HEADERS }}
+                  OTEL_EXPORTER_OTLP_TRACES_COMPRESSION: gzip
               run: |
                   git fetch origin $GITHUB_BASE_REF
                   php bin/infection \
