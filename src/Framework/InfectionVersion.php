@@ -33,58 +33,55 @@
 
 declare(strict_types=1);
 
-namespace Infection\DevTools\PHPStan\Rules;
+namespace Infection\Framework;
 
-use Infection\Container\Container;
-use Infection\Testing\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\Node\Expr\New_;
-use PHPStan\Analyser\Scope;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
-use Symfony\Component\Filesystem\Path;
-use function sprintf;
+use function class_exists;
+use Composer\InstalledVersions;
+use OutOfBoundsException;
+use function preg_quote;
+use function Safe\preg_match;
 
 /**
- * @implements Rule<New_>
+ * @internal
+ * @final
  */
-final class InfectionContainerRule implements Rule {
-    /**
-     * @var string[]|null
-     */
-    private static $containerFiles;
+class InfectionVersion
+{
+    public const string PACKAGE_NAME = 'infection/infection';
 
-    public function getNodeType(): string {
-        return New_::class;
-    }
-
-    public function processNode(Node $node, Scope $scope): array {
-        if (
-            $node->class instanceof Node\Name
-            && $node->class->toString() === Container::class
-            && !in_array($scope->getFile(), $this->getContainerFiles(), true)
-        ) {
-            return [RuleErrorBuilder::message(
-                sprintf(
-                    'Did not expect to find a usage of the Infection container. Please use "%s::getContainer() instead.',
-                    SingletonContainer::class,
-                ))->identifier('infection.container')->build()];
-        }
-
-        return [];
-    }
+    private ?string $prettyVersion = null;
 
     /**
-     * @return string[]
+     * @throws OutOfBoundsException
      */
-    private function getContainerFiles(): array
+    public function prettyVersion(): string
     {
-        return self::$containerFiles ??= array_map(
-            static fn (string $path): string => Path::canonicalize($path),
-            [
-                __DIR__ . '/../../../tests/phpunit/Container/ContainerTest.php',
-                __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
-            ],
-        );
+        return $this->prettyVersion ??= $this->retrievePrettyVersion();
+    }
+
+    /**
+     * @throws OutOfBoundsException
+     */
+    private function retrievePrettyVersion(): string
+    {
+        // Pre 2.0 Composer runtime didn't have this class.
+        // @codeCoverageIgnoreStart
+        if (!class_exists(InstalledVersions::class)) {
+            return 'unknown';
+        }
+        // @codeCoverageIgnoreEnd
+
+        try {
+            return (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
+            // @codeCoverageIgnoreStart
+        } catch (OutOfBoundsException $exception) {
+            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $exception->getMessage()) === 0) {
+                throw $exception;
+            }
+
+            // We have a bogus exception: how can Infection be not installed if we're here?
+            return 'not-installed';
+        }
+        // @codeCoverageIgnoreEnd
     }
 }

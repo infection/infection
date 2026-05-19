@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\DevTools\PHPat;
+namespace Infection\Tests\Architecture\PHPat;
 
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
@@ -48,7 +48,6 @@ final class SrcShouldNotDependOnTestsTest
             ->excluding(
                 Selector::inNamespace('Infection\\Tests'),
                 Selector::inNamespace('Infection\\Benchmark'),
-                Selector::inNamespace('Infection\\DevTools'),
             )
             ->shouldNot()
             ->dependOn()
