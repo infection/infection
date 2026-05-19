@@ -62,10 +62,13 @@ final class CalculatorTest extends TestCase
     ): void {
         $calculator = new Calculator(
             $roundingPrecision,
-            $killedCount,
-            $errorCount,
-            $timedOutCount,
-            $notTestedCount,
+            $killedCount + $errorCount + $timedOutCount,
+            array_sum([
+                $killedCount,
+                $errorCount,
+                $escapedCount,
+                $timedOutCount,
+            ]),
             array_sum([
                 $killedCount,
                 $errorCount,
