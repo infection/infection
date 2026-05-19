@@ -11511,6 +11511,12 @@ count = 3
 [[issues]]
 file = "tests/phpunit/Telemetry/Attribute/RunSpanAttributesProviderTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Telemetry\Attribute\RunSpanAttributesProviderTest::test_it_marks_partial_runs_when_a_source_filter_is_configured`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/Attribute/RunSpanAttributesProviderTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Telemetry\Attribute\RunSpanAttributesProviderTest::test_it_omits_static_analysis_tool_attributes_when_static_analysis_is_disabled`.'
 count = 1
 
