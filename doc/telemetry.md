@@ -65,24 +65,42 @@ Infection records the following lifecycle spans for every run:
 
 ## Run Attributes
 
-The root `infection.run` span includes run identity, execution-context, and
-toolchain attributes that are useful for filtering dashboards:
+The root `infection.run` span includes run identity, execution-context,
+toolchain, and run-summary attributes that are useful for filtering dashboards:
 
-| Attribute                                   | Description                                                                                                               |
-|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `infection.project.name`                    | Project label. Uses `INFECTION_PROJECT_NAME`, then root `composer.json` name, then project directory basename.            |
-| `infection.project.dir`                     | Resolved project directory.                                                                                               |
-| `infection.config.path`                     | Infection configuration path, relative to `infection.project.dir` when possible.                                          |
-| `infection.version`                         | Infection version reported by Composer metadata.                                                                          |
-| `infection.distribution`                    | `source` or `phar`.                                                                                                       |
-| `infection.git.sha`                         | Current `HEAD` commit SHA when the project directory is a Git checkout.                                                   |
-| `infection.thread.count`                    | Resolved mutation runner thread count.                                                                                    |
-| `infection.initial_tests.skipped`           | Whether the initial test run was skipped.                                                                                 |
-| `infection.initial_static_analysis.skipped` | Whether the initial static analysis run was skipped because no static analysis tool was enabled.                          |
-| `infection.test_framework.name`             | Normalised configured test framework name, for example `phpunit`.                                                         |
-| `infection.test_framework.version`          | Version reported by the configured test framework adapter.                                                                |
-| `infection.static_analysis_tool.name`       | Normalised configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled.     |
-| `infection.static_analysis_tool.version`    | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
+| Attribute                                            | Description                                                                                                               |
+|------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `infection.project.name`                             | Project label. Uses `INFECTION_PROJECT_NAME`, then root `composer.json` name, then project directory basename.            |
+| `infection.project.dir`                              | Resolved project directory.                                                                                               |
+| `infection.config.path`                              | Infection configuration path, relative to `infection.project.dir` when possible.                                          |
+| `infection.version`                                  | Infection version reported by Composer metadata.                                                                          |
+| `infection.distribution`                             | `source` or `phar`.                                                                                                       |
+| `infection.git.sha`                                  | Current `HEAD` commit SHA when the project directory is a Git checkout.                                                   |
+| `infection.thread.count`                             | Resolved mutation runner thread count.                                                                                    |
+| `infection.initial_tests.skipped`                    | Whether the initial test run was skipped.                                                                                 |
+| `infection.initial_static_analysis.skipped`          | Whether the initial static analysis run was skipped because no static analysis tool was enabled.                          |
+| `infection.test_framework.name`                      | Normalised configured test framework name, for example `phpunit`.                                                         |
+| `infection.test_framework.version`                   | Version reported by the configured test framework adapter.                                                                |
+| `infection.static_analysis_tool.name`                | Normalised configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled.     |
+| `infection.static_analysis_tool.version`             | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
+| `infection.source_file.count`                        | Number of source files collected for the run.                                                                             |
+| `infection.mutation.count`                           | Number of generated mutations selected for mutation evaluation.                                                           |
+| `infection.mutation.suppressed.count`                | Number of generated mutations suppressed before mutant evaluation, including heuristic suppression.                       |
+| `infection.mutation.evaluated.count`                 | Number of mutations evaluated.                                                                                            |
+| `infection.mutation.killed_by_tests.count`           | Number of mutation results with `killed by tests` detection status.                                                       |
+| `infection.mutation.killed_by_static_analysis.count` | Number of mutation results with `killed by static analysis` detection status.                                             |
+| `infection.mutation.escaped.count`                   | Number of mutation results with `escaped` detection status.                                                               |
+| `infection.mutation.error.count`                     | Number of mutation results with `error` detection status.                                                                 |
+| `infection.mutation.timed_out.count`                 | Number of mutation results with `timed out` detection status.                                                             |
+| `infection.mutation.skipped.count`                   | Number of mutation results with `skipped` detection status.                                                               |
+| `infection.mutation.syntax_error.count`              | Number of mutation results with `syntax error` detection status.                                                          |
+| `infection.mutation.not_covered.count`               | Number of mutation results with `not covered` detection status.                                                           |
+| `infection.mutation.ignored.count`                   | Number of mutation results with `ignored` detection status.                                                               |
+| `infection.msi`                                      | Final Mutation Score Indicator percentage.                                                                                |
+| `infection.covered_msi`                              | Final covered-code Mutation Score Indicator percentage.                                                                   |
+| `infection.msi.threshold`                            | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
+| `infection.covered_msi.threshold`                    | Effective minimum covered-code MSI threshold, or `0.0` when no threshold is configured.                                   |
+
 
 ## Configuration
 

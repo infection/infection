@@ -2841,7 +2841,7 @@ count = 1
 [[issues]]
 file = "src/Telemetry/Attribute/RunSpanAttributesProvider.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\Telemetry\Attribute\RunSpanAttributesProvider::provide`.'
+message = 'Potentially unhandled exception `Infection\AbstractTestFramework\InvalidVersion` in `Infection\Telemetry\Attribute\RunSpanAttributesProvider::provideInitialAttributes`.'
 count = 1
 
 [[issues]]
