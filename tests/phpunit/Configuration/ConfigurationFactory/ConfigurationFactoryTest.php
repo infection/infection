@@ -251,6 +251,7 @@ final class ConfigurationFactoryTest extends TestCase
                 githubActionsDetected: false,
                 projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
                 fileSystem: $fileSystem,
+                cpuCoresCountProvider: new CpuCoresCountProvider(),
             )
             ->create(
                 ...ConfigurationFactoryInputBuilder::withMinimalTestData()
@@ -270,6 +271,7 @@ final class ConfigurationFactoryTest extends TestCase
                 githubActionsDetected: false,
                 projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
                 gitSha: '0123456789abcdef',
+                cpuCoresCountProvider: new CpuCoresCountProvider(),
             )
             ->create(
                 ...ConfigurationFactoryInputBuilder::withMinimalTestData()
