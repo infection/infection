@@ -106,8 +106,8 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `infection.mutation.ignored.count`                   | Number of mutation results with `ignored` detection status.                                                               |
 | `infection.msi.value`                                | Final Mutation Score Indicator percentage.                                                                                |
 | `infection.mutation.coverage_rate.value`             | Final mutation code coverage percentage.                                                                                  |
-| `infection.covered_msi`                              | Final covered-code Mutation Score Indicator percentage.                                                                   |
-| `infection.msi.threshold.value`                      | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
+| `infection.covered_msi.value`                        | Final covered-code Mutation Score Indicator percentage.                                                                   |
+| `infection.msi.threshold`                            | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
 | `infection.covered_msi.threshold`                    | Effective minimum covered-code MSI threshold, or `0.0` when no threshold is configured.                                   |
 
 
