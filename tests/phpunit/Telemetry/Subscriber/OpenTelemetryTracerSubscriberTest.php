@@ -311,8 +311,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ignored.count'));
         $this->assertSame(100.0, $run->getAttributes()->get('infection.msi.value'));
         $this->assertSame(100.0, $run->getAttributes()->get('infection.mutation.coverage_rate.value'));
-        $this->assertSame(100.0, $run->getAttributes()->get('infection.covered_msi'));
-        $this->assertSame(0.0, $run->getAttributes()->get('infection.msi.threshold.value'));
+        $this->assertSame(100.0, $run->getAttributes()->get('infection.covered_msi.value'));
+        $this->assertSame(0.0, $run->getAttributes()->get('infection.msi.threshold'));
         $this->assertSame(0.0, $run->getAttributes()->get('infection.covered_msi.threshold'));
         $this->assertSame('/path/to/project', $run->getAttributes()->get('infection.project.path'));
         $this->assertSame('infection.json5', $run->getAttributes()->get('infection.config.path'));
@@ -330,7 +330,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('/path/to/src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
         $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(1, $mutationEvaluation->getAttributes()->get('infection.mutation.count'));
+        $this->assertSame(1, $mutationEvaluation->getAttributes()->get('infection.mutation.generated.count'));
         $this->assertSame('mutation-A', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.id'));
         $this->assertSame('For_', $mutationEvaluationForMutation->getAttributes()->get('infection.mutator.name'));
         $this->assertSame('/path/to/src/Foo.php', $mutationEvaluationForMutation->getAttributes()->get('code.file.path'));
