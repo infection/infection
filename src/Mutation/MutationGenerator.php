@@ -92,6 +92,7 @@ class MutationGenerator
         $sources = $this->sourceCollector->collect();
         $numberOfFiles = count($sources);
         $mutationsCount = 0;
+        $mutatedFilesCount = 0;
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
@@ -119,10 +120,14 @@ class MutationGenerator
 
             $fileMutationsCount = count($sourceFileMutationIds);
             $mutationsCount += $fileMutationsCount;
+
+            if ($fileMutationsCount > 0) {
+                ++$mutatedFilesCount;
+            }
         }
 
         $this->eventDispatcher->dispatch(
-            new MutationGenerationWasFinished($mutationsCount),
+            new MutationGenerationWasFinished($mutationsCount, $mutatedFilesCount),
         );
     }
 }

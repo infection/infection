@@ -43,12 +43,13 @@ use PHPUnit\Framework\TestCase;
 final class MutationGenerationWasFinishedTest extends TestCase
 {
     /**
-     * This class is only used to fire events, and the only functionality it needs is exposing the generated total
+     * This class is only used to fire events, and the only functionality it needs is exposing the generation totals.
      */
-    public function test_it_exposes_the_generated_total(): void
+    public function test_it_exposes_the_generation_totals(): void
     {
-        $class = new MutationGenerationWasFinished(2);
+        $class = new MutationGenerationWasFinished(2, 1);
 
         $this->assertSame(2, $class->mutationsCount);
+        $this->assertSame(1, $class->mutatedFilesCount);
     }
 }

@@ -102,8 +102,12 @@ final readonly class RunSpanAttributesProvider
     /**
      * @return Attributes
      */
-    public function provideSummaryAttributes(int $sourceFileCount, int $mutationCount, int $evaluatedMutationCount): array
-    {
+    public function provideSummaryAttributes(
+        int $sourceFileCount,
+        int $mutatedFileCount,
+        int $mutationCount,
+        int $evaluatedMutationCount,
+    ): array {
         $mutationCount = max(
             $mutationCount,
             $evaluatedMutationCount,
@@ -112,6 +116,7 @@ final readonly class RunSpanAttributesProvider
 
         return [
             'infection.source_file.count' => $sourceFileCount,
+            'infection.mutated_file.count' => $mutatedFileCount,
             'infection.mutation.generated.count' => $mutationCount,
             'infection.mutation.evaluated.count' => $evaluatedMutationCount,
             'infection.mutation.suppressed.count' => $mutationCount - $evaluatedMutationCount,

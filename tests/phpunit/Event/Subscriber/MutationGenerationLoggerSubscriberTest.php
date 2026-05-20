@@ -98,7 +98,7 @@ final class MutationGenerationLoggerSubscriberTest extends TestCase
             ->method('finish');
 
         $this->dispatcher->dispatch(
-            new MutationGenerationWasFinished(2),
+            new MutationGenerationWasFinished(2, 1),
         );
     }
 }

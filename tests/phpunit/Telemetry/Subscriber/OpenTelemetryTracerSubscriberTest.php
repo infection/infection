@@ -189,7 +189,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onAstEnrichmentWasFinished(new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'));
         $this->subscriber->onAstProcessingWasFinished(new AstProcessingWasFinished('/path/to/project/src/Foo.php'));
         $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
-        $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished(2));
+        $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished(2, 1));
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
         $this->subscriber->onHeuristicSuppressionWasStarted(new HeuristicSuppressionWasStarted($mutation));
@@ -295,6 +295,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.source_file.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutated_file.count'));
         $this->assertSame(2, $run->getAttributes()->get('infection.mutation.generated.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.evaluated.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.suppressed.count'));
@@ -335,6 +336,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
         $this->assertSame('src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
         $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
+        $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.mutated_file.count'));
         $this->assertSame(2, $mutationGeneration->getAttributes()->get('infection.mutation.generated.count'));
         $this->assertFalse($mutationEvaluation->getAttributes()->has('infection.mutation.count'));
         $this->assertSame('mutation-A', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.id'));

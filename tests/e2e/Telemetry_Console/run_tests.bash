@@ -95,6 +95,7 @@ assert_contains '"infection.static_analysis_tool.version":' var/execution-with-t
 assert_contains '"code.file.path": "tests\/e2e\/Telemetry_Console\/src\/SourceClass.php"' var/execution-with-trace-exporter.stdout
 assert_contains '"code.file.path": "tests\/e2e\/Telemetry_Console\/src\/AnotherSourceClass.php"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutated_file.count": 2' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.generated.count": 6' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.evaluated.count": 6' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.suppressed.count": 0' var/execution-with-trace-exporter.stdout
