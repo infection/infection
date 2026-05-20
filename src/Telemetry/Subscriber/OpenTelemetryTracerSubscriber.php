@@ -181,6 +181,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     /** @var array<int, string> */
     private array $mutantProcessExecutionSpanMutationHashes = [];
 
+    /** @var array<non-empty-string, non-empty-string> */
+    private array $projectRelativePathCache = [];
+
     private int $sourceFileCount = 0;
 
     /**
@@ -647,14 +650,18 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     }
 
     /**
-     * @param non-empty-string $path
-     *
      * @return non-empty-string
      */
     private function getProjectRelativePath(string $path): string
     {
+        if (isset($this->projectRelativePathCache[$path])) {
+            return $this->projectRelativePathCache[$path];
+        }
+
         if (!Path::isAbsolute($path)) {
-            return $path;
+            Assert::stringNotEmpty($path);
+
+            return $this->projectRelativePathCache[$path] = $path;
         }
 
         $relativePath = Path::makeRelative(

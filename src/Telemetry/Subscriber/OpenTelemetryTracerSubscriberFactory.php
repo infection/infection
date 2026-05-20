@@ -60,7 +60,11 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
 
         return $tracer === null
             ? new NullSubscriber()
-            : new OpenTelemetryTracerSubscriber($tracer, $this->configuration, $this->runSpanAttributesProvider)
+            : new OpenTelemetryTracerSubscriber(
+                $tracer,
+                $this->configuration,
+                $this->runSpanAttributesProvider,
+            )
         ;
     }
 }
