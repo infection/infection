@@ -112,7 +112,7 @@ assert_contains '"infection.mutation.syntax_error.count": 0' var/execution-with-
 assert_contains '"infection.mutation.ignored.count": 0' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.msi.value": 100' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.mutation.coverage_rate.value": 100' var/execution-with-trace-exporter.stdout
-assert_contains '"infection.covered_msi": 100' var/execution-with-trace-exporter.stdout
-assert_contains '"infection.msi.threshold.value": 0' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.covered_msi.value": 100' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.msi.threshold": 0' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.covered_msi.threshold": 0' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"infection.mutation.status": "killed by tests"' var/execution-with-trace-exporter.stdout

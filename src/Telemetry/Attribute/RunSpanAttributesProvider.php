@@ -132,8 +132,8 @@ final readonly class RunSpanAttributesProvider
             'infection.mutation.ignored.count' => $this->metricsCalculator->getIgnoredCount(),
             'infection.msi.value' => $this->metricsCalculator->getMutationScoreIndicator(),
             'infection.mutation.coverage_rate.value' => $this->metricsCalculator->getCoverageRate(),
-            'infection.covered_msi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-            'infection.msi.threshold.value' => $this->configuration->minMsi ?? 0.0,
+            'infection.covered_msi.value' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
+            'infection.msi.threshold' => $this->configuration->minMsi ?? 0.0,
             'infection.covered_msi.threshold' => $this->configuration->minCoveredMsi ?? 0.0,
         ];
     }
