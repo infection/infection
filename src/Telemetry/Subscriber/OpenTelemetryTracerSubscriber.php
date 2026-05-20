@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Subscriber;
 
 use function array_keys;
+use Infection\Configuration\Configuration;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
@@ -117,6 +118,8 @@ use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\SpanHandle;
 use function spl_object_id;
 use function str_starts_with;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * @phpstan-import-type Attributes from RunSpanAttributesProvider
@@ -178,6 +181,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     /** @var array<int, string> */
     private array $mutantProcessExecutionSpanMutationHashes = [];
 
+    /** @var array<non-empty-string, non-empty-string> */
+    private array $projectRelativePathCache = [];
+
     private int $sourceFileCount = 0;
 
     /**
@@ -189,6 +195,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function __construct(
         private readonly OpenTelemetryTracer $telemetry,
+        private readonly Configuration $configuration,
         private readonly RunSpanAttributesProvider $runSpanAttributesProvider,
     ) {
     }
@@ -282,7 +289,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $span = $this->startChild(
             'infection.ast_processing.file',
-            ['code.file.path' => $event->sourceFilePath],
+            ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
             parent: $this->astProcessingSpan,
         );
 
@@ -304,7 +311,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $span = $this->startChild(
             'infection.ast_parsing',
-            ['code.file.path' => $event->sourceFilePath],
+            ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
             parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
 
@@ -326,7 +333,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $span = $this->startChild(
             'infection.ast_enrichment',
-            ['code.file.path' => $event->sourceFilePath],
+            ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
             parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
 
@@ -361,7 +368,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
             [
                 'infection.mutation.id' => $mutation->getHash(),
                 'infection.mutator.name' => $mutation->getMutatorName(),
-                'code.file.path' => $mutation->getOriginalFilePath(),
+                'code.file.path' => $this->getProjectRelativePath($mutation->getOriginalFilePath()),
                 'code.line.start' => $mutation->getOriginalStartingLine(),
                 'code.line.end' => $mutation->getOriginalEndingLine(),
             ],
@@ -640,6 +647,30 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if ($span !== null) {
             $this->telemetry->end($span, $attributes);
         }
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getProjectRelativePath(string $path): string
+    {
+        if (isset($this->projectRelativePathCache[$path])) {
+            return $this->projectRelativePathCache[$path];
+        }
+
+        if (!Path::isAbsolute($path)) {
+            Assert::stringNotEmpty($path);
+
+            return $this->projectRelativePathCache[$path] = $path;
+        }
+
+        $relativePath = Path::makeRelative(
+            Path::canonicalize($path),
+            Path::canonicalize($this->configuration->projectDirectory),
+        );
+        Assert::stringNotEmpty($relativePath);
+
+        return $relativePath;
     }
 
     private function endAstSpans(): void
