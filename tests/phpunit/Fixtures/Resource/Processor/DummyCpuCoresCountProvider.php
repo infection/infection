@@ -37,7 +37,7 @@ namespace Infection\Tests\Fixtures\Resource\Processor;
 
 use Infection\Resource\Processor\CpuCoresCountProvider;
 
-final class FakeCpuCoresCountProvider extends CpuCoresCountProvider
+final class DummyCpuCoresCountProvider extends CpuCoresCountProvider
 {
     public function __construct(private readonly int $count)
     {

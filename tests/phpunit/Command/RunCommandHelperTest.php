@@ -39,7 +39,7 @@ use Infection\Command\RunCommand;
 use Infection\Command\RunCommandHelper;
 use Infection\Container\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider;
+use Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -98,11 +98,11 @@ final class RunCommandHelperTest extends TestCase
 
         yield 'numeric string' => [5, '5'];
 
-        yield 'max with 1 CPU core stays at minimum of 1' => [1, 'max', new FakeCpuCoresCountProvider(1)];
+        yield 'max with 1 CPU core stays at minimum of 1' => [1, 'max', new DummyCpuCoresCountProvider(1)];
 
-        yield 'max with 2 CPU cores is 1' => [1, 'max', new FakeCpuCoresCountProvider(2)];
+        yield 'max with 2 CPU cores is 1' => [1, 'max', new DummyCpuCoresCountProvider(2)];
 
-        yield 'max with 8 CPU cores is 7' => [7, 'max', new FakeCpuCoresCountProvider(8)];
+        yield 'max with 8 CPU cores is 7' => [7, 'max', new DummyCpuCoresCountProvider(8)];
     }
 
     #[DataProvider('providesDotsPerRow')]

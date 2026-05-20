@@ -5841,7 +5841,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/RunCommandHelperTest.php"
 code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider` not found.'
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider` not found.'
 count = 3
 
 [[issues]]
@@ -5979,7 +5979,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "non-existent-class"
-message = 'Class `Infection\Tests\Fixtures\Resource\Processor\FakeCpuCoresCountProvider` not found.'
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider` not found.'
 count = 3
 
 [[issues]]
