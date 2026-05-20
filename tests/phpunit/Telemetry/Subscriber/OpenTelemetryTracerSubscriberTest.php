@@ -330,7 +330,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('/path/to/src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
         $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(1, $mutationEvaluation->getAttributes()->get('infection.mutation.generated.count'));
+        $this->assertSame(2, $mutationGeneration->getAttributes()->get('infection.mutation.count'));
+        $this->assertFalse($mutationEvaluation->getAttributes()->has('infection.mutation.count'));
         $this->assertSame('mutation-A', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.id'));
         $this->assertSame('For_', $mutationEvaluationForMutation->getAttributes()->get('infection.mutator.name'));
         $this->assertSame('/path/to/src/Foo.php', $mutationEvaluationForMutation->getAttributes()->get('code.file.path'));

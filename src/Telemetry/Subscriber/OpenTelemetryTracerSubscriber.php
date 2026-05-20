@@ -240,7 +240,10 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $this->mutationCount = $event->mutationsCount;
 
-        $this->end($this->mutationGenerationSpan);
+        $this->end(
+            $this->mutationGenerationSpan,
+            ['infection.mutation.count' => $event->mutationsCount],
+        );
         $this->mutationGenerationSpan = null;
     }
 
@@ -336,7 +339,6 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $this->mutationEvaluationSpan = $this->startChild(
             'infection.mutation_evaluation',
-            ['infection.mutation.generated.count' => $event->mutationCount],
             parent: $this->mutationAnalysisSpan,
         );
     }
