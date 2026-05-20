@@ -72,7 +72,8 @@ assert_line_count 1 '"name": "infection.initial_tests"' var/execution-with-trace
 assert_line_count 1 '"name": "infection.initial_static_analysis"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.source_collection"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_analysis"' var/execution-with-trace-exporter.stdout
-assert_line_count 2 '"name": "infection.ast_processing"' var/execution-with-trace-exporter.stdout
+assert_line_count 1 '"name": "infection.ast_processing"' var/execution-with-trace-exporter.stdout
+assert_line_count 2 '"name": "infection.ast_processing.file"' var/execution-with-trace-exporter.stdout
 assert_line_count 2 '"name": "infection.ast_parsing"' var/execution-with-trace-exporter.stdout
 assert_line_count 2 '"name": "infection.ast_enrichment"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_generation"' var/execution-with-trace-exporter.stdout
