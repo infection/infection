@@ -250,8 +250,8 @@ final class RunSpanAttributesProviderTest extends TestCase
                 'infection.mutation.ignored.count' => 0,
                 'infection.msi.value' => 0.0,
                 'infection.mutation.coverage_rate.value' => 0.0,
-                'infection.covered_msi' => 0.0,
-                'infection.msi.threshold.value' => 0.0,
+                'infection.covered_msi.value' => 0.0,
+                'infection.msi.threshold' => 0.0,
                 'infection.covered_msi.threshold' => 0.0,
             ],
         ];
@@ -298,8 +298,8 @@ final class RunSpanAttributesProviderTest extends TestCase
                 'infection.mutation.ignored.count' => 1,
                 'infection.msi.value' => 75.0,
                 'infection.mutation.coverage_rate.value' => 87.5,
-                'infection.covered_msi' => 85.71,
-                'infection.msi.threshold.value' => 72.3,
+                'infection.covered_msi.value' => 85.71,
+                'infection.msi.threshold' => 72.3,
                 'infection.covered_msi.threshold' => 81.5,
             ],
         ];
