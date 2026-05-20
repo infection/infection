@@ -88,6 +88,7 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `infection.static_analysis_tool.name`                | Normalised configured static analysis tool name, for example `phpstan`; only emitted when static analysis is enabled.     |
 | `infection.static_analysis_tool.version`             | Version reported by the configured static analysis tool adapter; only emitted with `infection.static_analysis_tool.name`. |
 | `infection.source_file.count`                        | Number of source files collected for the run.                                                                             |
+| `infection.mutated_file.count`                       | Number of source files for which at least one mutation was generated.                                                     |
 | `infection.mutation.generated.count`                 | Number of generated mutations selected for mutation evaluation.                                                           |
 | `infection.mutation.evaluated.count`                 | Number of mutations evaluated.                                                                                            |
 | `infection.mutation.suppressed.count`                | Number of generated mutations suppressed before mutant evaluation, including heuristic suppression.                       |

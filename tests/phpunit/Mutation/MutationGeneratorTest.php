@@ -138,7 +138,7 @@ final class MutationGeneratorTest extends TestCase
                     'path/to/fileB',
                     [],
                 )],
-                [new MutationGenerationWasFinished(2)],
+                [new MutationGenerationWasFinished(2, 1)],
             ))
         ;
 

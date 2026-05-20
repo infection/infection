@@ -185,6 +185,7 @@ final class RunSpanAttributesProviderTest extends TestCase
         Configuration $configuration,
         array $detectionStatuses,
         int $sourceFileCount,
+        int $mutatedFileCount,
         int $mutationCount,
         int $evaluatedMutationCount,
         array $expected,
@@ -213,6 +214,7 @@ final class RunSpanAttributesProviderTest extends TestCase
 
         $actual = $provider->provideSummaryAttributes(
             $sourceFileCount,
+            $mutatedFileCount,
             $mutationCount,
             $evaluatedMutationCount,
         );
@@ -228,8 +230,10 @@ final class RunSpanAttributesProviderTest extends TestCase
             0,
             0,
             0,
+            0,
             [
                 'infection.source_file.count' => 0,
+                'infection.mutated_file.count' => 0,
                 'infection.mutation.generated.count' => 0,
                 'infection.mutation.evaluated.count' => 0,
                 'infection.mutation.suppressed.count' => 0,
@@ -274,10 +278,12 @@ final class RunSpanAttributesProviderTest extends TestCase
                 DetectionStatus::IGNORED,
             ],
             3,
+            2,
             12,
             10,
             [
                 'infection.source_file.count' => 3,
+                'infection.mutated_file.count' => 2,
                 'infection.mutation.generated.count' => 12,
                 'infection.mutation.evaluated.count' => 10,
                 'infection.mutation.suppressed.count' => 2,
