@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
+use Infection\Configuration\Configuration;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\SubscriberFactory;
@@ -48,6 +49,7 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
 {
     public function __construct(
         private OpenTelemetryTracerFactory $telemetryTracerFactory,
+        private Configuration $configuration,
         private RunSpanAttributesProvider $runSpanAttributesProvider,
     ) {
     }
@@ -58,7 +60,7 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
 
         return $tracer === null
             ? new NullSubscriber()
-            : new OpenTelemetryTracerSubscriber($tracer, $this->runSpanAttributesProvider)
+            : new OpenTelemetryTracerSubscriber($tracer, $this->configuration, $this->runSpanAttributesProvider)
         ;
     }
 }
