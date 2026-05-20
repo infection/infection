@@ -38,3 +38,4 @@ jobs:
           advanced-security: false
           annotations: true
           inputs: .github
+          min-severity: low
