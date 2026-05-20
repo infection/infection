@@ -112,6 +112,10 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 | `infection.msi.threshold`                            | Effective minimum MSI threshold, or `0.0` when no threshold is configured.                                                |
 | `infection.covered_msi.threshold`                    | Effective minimum covered-code MSI threshold, or `0.0` when no threshold is configured.                                   |
 
+## Span Attributes
+
+File-level spans use `code.file.path` for the source file path. The value is
+emitted relative to `infection.project.path`.
 
 ## Configuration
 
