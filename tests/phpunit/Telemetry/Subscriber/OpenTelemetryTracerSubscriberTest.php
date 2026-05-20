@@ -230,6 +230,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.source_collection',
                 'infection.ast_parsing',
                 'infection.ast_enrichment',
+                'infection.ast_processing.file',
                 'infection.ast_processing',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation.heuristic',
@@ -256,6 +257,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $initialStaticAnalysis = $this->getSpanFromExporter('infection.initial_static_analysis');
         $mutationAnalysis = $this->getSpanFromExporter('infection.mutation_analysis');
         $astProcessing = $this->getSpanFromExporter('infection.ast_processing');
+        $astProcessingFile = $this->getSpanFromExporter('infection.ast_processing.file');
         $astParsing = $this->getSpanFromExporter('infection.ast_parsing');
         $astEnrichment = $this->getSpanFromExporter('infection.ast_enrichment');
         $mutationGeneration = $this->getSpanFromExporter('infection.mutation_generation');
@@ -276,8 +278,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($run->getSpanId(), $sourceCollection->getParentSpanId());
         $this->assertSame($run->getSpanId(), $mutationAnalysis->getParentSpanId());
         $this->assertSame($mutationAnalysis->getSpanId(), $astProcessing->getParentSpanId());
-        $this->assertSame($astProcessing->getSpanId(), $astParsing->getParentSpanId());
-        $this->assertSame($astProcessing->getSpanId(), $astEnrichment->getParentSpanId());
+        $this->assertSame($astProcessing->getSpanId(), $astProcessingFile->getParentSpanId());
+        $this->assertSame($astProcessingFile->getSpanId(), $astParsing->getParentSpanId());
+        $this->assertSame($astProcessingFile->getSpanId(), $astEnrichment->getParentSpanId());
         $this->assertSame($mutationAnalysis->getSpanId(), $mutationGeneration->getParentSpanId());
         $this->assertSame($mutationAnalysis->getSpanId(), $mutationEvaluation->getParentSpanId());
         $this->assertSame($mutationEvaluation->getSpanId(), $mutationEvaluationForMutation->getParentSpanId());
@@ -326,7 +329,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertFalse($run->getAttributes()->has('infection.static_analysis_tool.name'));
         $this->assertFalse($run->getAttributes()->has('infection.static_analysis_tool.version'));
         $this->assertIsString($run->getAttributes()->get('infection.version'));
-        $this->assertSame('/path/to/src/Foo.php', $astProcessing->getAttributes()->get('code.file.path'));
+        $this->assertFalse($astProcessing->getAttributes()->has('code.file.path'));
+        $this->assertSame('/path/to/src/Foo.php', $astProcessingFile->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
         $this->assertSame('/path/to/src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
         $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
@@ -366,13 +370,14 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(
             [
+                'infection.ast_parsing',
+                'infection.ast_enrichment',
+                'infection.ast_processing.file',
+                'infection.ast_processing',
                 'infection.initial_tests',
                 'infection.initial_static_analysis',
                 'infection.artefact_collection',
                 'infection.source_collection',
-                'infection.ast_parsing',
-                'infection.ast_enrichment',
-                'infection.ast_processing',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation.mutation',
                 'infection.mutation_evaluation',

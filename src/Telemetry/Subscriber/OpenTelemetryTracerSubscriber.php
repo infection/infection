@@ -143,8 +143,10 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     private ?SpanHandle $reportingSpan = null;
 
+    private ?SpanHandle $astProcessingSpan = null;
+
     /** @var array<string, SpanHandle> */
-    private array $astProcessingSpans = [];
+    private array $astProcessingFileSpans = [];
 
     /** @var array<string, SpanHandle> */
     private array $astParsingSpans = [];
@@ -229,6 +231,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
+        $this->endAstSpans();
+
         $this->mutationGenerationSpan = $this->startChild(
             'infection.mutation_generation',
             ['infection.source_file.count' => $event->mutableFilesCount],
@@ -271,22 +275,27 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
     {
-        $span = $this->startChild(
+        $this->astProcessingSpan ??= $this->startChild(
             'infection.ast_processing',
-            ['code.file.path' => $event->sourceFilePath],
             parent: $this->mutationAnalysisSpan,
         );
 
+        $span = $this->startChild(
+            'infection.ast_processing.file',
+            ['code.file.path' => $event->sourceFilePath],
+            parent: $this->astProcessingSpan,
+        );
+
         if ($span !== null) {
-            $this->astProcessingSpans[$event->sourceFilePath] = $span;
+            $this->astProcessingFileSpans[$event->sourceFilePath] = $span;
         }
     }
 
     public function onAstProcessingWasFinished(AstProcessingWasFinished $event): void
     {
-        $span = $this->astProcessingSpans[$event->sourceFilePath] ?? null;
+        $span = $this->astProcessingFileSpans[$event->sourceFilePath] ?? null;
 
-        unset($this->astProcessingSpans[$event->sourceFilePath]);
+        unset($this->astProcessingFileSpans[$event->sourceFilePath]);
 
         $this->end($span);
     }
@@ -296,7 +305,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $span = $this->startChild(
             'infection.ast_parsing',
             ['code.file.path' => $event->sourceFilePath],
-            parent: $this->astProcessingSpans[$event->sourceFilePath] ?? null,
+            parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
 
         if ($span !== null) {
@@ -318,7 +327,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $span = $this->startChild(
             'infection.ast_enrichment',
             ['code.file.path' => $event->sourceFilePath],
-            parent: $this->astProcessingSpans[$event->sourceFilePath] ?? null,
+            parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
 
         if ($span !== null) {
@@ -643,13 +652,16 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
             $this->end($span);
         }
 
-        foreach ($this->astProcessingSpans as $span) {
+        foreach ($this->astProcessingFileSpans as $span) {
             $this->end($span);
         }
 
+        $this->end($this->astProcessingSpan);
+
         $this->astParsingSpans = [];
         $this->astEnrichmentSpans = [];
-        $this->astProcessingSpans = [];
+        $this->astProcessingFileSpans = [];
+        $this->astProcessingSpan = null;
     }
 
     private function endMutationEvaluationChildSpans(string $hash): void

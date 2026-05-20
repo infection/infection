@@ -54,6 +54,8 @@ Infection records the following lifecycle spans for every run:
 - `infection.initial_static_analysis`
 - `infection.mutation_generation`
 - `infection.mutation_analysis`
+- `infection.ast_processing`
+- `infection.ast_processing.file` (one per processed source file)
 - `infection.mutation_evaluation`
 - `infection.mutation_evaluation.mutation` (one per started mutant evaluation)
 - `infection.mutation_evaluation.heuristic_suppression`
