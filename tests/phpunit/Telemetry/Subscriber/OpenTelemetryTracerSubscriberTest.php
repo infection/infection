@@ -188,7 +188,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onAstEnrichmentWasFinished(new AstEnrichmentWasFinished('/path/to/src/Foo.php'));
         $this->subscriber->onAstProcessingWasFinished(new AstProcessingWasFinished('/path/to/src/Foo.php'));
         $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
-        $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished());
+        $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished(2));
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
         $this->subscriber->onHeuristicSuppressionWasStarted(new HeuristicSuppressionWasStarted($mutation));
@@ -291,9 +291,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.generated.count'));
+        $this->assertSame(2, $run->getAttributes()->get('infection.mutation.generated.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.evaluated.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.suppressed.count'));
+        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.suppressed.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.eligible.count'));
         $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ineligible.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutation.tested_eligible.count'));

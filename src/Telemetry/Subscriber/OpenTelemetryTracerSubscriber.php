@@ -178,6 +178,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     private int $sourceFileCount = 0;
 
+    /**
+     * @var positive-int|int
+     */
     private int $mutationCount = 0;
 
     private int $evaluatedMutationCount = 0;
@@ -235,6 +238,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
     {
+        $this->mutationCount = $event->mutationsCount;
+
         $this->end($this->mutationGenerationSpan);
         $this->mutationGenerationSpan = null;
     }
@@ -329,8 +334,6 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
     {
-        $this->mutationCount = $event->mutationCount;
-
         $this->mutationEvaluationSpan = $this->startChild(
             'infection.mutation_evaluation',
             ['infection.mutation.generated.count' => $event->mutationCount],
