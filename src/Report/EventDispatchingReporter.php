@@ -77,12 +77,10 @@ final readonly class EventDispatchingReporter implements Reporter
             new ReporterWasStarted($reporterId, $this->name),
         );
 
-        try {
-            $this->decoratedReporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReporterWasFinished($reporterId, $this->name),
-            );
-        }
+        $this->decoratedReporter->report();
+
+        $this->eventDispatcher->dispatch(
+            new ReporterWasFinished($reporterId, $this->name),
+        );
     }
 }
