@@ -319,7 +319,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     public function onAstParsingWasStarted(AstParsingWasStarted $event): void
     {
         $span = $this->startChild(
-            'infection.ast_parsing',
+            'infection.ast_processing.file.parsing',
             ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
             parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
@@ -341,7 +341,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void
     {
         $span = $this->startChild(
-            'infection.ast_enrichment',
+            'infection.ast_processing.file.enrichment',
             ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
             parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
@@ -413,7 +413,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $hash = $event->mutation->getHash();
 
         $span = $this->startChild(
-            'infection.mutation_evaluation.heuristic_suppression',
+            'infection.mutation_evaluation.mutation.heuristic_suppression',
             parent: $this->mutationEvaluationSpans[$hash] ?? null,
         );
 
@@ -438,7 +438,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $key = self::heuristicKey($hash, $event->heuristic->value);
 
         $span = $this->startChild(
-            'infection.mutation_evaluation.heuristic',
+            'infection.mutation_evaluation.mutation.heuristic',
             ['infection.mutation_evaluation.heuristic.id' => $event->heuristic->value],
             $this->heuristicSuppressionSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
@@ -487,7 +487,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $hash = $event->mutant->getMutation()->getHash();
 
         $span = $this->startChild(
-            'infection.mutation_evaluation.mutant_materialisation',
+            'infection.mutation_evaluation.mutant_analysis.materialisation',
             parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -512,7 +512,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         ++$this->evaluatedMutationCount;
 
         $span = $this->startChild(
-            'infection.mutation_evaluation.mutant_evaluation',
+            'infection.mutation_evaluation.mutant_analysis.evaluation',
             parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -537,7 +537,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $key = spl_object_id($event->mutantProcess);
 
         $span = $this->startChild(
-            'infection.mutation_evaluation.process',
+            'infection.mutation_evaluation.mutant_analysis.evaluation.process',
             parent: $this->mutantEvaluationSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 

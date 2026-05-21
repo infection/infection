@@ -56,14 +56,16 @@ Infection records the following lifecycle spans for every run:
 - `infection.mutation_analysis`
 - `infection.ast_processing`
 - `infection.ast_processing.file` (one per processed source file)
+- `infection.ast_processing.file.parsing`
+- `infection.ast_processing.file.enrichment`
 - `infection.mutation_evaluation`
 - `infection.mutation_evaluation.mutation` (one per started mutant evaluation)
-- `infection.mutation_evaluation.heuristic_suppression`
-- `infection.mutation_evaluation.heuristic`
+- `infection.mutation_evaluation.mutation.heuristic_suppression`
+- `infection.mutation_evaluation.mutation.heuristic`
 - `infection.mutation_evaluation.mutant_analysis`
-- `infection.mutation_evaluation.mutant_materialisation`
-- `infection.mutation_evaluation.mutant_evaluation`
-- `infection.mutation_evaluation.process`
+- `infection.mutation_evaluation.mutant_analysis.materialisation`
+- `infection.mutation_evaluation.mutant_analysis.evaluation`
+- `infection.mutation_evaluation.mutant_analysis.evaluation.process`
 
 ## Run Attributes
 
