@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Attribute;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MutationSpanAttributesProvider::class)]
@@ -53,6 +55,7 @@ final class MutationSpanAttributesProviderTest extends TestCase
             ->build();
         $provider = new MutationSpanAttributesProvider(
             new ProjectRelativePathResolver($configuration),
+            $configuration->timeoutsAsEscaped,
         );
         $mutation = MutationBuilder::withMinimalTestData()
             ->withHash('mutation-A')
@@ -77,7 +80,10 @@ final class MutationSpanAttributesProviderTest extends TestCase
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withProjectDirectory('/path/to/project')
             ->build();
-        $provider = new MutationSpanAttributesProvider(new ProjectRelativePathResolver($configuration));
+        $provider = new MutationSpanAttributesProvider(
+            new ProjectRelativePathResolver($configuration),
+            $configuration->timeoutsAsEscaped,
+        );
 
         $sourceFileRelativePath = 'src/Foo.php';
         $mutation = MutationBuilder::withMinimalTestData()
@@ -88,5 +94,51 @@ final class MutationSpanAttributesProviderTest extends TestCase
         $actual = $provider->provide($mutation)['code.file.path'];
 
         $this->assertSame($sourceFileRelativePath, $actual);
+    }
+
+    #[DataProvider('msiCategoryProvider')]
+    public function test_it_provides_the_msi_category(
+        DetectionStatus $detectionStatus,
+        bool $timeoutsAsEscaped,
+        string $expectedCategory,
+    ): void {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withTimeoutsAsEscaped($timeoutsAsEscaped)
+            ->build();
+        $provider = new MutationSpanAttributesProvider(
+            new ProjectRelativePathResolver($configuration),
+            $configuration->timeoutsAsEscaped,
+        );
+
+        $this->assertSame(
+            ['infection.mutation.msi.category' => $expectedCategory],
+            $provider->provideResultAttributes($detectionStatus),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{DetectionStatus, bool, string}>
+     */
+    public static function msiCategoryProvider(): iterable
+    {
+        yield 'killed by tests' => [DetectionStatus::KILLED_BY_TESTS, false, 'covered'];
+
+        yield 'killed by static analysis' => [DetectionStatus::KILLED_BY_STATIC_ANALYSIS, false, 'covered'];
+
+        yield 'error' => [DetectionStatus::ERROR, false, 'covered'];
+
+        yield 'syntax error' => [DetectionStatus::SYNTAX_ERROR, false, 'covered'];
+
+        yield 'timed out counted as covered' => [DetectionStatus::TIMED_OUT, false, 'covered'];
+
+        yield 'timed out counted as not covered' => [DetectionStatus::TIMED_OUT, true, 'not_covered'];
+
+        yield 'escaped' => [DetectionStatus::ESCAPED, false, 'not_covered'];
+
+        yield 'not covered' => [DetectionStatus::NOT_COVERED, false, 'not_covered'];
+
+        yield 'skipped' => [DetectionStatus::SKIPPED, false, 'ineligible'];
+
+        yield 'ignored' => [DetectionStatus::IGNORED, false, 'ineligible'];
     }
 }

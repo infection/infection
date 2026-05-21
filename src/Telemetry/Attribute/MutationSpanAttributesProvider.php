@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Attribute;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\Mutation;
 use Infection\Telemetry\ProjectRelativePathResolver;
 
@@ -47,6 +48,7 @@ final readonly class MutationSpanAttributesProvider
 {
     public function __construct(
         private ProjectRelativePathResolver $projectRelativePathResolver,
+        private bool $timeoutsAsEscaped,
     ) {
     }
 
@@ -62,5 +64,31 @@ final readonly class MutationSpanAttributesProvider
             'code.line.start' => $mutation->getOriginalStartingLine(),
             'code.line.end' => $mutation->getOriginalEndingLine(),
         ];
+    }
+
+    /** @return Attributes */
+    public function provideResultAttributes(DetectionStatus $detectionStatus): array
+    {
+        return [
+            'infection.mutation.msi.category' => $this->getMsiCategory($detectionStatus),
+        ];
+    }
+
+    // TODO: to rework this in regards to MetricsCalculator...
+    private function getMsiCategory(DetectionStatus $detectionStatus): string
+    {
+        return match ($detectionStatus) {
+            DetectionStatus::KILLED_BY_TESTS,
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
+            DetectionStatus::ERROR,
+            DetectionStatus::SYNTAX_ERROR => 'covered',
+            DetectionStatus::TIMED_OUT => $this->timeoutsAsEscaped
+                ? 'not_covered'
+                : 'covered',
+            DetectionStatus::ESCAPED,
+            DetectionStatus::NOT_COVERED => 'not_covered',
+            DetectionStatus::SKIPPED,
+            DetectionStatus::IGNORED => 'ineligible',
+        };
     }
 }
