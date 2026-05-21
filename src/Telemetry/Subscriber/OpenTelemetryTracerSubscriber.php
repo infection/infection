@@ -402,6 +402,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
             [
                 'infection.mutation.status' => $result->getDetectionStatus()->value,
                 'infection.mutation.runtime' => $result->getProcessRuntime(),
+                ...$this->mutationSpanAttributesProvider->provideResultAttributes($result->getDetectionStatus()),
             ],
         );
     }

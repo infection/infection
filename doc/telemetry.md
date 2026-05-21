@@ -126,6 +126,11 @@ Mutation-level spans and their child spans include `infection.mutation.id`,
 `infection.mutator.name`, `code.file.path`, `code.line.start`, and
 `code.line.end`. This makes mutation child spans queryable on their own in
 backends that do not support grouping or filtering by parent span attributes.
+Finished `infection.mutation_evaluation.mutation` spans also include
+`infection.mutation.msi.category`, which classifies the mutation's contribution
+to MSI as `covered`, `not_covered`, or `ineligible`. Timeouts are classified as
+`covered` unless `infection.timeouts_as_escaped` is enabled, in which case they
+are classified as `not_covered`.
 
 Reporter-level spans include `infection.reporter.id`, the run-local reporter
 object id, and `infection.reporter.name`, the stable reporter name configured by

@@ -334,9 +334,14 @@ final class Container extends DIContainer
                     $container->getMetricsCalculator(),
                 );
             },
-            MutationSpanAttributesProvider::class => static fn (self $container): MutationSpanAttributesProvider => new MutationSpanAttributesProvider(
-                $container->get(ProjectRelativePathResolver::class),
-            ),
+            MutationSpanAttributesProvider::class => static function (self $container): MutationSpanAttributesProvider {
+                $config = $container->getConfiguration();
+
+                return new MutationSpanAttributesProvider(
+                    $container->get(ProjectRelativePathResolver::class),
+                    $config->timeoutsAsEscaped,
+                );
+            },
             ProjectRelativePathResolver::class => static fn (self $container): ProjectRelativePathResolver => new ProjectRelativePathResolver(
                 $container->getConfiguration(),
             ),
