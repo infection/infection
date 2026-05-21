@@ -83,8 +83,10 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -134,13 +136,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $testFrameworkAdapter
             ->method('getVersion')
             ->willReturn('12.3.4');
+        $projectRelativePathResolver = new ProjectRelativePathResolver($configuration);
 
         $this->subscriber = new OpenTelemetryTracerSubscriber(
             new OpenTelemetryTracer(
                 $this->tracerProvider->getTracer('infection'),
                 $this->tracerProvider,
             ),
-            $configuration,
             new RunSpanAttributesProvider(
                 $configuration,
                 new InfectionVersion(),
@@ -148,6 +150,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 null,
                 $this->metricsCalculator,
             ),
+            new MutationSpanAttributesProvider($projectRelativePathResolver),
+            $projectRelativePathResolver,
         );
     }
 
@@ -344,6 +348,15 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('src/Foo.php', $mutationEvaluationForMutation->getAttributes()->get('code.file.path'));
         $this->assertSame(10, $mutationEvaluationForMutation->getAttributes()->get('code.line.start'));
         $this->assertSame(15, $mutationEvaluationForMutation->getAttributes()->get('code.line.end'));
+
+        foreach ([$heuristicSuppression, $heuristic, $mutantAnalysis, $mutantMaterialisation, $mutantEvaluation, $process] as $mutationChildSpan) {
+            $this->assertSame('mutation-A', $mutationChildSpan->getAttributes()->get('infection.mutation.id'));
+            $this->assertSame('For_', $mutationChildSpan->getAttributes()->get('infection.mutator.name'));
+            $this->assertSame('src/Foo.php', $mutationChildSpan->getAttributes()->get('code.file.path'));
+            $this->assertSame(10, $mutationChildSpan->getAttributes()->get('code.line.start'));
+            $this->assertSame(15, $mutationChildSpan->getAttributes()->get('code.line.end'));
+        }
+
         $this->assertSame(HeuristicName::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
         $this->assertSame(DetectionStatus::KILLED_BY_TESTS->value, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.status'));
         $this->assertSame(0.123, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.runtime'));
