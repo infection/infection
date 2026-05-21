@@ -51,7 +51,9 @@ final class MutationSpanAttributesProviderTest extends TestCase
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withProjectDirectory('/path/to/project')
             ->build();
-        $provider = new MutationSpanAttributesProvider(new ProjectRelativePathResolver($configuration));
+        $provider = new MutationSpanAttributesProvider(
+            new ProjectRelativePathResolver($configuration),
+        );
         $mutation = MutationBuilder::withMinimalTestData()
             ->withHash('mutation-A')
             ->withOriginalFilePath('/path/to/project/src/Foo.php')
@@ -76,11 +78,15 @@ final class MutationSpanAttributesProviderTest extends TestCase
             ->withProjectDirectory('/path/to/project')
             ->build();
         $provider = new MutationSpanAttributesProvider(new ProjectRelativePathResolver($configuration));
+
+        $sourceFileRelativePath = 'src/Foo.php';
         $mutation = MutationBuilder::withMinimalTestData()
             ->withHash('mutation-A')
-            ->withOriginalFilePath('src/Foo.php')
+            ->withOriginalFilePath($sourceFileRelativePath)
             ->build();
 
-        $this->assertSame('src/Foo.php', $provider->provide($mutation)['code.file.path']);
+        $actual = $provider->provide($mutation)['code.file.path'];
+
+        $this->assertSame($sourceFileRelativePath, $actual);
     }
 }
