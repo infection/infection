@@ -250,8 +250,8 @@ final class ConfigurationFactoryTest extends TestCase
                 ciDetected: false,
                 githubActionsDetected: false,
                 projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
-                fileSystem: $fileSystem,
                 cpuCoresCountProvider: new CpuCoresCountProvider(),
+                fileSystem: $fileSystem,
             )
             ->create(
                 ...ConfigurationFactoryInputBuilder::withMinimalTestData()
@@ -270,8 +270,8 @@ final class ConfigurationFactoryTest extends TestCase
                 ciDetected: false,
                 githubActionsDetected: false,
                 projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
-                gitSha: '0123456789abcdef',
                 cpuCoresCountProvider: new CpuCoresCountProvider(),
+                gitSha: '0123456789abcdef',
             )
             ->create(
                 ...ConfigurationFactoryInputBuilder::withMinimalTestData()
