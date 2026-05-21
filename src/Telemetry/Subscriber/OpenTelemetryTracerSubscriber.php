@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Subscriber;
 
 use function array_keys;
-use Infection\Configuration\Configuration;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
@@ -113,13 +112,13 @@ use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
+use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\SpanHandle;
 use function spl_object_id;
 use function str_starts_with;
-use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
 
 /**
  * @phpstan-import-type Attributes from RunSpanAttributesProvider
@@ -181,9 +180,6 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     /** @var array<int, string> */
     private array $mutantProcessExecutionSpanMutationHashes = [];
 
-    /** @var array<non-empty-string, non-empty-string> */
-    private array $projectRelativePathCache = [];
-
     private int $sourceFileCount = 0;
 
     /**
@@ -200,8 +196,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function __construct(
         private readonly OpenTelemetryTracer $telemetry,
-        private readonly Configuration $configuration,
         private readonly RunSpanAttributesProvider $runSpanAttributesProvider,
+        private readonly MutationSpanAttributesProvider $mutationSpanAttributesProvider,
+        private readonly ProjectRelativePathResolver $projectRelativePathResolver,
     ) {
     }
 
@@ -298,7 +295,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $span = $this->startChild(
             'infection.ast_processing.file',
-            ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
+            ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
             parent: $this->astProcessingSpan,
         );
 
@@ -320,7 +317,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $span = $this->startChild(
             'infection.ast_processing.file.parsing',
-            ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
+            ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
             parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
 
@@ -342,7 +339,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     {
         $span = $this->startChild(
             'infection.ast_processing.file.enrichment',
-            ['code.file.path' => $this->getProjectRelativePath($event->sourceFilePath)],
+            ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
             parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
         );
 
@@ -374,13 +371,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutation',
-            [
-                'infection.mutation.id' => $mutation->getHash(),
-                'infection.mutator.name' => $mutation->getMutatorName(),
-                'code.file.path' => $this->getProjectRelativePath($mutation->getOriginalFilePath()),
-                'code.line.start' => $mutation->getOriginalStartingLine(),
-                'code.line.end' => $mutation->getOriginalEndingLine(),
-            ],
+            $this->mutationSpanAttributesProvider->provide($mutation),
             $this->mutationEvaluationSpan,
         );
 
@@ -414,6 +405,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutation.heuristic_suppression',
+            $this->mutationSpanAttributesProvider->provide($event->mutation),
             parent: $this->mutationEvaluationSpans[$hash] ?? null,
         );
 
@@ -439,7 +431,10 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutation.heuristic',
-            ['infection.mutation_evaluation.heuristic.id' => $event->heuristic->value],
+            [
+                ...$this->mutationSpanAttributesProvider->provide($event->mutation),
+                'infection.mutation_evaluation.heuristic.id' => $event->heuristic->value,
+            ],
             $this->heuristicSuppressionSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -459,10 +454,12 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutantAnalysisWasStarted(MutantAnalysisWasStarted $event): void
     {
-        $hash = $event->mutant->getMutation()->getHash();
+        $mutation = $event->mutant->getMutation();
+        $hash = $mutation->getHash();
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutant_analysis',
+            $this->mutationSpanAttributesProvider->provide($mutation),
             parent: $this->mutationEvaluationSpans[$hash] ?? null,
         );
 
@@ -484,10 +481,12 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutantMaterialisationWasStarted(MutantMaterialisationWasStarted $event): void
     {
-        $hash = $event->mutant->getMutation()->getHash();
+        $mutation = $event->mutant->getMutation();
+        $hash = $mutation->getHash();
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutant_analysis.materialisation',
+            $this->mutationSpanAttributesProvider->provide($mutation),
             parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -507,12 +506,14 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void
     {
-        $hash = $event->mutant->getMutation()->getHash();
+        $mutation = $event->mutant->getMutation();
+        $hash = $mutation->getHash();
 
         ++$this->evaluatedMutationCount;
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutant_analysis.evaluation',
+            $this->mutationSpanAttributesProvider->provide($mutation),
             parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -533,11 +534,13 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutantProcessExecutionWasStarted(MutantProcessExecutionWasStarted $event): void
     {
-        $hash = $event->mutantProcess->getMutant()->getMutation()->getHash();
+        $mutation = $event->mutantProcess->getMutant()->getMutation();
+        $hash = $mutation->getHash();
         $key = spl_object_id($event->mutantProcess);
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+            $this->mutationSpanAttributesProvider->provide($mutation),
             parent: $this->mutantEvaluationSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -638,7 +641,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     /**
      * @param non-empty-string $name
-     * @param array<non-empty-string, bool|int|float|string> $attributes
+     * @param Attributes $attributes
      */
     private function startChild(string $name, array $attributes = [], ?SpanHandle $parent = null): ?SpanHandle
     {
@@ -657,30 +660,6 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if ($span !== null) {
             $this->telemetry->end($span, $attributes);
         }
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private function getProjectRelativePath(string $path): string
-    {
-        if (isset($this->projectRelativePathCache[$path])) {
-            return $this->projectRelativePathCache[$path];
-        }
-
-        if (!Path::isAbsolute($path)) {
-            Assert::stringNotEmpty($path);
-
-            return $this->projectRelativePathCache[$path] = $path;
-        }
-
-        $relativePath = Path::makeRelative(
-            Path::canonicalize($path),
-            Path::canonicalize($this->configuration->projectDirectory),
-        );
-        Assert::stringNotEmpty($relativePath);
-
-        return $relativePath;
     }
 
     private function endAstSpans(): void

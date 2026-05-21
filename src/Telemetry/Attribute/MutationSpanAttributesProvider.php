@@ -33,41 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Subscriber;
+namespace Infection\Telemetry\Attribute;
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
-use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
-use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
-use Infection\Telemetry\OpenTelemetryTracerFactory;
+use Infection\Mutation\Mutation;
 use Infection\Telemetry\ProjectRelativePathResolver;
 
 /**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ *
  * @internal
  */
-final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberFactory
+final readonly class MutationSpanAttributesProvider
 {
     public function __construct(
-        private OpenTelemetryTracerFactory $telemetryTracerFactory,
-        private RunSpanAttributesProvider $runSpanAttributesProvider,
-        private MutationSpanAttributesProvider $mutationSpanAttributesProvider,
         private ProjectRelativePathResolver $projectRelativePathResolver,
     ) {
     }
 
-    public function create(): EventSubscriber
+    /** @return Attributes */
+    public function provide(Mutation $mutation): array
     {
-        $tracer = $this->telemetryTracerFactory->create();
-
-        return $tracer === null
-            ? new NullSubscriber()
-            : new OpenTelemetryTracerSubscriber(
-                $tracer,
-                $this->runSpanAttributesProvider,
-                $this->mutationSpanAttributesProvider,
-                $this->projectRelativePathResolver,
-            )
-        ;
+        return [
+            'infection.mutation.id' => $mutation->getHash(),
+            'infection.mutator.name' => $mutation->getMutatorName(),
+            'code.file.path' => $this->projectRelativePathResolver->resolve(
+                $mutation->getOriginalFilePath(),
+            ),
+            'code.line.start' => $mutation->getOriginalStartingLine(),
+            'code.line.end' => $mutation->getOriginalEndingLine(),
+        ];
     }
 }

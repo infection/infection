@@ -69,7 +69,7 @@ final readonly class OpenTelemetryTracer
 
     /**
      * @param non-empty-string $name
-     * @param array<non-empty-string, bool|int|float|string> $attributes
+     * @param Attributes $attributes
      */
     public function startChildSpan(SpanHandle $parent, string $name, array $attributes = []): SpanHandle
     {

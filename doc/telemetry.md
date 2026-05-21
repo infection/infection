@@ -120,6 +120,11 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 File-level spans use `code.file.path` for the source file path. The value is
 emitted relative to `infection.project.path`.
 
+Mutation-level spans and their child spans include `infection.mutation.id`,
+`infection.mutator.name`, `code.file.path`, `code.line.start`, and
+`code.line.end`. This makes mutation child spans queryable on their own in
+backends that do not support grouping or filtering by parent span attributes.
+
 ## Configuration
 
 `INFECTION_TELEMETRY=true` is required before Infection creates any telemetry
