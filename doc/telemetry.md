@@ -66,6 +66,8 @@ Infection records the following lifecycle spans for every run:
 - `infection.mutation_evaluation.mutant_analysis.materialisation`
 - `infection.mutation_evaluation.mutant_analysis.evaluation`
 - `infection.mutation_evaluation.mutant_analysis.evaluation.process`
+- `infection.reporting`
+- `infection.reporting.reporter` (one per reporter run)
 
 ## Run Attributes
 
@@ -124,6 +126,10 @@ Mutation-level spans and their child spans include `infection.mutation.id`,
 `infection.mutator.name`, `code.file.path`, `code.line.start`, and
 `code.line.end`. This makes mutation child spans queryable on their own in
 backends that do not support grouping or filtering by parent span attributes.
+
+Reporter-level spans include `infection.reporter.id`, the run-local reporter
+object id, and `infection.reporter.name`, the stable reporter name configured by
+Infection.
 
 ## Configuration
 

@@ -33,38 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Report;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\Reporting\ReporterWasFinished;
+use Infection\Event\Events\Reporting\ReporterWasStarted;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
+use function spl_object_id;
 
 /**
  * @internal
  */
-final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
+final readonly class EventDispatchingReporter implements Reporter
 {
     public function __construct(
-        private Reporter $reporter,
+        private Reporter $decoratedReporter,
         private EventDispatcher $eventDispatcher,
+        private ReporterName $name,
     ) {
     }
 
-    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    public static function decorate(
+        ?Reporter $reporter,
+        EventDispatcher $eventDispatcher,
+        ReporterName $name,
+    ): ?Reporter {
+        return $reporter === null
+            ? null
+            : new self($reporter, $eventDispatcher, $name);
+    }
+
+    public function getDecoratedReporter(): Reporter
     {
+        return $this->decoratedReporter;
+    }
+
+    public function report(): void
+    {
+        $reporterId = spl_object_id($this->decoratedReporter);
+
         $this->eventDispatcher->dispatch(
-            new ReportingWasStarted(),
+            new ReporterWasStarted($reporterId, $this->name),
         );
 
-        try {
-            $this->reporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReportingWasFinished(),
-            );
-        }
+        $this->decoratedReporter->report();
+
+        $this->eventDispatcher->dispatch(
+            new ReporterWasFinished($reporterId, $this->name),
+        );
     }
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Reporter;
 
 use Generator;
+use Infection\Report\EventDispatchingReporter;
 use function sprintf;
 use function str_repeat;
 use function str_starts_with;
@@ -91,6 +92,8 @@ final readonly class FileLocationReporter implements Reporter
         foreach ($reporters as $reporter) {
             if ($reporter instanceof FederatedReporter) {
                 yield from $this->getFileReporters(...$reporter->reporters);
+            } elseif ($reporter instanceof EventDispatchingReporter) {
+                yield from $this->getFileReporters($reporter->getDecoratedReporter());
             } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
                 yield $reporter;
             }

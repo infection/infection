@@ -44,7 +44,9 @@ use Webmozart\Assert\Assert;
  */
 final class ProjectRelativePathResolver
 {
-    /** @var array<string, non-empty-string> */
+    /**
+     * @var array<non-empty-string, non-empty-string>
+     */
     private array $cache = [];
 
     public function __construct(
@@ -57,13 +59,13 @@ final class ProjectRelativePathResolver
      */
     public function resolve(string $path): string
     {
+        Assert::stringNotEmpty($path);
+
         if (isset($this->cache[$path])) {
             return $this->cache[$path];
         }
 
         if (!Path::isAbsolute($path)) {
-            Assert::stringNotEmpty($path);
-
             return $this->cache[$path] = $path;
         }
 
