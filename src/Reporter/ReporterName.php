@@ -43,6 +43,6 @@ enum ReporterName: string
     case SHOW_MUTATIONS = 'show_mutations';
     case SHOW_METRICS = 'show_metrics';
     case ADVISORY = 'advisory';
-    case FILE = 'file';
+    case FILE_REPORTERS = 'file';
     case STRYKER = 'stryker';
 }

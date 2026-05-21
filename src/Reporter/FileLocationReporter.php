@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Reporter;
 
 use Generator;
+use Infection\Report\EventDispatchingReporter;
 use function sprintf;
 use function str_repeat;
 use function str_starts_with;

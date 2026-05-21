@@ -129,8 +129,8 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Report\EventDispatchingReporter;
 use Infection\Reporter\AdvisoryReporter;
-use Infection\Reporter\EventDispatchingReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
@@ -563,7 +563,7 @@ final class Container extends DIContainer
                                 $container->getConfiguration()->logs,
                             ),
                             $eventDispatcher,
-                            ReporterName::FILE,
+                            ReporterName::FILE_REPORTERS,
                         ),
                         EventDispatchingReporter::decorate(
                             $container->getStrykerLoggerFactory()->createFromLogEntries(

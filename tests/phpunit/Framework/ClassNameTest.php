@@ -40,6 +40,7 @@ use Exception;
 use Infection\Console\Application;
 use Infection\Framework\ClassName;
 use Infection\Framework\Enum\EnumBucket;
+use Infection\Tests\Console\ApplicationTest;
 use Infection\Tests\Framework\Enum\EnumBucket\EnumBucketTest;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -110,7 +111,7 @@ final class ClassNameTest extends TestCase
         yield 'nominal' => [
             Application::class,
             [
-                'Infection\Tests\Console\ApplicationTest',
+                ApplicationTest::class,
                 'Infection\Tests\Console\Application\ApplicationTest',
             ],
         ];
@@ -126,7 +127,7 @@ final class ClassNameTest extends TestCase
         yield 'source located in tests' => [
             'Infection\Tests\Console\Application',
             [
-                'Infection\Tests\Console\ApplicationTest',
+                ApplicationTest::class,
                 'Infection\Tests\Console\Application\ApplicationTest',
             ],
         ];
@@ -135,7 +136,7 @@ final class ClassNameTest extends TestCase
         // is it clear that it is a case want to support.
         // Nonetheless, we have this test case to pin this scenario.
         yield 'already a test' => [
-            'Infection\Tests\Console\ApplicationTest',
+            ApplicationTest::class,
             [
                 'Infection\Tests\Console\ApplicationTestTest',
                 'Infection\Tests\Console\ApplicationTest\ApplicationTestTest',
@@ -210,7 +211,7 @@ final class ClassNameTest extends TestCase
     public static function notTestClassNamesProvider(): iterable
     {
         yield 'non-ambiguous case' => [
-            'Infection\Tests\Console\ApplicationTest',
+            ApplicationTest::class,
             [Application::class],
         ];
 

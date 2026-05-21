@@ -33,51 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reporter;
+namespace Infection\Tests\Report;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Reporting\ReporterWasFinished;
 use Infection\Event\Events\Reporting\ReporterWasStarted;
+use Infection\Report\EventDispatchingReporter;
+use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use function spl_object_id;
 
-/**
- * @internal
- */
-final readonly class EventDispatchingReporter implements Reporter
+#[CoversClass(EventDispatchingReporter::class)]
+final class EventDispatchingReporterTest extends TestCase
 {
-    public static function decorate(?Reporter $reporter, EventDispatcher $eventDispatcher, ReporterName $name): ?Reporter
+    public function test_it_dispatches_reporter_events_around_the_decorated_reporter(): void
     {
-        return $reporter === null
-            ? null
-            : new self($reporter, $eventDispatcher, $name);
-    }
+        $eventDispatcher = new EventDispatcherCollector();
 
-    public function __construct(
-        private Reporter $decoratedReporter,
-        private EventDispatcher $eventDispatcher,
-        private ReporterName $name,
-    ) {
-    }
+        $decoratedReporterMock = $this->createMock(Reporter::class);
+        $decoratedReporterMock
+            ->expects($this->once())
+            ->method('report');
 
-    public function getDecoratedReporter(): Reporter
-    {
-        return $this->decoratedReporter;
-    }
+        $decoratedReporterId = spl_object_id($decoratedReporterMock);
+        $reporterName = ReporterName::FILE_REPORTERS;
 
-    public function report(): void
-    {
-        $reporterId = spl_object_id($this->decoratedReporter);
-
-        $this->eventDispatcher->dispatch(
-            new ReporterWasStarted($reporterId, $this->name),
+        $reporter = EventDispatchingReporter::decorate(
+            $decoratedReporterMock,
+            $eventDispatcher,
+            $reporterName,
         );
 
-        try {
-            $this->decoratedReporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReporterWasFinished($reporterId, $this->name),
-            );
-        }
+        $this->assertInstanceOf(EventDispatchingReporter::class, $reporter);
+
+        $reporter->report();
+
+        $this->assertEquals(
+            [
+                new ReporterWasStarted(
+                    $decoratedReporterId,
+                    $reporterName,
+                ),
+                new ReporterWasFinished(
+                    $decoratedReporterId,
+                    $reporterName,
+                ),
+            ],
+            $eventDispatcher->getEvents(),
+        );
+    }
+
+    public function test_it_does_not_decorate_a_null_reporter(): void
+    {
+        $reporter = EventDispatchingReporter::decorate(
+            null,
+            new EventDispatcherCollector(),
+            ReporterName::FILE_REPORTERS,
+        );
+
+        $this->assertNull($reporter);
     }
 }

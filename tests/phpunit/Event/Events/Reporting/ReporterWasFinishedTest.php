@@ -45,7 +45,7 @@ final class ReporterWasFinishedTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void
     {
-        $name = ReporterName::FILE;
+        $name = ReporterName::FILE_REPORTERS;
         $event = new ReporterWasFinished(123, $name);
 
         $this->assertSame(123, $event->reporterId);
