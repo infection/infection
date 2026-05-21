@@ -126,7 +126,7 @@ final class ClassNameTest extends TestCase
         yield 'source located in tests' => [
             'Infection\Tests\Console\Application',
             [
-                ApplicationTest::class,
+                'Infection\Tests\Console\ApplicationTest',
                 'Infection\Tests\Console\Application\ApplicationTest',
             ],
         ];
@@ -135,7 +135,7 @@ final class ClassNameTest extends TestCase
         // is it clear that it is a case want to support.
         // Nonetheless, we have this test case to pin this scenario.
         yield 'already a test' => [
-            ApplicationTest::class,
+            'Infection\Tests\Console\ApplicationTest',
             [
                 'Infection\Tests\Console\ApplicationTestTest',
                 'Infection\Tests\Console\ApplicationTest\ApplicationTestTest',
@@ -210,7 +210,7 @@ final class ClassNameTest extends TestCase
     public static function notTestClassNamesProvider(): iterable
     {
         yield 'non-ambiguous case' => [
-            ApplicationTest::class,
+            'Infection\Tests\Console\ApplicationTest',
             [Application::class],
         ];
 
