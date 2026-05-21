@@ -33,38 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
+#[CoversClass(ReporterName::class)]
+final class ReporterNameTest extends TestCase
 {
-    public function __construct(
-        private Reporter $reporter,
-        private EventDispatcher $eventDispatcher,
-    ) {
-    }
-
-    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    public function test_it_can_be_instantiated(): void
     {
-        $this->eventDispatcher->dispatch(
-            new ReportingWasStarted(),
-        );
+        $name = ReporterName::SHOW_METRICS;
 
-        try {
-            $this->reporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReportingWasFinished(),
-            );
-        }
+        $this->assertSame('show_metrics', $name->value);
     }
 }

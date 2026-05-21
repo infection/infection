@@ -129,12 +129,14 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Report\EventDispatchingReporter;
 use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
 use Infection\Reporter\ShowMetricsReporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
@@ -524,28 +526,49 @@ final class Container extends DIContainer
             Reporter::class => static function (self $container): Reporter {
                 $output = $container->getOutput();
                 $config = $container->getConfiguration();
+                $eventDispatcher = $container->getEventDispatcher();
 
                 $reporter = new FederatedReporter(
                     ...array_filter([
-                        new ShowMutationsReporter(
-                            $output,
-                            $container->getResultsCollector(),
-                            $container->getDiffColorizer(),
-                            $config->numberOfShownMutations,
-                            !$config->mutateOnlyCoveredCode(),
-                            $config->timeoutsAsEscaped,
+                        EventDispatchingReporter::decorate(
+                            new ShowMutationsReporter(
+                                $output,
+                                $container->getResultsCollector(),
+                                $container->getDiffColorizer(),
+                                $config->numberOfShownMutations,
+                                !$config->mutateOnlyCoveredCode(),
+                                $config->timeoutsAsEscaped,
+                            ),
+                            $eventDispatcher,
+                            ReporterName::SHOW_MUTATIONS,
                         ),
-                        new ShowMetricsReporter(
-                            $output,
-                            $container->getMetricsCalculator(),
-                            !$config->mutateOnlyCoveredCode(),
+                        EventDispatchingReporter::decorate(
+                            new ShowMetricsReporter(
+                                $output,
+                                $container->getMetricsCalculator(),
+                                !$config->mutateOnlyCoveredCode(),
+                            ),
+                            $eventDispatcher,
+                            ReporterName::SHOW_METRICS,
                         ),
-                        new AdvisoryReporter($output),
-                        $container->getFileReporterFactory()->createFromConfiguration(
-                            $container->getConfiguration()->logs,
+                        EventDispatchingReporter::decorate(
+                            new AdvisoryReporter($output),
+                            $eventDispatcher,
+                            ReporterName::ADVISORY,
                         ),
-                        $container->getStrykerLoggerFactory()->createFromLogEntries(
-                            $container->getConfiguration()->logs,
+                        EventDispatchingReporter::decorate(
+                            $container->getFileReporterFactory()->createFromConfiguration(
+                                $container->getConfiguration()->logs,
+                            ),
+                            $eventDispatcher,
+                            ReporterName::FILE_REPORTERS,
+                        ),
+                        EventDispatchingReporter::decorate(
+                            $container->getStrykerLoggerFactory()->createFromLogEntries(
+                                $container->getConfiguration()->logs,
+                            ),
+                            $eventDispatcher,
+                            ReporterName::STRYKER,
                         ),
                     ]),
                 );
@@ -556,6 +579,10 @@ final class Container extends DIContainer
                     $config->numberOfShownMutations,
                 );
             },
+            ReportAfterMutationEvaluationFinishedSubscriber::class => static fn (self $container): ReportAfterMutationEvaluationFinishedSubscriber => new ReportAfterMutationEvaluationFinishedSubscriber(
+                $container->getReporter(),
+                $container->getEventDispatcher(),
+            ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 

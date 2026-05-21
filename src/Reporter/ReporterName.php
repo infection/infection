@@ -33,38 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
-use Infection\Reporter\Reporter;
+namespace Infection\Reporter;
 
 /**
  * @internal
  */
-final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
+enum ReporterName: string
 {
-    public function __construct(
-        private Reporter $reporter,
-        private EventDispatcher $eventDispatcher,
-    ) {
-    }
-
-    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
-    {
-        $this->eventDispatcher->dispatch(
-            new ReportingWasStarted(),
-        );
-
-        try {
-            $this->reporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReportingWasFinished(),
-            );
-        }
-    }
+    case SHOW_MUTATIONS = 'show_mutations';
+    case SHOW_METRICS = 'show_metrics';
+    case ADVISORY = 'advisory';
+    case FILE_REPORTERS = 'file';
+    case STRYKER = 'stryker';
 }

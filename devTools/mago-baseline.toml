@@ -10891,6 +10891,24 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Report/EventDispatchingReporterTest.php"
+code = "impossible-assignment"
+message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Report/EventDispatchingReporterTest.php"
+code = "no-value"
+message = 'Argument #2 passed to method `Infection\Report\EventDispatchingReporter::decorate` has type `never`, meaning it cannot produce a value.'
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Report/EventDispatchingReporterTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
+count = 2
+
+[[issues]]
 file = "tests/phpunit/Report/Framework/Writer/FileWriterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `contentsOrLinesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
