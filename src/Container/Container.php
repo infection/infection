@@ -156,7 +156,9 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
@@ -332,6 +334,12 @@ final class Container extends DIContainer
                     $container->getMetricsCalculator(),
                 );
             },
+            MutationSpanAttributesProvider::class => static fn (self $container): MutationSpanAttributesProvider => new MutationSpanAttributesProvider(
+                $container->get(ProjectRelativePathResolver::class),
+            ),
+            ProjectRelativePathResolver::class => static fn (self $container): ProjectRelativePathResolver => new ProjectRelativePathResolver(
+                $container->getConfiguration(),
+            ),
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->tmpDir,
                 $container->getDiffer(),

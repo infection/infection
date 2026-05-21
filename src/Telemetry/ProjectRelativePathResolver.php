@@ -33,41 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry\Subscriber;
+namespace Infection\Telemetry;
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
-use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
-use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
-use Infection\Telemetry\OpenTelemetryTracerFactory;
-use Infection\Telemetry\ProjectRelativePathResolver;
+use Infection\Configuration\Configuration;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberFactory
+final class ProjectRelativePathResolver
 {
+    /** @var array<string, non-empty-string> */
+    private array $cache = [];
+
     public function __construct(
-        private OpenTelemetryTracerFactory $telemetryTracerFactory,
-        private RunSpanAttributesProvider $runSpanAttributesProvider,
-        private MutationSpanAttributesProvider $mutationSpanAttributesProvider,
-        private ProjectRelativePathResolver $projectRelativePathResolver,
+        private readonly Configuration $configuration,
     ) {
     }
 
-    public function create(): EventSubscriber
+    /**
+     * @return non-empty-string
+     */
+    public function resolve(string $path): string
     {
-        $tracer = $this->telemetryTracerFactory->create();
+        if (isset($this->cache[$path])) {
+            return $this->cache[$path];
+        }
 
-        return $tracer === null
-            ? new NullSubscriber()
-            : new OpenTelemetryTracerSubscriber(
-                $tracer,
-                $this->runSpanAttributesProvider,
-                $this->mutationSpanAttributesProvider,
-                $this->projectRelativePathResolver,
-            )
-        ;
+        if (!Path::isAbsolute($path)) {
+            Assert::stringNotEmpty($path);
+
+            return $this->cache[$path] = $path;
+        }
+
+        $relativePath = Path::makeRelative(
+            Path::canonicalize($path),
+            Path::canonicalize($this->configuration->projectDirectory),
+        );
+        Assert::stringNotEmpty($relativePath);
+
+        return $this->cache[$path] = $relativePath;
     }
 }
