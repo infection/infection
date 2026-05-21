@@ -155,7 +155,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 null,
                 $this->metricsCalculator,
             ),
-            new MutationSpanAttributesProvider($projectRelativePathResolver),
+            new MutationSpanAttributesProvider($projectRelativePathResolver, $configuration->timeoutsAsEscaped),
             $projectRelativePathResolver,
         );
     }
@@ -375,6 +375,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(HeuristicName::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
         $this->assertSame(DetectionStatus::KILLED_BY_TESTS->value, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.status'));
+        $this->assertSame('covered', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.msi.category'));
         $this->assertSame(0.123, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.runtime'));
 
         $this->assertAllSpansAreFinished();
