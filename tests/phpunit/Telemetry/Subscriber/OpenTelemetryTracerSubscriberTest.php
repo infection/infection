@@ -86,6 +86,7 @@ use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
 use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
@@ -104,6 +105,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
+use function spl_object_id;
 
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerSubscriber::class)]
@@ -224,11 +226,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->metricsCalculator->collect($executionResult);
 
         $this->subscriber->onMutationEvaluationForMutationWasFinished(new MutationEvaluationForMutationWasFinished($executionResult));
-        $reporter = new TraceableReporter();
+        $traceableReporter = new TraceableReporter();
+        $reporterId = spl_object_id($traceableReporter);
+        $reporterName = ReporterName::FILE;
 
         $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
-        $this->subscriber->onReporterWasStarted(new ReporterWasStarted($reporter));
-        $this->subscriber->onReporterWasFinished(new ReporterWasFinished($reporter));
+        $this->subscriber->onReporterWasStarted(new ReporterWasStarted($reporterId, $reporterName));
+        $this->subscriber->onReporterWasFinished(new ReporterWasFinished($reporterId, $reporterName));
         $this->subscriber->onReportingWasFinished(new ReportingWasFinished());
         $this->subscriber->onMutationEvaluationWasFinished(new MutationEvaluationWasFinished());
         $this->subscriber->onMutationAnalysisWasFinished(new MutationAnalysisWasFinished());
@@ -308,7 +312,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($reporting->getSpanId(), $reporter->getParentSpanId());
 
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(TraceableReporter::class, $reporter->getAttributes()->get('infection.reporter.class'));
+        $this->assertSame($reporterId, $reporter->getAttributes()->get('infection.reporter.id'));
+        $this->assertSame('file', $reporter->getAttributes()->get('infection.reporter.name'));
         $this->assertSame(1, $run->getAttributes()->get('infection.source_file.count'));
         $this->assertSame(1, $run->getAttributes()->get('infection.mutated_file.count'));
         $this->assertSame(2, $run->getAttributes()->get('infection.mutation.generated.count'));
@@ -393,7 +398,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)));
         $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
         $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
-        $this->subscriber->onReporterWasStarted(new ReporterWasStarted(new TraceableReporter()));
+        $this->subscriber->onReporterWasStarted(new ReporterWasStarted(123, ReporterName::FILE));
         $this->subscriber->onApplicationExecutionWasFinished(new ApplicationExecutionWasFinished());
 
         $this->assertSame(

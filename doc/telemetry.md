@@ -127,8 +127,9 @@ Mutation-level spans and their child spans include `infection.mutation.id`,
 `code.line.end`. This makes mutation child spans queryable on their own in
 backends that do not support grouping or filtering by parent span attributes.
 
-Reporter-level spans include `infection.reporter.class`, the reporter class
-that produced the output.
+Reporter-level spans include `infection.reporter.id`, the run-local reporter
+object id, and `infection.reporter.name`, the stable reporter name configured by
+Infection.
 
 ## Configuration
 

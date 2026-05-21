@@ -33,51 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reporter;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\Reporting\ReporterWasFinished;
-use Infection\Event\Events\Reporting\ReporterWasStarted;
-use function spl_object_id;
+use Infection\Reporter\ReporterName;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class EventDispatchingReporter implements Reporter
+#[CoversClass(ReporterName::class)]
+final class ReporterNameTest extends TestCase
 {
-    public static function decorate(?Reporter $reporter, EventDispatcher $eventDispatcher, ReporterName $name): ?Reporter
+    public function test_it_can_be_instantiated(): void
     {
-        return $reporter === null
-            ? null
-            : new self($reporter, $eventDispatcher, $name);
-    }
+        $name = ReporterName::SHOW_METRICS;
 
-    public function __construct(
-        private Reporter $decoratedReporter,
-        private EventDispatcher $eventDispatcher,
-        private ReporterName $name,
-    ) {
-    }
-
-    public function getDecoratedReporter(): Reporter
-    {
-        return $this->decoratedReporter;
-    }
-
-    public function report(): void
-    {
-        $reporterId = spl_object_id($this->decoratedReporter);
-
-        $this->eventDispatcher->dispatch(
-            new ReporterWasStarted($reporterId, $this->name),
-        );
-
-        try {
-            $this->decoratedReporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReporterWasFinished($reporterId, $this->name),
-            );
-        }
+        $this->assertSame('show_metrics', $name->value);
     }
 }

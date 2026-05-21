@@ -35,49 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\Reporting\ReporterWasFinished;
-use Infection\Event\Events\Reporting\ReporterWasStarted;
-use function spl_object_id;
-
 /**
  * @internal
  */
-final readonly class EventDispatchingReporter implements Reporter
+enum ReporterName: string
 {
-    public static function decorate(?Reporter $reporter, EventDispatcher $eventDispatcher, ReporterName $name): ?Reporter
-    {
-        return $reporter === null
-            ? null
-            : new self($reporter, $eventDispatcher, $name);
-    }
-
-    public function __construct(
-        private Reporter $decoratedReporter,
-        private EventDispatcher $eventDispatcher,
-        private ReporterName $name,
-    ) {
-    }
-
-    public function getDecoratedReporter(): Reporter
-    {
-        return $this->decoratedReporter;
-    }
-
-    public function report(): void
-    {
-        $reporterId = spl_object_id($this->decoratedReporter);
-
-        $this->eventDispatcher->dispatch(
-            new ReporterWasStarted($reporterId, $this->name),
-        );
-
-        try {
-            $this->decoratedReporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReporterWasFinished($reporterId, $this->name),
-            );
-        }
-    }
+    case SHOW_MUTATIONS = 'show_mutations';
+    case SHOW_METRICS = 'show_metrics';
+    case ADVISORY = 'advisory';
+    case FILE = 'file';
+    case STRYKER = 'stryker';
 }

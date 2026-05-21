@@ -638,18 +638,19 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
             return;
         }
 
-        $this->reporterSpans[spl_object_id($event->reporter)] = $this->telemetry->startChildSpan(
+        $this->reporterSpans[$event->reporterId] = $this->telemetry->startChildSpan(
             $this->reportingSpan,
             'infection.reporting.reporter',
             [
-                'infection.reporter.class' => $event->reporter::class,
+                'infection.reporter.id' => $event->reporterId,
+                'infection.reporter.name' => $event->name->value,
             ],
         );
     }
 
     public function onReporterWasFinished(ReporterWasFinished $event): void
     {
-        $key = spl_object_id($event->reporter);
+        $key = $event->reporterId;
 
         if (!isset($this->reporterSpans[$key])) {
             return;

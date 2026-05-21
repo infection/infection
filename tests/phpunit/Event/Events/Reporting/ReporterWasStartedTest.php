@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Events\Reporting;
 
 use Infection\Event\Events\Reporting\ReporterWasStarted;
-use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -45,9 +45,10 @@ final class ReporterWasStartedTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void
     {
-        $reporter = $this->createStub(Reporter::class);
-        $event = new ReporterWasStarted($reporter);
+        $name = ReporterName::FILE;
+        $event = new ReporterWasStarted(123, $name);
 
-        $this->assertSame($reporter, $event->reporter);
+        $this->assertSame(123, $event->reporterId);
+        $this->assertSame($name, $event->name);
     }
 }

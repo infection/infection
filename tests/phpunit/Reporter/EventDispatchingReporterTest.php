@@ -39,9 +39,11 @@ use Infection\Event\Events\Reporting\ReporterWasFinished;
 use Infection\Event\Events\Reporting\ReporterWasStarted;
 use Infection\Reporter\EventDispatchingReporter;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function spl_object_id;
 
 #[CoversClass(EventDispatchingReporter::class)]
 final class EventDispatchingReporterTest extends TestCase
@@ -51,19 +53,33 @@ final class EventDispatchingReporterTest extends TestCase
         $eventDispatcher = new EventDispatcherCollector();
         $decoratedReporter = new EventAssertingReporter($eventDispatcher);
 
-        $reporter = new EventDispatchingReporter(
+        $reporter = EventDispatchingReporter::decorate(
             $decoratedReporter,
             $eventDispatcher,
+            ReporterName::FILE,
         );
+
+        $this->assertInstanceOf(EventDispatchingReporter::class, $reporter);
 
         $reporter->report();
 
         $this->assertEquals(
             [
-                new ReporterWasStarted($decoratedReporter),
-                new ReporterWasFinished($decoratedReporter),
+                new ReporterWasStarted(spl_object_id($decoratedReporter), ReporterName::FILE),
+                new ReporterWasFinished(spl_object_id($decoratedReporter), ReporterName::FILE),
             ],
             $eventDispatcher->getEvents(),
+        );
+    }
+
+    public function test_it_does_not_decorate_a_null_reporter(): void
+    {
+        $this->assertNull(
+            EventDispatchingReporter::decorate(
+                null,
+                new EventDispatcherCollector(),
+                ReporterName::FILE,
+            ),
         );
     }
 }
@@ -79,7 +95,7 @@ final readonly class EventAssertingReporter implements Reporter
     {
         TestCase::assertEquals(
             [
-                new ReporterWasStarted($this),
+                new ReporterWasStarted(spl_object_id($this), ReporterName::FILE),
             ],
             $this->eventDispatcher->getEvents(),
         );

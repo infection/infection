@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Events\Reporting;
 
-use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
 
 /**
  * @internal
@@ -43,7 +43,8 @@ use Infection\Reporter\Reporter;
 final readonly class ReporterWasStarted
 {
     public function __construct(
-        public Reporter $reporter,
+        public int $reporterId,
+        public ReporterName $name,
     ) {
     }
 }

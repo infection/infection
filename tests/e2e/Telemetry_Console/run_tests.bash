@@ -89,8 +89,9 @@ assert_line_count 1 '"name": "infection.reporting"' var/execution-with-trace-exp
 assert_line_count 4 '"name": "infection.reporting.reporter"' var/execution-with-trace-exporter.stdout
 assert_contains '"service.name": "infection"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.project.name": "infection\/infection"' var/execution-with-trace-exporter.stdout
-assert_contains '"infection.reporter.class": "Infection\\Reporter\\ShowMutationsReporter"' var/execution-with-trace-exporter.stdout
-assert_contains '"infection.reporter.class": "Infection\\Reporter\\ShowMetricsReporter"' var/execution-with-trace-exporter.stdout
+assert_line_count 4 '"infection.reporter.id":' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.reporter.name": "show_mutations"' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.reporter.name": "show_metrics"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.test_framework.name": "phpunit"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.test_framework.version":' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.static_analysis_tool.name": "phpstan"' var/execution-with-trace-exporter.stdout

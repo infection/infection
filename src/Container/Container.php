@@ -136,6 +136,7 @@ use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Reporter;
+use Infection\Reporter\ReporterName;
 use Infection\Reporter\ShowMetricsReporter;
 use Infection\Reporter\ShowMutationsReporter;
 use Infection\Reporter\StrykerReporterFactory;
@@ -528,32 +529,49 @@ final class Container extends DIContainer
                 $output = $container->getOutput();
                 $config = $container->getConfiguration();
                 $eventDispatcher = $container->getEventDispatcher();
-                $eventDispatchingReporter = static fn (?Reporter $reporter): ?Reporter => $reporter === null
-                    ? null
-                    : new EventDispatchingReporter($reporter, $eventDispatcher);
 
                 $reporter = new FederatedReporter(
                     ...array_filter([
-                        $eventDispatchingReporter(new ShowMutationsReporter(
-                            $output,
-                            $container->getResultsCollector(),
-                            $container->getDiffColorizer(),
-                            $config->numberOfShownMutations,
-                            !$config->mutateOnlyCoveredCode(),
-                            $config->timeoutsAsEscaped,
-                        )),
-                        $eventDispatchingReporter(new ShowMetricsReporter(
-                            $output,
-                            $container->getMetricsCalculator(),
-                            !$config->mutateOnlyCoveredCode(),
-                        )),
-                        $eventDispatchingReporter(new AdvisoryReporter($output)),
-                        $eventDispatchingReporter($container->getFileReporterFactory()->createFromConfiguration(
-                            $container->getConfiguration()->logs,
-                        )),
-                        $eventDispatchingReporter($container->getStrykerLoggerFactory()->createFromLogEntries(
-                            $container->getConfiguration()->logs,
-                        )),
+                        EventDispatchingReporter::decorate(
+                            new ShowMutationsReporter(
+                                $output,
+                                $container->getResultsCollector(),
+                                $container->getDiffColorizer(),
+                                $config->numberOfShownMutations,
+                                !$config->mutateOnlyCoveredCode(),
+                                $config->timeoutsAsEscaped,
+                            ),
+                            $eventDispatcher,
+                            ReporterName::SHOW_MUTATIONS,
+                        ),
+                        EventDispatchingReporter::decorate(
+                            new ShowMetricsReporter(
+                                $output,
+                                $container->getMetricsCalculator(),
+                                !$config->mutateOnlyCoveredCode(),
+                            ),
+                            $eventDispatcher,
+                            ReporterName::SHOW_METRICS,
+                        ),
+                        EventDispatchingReporter::decorate(
+                            new AdvisoryReporter($output),
+                            $eventDispatcher,
+                            ReporterName::ADVISORY,
+                        ),
+                        EventDispatchingReporter::decorate(
+                            $container->getFileReporterFactory()->createFromConfiguration(
+                                $container->getConfiguration()->logs,
+                            ),
+                            $eventDispatcher,
+                            ReporterName::FILE,
+                        ),
+                        EventDispatchingReporter::decorate(
+                            $container->getStrykerLoggerFactory()->createFromLogEntries(
+                                $container->getConfiguration()->logs,
+                            ),
+                            $eventDispatcher,
+                            ReporterName::STRYKER,
+                        ),
                     ]),
                 );
 
