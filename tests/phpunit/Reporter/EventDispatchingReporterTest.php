@@ -33,24 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Reporter;
 
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
+use Closure;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Reporter\EventDispatchingReporter;
 use Infection\Reporter\Reporter;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements MutationEvaluationWasFinishedSubscriber
+#[CoversClass(EventDispatchingReporter::class)]
+final class EventDispatchingReporterTest extends TestCase
+{
+    public function test_it_dispatches_reporting_events_around_the_decorated_reporter(): void
+    {
+        $eventDispatcher = new EventDispatcherCollector();
+        $decoratedReporter = new CallbackReporter(
+            static function () use ($eventDispatcher): void {
+                self::assertEquals(
+                    [
+                        new ReportingWasStarted(),
+                    ],
+                    $eventDispatcher->getEvents(),
+                );
+            },
+        );
+
+        $reporter = new EventDispatchingReporter(
+            $decoratedReporter,
+            $eventDispatcher,
+        );
+
+        $reporter->report();
+
+        $this->assertEquals(
+            [
+                new ReportingWasStarted(),
+                new ReportingWasFinished(),
+            ],
+            $eventDispatcher->getEvents(),
+        );
+    }
+}
+
+final readonly class CallbackReporter implements Reporter
 {
     public function __construct(
-        private Reporter $reporter,
+        private Closure $callback,
     ) {
     }
 
-    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    public function report(): void
     {
-        $this->reporter->report();
+        ($this->callback)();
     }
 }

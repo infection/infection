@@ -130,6 +130,7 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Reporter\AdvisoryReporter;
+use Infection\Reporter\EventDispatchingReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
 use Infection\Reporter\FileReporterFactory;
@@ -552,10 +553,13 @@ final class Container extends DIContainer
                     ]),
                 );
 
-                return new FileLocationReporter(
-                    $reporter,
-                    $output,
-                    $config->numberOfShownMutations,
+                return new EventDispatchingReporter(
+                    new FileLocationReporter(
+                        $reporter,
+                        $output,
+                        $config->numberOfShownMutations,
+                    ),
+                    $container->getEventDispatcher(),
                 );
             },
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
