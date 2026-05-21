@@ -52,7 +52,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup PHP for coverage
-        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # master
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # master
         with:
           php-version: ${{ env.PHP_VERSION }}
           coverage: pcov
@@ -84,7 +84,7 @@ jobs:
             --log-junit=var/coverage/junit.xml
 
       - name: Re-configure PHP for mutation testing without pcov and with opcache
-        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # master
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # master
         with:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none
