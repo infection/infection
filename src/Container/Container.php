@@ -527,41 +527,46 @@ final class Container extends DIContainer
             Reporter::class => static function (self $container): Reporter {
                 $output = $container->getOutput();
                 $config = $container->getConfiguration();
+                $eventDispatcher = $container->getEventDispatcher();
+                $eventDispatchingReporter = static fn (?Reporter $reporter): ?Reporter => $reporter === null
+                    ? null
+                    : new EventDispatchingReporter($reporter, $eventDispatcher);
 
                 $reporter = new FederatedReporter(
                     ...array_filter([
-                        new ShowMutationsReporter(
+                        $eventDispatchingReporter(new ShowMutationsReporter(
                             $output,
                             $container->getResultsCollector(),
                             $container->getDiffColorizer(),
                             $config->numberOfShownMutations,
                             !$config->mutateOnlyCoveredCode(),
                             $config->timeoutsAsEscaped,
-                        ),
-                        new ShowMetricsReporter(
+                        )),
+                        $eventDispatchingReporter(new ShowMetricsReporter(
                             $output,
                             $container->getMetricsCalculator(),
                             !$config->mutateOnlyCoveredCode(),
-                        ),
-                        new AdvisoryReporter($output),
-                        $container->getFileReporterFactory()->createFromConfiguration(
+                        )),
+                        $eventDispatchingReporter(new AdvisoryReporter($output)),
+                        $eventDispatchingReporter($container->getFileReporterFactory()->createFromConfiguration(
                             $container->getConfiguration()->logs,
-                        ),
-                        $container->getStrykerLoggerFactory()->createFromLogEntries(
+                        )),
+                        $eventDispatchingReporter($container->getStrykerLoggerFactory()->createFromLogEntries(
                             $container->getConfiguration()->logs,
-                        ),
+                        )),
                     ]),
                 );
 
-                return new EventDispatchingReporter(
-                    new FileLocationReporter(
-                        $reporter,
-                        $output,
-                        $config->numberOfShownMutations,
-                    ),
-                    $container->getEventDispatcher(),
+                return new FileLocationReporter(
+                    $reporter,
+                    $output,
+                    $config->numberOfShownMutations,
                 );
             },
+            ReportAfterMutationEvaluationFinishedSubscriber::class => static fn (self $container): ReportAfterMutationEvaluationFinishedSubscriber => new ReportAfterMutationEvaluationFinishedSubscriber(
+                $container->getReporter(),
+                $container->getEventDispatcher(),
+            ),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 

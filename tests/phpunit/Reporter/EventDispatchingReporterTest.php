@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reporter;
 
-use Closure;
-use Infection\Event\Events\Reporting\ReportingWasFinished;
-use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\Reporting\ReporterWasFinished;
+use Infection\Event\Events\Reporting\ReporterWasStarted;
 use Infection\Reporter\EventDispatchingReporter;
 use Infection\Reporter\Reporter;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -47,19 +46,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(EventDispatchingReporter::class)]
 final class EventDispatchingReporterTest extends TestCase
 {
-    public function test_it_dispatches_reporting_events_around_the_decorated_reporter(): void
+    public function test_it_dispatches_reporter_events_around_the_decorated_reporter(): void
     {
         $eventDispatcher = new EventDispatcherCollector();
-        $decoratedReporter = new CallbackReporter(
-            static function () use ($eventDispatcher): void {
-                self::assertEquals(
-                    [
-                        new ReportingWasStarted(),
-                    ],
-                    $eventDispatcher->getEvents(),
-                );
-            },
-        );
+        $decoratedReporter = new EventAssertingReporter($eventDispatcher);
 
         $reporter = new EventDispatchingReporter(
             $decoratedReporter,
@@ -70,23 +60,28 @@ final class EventDispatchingReporterTest extends TestCase
 
         $this->assertEquals(
             [
-                new ReportingWasStarted(),
-                new ReportingWasFinished(),
+                new ReporterWasStarted($decoratedReporter),
+                new ReporterWasFinished($decoratedReporter),
             ],
             $eventDispatcher->getEvents(),
         );
     }
 }
 
-final readonly class CallbackReporter implements Reporter
+final readonly class EventAssertingReporter implements Reporter
 {
     public function __construct(
-        private Closure $callback,
+        private EventDispatcherCollector $eventDispatcher,
     ) {
     }
 
     public function report(): void
     {
-        ($this->callback)();
+        TestCase::assertEquals(
+            [
+                new ReporterWasStarted($this),
+            ],
+            $this->eventDispatcher->getEvents(),
+        );
     }
 }

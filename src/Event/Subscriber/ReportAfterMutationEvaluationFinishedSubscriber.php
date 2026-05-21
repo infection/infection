@@ -35,8 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Reporter\Reporter;
 
 /**
@@ -46,11 +49,22 @@ final readonly class ReportAfterMutationEvaluationFinishedSubscriber implements 
 {
     public function __construct(
         private Reporter $reporter,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $this->reporter->report();
+        $this->eventDispatcher->dispatch(
+            new ReportingWasStarted(),
+        );
+
+        try {
+            $this->reporter->report();
+        } finally {
+            $this->eventDispatcher->dispatch(
+                new ReportingWasFinished(),
+            );
+        }
     }
 }

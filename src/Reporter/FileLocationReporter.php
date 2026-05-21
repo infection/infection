@@ -91,6 +91,8 @@ final readonly class FileLocationReporter implements Reporter
         foreach ($reporters as $reporter) {
             if ($reporter instanceof FederatedReporter) {
                 yield from $this->getFileReporters(...$reporter->reporters);
+            } elseif ($reporter instanceof EventDispatchingReporter) {
+                yield from $this->getFileReporters($reporter->getDecoratedReporter());
             } elseif ($reporter instanceof FileReporter && !str_starts_with($reporter->getFilePath(), 'php://')) {
                 yield $reporter;
             }

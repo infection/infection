@@ -37,8 +37,11 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber;
 use Infection\Reporter\Reporter;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -52,13 +55,24 @@ final class ReportAfterMutationEvaluationFinishedSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('report');
 
+        $reportingEventDispatcher = new EventDispatcherCollector();
+
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(
             new ReportAfterMutationEvaluationFinishedSubscriber(
                 $reporter,
+                $reportingEventDispatcher,
             ),
         );
 
         $dispatcher->dispatch(new MutationEvaluationWasFinished());
+
+        $this->assertEquals(
+            [
+                new ReportingWasStarted(),
+                new ReportingWasFinished(),
+            ],
+            $reportingEventDispatcher->getEvents(),
+        );
     }
 }

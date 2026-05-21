@@ -108,6 +108,10 @@ use Infection\Event\Events\Reporting\ReportingWasFinished;
 use Infection\Event\Events\Reporting\ReportingWasFinishedSubscriber;
 use Infection\Event\Events\Reporting\ReportingWasStarted;
 use Infection\Event\Events\Reporting\ReportingWasStartedSubscriber;
+use Infection\Event\Events\Reporting\ReporterWasFinished;
+use Infection\Event\Events\Reporting\ReporterWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReporterWasStarted;
+use Infection\Event\Events\Reporting\ReporterWasStartedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
 use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
@@ -125,7 +129,7 @@ use function str_starts_with;
  *
  * @internal
  */
-final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, HeuristicSuppressionWasFinishedSubscriber, HeuristicSuppressionWasStartedSubscriber, HeuristicWasFinishedSubscriber, HeuristicWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantAnalysisWasFinishedSubscriber, MutantAnalysisWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessExecutionWasFinishedSubscriber, MutantProcessExecutionWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, HeuristicSuppressionWasFinishedSubscriber, HeuristicSuppressionWasStartedSubscriber, HeuristicWasFinishedSubscriber, HeuristicWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantAnalysisWasFinishedSubscriber, MutantAnalysisWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessExecutionWasFinishedSubscriber, MutantProcessExecutionWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReporterWasFinishedSubscriber, ReporterWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
     private ?SpanHandle $rootSpan = null;
 
@@ -179,6 +183,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     /** @var array<int, string> */
     private array $mutantProcessExecutionSpanMutationHashes = [];
+
+    /** @var array<int, SpanHandle> */
+    private array $reporterSpans = [];
 
     private int $sourceFileCount = 0;
 
@@ -588,6 +595,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $this->end($this->mutationEvaluationSpan);
         $this->end($this->mutationAnalysisSpan);
+        $this->endReporterSpans();
         $this->end($this->reportingSpan);
         $this->end(
             $this->rootSpan,
@@ -614,6 +622,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onReportingWasFinished(ReportingWasFinished $event): void
     {
+        $this->endReporterSpans();
         $this->end($this->reportingSpan);
         $this->reportingSpan = null;
     }
@@ -621,6 +630,33 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     public function onReportingWasStarted(ReportingWasStarted $event): void
     {
         $this->reportingSpan = $this->startChild('infection.reporting');
+    }
+
+    public function onReporterWasStarted(ReporterWasStarted $event): void
+    {
+        if ($this->reportingSpan === null) {
+            return;
+        }
+
+        $this->reporterSpans[spl_object_id($event->reporter)] = $this->telemetry->startChildSpan(
+            $this->reportingSpan,
+            'infection.reporting.reporter',
+            [
+                'infection.reporter.class' => $event->reporter::class,
+            ],
+        );
+    }
+
+    public function onReporterWasFinished(ReporterWasFinished $event): void
+    {
+        $key = spl_object_id($event->reporter);
+
+        if (!isset($this->reporterSpans[$key])) {
+            return;
+        }
+
+        $this->end($this->reporterSpans[$key]);
+        unset($this->reporterSpans[$key]);
     }
 
     public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
@@ -660,6 +696,15 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if ($span !== null) {
             $this->telemetry->end($span, $attributes);
         }
+    }
+
+    private function endReporterSpans(): void
+    {
+        foreach ($this->reporterSpans as $span) {
+            $this->end($span);
+        }
+
+        $this->reporterSpans = [];
     }
 
     private function endAstSpans(): void

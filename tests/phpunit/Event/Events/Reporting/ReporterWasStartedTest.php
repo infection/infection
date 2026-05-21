@@ -33,40 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reporter;
+namespace Infection\Tests\Event\Events\Reporting;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\Reporting\ReporterWasFinished;
 use Infection\Event\Events\Reporting\ReporterWasStarted;
+use Infection\Reporter\Reporter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class EventDispatchingReporter implements Reporter
+#[CoversClass(ReporterWasStarted::class)]
+final class ReporterWasStartedTest extends TestCase
 {
-    public function __construct(
-        private Reporter $decoratedReporter,
-        private EventDispatcher $eventDispatcher,
-    ) {
-    }
-
-    public function getDecoratedReporter(): Reporter
+    public function test_it_can_be_instantiated(): void
     {
-        return $this->decoratedReporter;
-    }
+        $reporter = $this->createStub(Reporter::class);
+        $event = new ReporterWasStarted($reporter);
 
-    public function report(): void
-    {
-        $this->eventDispatcher->dispatch(
-            new ReporterWasStarted($this->decoratedReporter),
-        );
-
-        try {
-            $this->decoratedReporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReporterWasFinished($this->decoratedReporter),
-            );
-        }
+        $this->assertSame($reporter, $event->reporter);
     }
 }

@@ -33,40 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Reporter;
+namespace Infection\Event\Events\Reporting;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\Reporting\ReporterWasFinished;
-use Infection\Event\Events\Reporting\ReporterWasStarted;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class EventDispatchingReporter implements Reporter
+interface ReporterWasStartedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private Reporter $decoratedReporter,
-        private EventDispatcher $eventDispatcher,
-    ) {
-    }
-
-    public function getDecoratedReporter(): Reporter
-    {
-        return $this->decoratedReporter;
-    }
-
-    public function report(): void
-    {
-        $this->eventDispatcher->dispatch(
-            new ReporterWasStarted($this->decoratedReporter),
-        );
-
-        try {
-            $this->decoratedReporter->report();
-        } finally {
-            $this->eventDispatcher->dispatch(
-                new ReporterWasFinished($this->decoratedReporter),
-            );
-        }
-    }
+    public function onReporterWasStarted(ReporterWasStarted $event): void;
 }
