@@ -74,17 +74,17 @@ assert_line_count 1 '"name": "infection.source_collection"' var/execution-with-t
 assert_line_count 1 '"name": "infection.mutation_analysis"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.ast_processing"' var/execution-with-trace-exporter.stdout
 assert_line_count 2 '"name": "infection.ast_processing.file"' var/execution-with-trace-exporter.stdout
-assert_line_count 2 '"name": "infection.ast_parsing"' var/execution-with-trace-exporter.stdout
-assert_line_count 2 '"name": "infection.ast_enrichment"' var/execution-with-trace-exporter.stdout
+assert_line_count 2 '"name": "infection.ast_processing.file.parsing"' var/execution-with-trace-exporter.stdout
+assert_line_count 2 '"name": "infection.ast_processing.file.enrichment"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_generation"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.mutation_evaluation"' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"name": "infection.mutation_evaluation.mutation"' var/execution-with-trace-exporter.stdout
-assert_line_count 6 '"name": "infection.mutation_evaluation.heuristic_suppression"' var/execution-with-trace-exporter.stdout
-assert_line_count 18 '"name": "infection.mutation_evaluation.heuristic"' var/execution-with-trace-exporter.stdout
+assert_line_count 6 '"name": "infection.mutation_evaluation.mutation.heuristic_suppression"' var/execution-with-trace-exporter.stdout
+assert_line_count 18 '"name": "infection.mutation_evaluation.mutation.heuristic"' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_analysis"' var/execution-with-trace-exporter.stdout
-assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_materialisation"' var/execution-with-trace-exporter.stdout
-assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_evaluation"' var/execution-with-trace-exporter.stdout
-assert_line_count 6 '"name": "infection.mutation_evaluation.process"' var/execution-with-trace-exporter.stdout
+assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_analysis.materialisation"' var/execution-with-trace-exporter.stdout
+assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_analysis.evaluation"' var/execution-with-trace-exporter.stdout
+assert_line_count 6 '"name": "infection.mutation_evaluation.mutant_analysis.evaluation.process"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.reporting"' var/execution-with-trace-exporter.stdout
 assert_contains '"service.name": "infection"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.project.name": "infection\/infection"' var/execution-with-trace-exporter.stdout

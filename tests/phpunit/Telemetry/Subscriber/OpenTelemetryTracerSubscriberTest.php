@@ -229,18 +229,18 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.initial_static_analysis',
                 'infection.artefact_collection',
                 'infection.source_collection',
-                'infection.ast_parsing',
-                'infection.ast_enrichment',
+                'infection.ast_processing.file.parsing',
+                'infection.ast_processing.file.enrichment',
                 'infection.ast_processing.file',
                 'infection.ast_processing',
                 'infection.mutation_generation',
-                'infection.mutation_evaluation.heuristic',
-                'infection.mutation_evaluation.heuristic',
-                'infection.mutation_evaluation.heuristic_suppression',
-                'infection.mutation_evaluation.mutant_materialisation',
-                'infection.mutation_evaluation.process',
-                'infection.mutation_evaluation.process',
-                'infection.mutation_evaluation.mutant_evaluation',
+                'infection.mutation_evaluation.mutation.heuristic',
+                'infection.mutation_evaluation.mutation.heuristic',
+                'infection.mutation_evaluation.mutation.heuristic_suppression',
+                'infection.mutation_evaluation.mutant_analysis.materialisation',
+                'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+                'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+                'infection.mutation_evaluation.mutant_analysis.evaluation',
                 'infection.mutation_evaluation.mutant_analysis',
                 'infection.mutation_evaluation.mutation',
                 'infection.reporting',
@@ -259,17 +259,17 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutationAnalysis = $this->getSpanFromExporter('infection.mutation_analysis');
         $astProcessing = $this->getSpanFromExporter('infection.ast_processing');
         $astProcessingFile = $this->getSpanFromExporter('infection.ast_processing.file');
-        $astParsing = $this->getSpanFromExporter('infection.ast_parsing');
-        $astEnrichment = $this->getSpanFromExporter('infection.ast_enrichment');
+        $astParsing = $this->getSpanFromExporter('infection.ast_processing.file.parsing');
+        $astEnrichment = $this->getSpanFromExporter('infection.ast_processing.file.enrichment');
         $mutationGeneration = $this->getSpanFromExporter('infection.mutation_generation');
         $mutationEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation');
         $mutationEvaluationForMutation = $this->getSpanFromExporter('infection.mutation_evaluation.mutation');
-        $heuristic = $this->getSpanFromExporter('infection.mutation_evaluation.heuristic');
-        $heuristicSuppression = $this->getSpanFromExporter('infection.mutation_evaluation.heuristic_suppression');
+        $heuristic = $this->getSpanFromExporter('infection.mutation_evaluation.mutation.heuristic');
+        $heuristicSuppression = $this->getSpanFromExporter('infection.mutation_evaluation.mutation.heuristic_suppression');
         $mutantAnalysis = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis');
-        $mutantMaterialisation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_materialisation');
-        $mutantEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_evaluation');
-        $process = $this->getSpanFromExporter('infection.mutation_evaluation.process');
+        $mutantMaterialisation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.materialisation');
+        $mutantEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.evaluation');
+        $process = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.evaluation.process');
         $reporting = $this->getSpanFromExporter('infection.reporting');
 
         $this->assertSame(self::ROOT_SPAN_PARENT_ID, $run->getParentSpanId());
@@ -373,8 +373,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(
             [
-                'infection.ast_parsing',
-                'infection.ast_enrichment',
+                'infection.ast_processing.file.parsing',
+                'infection.ast_processing.file.enrichment',
                 'infection.ast_processing.file',
                 'infection.ast_processing',
                 'infection.initial_tests',
