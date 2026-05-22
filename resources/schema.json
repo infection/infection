@@ -684,7 +684,7 @@
         },
         "testFrameworkExtraArgs": {
             "type": "string",
-            "description": "Specify raw additional arguments to pass to PHPUnit."
+            "description": "Specify raw additional arguments to pass to Test Framework."
         }
     },
     "definitions": {
