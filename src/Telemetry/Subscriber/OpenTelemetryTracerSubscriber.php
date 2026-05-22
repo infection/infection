@@ -121,6 +121,7 @@ use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\SpanHandle;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use function spl_object_id;
 use function str_starts_with;
 
@@ -131,6 +132,8 @@ use function str_starts_with;
  */
 final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, HeuristicSuppressionWasFinishedSubscriber, HeuristicSuppressionWasStartedSubscriber, HeuristicWasFinishedSubscriber, HeuristicWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantAnalysisWasFinishedSubscriber, MutantAnalysisWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessExecutionWasFinishedSubscriber, MutantProcessExecutionWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReporterWasFinishedSubscriber, ReporterWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
 {
+    private const int NANOSECONDS_PER_SECOND = 1_000_000_000;
+
     private ?SpanHandle $rootSpan = null;
 
     private ?SpanHandle $sourceCollectionSpan = null;
@@ -177,6 +180,12 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     /** @var array<string, SpanHandle> */
     private array $mutantEvaluationSpans = [];
+
+    /** @var array<string, int> */
+    private array $mutantQueueWaitStartedAtInNs = [];
+
+    /** @var array<string, int> */
+    private array $mutantQueueWaitDurationInNs = [];
 
     /** @var array<int, SpanHandle> */
     private array $mutantProcessExecutionSpans = [];
@@ -527,6 +536,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         if ($span !== null) {
             $this->mutantEvaluationSpans[$hash] = $span;
+            $this->startQueueWait($hash, $span);
         }
     }
 
@@ -535,9 +545,14 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $hash = $event->mutant->getMutation()->getHash();
 
         $this->endMutantProcessExecutionSpans($hash);
-        $this->end($this->mutantEvaluationSpans[$hash] ?? null);
+        $this->end(
+            $this->mutantEvaluationSpans[$hash] ?? null,
+            $this->queueWaitDurationAttributes($hash),
+        );
 
         unset($this->mutantEvaluationSpans[$hash]);
+        unset($this->mutantQueueWaitStartedAtInNs[$hash]);
+        unset($this->mutantQueueWaitDurationInNs[$hash]);
     }
 
     public function onMutantProcessExecutionWasStarted(MutantProcessExecutionWasStarted $event): void
@@ -553,6 +568,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         );
 
         if ($span !== null) {
+            $this->stopQueueWait($hash, $span);
             $this->mutantProcessExecutionSpans[$key] = $span;
             $this->mutantProcessExecutionSpanMutationHashes[$key] = $hash;
         }
@@ -561,11 +577,16 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     public function onMutantProcessExecutionWasFinished(MutantProcessExecutionWasFinished $event): void
     {
         $key = spl_object_id($event->mutantProcess);
+        $hash = $event->mutantProcess->getMutant()->getMutation()->getHash();
 
-        $this->end($this->mutantProcessExecutionSpans[$key] ?? null);
+        $finishedAtNanos = $this->endAndGetEndEpochNanos($this->mutantProcessExecutionSpans[$key] ?? null);
 
         unset($this->mutantProcessExecutionSpans[$key]);
         unset($this->mutantProcessExecutionSpanMutationHashes[$key]);
+
+        if ($finishedAtNanos !== null && isset($this->mutantEvaluationSpans[$hash])) {
+            $this->mutantQueueWaitStartedAtInNs[$hash] = $finishedAtNanos;
+        }
     }
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
@@ -700,6 +721,19 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         }
     }
 
+    private function endAndGetEndEpochNanos(?SpanHandle $span): ?int
+    {
+        if ($span === null) {
+            return null;
+        }
+
+        $this->telemetry->end($span);
+
+        return $span->span instanceof ReadableSpanInterface
+            ? $span->span->toSpanData()->getEndEpochNanos()
+            : null;
+    }
+
     private function endReporterSpans(): void
     {
         foreach ($this->reporterSpans as $span) {
@@ -737,15 +771,58 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->end($this->heuristicSuppressionSpans[$hash] ?? null);
         $this->end($this->mutantMaterialisationSpans[$hash] ?? null);
         $this->endMutantProcessExecutionSpans($hash);
-        $this->end($this->mutantEvaluationSpans[$hash] ?? null);
+        $this->end(
+            $this->mutantEvaluationSpans[$hash] ?? null,
+            $this->queueWaitDurationAttributes($hash),
+        );
         $this->end($this->mutantAnalysisSpans[$hash] ?? null);
 
         unset(
             $this->heuristicSuppressionSpans[$hash],
             $this->mutantMaterialisationSpans[$hash],
+            $this->mutantQueueWaitStartedAtInNs[$hash],
+            $this->mutantQueueWaitDurationInNs[$hash],
             $this->mutantEvaluationSpans[$hash],
             $this->mutantAnalysisSpans[$hash],
         );
+    }
+
+    private function startQueueWait(string $hash, SpanHandle $span): void
+    {
+        if (!$span->span instanceof ReadableSpanInterface) {
+            return;
+        }
+
+        $this->mutantQueueWaitStartedAtInNs[$hash] = $span->span->toSpanData()->getStartEpochNanos();
+    }
+
+    private function stopQueueWait(string $hash, SpanHandle $span): void
+    {
+        $startedAtNanos = $this->mutantQueueWaitStartedAtInNs[$hash] ?? null;
+
+        unset($this->mutantQueueWaitStartedAtInNs[$hash]);
+
+        if ($startedAtNanos === null || !$span->span instanceof ReadableSpanInterface) {
+            return;
+        }
+
+        $duration = $span->span->toSpanData()->getStartEpochNanos() - $startedAtNanos;
+
+        if ($duration >= 0) {
+            $this->mutantQueueWaitDurationInNs[$hash] = ($this->mutantQueueWaitDurationInNs[$hash] ?? 0) + $duration;
+        }
+    }
+
+    /**
+     * @return array{'infection.mutation.queue_wait.duration'?: float}
+     */
+    private function queueWaitDurationAttributes(string $hash): array
+    {
+        $durationNanos = $this->mutantQueueWaitDurationInNs[$hash] ?? null;
+
+        return $durationNanos === null
+            ? []
+            : ['infection.mutation.queue_wait.duration' => $durationNanos / self::NANOSECONDS_PER_SECOND];
     }
 
     private function endHeuristicSpans(string $hash): void
