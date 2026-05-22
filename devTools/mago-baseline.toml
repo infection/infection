@@ -895,12 +895,6 @@ message = 'Invalid return type for function `Infection\Configuration\SourceFilte
 count = 1
 
 [[issues]]
-file = "src/Console/Application.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Console\Application::getPrettyVersion`.'
-count = 1
-
-[[issues]]
 file = "src/Console/LogVerbosity.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
@@ -5523,6 +5517,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/Debug/DumpAstCommand/DumpAstCommandTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest::createCommandTester`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Debug/DumpAstCommand/DumpAstCommandTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest::test_it_outputs_the_ast_of_a_file`.'
 count = 1
 
@@ -5530,6 +5530,12 @@ count = 1
 file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `invalidTimeValueProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\Debug\MockTeamCityCommandTest::createCommandTester`.'
 count = 1
 
 [[issues]]
@@ -5548,6 +5554,30 @@ count = 1
 file = "tests/phpunit/Command/Debug/MockTeamCityCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Debug\MockTeamCityCommandTest::test_it_reads_log_from_stdin_when_no_file_provided`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/DescribeCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\DescribeCommandTest::test_it_can_describe_a_mutator_when_asked_for_a_name`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/DescribeCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\DescribeCommandTest::test_it_described_the_remedy`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/DescribeCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\DescribeCommandTest::test_it_describes`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/DescribeCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\DescribeCommandTest::test_it_errors_when_mutator_does_not_exist`.'
 count = 1
 
 [[issues]]
@@ -5577,6 +5607,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/Git/GitBaseReferenceCommandTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\Git\GitBaseReferenceCommandTest::createCommandTester`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitBaseReferenceCommandTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitBaseReferenceCommandTest::test_it_outputs_the_base_reference_with_provided_base`.'
 count = 1
 
@@ -5584,6 +5620,12 @@ count = 1
 file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `commandExecutionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\Git\GitChangedFilesCommandTest::createCommandTester`.'
 count = 1
 
 [[issues]]
@@ -5601,7 +5643,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\Git\GitChangedLinesCommandTest::createCommandTester`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedLinesCommandTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitChangedLinesCommandTest::test_it_outputs_changed_lines`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitDefaultBaseCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\Git\GitDefaultBaseCommandTest::createCommandTester`.'
 count = 1
 
 [[issues]]
@@ -5625,6 +5679,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\InitialTest\InitialTestRunCommandTest::createCommandTester`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/InitialTest/InitialTestRunCommandTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\InitialTest\InitialTestRunCommandTest::executeCommand`.'
 count = 1
 
@@ -5637,6 +5697,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_source_files`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_source_files`.'
 count = 1
 
@@ -5644,6 +5710,42 @@ count = 1
 file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$fileSystemMock`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_it_create_custom_mutator_when_name_is_not_provided_at_command_call`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_it_create_custom_mutator_when_name_is_provided`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_it_trims_the_argument_value`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_it_trims_the_value_from_quetion_helper`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_it_uppercases_first_letter_of_argument_value`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/MakeCustomMutatorCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\MakeCustomMutatorCommandTest::test_uppercases_the_value_from_quetion_helper`.'
 count = 1
 
 [[issues]]
@@ -5728,6 +5830,30 @@ count = 1
 file = "tests/phpunit/Command/RunCommandHelperTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesUsesGitHubLogger` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/RunCommandHelperTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider` not found.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Command/RunCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_both_test_framework_option_names_are_passed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/RunCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_show_mutations_value_is_string_but_not_max`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/RunCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_threads_value_is_string_but_not_max`.'
 count = 1
 
 [[issues]]
@@ -5829,6 +5955,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
 code = "no-value"
+message = 'Argument #1 passed to method `Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::withCpuCoresCountProvider` has type `never`, meaning it cannot produce a value.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "no-value"
 message = 'Argument #5 passed to method `Infection\Configuration\ConfigurationFactory::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
@@ -5843,6 +5975,12 @@ file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTes
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Mutator\CustomMutator` not found.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
+code = "non-existent-class"
+message = 'Class `Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider` not found.'
+count = 3
 
 [[issues]]
 file = "tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php"
@@ -6055,6 +6193,12 @@ message = "Type `iterable` in return type of `valueProvider` is imprecise, equiv
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Console/ApplicationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Console\ApplicationTest::test_it_uses_the_infection_version`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Console/E2ETest.php"
 code = "implicit-to-string-cast"
 message = 'Implicit conversion to `string` for left operand via `Symfony\Component\Finder\SplFileInfo::__toString()`.'
@@ -6112,6 +6256,12 @@ count = 1
 file = "tests/phpunit/Console/E2ETest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\Tests\Console\E2ETest::installComposerDeps`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Console/E2ETest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Console\E2ETest::runInfection`.'
 count = 1
 
 [[issues]]
@@ -7276,6 +7426,12 @@ count = 3
 file = "tests/phpunit/Framework/Enum/ImplodableEnum/ImplodableEnumTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `separatorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/InfectionVersionTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Framework\InfectionVersionTest::test_it_returns_the_package_pretty_version`.'
 count = 1
 
 [[issues]]

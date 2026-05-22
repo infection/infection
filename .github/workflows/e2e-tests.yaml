@@ -14,10 +14,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   tests:
     runs-on: ${{ matrix.operating-system }}
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     strategy:
       matrix:
@@ -40,9 +44,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
@@ -106,7 +112,7 @@ jobs:
 
       - name: Install Linux dependencies for E2E tests
         if: runner.os != 'Windows'
-        uses: awalsh128/cache-apt-pkgs-action@v1
+        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
         with:
           packages: expect moreutils
 

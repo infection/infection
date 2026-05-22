@@ -33,31 +33,63 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Processor;
+namespace Infection\Tests\Architecture\PHPStan\Rules;
 
-use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
-use Infection\Framework\OperatingSystem;
+use function array_map;
+use function in_array;
+use Infection\Container\Container;
+use Infection\Testing\SingletonContainer;
+use PhpParser\Node;
+use PhpParser\Node\Expr\New_;
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 
 /**
- * @internal
- * @final
+ * @implements Rule<New_>
  */
-class CpuCoresCountProvider
+final class InfectionContainerRule implements Rule
 {
     /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
+     * @var string[]|null
      */
-    public function provide(): int
+    private static $containerFiles;
+
+    public function getNodeType(): string
     {
-        if (OperatingSystem::isWindows()) {
-            return 1;
+        return New_::class;
+    }
+
+    public function processNode(Node $node, Scope $scope): array
+    {
+        if (
+            $node->class instanceof Node\Name
+            && $node->class->toString() === Container::class
+            && !in_array($scope->getFile(), $this->getContainerFiles(), true)
+        ) {
+            return [RuleErrorBuilder::message(
+                sprintf(
+                    'Did not expect to find a usage of the Infection container. Please use "%s::getContainer() instead.',
+                    SingletonContainer::class,
+                ))->identifier('infection.container')->build()];
         }
 
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+        return [];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getContainerFiles(): array
+    {
+        return self::$containerFiles ??= array_map(
+            Path::canonicalize(...),
+            [
+                __DIR__ . '/../../../phpunit/Container/ContainerTest.php',
+                __DIR__ . '/../../../phpunit/MockedContainer.php',
+            ],
+        );
     }
 }

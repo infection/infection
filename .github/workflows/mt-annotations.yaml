@@ -10,10 +10,14 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     cancel-in-progress: true
 
+permissions: {}
+
 jobs:
     tests:
         runs-on: ubuntu-latest
         timeout-minutes: 30
+        permissions:
+            contents: read
 
         strategy:
             matrix:
@@ -26,8 +30,9 @@ jobs:
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   fetch-depth: 0
+                  persist-credentials: false
             - name: Setup PHP
-              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+              uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
               with:
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2.1

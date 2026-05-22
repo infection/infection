@@ -33,31 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Processor;
+namespace Infection\Tests\Fixtures\Resource\Processor;
 
-use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
-use Infection\Framework\OperatingSystem;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 
-/**
- * @internal
- * @final
- */
-class CpuCoresCountProvider
+final class DummyCpuCoresCountProvider extends CpuCoresCountProvider
 {
-    /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
-     */
+    public function __construct(private readonly int $count)
+    {
+    }
+
+    #[\Override]
     public function provide(): int
     {
-        if (OperatingSystem::isWindows()) {
-            return 1;
-        }
-
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+        return $this->count;
     }
 }

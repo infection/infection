@@ -33,31 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Processor;
+namespace Infection\Tests\Framework;
 
-use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
-use Infection\Framework\OperatingSystem;
+use Composer\InstalledVersions;
+use Infection\Framework\InfectionVersion;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class CpuCoresCountProvider
+#[CoversClass(InfectionVersion::class)]
+final class InfectionVersionTest extends TestCase
 {
-    /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
-     */
-    public function provide(): int
+    public function test_it_returns_the_package_pretty_version(): void
     {
-        if (OperatingSystem::isWindows()) {
-            return 1;
-        }
+        $expected = InstalledVersions::getPrettyVersion(InfectionVersion::PACKAGE_NAME);
 
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+        $actual = (new InfectionVersion())->prettyVersion();
+
+        $this->assertSame($expected, $actual);
     }
 }

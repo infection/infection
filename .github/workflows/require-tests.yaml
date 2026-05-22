@@ -1,8 +1,11 @@
 name: 'Require tests if source code is changed'
 
 on:
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] This workflow does not checkout or execute PR code; it only reviews changed file names.
     types: [opened]
+
+permissions:
+  pull-requests: write
 
 jobs:
   check:

@@ -33,31 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Processor;
+namespace Infection\Tests\Console;
 
-use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
-use Infection\Framework\OperatingSystem;
+use Infection\Console\Application;
+use Infection\Framework\InfectionVersion;
+use Infection\Testing\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class CpuCoresCountProvider
+#[CoversClass(Application::class)]
+final class ApplicationTest extends TestCase
 {
-    /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
-     */
-    public function provide(): int
+    public function test_it_uses_the_infection_version(): void
     {
-        if (OperatingSystem::isWindows()) {
-            return 1;
-        }
+        $versionMock = $this->createMock(InfectionVersion::class);
+        $versionMock
+            ->expects($this->once())
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
 
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+        $application = new Application(
+            SingletonContainer::getContainer(),
+            $versionMock,
+        );
+
+        $this->assertSame('1.2.3', $application->getVersion());
     }
 }

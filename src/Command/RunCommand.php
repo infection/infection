@@ -62,6 +62,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\AdapterInstaller;
@@ -433,7 +434,7 @@ final class RunCommand extends BaseCommand
         LoggerInterface $logger,
     ): Container {
         $input = $io->getInput();
-        $commandHelper = new RunCommandHelper($input);
+        $commandHelper = new RunCommandHelper($input, new CpuCoresCountProvider());
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -587,6 +588,8 @@ final class RunCommand extends BaseCommand
         $container->getCoverageChecker()->checkCoverageRequirements();
 
         $config = $container->getConfiguration();
+
+        $consoleOutput->logRunningWithThreadCount($config->threadCount);
 
         if ($config->isStaticAnalysisEnabled()) {
             $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();

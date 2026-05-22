@@ -4,6 +4,19 @@ updates:
     directory: ".github/workflows"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
     groups:
       dependencies:
         patterns:
