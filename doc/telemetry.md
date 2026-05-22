@@ -131,6 +131,9 @@ Finished `infection.mutation_evaluation.mutation` spans also include
 to MSI as `covered`, `not_covered`, or `ineligible`. Timeouts are classified as
 `covered` unless `infection.timeouts_as_escaped` is enabled, in which case they
 are classified as `not_covered`.
+Finished `infection.mutation_evaluation.mutant_analysis.evaluation` spans
+include `infection.mutation.queue_wait.duration`, the accumulated queue wait
+duration for the mutant evaluation in seconds.
 
 Reporter-level spans include `infection.reporter.id`, the run-local reporter
 object id, and `infection.reporter.name`, the stable reporter name configured by
