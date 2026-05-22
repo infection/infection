@@ -44,6 +44,7 @@ final readonly class MutantProcessExecutionWasStarted
 {
     public function __construct(
         public MutantProcess $mutantProcess,
+        public int $thread,
     ) {
     }
 }

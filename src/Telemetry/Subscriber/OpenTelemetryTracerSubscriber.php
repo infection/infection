@@ -215,6 +215,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         private readonly RunSpanAttributesProvider $runSpanAttributesProvider,
         private readonly MutationSpanAttributesProvider $mutationSpanAttributesProvider,
         private readonly ProjectRelativePathResolver $projectRelativePathResolver,
+        private readonly string $testFramework,
     ) {
     }
 
@@ -563,7 +564,11 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
         $span = $this->startChild(
             'infection.mutation_evaluation.mutant_analysis.evaluation.process',
-            $this->mutationSpanAttributesProvider->provide($mutation),
+            [
+                ...$this->mutationSpanAttributesProvider->provide($mutation),
+                'infection.mutation.process.test_framework' => $this->testFramework,
+                'infection.mutation.process.thread' => $event->thread,
+            ],
             parent: $this->mutantEvaluationSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
         );
 
@@ -579,7 +584,10 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $key = spl_object_id($event->mutantProcess);
         $hash = $event->mutantProcess->getMutant()->getMutation()->getHash();
 
-        $finishedAtNanos = $this->endAndGetEndEpochNanos($this->mutantProcessExecutionSpans[$key] ?? null);
+        $finishedAtNanos = $this->endAndGetEndEpochNanos(
+            $this->mutantProcessExecutionSpans[$key] ?? null,
+            self::processFinishAttributes($event),
+        );
 
         unset($this->mutantProcessExecutionSpans[$key]);
         unset($this->mutantProcessExecutionSpanMutationHashes[$key]);
@@ -721,13 +729,16 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         }
     }
 
-    private function endAndGetEndEpochNanos(?SpanHandle $span): ?int
+    /**
+     * @param Attributes $attributes
+     */
+    private function endAndGetEndEpochNanos(?SpanHandle $span, array $attributes = []): ?int
     {
         if ($span === null) {
             return null;
         }
 
-        $this->telemetry->end($span);
+        $this->telemetry->end($span, $attributes);
 
         return $span->span instanceof ReadableSpanInterface
             ? $span->span->toSpanData()->getEndEpochNanos()
@@ -857,5 +868,23 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     private static function heuristicKey(string $mutationHash, string $heuristic): string
     {
         return $mutationHash . ':' . $heuristic;
+    }
+
+    /**
+     * @return Attributes
+     */
+    private static function processFinishAttributes(MutantProcessExecutionWasFinished $event): array
+    {
+        $attributes = [
+            'infection.mutation.process.timed_out' => $event->mutantProcess->isTimedOut(),
+        ];
+
+        $exitCode = $event->mutantProcess->getProcess()->getExitCode();
+
+        if ($exitCode !== null) {
+            $attributes['process.exit.code'] = $exitCode;
+        }
+
+        return $attributes;
     }
 }

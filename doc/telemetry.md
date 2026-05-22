@@ -134,6 +134,13 @@ are classified as `not_covered`.
 Finished `infection.mutation_evaluation.mutant_analysis.evaluation` spans
 include `infection.mutation.queue_wait.duration`, the accumulated queue wait
 duration for the mutant evaluation in seconds.
+Finished `infection.mutation_evaluation.mutant_analysis.evaluation.process`
+spans include `process.exit.code` when the process exposes an exit code, and
+`infection.mutation.process.timed_out`, indicating whether Infection marked the
+process as timed out. They also include
+`infection.mutation.process.test_framework`, the configured test framework
+name, and `infection.mutation.process.thread`, the worker thread assigned to
+the process.
 
 Reporter-level spans include `infection.reporter.id`, the run-local reporter
 object id, and `infection.reporter.name`, the stable reporter name configured by

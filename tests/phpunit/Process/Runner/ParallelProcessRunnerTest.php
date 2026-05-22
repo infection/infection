@@ -165,9 +165,9 @@ final class ParallelProcessRunnerTest extends TestCase
         $currentMutantProcess = $container->getCurrent();
 
         $expectedEvents = [
-            new MutantProcessExecutionWasStarted($firstProcess),
+            new MutantProcessExecutionWasStarted($firstProcess, 1),
             new MutantProcessExecutionWasFinished($firstProcess),
-            new MutantProcessExecutionWasStarted($currentMutantProcess),
+            new MutantProcessExecutionWasStarted($currentMutantProcess, 1),
             new MutantProcessExecutionWasFinished($currentMutantProcess),
         ];
 
