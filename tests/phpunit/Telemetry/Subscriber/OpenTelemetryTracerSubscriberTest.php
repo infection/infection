@@ -82,6 +82,7 @@ use Infection\Framework\InfectionVersion;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\Mutant;
 use Infection\Process\MutantProcess;
 use Infection\Process\Runner\HeuristicName;
 use Infection\Process\Runner\ProcessRunner;
@@ -108,6 +109,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function spl_object_id;
 use function sprintf;
+use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerSubscriber::class)]
@@ -159,6 +161,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             ),
             new MutationSpanAttributesProvider($projectRelativePathResolver, $configuration->timeoutsAsEscaped),
             $projectRelativePathResolver,
+            $configuration->testFramework,
         );
     }
 
@@ -179,10 +182,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             ->withMutation($mutation)
             ->build();
 
-        $process0 = $this->createMock(MutantProcess::class);
-        $process0->method('getMutant')->willReturn($mutant);
-        $process1 = $this->createMock(MutantProcess::class);
-        $process1->method('getMutant')->willReturn($mutant);
+        $process0 = $this->createMutantProcess($mutant, 0);
+        $process1 = $this->createMutantProcess($mutant, 1, true);
 
         $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
         $this->subscriber->onArtefactCollectionWasStarted(new ArtefactCollectionWasStarted());
@@ -214,9 +215,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutantMaterialisationWasStarted(new MutantMaterialisationWasStarted($mutant));
         $this->subscriber->onMutantMaterialisationWasFinished(new MutantMaterialisationWasFinished($mutant));
         $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutant));
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process0));
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process0, 1));
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($process0));
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process1));
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process1, 2));
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($process1));
         $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutant));
         $this->subscriber->onMutantAnalysisWasFinished(new MutantAnalysisWasFinished($mutant));
@@ -289,6 +290,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutantMaterialisation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.materialisation');
         $mutantEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.evaluation');
         $process = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.evaluation.process');
+        $secondProcess = $this->getMutantProcessExecutionSpanForThread(2);
         $reporter = $this->getSpanFromExporter('infection.reporting.reporter');
         $reporting = $this->getSpanFromExporter('infection.reporting');
 
@@ -377,6 +379,14 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         }
 
         $this->assertSame(HeuristicName::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
+        $this->assertSame(0, $process->getAttributes()->get('process.exit.code'));
+        $this->assertFalse($process->getAttributes()->get('infection.mutation.process.timed_out'));
+        $this->assertSame('phpunit', $process->getAttributes()->get('infection.mutation.process.test_framework'));
+        $this->assertSame(1, $process->getAttributes()->get('infection.mutation.process.thread'));
+        $this->assertSame(1, $secondProcess->getAttributes()->get('process.exit.code'));
+        $this->assertTrue($secondProcess->getAttributes()->get('infection.mutation.process.timed_out'));
+        $this->assertSame('phpunit', $secondProcess->getAttributes()->get('infection.mutation.process.test_framework'));
+        $this->assertSame(2, $secondProcess->getAttributes()->get('infection.mutation.process.thread'));
         $this->assertIsFloat($mutantEvaluation->getAttributes()->get('infection.mutation.queue_wait.duration'));
         $this->assertGreaterThanOrEqual(0.0, $mutantEvaluation->getAttributes()->get('infection.mutation.queue_wait.duration'));
         $this->assertSame(DetectionStatus::KILLED_BY_TESTS->value, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.status'));
@@ -485,14 +495,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutantB = MutantBuilder::withMinimalTestData()
             ->withMutation($mutationB)
             ->build();
-        $mutationAProcess0 = $this->createMock(MutantProcess::class);
-        $mutationAProcess0->method('getMutant')->willReturn($mutantA);
-        $mutationAProcess1 = $this->createMock(MutantProcess::class);
-        $mutationAProcess1->method('getMutant')->willReturn($mutantA);
-        $mutationBProcess0 = $this->createMock(MutantProcess::class);
-        $mutationBProcess0->method('getMutant')->willReturn($mutantB);
-        $mutationBProcess1 = $this->createMock(MutantProcess::class);
-        $mutationBProcess1->method('getMutant')->willReturn($mutantB);
+        $mutationAProcess0 = $this->createMutantProcess($mutantA, 0);
+        $mutationAProcess1 = $this->createMutantProcess($mutantA, 0);
+        $mutationBProcess0 = $this->createMutantProcess($mutantB, 0);
+        $mutationBProcess1 = $this->createMutantProcess($mutantB, 0);
 
         $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
         $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
@@ -501,11 +507,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $clock->setTime(2_000_000_000);
         $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantA));
         $clock->setTime(2_000_000_010);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess0));
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess0, 1));
         $clock->setTime(2_000_000_030);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess0));
         $clock->setTime(2_000_000_070);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess1));
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess1, 1));
         $clock->setTime(2_000_000_090);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess1));
         $clock->setTime(2_000_000_110);
@@ -514,11 +520,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $clock->setTime(3_000_000_000);
         $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantB));
         $clock->setTime(3_000_000_025);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess0));
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess0, 2));
         $clock->setTime(3_000_000_055);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess0));
         $clock->setTime(3_000_000_115);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess1));
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess1, 2));
         $clock->setTime(3_000_000_145);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess1));
         $clock->setTime(3_000_000_200);
@@ -549,6 +555,47 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 $name,
             ),
         );
+    }
+
+    private function getMutantProcessExecutionSpanForThread(int $thread): SpanDataInterface
+    {
+        /** @var SpanDataInterface $span */
+        foreach ($this->exporter->getSpans() as $span) {
+            if (
+                $span->getName() === 'infection.mutation_evaluation.mutant_analysis.evaluation.process'
+                && $span->getAttributes()->get('infection.mutation.process.thread') === $thread
+            ) {
+                return $span;
+            }
+        }
+
+        $this->fail(
+            sprintf(
+                'Mutant process execution span for thread "%d" was not exported.',
+                $thread,
+            ),
+        );
+    }
+
+    private function createMutantProcess(Mutant $mutant, ?int $exitCode, bool $timedOut = false): MutantProcess
+    {
+        $process = $this->createMock(Process::class);
+        $process
+            ->method('getExitCode')
+            ->willReturn($exitCode);
+
+        $mutantProcess = $this->createMock(MutantProcess::class);
+        $mutantProcess
+            ->method('getMutant')
+            ->willReturn($mutant);
+        $mutantProcess
+            ->method('getProcess')
+            ->willReturn($process);
+        $mutantProcess
+            ->method('isTimedOut')
+            ->willReturn($timedOut);
+
+        return $mutantProcess;
     }
 
     private function getMutantEvaluationSpanForMutation(string $mutationHash): SpanDataInterface
