@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Subscriber;
 
+use Infection\Configuration\Configuration;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\SubscriberFactory;
@@ -53,6 +54,7 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
         private RunSpanAttributesProvider $runSpanAttributesProvider,
         private MutationSpanAttributesProvider $mutationSpanAttributesProvider,
         private ProjectRelativePathResolver $projectRelativePathResolver,
+        private Configuration $configuration,
     ) {
     }
 
@@ -67,6 +69,7 @@ final readonly class OpenTelemetryTracerSubscriberFactory implements SubscriberF
                 $this->runSpanAttributesProvider,
                 $this->mutationSpanAttributesProvider,
                 $this->projectRelativePathResolver,
+                $this->configuration->testFramework,
             )
         ;
     }

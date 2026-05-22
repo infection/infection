@@ -219,7 +219,12 @@ class ParallelProcessRunner implements ProcessRunner
     {
         $mutantProcess = $mutantProcessContainer->getCurrent();
 
-        $this->eventDispatcher->dispatch(new MutantProcessExecutionWasStarted($mutantProcess));
+        $this->eventDispatcher->dispatch(
+            new MutantProcessExecutionWasStarted(
+                $mutantProcess,
+                $threadIndex,
+            ),
+        );
 
         $mutantProcess->getProcess()->start(null, [
             'INFECTION' => '1',
