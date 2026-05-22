@@ -96,6 +96,7 @@ assert_contains '"infection.test_framework.name": "phpunit"' var/execution-with-
 assert_contains '"infection.test_framework.version":' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.static_analysis_tool.name": "phpstan"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.static_analysis_tool.version":' var/execution-with-trace-exporter.stdout
+assert_contains '"infection.mutation.queue_wait.duration":' var/execution-with-trace-exporter.stdout
 assert_contains '"code.file.path": "tests\/e2e\/Telemetry_Console\/src\/SourceClass.php"' var/execution-with-trace-exporter.stdout
 assert_contains '"code.file.path": "tests\/e2e\/Telemetry_Console\/src\/AnotherSourceClass.php"' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.source_file.count": 2' var/execution-with-trace-exporter.stdout

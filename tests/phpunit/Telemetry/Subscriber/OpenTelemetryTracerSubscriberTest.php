@@ -96,6 +96,8 @@ use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Reporter\FakeReporter;
+use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
@@ -163,6 +165,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     protected function tearDown(): void
     {
         $this->tracerProvider->shutdown();
+        Clock::reset();
     }
 
     public function test_it_exports_the_started_and_finished_spans_with_their_parent_relationships(): void
@@ -374,6 +377,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         }
 
         $this->assertSame(HeuristicName::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
+        $this->assertIsFloat($mutantEvaluation->getAttributes()->get('infection.mutation.queue_wait.duration'));
+        $this->assertGreaterThanOrEqual(0.0, $mutantEvaluation->getAttributes()->get('infection.mutation.queue_wait.duration'));
         $this->assertSame(DetectionStatus::KILLED_BY_TESTS->value, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.status'));
         $this->assertSame('covered', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.msi.category'));
         $this->assertSame(0.123, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.runtime'));
@@ -448,6 +453,87 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertAllSpansAreFinished();
     }
 
+    public function test_it_calculates_the_queue_wait_duration_for_each_mutant_evaluation(): void
+    {
+        $clock = new class(1_000_000_000) implements ClockInterface {
+            public function __construct(
+                private int $time,
+            ) {
+            }
+
+            public function setTime(int $time): void
+            {
+                $this->time = $time;
+            }
+
+            public function now(): int
+            {
+                return $this->time;
+            }
+        };
+        Clock::setDefault($clock);
+
+        $mutationA = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutationB = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-B')
+            ->build();
+        $mutantA = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutationA)
+            ->build();
+        $mutantB = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutationB)
+            ->build();
+        $mutationAProcess0 = $this->createMock(MutantProcess::class);
+        $mutationAProcess0->method('getMutant')->willReturn($mutantA);
+        $mutationAProcess1 = $this->createMock(MutantProcess::class);
+        $mutationAProcess1->method('getMutant')->willReturn($mutantA);
+        $mutationBProcess0 = $this->createMock(MutantProcess::class);
+        $mutationBProcess0->method('getMutant')->willReturn($mutantB);
+        $mutationBProcess1 = $this->createMock(MutantProcess::class);
+        $mutationBProcess1->method('getMutant')->willReturn($mutantB);
+
+        $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
+        $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
+        $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)));
+
+        $clock->setTime(2_000_000_000);
+        $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantA));
+        $clock->setTime(2_000_000_010);
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess0));
+        $clock->setTime(2_000_000_030);
+        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess0));
+        $clock->setTime(2_000_000_070);
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess1));
+        $clock->setTime(2_000_000_090);
+        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess1));
+        $clock->setTime(2_000_000_110);
+        $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutantA));
+
+        $clock->setTime(3_000_000_000);
+        $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantB));
+        $clock->setTime(3_000_000_025);
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess0));
+        $clock->setTime(3_000_000_055);
+        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess0));
+        $clock->setTime(3_000_000_115);
+        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess1));
+        $clock->setTime(3_000_000_145);
+        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess1));
+        $clock->setTime(3_000_000_200);
+        $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutantB));
+
+        $this->assertSame(
+            0.000000050,
+            $this->getMutantEvaluationSpanForMutation('mutation-A')->getAttributes()->get('infection.mutation.queue_wait.duration'),
+        );
+        $this->assertSame(
+            0.000000085,
+            $this->getMutantEvaluationSpanForMutation('mutation-B')->getAttributes()->get('infection.mutation.queue_wait.duration'),
+        );
+    }
+
     private function getSpanFromExporter(string $name): SpanDataInterface
     {
         /** @var SpanDataInterface $span */
@@ -461,6 +547,26 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             sprintf(
                 'Span "%s" was not exported.',
                 $name,
+            ),
+        );
+    }
+
+    private function getMutantEvaluationSpanForMutation(string $mutationHash): SpanDataInterface
+    {
+        /** @var SpanDataInterface $span */
+        foreach ($this->exporter->getSpans() as $span) {
+            if (
+                $span->getName() === 'infection.mutation_evaluation.mutant_analysis.evaluation'
+                && $span->getAttributes()->get('infection.mutation.id') === $mutationHash
+            ) {
+                return $span;
+            }
+        }
+
+        $this->fail(
+            sprintf(
+                'Mutant evaluation span for mutation "%s" was not exported.',
+                $mutationHash,
             ),
         );
     }
