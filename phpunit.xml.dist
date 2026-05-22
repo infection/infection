@@ -31,8 +31,6 @@
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>
             <exclude>tests/phpunit/TestFramework/Coverage/Fixtures</exclude>
-
-            <exclude>tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php</exclude>
         </testsuite>
     </testsuites>
 
