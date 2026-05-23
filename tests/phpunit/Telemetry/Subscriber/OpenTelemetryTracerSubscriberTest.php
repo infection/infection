@@ -206,13 +206,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new SourceCollectionWasStarted(),
                 new SourceCollectionWasFinished(1),
                 new MutationAnalysisWasStarted(),
+                new MutationGenerationWasStarted(1),
                 new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
                 new AstParsingWasStarted('/path/to/project/src/Foo.php'),
                 new AstParsingWasFinished('/path/to/project/src/Foo.php'),
                 new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
                 new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'),
                 new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
-                new MutationGenerationWasStarted(1),
                 new MutationGenerationWasFinished(2, 1),
                 new MutationEvaluationWasStarted(
                     1,
@@ -307,7 +307,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($artefactCollection->getSpanId(), $initialStaticAnalysis->getParentSpanId());
         $this->assertSame($run->getSpanId(), $sourceCollection->getParentSpanId());
         $this->assertSame($run->getSpanId(), $mutationAnalysis->getParentSpanId());
-        $this->assertSame($mutationAnalysis->getSpanId(), $astProcessing->getParentSpanId());
+        $this->assertSame($mutationGeneration->getSpanId(), $astProcessing->getParentSpanId());
         $this->assertSame($astProcessing->getSpanId(), $astProcessingFile->getParentSpanId());
         $this->assertSame($astProcessingFile->getSpanId(), $astParsing->getParentSpanId());
         $this->assertSame($astProcessingFile->getSpanId(), $astEnrichment->getParentSpanId());
@@ -398,7 +398,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             $mutationAnalysis,
         );
         $this->assertSpanAttributesEquals(
-            self::createAttributes(AstProcessingWasStarted::class, MutationGenerationWasStarted::class),
+            self::createAttributes(AstProcessingWasStarted::class, AstProcessingWasFinished::class),
             $astProcessing,
         );
         $this->assertSpanAttributesEquals(
@@ -678,10 +678,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                   infection.source_collection [80, 90]
                   infection.mutation_analysis [100, 650]
                     infection.mutation_generation [110, 200]
-                    infection.ast_processing [120, 190]
-                      infection.ast_processing.file [130, 180]
-                        infection.ast_processing.file.parsing [140, 150]
-                        infection.ast_processing.file.enrichment [160, 170]
+                      infection.ast_processing [120, 190]
+                        infection.ast_processing.file [130, 180]
+                          infection.ast_processing.file.parsing [140, 150]
+                          infection.ast_processing.file.enrichment [160, 170]
                     infection.mutation_evaluation [210, 640]
                       infection.mutation_evaluation.mutation [220, 490]
                         infection.mutation_evaluation.mutation.heuristic_suppression [230, 280]
@@ -823,13 +823,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                             infection.mutation_evaluation.mutant_analysis.evaluation.process [610, 620]
                             infection.mutation_evaluation.mutant_analysis.evaluation.process [630, 640]
                     infection.mutation_generation [120, 510]
-                    infection.ast_processing [130, 380]
-                      infection.ast_processing.file [140, 190]
-                        infection.ast_processing.file.parsing [150, 160]
-                        infection.ast_processing.file.enrichment [170, 180]
-                      infection.ast_processing.file [320, 370]
-                        infection.ast_processing.file.parsing [330, 340]
-                        infection.ast_processing.file.enrichment [350, 360]
+                      infection.ast_processing [130, 380]
+                        infection.ast_processing.file [140, 190]
+                          infection.ast_processing.file.parsing [150, 160]
+                          infection.ast_processing.file.enrichment [170, 180]
+                        infection.ast_processing.file [320, 370]
+                          infection.ast_processing.file.parsing [330, 340]
+                          infection.ast_processing.file.enrichment [350, 360]
                   infection.reporting [680, 750]
                     infection.reporting.reporter [690, 700]
                     infection.reporting.reporter [710, 720]
@@ -851,10 +851,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new InitialStaticAnalysisRunWasStarted(),
                 new SourceCollectionWasStarted(),
                 new MutationAnalysisWasStarted(),
+                new MutationGenerationWasStarted(1),
                 new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
                 new AstParsingWasStarted('/path/to/project/src/Foo.php'),
                 new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
-                new MutationGenerationWasStarted(1),
                 new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)),
                 new MutationEvaluationForMutationWasStarted($mutation),
                 new ReportingWasStarted(),
@@ -968,6 +968,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             [
                 new ApplicationExecutionWasStarted(),
                 new MutationAnalysisWasStarted(),
+                new MutationGenerationWasStarted(1),
                 new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
                 new AstParsingWasStarted('/path/to/project/src/Foo.php'),
                 new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
@@ -981,6 +982,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.ast_processing.file.enrichment',
                 'infection.ast_processing.file',
                 'infection.ast_processing',
+                'infection.mutation_generation',
                 'infection.mutation_analysis',
                 'infection.run',
             ],
@@ -1000,6 +1002,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             [
                 new ApplicationExecutionWasStarted(),
                 new MutationAnalysisWasStarted(),
+                new MutationGenerationWasStarted(1),
                 new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
                 new AstParsingWasStarted('/path/to/project/src/Foo.php'),
                 new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
@@ -1014,6 +1017,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.ast_processing.file.enrichment',
                 'infection.ast_processing.file',
                 'infection.ast_processing',
+                'infection.mutation_generation',
                 'infection.mutation_analysis',
                 'infection.run',
             ],
@@ -1026,7 +1030,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         );
     }
 
-    public function test_it_ends_the_ast_processing_span_when_mutation_generation_starts_with_no_mutable_files(): void
+    public function test_it_ignores_ast_processing_before_mutation_generation_starts(): void
     {
         $this->recordEvents(
             $this->subscriber,
@@ -1034,16 +1038,23 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new ApplicationExecutionWasStarted(),
                 new MutationAnalysisWasStarted(),
                 new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasFinished('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'),
                 new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
                 new MutationGenerationWasStarted(0),
                 new ApplicationExecutionWasFinished(),
             ],
         );
 
-        $this->assertSpanEventClasses(
-            $this->getSpanFromExporter('infection.ast_processing'),
-            AstProcessingWasStarted::class,
-            MutationGenerationWasStarted::class,
+        $this->assertSame(
+            [
+                'infection.mutation_generation',
+                'infection.mutation_analysis',
+                'infection.run',
+            ],
+            $this->exporter->getSpanNames(),
         );
     }
 
@@ -1076,9 +1087,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 infection.run [1000, 1700]
                   infection.mutation_analysis [1100, 1700]
                     infection.mutation_generation [1200, 1700]
-                    infection.ast_processing [1300, 1600]
-                      infection.ast_processing.file [1300, 1400]
-                      infection.ast_processing.file [1500, 1600]
+                      infection.ast_processing [1300, 1600]
+                        infection.ast_processing.file [1300, 1400]
+                        infection.ast_processing.file [1500, 1600]
                 TXT,
             SpanTreeRenderer::render($this->exporter->getSpans()),
         );
