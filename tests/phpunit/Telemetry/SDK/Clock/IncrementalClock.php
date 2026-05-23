@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Telemetry\Clock;
+namespace Infection\Tests\Telemetry\SDK\Clock;
 
 use OpenTelemetry\API\Common\Time\ClockInterface;
 

@@ -36,19 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Telemetry\Subscriber;
 
 use Infection\Telemetry\OpenTelemetryTracer;
-use Infection\Telemetry\SpanHandle;
-use Infection\Tests\Telemetry\Clock\IncrementalClock;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
+use Infection\Tests\Telemetry\SDK\Clock\IncrementalClock;
+use Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SpanTreeRenderer::class)]
 final class SpanTreeRendererTest extends TestCase
 {
-    private InMemoryExporter $exporter;
+    private TestExporter $exporter;
 
     private TracerProvider $tracerProvider;
 
@@ -56,7 +54,7 @@ final class SpanTreeRendererTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->exporter = new InMemoryExporter();
+        $this->exporter = new TestExporter();
         $this->tracerProvider = new TracerProvider(
             new SimpleSpanProcessor($this->exporter),
         );

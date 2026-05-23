@@ -33,18 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Telemetry\Clock;
+namespace Infection\Tests\Telemetry\SDK\Trace\Span;
 
-use Infection\Tests\UnsupportedMethod;
-use OpenTelemetry\API\Common\Time\ClockInterface;
+use Infection\Tests\Telemetry\SDK\Trace\Tracer\GuardedTracer;
+use OpenTelemetry\API\Trace\NoopTracer;
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\Context\Context;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\InvalidArgumentException;
 
-/**
- * @internal
- */
-final class FakeClock implements ClockInterface
+#[CoversClass(GuardedSpan::class)]
+final class GuardedSpanTest extends TestCase
 {
-    public function now(): int
+    public function test_it_tracks_whether_the_span_is_open(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $span = $this->createSpan('infection.run');
+
+        $this->assertSame(
+            'infection.run',
+            $span->getName(),
+        );
+        $this->assertTrue($span->isOpen());
+
+        $context = $span->storeInContext(Context::getCurrent());
+
+        $this->assertSame($span, Span::fromContext($context));
+
+        $span->end(20);
+
+        $this->assertFalse($span->isOpen());
+    }
+
+    public function test_it_fails_when_readable_span_data_is_requested_for_a_non_readable_span(): void
+    {
+        $span = $this->createSpan('infection.invalid');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Span "infection.invalid" does not expose readable span data.');
+
+        $span->toSpanData();
+    }
+
+    private function createSpan(string $name): GuardedSpan
+    {
+        return (new GuardedTracer(NoopTracer::getInstance()))->guardStartedSpan(
+            span: Span::getInvalid(),
+            name: $name,
+            parent: null,
+        );
     }
 }

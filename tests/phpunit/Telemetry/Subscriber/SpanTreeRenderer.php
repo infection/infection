@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Subscriber;
 
+use function implode;
 use Infection\CannotBeInstantiated;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
-use function implode;
 use function sprintf;
 use function str_repeat;
 use function usort;

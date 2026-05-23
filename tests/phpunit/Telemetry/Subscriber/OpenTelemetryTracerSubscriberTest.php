@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Subscriber;
 
+use function array_map;
+use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
@@ -98,25 +100,24 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Process\Runner\NullProcessRunner;
 use Infection\Tests\Reporter\FakeReporter;
-use Infection\Tests\Telemetry\Clock\FakeClock;
-use Infection\Tests\Telemetry\Clock\IncrementalClock;
+use Infection\Tests\Telemetry\SDK\Clock\FakeClock;
+use Infection\Tests\Telemetry\SDK\Clock\IncrementalClock;
+use Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter;
+use Infection\Tests\Telemetry\SDK\Trace\Tracer\GuardedTracer;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
-use function array_map;
-use function array_values;
 use function spl_object_id;
 use function sprintf;
+use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerSubscriber::class)]
@@ -126,11 +127,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     // invalid ID.
     private const string ROOT_SPAN_PARENT_ID = SpanContextValidator::INVALID_SPAN;
 
-    private InMemoryExporter $exporter;
+    private TestExporter $exporter;
 
     private TracerProvider $tracerProvider;
 
     private OpenTelemetryTracerSubscriber $subscriber;
+
+    private GuardedTracer $guardedTracer;
 
     private MetricsCalculator $metricsCalculator;
 
@@ -138,8 +141,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->exporter = new InMemoryExporter();
-        $this->tracerProvider = new TracerProvider(new SimpleSpanProcessor($this->exporter));
+        $this->exporter = new TestExporter();
+        $this->tracerProvider = new TracerProvider(
+            new SimpleSpanProcessor($this->exporter),
+        );
         $this->clock = new TestClock(1_000_000_000);
         Clock::setDefault(new FakeClock());
 
@@ -153,37 +158,6 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         );
 
         $this->subscriber = $this->createSubscriber($this->clock);
-    }
-
-    private function createSubscriber(ClockInterface $clock): OpenTelemetryTracerSubscriber
-    {
-        $configuration = ConfigurationBuilder::withMinimalTestData()
-            ->withProjectDirectory('/path/to/project')
-            ->build();
-
-        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapter
-            ->method('getVersion')
-            ->willReturn('12.3.4');
-        $projectRelativePathResolver = new ProjectRelativePathResolver($configuration);
-
-        return new OpenTelemetryTracerSubscriber(
-            new OpenTelemetryTracer(
-                $this->tracerProvider->getTracer('infection'),
-                $this->tracerProvider,
-                $clock,
-            ),
-            new RunSpanAttributesProvider(
-                $configuration,
-                new InfectionVersion(),
-                $testFrameworkAdapter,
-                null,
-                $this->metricsCalculator,
-            ),
-            new MutationSpanAttributesProvider($projectRelativePathResolver, $configuration->timeoutsAsEscaped),
-            $projectRelativePathResolver,
-            $configuration->testFramework,
-        );
     }
 
     protected function tearDown(): void
@@ -439,7 +413,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame('covered', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.msi.category'));
         $this->assertSame(0.123, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.runtime'));
 
-        $this->assertAllSpansAreFinished();
+        $this->exporter->assertAllSpansAreFinished();
+        $this->guardedTracer->assertHasNoOpenSpans();
         $this->assertTracerProviderWasShutdown();
     }
 
@@ -448,10 +423,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
      */
     #[DataProvider('spanTreeScenarioProvider')]
     public function test_it_can_describe_the_exported_span_tree_with_timings(
-        array  $events,
+        array $events,
         string $expected,
-    ): void
-    {
+    ): void {
         $this->recordEvents(
             $this->createSubscriber(
                 new IncrementalClock(10, 10),
@@ -462,22 +436,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $actual = SpanTreeRenderer::render($this->exporter->getSpans());
 
         $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @param list<object> $events
-     */
-    private function recordEvents(
-        OpenTelemetryTracerSubscriber $subscriber,
-        array  $events,
-    ): void
-    {
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
-
-        foreach ($events as $event) {
-            $dispatcher->dispatch($event);
-        }
+        $this->guardedTracer->assertHasNoOpenSpans();
     }
 
     public static function spanTreeScenarioProvider(): iterable
@@ -513,9 +472,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new ApplicationExecutionWasFinished(),
             ],
             <<<'TXT'
-            infection.run [10, 40]
-              infection.artefact_collection [20, 30]
-            TXT,
+                infection.run [10, 40]
+                  infection.artefact_collection [20, 30]
+                TXT,
         ];
 
         yield 'complete cycle with two basic mutations' => [
@@ -594,40 +553,40 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new ApplicationExecutionWasFinished(),
             ],
             <<<'TXT'
-            infection.run [10, 660]
-              infection.artefact_collection [20, 70]
-                infection.initial_tests [30, 40]
-                infection.initial_static_analysis [50, 60]
-              infection.source_collection [80, 90]
-              infection.mutation_analysis [100, 650]
-                infection.mutation_generation [110, 190]
-                infection.ast_processing [120, 640]
-                  infection.ast_processing.file [130, 180]
-                    infection.ast_processing.file.parsing [140, 150]
-                    infection.ast_processing.file.enrichment [160, 170]
-                infection.mutation_evaluation [200, 630]
-                  infection.mutation_evaluation.mutation [210, 480]
-                    infection.mutation_evaluation.mutation.heuristic_suppression [220, 270]
-                      infection.mutation_evaluation.mutation.heuristic [230, 240]
-                      infection.mutation_evaluation.mutation.heuristic [250, 260]
-                    infection.mutation_evaluation.mutant_analysis [280, 470]
-                      infection.mutation_evaluation.mutant_analysis.materialisation [290, 300]
-                      infection.mutation_evaluation.mutant_analysis.evaluation [410, 460]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [420, 430]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [440, 450]
-                  infection.mutation_evaluation.mutation [310, 560]
-                    infection.mutation_evaluation.mutation.heuristic_suppression [320, 370]
-                      infection.mutation_evaluation.mutation.heuristic [330, 340]
-                      infection.mutation_evaluation.mutation.heuristic [350, 360]
-                    infection.mutation_evaluation.mutant_analysis [380, 550]
-                      infection.mutation_evaluation.mutant_analysis.materialisation [390, 400]
-                      infection.mutation_evaluation.mutant_analysis.evaluation [490, 540]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [500, 510]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
-              infection.reporting [570, 620]
-                infection.reporting.reporter [580, 590]
-                infection.reporting.reporter [600, 610]
-            TXT,
+                infection.run [10, 660]
+                  infection.artefact_collection [20, 70]
+                    infection.initial_tests [30, 40]
+                    infection.initial_static_analysis [50, 60]
+                  infection.source_collection [80, 90]
+                  infection.mutation_analysis [100, 650]
+                    infection.mutation_generation [110, 190]
+                    infection.ast_processing [120, 640]
+                      infection.ast_processing.file [130, 180]
+                        infection.ast_processing.file.parsing [140, 150]
+                        infection.ast_processing.file.enrichment [160, 170]
+                    infection.mutation_evaluation [200, 630]
+                      infection.mutation_evaluation.mutation [210, 480]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [220, 270]
+                          infection.mutation_evaluation.mutation.heuristic [230, 240]
+                          infection.mutation_evaluation.mutation.heuristic [250, 260]
+                        infection.mutation_evaluation.mutant_analysis [280, 470]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [290, 300]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [410, 460]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [420, 430]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [440, 450]
+                      infection.mutation_evaluation.mutation [310, 560]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [320, 370]
+                          infection.mutation_evaluation.mutation.heuristic [330, 340]
+                          infection.mutation_evaluation.mutation.heuristic [350, 360]
+                        infection.mutation_evaluation.mutant_analysis [380, 550]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [390, 400]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [490, 540]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [500, 510]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
+                  infection.reporting [570, 620]
+                    infection.reporting.reporter [580, 590]
+                    infection.reporting.reporter [600, 610]
+                TXT,
         ];
 
         yield 'complete no-progress cycle with two basic mutations' => [
@@ -718,56 +677,47 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new ApplicationExecutionWasFinished(),
             ],
             <<<'TXT'
-            infection.run [10, 780]
-              infection.artefact_collection [20, 70]
-                infection.initial_tests [30, 40]
-                infection.initial_static_analysis [50, 60]
-              infection.source_collection [80, 90]
-              infection.mutation_analysis [100, 770]
-                infection.mutation_evaluation [110, 750]
-                  infection.mutation_evaluation.mutation [200, 580]
-                    infection.mutation_evaluation.mutation.heuristic_suppression [210, 280]
-                      infection.mutation_evaluation.mutation.heuristic [220, 230]
-                      infection.mutation_evaluation.mutation.heuristic [240, 250]
-                      infection.mutation_evaluation.mutation.heuristic [260, 270]
-                    infection.mutation_evaluation.mutant_analysis [290, 570]
-                      infection.mutation_evaluation.mutant_analysis.materialisation [300, 310]
-                      infection.mutation_evaluation.mutant_analysis.evaluation [510, 560]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [540, 550]
-                  infection.mutation_evaluation.mutation [380, 660]
-                    infection.mutation_evaluation.mutation.heuristic_suppression [390, 460]
-                      infection.mutation_evaluation.mutation.heuristic [400, 410]
-                      infection.mutation_evaluation.mutation.heuristic [420, 430]
-                      infection.mutation_evaluation.mutation.heuristic [440, 450]
-                    infection.mutation_evaluation.mutant_analysis [470, 650]
-                      infection.mutation_evaluation.mutant_analysis.materialisation [480, 490]
-                      infection.mutation_evaluation.mutant_analysis.evaluation [590, 640]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [600, 610]
-                        infection.mutation_evaluation.mutant_analysis.evaluation.process [620, 630]
-                infection.mutation_generation [120, 500]
-                infection.ast_processing [130, 760]
-                  infection.ast_processing.file [140, 190]
-                    infection.ast_processing.file.parsing [150, 160]
-                    infection.ast_processing.file.enrichment [170, 180]
-                  infection.ast_processing.file [320, 370]
-                    infection.ast_processing.file.parsing [330, 340]
-                    infection.ast_processing.file.enrichment [350, 360]
-              infection.reporting [670, 740]
-                infection.reporting.reporter [680, 690]
-                infection.reporting.reporter [700, 710]
-                infection.reporting.reporter [720, 730]
-            TXT,
+                infection.run [10, 780]
+                  infection.artefact_collection [20, 70]
+                    infection.initial_tests [30, 40]
+                    infection.initial_static_analysis [50, 60]
+                  infection.source_collection [80, 90]
+                  infection.mutation_analysis [100, 770]
+                    infection.mutation_evaluation [110, 750]
+                      infection.mutation_evaluation.mutation [200, 580]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [210, 280]
+                          infection.mutation_evaluation.mutation.heuristic [220, 230]
+                          infection.mutation_evaluation.mutation.heuristic [240, 250]
+                          infection.mutation_evaluation.mutation.heuristic [260, 270]
+                        infection.mutation_evaluation.mutant_analysis [290, 570]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [300, 310]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [510, 560]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [540, 550]
+                      infection.mutation_evaluation.mutation [380, 660]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [390, 460]
+                          infection.mutation_evaluation.mutation.heuristic [400, 410]
+                          infection.mutation_evaluation.mutation.heuristic [420, 430]
+                          infection.mutation_evaluation.mutation.heuristic [440, 450]
+                        infection.mutation_evaluation.mutant_analysis [470, 650]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [480, 490]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [590, 640]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [600, 610]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [620, 630]
+                    infection.mutation_generation [120, 500]
+                    infection.ast_processing [130, 760]
+                      infection.ast_processing.file [140, 190]
+                        infection.ast_processing.file.parsing [150, 160]
+                        infection.ast_processing.file.enrichment [170, 180]
+                      infection.ast_processing.file [320, 370]
+                        infection.ast_processing.file.parsing [330, 340]
+                        infection.ast_processing.file.enrichment [350, 360]
+                  infection.reporting [670, 740]
+                    infection.reporting.reporter [680, 690]
+                    infection.reporting.reporter [700, 710]
+                    infection.reporting.reporter [720, 730]
+                TXT,
         ];
-    }
-
-    private static function createFinishedMutantProcess(Mutant $mutant): MutantProcess
-    {
-        return new MutantProcess(
-            new Process(['php', '-v']),
-            $mutant,
-            new DummyMutantExecutionResultFactory(),
-        );
     }
 
     public function test_it_ends_open_spans_on_application_finish_even_if_the_finish_events_were_not_emitted(): void
@@ -811,7 +761,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             $this->getExportedSpanNames(),
         );
 
-        $this->assertAllSpansAreFinished();
+        $this->exporter->assertAllSpansAreFinished();
+        $this->guardedTracer->assertHasNoOpenSpans();
         $this->assertTracerProviderWasShutdown();
     }
 
@@ -833,7 +784,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             $this->getExportedSpanNames(),
         );
 
-        $this->assertAllSpansAreFinished();
+        $this->exporter->assertAllSpansAreFinished();
     }
 
     public function test_it_calculates_the_queue_wait_duration_for_each_mutant_evaluation(): void
@@ -895,6 +846,68 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         );
     }
 
+    private function createSubscriber(ClockInterface $clock): OpenTelemetryTracerSubscriber
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withProjectDirectory('/path/to/project')
+            ->build();
+
+        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getVersion')
+            ->willReturn('12.3.4');
+        $projectRelativePathResolver = new ProjectRelativePathResolver($configuration);
+
+        $this->guardedTracer = new GuardedTracer(
+            $this->tracerProvider->getTracer('infection'),
+        );
+
+        return new OpenTelemetryTracerSubscriber(
+            new OpenTelemetryTracer(
+                $this->guardedTracer,
+                $this->tracerProvider,
+                $clock,
+            ),
+            new RunSpanAttributesProvider(
+                $configuration,
+                new InfectionVersion(),
+                $testFrameworkAdapter,
+                null,
+                $this->metricsCalculator,
+            ),
+            new MutationSpanAttributesProvider(
+                $projectRelativePathResolver,
+                $configuration->timeoutsAsEscaped,
+            ),
+            $projectRelativePathResolver,
+            $configuration->testFramework,
+        );
+    }
+
+    /**
+     * @param list<object> $events
+     */
+    private function recordEvents(
+        OpenTelemetryTracerSubscriber $subscriber,
+        array $events,
+    ): void {
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        foreach ($events as $event) {
+            $dispatcher->dispatch($event);
+        }
+    }
+
+    private static function createFinishedMutantProcess(Mutant $mutant): MutantProcess
+    {
+        return new MutantProcess(
+            new Process(['php', '-v']),
+            $mutant,
+            new DummyMutantExecutionResultFactory(),
+        );
+    }
+
     private function getSpanFromExporter(string $name): SpanDataInterface
     {
         /** @var SpanDataInterface $span */
@@ -932,8 +945,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         );
     }
 
-    private function createMutantProcess(Mutant $mutant, ?int $exitCode, bool $timedOut = false): MutantProcess
-    {
+    private function createMutantProcess(
+        Mutant $mutant,
+        ?int $exitCode,
+        bool $timedOut = false,
+    ): MutantProcess {
         $process = $this->createMock(Process::class);
         $process
             ->method('getExitCode')
@@ -984,20 +1000,6 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 $this->exporter->getSpans(),
             ),
         );
-    }
-
-    private function assertAllSpansAreFinished(): void
-    {
-        /** @var SpanDataInterface $span */
-        foreach ($this->exporter->getSpans() as $span) {
-            $this->assertTrue(
-                $span->hasEnded(),
-                sprintf(
-                    'Expected the span "%s" to have ended.',
-                    $span->getName(),
-                ),
-            );
-        }
     }
 
     /**
