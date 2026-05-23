@@ -37,7 +37,6 @@ namespace Infection\Telemetry;
 
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use OpenTelemetry\API\Common\Time\ClockInterface;
-use OpenTelemetry\API\Common\Time\SystemClock;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
@@ -51,7 +50,7 @@ final readonly class OpenTelemetryTracer
     public function __construct(
         private TracerInterface $tracer,
         private ?TracerProviderInterface $tracerProvider,
-        private ClockInterface $clock = new SystemClock(),
+        private ClockInterface $clock,
     ) {
     }
 
