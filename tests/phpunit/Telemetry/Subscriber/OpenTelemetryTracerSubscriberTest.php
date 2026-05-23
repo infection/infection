@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Subscriber;
 
-use function array_map;
+use function array_filter;
 use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
@@ -119,6 +119,9 @@ use function spl_object_id;
 use function sprintf;
 use Symfony\Component\Process\Process;
 
+/**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ */
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerSubscriber::class)]
 final class OpenTelemetryTracerSubscriberTest extends TestCase
@@ -178,46 +181,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             ->build();
 
         $process0 = $this->createMutantProcess($mutant, 0);
-        $process1 = $this->createMutantProcess($mutant, 1, true);
-
-        $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
-        $this->subscriber->onArtefactCollectionWasStarted(new ArtefactCollectionWasStarted());
-        $this->subscriber->onInitialTestSuiteWasStarted(new InitialTestSuiteWasStarted());
-        $this->subscriber->onInitialTestSuiteWasFinished(new InitialTestSuiteWasFinished('Test suite output'));
-        $this->subscriber->onInitialStaticAnalysisRunWasStarted(new InitialStaticAnalysisRunWasStarted());
-        $this->subscriber->onInitialStaticAnalysisRunWasFinished(new InitialStaticAnalysisRunWasFinished('Static analysis output'));
-        $this->subscriber->onArtefactCollectionWasFinished(new ArtefactCollectionWasFinished());
-        $this->subscriber->onSourceCollectionWasStarted(new SourceCollectionWasStarted());
-        $this->subscriber->onSourceCollectionWasFinished(new SourceCollectionWasFinished(1));
-        $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
-        $this->subscriber->onAstProcessingWasStarted(new AstProcessingWasStarted('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstParsingWasStarted(new AstParsingWasStarted('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstParsingWasFinished(new AstParsingWasFinished('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstEnrichmentWasStarted(new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstEnrichmentWasFinished(new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstProcessingWasFinished(new AstProcessingWasFinished('/path/to/project/src/Foo.php'));
-        $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
-        $this->subscriber->onMutationGenerationWasFinished(new MutationGenerationWasFinished(2, 1));
-        $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)));
-        $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
-        $this->subscriber->onHeuristicSuppressionWasStarted(new HeuristicSuppressionWasStarted($mutation));
-        $this->subscriber->onHeuristicWasStarted(new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX));
-        $this->subscriber->onHeuristicWasFinished(new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX));
-        $this->subscriber->onHeuristicWasStarted(new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS));
-        $this->subscriber->onHeuristicWasFinished(new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS));
-        $this->subscriber->onHeuristicSuppressionWasFinished(new HeuristicSuppressionWasFinished($mutation));
-        $this->subscriber->onMutantAnalysisWasStarted(new MutantAnalysisWasStarted($mutant));
-        $this->subscriber->onMutantMaterialisationWasStarted(new MutantMaterialisationWasStarted($mutant));
-        $this->subscriber->onMutantMaterialisationWasFinished(new MutantMaterialisationWasFinished($mutant));
-        $this->clock->setTime(2_000_000_000);
-        $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutant));
-        $this->clock->setTime(2_000_000_010);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process0, 1));
-        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($process0));
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process1, 2));
-        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($process1));
-        $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutant));
-        $this->subscriber->onMutantAnalysisWasFinished(new MutantAnalysisWasFinished($mutant));
+        $process1 = $this->createMutantProcess($mutant, 1, timedOut: true);
 
         $executionResult = MutantExecutionResultBuilder::withMinimalTestData()
             ->withMutantHash($mutation->getHash())
@@ -225,19 +189,64 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             ->withProcessRuntime(0.123)
             ->build();
         $this->metricsCalculator->collect($executionResult);
-
-        $this->subscriber->onMutationEvaluationForMutationWasFinished(new MutationEvaluationForMutationWasFinished($executionResult));
         $fakeReporter = new FakeReporter();
         $reporterId = spl_object_id($fakeReporter);
         $reporterName = ReporterName::FILE_REPORTERS;
 
-        $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
-        $this->subscriber->onReporterWasStarted(new ReporterWasStarted($reporterId, $reporterName));
-        $this->subscriber->onReporterWasFinished(new ReporterWasFinished($reporterId, $reporterName));
-        $this->subscriber->onReportingWasFinished(new ReportingWasFinished());
-        $this->subscriber->onMutationEvaluationWasFinished(new MutationEvaluationWasFinished());
-        $this->subscriber->onMutationAnalysisWasFinished(new MutationAnalysisWasFinished());
-        $this->subscriber->onApplicationExecutionWasFinished(new ApplicationExecutionWasFinished());
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new ArtefactCollectionWasStarted(),
+                new InitialTestSuiteWasStarted(),
+                new InitialTestSuiteWasFinished('Test suite output'),
+                new InitialStaticAnalysisRunWasStarted(),
+                new InitialStaticAnalysisRunWasFinished('Static analysis output'),
+                new ArtefactCollectionWasFinished(),
+                new SourceCollectionWasStarted(),
+                new SourceCollectionWasFinished(1),
+                new MutationAnalysisWasStarted(),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasFinished('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'),
+                new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
+                new MutationGenerationWasStarted(1),
+                new MutationGenerationWasFinished(2, 1),
+                new MutationEvaluationWasStarted(
+                    1,
+                    $this->createStub(ProcessRunner::class),
+                ),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new HeuristicSuppressionWasStarted($mutation),
+                new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicSuppressionWasFinished($mutation),
+                new MutantAnalysisWasStarted($mutant),
+                new MutantMaterialisationWasStarted($mutant),
+                new MutantMaterialisationWasFinished($mutant),
+                new SetClockAt(2_000_000_000),
+                new MutantEvaluationWasStarted($mutant),
+                new SetClockAt(2_000_000_010),
+                new MutantProcessExecutionWasStarted($process0, 1),
+                new MutantProcessExecutionWasFinished($process0),
+                new MutantProcessExecutionWasStarted($process1, 2),
+                new MutantProcessExecutionWasFinished($process1),
+                new MutantEvaluationWasFinished($mutant),
+                new MutantAnalysisWasFinished($mutant),
+                new MutationEvaluationForMutationWasFinished($executionResult),
+                new ReportingWasStarted(),
+                new ReporterWasStarted($reporterId, $reporterName),
+                new ReporterWasFinished($reporterId, $reporterName),
+                new ReportingWasFinished(),
+                new MutationEvaluationWasFinished(),
+                new MutationAnalysisWasFinished(),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
 
         $this->assertSame(
             [
@@ -265,7 +274,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.mutation_analysis',
                 'infection.run',
             ],
-            $this->getExportedSpanNames(),
+            $this->exporter->getSpanNames(),
         );
 
         $run = $this->getSpanFromExporter('infection.run');
@@ -281,12 +290,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutationGeneration = $this->getSpanFromExporter('infection.mutation_generation');
         $mutationEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation');
         $mutationEvaluationForMutation = $this->getSpanFromExporter('infection.mutation_evaluation.mutation');
-        $heuristic = $this->getSpanFromExporter('infection.mutation_evaluation.mutation.heuristic');
+        $heuristic = $this->getHeuristicSpanForHeuristic(HeuristicName::IGNORED_BY_REGEX);
+        $secondHeuristic = $this->getHeuristicSpanForHeuristic(HeuristicName::UNCOVERED_BY_TESTS);
         $heuristicSuppression = $this->getSpanFromExporter('infection.mutation_evaluation.mutation.heuristic_suppression');
         $mutantAnalysis = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis');
         $mutantMaterialisation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.materialisation');
         $mutantEvaluation = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.evaluation');
-        $process = $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.evaluation.process');
+        $process = $this->getMutantProcessExecutionSpanForThread(1);
         $secondProcess = $this->getMutantProcessExecutionSpanForThread(2);
         $reporter = $this->getSpanFromExporter('infection.reporting.reporter');
         $reporting = $this->getSpanFromExporter('infection.reporting');
@@ -313,105 +323,213 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($run->getSpanId(), $reporting->getParentSpanId());
         $this->assertSame($reporting->getSpanId(), $reporter->getParentSpanId());
 
-        $this->assertSpanEventClasses($run, ApplicationExecutionWasStarted::class, ApplicationExecutionWasFinished::class);
-        $this->assertSpanEventClasses($artefactCollection, ArtefactCollectionWasStarted::class, ArtefactCollectionWasFinished::class);
-        $this->assertSpanEventClasses($sourceCollection, SourceCollectionWasStarted::class, SourceCollectionWasFinished::class);
-        $this->assertSpanEventClasses($initialTests, InitialTestSuiteWasStarted::class, InitialTestSuiteWasFinished::class);
-        $this->assertSpanEventClasses($initialStaticAnalysis, InitialStaticAnalysisRunWasStarted::class, InitialStaticAnalysisRunWasFinished::class);
-        $this->assertSpanEventClasses($mutationAnalysis, MutationAnalysisWasStarted::class, MutationAnalysisWasFinished::class);
-        $this->assertSpanEventClasses($astProcessing, AstProcessingWasStarted::class, MutationGenerationWasStarted::class);
-        $this->assertSpanEventClasses($astProcessingFile, AstProcessingWasStarted::class, AstProcessingWasFinished::class);
-        $this->assertSpanEventClasses($astParsing, AstParsingWasStarted::class, AstParsingWasFinished::class);
-        $this->assertSpanEventClasses($astEnrichment, AstEnrichmentWasStarted::class, AstEnrichmentWasFinished::class);
-        $this->assertSpanEventClasses($mutationGeneration, MutationGenerationWasStarted::class, MutationGenerationWasFinished::class);
-        $this->assertSpanEventClasses($mutationEvaluation, MutationEvaluationWasStarted::class, MutationEvaluationWasFinished::class);
-        $this->assertSpanEventClasses($mutationEvaluationForMutation, MutationEvaluationForMutationWasStarted::class, MutationEvaluationForMutationWasFinished::class);
-        $this->assertSpanEventClasses($heuristic, HeuristicWasStarted::class, HeuristicWasFinished::class);
-        $this->assertSpanEventClasses($heuristicSuppression, HeuristicSuppressionWasStarted::class, HeuristicSuppressionWasFinished::class);
-        $this->assertSpanEventClasses($mutantAnalysis, MutantAnalysisWasStarted::class, MutantAnalysisWasFinished::class);
-        $this->assertSpanEventClasses($mutantMaterialisation, MutantMaterialisationWasStarted::class, MutantMaterialisationWasFinished::class);
-        $this->assertSpanEventClasses($mutantEvaluation, MutantEvaluationWasStarted::class, MutantEvaluationWasFinished::class);
-        $this->assertSpanEventClasses($process, MutantProcessExecutionWasStarted::class, MutantProcessExecutionWasFinished::class);
-        $this->assertSpanEventClasses($secondProcess, MutantProcessExecutionWasStarted::class, MutantProcessExecutionWasFinished::class);
-        $this->assertSpanEventClasses($reporting, ReportingWasStarted::class, ReportingWasFinished::class);
-        $this->assertSpanEventClasses($reporter, ReporterWasStarted::class, ReporterWasFinished::class);
+        $mutationAttributes = [
+            'infection.mutation.id' => 'mutation-A',
+            'infection.mutator.name' => 'For_',
+            'code.file.path' => 'src/Foo.php',
+            'code.line.start' => 10,
+            'code.line.end' => 15,
+        ];
 
-        $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame($reporterId, $reporter->getAttributes()->get('infection.reporter.id'));
-        $this->assertSame('file', $reporter->getAttributes()->get('infection.reporter.name'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutated_file.count'));
-        $this->assertSame(2, $run->getAttributes()->get('infection.mutation.generated.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.evaluated.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.suppressed.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.eligible.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ineligible.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.tested_eligible.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.covered.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.tested_not_covered.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.not_covered.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.not_tested.count'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.mutation.killed_by_tests.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.killed_by_static_analysis.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.escaped.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.error.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.timed_out.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.skipped.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.syntax_error.count'));
-        $this->assertSame(0, $run->getAttributes()->get('infection.mutation.ignored.count'));
-        $this->assertSame(100.0, $run->getAttributes()->get('infection.msi.value'));
-        $this->assertSame(100.0, $run->getAttributes()->get('infection.mutation.coverage_rate.value'));
-        $this->assertSame(100.0, $run->getAttributes()->get('infection.covered_msi.value'));
-        $this->assertSame(0.0, $run->getAttributes()->get('infection.msi.threshold'));
-        $this->assertSame(0.0, $run->getAttributes()->get('infection.covered_msi.threshold'));
-        $this->assertSame('/path/to/project', $run->getAttributes()->get('infection.project.path'));
-        $this->assertSame('infection.json5', $run->getAttributes()->get('infection.config.path'));
-        $this->assertSame('source', $run->getAttributes()->get('infection.distribution'));
-        $this->assertSame(1, $run->getAttributes()->get('infection.thread.count'));
-        $this->assertFalse($run->getAttributes()->get('infection.run.source_filtered'));
-        $this->assertFalse($run->getAttributes()->get('infection.initial_tests.skipped'));
-        $this->assertTrue($run->getAttributes()->get('infection.initial_static_analysis.skipped'));
-        $this->assertSame('phpunit', $run->getAttributes()->get('infection.test_framework.name'));
-        $this->assertSame('12.3.4', $run->getAttributes()->get('infection.test_framework.version'));
-        $this->assertFalse($run->getAttributes()->has('infection.static_analysis_tool.name'));
-        $this->assertFalse($run->getAttributes()->has('infection.static_analysis_tool.version'));
-        $this->assertIsString($run->getAttributes()->get('infection.version'));
-        $this->assertFalse($astProcessing->getAttributes()->has('code.file.path'));
-        $this->assertSame('src/Foo.php', $astProcessingFile->getAttributes()->get('code.file.path'));
-        $this->assertSame('src/Foo.php', $astParsing->getAttributes()->get('code.file.path'));
-        $this->assertSame('src/Foo.php', $astEnrichment->getAttributes()->get('code.file.path'));
-        $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.source_file.count'));
-        $this->assertSame(1, $mutationGeneration->getAttributes()->get('infection.mutated_file.count'));
-        $this->assertSame(2, $mutationGeneration->getAttributes()->get('infection.mutation.generated.count'));
-        $this->assertFalse($mutationEvaluation->getAttributes()->has('infection.mutation.count'));
-        $this->assertSame('mutation-A', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.id'));
-        $this->assertSame('For_', $mutationEvaluationForMutation->getAttributes()->get('infection.mutator.name'));
-        $this->assertSame('src/Foo.php', $mutationEvaluationForMutation->getAttributes()->get('code.file.path'));
-        $this->assertSame(10, $mutationEvaluationForMutation->getAttributes()->get('code.line.start'));
-        $this->assertSame(15, $mutationEvaluationForMutation->getAttributes()->get('code.line.end'));
-
-        foreach ([$heuristicSuppression, $heuristic, $mutantAnalysis, $mutantMaterialisation, $mutantEvaluation, $process] as $mutationChildSpan) {
-            $this->assertSame('mutation-A', $mutationChildSpan->getAttributes()->get('infection.mutation.id'));
-            $this->assertSame('For_', $mutationChildSpan->getAttributes()->get('infection.mutator.name'));
-            $this->assertSame('src/Foo.php', $mutationChildSpan->getAttributes()->get('code.file.path'));
-            $this->assertSame(10, $mutationChildSpan->getAttributes()->get('code.line.start'));
-            $this->assertSame(15, $mutationChildSpan->getAttributes()->get('code.line.end'));
-        }
-
-        $this->assertSame(HeuristicName::IGNORED_BY_REGEX->value, $heuristic->getAttributes()->get('infection.mutation_evaluation.heuristic.id'));
-        $this->assertSame(0, $process->getAttributes()->get('process.exit.code'));
-        $this->assertFalse($process->getAttributes()->get('infection.mutation.process.timed_out'));
-        $this->assertSame('phpunit', $process->getAttributes()->get('infection.mutation.process.test_framework'));
-        $this->assertSame(1, $process->getAttributes()->get('infection.mutation.process.thread'));
-        $this->assertSame(1, $secondProcess->getAttributes()->get('process.exit.code'));
-        $this->assertTrue($secondProcess->getAttributes()->get('infection.mutation.process.timed_out'));
-        $this->assertSame('phpunit', $secondProcess->getAttributes()->get('infection.mutation.process.test_framework'));
-        $this->assertSame(2, $secondProcess->getAttributes()->get('infection.mutation.process.thread'));
-        $this->assertIsFloat($mutantEvaluation->getAttributes()->get('infection.mutation.queue_wait.duration'));
-        $this->assertGreaterThanOrEqual(0.0, $mutantEvaluation->getAttributes()->get('infection.mutation.queue_wait.duration'));
-        $this->assertSame(DetectionStatus::KILLED_BY_TESTS->value, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.status'));
-        $this->assertSame('covered', $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.msi.category'));
-        $this->assertSame(0.123, $mutationEvaluationForMutation->getAttributes()->get('infection.mutation.runtime'));
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                ApplicationExecutionWasStarted::class,
+                ApplicationExecutionWasFinished::class,
+                [
+                    'infection.project.name' => 'project',
+                    'infection.project.path' => '/path/to/project',
+                    'infection.config.path' => 'infection.json5',
+                    'infection.version' => (new InfectionVersion())->prettyVersion(),
+                    'infection.distribution' => 'source',
+                    'infection.thread.count' => 1,
+                    'infection.run.source_filtered' => false,
+                    'infection.timeouts_as_escaped' => false,
+                    'infection.initial_tests.skipped' => false,
+                    'infection.initial_static_analysis.skipped' => true,
+                    'infection.test_framework.name' => 'phpunit',
+                    'infection.test_framework.version' => '12.3.4',
+                    'infection.source_file.count' => 1,
+                    'infection.mutated_file.count' => 1,
+                    'infection.mutation.generated.count' => 2,
+                    'infection.mutation.evaluated.count' => 1,
+                    'infection.mutation.suppressed.count' => 1,
+                    'infection.mutation.eligible.count' => 1,
+                    'infection.mutation.ineligible.count' => 0,
+                    'infection.mutation.tested_eligible.count' => 1,
+                    'infection.mutation.covered.count' => 1,
+                    'infection.mutation.tested_not_covered.count' => 0,
+                    'infection.mutation.not_covered.count' => 0,
+                    'infection.mutation.not_tested.count' => 0,
+                    'infection.mutation.killed_by_tests.count' => 1,
+                    'infection.mutation.killed_by_static_analysis.count' => 0,
+                    'infection.mutation.escaped.count' => 0,
+                    'infection.mutation.error.count' => 0,
+                    'infection.mutation.timed_out.count' => 0,
+                    'infection.mutation.skipped.count' => 0,
+                    'infection.mutation.syntax_error.count' => 0,
+                    'infection.mutation.ignored.count' => 0,
+                    'infection.msi.value' => 100.0,
+                    'infection.mutation.coverage_rate.value' => 100.0,
+                    'infection.covered_msi.value' => 100.0,
+                    'infection.msi.threshold' => 0.0,
+                    'infection.covered_msi.threshold' => 0.0,
+                ],
+            ),
+            $run,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(ArtefactCollectionWasStarted::class, ArtefactCollectionWasFinished::class),
+            $artefactCollection,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(SourceCollectionWasStarted::class, SourceCollectionWasFinished::class, ['infection.source_file.count' => 1]),
+            $sourceCollection,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(InitialTestSuiteWasStarted::class, InitialTestSuiteWasFinished::class),
+            $initialTests,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(InitialStaticAnalysisRunWasStarted::class, InitialStaticAnalysisRunWasFinished::class),
+            $initialStaticAnalysis,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(MutationAnalysisWasStarted::class, MutationAnalysisWasFinished::class),
+            $mutationAnalysis,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(AstProcessingWasStarted::class, MutationGenerationWasStarted::class),
+            $astProcessing,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(AstProcessingWasStarted::class, AstProcessingWasFinished::class, ['code.file.path' => 'src/Foo.php']),
+            $astProcessingFile,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(AstParsingWasStarted::class, AstParsingWasFinished::class, ['code.file.path' => 'src/Foo.php']),
+            $astParsing,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(AstEnrichmentWasStarted::class, AstEnrichmentWasFinished::class, ['code.file.path' => 'src/Foo.php']),
+            $astEnrichment,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                MutationGenerationWasStarted::class,
+                MutationGenerationWasFinished::class,
+                [
+                    'infection.source_file.count' => 1,
+                    'infection.mutated_file.count' => 1,
+                    'infection.mutation.generated.count' => 2,
+                ],
+            ),
+            $mutationGeneration,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(MutationEvaluationWasStarted::class, MutationEvaluationWasFinished::class),
+            $mutationEvaluation,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                MutationEvaluationForMutationWasStarted::class,
+                MutationEvaluationForMutationWasFinished::class,
+                [
+                    ...$mutationAttributes,
+                    'infection.mutation.status' => DetectionStatus::KILLED_BY_TESTS->value,
+                    'infection.mutation.runtime' => 0.123,
+                    'infection.mutation.msi.category' => 'covered',
+                ],
+            ),
+            $mutationEvaluationForMutation,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                HeuristicWasStarted::class,
+                HeuristicWasFinished::class,
+                [
+                    ...$mutationAttributes,
+                    'infection.mutation_evaluation.heuristic.id' => HeuristicName::IGNORED_BY_REGEX->value,
+                ],
+            ),
+            $heuristic,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                HeuristicWasStarted::class,
+                HeuristicWasFinished::class,
+                [
+                    ...$mutationAttributes,
+                    'infection.mutation_evaluation.heuristic.id' => HeuristicName::UNCOVERED_BY_TESTS->value,
+                ],
+            ),
+            $secondHeuristic,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(HeuristicSuppressionWasStarted::class, HeuristicSuppressionWasFinished::class, $mutationAttributes),
+            $heuristicSuppression,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(MutantAnalysisWasStarted::class, MutantAnalysisWasFinished::class, $mutationAttributes),
+            $mutantAnalysis,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(MutantMaterialisationWasStarted::class, MutantMaterialisationWasFinished::class, $mutationAttributes),
+            $mutantMaterialisation,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                MutantEvaluationWasStarted::class,
+                MutantEvaluationWasFinished::class,
+                [
+                    ...$mutationAttributes,
+                    'infection.mutation.queue_wait.duration' => 0.000000010,
+                ],
+            ),
+            $mutantEvaluation,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                MutantProcessExecutionWasStarted::class,
+                MutantProcessExecutionWasFinished::class,
+                [
+                    ...$mutationAttributes,
+                    'infection.mutation.process.test_framework' => 'phpunit',
+                    'infection.mutation.process.thread' => 1,
+                    'infection.mutation.process.timed_out' => false,
+                    'process.exit.code' => 0,
+                ],
+            ),
+            $process,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                MutantProcessExecutionWasStarted::class,
+                MutantProcessExecutionWasFinished::class,
+                [
+                    ...$mutationAttributes,
+                    'infection.mutation.process.test_framework' => 'phpunit',
+                    'infection.mutation.process.thread' => 2,
+                    'infection.mutation.process.timed_out' => true,
+                    'process.exit.code' => 1,
+                ],
+            ),
+            $secondProcess,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(ReportingWasStarted::class, ReportingWasFinished::class),
+            $reporting,
+        );
+        $this->assertSpanAttributesEquals(
+            self::createAttributes(
+                ReporterWasStarted::class,
+                ReporterWasFinished::class,
+                [
+                    'infection.reporter.id' => $reporterId,
+                    'infection.reporter.name' => 'file',
+                ],
+            ),
+            $reporter,
+        );
 
         $this->exporter->assertAllSpansAreFinished();
         $this->guardedTracer->assertHasNoOpenSpans();
@@ -724,21 +842,26 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     {
         $mutation = MutationBuilder::withMinimalTestData()->build();
 
-        $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
-        $this->subscriber->onArtefactCollectionWasStarted(new ArtefactCollectionWasStarted());
-        $this->subscriber->onInitialTestSuiteWasStarted(new InitialTestSuiteWasStarted());
-        $this->subscriber->onInitialStaticAnalysisRunWasStarted(new InitialStaticAnalysisRunWasStarted());
-        $this->subscriber->onSourceCollectionWasStarted(new SourceCollectionWasStarted());
-        $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
-        $this->subscriber->onAstProcessingWasStarted(new AstProcessingWasStarted('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstParsingWasStarted(new AstParsingWasStarted('/path/to/project/src/Foo.php'));
-        $this->subscriber->onAstEnrichmentWasStarted(new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'));
-        $this->subscriber->onMutationGenerationWasStarted(new MutationGenerationWasStarted(1));
-        $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)));
-        $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
-        $this->subscriber->onReportingWasStarted(new ReportingWasStarted());
-        $this->subscriber->onReporterWasStarted(new ReporterWasStarted(123, ReporterName::FILE_REPORTERS));
-        $this->subscriber->onApplicationExecutionWasFinished(new ApplicationExecutionWasFinished());
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new ArtefactCollectionWasStarted(),
+                new InitialTestSuiteWasStarted(),
+                new InitialStaticAnalysisRunWasStarted(),
+                new SourceCollectionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new MutationGenerationWasStarted(1),
+                new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new ReportingWasStarted(),
+                new ReporterWasStarted(123, ReporterName::FILE_REPORTERS),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
 
         $this->assertSame(
             [
@@ -758,7 +881,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.reporting',
                 'infection.run',
             ],
-            $this->getExportedSpanNames(),
+            $this->exporter->getSpanNames(),
         );
 
         $this->exporter->assertAllSpansAreFinished();
@@ -770,21 +893,531 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     {
         $mutation = MutationBuilder::withMinimalTestData()->build();
 
-        $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
-        $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
-        $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)));
-        $this->subscriber->onMutationEvaluationForMutationWasStarted(new MutationEvaluationForMutationWasStarted($mutation));
-        $this->subscriber->onMutationEvaluationWasFinished(new MutationEvaluationWasFinished());
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new MutationEvaluationWasFinished(),
+            ],
+        );
 
         $this->assertSame(
             [
                 'infection.mutation_evaluation.mutation',
                 'infection.mutation_evaluation',
             ],
-            $this->getExportedSpanNames(),
+            $this->exporter->getSpanNames(),
         );
 
         $this->exporter->assertAllSpansAreFinished();
+    }
+
+    public function test_it_ends_open_mutation_evaluation_child_spans_on_mutation_evaluation_finish(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->build();
+        $process = $this->createMutantProcess($mutant, 0);
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new HeuristicSuppressionWasStarted($mutation),
+                new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+                new MutantAnalysisWasStarted($mutant),
+                new MutantMaterialisationWasStarted($mutant),
+                new MutantEvaluationWasStarted($mutant),
+                new MutantProcessExecutionWasStarted($process, 1),
+                new MutationEvaluationWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.mutation_evaluation.mutation.heuristic',
+                'infection.mutation_evaluation.mutation.heuristic_suppression',
+                'infection.mutation_evaluation.mutant_analysis.materialisation',
+                'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+                'infection.mutation_evaluation.mutant_analysis.evaluation',
+                'infection.mutation_evaluation.mutant_analysis',
+                'infection.mutation_evaluation.mutation',
+                'infection.mutation_evaluation',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+
+        foreach ($this->exporter->getSpans() as $span) {
+            $this->assertSame(MutationEvaluationWasFinished::class, $span->getAttributes()->get('infection.event.class.end'));
+        }
+    }
+
+    public function test_it_ends_open_ast_spans_on_application_finish(): void
+    {
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.ast_processing.file.parsing',
+                'infection.ast_processing.file.enrichment',
+                'infection.ast_processing.file',
+                'infection.ast_processing',
+                'infection.mutation_analysis',
+                'infection.run',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+        $this->assertSpanEventClasses(
+            $this->getSpanFromExporter('infection.ast_processing'),
+            AstProcessingWasStarted::class,
+            ApplicationExecutionWasFinished::class,
+        );
+    }
+
+    public function test_it_ends_open_mutation_evaluation_child_spans_on_application_finish(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new MutantAnalysisWasStarted($mutant),
+                new MutantEvaluationWasStarted($mutant),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.mutation_evaluation.mutant_analysis.evaluation',
+                'infection.mutation_evaluation.mutant_analysis',
+                'infection.mutation_evaluation.mutation',
+                'infection.mutation_evaluation',
+                'infection.mutation_analysis',
+                'infection.run',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+        $this->assertSpanEventClasses(
+            $this->getMutantEvaluationSpanForMutation('mutation-A'),
+            MutantEvaluationWasStarted::class,
+            ApplicationExecutionWasFinished::class,
+        );
+    }
+
+    public function test_it_ends_open_mutant_materialisation_span_on_mutant_analysis_finish(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new MutantAnalysisWasStarted($mutant),
+                new MutantMaterialisationWasStarted($mutant),
+                new MutantAnalysisWasFinished($mutant),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.mutation_evaluation.mutant_analysis.materialisation',
+                'infection.mutation_evaluation.mutant_analysis',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+        $this->assertSpanEventClasses(
+            $this->getSpanFromExporter('infection.mutation_evaluation.mutant_analysis.materialisation'),
+            MutantMaterialisationWasStarted::class,
+            MutantAnalysisWasFinished::class,
+        );
+    }
+
+    public function test_it_ends_open_mutation_analysis_child_spans_on_mutation_analysis_finish(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationGenerationWasStarted(1),
+                new MutationEvaluationWasStarted(IterableCounter::UNKNOWN_COUNT, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new MutationAnalysisWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.mutation_generation',
+                'infection.mutation_evaluation.mutation',
+                'infection.mutation_evaluation',
+                'infection.mutation_analysis',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+
+        foreach ($this->exporter->getSpans() as $span) {
+            $this->assertSame(MutationAnalysisWasFinished::class, $span->getAttributes()->get('infection.event.class.end'));
+        }
+    }
+
+    public function test_it_ends_open_mutation_evaluation_child_spans_on_mutation_evaluation_for_mutation_finish(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->build();
+        $process = $this->createMutantProcess($mutant, 0);
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new HeuristicSuppressionWasStarted($mutation),
+                new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+                new MutantAnalysisWasStarted($mutant),
+                new MutantMaterialisationWasStarted($mutant),
+                new MutantEvaluationWasStarted($mutant),
+                new MutantProcessExecutionWasStarted($process, 1),
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()
+                        ->withMutantHash('mutation-A')
+                        ->build(),
+                ),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.mutation_evaluation.mutation.heuristic',
+                'infection.mutation_evaluation.mutation.heuristic_suppression',
+                'infection.mutation_evaluation.mutant_analysis.materialisation',
+                'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+                'infection.mutation_evaluation.mutant_analysis.evaluation',
+                'infection.mutation_evaluation.mutant_analysis',
+                'infection.mutation_evaluation.mutation',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+
+        foreach ($this->exporter->getSpans() as $span) {
+            $this->assertSame(MutationEvaluationForMutationWasFinished::class, $span->getAttributes()->get('infection.event.class.end'));
+        }
+    }
+
+    public function test_it_ends_only_the_current_mutation_heuristic_spans_when_hashes_share_a_prefix(): void
+    {
+        $mutationA = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation')
+            ->build();
+        $mutationB = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-B')
+            ->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutationA),
+                new MutationEvaluationForMutationWasStarted($mutationB),
+                new HeuristicSuppressionWasStarted($mutationA),
+                new HeuristicSuppressionWasStarted($mutationB),
+                new HeuristicWasStarted($mutationA, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutationB, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicSuppressionWasFinished($mutationB),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'mutation-B',
+                'mutation-B',
+            ],
+            $this->getExportedMutationIds(),
+        );
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new HeuristicSuppressionWasFinished($mutationA),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'mutation-B',
+                'mutation-B',
+                'mutation',
+                'mutation',
+            ],
+            $this->getExportedMutationIds(),
+        );
+    }
+
+    public function test_it_does_not_end_heuristic_spans_for_a_different_mutation_with_a_matching_hash_prefix(): void
+    {
+        $mutationA = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation')
+            ->build();
+        $mutationB = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-B')
+            ->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutationA),
+                new MutationEvaluationForMutationWasStarted($mutationB),
+                new HeuristicSuppressionWasStarted($mutationB),
+                new HeuristicSuppressionWasStarted($mutationA),
+                new HeuristicWasStarted($mutationB, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutationA, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicSuppressionWasFinished($mutationA),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'mutation',
+                'mutation',
+            ],
+            $this->getExportedMutationIds(),
+        );
+    }
+
+    public function test_it_tracks_overlapping_heuristics_for_the_same_mutation_separately(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new HeuristicSuppressionWasStarted($mutation),
+                new HeuristicWasStarted($mutation, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasFinished($mutation, HeuristicName::IGNORED_BY_REGEX),
+            ],
+        );
+
+        $this->assertSame(
+            [HeuristicName::IGNORED_BY_REGEX->value],
+            $this->getExportedHeuristicIds(),
+        );
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new HeuristicWasFinished($mutation, HeuristicName::UNCOVERED_BY_TESTS),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                HeuristicName::IGNORED_BY_REGEX->value,
+                HeuristicName::UNCOVERED_BY_TESTS->value,
+            ],
+            $this->getExportedHeuristicIds(),
+        );
+    }
+
+    public function test_it_ends_open_mutant_process_spans_for_the_finished_mutant_evaluation_only(): void
+    {
+        $mutationA = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutationB = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-B')
+            ->build();
+        $mutantA = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutationA)
+            ->build();
+        $mutantB = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutationB)
+            ->build();
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutationA),
+                new MutationEvaluationForMutationWasStarted($mutationB),
+                new MutantEvaluationWasStarted($mutantA),
+                new MutantEvaluationWasStarted($mutantB),
+                new MutantProcessExecutionWasStarted($this->createMutantProcess($mutantA, 0), 1),
+                new MutantProcessExecutionWasStarted($this->createMutantProcess($mutantB, 0), 2),
+                new MutantEvaluationWasFinished($mutantB),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'mutation-B',
+                'mutation-B',
+            ],
+            $this->getExportedMutationIds(),
+        );
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new MutantEvaluationWasFinished($mutantA),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'mutation-B',
+                'mutation-B',
+                'mutation-A',
+                'mutation-A',
+            ],
+            $this->getExportedMutationIds(),
+        );
+    }
+
+    public function test_it_ends_open_reporter_spans_on_reporting_finish(): void
+    {
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new ReportingWasStarted(),
+                new ReporterWasStarted(123, ReporterName::FILE_REPORTERS),
+                new ReportingWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.reporting.reporter',
+                'infection.reporting',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+        $this->assertSpanEventClasses(
+            $this->getSpanFromExporter('infection.reporting.reporter'),
+            ReporterWasStarted::class,
+            ReportingWasFinished::class,
+        );
+    }
+
+    public function test_it_does_not_record_queue_wait_duration_when_process_starts_without_a_mutant_evaluation(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->build();
+        $process = $this->createMutantProcess($mutant, 0);
+        $secondProcess = $this->createMutantProcess($mutant, 0);
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new MutationEvaluationForMutationWasStarted($mutation),
+                new MutantProcessExecutionWasStarted($process, 1),
+                new MutantProcessExecutionWasFinished($process),
+                new MutantProcessExecutionWasStarted($secondProcess, 1),
+                new MutantProcessExecutionWasFinished($secondProcess),
+                new MutantEvaluationWasStarted($mutant),
+                new MutantEvaluationWasFinished($mutant),
+            ],
+        );
+
+        $this->assertFalse(
+            $this->getMutantEvaluationSpanForMutation('mutation-A')->getAttributes()->has('infection.mutation.queue_wait.duration'),
+        );
+    }
+
+    public function test_it_records_zero_queue_wait_duration_when_process_starts_immediately(): void
+    {
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->build();
+        $process = $this->createMutantProcess($mutant, 0);
+
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(1, $this->createStub(ProcessRunner::class)),
+                new SetClockAt(2_000_000_000),
+                new MutantEvaluationWasStarted($mutant),
+                new MutantProcessExecutionWasStarted($process, 1),
+                new MutantProcessExecutionWasFinished($process),
+                new MutantEvaluationWasFinished($mutant),
+            ],
+        );
+
+        $this->assertSame(
+            0,
+            $this->getMutantEvaluationSpanForMutation('mutation-A')->getAttributes()->get('infection.mutation.queue_wait.duration'),
+        );
     }
 
     public function test_it_calculates_the_queue_wait_duration_for_each_mutant_evaluation(): void
@@ -806,35 +1439,38 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $mutationBProcess0 = $this->createMutantProcess($mutantB, 0);
         $mutationBProcess1 = $this->createMutantProcess($mutantB, 0);
 
-        $this->subscriber->onApplicationExecutionWasStarted(new ApplicationExecutionWasStarted());
-        $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
-        $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)));
-
-        $this->clock->setTime(2_000_000_000);
-        $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantA));
-        $this->clock->setTime(2_000_000_010);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess0, 1));
-        $this->clock->setTime(2_000_000_030);
-        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess0));
-        $this->clock->setTime(2_000_000_070);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess1, 1));
-        $this->clock->setTime(2_000_000_090);
-        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess1));
-        $this->clock->setTime(2_000_000_110);
-        $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutantA));
-
-        $this->clock->setTime(3_000_000_000);
-        $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantB));
-        $this->clock->setTime(3_000_000_025);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess0, 2));
-        $this->clock->setTime(3_000_000_055);
-        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess0));
-        $this->clock->setTime(3_000_000_115);
-        $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess1, 2));
-        $this->clock->setTime(3_000_000_145);
-        $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess1));
-        $this->clock->setTime(3_000_000_200);
-        $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutantB));
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)),
+                new SetClockAt(2_000_000_000),
+                new MutantEvaluationWasStarted($mutantA),
+                new SetClockAt(2_000_000_010),
+                new MutantProcessExecutionWasStarted($mutationAProcess0, 1),
+                new SetClockAt(2_000_000_030),
+                new MutantProcessExecutionWasFinished($mutationAProcess0),
+                new SetClockAt(2_000_000_070),
+                new MutantProcessExecutionWasStarted($mutationAProcess1, 1),
+                new SetClockAt(2_000_000_090),
+                new MutantProcessExecutionWasFinished($mutationAProcess1),
+                new SetClockAt(2_000_000_110),
+                new MutantEvaluationWasFinished($mutantA),
+                new SetClockAt(3_000_000_000),
+                new MutantEvaluationWasStarted($mutantB),
+                new SetClockAt(3_000_000_025),
+                new MutantProcessExecutionWasStarted($mutationBProcess0, 2),
+                new SetClockAt(3_000_000_055),
+                new MutantProcessExecutionWasFinished($mutationBProcess0),
+                new SetClockAt(3_000_000_115),
+                new MutantProcessExecutionWasStarted($mutationBProcess1, 2),
+                new SetClockAt(3_000_000_145),
+                new MutantProcessExecutionWasFinished($mutationBProcess1),
+                new SetClockAt(3_000_000_200),
+                new MutantEvaluationWasFinished($mutantB),
+            ],
+        );
 
         $this->assertSame(
             0.000000050,
@@ -895,6 +1531,12 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $dispatcher->addSubscriber($subscriber);
 
         foreach ($events as $event) {
+            if ($event instanceof SetClockAt) {
+                $this->clock->setTime($event->time);
+
+                continue;
+            }
+
             $dispatcher->dispatch($event);
         }
     }
@@ -910,39 +1552,67 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
     private function getSpanFromExporter(string $name): SpanDataInterface
     {
-        /** @var SpanDataInterface $span */
-        foreach ($this->exporter->getSpans() as $span) {
-            if ($span->getName() === $name) {
-                return $span;
-            }
-        }
+        $matchingSpans = array_values(
+            array_filter(
+                $this->exporter->getSpans(),
+                static fn (SpanDataInterface $span): bool => $span->getName() === $name,
+            ),
+        );
 
-        $this->fail(
+        $this->assertCount(
+            1,
+            $matchingSpans,
             sprintf(
-                'Span "%s" was not exported.',
+                'Expected exactly one span named "%s".',
                 $name,
             ),
         );
+
+        return $matchingSpans[0];
     }
 
     private function getMutantProcessExecutionSpanForThread(int $thread): SpanDataInterface
     {
-        /** @var SpanDataInterface $span */
-        foreach ($this->exporter->getSpans() as $span) {
-            if (
-                $span->getName() === 'infection.mutation_evaluation.mutant_analysis.evaluation.process'
-                && $span->getAttributes()->get('infection.mutation.process.thread') === $thread
-            ) {
-                return $span;
-            }
-        }
+        $matchingSpans = array_values(
+            array_filter(
+                $this->exporter->getSpans(),
+                static fn (SpanDataInterface $span): bool => $span->getName() === 'infection.mutation_evaluation.mutant_analysis.evaluation.process'
+                    && $span->getAttributes()->get('infection.mutation.process.thread') === $thread,
+            ),
+        );
 
-        $this->fail(
+        $this->assertCount(
+            1,
+            $matchingSpans,
             sprintf(
-                'Mutant process execution span for thread "%d" was not exported.',
+                'Expected exactly one mutant process execution span for thread "%d".',
                 $thread,
             ),
         );
+
+        return $matchingSpans[0];
+    }
+
+    private function getHeuristicSpanForHeuristic(HeuristicName $heuristic): SpanDataInterface
+    {
+        $matchingSpans = array_values(
+            array_filter(
+                $this->exporter->getSpans(),
+                static fn (SpanDataInterface $span): bool => $span->getName() === 'infection.mutation_evaluation.mutation.heuristic'
+                    && $span->getAttributes()->get('infection.mutation_evaluation.heuristic.id') === $heuristic->value,
+            ),
+        );
+
+        $this->assertCount(
+            1,
+            $matchingSpans,
+            sprintf(
+                'Expected exactly one heuristic span for heuristic "%s".',
+                $heuristic->value,
+            ),
+        );
+
+        return $matchingSpans[0];
     }
 
     private function createMutantProcess(
@@ -971,35 +1641,56 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
     private function getMutantEvaluationSpanForMutation(string $mutationHash): SpanDataInterface
     {
-        /** @var SpanDataInterface $span */
-        foreach ($this->exporter->getSpans() as $span) {
-            if (
-                $span->getName() === 'infection.mutation_evaluation.mutant_analysis.evaluation'
-                && $span->getAttributes()->get('infection.mutation.id') === $mutationHash
-            ) {
-                return $span;
-            }
-        }
+        $matchingSpans = array_values(
+            array_filter(
+                $this->exporter->getSpans(),
+                static fn (SpanDataInterface $span): bool => $span->getName() === 'infection.mutation_evaluation.mutant_analysis.evaluation'
+                    && $span->getAttributes()->get('infection.mutation.id') === $mutationHash,
+            ),
+        );
 
-        $this->fail(
+        $this->assertCount(
+            1,
+            $matchingSpans,
             sprintf(
-                'Mutant evaluation span for mutation "%s" was not exported.',
+                'Expected exactly one mutant evaluation span for mutation "%s".',
                 $mutationHash,
             ),
         );
+
+        return $matchingSpans[0];
     }
 
     /**
      * @return list<string>
      */
-    private function getExportedSpanNames(): array
+    private function getExportedMutationIds(): array
     {
-        return array_values(
-            array_map(
-                static fn (SpanDataInterface $span): string => $span->getName(),
-                $this->exporter->getSpans(),
-            ),
-        );
+        $mutationIds = [];
+
+        foreach ($this->exporter->getSpans() as $span) {
+            if ($span->getAttributes()->has('infection.mutation.id')) {
+                $mutationIds[] = $span->getAttributes()->get('infection.mutation.id');
+            }
+        }
+
+        return $mutationIds;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getExportedHeuristicIds(): array
+    {
+        $heuristicIds = [];
+
+        foreach ($this->exporter->getSpans() as $span) {
+            if ($span->getAttributes()->has('infection.mutation_evaluation.heuristic.id')) {
+                $heuristicIds[] = $span->getAttributes()->get('infection.mutation_evaluation.heuristic.id');
+            }
+        }
+
+        return $heuristicIds;
     }
 
     /**
@@ -1010,6 +1701,33 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     {
         $this->assertSame($startEventClass, $span->getAttributes()->get('infection.event.class.start'));
         $this->assertSame($endEventClass, $span->getAttributes()->get('infection.event.class.end'));
+    }
+
+    /**
+     * @param Attributes $expected
+     */
+    private function assertSpanAttributesEquals(array $expected, SpanDataInterface $span): void
+    {
+        $this->assertEqualsCanonicalizing($expected, $span->getAttributes()->toArray());
+    }
+
+    /**
+     * @param class-string $startEventClass
+     * @param class-string $endEventClass
+     * @param Attributes $attributes
+     *
+     * @return Attributes
+     */
+    private static function createAttributes(
+        string $startEventClass,
+        string $endEventClass,
+        array $attributes = [],
+    ): array {
+        return [
+            'infection.event.class.start' => $startEventClass,
+            'infection.event.class.end' => $endEventClass,
+            ...$attributes,
+        ];
     }
 
     private function assertTracerProviderWasShutdown(): void

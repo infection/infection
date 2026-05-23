@@ -85,10 +85,6 @@ final class GuardedTracer implements TracerInterface
 
     public function assertHasNoOpenSpans(): void
     {
-        if ($this->openSpans === []) {
-            return;
-        }
-
         Assert::same(
             $this->openSpans,
             [],

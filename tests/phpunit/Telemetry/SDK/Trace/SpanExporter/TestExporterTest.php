@@ -43,6 +43,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TestExporter::class)]
 final class TestExporterTest extends TestCase
 {
+    public function test_it_returns_the_exported_span_names(): void
+    {
+        $exporter = new TestExporter();
+        $exporter->export([
+            $this->createSpan('infection.run', true),
+            $this->createSpan('infection.mutation_analysis', true),
+        ]);
+
+        $this->assertSame(
+            [
+                'infection.run',
+                'infection.mutation_analysis',
+            ],
+            $exporter->getSpanNames(),
+        );
+    }
+
     public function test_it_accepts_finished_spans(): void
     {
         $exporter = new TestExporter();
