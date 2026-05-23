@@ -81,6 +81,7 @@ final readonly class RunSpanAttributesProvider
             'vcs.ref.head.revision' => $this->configuration->gitSha,
             'infection.thread.count' => $this->configuration->threadCount,
             'infection.run.source_filtered' => $this->configuration->sourceFilter !== null,
+            'infection.run.progress_enabled' => !$this->configuration->noProgress,
             'infection.timeouts_as_escaped' => $this->configuration->timeoutsAsEscaped,
             'infection.initial_tests.skipped' => $this->configuration->skipInitialTests,
             'infection.initial_static_analysis.skipped' => !$this->configuration->isStaticAnalysisEnabled(),

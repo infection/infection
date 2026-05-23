@@ -68,6 +68,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
             ->withGitSha('0123456789abcdef')
             ->withTimeoutsAsEscaped(true)
+            ->withNoProgress(true)
             ->build();
 
         $infectionVersionMock = $this->createMock(InfectionVersion::class);
@@ -103,6 +104,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             'vcs.ref.head.revision' => '0123456789abcdef',
             'infection.thread.count' => 8,
             'infection.run.source_filtered' => false,
+            'infection.run.progress_enabled' => false,
             'infection.timeouts_as_escaped' => true,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,
@@ -174,6 +176,34 @@ final class RunSpanAttributesProviderTest extends TestCase
         $actual = $provider->provideInitialAttributes();
 
         $this->assertTrue($actual['infection.run.source_filtered']);
+    }
+
+    public function test_it_marks_runs_when_progress_output_is_enabled(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withNoProgress(false)
+            ->build();
+
+        $infectionVersion = $this->createStub(InfectionVersion::class);
+        $infectionVersion
+            ->method('prettyVersion')
+            ->willReturn('1.2.3');
+        $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapter
+            ->method('getVersion')
+            ->willReturn('12.3.4');
+
+        $provider = new RunSpanAttributesProvider(
+            $configuration,
+            $infectionVersion,
+            $testFrameworkAdapter,
+            null,
+            new MetricsCalculator($configuration->msiPrecision, $configuration->timeoutsAsEscaped),
+        );
+
+        $actual = $provider->provideInitialAttributes();
+
+        $this->assertTrue($actual['infection.run.progress_enabled']);
     }
 
     /**
