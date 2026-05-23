@@ -323,10 +323,14 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
     {
+        if ($this->mutationGenerationSpan === null) {
+            return;
+        }
+
         $this->astProcessingSpan ??= $this->startChild(
             'infection.ast_processing',
             $event,
-            parent: $this->mutationAnalysisSpan,
+            parent: $this->mutationGenerationSpan,
         );
 
         $span = $this->startChild(
@@ -355,11 +359,15 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onAstParsingWasStarted(AstParsingWasStarted $event): void
     {
+        if (!isset($this->astProcessingFileSpans[$event->sourceFilePath])) {
+            return;
+        }
+
         $span = $this->startChild(
             'infection.ast_processing.file.parsing',
             $event,
             ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
-            parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
+            parent: $this->astProcessingFileSpans[$event->sourceFilePath],
         );
 
         if ($span !== null) {
@@ -378,11 +386,15 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void
     {
+        if (!isset($this->astProcessingFileSpans[$event->sourceFilePath])) {
+            return;
+        }
+
         $span = $this->startChild(
             'infection.ast_processing.file.enrichment',
             $event,
             ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
-            parent: $this->astProcessingFileSpans[$event->sourceFilePath] ?? null,
+            parent: $this->astProcessingFileSpans[$event->sourceFilePath],
         );
 
         if ($span !== null) {
