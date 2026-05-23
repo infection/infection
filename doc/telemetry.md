@@ -119,6 +119,12 @@ toolchain, and run-summary attributes that are useful for filtering dashboards:
 
 ## Span Attributes
 
+All spans include `infection.event.class.start` and
+`infection.event.class.end`, the fully-qualified PHP class names of the
+Infection events that started and ended the span. These are intended as a
+debugging aid when correlating exported spans with Infection's event subscriber
+flow.
+
 File-level spans use `code.file.path` for the source file path. The value is
 emitted relative to `infection.project.path`.
 

@@ -316,6 +316,29 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->assertSame($run->getSpanId(), $reporting->getParentSpanId());
         $this->assertSame($reporting->getSpanId(), $reporter->getParentSpanId());
 
+        $this->assertSpanEventClasses($run, ApplicationExecutionWasStarted::class, ApplicationExecutionWasFinished::class);
+        $this->assertSpanEventClasses($artefactCollection, ArtefactCollectionWasStarted::class, ArtefactCollectionWasFinished::class);
+        $this->assertSpanEventClasses($sourceCollection, SourceCollectionWasStarted::class, SourceCollectionWasFinished::class);
+        $this->assertSpanEventClasses($initialTests, InitialTestSuiteWasStarted::class, InitialTestSuiteWasFinished::class);
+        $this->assertSpanEventClasses($initialStaticAnalysis, InitialStaticAnalysisRunWasStarted::class, InitialStaticAnalysisRunWasFinished::class);
+        $this->assertSpanEventClasses($mutationAnalysis, MutationAnalysisWasStarted::class, MutationAnalysisWasFinished::class);
+        $this->assertSpanEventClasses($astProcessing, AstProcessingWasStarted::class, MutationGenerationWasStarted::class);
+        $this->assertSpanEventClasses($astProcessingFile, AstProcessingWasStarted::class, AstProcessingWasFinished::class);
+        $this->assertSpanEventClasses($astParsing, AstParsingWasStarted::class, AstParsingWasFinished::class);
+        $this->assertSpanEventClasses($astEnrichment, AstEnrichmentWasStarted::class, AstEnrichmentWasFinished::class);
+        $this->assertSpanEventClasses($mutationGeneration, MutationGenerationWasStarted::class, MutationGenerationWasFinished::class);
+        $this->assertSpanEventClasses($mutationEvaluation, MutationEvaluationWasStarted::class, MutationEvaluationWasFinished::class);
+        $this->assertSpanEventClasses($mutationEvaluationForMutation, MutationEvaluationForMutationWasStarted::class, MutationEvaluationForMutationWasFinished::class);
+        $this->assertSpanEventClasses($heuristic, HeuristicWasStarted::class, HeuristicWasFinished::class);
+        $this->assertSpanEventClasses($heuristicSuppression, HeuristicSuppressionWasStarted::class, HeuristicSuppressionWasFinished::class);
+        $this->assertSpanEventClasses($mutantAnalysis, MutantAnalysisWasStarted::class, MutantAnalysisWasFinished::class);
+        $this->assertSpanEventClasses($mutantMaterialisation, MutantMaterialisationWasStarted::class, MutantMaterialisationWasFinished::class);
+        $this->assertSpanEventClasses($mutantEvaluation, MutantEvaluationWasStarted::class, MutantEvaluationWasFinished::class);
+        $this->assertSpanEventClasses($process, MutantProcessExecutionWasStarted::class, MutantProcessExecutionWasFinished::class);
+        $this->assertSpanEventClasses($secondProcess, MutantProcessExecutionWasStarted::class, MutantProcessExecutionWasFinished::class);
+        $this->assertSpanEventClasses($reporting, ReportingWasStarted::class, ReportingWasFinished::class);
+        $this->assertSpanEventClasses($reporter, ReporterWasStarted::class, ReporterWasFinished::class);
+
         $this->assertSame(1, $sourceCollection->getAttributes()->get('infection.source_file.count'));
         $this->assertSame($reporterId, $reporter->getAttributes()->get('infection.reporter.id'));
         $this->assertSame('file', $reporter->getAttributes()->get('infection.reporter.name'));
@@ -643,6 +666,16 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 ),
             );
         }
+    }
+
+    /**
+     * @param class-string $startEventClass
+     * @param class-string $endEventClass
+     */
+    private function assertSpanEventClasses(SpanDataInterface $span, string $startEventClass, string $endEventClass): void
+    {
+        $this->assertSame($startEventClass, $span->getAttributes()->get('infection.event.class.start'));
+        $this->assertSame($endEventClass, $span->getAttributes()->get('infection.event.class.end'));
     }
 
     private function assertTracerProviderWasShutdown(): void
