@@ -51,9 +51,9 @@ use function sprintf;
  *
  * @internal
  */
-final class TestExporter implements SpanExporterInterface
+final readonly class TestExporter implements SpanExporterInterface
 {
-    private readonly InMemoryExporter $exporter;
+    private InMemoryExporter $exporter;
 
     public function __construct()
     {
