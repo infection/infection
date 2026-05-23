@@ -79,6 +79,8 @@ final class GuardedTracerTest extends TestCase
 
     public function test_it_allows_spans_to_be_closed_after_their_children(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $root = $this->telemetry->startRootSpan('infection.run');
         $child = $this->telemetry->startChildSpan($root, 'infection.child');
 
@@ -86,7 +88,6 @@ final class GuardedTracerTest extends TestCase
         $this->telemetry->end($root);
 
         $this->guardedTracer->assertHasNoOpenSpans();
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_rejects_ending_a_parent_span_while_a_child_span_is_open(): void

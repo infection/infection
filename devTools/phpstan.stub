@@ -8,3 +8,35 @@ namespace PhpParser\Node {
         public function toString() {}
     }
 }
+
+namespace OpenTelemetry\API\Trace {
+    use Throwable;
+
+    interface SpanInterface
+    {
+        /**
+         * @param bool|int|float|string|array<array-key, bool|int|float|string>|null $value
+         */
+        public function setAttribute(string $key, bool|int|float|string|array|null $value): SpanInterface;
+
+        /**
+         * @param iterable<non-empty-string, bool|int|float|string|array<array-key, bool|int|float|string>|null> $attributes
+         */
+        public function setAttributes(iterable $attributes): SpanInterface;
+
+        /**
+         * @param iterable<non-empty-string, bool|int|float|string|array<array-key, bool|int|float|string>|null> $attributes
+         */
+        public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanInterface;
+
+        /**
+         * @param iterable<non-empty-string, bool|int|float|string|array<array-key, bool|int|float|string>|null> $attributes
+         */
+        public function addEvent(string $name, iterable $attributes = [], ?int $timestamp = null): SpanInterface;
+
+        /**
+         * @param iterable<non-empty-string, bool|int|float|string|array<array-key, bool|int|float|string>|null> $attributes
+         */
+        public function recordException(Throwable $exception, iterable $attributes = []): SpanInterface;
+    }
+}

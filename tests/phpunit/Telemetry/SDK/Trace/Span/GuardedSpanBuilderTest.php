@@ -71,6 +71,9 @@ final class GuardedSpanBuilderTest extends TestCase
         $parent->end();
     }
 
+    /**
+     * @param non-empty-string $name
+     */
     private function createBuilder(
         string $name,
         ?GuardedTracer $tracer = null,

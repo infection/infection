@@ -74,7 +74,7 @@ final class SpanTreeRenderer
     }
 
     /**
-     * @param SpanDataInterface $childrenByParentId
+     * @param array<string, list<SpanDataInterface>> $childrenByParentId
      * @param list<string> $lines
      */
     private static function renderSpanTreeNode(

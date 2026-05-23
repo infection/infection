@@ -68,8 +68,6 @@ final class TestExporterTest extends TestCase
         ]);
 
         $exporter->assertAllSpansAreFinished();
-
-        $this->addToAssertionCount(1);
     }
 
     public function test_it_rejects_unfinished_spans(): void
@@ -79,6 +77,7 @@ final class TestExporterTest extends TestCase
             $this->createSpan('infection.run', false),
         ]);
 
+        /** @phpstan-ignore classConstant.internalClass */
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Expected the span "infection.run" to have ended.');
 
