@@ -35,9 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Subscriber;
 
-use function array_map;
-use function array_values;
+use;
+use;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
@@ -97,8 +98,10 @@ use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Reporter\FakeReporter;
-use Infection\Tests\Telemetry\FakeClock;
+use Infection\Tests\Telemetry\Clock\FakeClock;
+use Infection\Tests\Telemetry\Clock\IncrementalClock;
 use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -106,11 +109,14 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
+use function array_map;
+use function array_values;
 use function spl_object_id;
 use function sprintf;
-use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerSubscriber::class)]
@@ -146,17 +152,26 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             $configuration->timeoutsAsEscaped,
         );
 
+        $this->subscriber = $this->createSubscriber($this->clock);
+    }
+
+    private function createSubscriber(ClockInterface $clock): OpenTelemetryTracerSubscriber
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withProjectDirectory('/path/to/project')
+            ->build();
+
         $testFrameworkAdapter = $this->createStub(TestFrameworkAdapter::class);
         $testFrameworkAdapter
             ->method('getVersion')
             ->willReturn('12.3.4');
         $projectRelativePathResolver = new ProjectRelativePathResolver($configuration);
 
-        $this->subscriber = new OpenTelemetryTracerSubscriber(
+        return new OpenTelemetryTracerSubscriber(
             new OpenTelemetryTracer(
                 $this->tracerProvider->getTracer('infection'),
                 $this->tracerProvider,
-                $this->clock,
+                $clock,
             ),
             new RunSpanAttributesProvider(
                 $configuration,
@@ -426,6 +441,48 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertAllSpansAreFinished();
         $this->assertTracerProviderWasShutdown();
+    }
+
+    /**
+     * @param list<object> $events
+     */
+    #[DataProvider('spanTreeScenarioProvider')]
+    public function test_it_can_describe_the_exported_span_tree_with_timings(
+        array $events,
+        string $expectedSpanTree,
+    ): void
+    {
+        $this->subscriber = $this->createSubscriber(
+            new IncrementalClock(10, 10),
+        );
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber($this->subscriber);
+
+        foreach ($events as $event) {
+            $dispatcher->dispatch($event);
+        }
+
+        $this->assertSame(
+            $expectedSpanTree,
+            (new SpanTreeRenderer())->render($this->exporter->getSpans()),
+        );
+    }
+
+    public static function spanTreeScenarioProvider(): iterable
+    {
+        yield 'run with artefact collection' => [
+            [
+                new ApplicationExecutionWasStarted(),
+                new ArtefactCollectionWasStarted(),
+                new ArtefactCollectionWasFinished(),
+                new ApplicationExecutionWasFinished(),
+            ],
+            <<<'TXT'
+            infection.run [10, 40]
+              infection.artefact_collection [20, 30]
+            TXT,
+        ];
     }
 
     public function test_it_ends_open_spans_on_application_finish_even_if_the_finish_events_were_not_emitted(): void

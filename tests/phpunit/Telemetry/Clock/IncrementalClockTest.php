@@ -33,18 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Telemetry;
+namespace Infection\Tests\Telemetry\Clock;
 
-use Infection\Tests\UnsupportedMethod;
-use OpenTelemetry\API\Common\Time\ClockInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class FakeClock implements ClockInterface
+#[CoversClass(IncrementalClock::class)]
+final class IncrementalClockTest extends TestCase
 {
-    public function now(): int
+    public function test_it_returns_the_current_time_and_increments_it_after_each_read(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $clock = new IncrementalClock(1_000, 25);
+
+        $this->assertSame(1_000, $clock->now());
+        $this->assertSame(1_025, $clock->now());
+        $this->assertSame(1_050, $clock->now());
     }
 }
