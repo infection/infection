@@ -11569,6 +11569,54 @@ message = 'Potentially unhandled exception `RuntimeException` in `Infection\Test
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerTest.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$span`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/SDK/Trace/Span/GuardedSpan.php"
+code = "imprecise-type"
+message = "Type `iterable` in parameter `$attributes` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Telemetry/SDK/Trace/Span/GuardedSpanBuilder.php"
+code = "imprecise-type"
+message = "Type `iterable` in parameter `$attributes` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 2
+
+[[issues]]
+file = "tests/phpunit/Telemetry/SDK/Trace/SpanExporter/TestExporter.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `list<mixed>` is less specific than the declared return type `list<OpenTelemetry\SDK\Trace\SpanDataInterface>` for function `Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter::getSpans` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `spanTreeScenarioProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `array{}|list<mixed>` is less specific than the declared return type `list<string>` for function `Infection\Tests\Telemetry\Subscriber\OpenTelemetryTracerSubscriberTest::getExportedHeuristicIds` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `array{}|list<mixed>` is less specific than the declared return type `list<string>` for function `Infection\Tests\Telemetry\Subscriber\OpenTelemetryTracerSubscriberTest::getExportedMutationIds` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Telemetry\Subscriber\OpenTelemetryTracerSubscriberTest::test_it_exports_the_started_and_finished_spans_with_their_parent_relationships`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Coverage/CoveredTraceProviderTest.php"
 code = "impossible-type-comparison"
 message = 'Impossible type assertion: `$traces` of type `array<array-key, Infection\TestFramework\Tracing\Trace\Trace>` can never be `list{int(1), int(2), int(3)}`.'
