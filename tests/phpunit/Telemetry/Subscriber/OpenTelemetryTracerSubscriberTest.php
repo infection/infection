@@ -993,6 +993,102 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         );
     }
 
+    public function test_it_ends_open_ast_spans_on_mutation_analysis_finish(): void
+    {
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new MutationAnalysisWasFinished(),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            [
+                'infection.ast_processing.file.parsing',
+                'infection.ast_processing.file.enrichment',
+                'infection.ast_processing.file',
+                'infection.ast_processing',
+                'infection.mutation_analysis',
+                'infection.run',
+            ],
+            $this->exporter->getSpanNames(),
+        );
+        $this->assertSpanEventClasses(
+            $this->getSpanFromExporter('infection.ast_processing'),
+            AstProcessingWasStarted::class,
+            MutationAnalysisWasFinished::class,
+        );
+    }
+
+    public function test_it_ends_the_ast_processing_span_when_mutation_generation_starts_with_no_mutable_files(): void
+    {
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new ApplicationExecutionWasStarted(),
+                new MutationAnalysisWasStarted(),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
+                new MutationGenerationWasStarted(0),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
+
+        $this->assertSpanEventClasses(
+            $this->getSpanFromExporter('infection.ast_processing'),
+            AstProcessingWasStarted::class,
+            MutationGenerationWasStarted::class,
+        );
+    }
+
+    public function test_it_waits_for_all_mutable_files_before_ending_the_ast_processing_span(): void
+    {
+        $this->recordEvents(
+            $this->subscriber,
+            [
+                new SetClockAt(1000),
+                new ApplicationExecutionWasStarted(),
+                new SetClockAt(1100),
+                new MutationAnalysisWasStarted(),
+                new SetClockAt(1200),
+                new MutationGenerationWasStarted(2),
+                new SetClockAt(1300),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new SetClockAt(1400),
+                new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
+                new SetClockAt(1500),
+                new AstProcessingWasStarted('/path/to/project/src/Bar.php'),
+                new SetClockAt(1600),
+                new AstProcessingWasFinished('/path/to/project/src/Bar.php'),
+                new SetClockAt(1700),
+                new ApplicationExecutionWasFinished(),
+            ],
+        );
+
+        $this->assertSame(
+            <<<'TXT'
+                infection.run [1000, 1700]
+                  infection.mutation_analysis [1100, 1700]
+                    infection.mutation_generation [1200, 1700]
+                    infection.ast_processing [1300, 1600]
+                      infection.ast_processing.file [1300, 1400]
+                      infection.ast_processing.file [1500, 1600]
+                TXT,
+            SpanTreeRenderer::render($this->exporter->getSpans()),
+        );
+        $this->assertSpanEventClasses(
+            $this->getSpanFromExporter('infection.ast_processing'),
+            AstProcessingWasStarted::class,
+            AstProcessingWasFinished::class,
+        );
+    }
+
     public function test_it_ends_open_mutation_evaluation_child_spans_on_application_finish(): void
     {
         $mutation = MutationBuilder::withMinimalTestData()

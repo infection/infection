@@ -848,7 +848,15 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
             return;
         }
 
-        if ($this->astParsingSpans !== [] || $this->astEnrichmentSpans !== [] || $this->astProcessingFileSpans !== []) {
+        if ($this->astParsingSpans !== []) {
+            return;
+        }
+
+        if ($this->astEnrichmentSpans !== []) {
+            return;
+        }
+
+        if ($this->astProcessingFileSpans !== []) {
             return;
         }
 
