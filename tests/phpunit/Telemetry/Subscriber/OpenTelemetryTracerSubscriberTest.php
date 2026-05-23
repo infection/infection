@@ -238,11 +238,11 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new MutantEvaluationWasFinished($mutant),
                 new MutantAnalysisWasFinished($mutant),
                 new MutationEvaluationForMutationWasFinished($executionResult),
+                new MutationEvaluationWasFinished(),
                 new ReportingWasStarted(),
                 new ReporterWasStarted($reporterId, $reporterName),
                 new ReporterWasFinished($reporterId, $reporterName),
                 new ReportingWasFinished(),
-                new MutationEvaluationWasFinished(),
                 new MutationAnalysisWasFinished(),
                 new ApplicationExecutionWasFinished(),
             ],
@@ -268,10 +268,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.mutation_evaluation.mutant_analysis.evaluation',
                 'infection.mutation_evaluation.mutant_analysis',
                 'infection.mutation_evaluation.mutation',
-                'infection.reporting.reporter',
-                'infection.reporting',
                 'infection.mutation_evaluation',
                 'infection.mutation_analysis',
+                'infection.reporting.reporter',
+                'infection.reporting',
                 'infection.run',
             ],
             $this->exporter->getSpanNames(),
@@ -394,7 +394,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             $initialStaticAnalysis,
         );
         $this->assertSpanAttributesEquals(
-            self::createAttributes(MutationAnalysisWasStarted::class, MutationAnalysisWasFinished::class),
+            self::createAttributes(MutationAnalysisWasStarted::class, MutationEvaluationWasFinished::class),
             $mutationAnalysis,
         );
         $this->assertSpanAttributesEquals(
@@ -660,13 +660,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                         ->withMutantHash('mutation-B')
                         ->build(),
                 ),
+                new MutationEvaluationWasFinished(),
                 new ReportingWasStarted(),
                 new ReporterWasStarted(123, ReporterName::FILE_REPORTERS),
                 new ReporterWasFinished(123, ReporterName::FILE_REPORTERS),
                 new ReporterWasStarted(456, ReporterName::SHOW_METRICS),
                 new ReporterWasFinished(456, ReporterName::SHOW_METRICS),
                 new ReportingWasFinished(),
-                new MutationEvaluationWasFinished(),
                 new MutationAnalysisWasFinished(),
                 new ApplicationExecutionWasFinished(),
             ],
@@ -676,13 +676,13 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     infection.initial_tests [30, 40]
                     infection.initial_static_analysis [50, 60]
                   infection.source_collection [80, 90]
-                  infection.mutation_analysis [100, 650]
+                  infection.mutation_analysis [100, 590]
                     infection.mutation_generation [110, 200]
                       infection.ast_processing [120, 190]
                         infection.ast_processing.file [130, 180]
                           infection.ast_processing.file.parsing [140, 150]
                           infection.ast_processing.file.enrichment [160, 170]
-                    infection.mutation_evaluation [210, 640]
+                    infection.mutation_evaluation [210, 580]
                       infection.mutation_evaluation.mutation [220, 490]
                         infection.mutation_evaluation.mutation.heuristic_suppression [230, 280]
                           infection.mutation_evaluation.mutation.heuristic [240, 250]
@@ -701,9 +701,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                           infection.mutation_evaluation.mutant_analysis.evaluation [500, 550]
                             infection.mutation_evaluation.mutant_analysis.evaluation.process [510, 520]
                             infection.mutation_evaluation.mutant_analysis.evaluation.process [530, 540]
-                  infection.reporting [580, 630]
-                    infection.reporting.reporter [590, 600]
+                  infection.reporting [600, 650]
                     infection.reporting.reporter [610, 620]
+                    infection.reporting.reporter [630, 640]
                 TXT,
         ];
 
@@ -782,6 +782,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                         ->withMutantHash('mutation-B')
                         ->build(),
                 ),
+                new MutationEvaluationWasFinished(),
                 new ReportingWasStarted(),
                 new ReporterWasStarted(123, ReporterName::FILE_REPORTERS),
                 new ReporterWasFinished(123, ReporterName::FILE_REPORTERS),
@@ -790,7 +791,6 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 new ReporterWasStarted(789, ReporterName::ADVISORY),
                 new ReporterWasFinished(789, ReporterName::ADVISORY),
                 new ReportingWasFinished(),
-                new MutationEvaluationWasFinished(),
                 new MutationAnalysisWasFinished(),
                 new ApplicationExecutionWasFinished(),
             ],
@@ -800,8 +800,8 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     infection.initial_tests [30, 40]
                     infection.initial_static_analysis [50, 60]
                   infection.source_collection [80, 90]
-                  infection.mutation_analysis [100, 770]
-                    infection.mutation_evaluation [110, 760]
+                  infection.mutation_analysis [100, 690]
+                    infection.mutation_evaluation [110, 680]
                       infection.mutation_evaluation.mutation [200, 590]
                         infection.mutation_evaluation.mutation.heuristic_suppression [210, 280]
                           infection.mutation_evaluation.mutation.heuristic [220, 230]
@@ -830,10 +830,10 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                         infection.ast_processing.file [320, 370]
                           infection.ast_processing.file.parsing [330, 340]
                           infection.ast_processing.file.enrichment [350, 360]
-                  infection.reporting [680, 750]
-                    infection.reporting.reporter [690, 700]
+                  infection.reporting [700, 770]
                     infection.reporting.reporter [710, 720]
                     infection.reporting.reporter [730, 740]
+                    infection.reporting.reporter [750, 760]
                 TXT,
         ];
     }
@@ -908,6 +908,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             [
                 'infection.mutation_evaluation.mutation',
                 'infection.mutation_evaluation',
+                'infection.mutation_analysis',
             ],
             $this->exporter->getSpanNames(),
         );
@@ -952,6 +953,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 'infection.mutation_evaluation.mutant_analysis',
                 'infection.mutation_evaluation.mutation',
                 'infection.mutation_evaluation',
+                'infection.mutation_analysis',
             ],
             $this->exporter->getSpanNames(),
         );
