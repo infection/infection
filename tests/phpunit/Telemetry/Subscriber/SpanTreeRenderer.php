@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Subscriber;
 
+use Infection\CannotBeInstantiated;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use function implode;
@@ -47,10 +48,12 @@ use function usort;
  */
 final class SpanTreeRenderer
 {
+    use CannotBeInstantiated;
+
     /**
      * @param SpanDataInterface[] $spans
      */
-    public function render(array $spans): string
+    public static function render(array $spans): string
     {
         $childrenByParentId = [];
 
@@ -61,10 +64,10 @@ final class SpanTreeRenderer
         $lines = [];
         $rootSpans = $childrenByParentId[SpanContextValidator::INVALID_SPAN] ?? [];
 
-        $this->sortSpans($rootSpans);
+        self::sortSpans($rootSpans);
 
         foreach ($rootSpans as $rootSpan) {
-            $this->renderSpanTreeNode($rootSpan, $childrenByParentId, $lines);
+            self::renderSpanTreeNode($rootSpan, $childrenByParentId, $lines);
         }
 
         return implode("\n", $lines);
@@ -74,7 +77,7 @@ final class SpanTreeRenderer
      * @param SpanDataInterface $childrenByParentId
      * @param list<string> $lines
      */
-    private function renderSpanTreeNode(
+    private static function renderSpanTreeNode(
         SpanDataInterface $span,
         array $childrenByParentId,
         array &$lines,
@@ -90,17 +93,17 @@ final class SpanTreeRenderer
 
         $children = $childrenByParentId[$span->getSpanId()] ?? [];
 
-        $this->sortSpans($children);
+        self::sortSpans($children);
 
         foreach ($children as $child) {
-            $this->renderSpanTreeNode($child, $childrenByParentId, $lines, $depth + 1);
+            self::renderSpanTreeNode($child, $childrenByParentId, $lines, $depth + 1);
         }
     }
 
     /**
      * @param list<SpanDataInterface> $spans
      */
-    private function sortSpans(array &$spans): void
+    private static function sortSpans(array &$spans): void
     {
         usort(
             $spans,

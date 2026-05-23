@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\Subscriber;
 
-use;
-use;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
@@ -94,9 +92,11 @@ use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Mutant\DummyMutantExecutionResultFactory;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
+use Infection\Tests\Process\Runner\NullProcessRunner;
 use Infection\Tests\Reporter\FakeReporter;
 use Infection\Tests\Telemetry\Clock\FakeClock;
 use Infection\Tests\Telemetry\Clock\IncrementalClock;
@@ -448,29 +448,63 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
      */
     #[DataProvider('spanTreeScenarioProvider')]
     public function test_it_can_describe_the_exported_span_tree_with_timings(
-        array $events,
-        string $expectedSpanTree,
+        array  $events,
+        string $expected,
     ): void
     {
-        $this->subscriber = $this->createSubscriber(
-            new IncrementalClock(10, 10),
+        $this->recordEvents(
+            $this->createSubscriber(
+                new IncrementalClock(10, 10),
+            ),
+            $events,
         );
 
+        $actual = SpanTreeRenderer::render($this->exporter->getSpans());
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param list<object> $events
+     */
+    private function recordEvents(
+        OpenTelemetryTracerSubscriber $subscriber,
+        array  $events,
+    ): void
+    {
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber($this->subscriber);
+        $dispatcher->addSubscriber($subscriber);
 
         foreach ($events as $event) {
             $dispatcher->dispatch($event);
         }
-
-        $this->assertSame(
-            $expectedSpanTree,
-            (new SpanTreeRenderer())->render($this->exporter->getSpans()),
-        );
     }
 
     public static function spanTreeScenarioProvider(): iterable
     {
+        $mutationA = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-A')
+            ->build();
+        $mutationB = MutationBuilder::withMinimalTestData()
+            ->withHash('mutation-B')
+            ->build();
+        $mutantA = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutationA)
+            ->build();
+        $mutantB = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutationB)
+            ->build();
+
+        $mutationAProcess1 = self::createFinishedMutantProcess($mutantA);
+        $mutationAProcess2 = self::createFinishedMutantProcess($mutantA);
+        $mutationBProcess1 = self::createFinishedMutantProcess($mutantB);
+        $mutationBProcess2 = self::createFinishedMutantProcess($mutantB);
+
+        $noProgressMutationAProcess1 = self::createFinishedMutantProcess($mutantA);
+        $noProgressMutationAProcess2 = self::createFinishedMutantProcess($mutantA);
+        $noProgressMutationBProcess1 = self::createFinishedMutantProcess($mutantB);
+        $noProgressMutationBProcess2 = self::createFinishedMutantProcess($mutantB);
+
         yield 'run with artefact collection' => [
             [
                 new ApplicationExecutionWasStarted(),
@@ -483,6 +517,257 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
               infection.artefact_collection [20, 30]
             TXT,
         ];
+
+        yield 'complete cycle with two basic mutations' => [
+            [
+                new ApplicationExecutionWasStarted(),
+                new ArtefactCollectionWasStarted(),
+                new InitialTestSuiteWasStarted(),
+                new InitialTestSuiteWasFinished('Test suite output'),
+                new InitialStaticAnalysisRunWasStarted(),
+                new InitialStaticAnalysisRunWasFinished('Static analysis output'),
+                new ArtefactCollectionWasFinished(),
+                new SourceCollectionWasStarted(),
+                new SourceCollectionWasFinished(1),
+                new MutationAnalysisWasStarted(),
+                new MutationGenerationWasStarted(1),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasFinished('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'),
+                new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
+                new MutationGenerationWasFinished(2, 1),
+                new MutationEvaluationWasStarted(2, new NullProcessRunner()),
+                new MutationEvaluationForMutationWasStarted($mutationA),
+                new HeuristicSuppressionWasStarted($mutationA),
+                new HeuristicWasStarted($mutationA, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutationA, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutationA, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasFinished($mutationA, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicSuppressionWasFinished($mutationA),
+                new MutantAnalysisWasStarted($mutantA),
+                new MutantMaterialisationWasStarted($mutantA),
+                new MutantMaterialisationWasFinished($mutantA),
+                new MutationEvaluationForMutationWasStarted($mutationB),
+                new HeuristicSuppressionWasStarted($mutationB),
+                new HeuristicWasStarted($mutationB, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutationB, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutationB, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasFinished($mutationB, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicSuppressionWasFinished($mutationB),
+                new MutantAnalysisWasStarted($mutantB),
+                new MutantMaterialisationWasStarted($mutantB),
+                new MutantMaterialisationWasFinished($mutantB),
+                new MutantEvaluationWasStarted($mutantA),
+                new MutantProcessExecutionWasStarted($mutationAProcess1, 1),
+                new MutantProcessExecutionWasFinished($mutationAProcess1),
+                new MutantProcessExecutionWasStarted($mutationAProcess2, 2),
+                new MutantProcessExecutionWasFinished($mutationAProcess2),
+                new MutantEvaluationWasFinished($mutantA),
+                new MutantAnalysisWasFinished($mutantA),
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()
+                        ->withMutantHash('mutation-A')
+                        ->build(),
+                ),
+                new MutantEvaluationWasStarted($mutantB),
+                new MutantProcessExecutionWasStarted($mutationBProcess1, 1),
+                new MutantProcessExecutionWasFinished($mutationBProcess1),
+                new MutantProcessExecutionWasStarted($mutationBProcess2, 2),
+                new MutantProcessExecutionWasFinished($mutationBProcess2),
+                new MutantEvaluationWasFinished($mutantB),
+                new MutantAnalysisWasFinished($mutantB),
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()
+                        ->withMutantHash('mutation-B')
+                        ->build(),
+                ),
+                new ReportingWasStarted(),
+                new ReporterWasStarted(123, ReporterName::FILE_REPORTERS),
+                new ReporterWasFinished(123, ReporterName::FILE_REPORTERS),
+                new ReporterWasStarted(456, ReporterName::SHOW_METRICS),
+                new ReporterWasFinished(456, ReporterName::SHOW_METRICS),
+                new ReportingWasFinished(),
+                new MutationEvaluationWasFinished(),
+                new MutationAnalysisWasFinished(),
+                new ApplicationExecutionWasFinished(),
+            ],
+            <<<'TXT'
+            infection.run [10, 660]
+              infection.artefact_collection [20, 70]
+                infection.initial_tests [30, 40]
+                infection.initial_static_analysis [50, 60]
+              infection.source_collection [80, 90]
+              infection.mutation_analysis [100, 650]
+                infection.mutation_generation [110, 190]
+                infection.ast_processing [120, 640]
+                  infection.ast_processing.file [130, 180]
+                    infection.ast_processing.file.parsing [140, 150]
+                    infection.ast_processing.file.enrichment [160, 170]
+                infection.mutation_evaluation [200, 630]
+                  infection.mutation_evaluation.mutation [210, 480]
+                    infection.mutation_evaluation.mutation.heuristic_suppression [220, 270]
+                      infection.mutation_evaluation.mutation.heuristic [230, 240]
+                      infection.mutation_evaluation.mutation.heuristic [250, 260]
+                    infection.mutation_evaluation.mutant_analysis [280, 470]
+                      infection.mutation_evaluation.mutant_analysis.materialisation [290, 300]
+                      infection.mutation_evaluation.mutant_analysis.evaluation [410, 460]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [420, 430]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [440, 450]
+                  infection.mutation_evaluation.mutation [310, 560]
+                    infection.mutation_evaluation.mutation.heuristic_suppression [320, 370]
+                      infection.mutation_evaluation.mutation.heuristic [330, 340]
+                      infection.mutation_evaluation.mutation.heuristic [350, 360]
+                    infection.mutation_evaluation.mutant_analysis [380, 550]
+                      infection.mutation_evaluation.mutant_analysis.materialisation [390, 400]
+                      infection.mutation_evaluation.mutant_analysis.evaluation [490, 540]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [500, 510]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
+              infection.reporting [570, 620]
+                infection.reporting.reporter [580, 590]
+                infection.reporting.reporter [600, 610]
+            TXT,
+        ];
+
+        yield 'complete no-progress cycle with two basic mutations' => [
+            [
+                new ApplicationExecutionWasStarted(),
+                new ArtefactCollectionWasStarted(),
+                new InitialTestSuiteWasStarted(),
+                new InitialTestSuiteWasFinished('Test suite output'),
+                new InitialStaticAnalysisRunWasStarted(),
+                new InitialStaticAnalysisRunWasFinished('Static analysis output'),
+                new ArtefactCollectionWasFinished(),
+                new SourceCollectionWasStarted(),
+                new SourceCollectionWasFinished(2),
+                new MutationAnalysisWasStarted(),
+                new MutationEvaluationWasStarted(2, new NullProcessRunner()),
+                new MutationGenerationWasStarted(2),
+                new AstProcessingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasStarted('/path/to/project/src/Foo.php'),
+                new AstParsingWasFinished('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Foo.php'),
+                new AstEnrichmentWasFinished('/path/to/project/src/Foo.php'),
+                new AstProcessingWasFinished('/path/to/project/src/Foo.php'),
+                new MutationEvaluationForMutationWasStarted($mutationA),
+                new HeuristicSuppressionWasStarted($mutationA),
+                new HeuristicWasStarted($mutationA, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutationA, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutationA, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasFinished($mutationA, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasStarted($mutationA, HeuristicName::TAKING_TOO_LONG),
+                new HeuristicWasFinished($mutationA, HeuristicName::TAKING_TOO_LONG),
+                new HeuristicSuppressionWasFinished($mutationA),
+                new MutantAnalysisWasStarted($mutantA),
+                new MutantMaterialisationWasStarted($mutantA),
+                new MutantMaterialisationWasFinished($mutantA),
+                new AstProcessingWasStarted('/path/to/project/src/Bar.php'),
+                new AstParsingWasStarted('/path/to/project/src/Bar.php'),
+                new AstParsingWasFinished('/path/to/project/src/Bar.php'),
+                new AstEnrichmentWasStarted('/path/to/project/src/Bar.php'),
+                new AstEnrichmentWasFinished('/path/to/project/src/Bar.php'),
+                new AstProcessingWasFinished('/path/to/project/src/Bar.php'),
+                new MutationEvaluationForMutationWasStarted($mutationB),
+                new HeuristicSuppressionWasStarted($mutationB),
+                new HeuristicWasStarted($mutationB, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasFinished($mutationB, HeuristicName::IGNORED_BY_REGEX),
+                new HeuristicWasStarted($mutationB, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasFinished($mutationB, HeuristicName::UNCOVERED_BY_TESTS),
+                new HeuristicWasStarted($mutationB, HeuristicName::TAKING_TOO_LONG),
+                new HeuristicWasFinished($mutationB, HeuristicName::TAKING_TOO_LONG),
+                new HeuristicSuppressionWasFinished($mutationB),
+                new MutantAnalysisWasStarted($mutantB),
+                new MutantMaterialisationWasStarted($mutantB),
+                new MutantMaterialisationWasFinished($mutantB),
+                new MutationGenerationWasFinished(2, 2),
+                new MutantEvaluationWasStarted($mutantA),
+                new MutantProcessExecutionWasStarted($noProgressMutationAProcess1, 1),
+                new MutantProcessExecutionWasFinished($noProgressMutationAProcess1),
+                new MutantProcessExecutionWasStarted($noProgressMutationAProcess2, 2),
+                new MutantProcessExecutionWasFinished($noProgressMutationAProcess2),
+                new MutantEvaluationWasFinished($mutantA),
+                new MutantAnalysisWasFinished($mutantA),
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()
+                        ->withMutantHash('mutation-A')
+                        ->build(),
+                ),
+                new MutantEvaluationWasStarted($mutantB),
+                new MutantProcessExecutionWasStarted($noProgressMutationBProcess1, 1),
+                new MutantProcessExecutionWasFinished($noProgressMutationBProcess1),
+                new MutantProcessExecutionWasStarted($noProgressMutationBProcess2, 2),
+                new MutantProcessExecutionWasFinished($noProgressMutationBProcess2),
+                new MutantEvaluationWasFinished($mutantB),
+                new MutantAnalysisWasFinished($mutantB),
+                new MutationEvaluationForMutationWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()
+                        ->withMutantHash('mutation-B')
+                        ->build(),
+                ),
+                new ReportingWasStarted(),
+                new ReporterWasStarted(123, ReporterName::FILE_REPORTERS),
+                new ReporterWasFinished(123, ReporterName::FILE_REPORTERS),
+                new ReporterWasStarted(456, ReporterName::SHOW_METRICS),
+                new ReporterWasFinished(456, ReporterName::SHOW_METRICS),
+                new ReporterWasStarted(789, ReporterName::ADVISORY),
+                new ReporterWasFinished(789, ReporterName::ADVISORY),
+                new ReportingWasFinished(),
+                new MutationEvaluationWasFinished(),
+                new MutationAnalysisWasFinished(),
+                new ApplicationExecutionWasFinished(),
+            ],
+            <<<'TXT'
+            infection.run [10, 780]
+              infection.artefact_collection [20, 70]
+                infection.initial_tests [30, 40]
+                infection.initial_static_analysis [50, 60]
+              infection.source_collection [80, 90]
+              infection.mutation_analysis [100, 770]
+                infection.mutation_evaluation [110, 750]
+                  infection.mutation_evaluation.mutation [200, 580]
+                    infection.mutation_evaluation.mutation.heuristic_suppression [210, 280]
+                      infection.mutation_evaluation.mutation.heuristic [220, 230]
+                      infection.mutation_evaluation.mutation.heuristic [240, 250]
+                      infection.mutation_evaluation.mutation.heuristic [260, 270]
+                    infection.mutation_evaluation.mutant_analysis [290, 570]
+                      infection.mutation_evaluation.mutant_analysis.materialisation [300, 310]
+                      infection.mutation_evaluation.mutant_analysis.evaluation [510, 560]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [540, 550]
+                  infection.mutation_evaluation.mutation [380, 660]
+                    infection.mutation_evaluation.mutation.heuristic_suppression [390, 460]
+                      infection.mutation_evaluation.mutation.heuristic [400, 410]
+                      infection.mutation_evaluation.mutation.heuristic [420, 430]
+                      infection.mutation_evaluation.mutation.heuristic [440, 450]
+                    infection.mutation_evaluation.mutant_analysis [470, 650]
+                      infection.mutation_evaluation.mutant_analysis.materialisation [480, 490]
+                      infection.mutation_evaluation.mutant_analysis.evaluation [590, 640]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [600, 610]
+                        infection.mutation_evaluation.mutant_analysis.evaluation.process [620, 630]
+                infection.mutation_generation [120, 500]
+                infection.ast_processing [130, 760]
+                  infection.ast_processing.file [140, 190]
+                    infection.ast_processing.file.parsing [150, 160]
+                    infection.ast_processing.file.enrichment [170, 180]
+                  infection.ast_processing.file [320, 370]
+                    infection.ast_processing.file.parsing [330, 340]
+                    infection.ast_processing.file.enrichment [350, 360]
+              infection.reporting [670, 740]
+                infection.reporting.reporter [680, 690]
+                infection.reporting.reporter [700, 710]
+                infection.reporting.reporter [720, 730]
+            TXT,
+        ];
+    }
+
+    private static function createFinishedMutantProcess(Mutant $mutant): MutantProcess
+    {
+        return new MutantProcess(
+            new Process(['php', '-v']),
+            $mutant,
+            new DummyMutantExecutionResultFactory(),
+        );
     }
 
     public function test_it_ends_open_spans_on_application_finish_even_if_the_finish_events_were_not_emitted(): void

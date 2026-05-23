@@ -118,8 +118,7 @@ final class SpanTreeRendererTest extends TestCase
                   infection.ast_processing.file.parsing [70, 80]
             TXT;
 
-        $renderer = new SpanTreeRenderer();
-        $actual = $renderer->render($this->exporter->getSpans());
+        $actual = SpanTreeRenderer::render($this->exporter->getSpans());
 
         $this->assertSame($expected, $actual);
     }
