@@ -96,6 +96,9 @@ final class GitChangedFilesCommandTest extends TestCase
             ->with($expectedBase)
             ->willReturn(self::REFERENCE);
         $gitMock
+            ->method('getProjectDirectory')
+            ->willReturn('/path/to/project');
+        $gitMock
             ->method('getChangedFileRelativePaths')
             ->with($expectedFilter, self::REFERENCE, ['src', 'lib'])
             ->willReturn($files);

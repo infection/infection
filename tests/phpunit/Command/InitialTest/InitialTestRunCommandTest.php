@@ -200,6 +200,9 @@ final class InitialTestRunCommandTest extends TestCase
     ): CommandTester {
         $gitMock = $this->createMock(Git::class);
         $gitMock
+            ->method('getProjectDirectory')
+            ->willReturn('/path/to/project');
+        $gitMock
             ->method('getBaseReference')
             ->willReturn('<refinedGitReference>');
 
