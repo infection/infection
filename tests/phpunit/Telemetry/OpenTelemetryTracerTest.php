@@ -37,11 +37,11 @@ namespace Infection\Tests\Telemetry;
 
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\SpanHandle;
+use Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,7 +54,7 @@ use function sprintf;
 #[CoversClass(SpanHandle::class)]
 final class OpenTelemetryTracerTest extends TestCase
 {
-    private InMemoryExporter $exporter;
+    private TestExporter $exporter;
 
     private TracerProvider $tracerProvider;
 
@@ -62,7 +62,7 @@ final class OpenTelemetryTracerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->exporter = new InMemoryExporter();
+        $this->exporter = new TestExporter();
         $this->tracerProvider = new TracerProvider(
             new SimpleSpanProcessor($this->exporter),
         );
