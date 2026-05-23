@@ -163,6 +163,16 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
     /** @var array<string, SpanHandle> */
     private array $astEnrichmentSpans = [];
 
+    /**
+     * @var positive-int|0|null
+     */
+    private ?int $astProcessingFileCount = null;
+
+    /**
+     * @var positive-int|0
+     */
+    private int $processedAstFileCount = 0;
+
     /** @var array<string, SpanHandle> */
     private array $mutationEvaluationSpans = [];
 
@@ -262,7 +272,8 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->endAstSpans($event);
+        $this->astProcessingFileCount = $event->mutableFilesCount;
+        $this->endAstProcessingSpanIfComplete($event);
 
         $this->mutationGenerationSpan = $this->startChild(
             'infection.mutation_generation',
@@ -337,6 +348,9 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         unset($this->astProcessingFileSpans[$event->sourceFilePath]);
 
         $this->end($span, event: $event);
+
+        ++$this->processedAstFileCount;
+        $this->endAstProcessingSpanIfComplete($event);
     }
 
     public function onAstParsingWasStarted(AstParsingWasStarted $event): void
@@ -820,6 +834,34 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->astEnrichmentSpans = [];
         $this->astProcessingFileSpans = [];
         $this->astProcessingSpan = null;
+        $this->astProcessingFileCount = null;
+        $this->processedAstFileCount = 0;
+    }
+
+    private function endAstProcessingSpanIfComplete(object $event): void
+    {
+        if (
+            $this->astProcessingFileCount === null
+            || $this->processedAstFileCount < $this->astProcessingFileCount
+            || $this->hasOpenAstProcessingSpans()
+        ) {
+            return;
+        }
+
+        $this->end($this->astProcessingSpan, event: $event);
+        $this->astProcessingSpan = null;
+        $this->astProcessingFileCount = null;
+        $this->processedAstFileCount = 0;
+    }
+
+    private function hasOpenAstProcessingSpans(): bool
+    {
+        return $this->astParsingSpans !== []
+            || (
+                $this->astEnrichmentSpans !== []
+                    ? true
+                    : $this->astProcessingFileSpans !== []
+            );
     }
 
     private function endMutationEvaluationChildSpans(string $hash, object $event): void
