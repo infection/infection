@@ -223,6 +223,21 @@ parameters:
             identifier: offsetAccess.notFound
             count: 6
             path: ../src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php
+
+        # Legitimate report. We have a fairly simple usage of this class so if it proves
+        # problematic we can always create our own clock instead at any time.
+        -
+            message: '#TestClock#'
+            identifier: property.internalClass
+            path: ../tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php
+        -
+            message: '#TestClock#'
+            identifier: method.internalClass
+            path: ../tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php
+        -
+            message: '#TestClock#'
+            identifier: new.internalClass
+            path: ../tests/phpunit/Telemetry/Subscriber/OpenTelemetryTracerSubscriberTest.php
     level: 8
     paths:
         - ../src

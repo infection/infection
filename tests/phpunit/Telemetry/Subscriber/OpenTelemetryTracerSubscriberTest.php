@@ -97,8 +97,9 @@ use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Reporter\FakeReporter;
+use Infection\Tests\Telemetry\FakeClock;
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
@@ -127,10 +128,14 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
     private MetricsCalculator $metricsCalculator;
 
+    private TestClock $clock;
+
     protected function setUp(): void
     {
         $this->exporter = new InMemoryExporter();
         $this->tracerProvider = new TracerProvider(new SimpleSpanProcessor($this->exporter));
+        $this->clock = new TestClock(1_000_000_000);
+        Clock::setDefault(new FakeClock());
 
         $configuration = ConfigurationBuilder::withMinimalTestData()
             ->withProjectDirectory('/path/to/project')
@@ -151,6 +156,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
             new OpenTelemetryTracer(
                 $this->tracerProvider->getTracer('infection'),
                 $this->tracerProvider,
+                $this->clock,
             ),
             new RunSpanAttributesProvider(
                 $configuration,
@@ -214,7 +220,9 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutantAnalysisWasStarted(new MutantAnalysisWasStarted($mutant));
         $this->subscriber->onMutantMaterialisationWasStarted(new MutantMaterialisationWasStarted($mutant));
         $this->subscriber->onMutantMaterialisationWasFinished(new MutantMaterialisationWasFinished($mutant));
+        $this->clock->setTime(2_000_000_000);
         $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutant));
+        $this->clock->setTime(2_000_000_010);
         $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process0, 1));
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($process0));
         $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($process1, 2));
@@ -488,24 +496,6 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
     public function test_it_calculates_the_queue_wait_duration_for_each_mutant_evaluation(): void
     {
-        $clock = new class(1_000_000_000) implements ClockInterface {
-            public function __construct(
-                private int $time,
-            ) {
-            }
-
-            public function setTime(int $time): void
-            {
-                $this->time = $time;
-            }
-
-            public function now(): int
-            {
-                return $this->time;
-            }
-        };
-        Clock::setDefault($clock);
-
         $mutationA = MutationBuilder::withMinimalTestData()
             ->withHash('mutation-A')
             ->build();
@@ -527,30 +517,30 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
         $this->subscriber->onMutationAnalysisWasStarted(new MutationAnalysisWasStarted());
         $this->subscriber->onMutationEvaluationWasStarted(new MutationEvaluationWasStarted(2, $this->createStub(ProcessRunner::class)));
 
-        $clock->setTime(2_000_000_000);
+        $this->clock->setTime(2_000_000_000);
         $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantA));
-        $clock->setTime(2_000_000_010);
+        $this->clock->setTime(2_000_000_010);
         $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess0, 1));
-        $clock->setTime(2_000_000_030);
+        $this->clock->setTime(2_000_000_030);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess0));
-        $clock->setTime(2_000_000_070);
+        $this->clock->setTime(2_000_000_070);
         $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationAProcess1, 1));
-        $clock->setTime(2_000_000_090);
+        $this->clock->setTime(2_000_000_090);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationAProcess1));
-        $clock->setTime(2_000_000_110);
+        $this->clock->setTime(2_000_000_110);
         $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutantA));
 
-        $clock->setTime(3_000_000_000);
+        $this->clock->setTime(3_000_000_000);
         $this->subscriber->onMutantEvaluationWasStarted(new MutantEvaluationWasStarted($mutantB));
-        $clock->setTime(3_000_000_025);
+        $this->clock->setTime(3_000_000_025);
         $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess0, 2));
-        $clock->setTime(3_000_000_055);
+        $this->clock->setTime(3_000_000_055);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess0));
-        $clock->setTime(3_000_000_115);
+        $this->clock->setTime(3_000_000_115);
         $this->subscriber->onMutantProcessExecutionWasStarted(new MutantProcessExecutionWasStarted($mutationBProcess1, 2));
-        $clock->setTime(3_000_000_145);
+        $this->clock->setTime(3_000_000_145);
         $this->subscriber->onMutantProcessExecutionWasFinished(new MutantProcessExecutionWasFinished($mutationBProcess1));
-        $clock->setTime(3_000_000_200);
+        $this->clock->setTime(3_000_000_200);
         $this->subscriber->onMutantEvaluationWasFinished(new MutantEvaluationWasFinished($mutantB));
 
         $this->assertSame(

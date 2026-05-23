@@ -37,6 +37,7 @@ namespace Infection\Tests\Telemetry;
 
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\SpanHandle;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -68,6 +69,7 @@ final class OpenTelemetryTracerTest extends TestCase
         $this->tracer = new OpenTelemetryTracer(
             $this->tracerProvider->getTracer('infection'),
             $this->tracerProvider,
+            Clock::getDefault(),
         );
     }
 
@@ -125,6 +127,7 @@ final class OpenTelemetryTracerTest extends TestCase
         $tracer = new OpenTelemetryTracer(
             NoopTracer::getInstance(),
             null,
+            Clock::getDefault(),
         );
 
         $tracer->shutdown();
