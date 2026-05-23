@@ -77,7 +77,7 @@ class SchemaConfigurationFactory
             minCoveredMsi: $rawConfig->minCoveredMsi ?? null,
             timeoutsAsEscaped: $rawConfig->timeoutsAsEscaped ?? null,
             maxTimeouts: $rawConfig->maxTimeouts ?? null,
-            mutators: (array)($rawConfig->mutators ?? []),
+            mutators: (array) ($rawConfig->mutators ?? []),
             testFramework: self::getTestFramework($rawConfig),
             bootstrap: self::normalizeString($rawConfig->bootstrap ?? null),
             initialTestsPhpOptions: self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),

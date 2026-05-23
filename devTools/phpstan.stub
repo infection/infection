@@ -12,6 +12,23 @@ namespace PhpParser\Node {
 namespace OpenTelemetry\API\Trace {
     use Throwable;
 
+    interface SpanContextInterface
+    {
+    }
+
+    interface SpanBuilderInterface
+    {
+        /**
+         * @param iterable<non-empty-string, bool|int|float|string|array<array-key, bool|int|float|string>|null> $attributes
+         */
+        public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanBuilderInterface;
+
+        /**
+         * @param iterable<non-empty-string, bool|int|float|string|array<array-key, bool|int|float|string>|null> $attributes
+         */
+        public function setAttributes(iterable $attributes): SpanBuilderInterface;
+    }
+
     interface SpanInterface
     {
         /**
