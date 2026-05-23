@@ -840,23 +840,13 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     private function endAstProcessingSpanIfComplete(object $event): void
     {
-        if ($this->astProcessingFileCount === null) {
-            return;
-        }
-
-        if ($this->processedAstFileCount < $this->astProcessingFileCount) {
-            return;
-        }
-
-        if ($this->astParsingSpans !== []) {
-            return;
-        }
-
-        if ($this->astEnrichmentSpans !== []) {
-            return;
-        }
-
-        if ($this->astProcessingFileSpans !== []) {
+        if (
+            $this->astProcessingFileCount === null
+            || $this->processedAstFileCount < $this->astProcessingFileCount
+            || $this->astParsingSpans !== []
+            || $this->astEnrichmentSpans !== []
+            || $this->astProcessingFileSpans !== []
+        ) {
             return;
         }
 
