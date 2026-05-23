@@ -427,12 +427,12 @@ final class Container extends DIContainer
                     $container->get(MutationGenerationLoggerSubscriber::class),
                     $container->get(MutationTestingResultsCollectorSubscriber::class),
                     $container->get(MutationAnalysisLoggerSubscriber::class),
+                    $container->get(OpenTelemetryTracerSubscriberFactory::class),
                     $container->get(ReportAfterMutationEvaluationFinishedSubscriber::class),
                     $container->get(PerformanceLoggerSubscriber::class),
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->get(StopInfectionOnSigintSignalSubscriber::class),
                     $container->get(DispatchPcntlSignalSubscriber::class),
-                    $container->get(OpenTelemetryTracerSubscriberFactory::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {

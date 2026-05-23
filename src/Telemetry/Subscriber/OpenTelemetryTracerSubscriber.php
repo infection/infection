@@ -317,8 +317,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->mutationEvaluationSpans = [];
         $this->end($this->mutationEvaluationSpan, event: $event);
         $this->mutationEvaluationSpan = null;
-        $this->end($this->mutationAnalysisSpan, event: $event);
-        $this->mutationAnalysisSpan = null;
+        $this->endMutationAnalysisSpan($event);
     }
 
     public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
@@ -655,6 +654,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->mutationEvaluationSpans = [];
         $this->end($this->mutationEvaluationSpan, event: $event);
         $this->mutationEvaluationSpan = null;
+        $this->endMutationAnalysisSpan($event);
     }
 
     public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
@@ -848,6 +848,16 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->astProcessingSpan = null;
         $this->astProcessingFileCount = null;
         $this->processedAstFileCount = 0;
+    }
+
+    private function endMutationAnalysisSpan(object $event): void
+    {
+        if ($this->mutationGenerationSpan !== null || $this->astProcessingSpan !== null) {
+            return;
+        }
+
+        $this->end($this->mutationAnalysisSpan, event: $event);
+        $this->mutationAnalysisSpan = null;
     }
 
     private function endAstProcessingSpanIfComplete(object $event): void
