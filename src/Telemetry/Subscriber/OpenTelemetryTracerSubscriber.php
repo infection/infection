@@ -843,9 +843,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         if (
             $this->astProcessingFileCount === null
             || $this->processedAstFileCount < $this->astProcessingFileCount
-            || $this->astParsingSpans !== []
-            || $this->astEnrichmentSpans !== []
-            || $this->astProcessingFileSpans !== []
+            || $this->hasOpenAstProcessingSpans()
         ) {
             return;
         }
@@ -854,6 +852,16 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
         $this->astProcessingSpan = null;
         $this->astProcessingFileCount = null;
         $this->processedAstFileCount = 0;
+    }
+
+    private function hasOpenAstProcessingSpans(): bool
+    {
+        return $this->astParsingSpans !== []
+            || (
+                $this->astEnrichmentSpans !== []
+                    ? true
+                    : $this->astProcessingFileSpans !== []
+            );
     }
 
     private function endMutationEvaluationChildSpans(string $hash, object $event): void
