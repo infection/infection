@@ -68,6 +68,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
             ->withGitSha('0123456789abcdef')
             ->withTimeoutsAsEscaped(true)
+            ->withNoProgress(true)
             ->build();
 
         $infectionVersionMock = $this->createMock(InfectionVersion::class);
@@ -103,6 +104,7 @@ final class RunSpanAttributesProviderTest extends TestCase
             'vcs.ref.head.revision' => '0123456789abcdef',
             'infection.thread.count' => 8,
             'infection.run.source_filtered' => false,
+            'infection.run.progress_enabled' => false,
             'infection.timeouts_as_escaped' => true,
             'infection.initial_tests.skipped' => true,
             'infection.initial_static_analysis.skipped' => false,
