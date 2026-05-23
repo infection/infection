@@ -677,33 +677,33 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     infection.initial_static_analysis [50, 60]
                   infection.source_collection [80, 90]
                   infection.mutation_analysis [100, 650]
-                    infection.mutation_generation [110, 190]
-                    infection.ast_processing [120, 640]
+                    infection.mutation_generation [110, 200]
+                    infection.ast_processing [120, 190]
                       infection.ast_processing.file [130, 180]
                         infection.ast_processing.file.parsing [140, 150]
                         infection.ast_processing.file.enrichment [160, 170]
-                    infection.mutation_evaluation [200, 630]
-                      infection.mutation_evaluation.mutation [210, 480]
-                        infection.mutation_evaluation.mutation.heuristic_suppression [220, 270]
-                          infection.mutation_evaluation.mutation.heuristic [230, 240]
-                          infection.mutation_evaluation.mutation.heuristic [250, 260]
-                        infection.mutation_evaluation.mutant_analysis [280, 470]
-                          infection.mutation_evaluation.mutant_analysis.materialisation [290, 300]
-                          infection.mutation_evaluation.mutant_analysis.evaluation [410, 460]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [420, 430]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [440, 450]
-                      infection.mutation_evaluation.mutation [310, 560]
-                        infection.mutation_evaluation.mutation.heuristic_suppression [320, 370]
-                          infection.mutation_evaluation.mutation.heuristic [330, 340]
-                          infection.mutation_evaluation.mutation.heuristic [350, 360]
-                        infection.mutation_evaluation.mutant_analysis [380, 550]
-                          infection.mutation_evaluation.mutant_analysis.materialisation [390, 400]
-                          infection.mutation_evaluation.mutant_analysis.evaluation [490, 540]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [500, 510]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
-                  infection.reporting [570, 620]
-                    infection.reporting.reporter [580, 590]
-                    infection.reporting.reporter [600, 610]
+                    infection.mutation_evaluation [210, 640]
+                      infection.mutation_evaluation.mutation [220, 490]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [230, 280]
+                          infection.mutation_evaluation.mutation.heuristic [240, 250]
+                          infection.mutation_evaluation.mutation.heuristic [260, 270]
+                        infection.mutation_evaluation.mutant_analysis [290, 480]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [300, 310]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [420, 470]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [430, 440]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [450, 460]
+                      infection.mutation_evaluation.mutation [320, 570]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [330, 380]
+                          infection.mutation_evaluation.mutation.heuristic [340, 350]
+                          infection.mutation_evaluation.mutation.heuristic [360, 370]
+                        infection.mutation_evaluation.mutant_analysis [390, 560]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [400, 410]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [500, 550]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [510, 520]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [530, 540]
+                  infection.reporting [580, 630]
+                    infection.reporting.reporter [590, 600]
+                    infection.reporting.reporter [610, 620]
                 TXT,
         ];
 
@@ -801,39 +801,39 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     infection.initial_static_analysis [50, 60]
                   infection.source_collection [80, 90]
                   infection.mutation_analysis [100, 770]
-                    infection.mutation_evaluation [110, 750]
-                      infection.mutation_evaluation.mutation [200, 580]
+                    infection.mutation_evaluation [110, 760]
+                      infection.mutation_evaluation.mutation [200, 590]
                         infection.mutation_evaluation.mutation.heuristic_suppression [210, 280]
                           infection.mutation_evaluation.mutation.heuristic [220, 230]
                           infection.mutation_evaluation.mutation.heuristic [240, 250]
                           infection.mutation_evaluation.mutation.heuristic [260, 270]
-                        infection.mutation_evaluation.mutant_analysis [290, 570]
+                        infection.mutation_evaluation.mutant_analysis [290, 580]
                           infection.mutation_evaluation.mutant_analysis.materialisation [300, 310]
-                          infection.mutation_evaluation.mutant_analysis.evaluation [510, 560]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [520, 530]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [540, 550]
-                      infection.mutation_evaluation.mutation [380, 660]
-                        infection.mutation_evaluation.mutation.heuristic_suppression [390, 460]
-                          infection.mutation_evaluation.mutation.heuristic [400, 410]
-                          infection.mutation_evaluation.mutation.heuristic [420, 430]
-                          infection.mutation_evaluation.mutation.heuristic [440, 450]
-                        infection.mutation_evaluation.mutant_analysis [470, 650]
-                          infection.mutation_evaluation.mutant_analysis.materialisation [480, 490]
-                          infection.mutation_evaluation.mutant_analysis.evaluation [590, 640]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [600, 610]
-                            infection.mutation_evaluation.mutant_analysis.evaluation.process [620, 630]
-                    infection.mutation_generation [120, 500]
-                    infection.ast_processing [130, 760]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [520, 570]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [530, 540]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [550, 560]
+                      infection.mutation_evaluation.mutation [390, 670]
+                        infection.mutation_evaluation.mutation.heuristic_suppression [400, 470]
+                          infection.mutation_evaluation.mutation.heuristic [410, 420]
+                          infection.mutation_evaluation.mutation.heuristic [430, 440]
+                          infection.mutation_evaluation.mutation.heuristic [450, 460]
+                        infection.mutation_evaluation.mutant_analysis [480, 660]
+                          infection.mutation_evaluation.mutant_analysis.materialisation [490, 500]
+                          infection.mutation_evaluation.mutant_analysis.evaluation [600, 650]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [610, 620]
+                            infection.mutation_evaluation.mutant_analysis.evaluation.process [630, 640]
+                    infection.mutation_generation [120, 510]
+                    infection.ast_processing [130, 380]
                       infection.ast_processing.file [140, 190]
                         infection.ast_processing.file.parsing [150, 160]
                         infection.ast_processing.file.enrichment [170, 180]
                       infection.ast_processing.file [320, 370]
                         infection.ast_processing.file.parsing [330, 340]
                         infection.ast_processing.file.enrichment [350, 360]
-                  infection.reporting [670, 740]
-                    infection.reporting.reporter [680, 690]
-                    infection.reporting.reporter [700, 710]
-                    infection.reporting.reporter [720, 730]
+                  infection.reporting [680, 750]
+                    infection.reporting.reporter [690, 700]
+                    infection.reporting.reporter [710, 720]
+                    infection.reporting.reporter [730, 740]
                 TXT,
         ];
     }
@@ -865,14 +865,14 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
 
         $this->assertSame(
             [
-                'infection.ast_processing.file.parsing',
-                'infection.ast_processing.file.enrichment',
-                'infection.ast_processing.file',
-                'infection.ast_processing',
                 'infection.initial_tests',
                 'infection.initial_static_analysis',
                 'infection.artefact_collection',
                 'infection.source_collection',
+                'infection.ast_processing.file.parsing',
+                'infection.ast_processing.file.enrichment',
+                'infection.ast_processing.file',
+                'infection.ast_processing',
                 'infection.mutation_generation',
                 'infection.mutation_evaluation.mutation',
                 'infection.mutation_evaluation',
