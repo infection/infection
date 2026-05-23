@@ -36,9 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Container;
 
 use function array_keys;
+use function array_map;
+use function array_search;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
+use Infection\Event\Subscriber\ChainSubscriberFactory;
+use Infection\Event\Subscriber\ReportAfterMutationEvaluationFinishedSubscriber;
+use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
@@ -48,6 +53,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use ReflectionProperty;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
@@ -101,6 +107,31 @@ final class ContainerTest extends TestCase
         $container = SingletonContainer::getContainer();
 
         $container->getFileSystem();
+    }
+
+    public function test_it_registers_telemetry_before_the_reporting_trigger_subscriber(): void
+    {
+        $containerReflection = new ContainerReflection(SingletonContainer::getContainer());
+        $chainSubscriberFactory = $containerReflection->getService(ChainSubscriberFactory::class);
+        $subscriberFactoriesProperty = new ReflectionProperty(ChainSubscriberFactory::class, 'subscribersAndFactories');
+
+        $this->assertInstanceOf(ChainSubscriberFactory::class, $chainSubscriberFactory);
+
+        $subscriberFactories = $subscriberFactoriesProperty->getValue($chainSubscriberFactory);
+        $this->assertIsArray($subscriberFactories);
+
+        /** @var list<object> $subscriberFactories */
+        $subscriberFactoryClasses = array_map(
+            static fn (object $subscriberOrFactory): string => $subscriberOrFactory::class,
+            $subscriberFactories,
+        );
+
+        $telemetryPosition = array_search(OpenTelemetryTracerSubscriberFactory::class, $subscriberFactoryClasses, true);
+        $reportingPosition = array_search(ReportAfterMutationEvaluationFinishedSubscriber::class, $subscriberFactoryClasses, true);
+
+        $this->assertIsInt($telemetryPosition);
+        $this->assertIsInt($reportingPosition);
+        $this->assertLessThan($reportingPosition, $telemetryPosition);
     }
 
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
