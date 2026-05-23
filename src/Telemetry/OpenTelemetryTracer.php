@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Telemetry;
 
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
@@ -49,6 +50,7 @@ final readonly class OpenTelemetryTracer
     public function __construct(
         private TracerInterface $tracer,
         private ?TracerProviderInterface $tracerProvider,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -63,6 +65,7 @@ final readonly class OpenTelemetryTracer
                 ->spanBuilder($name)
                 ->setParent(false)
                 ->setAttributes($attributes)
+                ->setStartTimestamp($this->clock->now())
                 ->startSpan(),
         );
     }
@@ -78,6 +81,7 @@ final readonly class OpenTelemetryTracer
                 ->spanBuilder($name)
                 ->setParent($parent->getContext())
                 ->setAttributes($attributes)
+                ->setStartTimestamp($this->clock->now())
                 ->startSpan(),
         );
     }
@@ -85,13 +89,18 @@ final readonly class OpenTelemetryTracer
     /**
      * @param Attributes $attributes
      */
-    public function end(SpanHandle $span, array $attributes = []): void
-    {
+    public function end(
+        SpanHandle $span,
+        array $attributes = [],
+        ?int $endEpochInNs = null,
+    ): void {
         if ($attributes !== []) {
             $span->span->setAttributes($attributes);
         }
 
-        $span->span->end();
+        $span->span->end(
+            $endEpochInNs ?? $this->clock->now(),
+        );
     }
 
     public function shutdown(): void

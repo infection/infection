@@ -43,6 +43,7 @@ use function implode;
 use function in_array;
 use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use InvalidArgumentException;
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use RuntimeException;
 use function Safe\putenv;
@@ -91,6 +92,7 @@ final readonly class OpenTelemetryTracerFactory
         return new OpenTelemetryTracer(
             $tracerProvider->getTracer(self::TRACER_NAME),
             $tracerProvider,
+            Clock::getDefault(),
         );
     }
 
