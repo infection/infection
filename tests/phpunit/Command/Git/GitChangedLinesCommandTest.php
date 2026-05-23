@@ -93,6 +93,7 @@ final class GitChangedLinesCommandTest extends TestCase
     ): void {
         $gitMock = $this->createMock(Git::class);
         $gitMock->method('getDefaultBase')->willReturn($defaultBase);
+        $gitMock->method('getProjectDirectory')->willReturn('/path/to/project');
         $gitMock
             ->method('getBaseReference')
             ->with($expectedBase)
