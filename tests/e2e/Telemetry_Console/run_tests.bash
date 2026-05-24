@@ -61,11 +61,12 @@ assert_not_contains '"name": "infection.' var/execution-no-env-variable.stdout
 
 rm -rf var/cache-phpstan var/infection var/phpunit var/report
 
-INFECTION_TELEMETRY=true OTEL_TRACES_EXPORTER=console php $INFECTION --no-interaction --quiet --no-progress \
+INFECTION_TELEMETRY=true OTEL_TRACES_EXPORTER=console OTEL_METRICS_EXPORTER=none php $INFECTION --no-interaction --quiet --no-progress \
     1> var/execution-with-trace-exporter.stdout \
     2> var/execution-with-trace-exporter.stderr
 
 diff -u --ignore-all-space expected.stderr var/execution-with-trace-exporter.stderr
+assert_not_contains '"name": "infection.run.count"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.run"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.artefact_collection"' var/execution-with-trace-exporter.stdout
 assert_line_count 1 '"name": "infection.initial_tests"' var/execution-with-trace-exporter.stdout
@@ -125,3 +126,42 @@ assert_contains '"infection.covered_msi.value": 100' var/execution-with-trace-ex
 assert_contains '"infection.msi.threshold": 0' var/execution-with-trace-exporter.stdout
 assert_contains '"infection.covered_msi.threshold": 0' var/execution-with-trace-exporter.stdout
 assert_line_count 6 '"infection.mutation.status": "killed by tests"' var/execution-with-trace-exporter.stdout
+
+rm -rf var/cache-phpstan var/infection var/phpunit var/report
+
+INFECTION_TELEMETRY=true OTEL_TRACES_EXPORTER=none OTEL_METRICS_EXPORTER=console php $INFECTION --no-interaction --quiet --no-progress \
+    1> var/execution-with-metrics-exporter.stdout \
+    2> var/execution-with-metrics-exporter.stderr
+
+diff -u --ignore-all-space expected.stderr var/execution-with-metrics-exporter.stderr
+assert_not_contains '"name": "infection.run"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.run.count"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.run.duration"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.phase.duration"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.source_file.count"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.mutated_file.count"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.mutation.generated.count"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.mutation.count"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.mutant.process.count"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.reporter.duration"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.msi"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.covered_msi"' var/execution-with-metrics-exporter.stdout
+assert_line_count 1 '"name": "infection.mutation.coverage_rate"' var/execution-with-metrics-exporter.stdout
+assert_contains '"service.name": "infection"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.project.name": "infection\/infection"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.test_framework.name": "phpunit"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.static_analysis_tool.name": "phpstan"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.phase.name": "mutation_generation"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.mutation.status": "killed by tests"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.mutation.msi.category": "covered"' var/execution-with-metrics-exporter.stdout
+assert_contains '"infection.reporter.name": "show_mutations"' var/execution-with-metrics-exporter.stdout
+assert_contains '"unit": "{run}"' var/execution-with-metrics-exporter.stdout
+assert_contains '"unit": "{mutation}"' var/execution-with-metrics-exporter.stdout
+assert_contains '"unit": "%"' var/execution-with-metrics-exporter.stdout
+assert_contains '"value": 1' var/execution-with-metrics-exporter.stdout
+assert_contains '"value": 6' var/execution-with-metrics-exporter.stdout
+assert_contains '"sum": 2' var/execution-with-metrics-exporter.stdout
+assert_contains '"sum": 6' var/execution-with-metrics-exporter.stdout
+assert_contains '"sum": 100' var/execution-with-metrics-exporter.stdout
+assert_not_contains '"code.file.path":' var/execution-with-metrics-exporter.stdout
+assert_not_contains '"infection.mutation.id":' var/execution-with-metrics-exporter.stdout
