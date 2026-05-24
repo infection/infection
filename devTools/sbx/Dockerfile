@@ -35,6 +35,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         curl \
         wget \
     && echo 'xdebug.mode=coverage' > /etc/php/${PHP_VERSION}/cli/conf.d/xdebug.ini \
+    && echo 'memory_limit=-1' > /etc/php/${PHP_VERSION}/cli/conf.d/memory-limit.ini \
     && rm -rf /tmp/*
 
 COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
