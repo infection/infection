@@ -104,6 +104,7 @@ final class ConfigurationFactoryInputBuilder
             mutatorsInput: '',
             testFramework: null,
             testFrameworkExtraOptions: null,
+            testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             sourceFilter: null,
             threadCount: 1,
