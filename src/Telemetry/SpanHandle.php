@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry;
 
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 
 /**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ *
  * Pairs a span with its captured context so that concurrent spans (e.g. per-mutation
  * execution spans) can be independently ended and used as parents for child spans,
  * without relying on the global active-span state.
@@ -48,16 +51,18 @@ use OpenTelemetry\Context\ContextInterface;
  */
 final readonly class SpanHandle
 {
-    private ContextInterface $context;
+    public readonly ContextInterface $context;
 
+    /**
+     * @param non-empty-string $name
+     * @param Attributes $attributes
+     */
     public function __construct(
-        public SpanInterface $span,
+        public readonly SpanInterface $span,
+        public readonly string $name,
+        public readonly int $startEpochNanos,
+        public readonly array $attributes,
     ) {
         $this->context = $span->storeInContext(Context::getCurrent());
-    }
-
-    public function getContext(): ContextInterface
-    {
-        return $this->context;
     }
 }

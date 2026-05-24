@@ -41,6 +41,7 @@ use Exception;
 use function getenv;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\OpenTelemetryTracerFactory;
+use Infection\Telemetry\SDK\FailingMeterProviderFactory;
 use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use InvalidArgumentException;
@@ -57,6 +58,7 @@ use UnexpectedValueException;
 #[BackupGlobals(true)]
 #[Group('integration')]
 #[CoversClass(OpenTelemetryTracerFactory::class)]
+#[CoversClass(FailingMeterProviderFactory::class)]
 #[CoversClass(FailingTracerProviderFactory::class)]
 final class OpenTelemetryTracerFactoryTest extends TestCase
 {
@@ -139,6 +141,15 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
                 OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
             ],
             $expectNoTracer,
+        ];
+
+        yield 'traces exporter disabled and metrics exporter enabled with Infection telemetry' => [
+            [
+                Variables::OTEL_TRACES_EXPORTER => 'none',
+                Variables::OTEL_METRICS_EXPORTER => 'console',
+                OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+            ],
+            $expectTracer,
         ];
 
         yield 'traces exporter disabled case-insensitively with Infection telemetry' => [
@@ -234,13 +245,30 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
             ),
         ];
 
-        yield 'unsupported metrics exporter with Infection telemetry' => [
+        yield 'console metrics exporter with Infection telemetry' => [
             [
                 Variables::OTEL_METRICS_EXPORTER => 'console',
                 OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
             ],
+            $expectTracer,
+        ];
+
+        yield 'OTLP metrics exporter with Infection telemetry' => [
+            [
+                Variables::OTEL_METRICS_EXPORTER => 'otlp',
+                Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL => 'http/protobuf',
+                OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+            ],
+            $expectTracer,
+        ];
+
+        yield 'unsupported metrics exporter with Infection telemetry' => [
+            [
+                Variables::OTEL_METRICS_EXPORTER => 'http',
+                OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+            ],
             new InvalidArgumentException(
-                'Unsupported OpenTelemetry exporter configured via OTEL_METRICS_EXPORTER="console". Supported values: none.',
+                'Unsupported OpenTelemetry exporter configured via OTEL_METRICS_EXPORTER="http". Supported values: otlp, console, none.',
             ),
         ];
 

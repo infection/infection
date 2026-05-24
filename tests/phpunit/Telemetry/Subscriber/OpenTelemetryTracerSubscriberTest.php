@@ -90,6 +90,7 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Reporter\ReporterName;
 use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use Infection\Telemetry\OpenTelemetryMetrics;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriber;
@@ -108,6 +109,7 @@ use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -343,6 +345,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     'infection.distribution' => 'source',
                     'infection.thread.count' => 1,
                     'infection.run.source_filtered' => false,
+                    'infection.run.progress_enabled' => true,
                     'infection.timeouts_as_escaped' => false,
                     'infection.initial_tests.skipped' => false,
                     'infection.initial_static_analysis.skipped' => true,
@@ -1612,6 +1615,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 $this->guardedTracer,
                 $this->tracerProvider,
                 $clock,
+                self::createNoopMetrics(),
             ),
             new RunSpanAttributesProvider(
                 $configuration,
@@ -1842,5 +1846,15 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
     private function assertTracerProviderWasShutdown(): void
     {
         $this->assertFalse($this->tracerProvider->getTracer('infection')->isEnabled());
+    }
+
+    private static function createNoopMetrics(): OpenTelemetryMetrics
+    {
+        $meterProvider = new NoopMeterProvider();
+
+        return new OpenTelemetryMetrics(
+            $meterProvider->getMeter('infection'),
+            $meterProvider,
+        );
     }
 }

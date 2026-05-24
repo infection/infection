@@ -51,6 +51,7 @@ final readonly class OpenTelemetryTracer
         private TracerInterface $tracer,
         private ?TracerProviderInterface $tracerProvider,
         private ClockInterface $clock,
+        private OpenTelemetryMetrics $metrics,
     ) {
     }
 
@@ -60,13 +61,20 @@ final readonly class OpenTelemetryTracer
      */
     public function startRootSpan(string $name, array $attributes = []): SpanHandle
     {
+        $startEpochNanos = $this->clock->now();
+
+        $this->metrics->startRun($attributes);
+
         return new SpanHandle(
             $this->tracer
                 ->spanBuilder($name)
                 ->setParent(false)
                 ->setAttributes($attributes)
-                ->setStartTimestamp($this->clock->now())
+                ->setStartTimestamp($startEpochNanos)
                 ->startSpan(),
+            $name,
+            $startEpochNanos,
+            $attributes,
         );
     }
 
@@ -76,13 +84,18 @@ final readonly class OpenTelemetryTracer
      */
     public function startChildSpan(SpanHandle $parent, string $name, array $attributes = []): SpanHandle
     {
+        $startEpochInNs = $this->clock->now();
+
         return new SpanHandle(
             $this->tracer
                 ->spanBuilder($name)
-                ->setParent($parent->getContext())
+                ->setParent($parent->context)
                 ->setAttributes($attributes)
-                ->setStartTimestamp($this->clock->now())
+                ->setStartTimestamp($startEpochInNs)
                 ->startSpan(),
+            $name,
+            $startEpochInNs,
+            $attributes,
         );
     }
 
@@ -94,17 +107,28 @@ final readonly class OpenTelemetryTracer
         array $attributes = [],
         ?int $endEpochInNs = null,
     ): void {
+        $endEpochInNs ??= $this->clock->now();
+        $spanAttributes = [
+            ...$span->attributes,
+            ...$attributes,
+        ];
+
         if ($attributes !== []) {
             $span->span->setAttributes($attributes);
         }
 
-        $span->span->end(
-            $endEpochInNs ?? $this->clock->now(),
+        $span->span->end($endEpochInNs);
+
+        $this->metrics->recordSpanEnded(
+            $span,
+            $endEpochInNs,
+            $spanAttributes,
         );
     }
 
     public function shutdown(): void
     {
         $this->tracerProvider?->shutdown();
+        $this->metrics->shutdown();
     }
 }

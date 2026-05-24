@@ -120,6 +120,7 @@ use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\FakeSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Telemetry\SDK\FailingMeterProviderFactory;
 use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Telemetry\SpanHandle;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
@@ -251,6 +252,7 @@ final class ProjectCodeProvider
      * For example, test cases that are in a child directory.
      */
     public const array CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+        FailingMeterProviderFactory::class,
         FilterBuilder::class,
     ];
 
