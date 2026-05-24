@@ -31,8 +31,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         re2c \
         # CA bundle used by curl for HTTPS downloads
         ca-certificates \
-        # Downloads the container-structure-test and PIE PHARs during image build
+        # Downloads files during image build and sandbox usage
         curl \
+        wget \
     && echo 'xdebug.mode=coverage' > /etc/php/${PHP_VERSION}/cli/conf.d/xdebug.ini \
     && rm -rf /tmp/*
 

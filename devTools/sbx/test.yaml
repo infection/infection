@@ -49,6 +49,12 @@ commandTests:
         args: ["version"]
         exitCode: 0
 
+    -   name: "wget is executable"
+        command: "wget"
+        args: ["--version"]
+        expectedOutput: ["(?m)^GNU Wget "]
+        exitCode: 0
+
     -   name: "Container runs as agent user"
         command: "whoami"
         expectedOutput: ["(?m)^agent$"]
