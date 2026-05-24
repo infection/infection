@@ -160,6 +160,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use Infection\Telemetry\OpenTelemetryTracerFactory;
 use Infection\Telemetry\ProjectRelativePathResolver;
 use Infection\Telemetry\Subscriber\OpenTelemetryTracerSubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
@@ -421,6 +422,7 @@ final class Container extends DIContainer
             MaxTimeoutsChecker::class => static fn (self $container): MaxTimeoutsChecker => new MaxTimeoutsChecker(
                 $container->getConfiguration()->maxTimeouts,
             ),
+            OpenTelemetryTracerFactory::class => static fn () => new OpenTelemetryTracerFactory(),
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->get(InitialTestsExecutionLoggerSubscriber::class),
