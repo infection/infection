@@ -87,6 +87,7 @@
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
         "guzzlehttp/guzzle": "^7.10",
+        "open-telemetry/transport-grpc": "^1.0",
         "phpat/phpat": "^0.12.4",
         "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",

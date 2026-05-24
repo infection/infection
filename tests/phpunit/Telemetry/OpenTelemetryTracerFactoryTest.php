@@ -308,6 +308,73 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
         ];
     }
 
+    public function test_it_rejects_grpc_traces_protocol_when_the_grpc_extension_is_not_loaded(): void
+    {
+        self::setEnvVariables([
+            Variables::OTEL_TRACES_EXPORTER => 'otlp',
+            Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => 'grpc',
+            OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+        ]);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Unsupported OpenTelemetry OTLP gRPC protocol configured via OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="grpc" because the grpc PHP extension is not loaded.',
+            ),
+        );
+
+        (new OpenTelemetryTracerFactory(false))->create();
+    }
+
+    public function test_it_rejects_grpc_metrics_protocol_when_the_grpc_extension_is_not_loaded(): void
+    {
+        self::setEnvVariables([
+            Variables::OTEL_TRACES_EXPORTER => 'none',
+            Variables::OTEL_METRICS_EXPORTER => 'otlp',
+            Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL => 'grpc',
+            OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+        ]);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Unsupported OpenTelemetry OTLP gRPC protocol configured via OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="grpc" because the grpc PHP extension is not loaded.',
+            ),
+        );
+
+        (new OpenTelemetryTracerFactory(false))->create();
+    }
+
+    public function test_it_rejects_global_grpc_protocol_when_the_grpc_extension_is_not_loaded(): void
+    {
+        self::setEnvVariables([
+            Variables::OTEL_TRACES_EXPORTER => 'otlp',
+            Variables::OTEL_EXPORTER_OTLP_PROTOCOL => 'grpc',
+            OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+        ]);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Unsupported OpenTelemetry OTLP gRPC protocol configured via OTEL_EXPORTER_OTLP_PROTOCOL="grpc" because the grpc PHP extension is not loaded.',
+            ),
+        );
+
+        (new OpenTelemetryTracerFactory(false))->create();
+    }
+
+    public function test_it_allows_grpc_protocol_configuration_when_the_otlp_exporter_is_not_used(): void
+    {
+        self::setEnvVariables([
+            Variables::OTEL_TRACES_EXPORTER => 'console',
+            Variables::OTEL_EXPORTER_OTLP_PROTOCOL => 'grpc',
+            OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+        ]);
+
+        $tracer = (new OpenTelemetryTracerFactory(false))->create();
+
+        $tracer?->shutdown();
+
+        $this->assertInstanceOf(OpenTelemetryTracer::class, $tracer);
+    }
+
     public function test_it_sets_the_default_service_name_when_creating_a_tracer(): void
     {
         self::setEnvVariables([

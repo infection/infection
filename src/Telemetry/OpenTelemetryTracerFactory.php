@@ -37,6 +37,7 @@ namespace Infection\Telemetry;
 
 use const FILTER_NULL_ON_FAILURE;
 use const FILTER_VALIDATE_BOOL;
+use function extension_loaded;
 use function filter_var;
 use function getenv;
 use function implode;
@@ -70,6 +71,11 @@ final readonly class OpenTelemetryTracerFactory
      */
     private const string METER_NAME = 'infection';
 
+    public function __construct(
+        private ?bool $grpcExtensionLoaded = null,
+    ) {
+    }
+
     /**
      * @throws RuntimeException
      */
@@ -82,7 +88,7 @@ final readonly class OpenTelemetryTracerFactory
             return null;
         }
 
-        self::guardSupportedExporters();
+        $this->guardSupportedExporters();
 
         $tracingDisabled = self::isTracingDisabled();
         $metricsDisabled = self::isMetricsDisabled();
@@ -164,12 +170,42 @@ final readonly class OpenTelemetryTracerFactory
         $_ENV[Variables::OTEL_TRACES_EXPORTER] = 'console';
     }
 
-    private static function guardSupportedExporters(): void
+    private function guardSupportedExporters(): void
     {
         self::guardExporter(Variables::OTEL_TRACES_EXPORTER, ['otlp', 'console', 'none']);
         self::guardExporter(Variables::OTEL_METRICS_EXPORTER, ['otlp', 'console', 'none']);
         self::guardExporter(Variables::OTEL_LOGS_EXPORTER, ['none']);
+        $this->guardGrpcProtocol(Variables::OTEL_TRACES_EXPORTER, Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL);
+        $this->guardGrpcProtocol(Variables::OTEL_METRICS_EXPORTER, Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL);
         self::guardAutoload();
+    }
+
+    private function guardGrpcProtocol(string $exporterVariable, string $signalProtocolVariable): void
+    {
+        if (strtolower((string) getenv($exporterVariable)) !== 'otlp') {
+            return;
+        }
+
+        $protocolVariable = getenv($signalProtocolVariable) !== false
+            ? $signalProtocolVariable
+            : Variables::OTEL_EXPORTER_OTLP_PROTOCOL;
+        $protocol = getenv($protocolVariable);
+
+        if (
+            $protocol === false
+            || strtolower($protocol) !== 'grpc'
+            || $this->isGrpcExtensionLoaded()
+        ) {
+            return;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf(
+                'Unsupported OpenTelemetry OTLP gRPC protocol configured via %s="%s" because the grpc PHP extension is not loaded.',
+                $protocolVariable,
+                $protocol,
+            ),
+        );
     }
 
     /**
@@ -232,5 +268,10 @@ final readonly class OpenTelemetryTracerFactory
             && filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) === true
                 ? $value
                 : null;
+    }
+
+    private function isGrpcExtensionLoaded(): bool
+    {
+        return $this->grpcExtensionLoaded ?? extension_loaded('grpc');
     }
 }
