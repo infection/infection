@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry;
 
+use function extension_loaded;
 use const FILTER_NULL_ON_FAILURE;
 use const FILTER_VALIDATE_BOOL;
-use function extension_loaded;
 use function filter_var;
 use function getenv;
 use function implode;
