@@ -91,6 +91,14 @@ final class MutantCommandLineScenario
         return $clone;
     }
 
+    public function withExtraArgs(string $extraArgs): self
+    {
+        $clone = clone $this;
+        $clone->extraOptions = $extraArgs;
+
+        return $clone;
+    }
+
     /**
      * @param list<string> $expected
      */

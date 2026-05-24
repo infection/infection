@@ -33,52 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Option;
+namespace Infection\Tests\Command\Option;
 
-use Infection\CannotBeInstantiated;
-use Infection\Console\IO;
-use function sprintf;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
-use function trim;
+use Infection\Command\Option\TestFrameworkExtraArgsOption;
+use Infection\Tests\Command\CommandOptionTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Symfony\Component\Console\Input\StringInput;
 
-/**
- * @internal
- */
-final class TestFrameworkOptionsOption implements CommandOption
+#[CoversClass(TestFrameworkExtraArgsOption::class)]
+final class TestFrameworkExtraArgsOptionTest extends CommandOptionTestCase
 {
-    use CannotBeInstantiated;
-
-    public const string NAME = 'test-framework-options';
-
-    /**
-     * @template T of Command
-     */
-    public static function addOption(Command $command): Command
+    public static function optionProvider(): iterable
     {
-        return $command->addOption(
-            self::NAME,
+        yield 'no option' => [
+            new StringInput(''),
             null,
-            InputOption::VALUE_REQUIRED,
-            sprintf(
-                'Deprecated. Use --%s instead.',
-                TestFrameworkExtraArgsOption::NAME,
-            ),
-        );
+        ];
+
+        yield 'single value' => [
+            new StringInput('--test-framework-extra-args="tests/FooTest.php"'),
+            'tests/FooTest.php',
+        ];
+
+        yield 'multiple values' => [
+            new StringInput('--test-framework-extra-args="tests/FooTest.php --filter=\"a test\""'),
+            'tests/FooTest.php --filter="a test"',
+        ];
+
+        yield 'untrimmed value' => [
+            new StringInput('--test-framework-extra-args=" tests/FooTest.php "'),
+            'tests/FooTest.php',
+        ];
+
+        yield 'empty value' => [
+            new StringInput('--test-framework-extra-args=""'),
+            null,
+        ];
     }
 
-    /**
-     * @return non-empty-string|null
-     */
-    public static function get(IO $io): ?string
+    protected function getOptionClassName(): string
     {
-        $value = trim((string) $io->getInput()->getOption(self::NAME));
-
-        return $value === '' ? null : $value;
-    }
-
-    public static function isProvided(IO $io): bool
-    {
-        return $io->getInput()->getOption(self::NAME) !== null;
+        return TestFrameworkExtraArgsOption::class;
     }
 }

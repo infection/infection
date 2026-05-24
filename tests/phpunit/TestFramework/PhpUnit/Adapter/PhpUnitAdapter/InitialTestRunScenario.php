@@ -114,6 +114,14 @@ final class InitialTestRunScenario
         return $clone;
     }
 
+    public function withExtraArgs(string $extraArgs): self
+    {
+        $clone = clone $this;
+        $clone->extraOptions = $extraArgs;
+
+        return $clone;
+    }
+
     /**
      * @param list<string> $phpExtraArgs
      */

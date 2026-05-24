@@ -679,7 +679,12 @@
         },
         "testFrameworkOptions": {
             "type": "string",
-            "description": "Specify an additional options to pass to the test framework (e.g. enabling Verbose Mode). --test-framework-options will override this option."
+            "deprecated": true,
+            "description": "Deprecated. Use testFrameworkExtraArgs instead."
+        },
+        "testFrameworkExtraArgs": {
+            "type": "string",
+            "description": "Specify raw additional arguments to pass to Test Framework."
         }
     },
     "definitions": {

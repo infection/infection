@@ -73,4 +73,19 @@ final class RunCommandTest extends TestCase
         $result = $tester->execute(['--show-mutations' => 'abc']);
         $this->assertSame(1, $result);
     }
+
+    public function test_it_fails_when_both_test_framework_option_names_are_passed(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass both the legacy option "--test-framework-options" and "--test-framework-extra-args".');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            '--test-framework-options' => '',
+            '--test-framework-extra-args' => '',
+        ]);
+    }
 }

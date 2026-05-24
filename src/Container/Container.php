@@ -252,8 +252,6 @@ final class Container extends DIContainer
 
     public const null DEFAULT_STATIC_ANALYSIS_TOOL = null;
 
-    public const null DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
-
     public const null DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
     public const null DEFAULT_FILTER = null;
@@ -700,7 +698,8 @@ final class Container extends DIContainer
         ?int $maxTimeouts = self::DEFAULT_MAX_TIMEOUTS,
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
-        ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        ?string $testFrameworkExtraOptions = null,
+        ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
@@ -784,6 +783,7 @@ final class Container extends DIContainer
                 mutatorsInput: $mutatorsInput,
                 testFramework: $testFramework,
                 testFrameworkExtraOptions: $testFrameworkExtraOptions,
+                testFrameworkExtraArgs: $testFrameworkExtraArgs,
                 staticAnalysisToolOptions: $staticAnalysisToolOptions,
                 sourceFilter: $sourceFilter,
                 threadCount: $threadCount,

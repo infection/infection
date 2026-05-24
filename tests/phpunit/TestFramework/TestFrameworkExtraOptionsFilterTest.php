@@ -84,5 +84,7 @@ final class TestFrameworkExtraOptionsFilterTest extends TestCase
         yield ['--a --configuration="some Test#2" --b=value', '--a --b=value'];
 
         yield ['--a --configuration=\'some Test#2\' --b=value', '--a --b=value'];
+
+        yield ['--configuration phpunit.xml --filter="a test" tests/FooTest.php --colors=always', 'tests/FooTest.php --colors=always'];
     }
 }

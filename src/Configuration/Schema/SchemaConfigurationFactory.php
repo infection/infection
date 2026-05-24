@@ -46,6 +46,7 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
+use function property_exists;
 use stdClass;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -62,6 +63,8 @@ class SchemaConfigurationFactory
     {
         /** @var stdClass $mago */
         $mago = $rawConfig->mago ?? new stdClass();
+
+        self::assertTestFrameworkOptionsAreNotBothConfigured($rawConfig);
 
         return new SchemaConfiguration(
             pathname: $pathname,
@@ -82,6 +85,7 @@ class SchemaConfigurationFactory
             bootstrap: self::normalizeString($rawConfig->bootstrap ?? null),
             initialTestsPhpOptions: self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
             testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
+            testFrameworkExtraArgs: self::normalizeString($rawConfig->testFrameworkExtraArgs ?? null),
             staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
             threads: $rawConfig->threads ?? null,
             dotsPerRow: $rawConfig->dotsPerRow ?? null,
@@ -96,6 +100,15 @@ class SchemaConfigurationFactory
         Assert::nullOrGreaterThanEq($timeout, 0);
 
         return $timeout;
+    }
+
+    private static function assertTestFrameworkOptionsAreNotBothConfigured(stdClass $rawConfig): void
+    {
+        Assert::false(
+            property_exists($rawConfig, 'testFrameworkOptions')
+            && property_exists($rawConfig, 'testFrameworkExtraArgs'),
+            'Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".',
+        );
     }
 
     /**

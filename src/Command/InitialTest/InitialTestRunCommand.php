@@ -42,8 +42,8 @@ use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
+use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
-use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
@@ -71,7 +71,7 @@ final class InitialTestRunCommand extends BaseCommand
         FilterOption::addOption($this);
         InitialTestsPhpOptionsOption::addOption($this);
         TestFrameworkOption::addOption($this);
-        TestFrameworkOptionsOption::addOption($this);
+        TestFrameworkExtraArgsOption::addOption($this);
         DebugOption::addOption($this, default: true);
     }
 
@@ -89,7 +89,7 @@ final class InitialTestRunCommand extends BaseCommand
             debug: DebugOption::get($io),
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             testFramework: TestFrameworkOption::get($io),
-            testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
+            testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );
 
