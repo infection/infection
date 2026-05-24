@@ -35,33 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\SDK\Trace\SpanExporter;
 
-use Closure;
-use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
-use LogicException;
-use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
-use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Trace\EventInterface;
-use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
-use OpenTelemetry\SDK\Trace\StatusDataInterface;
-use PHPUnit\Exception as PHPUnitException;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 #[CoversClass(TestExporter::class)]
 final class TestExporterTest extends TestCase
 {
-    use ExpectsThrowables;
-
     public function test_it_returns_the_exported_span_names(): void
     {
         $exporter = new TestExporter();
-        $runSpan = self::createSpan('infection.run', true);
-        $mutationAnalysisSpan = self::createSpan('infection.mutation_analysis', true);
+        $runSpan = $this->createSpan('infection.run', true);
+        $mutationAnalysisSpan = $this->createSpan('infection.mutation_analysis', true);
 
         $exporter->export([
             $runSpan,
@@ -80,9 +67,9 @@ final class TestExporterTest extends TestCase
     public function test_it_returns_the_exported_spans_by_name(): void
     {
         $exporter = new TestExporter();
-        $runSpan = self::createSpan('infection.run', true);
-        $firstMutationAnalysisSpan = self::createSpan('infection.mutation_analysis', true);
-        $secondMutationAnalysisSpan = self::createSpan('infection.mutation_analysis', true);
+        $runSpan = $this->createSpan('infection.run', true);
+        $firstMutationAnalysisSpan = $this->createSpan('infection.mutation_analysis', true);
+        $secondMutationAnalysisSpan = $this->createSpan('infection.mutation_analysis', true);
 
         $exporter->export([
             $runSpan,
@@ -103,7 +90,7 @@ final class TestExporterTest extends TestCase
     {
         $exporter = new TestExporter();
         $exporter->export([
-            self::createSpan('infection.run', true),
+            $this->createSpan('infection.run', true),
         ]);
 
         $exporter->assertAllSpansAreFinished();
@@ -113,144 +100,26 @@ final class TestExporterTest extends TestCase
     {
         $exporter = new TestExporter();
         $exporter->export([
-            self::createSpan('infection.run', false),
+            $this->createSpan('infection.run', false),
         ]);
 
-        $failure = $this->expectToThrow(
-            self::rethrowPhpUnitFailures(static function () use ($exporter): void {
-                $exporter->assertAllSpansAreFinished();
-            }),
-        );
+        // @phpstan-ignore classConstant.internalClass
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Expected the span "infection.run" to have ended.');
 
-        Assert::assertStringStartsWith(
-            'Expected the span "infection.run" to have ended.',
-            $failure->getMessage(),
-        );
+        $exporter->assertAllSpansAreFinished();
     }
 
-    private static function createSpan(string $name, bool $ended): SpanDataInterface
+    private function createSpan(string $name, bool $ended): SpanDataInterface
     {
-        return new class($name, $ended) implements SpanDataInterface {
-            public function __construct(
-                private readonly string $name,
-                private readonly bool $ended,
-            ) {
-            }
+        $spanMock = $this->createMock(SpanDataInterface::class);
+        $spanMock
+            ->method('getName')
+            ->willReturn($name);
+        $spanMock
+            ->method('hasEnded')
+            ->willReturn($ended);
 
-            public function getName(): string
-            {
-                return $this->name;
-            }
-
-            public function hasEnded(): bool
-            {
-                return $this->ended;
-            }
-
-            public function getKind(): int
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getContext(): SpanContextInterface
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getParentContext(): SpanContextInterface
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getTraceId(): string
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getSpanId(): string
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getParentSpanId(): string
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getStatus(): StatusDataInterface
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getStartEpochNanos(): int
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getAttributes(): AttributesInterface
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            /**
-             * @return list<EventInterface>
-             */
-            public function getEvents(): array
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            /**
-             * @return list<LinkInterface>
-             */
-            public function getLinks(): array
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getEndEpochNanos(): int
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getInstrumentationScope(): InstrumentationScopeInterface
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getResource(): ResourceInfo
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getTotalDroppedEvents(): int
-            {
-                throw new LogicException('Not implemented.');
-            }
-
-            public function getTotalDroppedLinks(): int
-            {
-                throw new LogicException('Not implemented.');
-            }
-        };
-    }
-
-    /**
-     * @param Closure(): void $action
-     *
-     * @return Closure(): void
-     */
-    private static function rethrowPhpUnitFailures(Closure $action): Closure
-    {
-        return static function () use ($action): void {
-            try {
-                $action();
-            } catch (PHPUnitException $error) {
-                throw new RuntimeException(
-                    $error->getMessage(),
-                    previous: $error,
-                );
-            }
-        };
+        return $spanMock;
     }
 }

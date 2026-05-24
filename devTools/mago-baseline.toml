@@ -11955,12 +11955,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Telemetry/Attribute/RunSpanAttributesProviderTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Telemetry\Attribute\RunSpanAttributesProviderTest::test_it_marks_runs_when_progress_output_is_enabled`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Telemetry/Attribute/RunSpanAttributesProviderTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Telemetry\Attribute\RunSpanAttributesProviderTest::test_it_omits_static_analysis_tool_attributes_when_static_analysis_is_disabled`.'
 count = 1
 
@@ -11992,12 +11986,6 @@ count = 1
 file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_sets_the_default_service_name_when_creating_a_tracer`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Telemetry/OpenTelemetryTracerTest.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$span`."
 count = 1
 
 [[issues]]

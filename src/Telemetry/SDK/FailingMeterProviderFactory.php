@@ -36,10 +36,7 @@ declare(strict_types=1);
 namespace Infection\Telemetry\SDK;
 
 use function count;
-use function extension_loaded;
 use function is_string;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
@@ -65,8 +62,6 @@ use RuntimeException;
  */
 final readonly class FailingMeterProviderFactory
 {
-    use LogsMessagesTrait;
-
     /**
      * @throws RuntimeException
      */
@@ -89,17 +84,14 @@ final readonly class FailingMeterProviderFactory
         $factory = Registry::metricExporterFactory($exporters[0]);
         $exporter = $factory->create();
 
-        if (
-            $exporter instanceof MetricExporter
-            && !extension_loaded('protobuf')
-        ) {
-            self::logWarning('protobuf is being used as a transport without the extension. See https://opentelemetry.io/docs/languages/php/#optional-php-extensions');
-        }
-
         return MeterProvider::builder()
             ->setResource(ResourceInfoFactory::defaultResource())
             ->addReader(new ExportingReader($exporter))
-            ->setExemplarFilter($this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER)))
+            ->setExemplarFilter(
+                $this->createExemplarFilter(
+                    Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER),
+                ),
+            )
             ->build();
     }
 

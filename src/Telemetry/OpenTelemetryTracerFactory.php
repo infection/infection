@@ -132,22 +132,14 @@ final readonly class OpenTelemetryTracerFactory
     {
         $tracesExporter = getenv(Variables::OTEL_TRACES_EXPORTER);
 
-        if ($tracesExporter !== false) {
-            return strtolower($tracesExporter) === 'none';
-        }
-
-        return false;
+        return $tracesExporter !== false && strtolower($tracesExporter) === 'none';
     }
 
     private function isMetricsDisabled(): bool
     {
         $metricsExporter = getenv(Variables::OTEL_METRICS_EXPORTER);
 
-        if ($metricsExporter !== false) {
-            return strtolower($metricsExporter) === 'none';
-        }
-
-        return true;
+        return $metricsExporter === false || strtolower($metricsExporter) === 'none';
     }
 
     private static function setDefaultServiceName(): void

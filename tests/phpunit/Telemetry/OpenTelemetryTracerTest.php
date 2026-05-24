@@ -47,7 +47,6 @@ use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -88,7 +87,7 @@ final class OpenTelemetryTracerTest extends TestCase
             $this->tracerProvider->getTracer('infection'),
             $this->tracerProvider,
             Clock::getDefault(),
-            self::createNoopMetrics(),
+            NoopOpenTelemetryMetricsFactory::create(),
         );
     }
 
@@ -147,7 +146,7 @@ final class OpenTelemetryTracerTest extends TestCase
             NoopTracer::getInstance(),
             null,
             Clock::getDefault(),
-            self::createNoopMetrics(),
+            NoopOpenTelemetryMetricsFactory::create(),
         );
 
         $tracer->shutdown();
@@ -317,15 +316,5 @@ final class OpenTelemetryTracerTest extends TestCase
         );
 
         return $matchingSpans[0];
-    }
-
-    private static function createNoopMetrics(): OpenTelemetryMetrics
-    {
-        $meterProvider = new NoopMeterProvider();
-
-        return new OpenTelemetryMetrics(
-            $meterProvider->getMeter('infection'),
-            $meterProvider,
-        );
     }
 }

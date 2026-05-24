@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\SDK\Metrics\MetricExporter;
 
-use Closure;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use OpenTelemetry\SDK\Common\Attribute\Attributes as OTelAttributes;
@@ -48,11 +47,9 @@ use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use PHPUnit\Exception as PHPUnitException;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 /**
  * @phpstan-import-type Attributes from RunSpanAttributesProvider
@@ -130,19 +127,14 @@ final class TestExporterTest extends TestCase
             ),
         ]);
 
-        $failure = $this->expectToThrow(
-            self::rethrowPhpUnitFailures(static function () use ($exporter): void {
-                $exporter->assertSameCounterValue(
-                    'infection.mutation.count',
-                    self::COUNTER_VALUE,
-                    ['infection.mutation.status' => 'escaped'],
-                );
-            }),
-        );
+        // @phpstan-ignore classConstant.internalClass
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Expected exactly one metric data point named "infection.mutation.count" with matching attributes, got 0.');
 
-        Assert::assertStringStartsWith(
-            'Expected exactly one metric data point named "infection.mutation.count" with matching attributes, got 0.',
-            $failure->getMessage(),
+        $exporter->assertSameCounterValue(
+            'infection.mutation.count',
+            self::COUNTER_VALUE,
+            ['infection.mutation.status' => 'escaped'],
         );
     }
 
@@ -169,19 +161,14 @@ final class TestExporterTest extends TestCase
             ),
         ]);
 
-        $failure = $this->expectToThrow(
-            self::rethrowPhpUnitFailures(static function () use ($exporter): void {
-                $exporter->assertSameCounterValue(
-                    'infection.mutation.count',
-                    self::COUNTER_VALUE,
-                    ['infection.mutation.status' => 'escaped'],
-                );
-            }),
-        );
+        // @phpstan-ignore classConstant.internalClass
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Expected exactly one metric data point named "infection.mutation.count" with matching attributes, got 2.');
 
-        Assert::assertStringStartsWith(
-            'Expected exactly one metric data point named "infection.mutation.count" with matching attributes, got 2.',
-            $failure->getMessage(),
+        $exporter->assertSameCounterValue(
+            'infection.mutation.count',
+            self::COUNTER_VALUE,
+            ['infection.mutation.status' => 'escaped'],
         );
     }
 
@@ -197,16 +184,11 @@ final class TestExporterTest extends TestCase
             ),
         ]);
 
-        $failure = $this->expectToThrow(
-            self::rethrowPhpUnitFailures(static function () use ($exporter): void {
-                $exporter->assertNoDataPointHasAttribute('infection.mutation.id');
-            }),
-        );
+        // @phpstan-ignore classConstant.internalClass
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that an array does not have the key \'infection.mutation.id\'.');
 
-        Assert::assertStringStartsWith(
-            'Failed asserting that an array does not have the key \'infection.mutation.id\'.',
-            $failure->getMessage(),
-        );
+        $exporter->assertNoDataPointHasAttribute('infection.mutation.id');
     }
 
     /**
@@ -283,24 +265,5 @@ final class TestExporterTest extends TestCase
             null,
             $data,
         );
-    }
-
-    /**
-     * @param Closure(): void $action
-     *
-     * @return Closure(): void
-     */
-    private static function rethrowPhpUnitFailures(Closure $action): Closure
-    {
-        return static function () use ($action): void {
-            try {
-                $action();
-            } catch (PHPUnitException $error) {
-                throw new RuntimeException(
-                    $error->getMessage(),
-                    previous: $error,
-                );
-            }
-        };
     }
 }
