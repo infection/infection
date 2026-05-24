@@ -320,14 +320,18 @@ $(MAGO): vendor
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
-	composer require infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
+	composer require --no-interaction \
+		infection/codeception-adapter \
+		infection/phpspec-adapter \
+		testo/bridge-infection
+
 	# Workaround for https://github.com/box-project/box/issues/580
-	composer install --no-dev
+	composer install --no-interaction --no-dev
 	$(BOX) --version
-	$(BOX) validate
-	$(BOX) compile
+	$(BOX) validate --no-interaction
+	$(BOX) compile --no-interaction
 	composer remove infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
-	composer install
+	composer install --no-interaction
 	touch -c $@
 
 vendor: composer.lock
