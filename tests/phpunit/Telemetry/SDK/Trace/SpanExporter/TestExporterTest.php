@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Telemetry\SDK\Trace\SpanExporter;
 
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -46,17 +47,42 @@ final class TestExporterTest extends TestCase
     public function test_it_returns_the_exported_span_names(): void
     {
         $exporter = new TestExporter();
+        $runSpan = $this->createSpan('infection.run', true);
+        $mutationAnalysisSpan = $this->createSpan('infection.mutation_analysis', true);
+
         $exporter->export([
-            $this->createSpan('infection.run', true),
-            $this->createSpan('infection.mutation_analysis', true),
+            $runSpan,
+            $mutationAnalysisSpan,
         ]);
 
-        $this->assertSame(
+        Assert::assertSame(
             [
                 'infection.run',
                 'infection.mutation_analysis',
             ],
             $exporter->getSpanNames(),
+        );
+    }
+
+    public function test_it_returns_the_exported_spans_by_name(): void
+    {
+        $exporter = new TestExporter();
+        $runSpan = $this->createSpan('infection.run', true);
+        $firstMutationAnalysisSpan = $this->createSpan('infection.mutation_analysis', true);
+        $secondMutationAnalysisSpan = $this->createSpan('infection.mutation_analysis', true);
+
+        $exporter->export([
+            $runSpan,
+            $firstMutationAnalysisSpan,
+            $secondMutationAnalysisSpan,
+        ]);
+
+        Assert::assertSame(
+            [
+                $firstMutationAnalysisSpan,
+                $secondMutationAnalysisSpan,
+            ],
+            $exporter->getSpansByName('infection.mutation_analysis'),
         );
     }
 
@@ -77,7 +103,7 @@ final class TestExporterTest extends TestCase
             $this->createSpan('infection.run', false),
         ]);
 
-        /** @phpstan-ignore classConstant.internalClass */
+        // @phpstan-ignore classConstant.internalClass
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Expected the span "infection.run" to have ended.');
 
@@ -86,14 +112,14 @@ final class TestExporterTest extends TestCase
 
     private function createSpan(string $name, bool $ended): SpanDataInterface
     {
-        $span = $this->createStub(SpanDataInterface::class);
-        $span
+        $spanMock = $this->createMock(SpanDataInterface::class);
+        $spanMock
             ->method('getName')
             ->willReturn($name);
-        $span
+        $spanMock
             ->method('hasEnded')
             ->willReturn($ended);
 
-        return $span;
+        return $spanMock;
     }
 }

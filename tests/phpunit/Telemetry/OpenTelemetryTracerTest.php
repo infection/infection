@@ -35,15 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry;
 
+use function count;
+use Infection\Telemetry\OpenTelemetryMetrics;
 use Infection\Telemetry\OpenTelemetryTracer;
 use Infection\Telemetry\SpanHandle;
+use Infection\Tests\Telemetry\SDK\Clock\IncrementalClock;
+use Infection\Tests\Telemetry\SDK\Metrics\MetricExporter\TestExporter as MetricsTestExporter;
 use Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\SpanContextValidator;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -54,6 +61,18 @@ use function sprintf;
 #[CoversClass(SpanHandle::class)]
 final class OpenTelemetryTracerTest extends TestCase
 {
+    private const int CLOCK_START_NANOS = 1_000_000_000;
+
+    private const int CLOCK_TICK_NANOS = 1_000_000_000;
+
+    private const int EXPLICIT_SPAN_END_NANOS = 20_000_000_000;
+
+    private const float RUN_DURATION = 9.0;
+
+    private const int GENERATED_MUTATIONS_COUNT = 13;
+
+    private const float MUTATION_RUNTIME = 0.42;
+
     private TestExporter $exporter;
 
     private TracerProvider $tracerProvider;
@@ -70,6 +89,7 @@ final class OpenTelemetryTracerTest extends TestCase
             $this->tracerProvider->getTracer('infection'),
             $this->tracerProvider,
             Clock::getDefault(),
+            NoopOpenTelemetryMetricsFactory::create(),
         );
     }
 
@@ -99,13 +119,13 @@ final class OpenTelemetryTracerTest extends TestCase
         $rootSpan = $this->getSpanFromExporter('infection.root');
         $childSpan = $this->getSpanFromExporter('infection.child');
 
-        $this->assertSame(SpanContextValidator::INVALID_SPAN, $rootSpan->getParentSpanId());
-        $this->assertSame($rootSpan->getSpanId(), $childSpan->getParentSpanId());
-        $this->assertTrue($rootSpan->hasEnded());
-        $this->assertTrue($childSpan->hasEnded());
-        $this->assertTrue($rootSpan->getAttributes()->get('infection.root.started'));
-        $this->assertSame(1, $childSpan->getAttributes()->get('infection.child.started'));
-        $this->assertSame('yes', $childSpan->getAttributes()->get('infection.child.finished'));
+        Assert::assertSame(SpanContextValidator::INVALID_SPAN, $rootSpan->getParentSpanId());
+        Assert::assertSame($rootSpan->getSpanId(), $childSpan->getParentSpanId());
+        Assert::assertTrue($rootSpan->hasEnded());
+        Assert::assertTrue($childSpan->hasEnded());
+        Assert::assertTrue($rootSpan->getAttributes()->get('infection.root.started'));
+        Assert::assertSame(1, $childSpan->getAttributes()->get('infection.child.started'));
+        Assert::assertSame('yes', $childSpan->getAttributes()->get('infection.child.finished'));
     }
 
     public function test_it_shuts_down_the_tracer_provider(): void
@@ -118,8 +138,40 @@ final class OpenTelemetryTracerTest extends TestCase
             ->startSpan();
         $span->end();
 
-        $this->assertSame([], $this->exporter->getSpans());
-        $this->assertFalse($this->tracerProvider->getTracer('infection')->isEnabled());
+        Assert::assertSame([], $this->exporter->getSpans());
+        Assert::assertFalse($this->tracerProvider->getTracer('infection')->isEnabled());
+    }
+
+    public function test_it_uses_the_explicit_end_timestamp_when_provided(): void
+    {
+        $metricsExporter = new MetricsTestExporter();
+        $meterProvider = MeterProvider::builder()
+            ->addReader(new ExportingReader($metricsExporter))
+            ->build();
+        $telemetry = new OpenTelemetryTracer(
+            $this->tracerProvider->getTracer('infection'),
+            $this->tracerProvider,
+            new IncrementalClock(
+                self::CLOCK_START_NANOS,
+                self::CLOCK_TICK_NANOS,
+            ),
+            new OpenTelemetryMetrics(
+                $meterProvider->getMeter('infection'),
+                $meterProvider,
+            ),
+        );
+
+        $run = $telemetry->startRootSpan('infection.run');
+        $phase = $telemetry->startChildSpan($run, 'infection.reporting');
+
+        $telemetry->end($phase, [], self::EXPLICIT_SPAN_END_NANOS);
+        $meterProvider->forceFlush();
+
+        $metricsExporter->assertSameHistogramValue(
+            'infection.phase.duration',
+            18.0,
+            ['infection.phase.name' => 'reporting'],
+        );
     }
 
     public function test_it_can_be_used_without_a_tracer_provider(): void
@@ -128,27 +180,180 @@ final class OpenTelemetryTracerTest extends TestCase
             NoopTracer::getInstance(),
             null,
             Clock::getDefault(),
+            NoopOpenTelemetryMetricsFactory::create(),
         );
 
         $tracer->shutdown();
 
-        $this->assertSame([], $this->exporter->getSpans());
+        Assert::assertSame([], $this->exporter->getSpans());
+    }
+
+    public function test_it_records_metrics_from_ended_spans(): void
+    {
+        $metricsExporter = new MetricsTestExporter();
+        $meterProvider = MeterProvider::builder()
+            ->addReader(new ExportingReader($metricsExporter))
+            ->build();
+        $telemetry = new OpenTelemetryTracer(
+            $this->tracerProvider->getTracer('infection'),
+            $this->tracerProvider,
+            new IncrementalClock(
+                self::CLOCK_START_NANOS,
+                self::CLOCK_TICK_NANOS,
+            ),
+            new OpenTelemetryMetrics(
+                $meterProvider->getMeter('infection'),
+                $meterProvider,
+            ),
+        );
+
+        $run = $telemetry->startRootSpan(
+            'infection.run',
+            [
+                'infection.project.name' => 'acme/project',
+                'infection.version' => '1.2.3',
+                'infection.distribution' => 'source',
+                'infection.thread.count' => 4,
+                'infection.run.source_filtered' => false,
+                'infection.run.progress_enabled' => true,
+                'infection.timeouts_as_escaped' => false,
+                'infection.initial_tests.skipped' => false,
+                'infection.initial_static_analysis.skipped' => true,
+                'infection.test_framework.name' => 'phpunit',
+            ],
+        );
+
+        $phase = $telemetry->startChildSpan($run, 'infection.mutation_generation');
+        $telemetry->end(
+            $phase,
+            [
+                'infection.source_file.count' => 8,
+                'infection.mutated_file.count' => 5,
+                'infection.mutation.generated.count' => self::GENERATED_MUTATIONS_COUNT,
+            ],
+        );
+
+        $mutation = $telemetry->startChildSpan($run, 'infection.mutation_evaluation.mutation');
+        $telemetry->end(
+            $mutation,
+            [
+                'infection.mutation.status' => 'escaped',
+                'infection.mutation.runtime' => self::MUTATION_RUNTIME,
+                'infection.mutation.msi.category' => 'not_covered',
+                'infection.mutation.id' => 'should-not-be-a-metric-attribute',
+                'code.file.path' => 'src/Foo.php',
+            ],
+        );
+
+        $process = $telemetry->startChildSpan(
+            $run,
+            'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+            [
+                'infection.mutation.process.test_framework' => 'phpunit',
+                'infection.mutation.process.thread' => 2,
+            ],
+        );
+        $telemetry->end(
+            $process,
+            [
+                'infection.mutation.process.timed_out' => true,
+                'process.exit.code' => 1,
+            ],
+        );
+
+        $reporter = $telemetry->startChildSpan(
+            $run,
+            'infection.reporting.reporter',
+            ['infection.reporter.name' => 'show_metrics'],
+        );
+        $telemetry->end($reporter);
+
+        $telemetry->end(
+            $run,
+            [
+                'infection.mutation.evaluated.count' => 1,
+                'infection.mutation.not_covered.count' => 1,
+                'infection.msi.value' => 0.0,
+                'infection.mutation.coverage_rate.value' => 100.0,
+                'infection.covered_msi.value' => 0.0,
+            ],
+        );
+        $meterProvider->forceFlush();
+
+        $metricsExporter->assertSameHistogramValue(
+            'infection.run.duration',
+            self::RUN_DURATION,
+            ['infection.project.name' => 'acme/project'],
+        );
+        $metricsExporter->assertSameCounterValue(
+            'infection.run.count',
+            1,
+            ['infection.project.name' => 'acme/project'],
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.phase.duration',
+            1.0,
+            [
+                'infection.project.name' => 'acme/project',
+                'infection.phase.name' => 'mutation_generation',
+            ],
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.mutation.generated.count',
+            self::GENERATED_MUTATIONS_COUNT,
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.mutation.evaluation.duration',
+            1.0,
+            ['infection.mutation.status' => 'escaped'],
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.mutation.runtime',
+            self::MUTATION_RUNTIME,
+            ['infection.mutation.msi.category' => 'not_covered'],
+        );
+        $metricsExporter->assertSameCounterValue(
+            'infection.mutation.count',
+            1,
+            ['infection.mutation.status' => 'escaped'],
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.mutant.process.duration',
+            1.0,
+            ['infection.mutation.process.thread' => 2],
+        );
+        $metricsExporter->assertSameCounterValue(
+            'infection.mutant.process.count',
+            1,
+            ['infection.mutation.process.timed_out' => true],
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.reporter.duration',
+            1.0,
+            ['infection.reporter.name' => 'show_metrics'],
+        );
+        $metricsExporter->assertSameHistogramValue(
+            'infection.msi',
+            0.0,
+        );
+        $metricsExporter->assertNoDataPointHasAttribute('infection.mutation.id');
+        $metricsExporter->assertNoDataPointHasAttribute('code.file.path');
     }
 
     private function getSpanFromExporter(string $name): SpanDataInterface
     {
-        /** @var SpanDataInterface $span */
-        foreach ($this->exporter->getSpans() as $span) {
-            if ($span->getName() === $name) {
-                return $span;
-            }
-        }
+        $matchingSpans = $this->exporter->getSpansByName($name);
 
-        $this->fail(
+        Assert::assertCount(
+            1,
+            $matchingSpans,
             sprintf(
-                'Span "%s" was not exported.',
+                'Expected exactly one span named "%s", got %d.',
                 $name,
+                count($matchingSpans),
             ),
         );
+
+        return $matchingSpans[0];
     }
 }

@@ -41,10 +41,13 @@ use function filter_var;
 use function getenv;
 use function implode;
 use function in_array;
+use Infection\Telemetry\SDK\FailingMeterProviderFactory;
 use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
+use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use RuntimeException;
 use function Safe\putenv;
 use function sprintf;
@@ -63,6 +66,11 @@ final readonly class OpenTelemetryTracerFactory
     private const string TRACER_NAME = 'infection';
 
     /**
+     * See https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/metrics/api.md#get-a-meter
+     */
+    private const string METER_NAME = 'infection';
+
+    /**
      * @throws RuntimeException
      */
     public function create(): ?OpenTelemetryTracer
@@ -76,23 +84,37 @@ final readonly class OpenTelemetryTracerFactory
 
         self::guardSupportedExporters();
 
-        if (self::isTracingDisabled()) {
+        $tracingDisabled = self::isTracingDisabled();
+        $metricsDisabled = self::isMetricsDisabled();
+
+        if ($tracingDisabled && $metricsDisabled) {
             return null;
         }
 
-        self::setDefaultTracesExporter();
+        if (!$tracingDisabled) {
+            self::setDefaultTracesExporter();
+        }
 
         // Note that in theory we could create the TracerProvider directly,
         // not needing to set the service name via an environment variable.
         // However, it's a lot of boilerplate, so not worth it, at least at
         // the time of writing.
         self::setDefaultServiceName();
-        $tracerProvider = (new FailingTracerProviderFactory())->create();
+        $tracerProvider = $tracingDisabled
+            ? new NoopTracerProvider()
+            : (new FailingTracerProviderFactory())->create();
+        $meterProvider = $metricsDisabled
+            ? new NoopMeterProvider()
+            : (new FailingMeterProviderFactory())->create();
 
         return new OpenTelemetryTracer(
             $tracerProvider->getTracer(self::TRACER_NAME),
             $tracerProvider,
             Clock::getDefault(),
+            new OpenTelemetryMetrics(
+                $meterProvider->getMeter(self::METER_NAME),
+                $meterProvider,
+            ),
         );
     }
 
@@ -110,11 +132,14 @@ final readonly class OpenTelemetryTracerFactory
     {
         $tracesExporter = getenv(Variables::OTEL_TRACES_EXPORTER);
 
-        if ($tracesExporter !== false) {
-            return strtolower($tracesExporter) === 'none';
-        }
+        return $tracesExporter !== false && strtolower($tracesExporter) === 'none';
+    }
 
-        return false;
+    private function isMetricsDisabled(): bool
+    {
+        $metricsExporter = getenv(Variables::OTEL_METRICS_EXPORTER);
+
+        return $metricsExporter === false || strtolower($metricsExporter) === 'none';
     }
 
     private static function setDefaultServiceName(): void
@@ -142,7 +167,7 @@ final readonly class OpenTelemetryTracerFactory
     private static function guardSupportedExporters(): void
     {
         self::guardExporter(Variables::OTEL_TRACES_EXPORTER, ['otlp', 'console', 'none']);
-        self::guardExporter(Variables::OTEL_METRICS_EXPORTER, ['none']);
+        self::guardExporter(Variables::OTEL_METRICS_EXPORTER, ['otlp', 'console', 'none']);
         self::guardExporter(Variables::OTEL_LOGS_EXPORTER, ['none']);
         self::guardAutoload();
     }

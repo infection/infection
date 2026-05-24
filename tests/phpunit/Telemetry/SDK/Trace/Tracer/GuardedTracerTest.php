@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Telemetry\SDK\Trace\Tracer;
 
 use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Tests\Telemetry\NoopOpenTelemetryMetricsFactory;
 use Infection\Tests\Telemetry\SDK\Clock\IncrementalClock;
 use Infection\Tests\Telemetry\SDK\Trace\Span\GuardedSpan;
 use Infection\Tests\Telemetry\SDK\Trace\Span\GuardedSpanBuilder;
@@ -69,6 +70,7 @@ final class GuardedTracerTest extends TestCase
             $this->guardedTracer,
             $this->tracerProvider,
             new IncrementalClock(10, 10),
+            NoopOpenTelemetryMetricsFactory::create(),
         );
     }
 

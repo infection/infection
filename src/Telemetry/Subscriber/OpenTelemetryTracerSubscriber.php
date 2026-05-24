@@ -231,6 +231,7 @@ final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFini
 
     public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
     {
+        // TODO: the names are re-usable so we should move them to a dedicated class
         $this->rootSpan = $this->telemetry->startRootSpan(
             'infection.run',
             [

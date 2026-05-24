@@ -33,36 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Telemetry;
+namespace Infection\Tests\Telemetry;
 
-use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
-use OpenTelemetry\API\Trace\SpanInterface;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextInterface;
+use Infection\CannotBeInstantiated;
+use Infection\Telemetry\OpenTelemetryMetrics;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 
-/**
- * @phpstan-import-type Attributes from RunSpanAttributesProvider
- *
- * Pairs a span with its captured context so that concurrent spans (e.g. per-mutation
- * execution spans) can be independently ended and used as parents for child spans,
- * without relying on the global active-span state.
- *
- * @internal
- */
-final readonly class SpanHandle
+final class NoopOpenTelemetryMetricsFactory
 {
-    public ContextInterface $context;
+    use CannotBeInstantiated;
 
-    /**
-     * @param non-empty-string $name
-     * @param Attributes $attributes
-     */
-    public function __construct(
-        public SpanInterface $span,
-        public string $name,
-        public int $startEpochNanos,
-        public array $attributes,
-    ) {
-        $this->context = $span->storeInContext(Context::getCurrent());
+    public static function create(): OpenTelemetryMetrics
+    {
+        $meterProvider = new NoopMeterProvider();
+
+        return new OpenTelemetryMetrics(
+            $meterProvider->getMeter('infection'),
+            $meterProvider,
+        );
     }
 }

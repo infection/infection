@@ -100,6 +100,7 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use Infection\Tests\Process\Runner\NullProcessRunner;
 use Infection\Tests\Reporter\FakeReporter;
+use Infection\Tests\Telemetry\NoopOpenTelemetryMetricsFactory;
 use Infection\Tests\Telemetry\SDK\Clock\FakeClock;
 use Infection\Tests\Telemetry\SDK\Clock\IncrementalClock;
 use Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter;
@@ -343,6 +344,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                     'infection.distribution' => 'source',
                     'infection.thread.count' => 1,
                     'infection.run.source_filtered' => false,
+                    'infection.run.progress_enabled' => true,
                     'infection.timeouts_as_escaped' => false,
                     'infection.initial_tests.skipped' => false,
                     'infection.initial_static_analysis.skipped' => true,
@@ -1612,6 +1614,7 @@ final class OpenTelemetryTracerSubscriberTest extends TestCase
                 $this->guardedTracer,
                 $this->tracerProvider,
                 $clock,
+                NoopOpenTelemetryMetricsFactory::create(),
             ),
             new RunSpanAttributesProvider(
                 $configuration,

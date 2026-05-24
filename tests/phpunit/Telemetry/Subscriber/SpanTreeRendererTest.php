@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Telemetry\Subscriber;
 
 use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Tests\Telemetry\NoopOpenTelemetryMetricsFactory;
 use Infection\Tests\Telemetry\SDK\Clock\IncrementalClock;
 use Infection\Tests\Telemetry\SDK\Trace\SpanExporter\TestExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -62,6 +63,7 @@ final class SpanTreeRendererTest extends TestCase
             $this->tracerProvider->getTracer('infection'),
             $this->tracerProvider,
             new IncrementalClock(10, 10),
+            NoopOpenTelemetryMetricsFactory::create(),
         );
     }
 

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\SDK\Trace\SpanExporter;
 
+use function array_filter;
 use function array_map;
 use function array_values;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -81,6 +82,19 @@ final readonly class TestExporter implements SpanExporterInterface
     public function getSpans(): array
     {
         return array_values($this->exporter->getSpans());
+    }
+
+    /**
+     * @return list<SpanDataInterface>
+     */
+    public function getSpansByName(string $name): array
+    {
+        return array_values(
+            array_filter(
+                $this->getSpans(),
+                static fn (SpanDataInterface $span): bool => $span->getName() === $name,
+            ),
+        );
     }
 
     /**
