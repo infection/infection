@@ -67,8 +67,7 @@ compile-docker: $(DOCKER_FILE_IMAGE)
 
 .PHONY: sbx-create
 sbx-create:	## Drops the existing PHP sbx image and create it anew
-sbx-create:
-	sbx-image-build
+sbx-create: sbx-image-build
 	sbx rm codex-infection || true
 	sbx run codex \
 		--template=infection-sbx-php-8.4:latest \
