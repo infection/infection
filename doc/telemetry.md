@@ -255,8 +255,8 @@ vendor/bin/infection
 ```
 
 Use the OTLP exporter with the gRPC transport by setting the protocol to
-`grpc`. This requires the PHP `grpc` extension and is only available when
-running Infection from a source install, not from the PHAR:
+`grpc`. This requires the PHP `grpc` extension. If a gRPC transport is
+requested without the extension, Infection will fail.
 
 ```bash
 INFECTION_TELEMETRY=true \

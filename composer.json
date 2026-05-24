@@ -51,16 +51,20 @@
         "colinodell/json5": "^3.0",
         "composer/xdebug-handler": "^3.0",
         "fidry/cpu-core-counter": "^1.0",
+        "guzzlehttp/guzzle": "^7.10",
         "infection/abstract-testframework-adapter": "^0.5.0",
+        "infection/codeception-adapter": "^0.4.6",
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.5 || ^1.0.0",
         "infection/mutator": "^0.4",
+        "infection/phpspec-adapter": "^0.3.1",
         "justinrainbow/json-schema": "^6.0",
         "nikic/php-parser": "^5.6.2",
         "ondram/ci-detector": "^4.1.0",
         "open-telemetry/api": "^1.9",
         "open-telemetry/exporter-otlp": "^1.4",
         "open-telemetry/sdk": "^1.14",
+        "open-telemetry/transport-grpc": "^1.2",
         "psr/log": "^2.0 || ^3.0",
         "sanmai/di-container": "^0.1.12",
         "sanmai/duoclock": "^0.1.0",
@@ -73,6 +77,7 @@
         "symfony/polyfill-php85": "^1.33",
         "symfony/process": "^6.4 || ^7.0 || ^8.0",
         "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0",
+        "testo/bridge-infection": "^0.1.4",
         "thecodingmachine/safe": "^v3.0",
         "webmozart/assert": "^1.11 || ^2.0"
     },
@@ -86,8 +91,6 @@
         "carthage-software/mago": "^1.20",
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
-        "guzzlehttp/guzzle": "^7.10",
-        "open-telemetry/transport-grpc": "^1.0",
         "phpat/phpat": "^0.12.4",
         "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",
@@ -104,9 +107,13 @@
         "thecodingmachine/phpstan-safe-rule": "^1.4",
         "webmozarts/strict-phpunit": "^7.15"
     },
+    "provide": {
+        "ext-grpc": "*"
+    },
     "config": {
         "platform": {
-            "php": "8.3.0"
+            "php": "8.3.0",
+            "ext-grpc": "1.80.0"
         },
         "sort-packages": true,
         "allow-plugins": {
