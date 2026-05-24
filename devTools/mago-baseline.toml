@@ -11595,6 +11595,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_allows_grpc_protocol_configuration_when_the_otlp_exporter_is_not_used`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_creates_a_tracer`.'
 count = 1
 
@@ -11602,6 +11608,24 @@ count = 1
 file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_keeps_the_existing_service_name_when_creating_a_tracer`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_rejects_global_grpc_protocol_when_the_grpc_extension_is_not_loaded`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_rejects_grpc_metrics_protocol_when_the_grpc_extension_is_not_loaded`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_rejects_grpc_traces_protocol_when_the_grpc_extension_is_not_loaded`.'
 count = 1
 
 [[issues]]
