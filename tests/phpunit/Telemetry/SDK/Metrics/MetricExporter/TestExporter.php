@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Telemetry\SDK\Metrics\MetricExporter;
 
+use function array_key_exists;
 use function array_values;
 use function count;
 use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
@@ -205,9 +206,10 @@ final readonly class TestExporter implements AggregationTemporalitySelectorInter
         $attributes = $dataPoint->attributes->toArray();
 
         foreach ($expectedAttributes as $key => $expectedValue) {
-            $value = $attributes[$key] ?? null;
-
-            if ($value !== $expectedValue) {
+            if (
+                !array_key_exists($key, $attributes)
+                || $attributes[$key] !== $expectedValue
+            ) {
                 return false;
             }
         }

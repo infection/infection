@@ -51,17 +51,17 @@ use OpenTelemetry\Context\ContextInterface;
  */
 final readonly class SpanHandle
 {
-    public readonly ContextInterface $context;
+    public ContextInterface $context;
 
     /**
      * @param non-empty-string $name
      * @param Attributes $attributes
      */
     public function __construct(
-        public readonly SpanInterface $span,
-        public readonly string $name,
-        public readonly int $startEpochNanos,
-        public readonly array $attributes,
+        public SpanInterface $span,
+        public string $name,
+        public int $startEpochNanos,
+        public array $attributes,
     ) {
         $this->context = $span->storeInContext(Context::getCurrent());
     }

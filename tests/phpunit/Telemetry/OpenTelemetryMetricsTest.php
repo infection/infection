@@ -41,6 +41,7 @@ use Infection\Telemetry\SpanHandle;
 use Infection\Tests\Telemetry\SDK\Metrics\MetricExporter\TestExporter;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +62,7 @@ final class OpenTelemetryMetricsTest extends TestCase
 
     private TestExporter $exporter;
 
-    private MeterProvider $meterProvider;
+    private MeterProviderInterface $meterProvider;
 
     private OpenTelemetryMetrics $metrics;
 

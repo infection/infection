@@ -55,7 +55,7 @@ final class OpenTelemetryMetrics
     private const int NANOSECONDS_PER_SECOND = 1_000_000_000;
 
     /**
-     * @array<string, string>
+     * @var array<non-empty-string, non-empty-string>
      */
     private const array SUMMARY_METRIC_NAMES = [
         'infection.source_file.count' => '{file}',
@@ -380,6 +380,8 @@ final class OpenTelemetryMetrics
     }
 
     /**
+     * @param non-empty-string $metricName
+     * @param non-empty-string $unit
      * @param Attributes $sourceAttributes
      * @param Attributes $metricAttributes
      * @param non-empty-string|null $sourceAttribute
@@ -415,6 +417,8 @@ final class OpenTelemetryMetrics
     }
 
     /**
+     * @param non-empty-string $name
+     * @param non-empty-string $unit
      * @param Attributes $attributes
      */
     private function recordHistogram(
@@ -428,11 +432,19 @@ final class OpenTelemetryMetrics
             ->record($value, $attributes);
     }
 
+    /**
+     * @param non-empty-string $name
+     * @param non-empty-string $unit
+     */
     private function counter(string $name, string $unit): CounterInterface
     {
         return $this->counters[$name] ??= $this->meter->createCounter($name, $unit);
     }
 
+    /**
+     * @param non-empty-string $name
+     * @param non-empty-string $unit
+     */
     private function histogram(string $name, string $unit): HistogramInterface
     {
         return $this->histograms[$name] ??= $this->meter->createHistogram($name, $unit);

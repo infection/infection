@@ -304,13 +304,7 @@ final class OpenTelemetryTracerTest extends TestCase
 
     private function getSpanFromExporter(string $name): SpanDataInterface
     {
-        $matchingSpans = [];
-
-        foreach ($this->exporter->getSpans() as $span) {
-            if ($span->getName() === $name) {
-                $matchingSpans[] = $span;
-            }
-        }
+        $matchingSpans = $this->exporter->getSpansByName($name);
 
         Assert::assertCount(
             1,

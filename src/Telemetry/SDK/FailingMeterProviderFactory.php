@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\SDK;
 
+use function count;
 use function extension_loaded;
+use function is_string;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
@@ -74,8 +76,17 @@ final readonly class FailingMeterProviderFactory
             return new NoopMeterProvider();
         }
 
-        $exporterName = Configuration::getList(Variables::OTEL_METRICS_EXPORTER)[0];
-        $factory = Registry::metricExporterFactory($exporterName);
+        $exporters = Configuration::getList(Variables::OTEL_METRICS_EXPORTER);
+
+        if (
+            count($exporters) !== 1
+            || !is_string($exporters[0])
+            || $exporters[0] === ''
+        ) {
+            throw new RuntimeException('The configured OpenTelemetry metrics exporter name must be a non-empty string.');
+        }
+
+        $factory = Registry::metricExporterFactory($exporters[0]);
         $exporter = $factory->create();
 
         if (
