@@ -34,6 +34,7 @@ jobs:
           # not get confused and apply a rule that would break on lower supported
           # versions.
           php-version: 8.3
+          extensions: grpc
 
       - name: Configure PHP-CS-Fixer GitHub Actions cache
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5

@@ -104,13 +104,9 @@
         "thecodingmachine/phpstan-safe-rule": "^1.4",
         "webmozarts/strict-phpunit": "^7.15"
     },
-    "provide": {
-        "ext-grpc": "*"
-    },
     "config": {
         "platform": {
-            "php": "8.3.0",
-            "ext-grpc": "1.80.0"
+            "php": "8.3.0"
         },
         "sort-packages": true,
         "allow-plugins": {

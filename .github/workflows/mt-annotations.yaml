@@ -35,6 +35,7 @@ jobs:
               uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
               with:
                   php-version: ${{ matrix.php-version }}
+                  extensions: grpc
                   tools: composer:v2.1
                   coverage: pcov
               env:

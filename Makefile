@@ -325,6 +325,7 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	cp composer.json var/phar/composer.json.bak
 	cp composer.lock var/phar/composer.lock.bak
 
+	composer remove open-telemetry/transport-grpc
 	composer require --no-interaction \
 		guzzlehttp/guzzle \
 		infection/codeception-adapter \
