@@ -14,6 +14,12 @@ commandTests:
         expectedOutput: ['(?m)^xdebug\.mode => coverage => coverage$']
         exitCode: 0
 
+    -   name: "PHP memory limit is disabled"
+        command: "php"
+        args: ["-r", "echo ini_get('memory_limit'), PHP_EOL;"]
+        expectedOutput: ['(?m)^-1$']
+        exitCode: 0
+
     -   name: "curl PHP extension is loaded"
         command: "php"
         args: ["-r", "exit(extension_loaded('curl') ? 0 : 1);"]
