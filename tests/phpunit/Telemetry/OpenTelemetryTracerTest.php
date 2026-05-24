@@ -65,6 +65,8 @@ final class OpenTelemetryTracerTest extends TestCase
 
     private const int CLOCK_TICK_NANOS = 1_000_000_000;
 
+    private const int EXPLICIT_SPAN_END_NANOS = 20_000_000_000;
+
     private const float RUN_DURATION = 9.0;
 
     private const int GENERATED_MUTATIONS_COUNT = 13;
@@ -138,6 +140,38 @@ final class OpenTelemetryTracerTest extends TestCase
 
         Assert::assertSame([], $this->exporter->getSpans());
         Assert::assertFalse($this->tracerProvider->getTracer('infection')->isEnabled());
+    }
+
+    public function test_it_uses_the_explicit_end_timestamp_when_provided(): void
+    {
+        $metricsExporter = new MetricsTestExporter();
+        $meterProvider = MeterProvider::builder()
+            ->addReader(new ExportingReader($metricsExporter))
+            ->build();
+        $telemetry = new OpenTelemetryTracer(
+            $this->tracerProvider->getTracer('infection'),
+            $this->tracerProvider,
+            new IncrementalClock(
+                self::CLOCK_START_NANOS,
+                self::CLOCK_TICK_NANOS,
+            ),
+            new OpenTelemetryMetrics(
+                $meterProvider->getMeter('infection'),
+                $meterProvider,
+            ),
+        );
+
+        $run = $telemetry->startRootSpan('infection.run');
+        $phase = $telemetry->startChildSpan($run, 'infection.reporting');
+
+        $telemetry->end($phase, [], self::EXPLICIT_SPAN_END_NANOS);
+        $meterProvider->forceFlush();
+
+        $metricsExporter->assertSameHistogramValue(
+            'infection.phase.duration',
+            18.0,
+            ['infection.phase.name' => 'reporting'],
+        );
     }
 
     public function test_it_can_be_used_without_a_tracer_provider(): void
@@ -249,15 +283,20 @@ final class OpenTelemetryTracerTest extends TestCase
         $metricsExporter->assertSameHistogramValue(
             'infection.run.duration',
             self::RUN_DURATION,
+            ['infection.project.name' => 'acme/project'],
         );
         $metricsExporter->assertSameCounterValue(
             'infection.run.count',
             1,
+            ['infection.project.name' => 'acme/project'],
         );
         $metricsExporter->assertSameHistogramValue(
             'infection.phase.duration',
             1.0,
-            ['infection.phase.name' => 'mutation_generation'],
+            [
+                'infection.project.name' => 'acme/project',
+                'infection.phase.name' => 'mutation_generation',
+            ],
         );
         $metricsExporter->assertSameHistogramValue(
             'infection.mutation.generated.count',

@@ -11965,9 +11965,51 @@ message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryMetricsTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `durationHistogramSpanProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryMetricsTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `phaseSpanProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryMetricsTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `phaseSummaryMetricProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `exemplarFilterProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `invalidMetricsExporterProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `tracerProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_the_meter_provider_factory_creates_configured_exemplar_filters`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_the_meter_provider_factory_rejects_unknown_exemplar_filters`.'
 count = 1
 
 [[issues]]
@@ -11986,6 +12028,24 @@ count = 1
 file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_sets_the_default_service_name_when_creating_a_tracer`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_it_sets_the_default_traces_exporter_when_creating_a_tracer`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_the_meter_provider_factory_rejects_invalid_metrics_exporter_configuration`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Telemetry/OpenTelemetryTracerFactoryTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Telemetry\OpenTelemetryTracerFactoryTest::test_the_meter_provider_factory_uses_a_noop_provider_when_the_sdk_is_disabled`.'
 count = 1
 
 [[issues]]

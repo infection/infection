@@ -46,11 +46,17 @@ use Infection\Telemetry\SDK\FailingTracerProviderFactory;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use RuntimeException;
 use function Safe\putenv;
 use function str_starts_with;
 use UnexpectedValueException;
@@ -318,6 +324,21 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
         $this->assertSame('infection', $_ENV[Variables::OTEL_SERVICE_NAME]);
     }
 
+    public function test_it_sets_the_default_traces_exporter_when_creating_a_tracer(): void
+    {
+        self::setEnvVariables([
+            OpenTelemetryTracerFactory::INFECTION_TELEMETRY => 'true',
+        ]);
+
+        $tracer = (new OpenTelemetryTracerFactory())->create();
+
+        $tracer?->shutdown();
+
+        $this->assertSame('console', getenv(Variables::OTEL_TRACES_EXPORTER));
+        $this->assertSame('console', $_SERVER[Variables::OTEL_TRACES_EXPORTER]);
+        $this->assertSame('console', $_ENV[Variables::OTEL_TRACES_EXPORTER]);
+    }
+
     public function test_it_keeps_the_existing_service_name_when_creating_a_tracer(): void
     {
         self::setEnvVariables([
@@ -333,6 +354,85 @@ final class OpenTelemetryTracerFactoryTest extends TestCase
         $this->assertSame('custom-service', getenv(Variables::OTEL_SERVICE_NAME));
         $this->assertSame('custom-service', $_SERVER[Variables::OTEL_SERVICE_NAME]);
         $this->assertSame('custom-service', $_ENV[Variables::OTEL_SERVICE_NAME]);
+    }
+
+    public function test_the_meter_provider_factory_uses_a_noop_provider_when_the_sdk_is_disabled(): void
+    {
+        self::setEnvVariables([
+            Variables::OTEL_SDK_DISABLED => 'true',
+            Variables::OTEL_METRICS_EXPORTER => 'console',
+        ]);
+
+        $meterProvider = (new FailingMeterProviderFactory())->create();
+
+        $this->assertInstanceOf(NoopMeterProvider::class, $meterProvider);
+    }
+
+    /**
+     * @param array<string, string> $environmentVariables
+     */
+    #[DataProvider('invalidMetricsExporterProvider')]
+    public function test_the_meter_provider_factory_rejects_invalid_metrics_exporter_configuration(
+        array $environmentVariables,
+    ): void {
+        self::setEnvVariables($environmentVariables);
+
+        $this->expectExceptionObject(
+            new RuntimeException('The configured OpenTelemetry metrics exporter name must be a non-empty string.'),
+        );
+
+        (new FailingMeterProviderFactory())->create();
+    }
+
+    public static function invalidMetricsExporterProvider(): iterable
+    {
+        yield 'several exporters' => [
+            [
+                Variables::OTEL_METRICS_EXPORTER => 'console,otlp',
+            ],
+        ];
+    }
+
+    /**
+     * @param class-string $expectedClass
+     */
+    #[DataProvider('exemplarFilterProvider')]
+    public function test_the_meter_provider_factory_creates_configured_exemplar_filters(
+        string $name,
+        string $expectedClass,
+    ): void {
+        $method = new ReflectionMethod(
+            FailingMeterProviderFactory::class,
+            'createExemplarFilter',
+        );
+
+        $this->assertInstanceOf(
+            $expectedClass,
+            $method->invoke(
+                new FailingMeterProviderFactory(),
+                $name,
+            ),
+        );
+    }
+
+    public static function exemplarFilterProvider(): iterable
+    {
+        yield 'sampled trace' => ['with_sampled_trace', WithSampledTraceExemplarFilter::class];
+
+        yield 'all' => ['all', AllExemplarFilter::class];
+
+        yield 'none' => ['none', NoneExemplarFilter::class];
+    }
+
+    public function test_the_meter_provider_factory_rejects_unknown_exemplar_filters(): void
+    {
+        $method = new ReflectionMethod(FailingMeterProviderFactory::class, 'createExemplarFilter');
+
+        $this->expectExceptionObject(
+            new RuntimeException('Unknown exemplar filter: unknown'),
+        );
+
+        $method->invoke(new FailingMeterProviderFactory(), 'unknown');
     }
 
     /**

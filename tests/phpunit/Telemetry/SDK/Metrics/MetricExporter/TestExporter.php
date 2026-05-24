@@ -124,6 +124,20 @@ final readonly class TestExporter implements AggregationTemporalitySelectorInter
     }
 
     /**
+     * @param Attributes $expectedAttributes
+     */
+    public function assertDataPointCount(
+        string $name,
+        int $expectedCount,
+        array $expectedAttributes = [],
+    ): void {
+        Assert::assertCount(
+            $expectedCount,
+            $this->findDataPoints($name, $expectedAttributes),
+        );
+    }
+
+    /**
      * @param non-empty-string $attribute
      */
     public function assertNoDataPointHasAttribute(string $attribute): void
