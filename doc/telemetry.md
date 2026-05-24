@@ -213,6 +213,9 @@ variables. The most relevant at present are:
 | `OTEL_SERVICE_NAME`                   | Service name attached to all telemetry.                                    | `infection`              |
 | `OTEL_SDK_DISABLED`                   | When `true`, forces the SDK off regardless of any other `OTEL_*` variable. | `false`                  |
 
+The OTLP gRPC transport requires the PHP `grpc` extension and is not available
+when running Infection from the PHAR. Use `http/protobuf` with the PHAR.
+
 For the full list of variables the OpenTelemetry SDK recognises, see the
 official [environment variable reference][otel-env-vars]. Variables that
 target signals, exporters, or protocols Infection does not yet support are
