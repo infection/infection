@@ -16,15 +16,16 @@ supported surface is:
 
 | Signal  | Status                                           |
 |---------|--------------------------------------------------|
-| Traces  | Supported with `console` and OTLP HTTP exporters |
-| Metrics | Supported with `console` and OTLP HTTP exporters |
+| Traces  | Supported with `console` and OTLP HTTP/gRPC exporters |
+| Metrics | Supported with `console` and OTLP HTTP/gRPC exporters |
 | Logs    | Not yet supported                                |
 
 Unsupported exporters (for example, a logs exporter, or a trace/metrics
 exporter other than `console` or `otlp`) are rejected at startup rather than
 silently producing no output. Unsupported OTLP protocols are likewise
-reported at startup. Additional signals and exporters will be added in later
-increments.
+reported at startup. The OTLP gRPC transport requires the PHP `grpc` extension
+to be loaded and is not available when running Infection from the PHAR.
+Additional signals and exporters will be added in later increments.
 
 ## Quick start
 
@@ -206,11 +207,14 @@ variables. The most relevant at present are:
 | `OTEL_EXPORTER_OTLP_ENDPOINT`         | Base OTLP endpoint.                                                        | unset                    |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  | OTLP endpoint for traces.                                                  | unset                    |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | OTLP endpoint for metrics.                                                 | unset                    |
-| `OTEL_EXPORTER_OTLP_PROTOCOL`         | OTLP protocol. Use `http/protobuf` for HTTP export.                        | SDK default              |
-| `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL`  | OTLP traces protocol. Use `http/protobuf` for HTTP export.                 | SDK default              |
-| `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL` | OTLP metrics protocol. Use `http/protobuf` for HTTP export.                | SDK default              |
+| `OTEL_EXPORTER_OTLP_PROTOCOL`         | OTLP protocol. Accepted values are `http/protobuf` and `grpc`.             | SDK default              |
+| `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL`  | OTLP traces protocol. Accepted values are `http/protobuf` and `grpc`.      | SDK default              |
+| `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL` | OTLP metrics protocol. Accepted values are `http/protobuf` and `grpc`.     | SDK default              |
 | `OTEL_SERVICE_NAME`                   | Service name attached to all telemetry.                                    | `infection`              |
 | `OTEL_SDK_DISABLED`                   | When `true`, forces the SDK off regardless of any other `OTEL_*` variable. | `false`                  |
+
+The OTLP gRPC transport requires the PHP `grpc` extension and is not available
+when running Infection from the PHAR. Use `http/protobuf` with the PHAR.
 
 For the full list of variables the OpenTelemetry SDK recognises, see the
 official [environment variable reference][otel-env-vars]. Variables that
@@ -253,6 +257,18 @@ OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip \
 vendor/bin/infection
 ```
 
+Use the OTLP exporter with the gRPC transport by setting the protocol to
+`grpc`. This requires the PHP `grpc` extension. If a gRPC transport is
+requested without the extension, Infection will fail.
+
+```bash
+INFECTION_TELEMETRY=true \
+OTEL_TRACES_EXPORTER=otlp \
+OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc \
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://127.0.0.1:4317 \
+vendor/bin/infection
+```
+
 ### Export metrics to an OTLP Collector
 
 Enable the metrics exporter explicitly. Metrics are off by default even when
@@ -265,6 +281,10 @@ OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf \
 OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://127.0.0.1:4318/v1/metrics \
 vendor/bin/infection
 ```
+
+Use `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=grpc` and a gRPC collector endpoint
+to export metrics over gRPC. This also requires the PHP `grpc` extension and
+is not available when running Infection from the PHAR.
 
 ### Capture traces from CI
 

@@ -25,6 +25,11 @@ commandTests:
         args: ["-r", "exit(extension_loaded('curl') ? 0 : 1);"]
         exitCode: 0
 
+    -   name: "gRPC PHP extension is loaded"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('grpc') ? 0 : 1);"]
+        exitCode: 0
+
     -   name: "composer is executable"
         command: "composer"
         args: ["--version"]

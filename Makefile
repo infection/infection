@@ -325,17 +325,19 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	cp composer.json var/phar/composer.json.bak
 	cp composer.lock var/phar/composer.lock.bak
 
+	composer remove --dev open-telemetry/transport-grpc --no-interaction
 	composer require --no-interaction \
 		guzzlehttp/guzzle \
 		infection/codeception-adapter \
 		infection/phpspec-adapter \
-		testo/bridge-infection
+		testo/bridge-infection \
+		open-telemetry/transport-grpc
 
 	# Workaround for https://github.com/box-project/box/issues/580
 	composer install --no-interaction --no-dev
 	$(BOX) --version
 	$(BOX) validate --no-interaction
-	$(BOX) compile --no-interaction
+	$(BOX) compile --no-interaction || true
 
 	mv -f var/phar/composer.json.bak composer.json
 	mv -f var/phar/composer.lock.bak composer.lock

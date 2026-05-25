@@ -55,6 +55,7 @@ jobs:
         uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # master
         with:
           php-version: ${{ env.PHP_VERSION }}
+          extensions: grpc
           coverage: pcov
           tools: composer
         env:
@@ -87,6 +88,7 @@ jobs:
         uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # master
         with:
           php-version: ${{ env.PHP_VERSION }}
+          extensions: grpc
           coverage: none
           ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
         env:
