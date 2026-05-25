@@ -51,24 +51,26 @@ INFECTION_TELEMETRY=true OTEL_TRACES_EXPORTER=console vendor/bin/infection debug
 Infection records the following lifecycle spans for every run:
 
 - `infection.run` (root span; covers the full execution)
-- `infection.initial_tests`
-- `infection.initial_static_analysis`
-- `infection.mutation_generation`
-- `infection.mutation_analysis`
-- `infection.ast_processing`
-- `infection.ast_processing.file` (one per processed source file)
-- `infection.ast_processing.file.parsing`
-- `infection.ast_processing.file.enrichment`
-- `infection.mutation_evaluation`
-- `infection.mutation_evaluation.mutation` (one per started mutant evaluation)
-- `infection.mutation_evaluation.mutation.heuristic_suppression`
-- `infection.mutation_evaluation.mutation.heuristic`
-- `infection.mutation_evaluation.mutant_analysis`
-- `infection.mutation_evaluation.mutant_analysis.materialisation`
-- `infection.mutation_evaluation.mutant_analysis.evaluation`
-- `infection.mutation_evaluation.mutant_analysis.evaluation.process`
-- `infection.reporting`
-- `infection.reporting.reporter` (one per reporter run)
+  - `infection.artefact_collection`
+    - `infection.initial_tests`
+    - `infection.initial_static_analysis`
+  - `infection.source_collection`
+  - `infection.mutation_analysis`
+    - `infection.mutation_generation`
+      - `infection.ast_processing`
+        - `infection.ast_processing.file` (one per processed source file)
+          - `infection.ast_processing.file.parsing` (one per parsed source file)
+          - `infection.ast_processing.file.enrichment` (one per enriched source file)
+    - `infection.mutation_evaluation`
+      - `infection.mutation_evaluation.mutation` (one per started mutant evaluation)
+        - `infection.mutation_evaluation.mutation.heuristic_suppression` (one per started heuristic suppression)
+          - `infection.mutation_evaluation.mutation.heuristic` (one per heuristic check)
+        - `infection.mutation_evaluation.mutant_analysis` (one per started mutant analysis)
+          - `infection.mutation_evaluation.mutant_analysis.materialisation` (one per mutant materialisation)
+          - `infection.mutation_evaluation.mutant_analysis.evaluation` (one per mutant evaluation)
+            - `infection.mutation_evaluation.mutant_analysis.evaluation.process` (one per mutant process execution)
+  - `infection.reporting`
+    - `infection.reporting.reporter` (one per reporter run)
 
 Infection also records metrics derived from those spans when
 `OTEL_METRICS_EXPORTER` is set to `console` or `otlp`. Metric attributes are
@@ -79,35 +81,168 @@ process exit code, and reporter name. Mutation ids, mutator names, file paths,
 line numbers, event classes, project paths, configuration paths, and Git SHAs
 remain trace-only.
 
-| Metric                                           | Instrument | Unit         | Description                                                                 |
-|--------------------------------------------------|------------|--------------|-----------------------------------------------------------------------------|
-| `infection.run.count`                            | Counter    | `{run}`      | Completed Infection runs.                                                   |
-| `infection.run.duration`                         | Histogram  | `s`          | Full run duration.                                                          |
-| `infection.phase.duration`                       | Histogram  | `s`          | Top-level phase duration, split by `infection.phase.name`.                  |
-| `infection.source_file.count`                    | Histogram  | `{file}`     | Source files collected or used for mutation generation.                     |
-| `infection.mutated_file.count`                   | Histogram  | `{file}`     | Source files for which at least one mutation was generated.                 |
-| `infection.mutation.generated.count`             | Histogram  | `{mutation}` | Generated mutations selected for mutation evaluation.                       |
-| `infection.mutation.evaluated.count`             | Histogram  | `{mutation}` | Evaluated mutations.                                                        |
-| `infection.mutation.suppressed.count`            | Histogram  | `{mutation}` | Generated mutations suppressed before mutant evaluation.                    |
-| `infection.mutation.*.count`                     | Histogram  | `{mutation}` | Run-summary mutation count metrics by MSI/status category.                  |
-| `infection.msi`                                  | Histogram  | `%`          | Final Mutation Score Indicator percentage.                                  |
-| `infection.covered_msi`                          | Histogram  | `%`          | Final covered-code Mutation Score Indicator percentage.                     |
-| `infection.mutation.coverage_rate`               | Histogram  | `%`          | Final mutation code coverage percentage.                                    |
-| `infection.msi.threshold`                        | Histogram  | `%`          | Effective minimum MSI threshold.                                            |
-| `infection.covered_msi.threshold`                | Histogram  | `%`          | Effective minimum covered-code MSI threshold.                               |
-| `infection.ast.file.duration`                    | Histogram  | `s`          | AST processing duration per processed file, without file-path attributes.   |
-| `infection.ast.file.parsing.duration`            | Histogram  | `s`          | AST parsing duration per processed file, without file-path attributes.      |
-| `infection.ast.file.enrichment.duration`         | Histogram  | `s`          | AST enrichment duration per processed file, without file-path attributes.   |
-| `infection.mutation.count`                       | Counter    | `{mutation}` | Completed mutation evaluations, split by status and MSI category.           |
-| `infection.mutation.evaluation.duration`         | Histogram  | `s`          | Mutation evaluation span duration, split by status and MSI category.        |
-| `infection.mutation.runtime`                     | Histogram  | `s`          | Runtime reported by the mutation execution result.                          |
-| `infection.mutant.analysis.duration`             | Histogram  | `s`          | Mutant analysis duration.                                                   |
-| `infection.mutant.materialisation.duration`      | Histogram  | `s`          | Mutant materialisation duration.                                            |
-| `infection.mutant.evaluation.duration`           | Histogram  | `s`          | Mutant evaluation duration.                                                 |
-| `infection.mutation.queue_wait.duration`         | Histogram  | `s`          | Accumulated queue wait before mutant process execution.                     |
-| `infection.mutant.process.count`                 | Counter    | `{process}`  | Mutant process executions.                                                  |
-| `infection.mutant.process.duration`              | Histogram  | `s`          | Mutant process execution duration.                                          |
-| `infection.reporter.duration`                    | Histogram  | `s`          | Reporter execution duration, split by reporter name.                        |
+| Metric                                               | Instrument | Unit         | Description                                                               |
+|------------------------------------------------------|------------|--------------|---------------------------------------------------------------------------|
+| `infection.run.count`                                | Counter    | `{run}`      | Completed Infection runs.                                                 |
+| `infection.run.duration`                             | Histogram  | `s`          | Full run duration.                                                        |
+| `infection.phase.duration`                           | Histogram  | `s`          | Top-level phase duration, split by `infection.phase.name`.                |
+| `infection.source_file.count`                        | Histogram  | `{file}`     | Source files collected or used for mutation generation.                   |
+| `infection.mutated_file.count`                       | Histogram  | `{file}`     | Source files for which at least one mutation was generated.               |
+| `infection.mutation.generated.count`                 | Histogram  | `{mutation}` | Generated mutations selected for mutation evaluation.                     |
+| `infection.mutation.evaluated.count`                 | Histogram  | `{mutation}` | Evaluated mutations.                                                      |
+| `infection.mutation.suppressed.count`                | Histogram  | `{mutation}` | Generated mutations suppressed before mutant evaluation.                  |
+| `infection.mutation.eligible.count`                  | Histogram  | `{mutation}` | Mutations eligible for MSI.                                               |
+| `infection.mutation.ineligible.count`                | Histogram  | `{mutation}` | Mutations that do not contribute to MSI, such as skipped and ignored.     |
+| `infection.mutation.tested_eligible.count`           | Histogram  | `{mutation}` | Mutations eligible for covered-code MSI.                                  |
+| `infection.mutation.covered.count`                   | Histogram  | `{mutation}` | Eligible mutations contributing positively to MSI.                        |
+| `infection.mutation.tested_not_covered.count`        | Histogram  | `{mutation}` | Tested eligible mutations contributing negatively to MSI.                 |
+| `infection.mutation.not_covered.count`               | Histogram  | `{mutation}` | Eligible mutations contributing negatively to MSI.                        |
+| `infection.mutation.not_tested.count`                | Histogram  | `{mutation}` | Mutation results with `not covered` detection status.                     |
+| `infection.mutation.killed_by_tests.count`           | Histogram  | `{mutation}` | Mutation results with `killed by tests` detection status.                 |
+| `infection.mutation.killed_by_static_analysis.count` | Histogram  | `{mutation}` | Mutation results with `killed by static analysis` detection status.       |
+| `infection.mutation.escaped.count`                   | Histogram  | `{mutation}` | Mutation results with `escaped` detection status.                         |
+| `infection.mutation.error.count`                     | Histogram  | `{mutation}` | Mutation results with `error` detection status.                           |
+| `infection.mutation.timed_out.count`                 | Histogram  | `{mutation}` | Mutation results with `timed out` detection status.                       |
+| `infection.mutation.skipped.count`                   | Histogram  | `{mutation}` | Mutation results with `skipped` detection status.                         |
+| `infection.mutation.syntax_error.count`              | Histogram  | `{mutation}` | Mutation results with `syntax error` detection status.                    |
+| `infection.mutation.ignored.count`                   | Histogram  | `{mutation}` | Mutation results with `ignored` detection status.                         |
+| `infection.msi`                                      | Histogram  | `%`          | Final Mutation Score Indicator percentage.                                |
+| `infection.covered_msi`                              | Histogram  | `%`          | Final covered-code Mutation Score Indicator percentage.                   |
+| `infection.mutation.coverage_rate`                   | Histogram  | `%`          | Final mutation code coverage percentage.                                  |
+| `infection.msi.threshold`                            | Histogram  | `%`          | Effective minimum MSI threshold.                                          |
+| `infection.covered_msi.threshold`                    | Histogram  | `%`          | Effective minimum covered-code MSI threshold.                             |
+| `infection.ast.file.duration`                        | Histogram  | `s`          | AST processing duration per processed file, without file-path attributes. |
+| `infection.ast.file.parsing.duration`                | Histogram  | `s`          | AST parsing duration per processed file, without file-path attributes.    |
+| `infection.ast.file.enrichment.duration`             | Histogram  | `s`          | AST enrichment duration per processed file, without file-path attributes. |
+| `infection.mutation.count`                           | Counter    | `{mutation}` | Completed mutation evaluations, split by status and MSI category.         |
+| `infection.mutation.evaluation.duration`             | Histogram  | `s`          | Mutation evaluation span duration, split by status and MSI category.      |
+| `infection.mutation.runtime`                         | Histogram  | `s`          | Runtime reported by the mutation execution result.                        |
+| `infection.mutant.analysis.duration`                 | Histogram  | `s`          | Mutant analysis duration.                                                 |
+| `infection.mutant.materialisation.duration`          | Histogram  | `s`          | Mutant materialisation duration.                                          |
+| `infection.mutant.evaluation.duration`               | Histogram  | `s`          | Mutant evaluation duration.                                               |
+| `infection.mutation.queue_wait.duration`             | Histogram  | `s`          | Accumulated queue wait before mutant process execution.                   |
+| `infection.mutant.process.count`                     | Counter    | `{process}`  | Mutant process executions.                                                |
+| `infection.mutant.process.duration`                  | Histogram  | `s`          | Mutant process execution duration.                                        |
+| `infection.reporter.duration`                        | Histogram  | `s`          | Reporter execution duration, split by reporter name.                      |
+
+## Dashboards
+
+When exporting telemetry to Sentry or another OpenTelemetry backend, the
+metrics emitted by Infection can be a useful starting point for aggregate
+dashboards, while traces can help with per-run drill-downs.
+
+Metrics are intentionally low-cardinality because telemetry backends aggregate
+and index metric time series by every distinct combination of metric name plus
+attributes. High-cardinality details can still be found but in traces instead.
+
+Depending on what you want to observe, dashboard ideas include:
+
+### Run health and score trends
+
+This dashboard can focus on the overall result of each Infection run: how often
+it runs, how long it takes, whether scores are moving in the right direction,
+and which final mutation outcomes explain those score changes.
+
+A useful starting layout is:
+
+- A run volume widget based on `infection.run.count`, to show how many
+  completed runs are represented in the selected time range.
+- A run duration widget based on `infection.run.duration`, using an average or
+  percentile aggregation such as p50/p95 to separate typical runs from slow
+  outliers.
+- Score trend widgets for `infection.msi`, `infection.covered_msi`, and
+  `infection.mutation.coverage_rate`, preferably displayed over time so that
+  regressions are visible.
+- Threshold reference widgets for `infection.msi.threshold` and
+  `infection.covered_msi.threshold`, which help show how close runs are to
+  failing configured quality gates.
+- Mutation volume widgets for `infection.mutation.generated.count`,
+  `infection.mutation.evaluated.count`, and
+  `infection.mutation.suppressed.count`, to make score changes easier to
+  compare between runs of different sizes.
+- Final outcome widgets based on the `infection.mutation.*.count` summary
+  metrics, such as killed by tests, killed by static analysis, escaped, timed
+  out, errored, skipped, ignored, syntax error, and not covered.
+
+Common filters for this dashboard are project name, Infection version,
+distribution, test framework, static-analysis tool, configured thread count,
+whether the run used source filtering, and whether initial tests or static
+analysis were skipped. These filters can help compare like-for-like runs before
+interpreting score or duration changes.
+
+### Pipeline performance
+
+Useful widgets might include `infection.phase.duration` grouped by
+`infection.phase.name`, total run duration, source/mutated/generated mutation
+counts, AST parsing/enrichment/file durations, and reporting duration. This can
+help show where a run spends its time: source collection, artefact collection,
+initial tests, static analysis, mutation generation, AST processing, mutation
+evaluation, or report generation.
+
+### Mutation outcome distribution
+
+This dashboard can focus on how mutations are classified once Infection has
+finished evaluating them. It can be useful when MSI changes need to be
+explained by concrete outcomes rather than only by the final score.
+
+A useful starting layout is:
+
+- An outcome distribution widget based on `infection.mutation.count`, grouped
+  by `infection.mutation.status`. This can show the live shape of evaluated
+  mutations across statuses such as killed by tests, killed by static analysis,
+  escaped, timed out, error, skipped, syntax error, not covered, and ignored.
+- An MSI impact widget based on `infection.mutation.count`, grouped by
+  `infection.mutation.msi.category`. The expected categories are `covered`,
+  `not_covered`, and `ineligible`, which gives a compact view of which
+  mutations improve, hurt, or do not affect MSI.
+- A mutation evaluation duration widget based on
+  `infection.mutation.evaluation.duration`, grouped by mutation status or MSI
+  category. Percentile aggregations such as p50/p95 can help distinguish common
+  outcomes from slow outliers.
+- A runtime widget based on `infection.mutation.runtime`, grouped by mutation
+  status. This can help separate slow test execution from other mutation
+  evaluation overhead.
+- Final summary widgets based on the run-level `infection.mutation.*.count`
+  metrics, especially `infection.mutation.escaped.count`,
+  `infection.mutation.timed_out.count`, `infection.mutation.error.count`,
+  `infection.mutation.not_tested.count`,
+  `infection.mutation.syntax_error.count`, `infection.mutation.skipped.count`,
+  and `infection.mutation.ignored.count`.
+
+The per-mutation `infection.mutation.count` and
+`infection.mutation.evaluation.duration` metrics are useful for distribution
+and latency questions. The run-summary `infection.mutation.*.count` metrics are
+useful for score and quality questions, because they are emitted once per run
+with the final totals used by Infection's score calculations.
+
+Common filters for this dashboard are project name, Infection version,
+distribution, test framework, static-analysis tool, configured thread count,
+whether timeouts count as escaped, whether source filtering was used, and
+whether initial tests or static analysis were skipped. These filters can help
+avoid comparing a full mutation run with a narrower filtered run.
+
+### Mutant process and concurrency
+
+Useful widgets might include queue-wait duration, mutant process count and
+duration, process timeout flag, process exit code, process thread, configured
+thread count, and test framework. This can help show whether mutation
+evaluation is bottlenecked by worker availability, slow test processes,
+timeouts, or recurring non-zero process exits.
+
+### Reporter cost
+
+Useful widgets might include reporting phase duration and
+`infection.reporter.duration` grouped by reporter name. This can help show
+which reporters add noticeable cost at the end of the run, for example when an
+expensive report format or upload dominates the reporting phase.
+
+Trace views can complement these dashboards for high-cardinality
+investigations that are intentionally not exposed as metric dimensions: source
+file paths, line numbers, mutation ids, mutator names, Git revisions,
+configuration paths, and individual event classes. For example, a metrics
+dashboard can highlight a regression or spike, and a representative
+`infection.run` trace can then show the relevant child spans for the exact
+file, mutator, mutation id, process, or reporter.
 
 ## Run Attributes
 
@@ -169,15 +304,26 @@ flow.
 File-level spans use `code.file.path` for the source file path. The value is
 emitted relative to `infection.project.path`.
 
+`infection.source_collection` spans include `infection.source_file.count`, the
+number of source files collected for the run. `infection.mutation_generation`
+spans include `infection.source_file.count` when generation starts, then
+`infection.mutated_file.count` and `infection.mutation.generated.count` when
+generation finishes.
+
 Mutation-level spans and their child spans include `infection.mutation.id`,
 `infection.mutator.name`, `code.file.path`, `code.line.start`, and
 `code.line.end`. This makes mutation child spans queryable on their own in
 backends that do not support grouping or filtering by parent span attributes.
 Finished `infection.mutation_evaluation.mutation` spans also include
-`infection.mutation.msi.category`, which classifies the mutation's contribution
-to MSI as `covered`, `not_covered`, or `ineligible`. Timeouts are classified as
-`covered` unless `infection.timeouts_as_escaped` is enabled, in which case they
-are classified as `not_covered`.
+`infection.mutation.status`, the final mutation detection status,
+`infection.mutation.runtime`, the runtime reported by the mutation execution
+result in seconds, and `infection.mutation.msi.category`, which classifies the
+mutation's contribution to MSI as `covered`, `not_covered`, or `ineligible`.
+Timeouts are classified as `covered` unless
+`infection.timeouts_as_escaped` is enabled, in which case they are classified
+as `not_covered`.
+Heuristic spans include `infection.mutation_evaluation.heuristic.id`, the
+heuristic that was checked for the mutation.
 Finished `infection.mutation_evaluation.mutant_analysis.evaluation` spans
 include `infection.mutation.queue_wait.duration`, the accumulated queue wait
 duration for the mutant evaluation in seconds.
