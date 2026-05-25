@@ -40,4 +40,13 @@ namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
  */
 final readonly class MutationGenerationWasFinished
 {
+    /**
+     * @param positive-int|0 $mutationsCount
+     * @param positive-int|0 $mutatedFilesCount
+     */
+    public function __construct(
+        public int $mutationsCount,
+        public int $mutatedFilesCount,
+    ) {
+    }
 }

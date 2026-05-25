@@ -52,6 +52,7 @@ use function Safe\preg_split;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -167,6 +168,25 @@ final readonly class CommandLineGit implements Git
         Assert::stringNotEmpty($directory);
 
         return $directory;
+    }
+
+    public function getSha(string $projectDirectory): ?string
+    {
+        try {
+            $sha = $this->shellCommandLineExecutor->execute([
+                'git',
+                '-C',
+                $projectDirectory,
+                'rev-parse',
+                'HEAD',
+            ]);
+        } catch (ProcessException) {
+            return null;
+        }
+
+        $sha = trim($sha);
+
+        return $sha === '' ? null : $sha;
     }
 
     /**

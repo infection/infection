@@ -25,6 +25,11 @@ commandTests:
         args: ["-r", "exit(extension_loaded('curl') ? 0 : 1);"]
         exitCode: 0
 
+    -   name: "gRPC PHP extension is loaded"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('grpc') ? 0 : 1);"]
+        exitCode: 0
+
     -   name: "composer is executable"
         command: "composer"
         args: ["--version"]
@@ -48,6 +53,11 @@ commandTests:
             - "/usr/bin/pkg-config"
             - "/usr/bin/libtoolize"
             - "/usr/bin/phpize"
+        exitCode: 0
+
+    -   name: "protobuf extension is loaded"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('protobuf') ? 0 : 1);"]
         exitCode: 0
 
     -   name: "container-structure-test is executable"

@@ -1,0 +1,1002 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Telemetry\Subscriber;
+
+use function array_keys;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinished;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStarted;
+use Infection\Event\Events\ArtefactCollection\ArtefactCollectionWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinished;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStarted;
+use Infection\Event\Events\Ast\AstEnrichment\AstEnrichmentWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinished;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStarted;
+use Infection\Event\Events\Ast\AstParsing\AstParsingWasStartedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasFinished;
+use Infection\Event\Events\Ast\AstProcessingWasFinishedSubscriber;
+use Infection\Event\Events\Ast\AstProcessingWasStarted;
+use Infection\Event\Events\Ast\AstProcessingWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicSuppressionWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\HeuristicSuppression\HeuristicWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantAnalysisWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantEvaluation\MutantProcessExecutionWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantAnalysis\MutantMaterialisation\MutantMaterialisationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationForMutationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Infection\Event\Events\Reporting\ReporterWasFinished;
+use Infection\Event\Events\Reporting\ReporterWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReporterWasStarted;
+use Infection\Event\Events\Reporting\ReporterWasStartedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasFinished;
+use Infection\Event\Events\Reporting\ReportingWasFinishedSubscriber;
+use Infection\Event\Events\Reporting\ReportingWasStarted;
+use Infection\Event\Events\Reporting\ReportingWasStartedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinished;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasFinishedSubscriber;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStarted;
+use Infection\Event\Events\SourceCollection\SourceCollectionWasStartedSubscriber;
+use Infection\Telemetry\Attribute\MutationSpanAttributesProvider;
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use Infection\Telemetry\OpenTelemetryTracer;
+use Infection\Telemetry\ProjectRelativePathResolver;
+use Infection\Telemetry\SpanHandle;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use function spl_object_id;
+use function str_starts_with;
+
+/**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ *
+ * @internal
+ */
+final class OpenTelemetryTracerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber, ArtefactCollectionWasFinishedSubscriber, ArtefactCollectionWasStartedSubscriber, AstEnrichmentWasFinishedSubscriber, AstEnrichmentWasStartedSubscriber, AstParsingWasFinishedSubscriber, AstParsingWasStartedSubscriber, AstProcessingWasFinishedSubscriber, AstProcessingWasStartedSubscriber, HeuristicSuppressionWasFinishedSubscriber, HeuristicSuppressionWasStartedSubscriber, HeuristicWasFinishedSubscriber, HeuristicWasStartedSubscriber, InitialStaticAnalysisRunWasFinishedSubscriber, InitialStaticAnalysisRunWasStartedSubscriber, InitialTestSuiteWasFinishedSubscriber, InitialTestSuiteWasStartedSubscriber, MutantAnalysisWasFinishedSubscriber, MutantAnalysisWasStartedSubscriber, MutantEvaluationWasFinishedSubscriber, MutantEvaluationWasStartedSubscriber, MutantMaterialisationWasFinishedSubscriber, MutantMaterialisationWasStartedSubscriber, MutantProcessExecutionWasFinishedSubscriber, MutantProcessExecutionWasStartedSubscriber, MutationAnalysisWasFinishedSubscriber, MutationAnalysisWasStartedSubscriber, MutationEvaluationForMutationWasFinishedSubscriber, MutationEvaluationForMutationWasStartedSubscriber, MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber, ReporterWasFinishedSubscriber, ReporterWasStartedSubscriber, ReportingWasFinishedSubscriber, ReportingWasStartedSubscriber, SourceCollectionWasFinishedSubscriber, SourceCollectionWasStartedSubscriber
+{
+    private const int NANOSECONDS_PER_SECOND = 1_000_000_000;
+
+    private ?SpanHandle $rootSpan = null;
+
+    private ?SpanHandle $sourceCollectionSpan = null;
+
+    private ?SpanHandle $artefactCollectionSpan = null;
+
+    private ?SpanHandle $initialTestsSpan = null;
+
+    private ?SpanHandle $initialStaticAnalysisSpan = null;
+
+    private ?SpanHandle $mutationAnalysisSpan = null;
+
+    private ?SpanHandle $mutationGenerationSpan = null;
+
+    private ?SpanHandle $mutationEvaluationSpan = null;
+
+    private ?SpanHandle $reportingSpan = null;
+
+    private ?SpanHandle $astProcessingSpan = null;
+
+    /** @var array<string, SpanHandle> */
+    private array $astProcessingFileSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $astParsingSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $astEnrichmentSpans = [];
+
+    /**
+     * @var positive-int|0|null
+     */
+    private ?int $astProcessingFileCount = null;
+
+    /**
+     * @var positive-int|0
+     */
+    private int $processedAstFileCount = 0;
+
+    /** @var array<string, SpanHandle> */
+    private array $mutationEvaluationSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $heuristicSuppressionSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $heuristicSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $mutantAnalysisSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $mutantMaterialisationSpans = [];
+
+    /** @var array<string, SpanHandle> */
+    private array $mutantEvaluationSpans = [];
+
+    /** @var array<string, int> */
+    private array $mutantQueueWaitStartedAtInNs = [];
+
+    /** @var array<string, int> */
+    private array $mutantQueueWaitDurationInNs = [];
+
+    /** @var array<int, SpanHandle> */
+    private array $mutantProcessExecutionSpans = [];
+
+    /** @var array<int, string> */
+    private array $mutantProcessExecutionSpanMutationHashes = [];
+
+    /** @var array<int, SpanHandle> */
+    private array $reporterSpans = [];
+
+    private int $sourceFileCount = 0;
+
+    /**
+     * @var positive-int|0
+     */
+    private int $mutatedFileCount = 0;
+
+    /**
+     * @var positive-int|0
+     */
+    private int $mutationCount = 0;
+
+    private int $evaluatedMutationCount = 0;
+
+    public function __construct(
+        private readonly OpenTelemetryTracer $telemetry,
+        private readonly RunSpanAttributesProvider $runSpanAttributesProvider,
+        private readonly MutationSpanAttributesProvider $mutationSpanAttributesProvider,
+        private readonly ProjectRelativePathResolver $projectRelativePathResolver,
+        private readonly string $testFramework,
+    ) {
+    }
+
+    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
+    {
+        // TODO: the names are re-usable so we should move them to a dedicated class
+        $this->rootSpan = $this->telemetry->startRootSpan(
+            'infection.run',
+            [
+                'infection.event.class.start' => $event::class,
+                ...$this->runSpanAttributesProvider->provideInitialAttributes(),
+            ],
+        );
+    }
+
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    {
+        $this->initialTestsSpan = $this->startChild(
+            'infection.initial_tests',
+            $event,
+            parent: $this->artefactCollectionSpan,
+        );
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->end($this->initialTestsSpan, event: $event);
+        $this->initialTestsSpan = null;
+    }
+
+    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
+    {
+        $this->initialStaticAnalysisSpan = $this->startChild(
+            'infection.initial_static_analysis',
+            $event,
+            parent: $this->artefactCollectionSpan,
+        );
+    }
+
+    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    {
+        $this->end($this->initialStaticAnalysisSpan, event: $event);
+        $this->initialStaticAnalysisSpan = null;
+    }
+
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    {
+        $this->astProcessingFileCount = $event->mutableFilesCount;
+        $this->endAstProcessingSpanIfComplete($event);
+
+        $this->mutationGenerationSpan = $this->startChild(
+            'infection.mutation_generation',
+            $event,
+            ['infection.source_file.count' => $event->mutableFilesCount],
+            parent: $this->mutationAnalysisSpan,
+        );
+    }
+
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
+    {
+        $this->mutationCount = $event->mutationsCount;
+        $this->mutatedFileCount = $event->mutatedFilesCount;
+
+        $this->end(
+            $this->mutationGenerationSpan,
+            [
+                'infection.mutated_file.count' => $event->mutatedFilesCount,
+                'infection.mutation.generated.count' => $event->mutationsCount,
+            ],
+            event: $event,
+        );
+        $this->mutationGenerationSpan = null;
+    }
+
+    public function onMutationAnalysisWasStarted(MutationAnalysisWasStarted $event): void
+    {
+        $this->mutationAnalysisSpan = $this->startChild('infection.mutation_analysis', $event);
+    }
+
+    public function onMutationAnalysisWasFinished(MutationAnalysisWasFinished $event): void
+    {
+        $this->endAstSpans($event);
+        $this->end($this->mutationGenerationSpan, event: $event);
+        $this->mutationGenerationSpan = null;
+
+        foreach ($this->mutationEvaluationSpans as $span) {
+            $this->end($span, event: $event);
+        }
+
+        $this->mutationEvaluationSpans = [];
+        $this->end($this->mutationEvaluationSpan, event: $event);
+        $this->mutationEvaluationSpan = null;
+        $this->endMutationAnalysisSpan($event);
+    }
+
+    public function onAstProcessingWasStarted(AstProcessingWasStarted $event): void
+    {
+        if ($this->mutationGenerationSpan === null) {
+            return;
+        }
+
+        $this->astProcessingSpan ??= $this->startChild(
+            'infection.ast_processing',
+            $event,
+            parent: $this->mutationGenerationSpan,
+        );
+
+        $span = $this->startChild(
+            'infection.ast_processing.file',
+            $event,
+            ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
+            parent: $this->astProcessingSpan,
+        );
+
+        if ($span !== null) {
+            $this->astProcessingFileSpans[$event->sourceFilePath] = $span;
+        }
+    }
+
+    public function onAstProcessingWasFinished(AstProcessingWasFinished $event): void
+    {
+        $span = $this->astProcessingFileSpans[$event->sourceFilePath] ?? null;
+
+        unset($this->astProcessingFileSpans[$event->sourceFilePath]);
+
+        $this->end($span, event: $event);
+
+        ++$this->processedAstFileCount;
+        $this->endAstProcessingSpanIfComplete($event);
+    }
+
+    public function onAstParsingWasStarted(AstParsingWasStarted $event): void
+    {
+        if (!isset($this->astProcessingFileSpans[$event->sourceFilePath])) {
+            return;
+        }
+
+        $span = $this->startChild(
+            'infection.ast_processing.file.parsing',
+            $event,
+            ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
+            parent: $this->astProcessingFileSpans[$event->sourceFilePath],
+        );
+
+        if ($span !== null) {
+            $this->astParsingSpans[$event->sourceFilePath] = $span;
+        }
+    }
+
+    public function onAstParsingWasFinished(AstParsingWasFinished $event): void
+    {
+        $span = $this->astParsingSpans[$event->sourceFilePath] ?? null;
+
+        unset($this->astParsingSpans[$event->sourceFilePath]);
+
+        $this->end($span, event: $event);
+    }
+
+    public function onAstEnrichmentWasStarted(AstEnrichmentWasStarted $event): void
+    {
+        if (!isset($this->astProcessingFileSpans[$event->sourceFilePath])) {
+            return;
+        }
+
+        $span = $this->startChild(
+            'infection.ast_processing.file.enrichment',
+            $event,
+            ['code.file.path' => $this->projectRelativePathResolver->resolve($event->sourceFilePath)],
+            parent: $this->astProcessingFileSpans[$event->sourceFilePath],
+        );
+
+        if ($span !== null) {
+            $this->astEnrichmentSpans[$event->sourceFilePath] = $span;
+        }
+    }
+
+    public function onAstEnrichmentWasFinished(AstEnrichmentWasFinished $event): void
+    {
+        $span = $this->astEnrichmentSpans[$event->sourceFilePath] ?? null;
+
+        unset($this->astEnrichmentSpans[$event->sourceFilePath]);
+
+        $this->end($span, event: $event);
+    }
+
+    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
+    {
+        $this->mutationEvaluationSpan = $this->startChild(
+            'infection.mutation_evaluation',
+            $event,
+            parent: $this->mutationAnalysisSpan,
+        );
+    }
+
+    public function onMutationEvaluationForMutationWasStarted(MutationEvaluationForMutationWasStarted $event): void
+    {
+        $mutation = $event->mutation;
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutation',
+            $event,
+            $this->mutationSpanAttributesProvider->provide($mutation),
+            $this->mutationEvaluationSpan,
+        );
+
+        if ($span !== null) {
+            $this->mutationEvaluationSpans[$mutation->getHash()] = $span;
+        }
+    }
+
+    public function onMutationEvaluationForMutationWasFinished(MutationEvaluationForMutationWasFinished $event): void
+    {
+        $result = $event->executionResult;
+        $hash = $result->getMutantHash();
+        $span = $this->mutationEvaluationSpans[$hash] ?? null;
+
+        $this->endMutationEvaluationChildSpans($hash, $event);
+
+        unset($this->mutationEvaluationSpans[$hash]);
+
+        $this->end(
+            $span,
+            [
+                'infection.mutation.status' => $result->getDetectionStatus()->value,
+                'infection.mutation.runtime' => $result->getProcessRuntime(),
+                ...$this->mutationSpanAttributesProvider->provideResultAttributes($result->getDetectionStatus()),
+            ],
+            event: $event,
+        );
+    }
+
+    public function onHeuristicSuppressionWasStarted(HeuristicSuppressionWasStarted $event): void
+    {
+        $hash = $event->mutation->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutation.heuristic_suppression',
+            $event,
+            $this->mutationSpanAttributesProvider->provide($event->mutation),
+            parent: $this->mutationEvaluationSpans[$hash] ?? null,
+        );
+
+        if ($span !== null) {
+            $this->heuristicSuppressionSpans[$hash] = $span;
+        }
+    }
+
+    public function onHeuristicSuppressionWasFinished(HeuristicSuppressionWasFinished $event): void
+    {
+        $hash = $event->mutation->getHash();
+
+        $this->endHeuristicSpans($hash, $event);
+        $this->end($this->heuristicSuppressionSpans[$hash] ?? null, event: $event);
+
+        unset($this->heuristicSuppressionSpans[$hash]);
+    }
+
+    public function onHeuristicWasStarted(HeuristicWasStarted $event): void
+    {
+        $hash = $event->mutation->getHash();
+        $key = self::heuristicKey($hash, $event->heuristic->value);
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutation.heuristic',
+            $event,
+            [
+                ...$this->mutationSpanAttributesProvider->provide($event->mutation),
+                'infection.mutation_evaluation.heuristic.id' => $event->heuristic->value,
+            ],
+            $this->heuristicSuppressionSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->heuristicSpans[$key] = $span;
+        }
+    }
+
+    public function onHeuristicWasFinished(HeuristicWasFinished $event): void
+    {
+        $key = self::heuristicKey($event->mutation->getHash(), $event->heuristic->value);
+
+        $this->end($this->heuristicSpans[$key] ?? null, event: $event);
+
+        unset($this->heuristicSpans[$key]);
+    }
+
+    public function onMutantAnalysisWasStarted(MutantAnalysisWasStarted $event): void
+    {
+        $mutation = $event->mutant->getMutation();
+        $hash = $mutation->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_analysis',
+            $event,
+            $this->mutationSpanAttributesProvider->provide($mutation),
+            parent: $this->mutationEvaluationSpans[$hash] ?? null,
+        );
+
+        if ($span !== null) {
+            $this->mutantAnalysisSpans[$hash] = $span;
+        }
+    }
+
+    public function onMutantAnalysisWasFinished(MutantAnalysisWasFinished $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $this->end($this->mutantMaterialisationSpans[$hash] ?? null, event: $event);
+        unset($this->mutantMaterialisationSpans[$hash]);
+
+        $this->end($this->mutantAnalysisSpans[$hash] ?? null, event: $event);
+        unset($this->mutantAnalysisSpans[$hash]);
+    }
+
+    public function onMutantMaterialisationWasStarted(MutantMaterialisationWasStarted $event): void
+    {
+        $mutation = $event->mutant->getMutation();
+        $hash = $mutation->getHash();
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_analysis.materialisation',
+            $event,
+            $this->mutationSpanAttributesProvider->provide($mutation),
+            parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->mutantMaterialisationSpans[$hash] = $span;
+        }
+    }
+
+    public function onMutantMaterialisationWasFinished(MutantMaterialisationWasFinished $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $this->end($this->mutantMaterialisationSpans[$hash] ?? null, event: $event);
+
+        unset($this->mutantMaterialisationSpans[$hash]);
+    }
+
+    public function onMutantEvaluationWasStarted(MutantEvaluationWasStarted $event): void
+    {
+        $mutation = $event->mutant->getMutation();
+        $hash = $mutation->getHash();
+
+        ++$this->evaluatedMutationCount;
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_analysis.evaluation',
+            $event,
+            $this->mutationSpanAttributesProvider->provide($mutation),
+            parent: $this->mutantAnalysisSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->mutantEvaluationSpans[$hash] = $span;
+            $this->startQueueWait($hash, $span);
+        }
+    }
+
+    public function onMutantEvaluationWasFinished(MutantEvaluationWasFinished $event): void
+    {
+        $hash = $event->mutant->getMutation()->getHash();
+
+        $this->endMutantProcessExecutionSpans($hash, $event);
+        $this->end(
+            $this->mutantEvaluationSpans[$hash] ?? null,
+            $this->queueWaitDurationAttributes($hash),
+            event: $event,
+        );
+
+        unset($this->mutantEvaluationSpans[$hash]);
+        unset($this->mutantQueueWaitStartedAtInNs[$hash]);
+        unset($this->mutantQueueWaitDurationInNs[$hash]);
+    }
+
+    public function onMutantProcessExecutionWasStarted(MutantProcessExecutionWasStarted $event): void
+    {
+        $mutation = $event->mutantProcess->getMutant()->getMutation();
+        $hash = $mutation->getHash();
+        $key = spl_object_id($event->mutantProcess);
+
+        $span = $this->startChild(
+            'infection.mutation_evaluation.mutant_analysis.evaluation.process',
+            $event,
+            [
+                ...$this->mutationSpanAttributesProvider->provide($mutation),
+                'infection.mutation.process.test_framework' => $this->testFramework,
+                'infection.mutation.process.thread' => $event->thread,
+            ],
+            parent: $this->mutantEvaluationSpans[$hash] ?? ($this->mutationEvaluationSpans[$hash] ?? null),
+        );
+
+        if ($span !== null) {
+            $this->stopQueueWait($hash, $span);
+            $this->mutantProcessExecutionSpans[$key] = $span;
+            $this->mutantProcessExecutionSpanMutationHashes[$key] = $hash;
+        }
+    }
+
+    public function onMutantProcessExecutionWasFinished(MutantProcessExecutionWasFinished $event): void
+    {
+        $key = spl_object_id($event->mutantProcess);
+        $hash = $event->mutantProcess->getMutant()->getMutation()->getHash();
+
+        $finishedAtNanos = $this->endAndGetEndEpochNanos(
+            $this->mutantProcessExecutionSpans[$key] ?? null,
+            self::processFinishAttributes($event),
+            event: $event,
+        );
+
+        unset($this->mutantProcessExecutionSpans[$key]);
+        unset($this->mutantProcessExecutionSpanMutationHashes[$key]);
+
+        if ($finishedAtNanos !== null && isset($this->mutantEvaluationSpans[$hash])) {
+            $this->mutantQueueWaitStartedAtInNs[$hash] = $finishedAtNanos;
+        }
+    }
+
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
+    {
+        foreach (array_keys($this->mutationEvaluationSpans) as $hash) {
+            $this->endMutationEvaluationChildSpans($hash, $event);
+            $this->end($this->mutationEvaluationSpans[$hash], event: $event);
+        }
+
+        $this->mutationEvaluationSpans = [];
+        $this->end($this->mutationEvaluationSpan, event: $event);
+        $this->mutationEvaluationSpan = null;
+        $this->endMutationAnalysisSpan($event);
+    }
+
+    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
+    {
+        $this->end($this->initialTestsSpan, event: $event);
+        $this->end($this->initialStaticAnalysisSpan, event: $event);
+        $this->end($this->artefactCollectionSpan, event: $event);
+        $this->end($this->sourceCollectionSpan, event: $event);
+        $this->endAstSpans($event);
+        $this->end($this->mutationGenerationSpan, event: $event);
+
+        foreach (array_keys($this->mutationEvaluationSpans) as $hash) {
+            $this->endMutationEvaluationChildSpans($hash, $event);
+            $this->end($this->mutationEvaluationSpans[$hash], event: $event);
+        }
+
+        $this->end($this->mutationEvaluationSpan, event: $event);
+        $this->end($this->mutationAnalysisSpan, event: $event);
+        $this->endReporterSpans($event);
+        $this->end($this->reportingSpan, event: $event);
+        $this->end(
+            $this->rootSpan,
+            $this->runSpanAttributesProvider->provideSummaryAttributes(
+                $this->sourceFileCount,
+                $this->mutatedFileCount,
+                $this->mutationCount,
+                $this->evaluatedMutationCount,
+            ),
+            event: $event,
+        );
+        $this->telemetry->shutdown();
+    }
+
+    public function onArtefactCollectionWasFinished(ArtefactCollectionWasFinished $event): void
+    {
+        $this->end($this->artefactCollectionSpan, event: $event);
+        $this->artefactCollectionSpan = null;
+    }
+
+    public function onArtefactCollectionWasStarted(ArtefactCollectionWasStarted $event): void
+    {
+        $this->artefactCollectionSpan = $this->startChild('infection.artefact_collection', $event);
+    }
+
+    public function onReportingWasFinished(ReportingWasFinished $event): void
+    {
+        $this->endReporterSpans($event);
+        $this->end($this->reportingSpan, event: $event);
+        $this->reportingSpan = null;
+    }
+
+    public function onReportingWasStarted(ReportingWasStarted $event): void
+    {
+        $this->reportingSpan = $this->startChild('infection.reporting', $event);
+    }
+
+    public function onReporterWasStarted(ReporterWasStarted $event): void
+    {
+        if ($this->reportingSpan === null) {
+            return;
+        }
+
+        $this->reporterSpans[$event->reporterId] = $this->telemetry->startChildSpan(
+            $this->reportingSpan,
+            'infection.reporting.reporter',
+            [
+                'infection.event.class.start' => $event::class,
+                'infection.reporter.id' => $event->reporterId,
+                'infection.reporter.name' => $event->name->value,
+            ],
+        );
+    }
+
+    public function onReporterWasFinished(ReporterWasFinished $event): void
+    {
+        $key = $event->reporterId;
+
+        if (!isset($this->reporterSpans[$key])) {
+            return;
+        }
+
+        $this->end($this->reporterSpans[$key], event: $event);
+        unset($this->reporterSpans[$key]);
+    }
+
+    public function onSourceCollectionWasFinished(SourceCollectionWasFinished $event): void
+    {
+        $this->sourceFileCount = $event->sourcesCount;
+
+        $this->end(
+            $this->sourceCollectionSpan,
+            ['infection.source_file.count' => $event->sourcesCount],
+            event: $event,
+        );
+        $this->sourceCollectionSpan = null;
+    }
+
+    public function onSourceCollectionWasStarted(SourceCollectionWasStarted $event): void
+    {
+        $this->sourceCollectionSpan = $this->startChild('infection.source_collection', $event);
+    }
+
+    /**
+     * @param non-empty-string $name
+     * @param Attributes $attributes
+     */
+    private function startChild(string $name, object $event, array $attributes = [], ?SpanHandle $parent = null): ?SpanHandle
+    {
+        $parent ??= $this->rootSpan;
+
+        return $parent === null
+            ? null
+            : $this->telemetry->startChildSpan(
+                $parent,
+                $name,
+                [
+                    'infection.event.class.start' => $event::class,
+                    ...$attributes,
+                ],
+            );
+    }
+
+    /**
+     * @param Attributes $attributes
+     */
+    private function end(?SpanHandle $span, array $attributes = [], ?object $event = null): void
+    {
+        if ($span !== null) {
+            if ($event !== null) {
+                $attributes = [
+                    'infection.event.class.end' => $event::class,
+                    ...$attributes,
+                ];
+            }
+
+            $this->telemetry->end($span, $attributes);
+        }
+    }
+
+    /**
+     * @param Attributes $attributes
+     */
+    private function endAndGetEndEpochNanos(?SpanHandle $span, array $attributes = [], ?object $event = null): ?int
+    {
+        if ($span === null) {
+            return null;
+        }
+
+        if ($event !== null) {
+            $attributes = [
+                'infection.event.class.end' => $event::class,
+                ...$attributes,
+            ];
+        }
+
+        $this->telemetry->end($span, $attributes);
+
+        return $span->span instanceof ReadableSpanInterface
+            ? $span->span->toSpanData()->getEndEpochNanos()
+            : null;
+    }
+
+    private function endReporterSpans(object $event): void
+    {
+        foreach ($this->reporterSpans as $span) {
+            $this->end($span, event: $event);
+        }
+
+        $this->reporterSpans = [];
+    }
+
+    private function endAstSpans(object $event): void
+    {
+        foreach ($this->astParsingSpans as $span) {
+            $this->end($span, event: $event);
+        }
+
+        foreach ($this->astEnrichmentSpans as $span) {
+            $this->end($span, event: $event);
+        }
+
+        foreach ($this->astProcessingFileSpans as $span) {
+            $this->end($span, event: $event);
+        }
+
+        $this->end($this->astProcessingSpan, event: $event);
+
+        $this->astParsingSpans = [];
+        $this->astEnrichmentSpans = [];
+        $this->astProcessingFileSpans = [];
+        $this->astProcessingSpan = null;
+        $this->astProcessingFileCount = null;
+        $this->processedAstFileCount = 0;
+    }
+
+    private function endMutationAnalysisSpan(object $event): void
+    {
+        if ($this->mutationGenerationSpan !== null || $this->astProcessingSpan !== null) {
+            return;
+        }
+
+        $this->end($this->mutationAnalysisSpan, event: $event);
+        $this->mutationAnalysisSpan = null;
+    }
+
+    private function endAstProcessingSpanIfComplete(object $event): void
+    {
+        if (
+            $this->astProcessingFileCount === null
+            || $this->processedAstFileCount < $this->astProcessingFileCount
+            || $this->hasOpenAstProcessingSpans()
+        ) {
+            return;
+        }
+
+        $this->end($this->astProcessingSpan, event: $event);
+        $this->astProcessingSpan = null;
+        $this->astProcessingFileCount = null;
+        $this->processedAstFileCount = 0;
+    }
+
+    private function hasOpenAstProcessingSpans(): bool
+    {
+        return $this->astParsingSpans !== []
+            || (
+                $this->astEnrichmentSpans !== []
+                    ? true
+                    : $this->astProcessingFileSpans !== []
+            );
+    }
+
+    private function endMutationEvaluationChildSpans(string $hash, object $event): void
+    {
+        $this->endHeuristicSpans($hash, $event);
+        $this->end($this->heuristicSuppressionSpans[$hash] ?? null, event: $event);
+        $this->end($this->mutantMaterialisationSpans[$hash] ?? null, event: $event);
+        $this->endMutantProcessExecutionSpans($hash, $event);
+        $this->end(
+            $this->mutantEvaluationSpans[$hash] ?? null,
+            $this->queueWaitDurationAttributes($hash),
+            event: $event,
+        );
+        $this->end($this->mutantAnalysisSpans[$hash] ?? null, event: $event);
+
+        unset(
+            $this->heuristicSuppressionSpans[$hash],
+            $this->mutantMaterialisationSpans[$hash],
+            $this->mutantQueueWaitStartedAtInNs[$hash],
+            $this->mutantQueueWaitDurationInNs[$hash],
+            $this->mutantEvaluationSpans[$hash],
+            $this->mutantAnalysisSpans[$hash],
+        );
+    }
+
+    private function startQueueWait(string $hash, SpanHandle $span): void
+    {
+        if (!$span->span instanceof ReadableSpanInterface) {
+            return;
+        }
+
+        $this->mutantQueueWaitStartedAtInNs[$hash] = $span->span->toSpanData()->getStartEpochNanos();
+    }
+
+    private function stopQueueWait(string $hash, SpanHandle $span): void
+    {
+        $startedAtNanos = $this->mutantQueueWaitStartedAtInNs[$hash] ?? null;
+
+        unset($this->mutantQueueWaitStartedAtInNs[$hash]);
+
+        if ($startedAtNanos === null || !$span->span instanceof ReadableSpanInterface) {
+            return;
+        }
+
+        $duration = $span->span->toSpanData()->getStartEpochNanos() - $startedAtNanos;
+
+        if ($duration >= 0) {
+            $this->mutantQueueWaitDurationInNs[$hash] = ($this->mutantQueueWaitDurationInNs[$hash] ?? 0) + $duration;
+        }
+    }
+
+    /**
+     * @return array{'infection.mutation.queue_wait.duration'?: float}
+     */
+    private function queueWaitDurationAttributes(string $hash): array
+    {
+        $durationNanos = $this->mutantQueueWaitDurationInNs[$hash] ?? null;
+
+        return $durationNanos === null
+            ? []
+            : ['infection.mutation.queue_wait.duration' => $durationNanos / self::NANOSECONDS_PER_SECOND];
+    }
+
+    private function endHeuristicSpans(string $hash, object $event): void
+    {
+        $prefix = $hash . ':';
+
+        foreach ($this->heuristicSpans as $key => $span) {
+            if (!str_starts_with($key, $prefix)) {
+                continue;
+            }
+
+            $this->end($span, event: $event);
+
+            unset($this->heuristicSpans[$key]);
+        }
+    }
+
+    private function endMutantProcessExecutionSpans(string $hash, object $event): void
+    {
+        foreach ($this->mutantProcessExecutionSpans as $key => $span) {
+            if (($this->mutantProcessExecutionSpanMutationHashes[$key] ?? null) !== $hash) {
+                continue;
+            }
+
+            $this->end($span, event: $event);
+
+            unset($this->mutantProcessExecutionSpans[$key]);
+            unset($this->mutantProcessExecutionSpanMutationHashes[$key]);
+        }
+    }
+
+    private static function heuristicKey(string $mutationHash, string $heuristic): string
+    {
+        return $mutationHash . ':' . $heuristic;
+    }
+
+    /**
+     * @return Attributes
+     */
+    private static function processFinishAttributes(MutantProcessExecutionWasFinished $event): array
+    {
+        $attributes = [
+            'infection.mutation.process.timed_out' => $event->mutantProcess->isTimedOut(),
+        ];
+
+        $exitCode = $event->mutantProcess->getProcess()->getExitCode();
+
+        if ($exitCode !== null) {
+            $attributes['process.exit.code'] = $exitCode;
+        }
+
+        return $attributes;
+    }
+}

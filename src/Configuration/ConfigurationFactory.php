@@ -40,9 +40,11 @@ use function array_key_exists;
 use function array_map;
 use function array_unique;
 use function array_values;
+use function basename;
 use function dirname;
 use function explode;
 use function file_exists;
+use function getenv;
 use function implode;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
@@ -55,6 +57,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -67,16 +70,21 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_array;
 use function is_numeric;
+use function is_string;
 use function ltrim;
 use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
+use Safe\Exceptions\JsonException;
+use function Safe\json_decode;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -85,6 +93,8 @@ use Webmozart\Assert\Assert;
  */
 class ConfigurationFactory
 {
+    public const string INFECTION_PROJECT_NAME = 'INFECTION_PROJECT_NAME';
+
     /**
      * Default allowed timeout (on a test basis) in seconds
      */
@@ -101,6 +111,7 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -171,6 +182,7 @@ class ConfigurationFactory
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
         $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
+        $projectDirectory = $this->retrieveProjectDirectory($projectDirectory);
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
@@ -212,10 +224,12 @@ class ConfigurationFactory
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-            projectDirectory: $this->retrieveProjectDirectory($projectDirectory),
+            projectDirectory: $projectDirectory,
+            projectName: $this->retrieveProjectName($projectDirectory),
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
             configurationPathname: $schema->pathname,
+            gitSha: $this->git->getSha($projectDirectory),
         );
     }
 
@@ -563,5 +577,65 @@ class ConfigurationFactory
         );
 
         return $resolvedProjectDirectory;
+    }
+
+    /**
+     * @param non-empty-string $projectDirectory
+     *
+     * @return non-empty-string
+     */
+    private function retrieveProjectName(string $projectDirectory): string
+    {
+        $projectName = trim((string) getenv(self::INFECTION_PROJECT_NAME));
+
+        if ($projectName !== '') {
+            return $projectName;
+        }
+
+        $composerPackageName = $this->getRootComposerPackageName($projectDirectory);
+
+        if ($composerPackageName !== null) {
+            return $composerPackageName;
+        }
+
+        $directoryName = basename($projectDirectory);
+        Assert::stringNotEmpty($directoryName);
+
+        return $directoryName;
+    }
+
+    /**
+     * @param non-empty-string $projectDirectory
+     *
+     * @return non-empty-string|null
+     */
+    private function getRootComposerPackageName(string $projectDirectory): ?string
+    {
+        $composerJsonPath = $projectDirectory . '/composer.json';
+
+        if (!$this->fileSystem->isReadableFile($composerJsonPath)) {
+            return null;
+        }
+
+        try {
+            $composerJson = json_decode(
+                $this->fileSystem->readFile($composerJsonPath),
+                true,
+            );
+        } catch (JsonException) {
+            return null;
+        }
+
+        if (
+            !is_array($composerJson)
+            || !isset($composerJson['name'])
+            || !is_string($composerJson['name'])
+        ) {
+            return null;
+        }
+
+        $name = trim($composerJson['name']);
+
+        return $name === '' ? null : $name;
     }
 }

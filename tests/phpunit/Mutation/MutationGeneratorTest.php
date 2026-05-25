@@ -114,6 +114,16 @@ final class MutationGeneratorTest extends TestCase
 
     public function test_it_dispatches_events(): void
     {
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation0
+            ->method('getHash')
+            ->willReturn('mutation-0');
+
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation1
+            ->method('getHash')
+            ->willReturn('mutation-1');
+
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
         $eventDispatcherMock
             ->expects($this->exactly(4))
@@ -122,20 +132,24 @@ final class MutationGeneratorTest extends TestCase
                 [new MutationGenerationWasStarted(2)],
                 [new MutableFileWasProcessed(
                     'path/to/fileA',
-                    [],
+                    ['mutation-0', 'mutation-1'],
                 )],
                 [new MutableFileWasProcessed(
                     'path/to/fileB',
                     [],
                 )],
-                [new MutationGenerationWasFinished()],
+                [new MutationGenerationWasFinished(2, 1)],
             ))
         ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock
             ->expects($this->exactly(2))
-            ->method('generate')->willReturn([])
+            ->method('generate')
+            ->willReturnOnConsecutiveCalls(
+                [$mutation0, $mutation1],
+                [],
+            )
         ;
 
         $sourceCollector = new FixedSourceCollector(

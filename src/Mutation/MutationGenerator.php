@@ -41,7 +41,7 @@ use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasPro
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\UnparsableFile;
+use Infection\PhpParser\Parser\UnparsableFile;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
@@ -91,6 +91,8 @@ class MutationGenerator
     {
         $sources = $this->sourceCollector->collect();
         $numberOfFiles = count($sources);
+        $mutationsCount = 0;
+        $mutatedFilesCount = 0;
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
@@ -115,8 +117,17 @@ class MutationGenerator
                     $sourceFileMutationIds,
                 ),
             );
+
+            $fileMutationsCount = count($sourceFileMutationIds);
+            $mutationsCount += $fileMutationsCount;
+
+            if ($fileMutationsCount > 0) {
+                ++$mutatedFilesCount;
+            }
         }
 
-        $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationWasFinished($mutationsCount, $mutatedFilesCount),
+        );
     }
 }

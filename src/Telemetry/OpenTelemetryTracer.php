@@ -1,0 +1,134 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Telemetry;
+
+use Infection\Telemetry\Attribute\RunSpanAttributesProvider;
+use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+
+/**
+ * @phpstan-import-type Attributes from RunSpanAttributesProvider
+ *
+ * @internal
+ */
+final readonly class OpenTelemetryTracer
+{
+    public function __construct(
+        private TracerInterface $tracer,
+        private ?TracerProviderInterface $tracerProvider,
+        private ClockInterface $clock,
+        private OpenTelemetryMetrics $metrics,
+    ) {
+    }
+
+    /**
+     * @param non-empty-string $name
+     * @param Attributes $attributes
+     */
+    public function startRootSpan(string $name, array $attributes = []): SpanHandle
+    {
+        $startEpochNanos = $this->clock->now();
+
+        $this->metrics->startRun($attributes);
+
+        return new SpanHandle(
+            $this->tracer
+                ->spanBuilder($name)
+                ->setParent(false)
+                ->setAttributes($attributes)
+                ->setStartTimestamp($startEpochNanos)
+                ->startSpan(),
+            $name,
+            $startEpochNanos,
+            $attributes,
+        );
+    }
+
+    /**
+     * @param non-empty-string $name
+     * @param Attributes $attributes
+     */
+    public function startChildSpan(SpanHandle $parent, string $name, array $attributes = []): SpanHandle
+    {
+        $startEpochInNs = $this->clock->now();
+
+        return new SpanHandle(
+            $this->tracer
+                ->spanBuilder($name)
+                ->setParent($parent->context)
+                ->setAttributes($attributes)
+                ->setStartTimestamp($startEpochInNs)
+                ->startSpan(),
+            $name,
+            $startEpochInNs,
+            $attributes,
+        );
+    }
+
+    /**
+     * @param Attributes $attributes
+     */
+    public function end(
+        SpanHandle $span,
+        array $attributes = [],
+        ?int $endEpochInNs = null,
+    ): void {
+        $endEpochInNs ??= $this->clock->now();
+        $spanAttributes = [
+            ...$span->attributes,
+            ...$attributes,
+        ];
+
+        if ($attributes !== []) {
+            $span->span->setAttributes($attributes);
+        }
+
+        $span->span->end($endEpochInNs);
+
+        $this->metrics->recordSpanEnded(
+            $span,
+            $endEpochInNs,
+            $spanAttributes,
+        );
+    }
+
+    public function shutdown(): void
+    {
+        $this->tracerProvider?->shutdown();
+        $this->metrics->shutdown();
+    }
+}

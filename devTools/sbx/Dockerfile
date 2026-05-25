@@ -24,6 +24,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         autoconf \
         bison \
         gcc \
+        g++ \
         libtool \
         make \
         php${PHP_VERSION}-dev \
@@ -46,6 +47,17 @@ RUN set -o errexit -o nounset -o pipefail \
     && curl -fL --output /tmp/pie.phar https://github.com/php/pie/releases/latest/download/pie.phar \
     && mv /tmp/pie.phar /usr/local/bin/pie \
     && chmod +x /usr/local/bin/pie
+
+RUN set -o errexit -o nounset -o pipefail \
+    && COMPOSER_ALLOW_SUPERUSER=1 pie install --no-interaction \
+        --with-php-config="/usr/bin/php-config${PHP_VERSION}" \
+        --with-phpize-path="/usr/bin/phpize${PHP_VERSION}" \
+        pie-extensions/grpc \
+    && COMPOSER_ALLOW_SUPERUSER=1 pie install --no-interaction \
+        --with-php-config="/usr/bin/php-config${PHP_VERSION}" \
+        --with-phpize-path="/usr/bin/phpize${PHP_VERSION}" \
+        pie-extensions/protobuf \
+    && rm -rf /tmp/* /root/.cache
 
 ARG CONTAINER_STRUCTURE_TEST_VERSION=1.22.1
 ARG TARGET_ARCH

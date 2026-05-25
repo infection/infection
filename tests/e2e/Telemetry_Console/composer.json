@@ -1,0 +1,16 @@
+{
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ignore_All_Mutations\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ignore_All_Mutations\\Test\\": "tests/"
+        }
+    }
+}
