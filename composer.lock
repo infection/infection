@@ -415,21 +415,21 @@
         },
         {
             "name": "infection/include-interceptor",
-            "version": "0.2.5",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/include-interceptor.git",
-                "reference": "0cc76d95a79d9832d74e74492b0a30139904bdf7"
+                "reference": "c083331bc0cd1cd319ac1b7a08e3ad4a34aa7992"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/0cc76d95a79d9832d74e74492b0a30139904bdf7",
-                "reference": "0cc76d95a79d9832d74e74492b0a30139904bdf7",
+                "url": "https://api.github.com/repos/infection/include-interceptor/zipball/c083331bc0cd1cd319ac1b7a08e3ad4a34aa7992",
+                "reference": "c083331bc0cd1cd319ac1b7a08e3ad4a34aa7992",
                 "shasum": ""
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.16",
-                "infection/infection": "^0.15.0",
+                "infection/infection": "^0.19.0",
                 "phan/phan": "^2.4 || ^3",
                 "php-coveralls/php-coveralls": "^2.2",
                 "phpstan/phpstan": "^0.12.8",
@@ -455,7 +455,7 @@
             "description": "Stream Wrapper: Include Interceptor. Allows to replace included (autoloaded) file with another one.",
             "support": {
                 "issues": "https://github.com/infection/include-interceptor/issues",
-                "source": "https://github.com/infection/include-interceptor/tree/0.2.5"
+                "source": "https://github.com/infection/include-interceptor/tree/1.0.0"
             },
             "funding": [
                 {
@@ -467,7 +467,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2021-08-09T10:03:57+00:00"
+            "time": "2024-05-03T21:48:06+00:00"
         },
         {
             "name": "infection/mutator",
