@@ -149,13 +149,82 @@ jobs:
           TERM: xterm-256color
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
 
+  phpstan-build-infection:
+    name: phpstan/build-infection
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Infection
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Checkout phpstan/build-infection
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: phpstan/build-infection
+          path: build-infection
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get composer cache directory
+        id: composer-cache
+        working-directory: build-infection
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-phpstan-build-infection-${{ hashFiles('build-infection/composer.*', 'composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-phpstan-build-infection-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Configure local Infection dependency
+        working-directory: build-infection
+        run: |
+          composer config repositories.local-infection '{"type":"path","url":"..","options":{"symlink":true,"versions":{"infection/infection":"0.32.99"}}}'
+
+      - name: Install dependencies
+        working-directory: build-infection
+        run: composer update infection/infection --with-all-dependencies --no-interaction --prefer-dist --no-progress
+
+      - name: Run lint
+        working-directory: build-infection
+        run: make lint
+
+      - name: Run tests
+        working-directory: build-infection
+        run: make tests
+
+      - name: Run PHPStan
+        working-directory: build-infection
+        run: make phpstan
+
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:
       name: E2E Tests Status
       runs-on: ubuntu-latest
       timeout-minutes: 30
-      needs: tests
+      needs:
+          - tests
+          - phpstan-build-infection
       if: always()
       steps:
           - name: Successful run
