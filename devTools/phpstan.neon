@@ -182,10 +182,6 @@ parameters:
         # PHPStan cannot really properly infer the types here
         -
             message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
-            identifier: argument.type
-            path: ../src/Source/Collector/BasicSourceCollector.php
-        -
-            message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
             identifier: return.type
             path: ../src/Source/Collector/BasicSourceCollector.php
 
