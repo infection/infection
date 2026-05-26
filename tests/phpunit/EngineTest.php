@@ -40,11 +40,13 @@ use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Metrics\Calculator;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\MutationGenerator;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -58,6 +60,7 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(Engine::class)]
@@ -140,8 +143,7 @@ final class EngineTest extends TestCase
         $consoleOutput = $this->createMock(ConsoleOutput::class);
         $consoleOutput->expects($this->never())->method($this->anything());
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator->expects($this->never())->method($this->anything());
+        $metricsCalculator = new MetricsCalculator(0);
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
@@ -249,22 +251,11 @@ final class EngineTest extends TestCase
             ->with(1000, 2.0, 3.0, $consoleOutput)
         ;
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTestedMutantsCount')
-            ->willReturn(1000)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getMutationScoreIndicator')
-            ->willReturn(2.0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(3.0)
-        ;
+        $metricsCalculator = self::createMetricsCalculator(
+            testedMutantsCount: 1000,
+            mutationScoreIndicator: 2.0,
+            coveredCodeMutationScoreIndicator: 3.0,
+        );
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
@@ -392,22 +383,11 @@ final class EngineTest extends TestCase
             ->with(100, 80.0, 85.0, $consoleOutput)
         ;
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTestedMutantsCount')
-            ->willReturn(100)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getMutationScoreIndicator')
-            ->willReturn(80.0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(85.0)
-        ;
+        $metricsCalculator = self::createMetricsCalculator(
+            testedMutantsCount: 100,
+            mutationScoreIndicator: 80.0,
+            coveredCodeMutationScoreIndicator: 85.0,
+        );
 
         $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
@@ -491,22 +471,11 @@ final class EngineTest extends TestCase
             ->method('checkMetrics')
         ;
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTestedMutantsCount')
-            ->willReturn(0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getMutationScoreIndicator')
-            ->willReturn(0.0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(0.0)
-        ;
+        $metricsCalculator = self::createMetricsCalculator(
+            testedMutantsCount: 0,
+            mutationScoreIndicator: 0.0,
+            coveredCodeMutationScoreIndicator: 0.0,
+        );
 
         $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
@@ -585,27 +554,12 @@ final class EngineTest extends TestCase
             ->method('checkMetrics')
         ;
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTimedOutCount')
-            ->willReturn(42)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTestedMutantsCount')
-            ->willReturn(0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getMutationScoreIndicator')
-            ->willReturn(0.0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(0.0)
-        ;
+        $metricsCalculator = self::createMetricsCalculator(
+            testedMutantsCount: 0,
+            mutationScoreIndicator: 0.0,
+            coveredCodeMutationScoreIndicator: 0.0,
+            timedOutCount: 42,
+        );
 
         $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
@@ -686,12 +640,7 @@ final class EngineTest extends TestCase
         $minMsiChecker = $this->createMock(MinMsiChecker::class);
         $minMsiChecker->expects($this->never())->method($this->anything());
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTimedOutCount')
-            ->willReturn(100)
-        ;
+        $metricsCalculator = self::createMetricsCalculator(timedOutCount: 100);
 
         $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
@@ -780,27 +729,11 @@ final class EngineTest extends TestCase
             ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0))
         ;
 
-        $metricsCalculator = $this->createMock(MetricsCalculator::class);
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTimedOutCount')
-            ->willReturn(0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getTestedMutantsCount')
-            ->willReturn(100)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getMutationScoreIndicator')
-            ->willReturn(50.0)
-        ;
-        $metricsCalculator
-            ->expects($this->once())
-            ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn(55.0)
-        ;
+        $metricsCalculator = self::createMetricsCalculator(
+            testedMutantsCount: 100,
+            mutationScoreIndicator: 50.0,
+            coveredCodeMutationScoreIndicator: 55.0,
+        );
 
         $testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
 
@@ -830,5 +763,43 @@ final class EngineTest extends TestCase
         $this->expectException(MinMsiCheckFailed::class);
 
         $engine->execute();
+    }
+
+    private static function createMetricsCalculator(
+        int $testedMutantsCount = 0,
+        float $mutationScoreIndicator = 0.0,
+        float $coveredCodeMutationScoreIndicator = 0.0,
+        int $timedOutCount = 0,
+    ): MetricsCalculator {
+        $metricsCalculator = new MetricsCalculator(0);
+
+        $reflection = new ReflectionClass($metricsCalculator);
+        $countByStatus = $reflection->getProperty('countByStatus')->getValue($metricsCalculator);
+        $countByStatus[DetectionStatus::TIMED_OUT->value] = $timedOutCount;
+
+        $reflection->getProperty('countByStatus')->setValue($metricsCalculator, $countByStatus);
+        $reflection->getProperty('totalMutantsCount')->setValue($metricsCalculator, $testedMutantsCount);
+        $reflection->getProperty('calculator')->setValue(
+            $metricsCalculator,
+            self::createCalculator($mutationScoreIndicator, $coveredCodeMutationScoreIndicator),
+        );
+
+        return $metricsCalculator;
+    }
+
+    private static function createCalculator(
+        float $mutationScoreIndicator,
+        float $coveredCodeMutationScoreIndicator,
+    ): Calculator {
+        $calculator = new Calculator(0, 0, 0, 0, 0, 0);
+
+        $reflection = new ReflectionClass($calculator);
+        $reflection->getProperty('mutationScoreIndicator')->setValue($calculator, $mutationScoreIndicator);
+        $reflection->getProperty('coveredMutationScoreIndicator')->setValue(
+            $calculator,
+            $coveredCodeMutationScoreIndicator,
+        );
+
+        return $calculator;
     }
 }

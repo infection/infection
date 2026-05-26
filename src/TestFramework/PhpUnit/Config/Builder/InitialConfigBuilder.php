@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-class InitialConfigBuilder implements ConfigBuilder
+final class InitialConfigBuilder implements ConfigBuilder
 {
     private readonly string $originalXmlConfigContent;
 

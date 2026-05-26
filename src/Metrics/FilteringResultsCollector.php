@@ -42,9 +42,8 @@ use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
- * @final
  */
-class FilteringResultsCollector implements Collector
+final class FilteringResultsCollector implements Collector
 {
     /**
      * @param DetectionStatus[] $targetDetectionStatuses

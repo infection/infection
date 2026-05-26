@@ -10,6 +10,10 @@ services:
         class: Infection\Tests\Architecture\PHPat\SrcShouldNotDependOnTestsTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\InterfaceImplementationsShouldBeFinalTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan

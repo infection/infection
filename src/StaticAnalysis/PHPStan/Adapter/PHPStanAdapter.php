@@ -37,8 +37,8 @@ namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
 use function array_merge;
 use function explode;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
@@ -64,7 +64,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
      */
     public function __construct(
         private readonly Filesystem $fileSystem,
-        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,

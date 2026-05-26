@@ -33,39 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\Architecture\PHPat;
 
-use function dirname;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Tracing\TraceProvider;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-/**
- * Provides the traces based on the PHPUnit XML coverage collected.
- *
- * @internal
- */
-final class PhpUnitXmlCoverageTraceProvider implements TraceProvider
+final class InterfaceImplementationsShouldBeFinalTest
 {
-    public function __construct(
-        private readonly ReportLocator $indexLocator,
-        private readonly IndexXmlCoverageParser $indexParser,
-        private readonly XmlCoverageParser $parser,
-    ) {
-    }
-
-    public function provideTraces(): iterable
+    public function testInterfaceImplementationsAreFinal(): Rule
     {
-        // The existence of the file should have already been checked. Hence in theory we should not
-        // have to deal with a FileNotFound exception here so we skip any friendly error handling
-        $indexPath = $this->indexLocator->locate();
-        $coverageBasePath = dirname($indexPath);
-
-        foreach ($this->indexParser->parse(
-            $indexPath,
-            $coverageBasePath,
-        ) as $infoProvider) {
-            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
-        }
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    Selector::inNamespace('Infection'),
+                    Selector::implements('/.*/', true),
+                ),
+            )
+            ->excluding(
+                Selector::isAbstract(),
+                Selector::isInterface(),
+                Selector::classname('Infection\\Process\\Runner\\ParallelProcessRunner'),
+                Selector::inNamespace('Infection\\Tests'),
+                Selector::inNamespace('Infection\\Benchmark'),
+            )
+            ->should()
+            ->beFinal()
+            ->because('Production interface implementations should be final by default.');
     }
 }

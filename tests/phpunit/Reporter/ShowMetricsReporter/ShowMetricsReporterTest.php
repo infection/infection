@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Reporter\ShowMetricsReporter;
 
 use Infection\Framework\Str;
+use Infection\Metrics\Calculator;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Mutant\DetectionStatus;
 use Infection\Reporter\Reporter;
 use Infection\Reporter\ShowMetricsReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 #[CoversClass(ShowMetricsReporter::class)]
@@ -340,48 +343,38 @@ final class ShowMetricsReporterTest extends TestCase
 
     private function createMetricsCalculator(MetricsScenario $scenario): MetricsCalculator
     {
-        $metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
+        $metricsCalculator = new MetricsCalculator(2);
 
-        $metricsCalculatorMock
-            ->method('getKilledByTestsCount')
-            ->willReturn($scenario->killedByTestsCount);
-        $metricsCalculatorMock
-            ->method('getKilledByStaticAnalysisCount')
-            ->willReturn($scenario->killedByStaticAnalysisCount);
-        $metricsCalculatorMock
-            ->method('getIgnoredCount')
-            ->willReturn($scenario->ignoredCount);
-        $metricsCalculatorMock
-            ->method('getNotTestedCount')
-            ->willReturn($scenario->notTestedCount);
-        $metricsCalculatorMock
-            ->method('getEscapedCount')
-            ->willReturn($scenario->escapedCount);
-        $metricsCalculatorMock
-            ->method('getErrorCount')
-            ->willReturn($scenario->errorCount);
-        $metricsCalculatorMock
-            ->method('getSyntaxErrorCount')
-            ->willReturn($scenario->syntaxErrorCount);
-        $metricsCalculatorMock
-            ->method('getTimedOutCount')
-            ->willReturn($scenario->timedOutCount);
-        $metricsCalculatorMock
-            ->method('getSkippedCount')
-            ->willReturn($scenario->skippedCount);
-        $metricsCalculatorMock
-            ->method('getTotalMutantsCount')
-            ->willReturn($scenario->totalMutantsCount);
-        $metricsCalculatorMock
-            ->method('getMutationScoreIndicator')
-            ->willReturn($scenario->mutationScoreIndicator);
-        $metricsCalculatorMock
-            ->method('getCoverageRate')
-            ->willReturn($scenario->coverageRate);
-        $metricsCalculatorMock
-            ->method('getCoveredCodeMutationScoreIndicator')
-            ->willReturn($scenario->coveredCodeMutationScoreIndicator);
+        $reflection = new ReflectionClass($metricsCalculator);
+        $reflection->getProperty('countByStatus')->setValue($metricsCalculator, [
+            DetectionStatus::KILLED_BY_TESTS->value => $scenario->killedByTestsCount,
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS->value => $scenario->killedByStaticAnalysisCount,
+            DetectionStatus::ERROR->value => $scenario->errorCount,
+            DetectionStatus::SYNTAX_ERROR->value => $scenario->syntaxErrorCount,
+            DetectionStatus::SKIPPED->value => $scenario->skippedCount,
+            DetectionStatus::IGNORED->value => $scenario->ignoredCount,
+            DetectionStatus::ESCAPED->value => $scenario->escapedCount,
+            DetectionStatus::TIMED_OUT->value => $scenario->timedOutCount,
+            DetectionStatus::NOT_COVERED->value => $scenario->notTestedCount,
+        ]);
+        $reflection->getProperty('totalMutantsCount')->setValue($metricsCalculator, $scenario->totalMutantsCount);
+        $reflection->getProperty('calculator')->setValue($metricsCalculator, self::createCalculator($scenario));
 
-        return $metricsCalculatorMock;
+        return $metricsCalculator;
+    }
+
+    private static function createCalculator(MetricsScenario $scenario): Calculator
+    {
+        $calculator = new Calculator(2, 0, 0, 0, 0, 0);
+
+        $reflection = new ReflectionClass($calculator);
+        $reflection->getProperty('mutationScoreIndicator')->setValue($calculator, $scenario->mutationScoreIndicator);
+        $reflection->getProperty('coverageRate')->setValue($calculator, $scenario->coverageRate);
+        $reflection->getProperty('coveredMutationScoreIndicator')->setValue(
+            $calculator,
+            $scenario->coveredCodeMutationScoreIndicator,
+        );
+
+        return $calculator;
     }
 }

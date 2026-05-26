@@ -38,6 +38,7 @@ namespace Infection\Tests\Reporter;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Environment\BuildContextResolver;
 use Infection\Environment\StrykerApiKeyResolver;
+use Infection\Metrics\Calculator;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
@@ -51,6 +52,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use ReflectionClass;
 use function Safe\putenv;
 
 #[CoversClass(StrykerReporter::class)]
@@ -60,7 +62,7 @@ final class StrykerReporterTest extends TestCase
 
     private MockObject&StrykerDashboardClient $strykerDashboardClient;
 
-    private MockObject&MetricsCalculator $metricsCalculatorMock;
+    private MetricsCalculator $metricsCalculator;
 
     private ConfigurableEnv $ciDetectorEnv;
 
@@ -73,7 +75,7 @@ final class StrykerReporterTest extends TestCase
         $this->backupEnvironmentVariables();
 
         $this->strykerDashboardClient = $this->createMock(StrykerDashboardClient::class);
-        $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
+        $this->metricsCalculator = self::createMetricsCalculator(33.3);
         $this->ciDetectorEnv = new ConfigurableEnv();
         $this->logger = new DummyLogger();
 
@@ -81,8 +83,8 @@ final class StrykerReporterTest extends TestCase
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
-            $this->metricsCalculatorMock,
-            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            $this->metricsCalculator,
+            new StrykerHtmlReportBuilder($this->metricsCalculator, new ResultsCollector()),
             StrykerConfig::forBadge('master'),
             $this->logger,
         );
@@ -245,8 +247,8 @@ final class StrykerReporterTest extends TestCase
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
-            $this->metricsCalculatorMock,
-            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            $this->metricsCalculator,
+            new StrykerHtmlReportBuilder($this->metricsCalculator, new ResultsCollector()),
             StrykerConfig::forBadge('/^\d+\\.x$/'),
             $this->logger,
         );
@@ -312,12 +314,6 @@ final class StrykerReporterTest extends TestCase
             ->method('sendReport')
             ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
         ;
-
-        $this->metricsCalculatorMock
-            ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
-
         $this->reporter->report();
 
         $this->assertSame(
@@ -348,18 +344,12 @@ final class StrykerReporterTest extends TestCase
             ->method('sendReport')
             ->with('github.com/a/b', '7.x', 'abc', '{"mutationScore":33.3}')
         ;
-
-        $this->metricsCalculatorMock
-            ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
-
         $strykerLogger = new StrykerReporter(
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
-            $this->metricsCalculatorMock,
-            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            $this->metricsCalculator,
+            new StrykerHtmlReportBuilder($this->metricsCalculator, new ResultsCollector()),
             StrykerConfig::forBadge('/^\d+\\.x$/'),
             $this->logger,
         );
@@ -394,12 +384,6 @@ final class StrykerReporterTest extends TestCase
             ->method('sendReport')
             ->with('github.com/a/b', 'master', 'abc', '{"mutationScore":33.3}')
         ;
-
-        $this->metricsCalculatorMock
-            ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
-
         $this->reporter->report();
 
         $this->assertSame(
@@ -420,8 +404,8 @@ final class StrykerReporterTest extends TestCase
             new BuildContextResolver(CiDetector::fromEnvironment($this->ciDetectorEnv)),
             new StrykerApiKeyResolver(),
             $this->strykerDashboardClient,
-            $this->metricsCalculatorMock,
-            new StrykerHtmlReportBuilder($this->metricsCalculatorMock, new ResultsCollector()),
+            $this->metricsCalculator,
+            new StrykerHtmlReportBuilder($this->metricsCalculator, new ResultsCollector()),
             StrykerConfig::forFullReport('master'),
             $this->logger,
         );
@@ -440,12 +424,6 @@ final class StrykerReporterTest extends TestCase
             ->method('sendReport')
             ->with('github.com/a/b', 'master', 'abc', '{"schemaVersion":"1","thresholds":{"high":90,"low":50},"files":{},"testFiles":{},"framework":{"name":"Infection","branding":{"homepageUrl":"https:\/\/infection.github.io\/","imageUrl":"https:\/\/infection.github.io\/images\/logo.png"}}}')
         ;
-
-        $this->metricsCalculatorMock
-            ->method('getMutationScoreIndicator')
-            ->willReturn(33.3)
-        ;
-
         $this->reporter->report();
 
         $this->assertSame(
@@ -458,5 +436,19 @@ final class StrykerReporterTest extends TestCase
             ],
             $this->logger->getLogs(),
         );
+    }
+
+    private static function createMetricsCalculator(float $mutationScoreIndicator): MetricsCalculator
+    {
+        $metricsCalculator = new MetricsCalculator(1);
+        $calculator = new Calculator(1, 0, 0, 0, 0, 0);
+
+        $calculatorReflection = new ReflectionClass($calculator);
+        $calculatorReflection->getProperty('mutationScoreIndicator')->setValue($calculator, $mutationScoreIndicator);
+
+        $metricsCalculatorReflection = new ReflectionClass($metricsCalculator);
+        $metricsCalculatorReflection->getProperty('calculator')->setValue($metricsCalculator, $calculator);
+
+        return $metricsCalculator;
     }
 }

@@ -46,7 +46,7 @@ use function sprintf;
 /**
  * @internal
  */
-class MetricsCalculator implements Collector
+final class MetricsCalculator implements Collector
 {
     /**
      * @var array<string, int>
