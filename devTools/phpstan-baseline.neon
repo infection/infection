@@ -1135,6 +1135,18 @@ parameters:
 			path: ../tests/phpunit/Reflection/AnonymousClassReflectionTest.php
 
 		-
+			rawMessage: Infection\Tests\Reflection\ProtChild should be final
+			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			rawMessage: Infection\Tests\Reflection\ProtParent should be final
+			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
 			rawMessage: Unused Infection\Tests\Reflection\ProtChild::foo
 			identifier: shipmonk.deadMethod
 			count: 1
