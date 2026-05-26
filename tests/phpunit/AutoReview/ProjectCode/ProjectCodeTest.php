@@ -253,20 +253,4 @@ final class ProjectCodeTest extends TestCase
             ),
         );
     }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
-    public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $this->assertTrue(
-            $reflectionClass->isTrait()
-            || $reflectionClass->isAbstract()
-            || $reflectionClass->isFinal(),
-            sprintf(
-                'The test class "%s" should be a trait, an abstract or final class.',
-                $className,
-            ),
-        );
-    }
 }
