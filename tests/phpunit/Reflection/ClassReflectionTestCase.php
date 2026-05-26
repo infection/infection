@@ -101,14 +101,14 @@ abstract class ClassReflectionTestCase extends TestCase
     abstract protected static function createFromName(string $name): ClassReflection;
 }
 
-class ProtParent
+abstract class ProtParent
 {
     protected function foo(): void
     {
     }
 }
 
-class ProtChild extends ProtParent
+final class ProtChild extends ProtParent
 {
     protected function foo(): void
     {

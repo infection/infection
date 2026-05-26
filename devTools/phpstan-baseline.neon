@@ -657,7 +657,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
-			count: 4
+			count: 3
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
@@ -1277,4 +1277,3 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
-
