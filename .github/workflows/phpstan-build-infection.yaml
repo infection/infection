@@ -1,0 +1,81 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: PHPStan Build Infection
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  tests:
+    name: phpstan/build-infection
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Infection
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Checkout phpstan/build-infection
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: phpstan/build-infection
+          path: build-infection
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        working-directory: build-infection
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-phpstan-build-infection-${{ hashFiles('build-infection/composer.*', 'composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-phpstan-build-infection-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Configure local Infection dependency
+        working-directory: build-infection
+        run: |
+          composer config repositories.local-infection '{"type":"path","url":"..","options":{"symlink":true,"versions":{"infection/infection":"0.32.99"}}}'
+
+      - name: Install dependencies
+        working-directory: build-infection
+        run: composer update infection/infection --with-all-dependencies --no-interaction --prefer-dist --no-progress
+
+      - name: Run lint
+        working-directory: build-infection
+        run: make lint
+
+      - name: Run tests
+        working-directory: build-infection
+        run: make tests
+
+      - name: Run PHPStan
+        working-directory: build-infection
+        run: make phpstan
