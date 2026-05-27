@@ -18,6 +18,14 @@ services:
         class: Infection\Tests\Architecture\PHPat\ClassesShouldBeFinalTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\SourceClassesShouldBeInternalTest
+        tags:
+            - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\ExtensionPointsShouldHaveDocBlockTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan

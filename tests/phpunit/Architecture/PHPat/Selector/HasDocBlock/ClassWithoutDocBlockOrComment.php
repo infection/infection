@@ -33,57 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\HasDocBlock;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
-use PHPat\Selector\SelectorInterface;
-
-final class InfectionSelector
+final class ClassWithoutDocBlockOrComment
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
-    {
-        return new InfectionCode();
-    }
-
-    public static function sourceCode(): InfectionSourceCode
-    {
-        return new InfectionSourceCode();
-    }
-
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
-    }
 }

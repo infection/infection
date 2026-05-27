@@ -35,55 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+use function trim;
 
-final class InfectionSelector
+final class HasDocBlock implements SelectorInterface
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
+    public function getName(): string
     {
-        return new InfectionCode();
+        return 'has a PHP doc-block';
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public function matches(ClassReflection $classReflection): bool
     {
-        return new InfectionSourceCode();
-    }
+        $docComment = $classReflection->getNativeReflection()->getDocComment();
 
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        return $docComment !== false
+            && trim($docComment) !== '';
     }
 }

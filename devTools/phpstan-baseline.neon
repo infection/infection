@@ -553,6 +553,12 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
+			rawMessage: Infection\Testing\BaseMutatorTestCase should not exist
+			identifier: phpat.testExtensionPointsHaveDocBlock
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
 			count: 1
@@ -717,7 +723,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-

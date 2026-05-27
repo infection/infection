@@ -33,57 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\HasInternalDocBlock;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
-use PHPat\Selector\SelectorInterface;
+use Infection\Tests\Architecture\PHPat\Selector\HasInternalDocBlock;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-final class InfectionSelector
+#[CoversClass(HasInternalDocBlock::class)]
+final class HasInternalDocBlockTest extends SelectorTestCase
 {
-    use CannotBeInstantiated;
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_classes_with_internal_doc_blocks(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new HasInternalDocBlock();
+        $classReflection = $this->createClassReflection($className);
 
-    public static function code(): InfectionCode
-    {
-        return new InfectionCode();
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public static function classProvider(): iterable
     {
-        return new InfectionSourceCode();
-    }
+        yield 'with internal docblock' => [
+            HasInternalDocBlockTestFixtureWithInternalDocBlock::class,
+            true,
+        ];
 
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        yield 'without internal docblock' => [
+            HasInternalDocBlockTestFixtureWithoutInternalDocBlock::class,
+            false,
+        ];
     }
 }

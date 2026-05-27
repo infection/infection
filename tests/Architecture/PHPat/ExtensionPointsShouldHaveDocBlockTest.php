@@ -33,57 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Selector\Selector;
-use PHPat\Selector\SelectorInterface;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class InfectionSelector
+final class ExtensionPointsShouldHaveDocBlockTest
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
+    public function testExtensionPointsHaveDocBlock(): Rule
     {
-        return new InfectionCode();
-    }
-
-    public static function sourceCode(): InfectionSourceCode
-    {
-        return new InfectionSourceCode();
-    }
-
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    InfectionSelector::sourceCode(),
+                    Selector::Not(InfectionSelector::hasDocBlock()),
+                    Selector::Not(InfectionSelector::hasInternalDocBlock()),
+                ),
+            )
+            ->excluding(
+                InfectionSelector::isAnonymousClass(),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('Extension points should have a PHP doc-block to improve usability.');
     }
 }
