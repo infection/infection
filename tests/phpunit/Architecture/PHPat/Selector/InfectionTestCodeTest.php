@@ -33,21 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use Infection\Benchmark\Instrumentor;
+use Infection\Benchmark\MutationGenerator\MutationGeneratorBench;
+use Infection\Engine;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class SrcShouldNotDependOnTestsTest
+#[CoversClass(InfectionTestCode::class)]
+final class InfectionTestCodeTest extends SelectorTestCase
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_infection_test_code(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new InfectionTestCode();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function classProvider(): iterable
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        yield 'infection source class' => [
+            Engine::class,
+            false,
+        ];
+
+        yield 'infection PHPUnit test class' => [
+            self::class,
+            true,
+        ];
+
+        yield 'infection benchmark class' => [
+            MutationGeneratorBench::class,
+            false,
+        ];
+
+        yield 'infection benchmark framework class' => [
+            Instrumentor::class,
+            true,
+        ];
+
+        yield 'vendor class' => [
+            TestCase::class,
+            false,
+        ];
     }
 }

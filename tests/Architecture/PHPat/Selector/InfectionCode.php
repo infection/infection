@@ -33,21 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+use function Safe\preg_match;
+use function str_replace;
+use function str_starts_with;
 
-final class SrcShouldNotDependOnTestsTest
+final class InfectionCode implements SelectorInterface
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    public function getName(): string
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        return 'Infection code';
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        $fileName = $classReflection->getFileName();
+
+        return $this->isInfectionClass($classReflection)
+            && $fileName !== null
+            && preg_match('#/tests/benchmark/[^/]+/[^/]+#', $this->normalizePath($fileName)) !== 1;
+    }
+
+    private function isInfectionClass(ClassReflection $classReflection): bool
+    {
+        $className = $classReflection->getName();
+
+        return $className === 'Infection'
+            || str_starts_with($className, 'Infection\\');
+    }
+
+    private function normalizePath(string $fileName): string
+    {
+        return str_replace('\\', '/', $fileName);
     }
 }

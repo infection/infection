@@ -33,21 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector\IsAnonymousClass;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use Infection\Tests\Architecture\PHPat\Selector\IsAnonymousClass;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-final class SrcShouldNotDependOnTestsTest
+#[CoversClass(IsAnonymousClass::class)]
+final class IsAnonymousClassTest extends SelectorTestCase
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    public function test_it_matches_source_anonymous_class_reflections(): void
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        $selector = new IsAnonymousClass();
+        $classReflection = $this->createAnonymousClassReflectionFromFile(
+            __DIR__ . '/source-anonymous-class.php',
+        );
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertTrue($actual);
+    }
+
+    public function test_it_does_not_match_nonanonymous_class_reflections(): void
+    {
+        $selector = new IsAnonymousClass();
+        $classReflection = $this->createClassReflection(self::class);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertFalse($actual);
     }
 }
