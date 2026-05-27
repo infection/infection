@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use Infection\Process\Runner\ParallelProcessRunner;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -85,6 +84,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
+use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Reporter\Http\StrykerCurlClient;
 use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Resource\Processor\CpuCoresCountProvider;
