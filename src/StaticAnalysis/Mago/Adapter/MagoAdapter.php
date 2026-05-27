@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\Mago\Adapter;
 
 use function array_merge;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
@@ -60,7 +60,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly MagoMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,

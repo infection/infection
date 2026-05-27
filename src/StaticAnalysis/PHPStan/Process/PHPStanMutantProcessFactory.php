@@ -37,9 +37,9 @@ namespace Infection\StaticAnalysis\PHPStan\Process;
 
 use function array_merge;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
@@ -55,7 +55,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
      */
     public function __construct(
         private Filesystem $fileSystem,
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private MutantExecutionResultFactory $mutantExecutionResultFactory,
         private string $staticAnalysisConfigPath,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
