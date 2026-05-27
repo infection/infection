@@ -40,7 +40,7 @@ use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
-final class InterfaceImplementationsShouldBeFinalTest
+final class ClassesShouldBeFinalTest
 {
     public function testInterfaceImplementationsAreFinal(): Rule
     {
@@ -59,6 +59,26 @@ final class InterfaceImplementationsShouldBeFinalTest
             ->should()
             ->beFinal()
             ->because('Production interface implementations should be final by default.');
+    }
+
+    public function testSourceConcreteClassesAreFinals(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    Selector::inNamespace('Infection'),
+                ),
+            )
+            ->excluding(
+                Selector::inNamespace('Infection\Tests'),
+                Selector::isTrait(),
+                Selector::isInterface(),
+                Selector::isAbstract(),
+                Selector::isFinal(),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('Source concrete classes should be final or @final classes.');
     }
 
     public function testParallelProcessRunnerIsNotExtended(): Rule

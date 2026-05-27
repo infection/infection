@@ -15,7 +15,7 @@ services:
         tags:
             - phpat.test
     -
-        class: Infection\Tests\Architecture\PHPat\InterfaceImplementationsShouldBeFinalTest
+        class: Infection\Tests\Architecture\PHPat\ClassesShouldBeFinalTest
         tags:
             - phpat.test
 
