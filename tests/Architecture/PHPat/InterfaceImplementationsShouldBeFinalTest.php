@@ -53,7 +53,6 @@ final class InterfaceImplementationsShouldBeFinalTest
             ->excluding(
                 Selector::isAbstract(),
                 Selector::isInterface(),
-                Selector::classname('Infection\\Process\\Runner\\ParallelProcessRunner'),
                 Selector::inNamespace('Infection\\Tests'),
                 Selector::inNamespace('Infection\\Benchmark'),
             )
