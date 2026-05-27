@@ -54,7 +54,7 @@ final class InterfaceImplementationsShouldBeFinalTest
             ->excluding(
                 Selector::isAbstract(),
                 Selector::isInterface(),
-                Selector::inNamespace('Infection\\Benchmark'),
+                Selector::withFilepath('/tests\/benchmark\/.+\//', true),
             )
             ->should()
             ->beFinal()
