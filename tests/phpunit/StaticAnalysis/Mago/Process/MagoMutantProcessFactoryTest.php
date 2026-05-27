@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\Mago\Process;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\Testing\MutatorName;
@@ -97,7 +97,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MagoMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -178,7 +178,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MagoMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -264,7 +264,7 @@ final class MagoMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(MagoMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())

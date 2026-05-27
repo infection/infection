@@ -44,14 +44,13 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
+final readonly class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 
     public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
+        private TestFrameworkAdapter $testFrameworkAdapter,
     ) {
     }
 

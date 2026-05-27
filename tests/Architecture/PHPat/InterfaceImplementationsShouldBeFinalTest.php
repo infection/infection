@@ -33,36 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Tests\Architecture\PHPat;
 
-use function array_filter;
-use function in_array;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Process\Runner\ParallelProcessRunner;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-/**
- * @internal
- */
-final readonly class FilteringResultsCollector implements Collector
+final class InterfaceImplementationsShouldBeFinalTest
 {
-    /**
-     * @param DetectionStatus[] $targetDetectionStatuses
-     */
-    public function __construct(
-        private Collector $targetCollector,
-        private array $targetDetectionStatuses,
-    ) {
+    public function testInterfaceImplementationsAreFinal(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    Selector::inNamespace('Infection'),
+                    Selector::implements('/.*/', true),
+                ),
+            )
+            ->excluding(
+                Selector::isAbstract(),
+                Selector::isInterface(),
+                Selector::withFilepath('/tests\/benchmark\/.+\//', true),
+            )
+            ->should()
+            ->beFinal()
+            ->because('Production interface implementations should be final by default.');
     }
 
-    public function collect(MutantExecutionResult ...$executionResults): void
+    public function testParallelProcessRunnerIsNotExtended(): Rule
     {
-        $filteredExecutionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
-        );
-
-        if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
-        }
+        return PHPat::rule()
+            ->classes(Selector::extends(ParallelProcessRunner::class))
+            ->shouldNot()
+            ->exist()
+            ->because('ParallelProcessRunner is intentionally non-final only to allow PHPUnit partial mocks.');
     }
 }
