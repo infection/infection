@@ -112,7 +112,6 @@ use Infection\Testing\SingletonContainer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
-use function ltrim;
 use function Pipeline\take;
 use ReflectionClass;
 use function sort;
@@ -231,11 +230,6 @@ final class ProjectCodeProvider
      */
     private static ?array $sourceClassesToCheckForPublicProperties = null;
 
-    /**
-     * @var string[]|null
-     */
-    private static ?array $testClasses = null;
-
     public static function provideSourceClasses(): iterable
     {
         if (self::$sourceClasses !== null) {
@@ -329,47 +323,6 @@ final class ProjectCodeProvider
         );
     }
 
-    public static function provideTestClasses(): iterable
-    {
-        if (self::$testClasses !== null) {
-            yield from self::$testClasses;
-
-            return;
-        }
-
-        $finder = Finder::create()
-            ->files()
-            ->name('*.php')
-            ->in(__DIR__ . '/../../../../tests')
-            ->notName('DummySymfony5FileSystem.php')
-            ->notName('DummySymfony6FileSystem.php')
-            ->exclude([
-                'Architecture',
-                'autoloaded',
-                'benchmark',
-                'e2e',
-                'Fixtures',
-            ])
-        ;
-
-        self::$testClasses = take($finder)
-            ->cast(self::castTestSplFileInfoToFQCN(...))
-            ->toList();
-
-        sort(self::$testClasses, SORT_STRING);
-
-        yield from self::$testClasses;
-    }
-
-    // "testClassesProvider" would be more correct but PHPUnit will then detect this method as a
-    // test instead of a test provider.
-    public static function classesTestProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(
-            self::provideTestClasses(),
-        );
-    }
-
     public static function nonTestedConcreteClassesProvider(): iterable
     {
         yield from DataProviderFactory::fromIterable([
@@ -392,19 +345,6 @@ final class ProjectCodeProvider
             'Infection',
             str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
             $file->getRelativePath() !== '' ? '\\' : '',
-            $file->getBasename('.' . $file->getExtension()),
-        );
-    }
-
-    private static function castTestSplFileInfoToFQCN(SplFileInfo $file): string
-    {
-        $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
-        $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
-
-        return sprintf(
-            'Infection\\Tests\\%s%s%s',
-            $fqcnPart,
-            $file->getRelativePath() === 'phpunit' ? '' : '\\',
             $file->getBasename('.' . $file->getExtension()),
         );
     }

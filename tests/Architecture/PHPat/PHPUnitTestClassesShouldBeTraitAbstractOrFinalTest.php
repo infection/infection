@@ -33,30 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\Tests\Configuration\ConfigurationBuilder;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-#[CoversClass(StaticAnalysisToolFactory::class)]
-final class StaticAnalysisToolFactoryTest extends TestCase
+final class PHPUnitTestClassesShouldBeTraitAbstractOrFinalTest
 {
-    public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
+    public function testPHPUnitTestClassesAreTraitAbstractOrFinal(): Rule
     {
-        $factory = new StaticAnalysisToolFactory(
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(StaticAnalysisToolExecutableFinder::class),
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
-
-        $factory->create('Fake SA Tool', 30);
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    Selector::inNamespace('Infection\\Tests'),
+                    Selector::withFilepath('#/tests/phpunit/#', true),
+                ),
+            )
+            ->excluding(
+                Selector::isTrait(),
+                Selector::isAbstract(),
+            )
+            ->should()
+            ->beFinal()
+            ->because('PHPUnit test classes should be traits, abstract classes, or final classes.');
     }
 }

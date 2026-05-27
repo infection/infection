@@ -5571,12 +5571,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "imprecise-type"
-message = "Type `iterable` in return type of `classesTestProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "imprecise-type"
 message = "Type `iterable` in return type of `nonFinalExtensionClasses` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -5602,12 +5596,6 @@ count = 1
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideSourceClasses` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `provideTestClasses` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -5649,7 +5637,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php:301:13}`."
+message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php:295:13}`."
 count = 1
 
 [[issues]]
@@ -5674,19 +5662,13 @@ count = 1
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 4
+count = 3
 
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
 code = "redundant-comparison"
 message = "Avoid direct comparison with boolean literals."
 count = 3
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\ProjectCode\ProjectCodeTest::test_all_test_classes_are_trait_abstract_or_final`.'
-count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"

@@ -11,6 +11,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\PHPUnitTestClassesShouldBeTraitAbstractOrFinalTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\InterfaceImplementationsShouldBeFinalTest
         tags:
             - phpat.test

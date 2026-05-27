@@ -6,6 +6,7 @@ namespace Infection\Tests\Fixtures\Process;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;

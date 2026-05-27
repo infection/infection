@@ -663,7 +663,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
-			count: 4
+			count: 3
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
@@ -1139,6 +1139,18 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Reflection/AnonymousClassReflectionTest.php
+
+		-
+			rawMessage: Infection\Tests\Reflection\ProtChild should be final
+			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			rawMessage: Infection\Tests\Reflection\ProtParent should be final
+			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
 
 		-
 			rawMessage: Unused Infection\Tests\Reflection\ProtChild::foo
