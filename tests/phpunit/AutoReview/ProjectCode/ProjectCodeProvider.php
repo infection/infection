@@ -100,7 +100,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
@@ -199,7 +198,6 @@ final class ProjectCodeProvider
         ConsoleHelper::class,
         FileSystem::class,
         MetricsCalculator::class,
-        PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
         SourceDirGuesser::class,
         StrykerDashboardClient::class,
