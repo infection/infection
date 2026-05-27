@@ -44,12 +44,12 @@ use Infection\TestFramework\Tracing\TraceProvider;
  *
  * @internal
  */
-final class PhpUnitXmlCoverageTraceProvider implements TraceProvider
+final readonly class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 {
     public function __construct(
-        private readonly ReportLocator $indexLocator,
-        private readonly IndexXmlCoverageParser $indexParser,
-        private readonly XmlCoverageParser $parser,
+        private ReportLocator $indexLocator,
+        private IndexXmlCoverageParser $indexParser,
+        private XmlCoverageParser $parser,
     ) {
     }
 
