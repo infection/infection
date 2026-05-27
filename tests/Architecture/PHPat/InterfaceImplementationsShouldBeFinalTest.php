@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat;
 
+use Infection\Process\Runner\ParallelProcessRunner;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -53,11 +54,19 @@ final class InterfaceImplementationsShouldBeFinalTest
             ->excluding(
                 Selector::isAbstract(),
                 Selector::isInterface(),
-                Selector::inNamespace('Infection\\Tests'),
                 Selector::inNamespace('Infection\\Benchmark'),
             )
             ->should()
             ->beFinal()
             ->because('Production interface implementations should be final by default.');
+    }
+
+    public function testParallelProcessRunnerIsNotExtended(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selector::extends(ParallelProcessRunner::class))
+            ->shouldNot()
+            ->exist()
+            ->because('ParallelProcessRunner is intentionally non-final only to allow PHPUnit partial mocks.');
     }
 }
