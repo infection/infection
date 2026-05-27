@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
@@ -61,7 +61,7 @@ final class MagoAdapterTest extends TestCase
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
 
         $this->adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -96,7 +96,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -127,7 +127,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -159,7 +159,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -209,7 +209,7 @@ final class MagoAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
@@ -227,7 +227,7 @@ final class MagoAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,

@@ -40,6 +40,7 @@ use function count;
 use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
@@ -441,7 +442,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(MutantExecutionResultFactory::class),
                 false,
             );
 
@@ -502,7 +503,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $mutantProcess = new DummyMutantProcess(
                 $process,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(MutantExecutionResultFactory::class),
                 false,
             );
 
@@ -563,7 +564,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(MutantExecutionResultFactory::class),
                 false,
             ),
             [],
@@ -629,9 +630,9 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             ),
             [
-                new readonly class($this->createStub(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new readonly class($this->createStub(MutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
-                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+                        private MutantExecutionResultFactory $mutantExecutionResultFactory,
                         private Process $nextProcessMock,
                     ) {
                     }
@@ -671,7 +672,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 MutantBuilder::withMinimalTestData()->build(),
-                $this->createStub(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createStub(MutantExecutionResultFactory::class),
                 true,
             ),
             [],

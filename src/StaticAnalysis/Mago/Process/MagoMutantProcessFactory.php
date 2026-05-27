@@ -37,9 +37,9 @@ namespace Infection\StaticAnalysis\Mago\Process;
 
 use function array_merge;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Symfony\Component\Process\Process;
 
@@ -52,7 +52,7 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private MagoMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private MutantExecutionResultFactory $mutantExecutionResultFactory,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
         private float $timeout,

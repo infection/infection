@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -58,7 +58,7 @@ final class MutantProcessTest extends TestCase
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
+        $mutantExecutionResultFactory = $this->createMock(MutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
