@@ -13,6 +13,12 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
+			rawMessage: 'Infection\Metrics\MetricsCalculator should be final'
+			identifier: phpat.testInterfaceImplementationsAreFinal
+			count: 1
+			path: ../src/Metrics/MetricsCalculator.php
+
+		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -1277,4 +1283,3 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
-
