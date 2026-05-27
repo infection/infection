@@ -36,20 +36,21 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
 use function str_contains;
 use function str_replace;
 
 final class InfectionSourceCode implements SelectorInterface
 {
+    use ClassReflectionAccessor;
+
     public function getName(): string
     {
         return 'Infection source code';
     }
 
-    public function matches(ClassReflection $classReflection): bool
+    public function matches($classReflection): bool
     {
-        $fileName = $classReflection->getFileName();
+        $fileName = $this->getClassReflectionFileName($classReflection);
 
         return (new InfectionCode())->matches($classReflection)
             && $fileName !== null

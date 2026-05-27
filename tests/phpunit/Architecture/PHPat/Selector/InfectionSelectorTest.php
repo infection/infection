@@ -38,53 +38,29 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\Benchmark\Instrumentor;
 use Infection\Engine;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InfectionSelector::class)]
 final class InfectionSelectorTest extends SelectorTestCase
 {
-    /**
-     * @param class-string $className
-     */
-    #[DataProvider('classProvider')]
-    public function test_it_matches_phpunit_test_code(
-        string $className,
-        bool $expected,
-    ): void {
-        $selector = InfectionSelector::phpunitTestCode();
-        $classReflection = $this->createClassReflection($className);
-
-        $actual = $selector->matches($classReflection);
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public static function classProvider(): iterable
+    public function test_it_matches_phpunit_test_code(): void
     {
-        yield 'infection source class' => [
-            Engine::class,
-            false,
+        $selector = InfectionSelector::phpunitTestCode();
+
+        $classExpectations = [
+            'infection source class' => [Engine::class, false],
+            'infection PHPUnit test class' => [self::class, true],
+            'infection non-PHPUnit test class' => [InfectionTestCode::class, false],
+            'infection benchmark framework class' => [Instrumentor::class, false],
+            'vendor class' => [TestCase::class, false],
         ];
 
-        yield 'infection PHPUnit test class' => [
-            self::class,
-            true,
-        ];
+        foreach ($classExpectations as $message => [$className, $expected]) {
+            $classReflection = $this->createClassReflection($className);
 
-        yield 'infection non-PHPUnit test class' => [
-            InfectionTestCode::class,
-            false,
-        ];
+            $actual = $selector->matches($classReflection);
 
-        yield 'infection benchmark framework class' => [
-            Instrumentor::class,
-            false,
-        ];
-
-        yield 'vendor class' => [
-            TestCase::class,
-            false,
-        ];
+            $this->assertSame($expected, $actual, $message);
+        }
     }
 }

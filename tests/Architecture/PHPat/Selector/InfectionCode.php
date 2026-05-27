@@ -36,30 +36,31 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
 use function Safe\preg_match;
 use function str_replace;
 use function str_starts_with;
 
 final class InfectionCode implements SelectorInterface
 {
+    use ClassReflectionAccessor;
+
     public function getName(): string
     {
         return 'Infection code';
     }
 
-    public function matches(ClassReflection $classReflection): bool
+    public function matches($classReflection): bool
     {
-        $fileName = $classReflection->getFileName();
+        $fileName = $this->getClassReflectionFileName($classReflection);
 
         return $this->isInfectionClass($classReflection)
             && $fileName !== null
             && preg_match('#/tests/benchmark/[^/]+/[^/]+#', $this->normalizePath($fileName)) !== 1;
     }
 
-    private function isInfectionClass(ClassReflection $classReflection): bool
+    private function isInfectionClass(mixed $classReflection): bool
     {
-        $className = $classReflection->getName();
+        $className = $this->getClassReflectionName($classReflection);
 
         return $className === 'Infection'
             || str_starts_with($className, 'Infection\\');

@@ -35,25 +35,52 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use PHPat\Selector\SelectorInterface;
-use function str_contains;
-use function str_replace;
+use InvalidArgumentException;
+use function is_object;
+use function is_string;
+use function method_exists;
 
-final class InfectionTestCode implements SelectorInterface
+trait ClassReflectionAccessor
 {
-    use ClassReflectionAccessor;
-
-    public function getName(): string
+    private function getClassReflectionName(mixed $classReflection): string
     {
-        return 'Infection test code';
+        if (!is_object($classReflection) || !method_exists($classReflection, 'getName')) {
+            throw new InvalidArgumentException('Expected a class reflection with a getName() method.');
+        }
+
+        return self::toString(
+            $classReflection->getName(),
+            'Expected the class reflection name to be a string.',
+        );
     }
 
-    public function matches($classReflection): bool
+    private function getClassReflectionFileName(mixed $classReflection): ?string
     {
-        $fileName = $this->getClassReflectionFileName($classReflection);
+        if (!is_object($classReflection) || !method_exists($classReflection, 'getFileName')) {
+            throw new InvalidArgumentException('Expected a class reflection with a getFileName() method.');
+        }
 
-        return (new InfectionCode())->matches($classReflection)
-            && $fileName !== null
-            && !str_contains(str_replace('\\', '/', $fileName), '/src/');
+        return self::toOptionalString(
+            $classReflection->getFileName(),
+            'Expected the class reflection file name to be null or a string.',
+        );
+    }
+
+    private static function toString(mixed $value, string $errorMessage): string
+    {
+        if (!is_string($value)) {
+            throw new InvalidArgumentException($errorMessage);
+        }
+
+        return $value;
+    }
+
+    private static function toOptionalString(mixed $value, string $errorMessage): ?string
+    {
+        if ($value === null || is_string($value)) {
+            return $value;
+        }
+
+        throw new InvalidArgumentException($errorMessage);
     }
 }
