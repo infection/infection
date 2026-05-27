@@ -101,21 +101,4 @@ final class ProjectCodeProviderTest extends TestCase
             ),
         );
     }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'nonFinalExtensionClasses')]
-    public function test_non_final_extension_classes_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true)
-            || interface_exists($className, true)
-            || trait_exists($className, true),
-            sprintf(
-                'The "%s" class was picked up by the test files finder, but it is not a class,'
-                . ' interface or trait. Please check for typos in the class name. If the '
-                . ' class no longer exists, remove it from %s::NON_FINAL_EXTENSION_CLASSES.',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
 }

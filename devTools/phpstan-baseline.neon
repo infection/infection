@@ -19,6 +19,18 @@ parameters:
 			path: ../src/Command/RunCommand.php
 
 		-
+			rawMessage: Infection\Config\ConsoleHelper should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Config/ConsoleHelper.php
+
+		-
+			rawMessage: Infection\Config\Guesser\SourceDirGuesser should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Config/Guesser/SourceDirGuesser.php
+
+		-
 			rawMessage: Variable property access on mixed.
 			identifier: property.dynamicName
 			count: 1
@@ -79,6 +91,12 @@ parameters:
 			path: ../src/Environment/BuildContextResolver.php
 
 		-
+			rawMessage: Infection\FileSystem\FileSystem should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/FileSystem/FileSystem.php
+
+		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -95,6 +113,12 @@ parameters:
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
+
+		-
+			rawMessage: Infection\FileSystem\Finder\TestFrameworkFinder should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
 			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-empty-string}.'
@@ -165,6 +189,12 @@ parameters:
 		-
 			rawMessage: Infection\Metrics\MetricsCalculator should be final
 			identifier: phpat.testInterfaceImplementationsAreFinal
+			count: 1
+			path: ../src/Metrics/MetricsCalculator.php
+
+		-
+			rawMessage: Infection\Metrics\MetricsCalculator should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
 			count: 1
 			path: ../src/Metrics/MetricsCalculator.php
 
@@ -310,6 +340,12 @@ parameters:
 			path: ../src/Process/Runner/ParallelProcessRunner.php
 
 		-
+			rawMessage: Infection\Process\Runner\ParallelProcessRunner should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Process/Runner/ParallelProcessRunner.php
+
+		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
 			identifier: missingType.generics
 			count: 1
@@ -362,6 +398,12 @@ parameters:
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: Infection\Reporter\Http\StrykerDashboardClient should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Reporter/Http/StrykerDashboardClient.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
@@ -434,6 +476,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
 			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
@@ -669,7 +717,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
-			count: 3
+			count: 2
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-

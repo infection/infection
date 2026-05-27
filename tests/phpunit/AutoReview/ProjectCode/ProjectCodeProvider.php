@@ -45,8 +45,6 @@ use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
-use Infection\Config\ConsoleHelper;
-use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
@@ -68,14 +66,12 @@ use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
-use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Git\NoGitProjectFound;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
-use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
@@ -84,9 +80,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Reporter\Http\StrykerCurlClient;
-use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
@@ -101,7 +95,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
@@ -189,21 +182,6 @@ final class ProjectCodeProvider
      */
     public const array CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
-    ];
-
-    /**
-     * This array contains all classes that are not extension points, but not final due to legacy
-     * reasons. This list should never be added to, only removed from.
-     */
-    public const array NON_FINAL_EXTENSION_CLASSES = [
-        ConsoleHelper::class,
-        FileSystem::class,
-        MetricsCalculator::class,
-        PhpUnitMutationConfigBuilder::class,
-        SourceDirGuesser::class,
-        StrykerDashboardClient::class,
-        TestFrameworkFinder::class,
-        ParallelProcessRunner::class,
     ];
 
     /**
@@ -329,13 +307,6 @@ final class ProjectCodeProvider
             ...self::NON_TESTED_CONCRETE_CLASSES,
             ...self::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION,
         ]);
-    }
-
-    public static function nonFinalExtensionClasses(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(
-            self::NON_FINAL_EXTENSION_CLASSES,
-        );
     }
 
     private static function castSplFileInfoToFQCN(SplFileInfo $file): string

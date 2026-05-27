@@ -36,13 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
-use function array_flip;
-use function array_key_exists;
 use function array_map;
 use function in_array;
 use Infection\Framework\ClassName;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\Testing\SingletonContainer;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
@@ -150,48 +147,6 @@ final class ProjectCodeTest extends TestCase
                 ProjectCodeProvider::class,
             ),
         );
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
-    public function test_non_extension_points_are_traits_interfaces_abstracts_or_finals(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $tagsAsKeys = array_flip(
-            SingletonContainer::getPHPDocParser()->parse(
-                (string) $reflectionClass->getDocComment(),
-            ),
-        );
-
-        $pass = $reflectionClass->isTrait()
-            || $reflectionClass->isInterface()
-            || $reflectionClass->isAbstract()
-            || $reflectionClass->isFinal()
-            || array_key_exists('@final', $tagsAsKeys)
-        ;
-
-        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
-            $this->assertFalse(
-                $pass,
-                sprintf(
-                    'The class "%s" is registered to "%s::NON_FINAL_EXTENSION_CLASSES but '
-                    . 'this should not be necessary.',
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-        } else {
-            $this->assertTrue(
-                $pass,
-                sprintf(
-                    'Expected the class "%s" to be a trait, an interface, an abstract or final '
-                    . 'class. Either fix it or if it is an extension point, add it to '
-                    . '%s::NON_FINAL_EXTENSION_CLASSES.',
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-        }
     }
 
     #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
