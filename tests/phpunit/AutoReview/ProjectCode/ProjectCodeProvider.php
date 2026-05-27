@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Process\Runner\ParallelProcessRunner;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -202,6 +203,7 @@ final class ProjectCodeProvider
         SourceDirGuesser::class,
         StrykerDashboardClient::class,
         TestFrameworkFinder::class,
+        ParallelProcessRunner::class,
     ];
 
     /**
