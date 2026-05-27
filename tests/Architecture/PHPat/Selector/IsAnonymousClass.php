@@ -36,19 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 use function str_starts_with;
 
 final class IsAnonymousClass implements SelectorInterface
 {
-    use ClassReflectionAccessor;
-
     public function getName(): string
     {
         return 'is an anonymous class';
     }
 
-    public function matches($classReflection): bool
+    public function matches(ClassReflection $classReflection): bool
     {
-        return str_starts_with($this->getClassReflectionName($classReflection), 'AnonymousClass');
+        return str_starts_with(
+            ClassReflectionAccessor::getName($classReflection),
+            // Note that this is the PHPStan internal representation, not the
+            // PHP one which changes from a version to another.
+            'AnonymousClass',
+        );
     }
 }

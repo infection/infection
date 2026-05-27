@@ -35,52 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use InvalidArgumentException;
-use function is_object;
-use function is_string;
-use function method_exists;
+use Infection\CannotBeInstantiated;
+use Webmozart\Assert\Assert;
 
-trait ClassReflectionAccessor
+final class ClassReflectionAccessor
 {
-    private function getClassReflectionName(mixed $classReflection): string
-    {
-        if (!is_object($classReflection) || !method_exists($classReflection, 'getName')) {
-            throw new InvalidArgumentException('Expected a class reflection with a getName() method.');
-        }
+    use CannotBeInstantiated;
 
-        return self::toString(
+    public static function getName(mixed $classReflection): string
+    {
+        Assert::object(
+            $classReflection,
+            'Expected a class reflection object.',
+        );
+        Assert::methodExists(
+            $classReflection,
+            'getName',
+            'Expected a class reflection with a getName() method.',
+        );
+
+        return Assert::string(
             $classReflection->getName(),
             'Expected the class reflection name to be a string.',
         );
     }
 
-    private function getClassReflectionFileName(mixed $classReflection): ?string
+    public static function getFileName(mixed $classReflection): ?string
     {
-        if (!is_object($classReflection) || !method_exists($classReflection, 'getFileName')) {
-            throw new InvalidArgumentException('Expected a class reflection with a getFileName() method.');
-        }
+        Assert::object(
+            $classReflection,
+            'Expected a class reflection object.',
+        );
+        Assert::methodExists(
+            $classReflection,
+            'getFileName',
+            'Expected a class reflection with a getFileName() method.',
+        );
 
-        return self::toOptionalString(
+        return Assert::nullOrString(
             $classReflection->getFileName(),
             'Expected the class reflection file name to be null or a string.',
         );
-    }
-
-    private static function toString(mixed $value, string $errorMessage): string
-    {
-        if (!is_string($value)) {
-            throw new InvalidArgumentException($errorMessage);
-        }
-
-        return $value;
-    }
-
-    private static function toOptionalString(mixed $value, string $errorMessage): ?string
-    {
-        if ($value === null || is_string($value)) {
-            return $value;
-        }
-
-        throw new InvalidArgumentException($errorMessage);
     }
 }

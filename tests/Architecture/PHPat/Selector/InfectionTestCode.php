@@ -36,24 +36,32 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use PHPat\Selector\SelectorInterface;
-use function str_contains;
-use function str_replace;
+use PHPStan\Reflection\ClassReflection;
+use Symfony\Component\Filesystem\Path;
 
 final class InfectionTestCode implements SelectorInterface
 {
-    use ClassReflectionAccessor;
+    private const string PROJECT_ROOT = __DIR__ . '/../../../../';
 
     public function getName(): string
     {
         return 'Infection test code';
     }
 
-    public function matches($classReflection): bool
+    public function matches(ClassReflection $classReflection): bool
     {
-        $fileName = $this->getClassReflectionFileName($classReflection);
+        $fileName = ClassReflectionAccessor::getFileName($classReflection);
 
-        return (new InfectionCode())->matches($classReflection)
-            && $fileName !== null
-            && !str_contains(str_replace('\\', '/', $fileName), '/src/');
+        return InfectionSelector::code()->matches($classReflection)
+            && self::isInTestsDirectory($fileName);
+    }
+
+    private static function isInTestsDirectory(?string $fileName): bool
+    {
+        return $fileName !== null
+            && Path::isBasePath(
+                'tests',
+                Path::makeRelative($fileName, self::PROJECT_ROOT),
+            );
     }
 }

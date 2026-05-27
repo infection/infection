@@ -36,38 +36,45 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use PHPat\Selector\SelectorInterface;
-use function Safe\preg_match;
-use function str_replace;
+use PHPStan\Reflection\ClassReflection;
 use function str_starts_with;
+use Symfony\Component\Filesystem\Path;
 
 final class InfectionCode implements SelectorInterface
 {
-    use ClassReflectionAccessor;
+    private const string PROJECT_ROOT = __DIR__ . '/../../../../';
 
     public function getName(): string
     {
         return 'Infection code';
     }
 
-    public function matches($classReflection): bool
+    public function matches(ClassReflection $classReflection): bool
     {
-        $fileName = $this->getClassReflectionFileName($classReflection);
+        $fileName = ClassReflectionAccessor::getFileName($classReflection);
 
         return $this->isInfectionClass($classReflection)
-            && $fileName !== null
-            && preg_match('#/tests/benchmark/[^/]+/[^/]+#', $this->normalizePath($fileName)) !== 1;
+            && !self::isBenchmarkFixture($fileName);
     }
 
     private function isInfectionClass(mixed $classReflection): bool
     {
-        $className = $this->getClassReflectionName($classReflection);
+        $className = ClassReflectionAccessor::getName($classReflection);
 
         return $className === 'Infection'
             || str_starts_with($className, 'Infection\\');
     }
 
-    private function normalizePath(string $fileName): string
+    private static function isBenchmarkFixture(?string $fileName): bool
     {
-        return str_replace('\\', '/', $fileName);
+        if ($fileName === null) {
+            return false;
+        }
+
+        $relativeFileName = Path::makeRelative($fileName, self::PROJECT_ROOT);
+        $relativeDirectory = Path::getDirectory($relativeFileName);
+
+        return $relativeDirectory !== 'tests/benchmark'
+            && Path::isBasePath('tests/benchmark', $relativeDirectory);
     }
 }
