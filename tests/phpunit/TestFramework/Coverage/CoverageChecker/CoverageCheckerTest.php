@@ -41,7 +41,6 @@ use Infection\TestFramework\Coverage\CoverageNotFound;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -296,9 +295,6 @@ final class CoverageCheckerTest extends TestCase
 
     public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_phpunit_test_framework_adapter(): void
     {
-        $phpUnitAdapterMock = $this->createMock(PhpUnitAdapter::class);
-        $phpUnitAdapterMock->method('hasJUnitReport')->willReturn(true);
-
         $checker = new CoverageChecker(
             false,
             false,
