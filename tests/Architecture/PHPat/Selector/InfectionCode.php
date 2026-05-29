@@ -51,7 +51,7 @@ final class InfectionCode implements SelectorInterface
 
     public function matches(ClassReflection $classReflection): bool
     {
-        $fileName = ClassReflectionAccessor::getFileName($classReflection);
+        $fileName = $classReflection->getFileName();
 
         return $this->isInfectionClass($classReflection)
             && !self::isBenchmarkFixture($fileName);
@@ -59,7 +59,7 @@ final class InfectionCode implements SelectorInterface
 
     private function isInfectionClass(mixed $classReflection): bool
     {
-        $className = ClassReflectionAccessor::getName($classReflection);
+        $className = $classReflection->getName();
 
         return $className === 'Infection'
             || str_starts_with($className, 'Infection\\');

@@ -49,7 +49,7 @@ final class IsAnonymousClass implements SelectorInterface
     public function matches(ClassReflection $classReflection): bool
     {
         return str_starts_with(
-            ClassReflectionAccessor::getName($classReflection),
+            $classReflection->getName(),
             // Note that this is the PHPStan internal representation, not the
             // PHP one which changes from a version to another.
             'AnonymousClass',
