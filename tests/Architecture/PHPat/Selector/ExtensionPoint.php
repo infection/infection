@@ -35,60 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
+use function in_array;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-final class InfectionSelector
+final class ExtensionPoint implements SelectorInterface
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
+    public function getName(): string
     {
-        return new InfectionCode();
+        return 'Infection extension point';
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public function matches(ClassReflection $classReflection): bool
     {
-        return new InfectionSourceCode();
-    }
-
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
+        return in_array(
+            ClassReflectionAccessor::getName($classReflection),
+            ProjectCodeProvider::EXTENSION_POINTS,
+            true,
         );
-    }
-
-    public static function extensionPoint(): ExtensionPoint
-    {
-        return new ExtensionPoint();
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
     }
 }

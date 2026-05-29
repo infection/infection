@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat;
 
-use function array_map;
-use function implode;
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
-use function preg_quote;
 
 final class SourceClassesShouldBeInternalTest
 {
@@ -56,7 +52,7 @@ final class SourceClassesShouldBeInternalTest
                 ),
             )
             ->excluding(
-                Selector::classname($this->extensionPointsRegex(), true),
+                InfectionSelector::extensionPoint(),
             )
             ->shouldNot()
             ->exist()
@@ -68,28 +64,12 @@ final class SourceClassesShouldBeInternalTest
         return PHPat::rule()
             ->classes(
                 Selector::AllOf(
-                    Selector::classname($this->extensionPointsRegex(), true),
+                    InfectionSelector::extensionPoint(),
                     InfectionSelector::hasInternalDocBlock(),
                 ),
             )
             ->shouldNot()
             ->exist()
             ->because('Extension points should not be tagged @internal.');
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private function extensionPointsRegex(): string
-    {
-        return '#^('
-            . implode(
-                '|',
-                array_map(
-                    static fn (string $className): string => preg_quote($className, '#'),
-                    ProjectCodeProvider::EXTENSION_POINTS,
-                ),
-            )
-            . ')$#';
     }
 }

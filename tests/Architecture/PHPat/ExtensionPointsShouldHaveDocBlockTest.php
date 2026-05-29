@@ -47,9 +47,8 @@ final class ExtensionPointsShouldHaveDocBlockTest
         return PHPat::rule()
             ->classes(
                 Selector::AllOf(
-                    InfectionSelector::sourceCode(),
+                    InfectionSelector::extensionPoint(),
                     Selector::Not(InfectionSelector::hasDocBlock()),
-                    Selector::Not(InfectionSelector::hasInternalDocBlock()),
                 ),
             )
             ->excluding(

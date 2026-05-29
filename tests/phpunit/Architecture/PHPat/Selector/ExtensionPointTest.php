@@ -35,60 +35,62 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
+use Infection\Engine;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use PHPat\Selector\SelectorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class InfectionSelector
+#[CoversClass(ExtensionPoint::class)]
+final class ExtensionPointTest extends SelectorTestCase
 {
-    use CannotBeInstantiated;
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_extension_points(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new ExtensionPoint();
+        $classReflection = $this->createClassReflection($className);
 
-    public static function code(): InfectionCode
-    {
-        return new InfectionCode();
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public static function classProvider(): iterable
     {
-        return new InfectionSourceCode();
-    }
+        yield 'extension point' => [
+            ProjectCodeProvider::EXTENSION_POINTS[0],
+            true,
+        ];
 
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
+        yield 'source class' => [
+            Engine::class,
+            false,
+        ];
 
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
+        yield 'architecture test class' => [
+            self::class,
+            false,
+        ];
 
-    public static function extensionPoint(): ExtensionPoint
-    {
-        return new ExtensionPoint();
-    }
+        yield 'project code provider' => [
+            ProjectCodeProvider::class,
+            false,
+        ];
 
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
+        yield 'vendor class' => [
+            TestCase::class,
+            false,
+        ];
 
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        yield 'phpat selector interface' => [
+            SelectorInterface::class,
+            false,
+        ];
     }
 }
