@@ -37,24 +37,36 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\Command\ConfigureCommand;
 use Infection\Engine;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIteratorTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(TestingUtilityConcreteClassWithoutCanonicalTest::class)]
-final class TestingUtilityConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
+#[CoversClass(PHPUnitTestSupportConcreteClassWithoutCanonicalTest::class)]
+final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
+    public function test_it_does_not_match_anonymous_classes(): void
+    {
+        $selector = new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
+        $classReflection = $this->createAnonymousClassReflectionFromFile(__DIR__ . '/IsAnonymousClass/source-anonymous-class.php');
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertFalse($actual);
+    }
+
     /**
      * @param class-string $className
      */
     #[DataProvider('classProvider')]
-    public function test_it_matches_testing_utility_concrete_classes_without_canonical_test(
+    public function test_it_matches_phpunit_test_support_concrete_classes_without_canonical_test(
         string $className,
         bool $expected,
     ): void {
-        $selector = new TestingUtilityConcreteClassWithoutCanonicalTest();
+        $selector = new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
         $classReflection = $this->createClassReflection($className);
 
         $actual = $selector->matches($classReflection);
@@ -76,6 +88,16 @@ final class TestingUtilityConcreteClassWithoutCanonicalTestTest extends Selector
 
         yield 'testing utility test' => [
             NonRewindableIteratorTest::class,
+            false,
+        ];
+
+        yield 'test support class outside TestingUtility without canonical test' => [
+            FixedProjectDirectoryProvider::class,
+            true,
+        ];
+
+        yield 'test support class outside TestingUtility with canonical test' => [
+            ConfigurationBuilder::class,
             false,
         ];
 

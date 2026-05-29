@@ -31,7 +31,7 @@ services:
         tags:
             - phpat.test
     -
-        class: Infection\Tests\Architecture\PHPat\ConcreteTestingUtilityClassesShouldHaveTestsTest
+        class: Infection\Tests\Architecture\PHPat\ConcretePHPUnitTestSupportClassesShouldHaveTestsTest
         tags:
             - phpat.test
 

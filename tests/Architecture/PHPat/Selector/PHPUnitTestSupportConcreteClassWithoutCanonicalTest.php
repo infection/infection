@@ -41,20 +41,21 @@ use PHPStan\Reflection\ClassReflection;
 use function str_ends_with;
 use Symfony\Component\Filesystem\Path;
 
-final class TestingUtilityConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
     private const string PROJECT_ROOT = __DIR__ . '/../../../../';
 
     public function getName(): string
     {
-        return 'testing utility concrete class without canonical test';
+        return 'PHPUnit test support concrete class without canonical test';
     }
 
     public function matches(ClassReflection $classReflection): bool
     {
         if (!self::isConcreteClass($classReflection)
+            || InfectionSelector::isAnonymousClass()->matches($classReflection)
             || self::isTestClass($classReflection)
-            || !self::isTestingUtilityCode($classReflection)
+            || !self::isPHPUnitTestSupportCode($classReflection)
         ) {
             return false;
         }
@@ -71,13 +72,13 @@ final class TestingUtilityConcreteClassWithoutCanonicalTest implements SelectorI
             && !$classReflection->isTrait();
     }
 
-    private static function isTestingUtilityCode(ClassReflection $classReflection): bool
+    private static function isPHPUnitTestSupportCode(ClassReflection $classReflection): bool
     {
         $fileName = $classReflection->getFileName();
 
         return $fileName !== null
             && Path::isBasePath(
-                'tests/phpunit/TestingUtility',
+                'tests/phpunit',
                 Path::makeRelative($fileName, self::PROJECT_ROOT),
             );
     }

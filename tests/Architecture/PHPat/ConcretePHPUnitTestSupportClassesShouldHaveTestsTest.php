@@ -39,14 +39,14 @@ use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
-final class ConcreteTestingUtilityClassesShouldHaveTestsTest
+final class ConcretePHPUnitTestSupportClassesShouldHaveTestsTest
 {
-    public function testConcreteTestingUtilityClassesHaveTests(): Rule
+    public function testConcretePHPUnitTestSupportClassesHaveTests(): Rule
     {
         return PHPat::rule()
-            ->classes(InfectionSelector::testingUtilityConcreteClassWithoutCanonicalTest())
+            ->classes(InfectionSelector::phpunitTestSupportConcreteClassWithoutCanonicalTest())
             ->shouldNot()
             ->exist()
-            ->because('Concrete testing utility classes should have a canonical test.');
+            ->because('Concrete PHPUnit test support classes should have a canonical test.');
     }
 }
