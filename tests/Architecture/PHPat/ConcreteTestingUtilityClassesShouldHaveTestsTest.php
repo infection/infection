@@ -33,36 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Framework\ClassName;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class ConcreteTestingUtilityClassesShouldHaveTestsTest
 {
-    public function getName(): string
+    public function testConcreteTestingUtilityClassesHaveTests(): Rule
     {
-        return 'source concrete class without canonical test';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        if (!self::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-        ) {
-            return false;
-        }
-
-        $className = $classReflection->getName();
-
-        return ClassName::getCanonicalTestClassName($className) === null;
-    }
-
-    private static function isConcreteClass(ClassReflection $classReflection): bool
-    {
-        return !$classReflection->isAbstract()
-            && !$classReflection->isInterface()
-            && !$classReflection->isTrait();
+        return PHPat::rule()
+            ->classes(InfectionSelector::testingUtilityConcreteClassWithoutCanonicalTest())
+            ->shouldNot()
+            ->exist()
+            ->because('Concrete testing utility classes should have a canonical test.');
     }
 }

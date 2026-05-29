@@ -1646,18 +1646,18 @@ parameters:
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Console\Command\TestOptionCommand should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
+			identifier: phpat.testConcreteTestingUtilityClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/Console/Command/TestOptionCommand.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\FS should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
+			identifier: phpat.testConcreteTestingUtilityClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/FS.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
+			identifier: phpat.testConcreteTestingUtilityClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/Process/TestPhpExecutableFinder.php

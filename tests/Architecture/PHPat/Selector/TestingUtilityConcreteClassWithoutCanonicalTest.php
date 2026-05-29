@@ -35,71 +35,55 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ExtensionPoint;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
+use Infection\Framework\ClassName;
 use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+use function str_ends_with;
+use Symfony\Component\Filesystem\Path;
 
-final class InfectionSelector
+final class TestingUtilityConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
-    use CannotBeInstantiated;
+    private const string PROJECT_ROOT = __DIR__ . '/../../../../';
 
-    public static function code(): InfectionCode
+    public function getName(): string
     {
-        return new InfectionCode();
+        return 'testing utility concrete class without canonical test';
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public function matches(ClassReflection $classReflection): bool
     {
-        return new InfectionSourceCode();
+        if (!self::isConcreteClass($classReflection)
+            || self::isTestClass($classReflection)
+            || !self::isTestingUtilityCode($classReflection)
+        ) {
+            return false;
+        }
+
+        $className = $classReflection->getName();
+
+        return ClassName::getCanonicalTestClassName($className) === null;
     }
 
-    public static function testCode(): InfectionTestCode
+    private static function isConcreteClass(ClassReflection $classReflection): bool
     {
-        return new InfectionTestCode();
+        return !$classReflection->isAbstract()
+            && !$classReflection->isInterface()
+            && !$classReflection->isTrait();
     }
 
-    public static function phpunitTestCode(): SelectorInterface
+    private static function isTestingUtilityCode(ClassReflection $classReflection): bool
     {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
+        $fileName = $classReflection->getFileName();
+
+        return $fileName !== null
+            && Path::isBasePath(
+                'tests/phpunit/TestingUtility',
+                Path::makeRelative($fileName, self::PROJECT_ROOT),
+            );
     }
 
-    public static function extensionPoint(): ExtensionPoint
+    private static function isTestClass(ClassReflection $classReflection): bool
     {
-        return new ExtensionPoint();
-    }
-
-    public static function sourceConcreteClassWithoutCanonicalTest(): SourceConcreteClassWithoutCanonicalTest
-    {
-        return new SourceConcreteClassWithoutCanonicalTest();
-    }
-
-    public static function testingUtilityConcreteClassWithoutCanonicalTest(): TestingUtilityConcreteClassWithoutCanonicalTest
-    {
-        return new TestingUtilityConcreteClassWithoutCanonicalTest();
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        return str_ends_with($classReflection->getName(), 'Test');
     }
 }

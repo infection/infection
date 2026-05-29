@@ -30,6 +30,10 @@ services:
         class: Infection\Tests\Architecture\PHPat\ConcreteSourceClassesShouldHaveTestsTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\ConcreteTestingUtilityClassesShouldHaveTestsTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan

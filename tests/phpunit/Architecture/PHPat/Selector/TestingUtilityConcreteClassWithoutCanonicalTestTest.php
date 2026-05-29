@@ -35,28 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use Infection\Command\BaseCommand;
 use Infection\Command\ConfigureCommand;
 use Infection\Engine;
-use Infection\Mutator\Mutator;
-use Infection\Tests\EngineTest;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
+use Infection\Tests\TestingUtility\Iterable\NonRewindableIteratorTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SourceConcreteClassWithoutCanonicalTest::class)]
-final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
+#[CoversClass(TestingUtilityConcreteClassWithoutCanonicalTest::class)]
+final class TestingUtilityConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
     /**
      * @param class-string $className
      */
     #[DataProvider('classProvider')]
-    public function test_it_matches_source_concrete_classes_without_canonical_test(
+    public function test_it_matches_testing_utility_concrete_classes_without_canonical_test(
         string $className,
         bool $expected,
     ): void {
-        $selector = new SourceConcreteClassWithoutCanonicalTest();
+        $selector = new TestingUtilityConcreteClassWithoutCanonicalTest();
         $classReflection = $this->createClassReflection($className);
 
         $actual = $selector->matches($classReflection);
@@ -66,38 +64,28 @@ final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 
     public static function classProvider(): iterable
     {
-        yield 'source concrete class without canonical test' => [
-            ConfigureCommand::class,
+        yield 'testing utility without canonical test' => [
+            FS::class,
             true,
         ];
 
-        yield 'source concrete class with canonical test' => [
+        yield 'testing utility with canonical test' => [
+            NonRewindableIterator::class,
+            false,
+        ];
+
+        yield 'testing utility test' => [
+            NonRewindableIteratorTest::class,
+            false,
+        ];
+
+        yield 'source class without canonical test' => [
+            ConfigureCommand::class,
+            false,
+        ];
+
+        yield 'source class with canonical test' => [
             Engine::class,
-            false,
-        ];
-
-        yield 'source abstract class' => [
-            BaseCommand::class,
-            false,
-        ];
-
-        yield 'source interface' => [
-            Mutator::class,
-            false,
-        ];
-
-        yield 'source trait' => [
-            CannotBeInstantiated::class,
-            false,
-        ];
-
-        yield 'test class' => [
-            EngineTest::class,
-            false,
-        ];
-
-        yield 'vendor class' => [
-            TestCase::class,
             false,
         ];
     }
