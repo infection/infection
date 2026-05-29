@@ -35,14 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
+use function in_array;
 use Infection\Framework\ClassName;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
-use function str_ends_with;
+use PHPUnit\Framework\Test;
 use Symfony\Component\Filesystem\Path;
 
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
+    private const PHPUNIT_DATA_PROVIDER_NAMESPACES = [
+        'Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider',
+        'Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider',
+        'Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser',
+    ];
+
     private const string PROJECT_ROOT = __DIR__ . '/../../../../';
 
     public function getName(): string
@@ -54,7 +61,8 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
     {
         if (!self::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
-            || self::isTestClass($classReflection)
+            || self::isPhpUnitTestCaseClass($classReflection)
+            || self::isKnownPhpUnitDataProviderClass($classReflection)
             || !self::isPHPUnitTestSupportCode($classReflection)
         ) {
             return false;
@@ -83,8 +91,17 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
             );
     }
 
-    private static function isTestClass(ClassReflection $classReflection): bool
+    private static function isPhpUnitTestCaseClass(ClassReflection $classReflection): bool
     {
-        return str_ends_with($classReflection->getName(), 'Test');
+        return $classReflection->implementsInterface(Test::class);
+    }
+
+    private static function isKnownPhpUnitDataProviderClass(ClassReflection $classReflection): bool
+    {
+        return in_array(
+            ClassName::getNamespace($classReflection->getName()),
+            self::PHPUNIT_DATA_PROVIDER_NAMESPACES,
+            true,
+        );
     }
 }

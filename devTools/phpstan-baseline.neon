@@ -1633,12 +1633,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/IdNodeIgnorer.php
 
 		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
-
-		-
 			rawMessage: Infection\Tests\Process\Exception\GenericProcessException should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1771,142 +1765,16 @@ parameters:
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\CodeceptionBDDProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionBDDProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\CodeceptionCestProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionCestProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\CodeceptionUnitProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/CodeceptionUnitProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit09Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit09Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit10Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit10Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit11Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit11Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit12Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestFileDataProvider/PhpUnit12Provider.php
-
-		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
 
 		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\CodeceptionProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/CodeceptionProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\PhpSpecProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpSpecProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\PhpUnit09Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit09Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\PhpUnit10Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit10Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\PhpUnit11Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit11Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\PhpUnit125Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit125Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider\PhpUnit12Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/SourceFileInfoProvider/PhpUnit12Provider.php
-
-		-
 			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\CodeceptionProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/CodeceptionProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpSpecProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpSpecProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit09Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit09Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit10Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit10Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit11Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit11Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit120Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit120Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser\PhpUnit125Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParser/PhpUnit125Provider.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter\InitialTestRunScenario should not exist

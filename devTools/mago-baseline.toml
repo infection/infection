@@ -7545,6 +7545,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Framework/ClassNameTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `classNamespaceProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/ClassNameTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `notTestClassNameProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 

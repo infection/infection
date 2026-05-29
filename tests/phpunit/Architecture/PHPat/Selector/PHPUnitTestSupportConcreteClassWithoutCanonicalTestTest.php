@@ -39,6 +39,7 @@ use Infection\Command\ConfigureCommand;
 use Infection\Engine;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider;
+use Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit09Provider;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIteratorTest;
@@ -88,6 +89,11 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends Sele
 
         yield 'testing utility test' => [
             NonRewindableIteratorTest::class,
+            false,
+        ];
+
+        yield 'PHPUnit data provider' => [
+            PhpUnit09Provider::class,
             false,
         ];
 
