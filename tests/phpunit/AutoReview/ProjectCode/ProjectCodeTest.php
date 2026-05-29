@@ -105,50 +105,6 @@ final class ProjectCodeTest extends TestCase
         ));
     }
 
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
-    public function test_non_extension_points_are_internal(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $docBlock = DocBlockParser::parse((string) $reflectionClass->getDocComment());
-
-        if (in_array($className, ProjectCodeProvider::EXTENSION_POINTS, true)) {
-            if ($docBlock === '') {
-                $this->markTestSkipped(
-                    sprintf(
-                        'The "%s" class is an extension point, but does not have a PHP '
-                        . 'doc-block or an empty one. Consider adding one to improve usability.',
-                        $className,
-                    ),
-                );
-            }
-
-            $this->assertStringNotContainsString(
-                '@internal',
-                $docBlock,
-                sprintf(
-                    'The "%s" class is marked as an extension point in %s::EXTENSION_POINTS'
-                    . '; It should either not be tagged as "@internal" or not be listed there.',
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-
-            return;
-        }
-
-        $this->assertStringContainsString(
-            '@internal',
-            $docBlock,
-            sprintf(
-                'The "%s" class is not an extension point: it should be marked as internal'
-                . ' or listed as an extension point in %s::EXTENSION_POINTS.',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
-
     #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
     public function test_source_classes_do_not_expose_public_properties(string $className): void
     {

@@ -235,13 +235,6 @@ final class ProjectCodeProvider
         yield from self::$sourceClasses;
     }
 
-    public static function sourceClassesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(
-            self::provideSourceClasses(),
-        );
-    }
-
     public static function provideConcreteSourceClasses(): iterable
     {
         yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(

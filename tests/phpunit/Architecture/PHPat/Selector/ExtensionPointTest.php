@@ -33,53 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\ProjectCode;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function class_exists;
+use Infection\Engine;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
+use PHPat\Selector\SelectorInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
-use function trait_exists;
 
-#[CoversClass(ProjectCodeProvider::class)]
-final class ProjectCodeProviderTest extends TestCase
+#[CoversClass(ExtensionPoint::class)]
+final class ExtensionPointTest extends SelectorTestCase
 {
-    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
-    public function test_concrete_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'Expected "%s" to be a class.',
-                $className,
-            ),
-        );
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_extension_points(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new ExtensionPoint();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    #[DataProviderExternal(ProjectCodeProvider::class, 'nonTestedConcreteClassesProvider')]
-    public function test_non_tested_concrete_class_provider_is_valid(string $className): void
+    public static function classProvider(): iterable
     {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'The class "%s" no longer exists. Please remove it from the list of non tested '
-                . 'classes in %s::NON_TESTED_CONCRETE_CLASSES.',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
+        yield 'extension point' => [
+            ProjectCodeProvider::EXTENSION_POINTS[0],
+            true,
+        ];
 
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
-    public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true) || trait_exists($className, true),
-            sprintf(
-                'Expected "%s" to be either a class or a trait.',
-                $className,
-            ),
-        );
+        yield 'source class' => [
+            Engine::class,
+            false,
+        ];
+
+        yield 'architecture test class' => [
+            self::class,
+            false,
+        ];
+
+        yield 'project code provider' => [
+            ProjectCodeProvider::class,
+            false,
+        ];
+
+        yield 'vendor class' => [
+            TestCase::class,
+            false,
+        ];
+
+        yield 'phpat selector interface' => [
+            SelectorInterface::class,
+            false,
+        ];
     }
 }

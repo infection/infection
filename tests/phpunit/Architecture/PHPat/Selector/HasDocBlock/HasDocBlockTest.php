@@ -33,53 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\ProjectCode;
+namespace Infection\Tests\Architecture\PHPat\Selector\HasDocBlock;
 
-use function class_exists;
+use Infection\Tests\Architecture\PHPat\Selector\HasDocBlock;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use function sprintf;
-use function trait_exists;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(ProjectCodeProvider::class)]
-final class ProjectCodeProviderTest extends TestCase
+#[CoversClass(HasDocBlock::class)]
+final class HasDocBlockTest extends SelectorTestCase
 {
-    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
-    public function test_concrete_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'Expected "%s" to be a class.',
-                $className,
-            ),
-        );
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_classes_with_doc_blocks(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new HasDocBlock();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    #[DataProviderExternal(ProjectCodeProvider::class, 'nonTestedConcreteClassesProvider')]
-    public function test_non_tested_concrete_class_provider_is_valid(string $className): void
+    public static function classProvider(): iterable
     {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'The class "%s" no longer exists. Please remove it from the list of non tested '
-                . 'classes in %s::NON_TESTED_CONCRETE_CLASSES.',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
+        yield 'with docblock' => [
+            ClassWithDocBlock::class,
+            true,
+        ];
 
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
-    public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true) || trait_exists($className, true),
-            sprintf(
-                'Expected "%s" to be either a class or a trait.',
-                $className,
-            ),
-        );
+        yield 'with comment' => [
+            ClassWithComment::class,
+            false,
+        ];
+
+        yield 'without docblock or comment' => [
+            ClassWithoutDocBlockOrComment::class,
+            false,
+        ];
     }
 }

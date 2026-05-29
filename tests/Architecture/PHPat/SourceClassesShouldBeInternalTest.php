@@ -33,62 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\CannotBeInstantiated;
-use PHPat\Selector\ClassImplements;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Selector\Selector;
-use PHPat\Selector\SelectorInterface;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class InfectionSelector
+final class SourceClassesShouldBeInternalTest
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
+    public function testNonExtensionPointsAreInternal(): Rule
     {
-        return new InfectionCode();
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    InfectionSelector::sourceCode(),
+                    Selector::Not(InfectionSelector::hasInternalDocBlock()),
+                ),
+            )
+            ->excluding(
+                InfectionSelector::extensionPoint(),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('Source classes should be marked @internal unless they are extension points.');
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public function testExtensionPointsAreNotInternal(): Rule
     {
-        return new InfectionSourceCode();
-    }
-
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function extensionPoint(): ExtensionPoint
-    {
-        return new ExtensionPoint();
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    InfectionSelector::extensionPoint(),
+                    InfectionSelector::hasInternalDocBlock(),
+                ),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('Extension points should not be tagged @internal.');
     }
 }
