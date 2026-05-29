@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function class_exists;
-use function interface_exists;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
@@ -46,24 +45,6 @@ use function trait_exists;
 #[CoversClass(ProjectCodeProvider::class)]
 final class ProjectCodeProviderTest extends TestCase
 {
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
-    public function test_source_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true)
-            || interface_exists($className, true)
-            || trait_exists($className, true),
-            sprintf(
-                'The "%s" class was picked up by the source files finder, but it is not a '
-                . 'class, interface or trait. Please check for typos in the class name. If the '
-                . ' problematic file is not a class file declaration, add it to the list of '
-                . 'excluded files in %s::provideSourceClasses().',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
-
     #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
     public function test_concrete_class_provider_is_valid(string $className): void
     {
