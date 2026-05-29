@@ -60,7 +60,8 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
 
     public function matches(ClassReflection $classReflection): bool
     {
-        if (!self::isConcreteClass($classReflection)
+        if (
+            !self::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
             || self::isPHPUnitTestClass($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)
