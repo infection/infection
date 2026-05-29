@@ -50,10 +50,8 @@ final class InfectionSourceCode implements SelectorInterface
 
     public function matches(ClassReflection $classReflection): bool
     {
-        $fileName = $classReflection->getFileName();
-
         return InfectionSelector::code()->matches($classReflection)
-            && self::isInSourceDirectory($fileName);
+            && self::isInSourceDirectory($classReflection->getFileName());
     }
 
     private static function isInSourceDirectory(?string $fileName): bool
