@@ -33,9 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use Infection\Engine;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use PHPat\Selector\SelectorInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
