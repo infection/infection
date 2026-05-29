@@ -50,7 +50,7 @@ final class ExtensionPoint implements SelectorInterface
     public function matches(ClassReflection $classReflection): bool
     {
         return in_array(
-            ClassReflectionAccessor::getName($classReflection),
+            $classReflection->getName(),
             ProjectCodeProvider::EXTENSION_POINTS,
             true,
         );

@@ -50,10 +50,8 @@ final class InfectionTestCode implements SelectorInterface
 
     public function matches(ClassReflection $classReflection): bool
     {
-        $fileName = ClassReflectionAccessor::getFileName($classReflection);
-
         return InfectionSelector::code()->matches($classReflection)
-            && self::isInTestsDirectory($fileName);
+            && self::isInTestsDirectory($classReflection->getFileName());
     }
 
     private static function isInTestsDirectory(?string $fileName): bool
