@@ -80,7 +80,6 @@ return (new Config())
     ->setRules([
         '@PHP7x1Migration' => true,
         '@PHP7x1Migration:risky' => true,
-        '@PHPUnit6x0Migration:risky' => true,
         '@PHPUnit7x5Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
