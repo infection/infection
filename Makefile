@@ -110,7 +110,7 @@ cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
 cs-check: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --diff --dry-run
+	$(PHP_CS_FIXER) check -v --diff
 	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
