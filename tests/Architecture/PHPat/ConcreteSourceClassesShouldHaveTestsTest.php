@@ -33,68 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\CannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ExtensionPoint;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
-use PHPat\Selector\SelectorInterface;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class InfectionSelector
+final class ConcreteSourceClassesShouldHaveTestsTest
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
+    public function testConcreteSourceClassesHaveTests(): Rule
     {
-        return new InfectionCode();
-    }
-
-    public static function sourceCode(): InfectionSourceCode
-    {
-        return new InfectionSourceCode();
-    }
-
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function extensionPoint(): ExtensionPoint
-    {
-        return new ExtensionPoint();
-    }
-
-    public static function sourceConcreteClassWithoutCanonicalTest(): SourceConcreteClassWithoutCanonicalTest
-    {
-        return new SourceConcreteClassWithoutCanonicalTest();
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceConcreteClassWithoutCanonicalTest())
+            ->shouldNot()
+            ->exist()
+            ->because('Concrete source classes should have a canonical test.');
     }
 }

@@ -5571,18 +5571,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "imprecise-type"
-message = "Type `iterable` in return type of `nonTestedConcreteClassesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `provideConcreteSourceClasses` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "imprecise-type"
 message = "Type `iterable` in return type of `provideSourceClassesToCheckForPublicProperties` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -5600,20 +5588,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #1 of `Infection\Tests\AutoReview\ConcreteClassReflector::filterByConcreteClasses`: expected `array<array-key, string>`, but provided type `array<array-key, mixed>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "mixed-property-type-coercion"
 message = "Mixed property type coercion"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "non-existent-class-like"
-message = 'Class, interface, enum, or trait `Infection\FileSystem\DummyFileSystem` not found.'
 count = 1
 
 [[issues]]
@@ -5625,19 +5601,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php:266:13}`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "yield-from-invalid-key-type"
-message = "Invalid key type from `yield from`: current generator expects to yield keys of type `string`, but the inner iterable yields keys of type `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "yield-from-invalid-value-type"
-message = "Invalid value type from `yield from`: current generator expects to yield `array{0: class-string}`, but the inner iterable yields `array{0: mixed}`."
+message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php:131:13}`."
 count = 1
 
 [[issues]]
@@ -5651,12 +5615,6 @@ file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
-code = "redundant-comparison"
-message = "Avoid direct comparison with boolean literals."
-count = 3
 
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"

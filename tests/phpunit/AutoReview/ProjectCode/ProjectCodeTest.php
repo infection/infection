@@ -37,8 +37,6 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
 use function array_map;
-use function in_array;
-use Infection\Framework\ClassName;
 use Infection\StreamWrapper\IncludeInterceptor;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -63,46 +61,6 @@ final class ProjectCodeTest extends TestCase
 
         $this->assertFileExists($infectionFile);
         $this->assertTrue(is_executable($infectionFile));
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
-    public function test_all_concrete_classes_have_tests(string $className): void
-    {
-        $testClassName = ClassName::getCanonicalTestClassName($className);
-
-        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false
-            && in_array($className, ProjectCodeProvider::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION, true) === false
-        ) {
-            $this->assertNotNull(
-                $testClassName,
-                sprintf(
-                    'Could not find the test "%s" for the class "%s". Please either add it'
-                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES or ::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION',
-                    $testClassName,
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-
-            return;
-        }
-
-        $this->assertNull(
-            $testClassName,
-            sprintf(
-                'The class "%s" has a test "%s". Please remove it from the list of non '
-                . 'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
-                $className,
-                $testClassName,
-                ProjectCodeProvider::class,
-            ),
-        );
-
-        $this->markTestSkipped(sprintf(
-            'No test found for "%s". You can improve this by adding the test "%s".',
-            $className,
-            $testClassName,
-        ));
     }
 
     #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]

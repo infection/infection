@@ -45,32 +45,6 @@ use function trait_exists;
 #[CoversClass(ProjectCodeProvider::class)]
 final class ProjectCodeProviderTest extends TestCase
 {
-    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
-    public function test_concrete_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'Expected "%s" to be a class.',
-                $className,
-            ),
-        );
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'nonTestedConcreteClassesProvider')]
-    public function test_non_tested_concrete_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'The class "%s" no longer exists. Please remove it from the list of non tested '
-                . 'classes in %s::NON_TESTED_CONCRETE_CLASSES.',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
-
     #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
     public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
     {
