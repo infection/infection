@@ -94,8 +94,31 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
 
     private static function isPHPUnitTestClass(ClassReflection $classReflection): bool
     {
+        $testCaseClassReflection = self::findParentClassReflection($classReflection, TestCase::class);
+
         return str_ends_with($classReflection->getName(), 'Test')
-            && $classReflection->isSubclassOf(TestCase::class);
+            && $testCaseClassReflection !== null
+            && $classReflection->isSubclassOfClass($testCaseClassReflection);
+    }
+
+    /**
+     * @param class-string $parentClassName
+     */
+    private static function findParentClassReflection(
+        ClassReflection $classReflection,
+        string $parentClassName,
+    ): ?ClassReflection {
+        $parentClassReflection = $classReflection->getParentClass();
+
+        while ($parentClassReflection !== null) {
+            if ($parentClassReflection->getName() === $parentClassName) {
+                return $parentClassReflection;
+            }
+
+            $parentClassReflection = $parentClassReflection->getParentClass();
+        }
+
+        return null;
     }
 
     private static function isKnownPhpUnitDataProviderClass(ClassReflection $classReflection): bool
