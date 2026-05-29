@@ -39,70 +39,19 @@ use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
-use Infection\Command\ConfigureCommand;
-use Infection\Command\Git\LoggerFactory;
-use Infection\Command\Git\Option\BaseOption;
-use Infection\Command\Git\Option\FilterOption;
-use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\SourceFilterOptions;
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\Source;
-use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
-use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
-use Infection\Configuration\SourceFilter\FakeSourceFilter;
-use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
-use Infection\Console\XdebugHandler;
-use Infection\Differ\Tokens;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
-use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
-use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
-use Infection\FileSystem\DummyFileSystem;
-use Infection\FileSystem\FakeFileSystem;
-use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
-use Infection\FileSystem\Finder\NonExecutableFinder;
-use Infection\Framework\OperatingSystem;
-use Infection\Git\NoGitProjectFound;
-use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
-use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\InfectionPrettyPrinter;
-use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\Reporter\Http\StrykerCurlClient;
-use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\Source\Collector\FakeSourceCollector;
-use Infection\Source\Collector\FixedSourceCollector;
-use Infection\Source\Collector\GitDiffSourceCollector;
-use Infection\Source\Matcher\FakeSourceLineMatcher;
-use Infection\Source\Matcher\NullSourceLineMatcher;
-use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\Locator\FakeLocator;
-use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\MapSourceClassToTestStrategy;
-use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
-use Infection\Testing\MutatorName;
-use Infection\Testing\SingletonContainer;
-use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
 use function Pipeline\take;
@@ -117,72 +66,6 @@ use Symfony\Component\Finder\SplFileInfo;
 final class ProjectCodeProvider
 {
     use CannotBeInstantiated;
-
-    /**
-     * This array contains all classes that don't have tests yet, due to legacy
-     * reasons. This list should never be added to, only removed from.
-     */
-    public const array NON_TESTED_CONCRETE_CLASSES = [
-        AdapterInstaller::class,
-        BaseMutatorTestCase::class,
-        BaseOption::class,
-        ConcreteComposerExecutableFinder::class,
-        ConfigureCommand::class,
-        ConfigurationOption::class,
-        ConsoleProgressBarLogger::class,
-        CpuCoresCountProvider::class,
-        CurrentWorkingDirectoryProvider::class,
-        DispatchPcntlSignalSubscriber::class,
-        DummyFileSystem::class,
-        EmptyTrace::class,
-        FakeFileSystem::class,
-        FakeLocator::class,
-        FakeSourceCollector::class,
-        FakeSourceFilter::class,
-        FakeSourceLineMatcher::class,
-        FileSystem::class,
-        FilterOption::class,
-        FixedSourceCollector::class,
-        SourceFilterOptions::class,
-        GitDiffFilter::class,
-        GitDiffSourceCollector::class,
-        IncompleteGitDiffFilter::class,
-        InvalidReportSource::class,
-        LoggerFactory::class,
-        Logs::class,
-        MapSourceClassToTestStrategy::class, // no need to test 1 const for now
-        MessageName::class,
-        MutationAnalysisLoggerName::class,
-        MutantExecutionResult::class,
-        MutationEvaluationWasStarted::class,
-        MutatorName::class,
-        NameResolverFactory::class,
-        NoGitProjectFound::class,
-        NodeMutationGenerator::class,
-        NoReportFound::class,
-        NonExecutableFinder::class,
-        NullSourceLineMatcher::class,
-        NullSubscriber::class,
-        OperatingSystem::class,
-        SchemaConfiguration::class,
-        SingletonContainer::class,
-        Source::class,
-        StopInfectionOnSigintSignalSubscriber::class,
-        StrykerCurlClient::class,
-        Tokens::class,
-        TooManyReportsFound::class,
-        XdebugHandler::class,
-        InfectionPrettyPrinter::class,
-    ];
-
-    /**
-     * This array contains all classes that have tests but for which the test case
-     * does not follow the pattern "Acme\Service\Foo" -> "Acme\Tests\FooTest".
-     * For example, test cases that are in a child directory.
-     */
-    public const array CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
-        FilterBuilder::class,
-    ];
 
     /**
      * This array contains all classes that can be extended by our users.
@@ -235,24 +118,6 @@ final class ProjectCodeProvider
         yield from self::$sourceClasses;
     }
 
-    public static function provideConcreteSourceClasses(): iterable
-    {
-        yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
-            self::provideSourceClasses(),
-            true,
-        ));
-    }
-
-    /**
-     * @return iterable<string, array{class-string}>
-     */
-    public static function concreteSourceClassesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(
-            self::provideConcreteSourceClasses(),
-        );
-    }
-
     public static function provideSourceClassesToCheckForPublicProperties(): iterable
     {
         if (self::$sourceClassesToCheckForPublicProperties !== null) {
@@ -292,14 +157,6 @@ final class ProjectCodeProvider
         yield from DataProviderFactory::fromIterable(
             self::provideSourceClassesToCheckForPublicProperties(),
         );
-    }
-
-    public static function nonTestedConcreteClassesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable([
-            ...self::NON_TESTED_CONCRETE_CLASSES,
-            ...self::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION,
-        ]);
     }
 
     private static function castSplFileInfoToFQCN(SplFileInfo $file): string

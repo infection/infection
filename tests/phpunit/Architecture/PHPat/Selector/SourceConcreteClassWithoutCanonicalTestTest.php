@@ -36,65 +36,69 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ExtensionPoint;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
-use PHPat\Selector\SelectorInterface;
+use Infection\Command\BaseCommand;
+use Infection\Command\ConfigureCommand;
+use Infection\Engine;
+use Infection\Mutator\Mutator;
+use Infection\Tests\EngineTest;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class InfectionSelector
+#[CoversClass(SourceConcreteClassWithoutCanonicalTest::class)]
+final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
-    use CannotBeInstantiated;
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_source_concrete_classes_without_canonical_test(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new SourceConcreteClassWithoutCanonicalTest();
+        $classReflection = $this->createClassReflection($className);
 
-    public static function code(): InfectionCode
-    {
-        return new InfectionCode();
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public static function classProvider(): iterable
     {
-        return new InfectionSourceCode();
-    }
+        yield 'source concrete class without canonical test' => [
+            ConfigureCommand::class,
+            true,
+        ];
 
-    public static function testCode(): InfectionTestCode
-    {
-        return new InfectionTestCode();
-    }
+        yield 'source concrete class with canonical test' => [
+            Engine::class,
+            false,
+        ];
 
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
+        yield 'source abstract class' => [
+            BaseCommand::class,
+            false,
+        ];
 
-    public static function extensionPoint(): ExtensionPoint
-    {
-        return new ExtensionPoint();
-    }
+        yield 'source interface' => [
+            Mutator::class,
+            false,
+        ];
 
-    public static function sourceConcreteClassWithoutCanonicalTest(): SourceConcreteClassWithoutCanonicalTest
-    {
-        return new SourceConcreteClassWithoutCanonicalTest();
-    }
+        yield 'source trait' => [
+            CannotBeInstantiated::class,
+            false,
+        ];
 
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
+        yield 'test class' => [
+            EngineTest::class,
+            false,
+        ];
 
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        yield 'vendor class' => [
+            TestCase::class,
+            false,
+        ];
     }
 }

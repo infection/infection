@@ -35,66 +35,34 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ExtensionPoint;
-use PHPat\Selector\ClassImplements;
-use PHPat\Selector\Selector;
+use Infection\Framework\ClassName;
 use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-final class InfectionSelector
+final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
-    use CannotBeInstantiated;
-
-    public static function code(): InfectionCode
+    public function getName(): string
     {
-        return new InfectionCode();
+        return 'source concrete class without canonical test';
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public function matches(ClassReflection $classReflection): bool
     {
-        return new InfectionSourceCode();
+        if (!self::isConcreteClass($classReflection)
+            || !InfectionSelector::sourceCode()->matches($classReflection)
+        ) {
+            return false;
+        }
+
+        $className = $classReflection->getName();
+
+        return ClassName::getCanonicalTestClassName($className) === null;
     }
 
-    public static function testCode(): InfectionTestCode
+    private static function isConcreteClass(ClassReflection $classReflection): bool
     {
-        return new InfectionTestCode();
-    }
-
-    public static function phpunitTestCode(): SelectorInterface
-    {
-        return Selector::AllOf(
-            self::testCode(),
-            Selector::withFilepath('#/tests/phpunit/#', true),
-        );
-    }
-
-    public static function extensionPoint(): ExtensionPoint
-    {
-        return new ExtensionPoint();
-    }
-
-    public static function sourceConcreteClassWithoutCanonicalTest(): SourceConcreteClassWithoutCanonicalTest
-    {
-        return new SourceConcreteClassWithoutCanonicalTest();
-    }
-
-    public static function hasDocBlock(): HasDocBlock
-    {
-        return new HasDocBlock();
-    }
-
-    public static function hasInternalDocBlock(): HasInternalDocBlock
-    {
-        return new HasInternalDocBlock();
-    }
-
-    public static function isAnonymousClass(): IsAnonymousClass
-    {
-        return new IsAnonymousClass();
-    }
-
-    public static function implementsAnyInterface(): ClassImplements
-    {
-        return Selector::implements('/.*/', true);
+        return !$classReflection->isAbstract()
+            && !$classReflection->isInterface()
+            && !$classReflection->isTrait();
     }
 }
