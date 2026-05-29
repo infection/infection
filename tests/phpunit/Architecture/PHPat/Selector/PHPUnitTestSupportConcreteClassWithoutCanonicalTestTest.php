@@ -37,11 +37,15 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\Command\ConfigureCommand;
 use Infection\Engine;
+use Infection\Tests\Architecture\PHPat\Selector\HasDocBlock\ClassWithDocBlock;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario;
 use Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit09Provider;
+use Infection\Tests\TestFramework\Tracing\Tracer\CodeceptionProvider;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIteratorTest;
@@ -106,6 +110,26 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends Sele
 
         yield 'PHPUnit data provider' => [
             PhpUnit09Provider::class,
+            false,
+        ];
+
+        yield 'PHPUnit test fixture namespace' => [
+            ClassWithDocBlock::class,
+            false,
+        ];
+
+        yield 'PHPUnit test fixture class' => [
+            ConfigurationFactoryScenario::class,
+            false,
+        ];
+
+        yield 'PHPUnit test fixture provider' => [
+            MutatorFixturesProvider::class,
+            false,
+        ];
+
+        yield 'another PHPUnit test fixture provider' => [
+            CodeceptionProvider::class,
             false,
         ];
 

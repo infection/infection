@@ -853,36 +853,6 @@ parameters:
 			path: ../src/Testing/SingletonContainer.php
 
 		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\HasDocBlock\ClassWithComment should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/HasDocBlock/ClassWithComment.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\HasDocBlock\ClassWithDocBlock should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/HasDocBlock/ClassWithDocBlock.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\HasDocBlock\ClassWithoutDocBlockOrComment should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/HasDocBlock/ClassWithoutDocBlockOrComment.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\HasInternalDocBlock\HasInternalDocBlockTestFixtureWithInternalDocBlock should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/HasInternalDocBlock/HasInternalDocBlockTestFixtureWithInternalDocBlock.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\HasInternalDocBlock\HasInternalDocBlockTestFixtureWithoutInternalDocBlock should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/HasInternalDocBlock/HasInternalDocBlockTestFixtureWithoutInternalDocBlock.php
-
-		-
 			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1087,12 +1057,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php
 
 		-
-			rawMessage: Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryScenario.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
@@ -1153,12 +1117,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
 
 		-
-			rawMessage: Infection\Tests\FileSystem\Finder\MockVendor should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
 			rawMessage: 'Only booleans are allowed in a ternary operator condition, string|false given.'
 			identifier: ternary.condNotBoolean
 			count: 1
@@ -1211,30 +1169,6 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			rawMessage: Infection\Tests\Framework\Enum\EnumBucket\AnotherStringBackedEnum should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Framework/Enum/EnumBucket/AnotherStringBackedEnum.php
-
-		-
-			rawMessage: Infection\Tests\Framework\Enum\EnumBucket\StringBackedEnum should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Framework/Enum/EnumBucket/StringBackedEnum.php
-
-		-
-			rawMessage: Infection\Tests\Framework\Enum\ImplodableEnum\SupportedTestFrameworkName should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Framework/Enum/ImplodableEnum/SupportedTestFrameworkName.php
-
-		-
-			rawMessage: Infection\Tests\Framework\Iterable\GeneratorFactory\SimpleIteratorAggregate should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Framework/Iterable/GeneratorFactory/SimpleIteratorAggregate.php
 
 		-
 			rawMessage: Infection\Tests\Logger\Console\BufferedOutputWithStdErrOutput should not exist
@@ -1313,12 +1247,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutation\FileMutationGenerator\Scenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Mutation/FileMutationGenerator/Scenario.php
 
 		-
 			rawMessage: 'Parameter #2 $stmts of class PhpParser\Node\Stmt\Namespace_ constructor expects array<PhpParser\Node\Stmt>|null, array<int, PhpParser\Node\Scalar\Int_> given.'
@@ -1445,12 +1373,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\MutatorFixturesProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorFixturesProvider.php
 
 		-
 			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<int|string, array<int|string, bool|string>|string>|bool> given.'
@@ -1597,30 +1519,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
 
 		-
-			rawMessage: Infection\Tests\PhpParser\NodeDumper\NodeDumper\NodeDumperScenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/PhpParser/NodeDumper/NodeDumper/NodeDumperScenario.php
-
-		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\AddTestsVisitor\Scenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/AddTestsVisitor/Scenario.php
-
-		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\ExcludeNonMutableCodeVisitor\Scenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/ExcludeNonMutableCodeVisitor/Scenario.php
-
-		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\ExcludeUnchangedLinesVisitor\Scenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/ExcludeUnchangedLinesVisitor/Scenario.php
-
-		-
 			rawMessage: Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\StopAtSkippedArgVisitor should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1675,20 +1573,8 @@ parameters:
 			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
 
 		-
-			rawMessage: Infection\Tests\Reflection\ProtChild should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
-
-		-
 			rawMessage: Infection\Tests\Reflection\ProtParent should be final
 			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
-			count: 1
-			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
-
-		-
-			rawMessage: Infection\Tests\Reflection\ProtParent should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
 
@@ -1747,12 +1633,6 @@ parameters:
 			path: ../tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php
 
 		-
-			rawMessage: Infection\Tests\Reporter\ShowMetricsReporter\MetricsScenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Reporter/ShowMetricsReporter/MetricsScenario.php
-
-		-
 			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
 			identifier: argument.type
 			count: 1
@@ -1781,18 +1661,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter\InitialTestRunScenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/InitialTestRunScenario.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter\MutantCommandLineScenario should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/MutantCommandLineScenario.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
@@ -1895,48 +1763,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TraceAssertion.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\CodeceptionProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/CodeceptionProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\PhpSpecProvider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/PhpSpecProvider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\PhpUnit09Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit09Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\PhpUnit10Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit10Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\PhpUnit11Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit11Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\PhpUnit120Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit120Provider.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Tracer\PhpUnit125Provider should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Tracer/PhpUnit125Provider.php
 
 		-
 			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.

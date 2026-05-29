@@ -45,10 +45,29 @@ use Symfony\Component\Filesystem\Path;
 
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
+    private const PHPUNIT_TEST_FIXTURE_NAMESPACES = [
+        'Infection\Tests\Architecture\PHPat\Selector\HasDocBlock',
+        'Infection\Tests\Architecture\PHPat\Selector\HasInternalDocBlock',
+        'Infection\Tests\Framework\Enum\EnumBucket',
+        'Infection\Tests\Framework\Enum\ImplodableEnum',
+    ];
+
+    private const PHPUNIT_TEST_FIXTURE_CLASSES = [
+        'Infection\Tests\FileSystem\Finder\MockVendor',
+        'Infection\Tests\Framework\Iterable\GeneratorFactory\SimpleIteratorAggregate',
+        'Infection\Tests\Reflection\ProtChild',
+        'Infection\Tests\Reflection\ProtParent',
+    ];
+
     private const PHPUNIT_DATA_PROVIDER_NAMESPACES = [
         'Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider',
         'Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider',
         'Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser',
+        'Infection\Tests\TestFramework\Tracing\Tracer',
+    ];
+
+    private const PHPUNIT_DATA_PROVIDER_CLASSES = [
+        'Infection\Tests\Mutator\MutatorFixturesProvider',
     ];
 
     private const string PROJECT_ROOT = __DIR__ . '/../../../../';
@@ -65,6 +84,8 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
             || self::isPHPUnitTestClass($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)
+            || self::isKnownPhpUnitScenarioClass($classReflection)
+            || self::isKnownPHPUnitTestFixtureClass($classReflection)
             || !self::isPHPUnitTestSupportCode($classReflection)
         ) {
             return false;
@@ -124,10 +145,30 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
 
     private static function isKnownPhpUnitDataProviderClass(ClassReflection $classReflection): bool
     {
-        return in_array(
-            ClassName::getNamespace($classReflection->getName()),
-            self::PHPUNIT_DATA_PROVIDER_NAMESPACES,
-            true,
-        );
+        $className = $classReflection->getName();
+
+        return in_array($className, self::PHPUNIT_DATA_PROVIDER_CLASSES, true)
+            || in_array(
+                ClassName::getNamespace($className),
+                self::PHPUNIT_DATA_PROVIDER_NAMESPACES,
+                true,
+            );
+    }
+
+    private static function isKnownPhpUnitScenarioClass(ClassReflection $classReflection): bool
+    {
+        return str_ends_with($classReflection->getName(), 'Scenario');
+    }
+
+    private static function isKnownPHPUnitTestFixtureClass(ClassReflection $classReflection): bool
+    {
+        $className = $classReflection->getName();
+
+        return in_array($className, self::PHPUNIT_TEST_FIXTURE_CLASSES, true)
+            || in_array(
+                ClassName::getNamespace($className),
+                self::PHPUNIT_TEST_FIXTURE_NAMESPACES,
+                true,
+            );
     }
 }
