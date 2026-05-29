@@ -1633,6 +1633,12 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/IdNodeIgnorer.php
 
 		-
+			rawMessage: Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
+
+		-
 			rawMessage: Infection\Tests\Process\Exception\GenericProcessException should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1

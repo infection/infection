@@ -39,7 +39,8 @@ use function in_array;
 use Infection\Framework\ClassName;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
-use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestCase;
+use function str_ends_with;
 use Symfony\Component\Filesystem\Path;
 
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements SelectorInterface
@@ -61,7 +62,7 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
     {
         if (!self::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
-            || self::isPhpUnitTestCaseClass($classReflection)
+            || self::isPHPUnitTestClass($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)
             || !self::isPHPUnitTestSupportCode($classReflection)
         ) {
@@ -91,9 +92,10 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
             );
     }
 
-    private static function isPhpUnitTestCaseClass(ClassReflection $classReflection): bool
+    private static function isPHPUnitTestClass(ClassReflection $classReflection): bool
     {
-        return $classReflection->implementsInterface(Test::class);
+        return str_ends_with($classReflection->getName(), 'Test')
+            && $classReflection->isSubclassOf(TestCase::class);
     }
 
     private static function isKnownPhpUnitDataProviderClass(ClassReflection $classReflection): bool
