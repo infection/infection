@@ -116,6 +116,7 @@ cs-check: $(PHP_CS_FIXER)
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
+	$(PHPSTAN) clear-result-cache --configuration devTools/phpstan.neon
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress
 
 .PHONY: phpstan-baseline
