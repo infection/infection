@@ -33,21 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+use function str_starts_with;
 
-final class SrcShouldNotDependOnTestsTest
+final class IsAnonymousClass implements SelectorInterface
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    public function getName(): string
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        return 'is an anonymous class';
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        return str_starts_with(
+            ClassReflectionAccessor::getName($classReflection),
+            // Note that this is the PHPStan internal representation, not the
+            // PHP one which changes from a version to another.
+            'AnonymousClass',
+        );
     }
 }

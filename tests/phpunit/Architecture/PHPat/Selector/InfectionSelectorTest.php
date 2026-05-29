@@ -33,21 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use Infection\Benchmark\Instrumentor;
+use Infection\Engine;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final class SrcShouldNotDependOnTestsTest
+#[CoversClass(InfectionSelector::class)]
+final class InfectionSelectorTest extends SelectorTestCase
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    public function test_it_matches_phpunit_test_code(): void
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        $selector = InfectionSelector::phpunitTestCode();
+
+        $classExpectations = [
+            'infection source class' => [Engine::class, false],
+            'infection PHPUnit test class' => [self::class, true],
+            'infection non-PHPUnit test class' => [InfectionTestCode::class, false],
+            'infection benchmark framework class' => [Instrumentor::class, false],
+            'vendor class' => [TestCase::class, false],
+        ];
+
+        foreach ($classExpectations as $message => [$className, $expected]) {
+            $classReflection = $this->createClassReflection($className);
+
+            $actual = $selector->matches($classReflection);
+
+            $this->assertSame($expected, $actual, $message);
+        }
     }
 }

@@ -28,6 +28,7 @@
         <testsuite name="Infection Test Suite">
             <directory>tests/phpunit</directory>
 
+            <exclude>tests/phpunit/Architecture</exclude>
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>
             <exclude>tests/phpunit/TestFramework/Coverage/Fixtures</exclude>

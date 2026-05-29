@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat;
 
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -44,12 +45,7 @@ final class PHPUnitTestClassesShouldBeTraitAbstractOrFinalTest
     public function testPHPUnitTestClassesAreTraitAbstractOrFinal(): Rule
     {
         return PHPat::rule()
-            ->classes(
-                Selector::AllOf(
-                    Selector::inNamespace('Infection\\Tests'),
-                    Selector::withFilepath('#/tests/phpunit/#', true),
-                ),
-            )
+            ->classes(InfectionSelector::phpunitTestCode())
             ->excluding(
                 Selector::isTrait(),
                 Selector::isAbstract(),

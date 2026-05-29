@@ -33,59 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Process\Runner\ParallelProcessRunner;
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use Infection\CannotBeInstantiated;
+use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use PHPat\Selector\SelectorInterface;
 
-final class ClassesShouldBeFinalTest
+final class InfectionSelector
 {
-    public function testInterfaceImplementationsAreFinal(): Rule
+    use CannotBeInstantiated;
+
+    public static function code(): InfectionCode
     {
-        return PHPat::rule()
-            ->classes(
-                Selector::AllOf(
-                    InfectionSelector::sourceCode(),
-                    InfectionSelector::implementsAnyInterface(),
-                ),
-            )
-            ->excluding(
-                Selector::isAbstract(),
-                Selector::isInterface(),
-            )
-            ->should()
-            ->beFinal()
-            ->because('Production interface implementations should be final by default.');
+        return new InfectionCode();
     }
 
-    public function testSourceConcreteClassesAreFinals(): Rule
+    public static function sourceCode(): InfectionSourceCode
     {
-        return PHPat::rule()
-            ->classes(
-                Selector::AllOf(
-                    InfectionSelector::sourceCode(),
-                ),
-            )
-            ->excluding(
-                Selector::isTrait(),
-                Selector::isInterface(),
-                Selector::isAbstract(),
-                Selector::isFinal(),
-            )
-            ->shouldNot()
-            ->exist()
-            ->because('Source concrete classes should be final or @final classes.');
+        return new InfectionSourceCode();
     }
 
-    public function testParallelProcessRunnerIsNotExtended(): Rule
+    public static function testCode(): InfectionTestCode
     {
-        return PHPat::rule()
-            ->classes(Selector::extends(ParallelProcessRunner::class))
-            ->shouldNot()
-            ->exist()
-            ->because('ParallelProcessRunner is intentionally non-final only to allow PHPUnit partial mocks.');
+        return new InfectionTestCode();
+    }
+
+    public static function phpunitTestCode(): SelectorInterface
+    {
+        return Selector::AllOf(
+            self::testCode(),
+            Selector::withFilepath('#/tests/phpunit/#', true),
+        );
+    }
+
+    public static function isAnonymousClass(): IsAnonymousClass
+    {
+        return new IsAnonymousClass();
+    }
+
+    public static function implementsAnyInterface(): ClassImplements
+    {
+        return Selector::implements('/.*/', true);
     }
 }

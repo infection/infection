@@ -33,21 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+use function str_starts_with;
+use Symfony\Component\Filesystem\Path;
 
-final class SrcShouldNotDependOnTestsTest
+final class InfectionCode implements SelectorInterface
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    private const string PROJECT_ROOT = __DIR__ . '/../../../../';
+
+    public function getName(): string
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        return 'Infection code';
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        $fileName = ClassReflectionAccessor::getFileName($classReflection);
+
+        return $this->isInfectionClass($classReflection)
+            && !self::isBenchmarkFixture($fileName);
+    }
+
+    private function isInfectionClass(mixed $classReflection): bool
+    {
+        $className = ClassReflectionAccessor::getName($classReflection);
+
+        return $className === 'Infection'
+            || str_starts_with($className, 'Infection\\');
+    }
+
+    private static function isBenchmarkFixture(?string $fileName): bool
+    {
+        if ($fileName === null) {
+            return false;
+        }
+
+        $relativeFileName = Path::makeRelative($fileName, self::PROJECT_ROOT);
+        $relativeDirectory = Path::getDirectory($relativeFileName);
+
+        return $relativeDirectory !== 'tests/benchmark'
+            && Path::isBasePath('tests/benchmark', $relativeDirectory);
     }
 }

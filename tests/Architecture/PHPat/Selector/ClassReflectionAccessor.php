@@ -33,21 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
+use Infection\CannotBeInstantiated;
+use Webmozart\Assert\Assert;
 
-final class SrcShouldNotDependOnTestsTest
+final class ClassReflectionAccessor
 {
-    public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
+    use CannotBeInstantiated;
+
+    public static function getName(mixed $classReflection): string
     {
-        return PHPat::rule()
-            ->classes(InfectionSelector::sourceCode())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::testCode())
-            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
+        Assert::object(
+            $classReflection,
+            'Expected a class reflection object.',
+        );
+        Assert::methodExists(
+            $classReflection,
+            'getName',
+            'Expected a class reflection with a getName() method.',
+        );
+
+        return Assert::string(
+            $classReflection->getName(),
+            'Expected the class reflection name to be a string.',
+        );
+    }
+
+    public static function getFileName(mixed $classReflection): ?string
+    {
+        Assert::object(
+            $classReflection,
+            'Expected a class reflection object.',
+        );
+        Assert::methodExists(
+            $classReflection,
+            'getFileName',
+            'Expected a class reflection with a getFileName() method.',
+        );
+
+        return Assert::nullOrString(
+            $classReflection->getFileName(),
+            'Expected the class reflection file name to be null or a string.',
+        );
     }
 }

@@ -22,12 +22,15 @@
 
     <testsuites>
         <testsuite name="Auto-Review Test Suite">
+            <directory>tests/phpunit/Architecture</directory>
             <directory>tests/phpunit/AutoReview</directory>
         </testsuite>
     </testsuites>
 
     <source>
         <include>
+            <directory>tests/Architecture</directory>
+            <directory>tests/phpunit/Architecture</directory>
             <directory>tests/phpunit/AutoReview</directory>
         </include>
     </source>
