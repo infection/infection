@@ -41,6 +41,9 @@ use Infection\Command\ConfigureCommand;
 use Infection\Engine;
 use Infection\Mutator\Mutator;
 use Infection\Tests\EngineTest;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
+use Infection\Tests\TestingUtility\Iterable\NonRewindableIteratorTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -73,6 +76,21 @@ final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 
         yield 'source concrete class with canonical test' => [
             Engine::class,
+            false,
+        ];
+
+        yield 'testing utility without canonical test' => [
+            FS::class,
+            true,
+        ];
+
+        yield 'testing utility with canonical test' => [
+            NonRewindableIterator::class,
+            false,
+        ];
+
+        yield 'testing utility test' => [
+            NonRewindableIteratorTest::class,
             false,
         ];
 

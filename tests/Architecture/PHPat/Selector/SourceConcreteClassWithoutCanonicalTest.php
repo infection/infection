@@ -38,9 +38,13 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\Framework\ClassName;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
+use function str_ends_with;
+use Symfony\Component\Filesystem\Path;
 
 final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
+    private const string PROJECT_ROOT = __DIR__ . '/../../../../';
+
     public function getName(): string
     {
         return 'source concrete class without canonical test';
@@ -49,7 +53,8 @@ final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
     public function matches(ClassReflection $classReflection): bool
     {
         if (!self::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
+            || self::isTestClass($classReflection)
+            || !self::isCodeRequiringCanonicalTest($classReflection)
         ) {
             return false;
         }
@@ -64,5 +69,27 @@ final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
         return !$classReflection->isAbstract()
             && !$classReflection->isInterface()
             && !$classReflection->isTrait();
+    }
+
+    private static function isCodeRequiringCanonicalTest(ClassReflection $classReflection): bool
+    {
+        return InfectionSelector::sourceCode()->matches($classReflection)
+            || self::isTestingUtilityCode($classReflection);
+    }
+
+    private static function isTestingUtilityCode(ClassReflection $classReflection): bool
+    {
+        $fileName = $classReflection->getFileName();
+
+        return $fileName !== null
+            && Path::isBasePath(
+                'tests/phpunit/TestingUtility',
+                Path::makeRelative($fileName, self::PROJECT_ROOT),
+            );
+    }
+
+    private static function isTestClass(ClassReflection $classReflection): bool
+    {
+        return str_ends_with($classReflection->getName(), 'Test');
     }
 }
