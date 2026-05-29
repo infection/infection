@@ -78,6 +78,11 @@ final class InfectionSelector
         return new SourceConcreteClassWithoutCanonicalTest();
     }
 
+    public static function phpunitTestSupportConcreteClassWithoutCanonicalTest(): PHPUnitTestSupportConcreteClassWithoutCanonicalTest
+    {
+        return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
+    }
+
     public static function hasDocBlock(): HasDocBlock
     {
         return new HasDocBlock();

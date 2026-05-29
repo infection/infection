@@ -45,6 +45,7 @@ use function sprintf;
 use function str_ends_with;
 use function str_starts_with;
 use function strlen;
+use function strrpos;
 use function substr;
 use Webmozart\Assert\Assert;
 
@@ -66,6 +67,17 @@ final class ClassName
 
         /** @phpstan-ignore return.type */
         return end($parts);
+    }
+
+    public static function getNamespace(string $className): string
+    {
+        $namespaceSeparatorPosition = strrpos($className, '\\');
+
+        if ($namespaceSeparatorPosition === false) {
+            return '';
+        }
+
+        return substr($className, 0, $namespaceSeparatorPosition);
     }
 
     /**

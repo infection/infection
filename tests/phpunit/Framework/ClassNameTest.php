@@ -86,6 +86,39 @@ final class ClassNameTest extends TestCase
         ];
     }
 
+    #[DataProvider('classNamespaceProvider')]
+    public function test_it_can_get_a_class_namespace(
+        string $className,
+        string $expected,
+    ): void {
+        $actual = ClassName::getNamespace($className);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function classNamespaceProvider(): iterable
+    {
+        yield 'nominal' => [
+            ClassName::class,
+            'Infection\Framework',
+        ];
+
+        yield 'nested namespace' => [
+            EnumBucket::class,
+            'Infection\Framework\Enum',
+        ];
+
+        yield 'UTF-8' => [
+            'Webmozarts\ClassName\Ütf8',
+            'Webmozarts\ClassName',
+        ];
+
+        yield 'root namespace' => [
+            Closure::class,
+            '',
+        ];
+    }
+
     /**
      * @param class-string $sourceClassName
      * @param Exception|class-string[] $expected

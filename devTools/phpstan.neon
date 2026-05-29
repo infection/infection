@@ -30,6 +30,10 @@ services:
         class: Infection\Tests\Architecture\PHPat\ConcreteSourceClassesShouldHaveTestsTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\ConcretePHPUnitTestSupportClassesShouldHaveTestsTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan
@@ -96,6 +100,20 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
+
+        # Permanent PHPat exceptions: these PHPUnit support classes are intentionally not tested directly.
+        -
+            identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+            count: 1
+            path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryGit.php
+        -
+            identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+            count: 1
+            path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php
+        -
+            identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+            count: 1
+            path: ../tests/phpunit/TestingUtility/FS.php
 
         -
             message: "#queryCount#"
