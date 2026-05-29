@@ -101,6 +101,20 @@ parameters:
             count: 1
             path: ../tests/phpunit/MockedContainer.php
 
+        # Permanent PHPat exceptions: these PHPUnit support classes are intentionally not tested directly.
+        -
+            identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+            count: 1
+            path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryGit.php
+        -
+            identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+            count: 1
+            path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php
+        -
+            identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+            count: 1
+            path: ../tests/phpunit/TestingUtility/FS.php
+
         -
             message: "#queryCount#"
             identifier: return.type

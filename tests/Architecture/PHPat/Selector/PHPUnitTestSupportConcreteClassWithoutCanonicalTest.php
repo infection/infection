@@ -41,13 +41,13 @@ use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\TestCase;
 use function str_ends_with;
+use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
 
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
     private const PHPUNIT_TEST_FIXTURE_NAMESPACES = [
-        'Infection\Tests\Architecture\PHPat\Selector\HasDocBlock',
-        'Infection\Tests\Architecture\PHPat\Selector\HasInternalDocBlock',
+        'Infection\Tests\Architecture\PHPat\Selector',
         'Infection\Tests\Framework\Enum\EnumBucket',
         'Infection\Tests\Framework\Enum\ImplodableEnum',
     ];
@@ -148,11 +148,7 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
         $className = $classReflection->getName();
 
         return in_array($className, self::PHPUNIT_DATA_PROVIDER_CLASSES, true)
-            || in_array(
-                ClassName::getNamespace($className),
-                self::PHPUNIT_DATA_PROVIDER_NAMESPACES,
-                true,
-            );
+            || self::isInRegisteredNamespace($className, self::PHPUNIT_DATA_PROVIDER_NAMESPACES);
     }
 
     private static function isKnownPhpUnitScenarioClass(ClassReflection $classReflection): bool
@@ -165,10 +161,27 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
         $className = $classReflection->getName();
 
         return in_array($className, self::PHPUNIT_TEST_FIXTURE_CLASSES, true)
-            || in_array(
-                ClassName::getNamespace($className),
-                self::PHPUNIT_TEST_FIXTURE_NAMESPACES,
-                true,
-            );
+            || self::isInRegisteredNamespace($className, self::PHPUNIT_TEST_FIXTURE_NAMESPACES);
+    }
+
+    /**
+     * @param list<string> $registeredNamespaces
+     */
+    private static function isInRegisteredNamespace(
+        string $className,
+        array $registeredNamespaces,
+    ): bool {
+        $namespace = ClassName::getNamespace($className);
+
+        foreach ($registeredNamespaces as $registeredNamespace) {
+            if (
+                $namespace === $registeredNamespace
+                || str_starts_with($namespace, $registeredNamespace . '\\')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

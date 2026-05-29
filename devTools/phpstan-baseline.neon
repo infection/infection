@@ -1045,18 +1045,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
 
 		-
-			rawMessage: Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryGit should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryGit.php
-
-		-
-			rawMessage: Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryInputBuilder should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
@@ -1775,12 +1763,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/Console/Command/TestOptionCommand.php
-
-		-
-			rawMessage: Infection\Tests\TestingUtility\FS should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestingUtility/FS.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder should not exist
