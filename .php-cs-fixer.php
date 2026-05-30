@@ -52,6 +52,7 @@ $finder = Finder::create()
         '.ci',
         '.composer',
         '.github',
+        '.sbx',
         '.tools',
         'build',
         'devTools',
