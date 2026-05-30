@@ -150,7 +150,7 @@ jobs:
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
 
   phpstan-build-infection:
-    name: phpstan/build-infection
+    name: PHPStan's infection build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -198,8 +198,8 @@ jobs:
       - name: Configure local Infection dependency
         working-directory: build-infection
         run: |
-          composer require --dev infection/infection@dev-master --no-update
           composer config repositories.local-infection '{"type":"path","url":"..","options":{"symlink":true,"versions":{"infection/infection":"dev-master"}}}'
+          composer require --dev infection/infection:dev-master --no-update
 
       - name: Install dependencies
         working-directory: build-infection
