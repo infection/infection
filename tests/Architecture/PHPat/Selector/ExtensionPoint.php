@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use function in_array;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
