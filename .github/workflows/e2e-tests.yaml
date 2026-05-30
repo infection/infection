@@ -198,7 +198,7 @@ jobs:
       - name: Configure local Infection dependency
         working-directory: build-infection
         run: |
-          composer require --dev infection/infection --no-update
+          composer require --dev infection/infection@dev-master --no-update
           composer config repositories.local-infection '{"type":"path","url":"..","options":{"symlink":true,"versions":{"infection/infection":"dev-master"}}}'
 
       - name: Install dependencies
