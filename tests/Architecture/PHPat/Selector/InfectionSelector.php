@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ExtensionPoint;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
