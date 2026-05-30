@@ -33,42 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture;
 
-use Infection\Testing\SingletonContainer;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
-
-final class HasTrivialImplementation implements SelectorInterface
+final class EmptyMethod
 {
-    private Analyser $analyser;
-
-    public function __construct(?Analyser $analyser = null)
+    public function doNothing(): void
     {
-        if ($analyser !== null) {
-            $this->analyser = $analyser;
-
-            return;
-        }
-
-        $container = SingletonContainer::getContainer();
-
-        $this->analyser = new Analyser(
-            $container->getParser(),
-            $container->getFileSystem(),
-        );
-    }
-
-    public function getName(): string
-    {
-        return 'class with trivial implementation';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        $analysisResult = $this->analyser->analyse($classReflection);
-
-        return $analysisResult->hasTrivialImplementation;
     }
 }

@@ -33,50 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture;
 
-use Infection\Framework\ClassName;
-use Infection\Testing\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use PHPStan\Reflection\ClassReflection;
-use Webmozart\Assert\Assert;
+use DomainException;
 
-final class FileAnalyser
+final class UnexpectedCallMethod
 {
-    public static function analyse(ClassReflection $classReflection): ?AnalysisResult
+    public function value(): never
     {
-        Assert::true(
-            ConcreteClassReflection::isConcreteClass($classReflection),
-            // This limitation is enough for the current selectors and keeps the
-            // analysis rules narrow. It can be expanded when another use case needs it.
-            'Only concrete classes can be analysed.',
-        );
-
-        $fileName = $classReflection->getFileName();
-
-        if ($fileName === null) {
-            return null;
-        }
-
-        $container = SingletonContainer::getContainer();
-        $nodes = $container->getParser()->parse(
-            $container->getFileSystem()->readFile($fileName),
-        );
-
-        if ($nodes === null) {
-            return null;
-        }
-
-        $visitor = new TargetClassAnalysisVisitor(
-            ClassName::getShortClassName($classReflection->getName()),
-        );
-
-        (new NodeTraverser(
-            new ParentConnectingVisitor(),
-            $visitor,
-        ))->traverse($nodes);
-
-        return $visitor->getAnalysisResult();
+        throw new DomainException('Unexpected call.');
     }
 }

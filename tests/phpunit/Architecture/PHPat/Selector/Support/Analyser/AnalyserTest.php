@@ -33,42 +33,68 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
-use Infection\Testing\SingletonContainer;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use PHPat\Selector\SelectorInterface;
+use Infection\FileSystem\FileSystem;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use PhpParser\ErrorHandler\Throwing;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 
-final class HasTrivialImplementation implements SelectorInterface
+#[CoversClass(Analyser::class)]
+#[CoversClass(AnalysisResult::class)]
+#[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
+final class AnalyserTest extends SelectorTestCase
 {
+    private ClassReflection $classReflection;
+
+    private FileSystem&MockObject $fileSystemMock;
+
+    private Parser&MockObject $parserMock;
+
     private Analyser $analyser;
 
-    public function __construct(?Analyser $analyser = null)
+    protected function setUp(): void
     {
-        if ($analyser !== null) {
-            $this->analyser = $analyser;
+        $this->classReflection = $this->createClassReflection(self::class);
 
-            return;
-        }
-
-        $container = SingletonContainer::getContainer();
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
+        $this->parserMock = $this->createMock(Parser::class);
 
         $this->analyser = new Analyser(
-            $container->getParser(),
-            $container->getFileSystem(),
+            $this->parserMock,
+            $this->fileSystemMock,
         );
     }
 
-    public function getName(): string
+    public function test_it_reads_the_class_file_parses_it_and_returns_the_analysis_result(): void
     {
-        return 'class with trivial implementation';
-    }
+        $fileContents = 'PHP file contents';
 
-    public function matches(ClassReflection $classReflection): bool
-    {
-        $analysisResult = $this->analyser->analyse($classReflection);
+        $nodes = [
+            new Class_('RandomTestClass'),
+        ];
 
-        return $analysisResult->hasTrivialImplementation;
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->with(__FILE__)
+            ->willReturn($fileContents);
+
+        $this->parserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->with(
+                $fileContents,
+                $this->isInstanceOf(Throwing::class),
+            )
+            ->willReturn($nodes);
+
+        $actual = $this->analyser->analyse($this->classReflection);
+
+        $this->assertTrue($actual->hasTrivialImplementation);
     }
 }

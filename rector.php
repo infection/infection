@@ -87,9 +87,8 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tests/phpunit',
     ])
-    ->withSkipPath(
-        __DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php',
-    )
+    ->withSkipPath(__DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php')
+    ->withSkipPath(__DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture')
     ->withCache(
         cacheClass: FileCacheStorage::class,
         cacheDirectory: __DIR__ . '/var/cache/rector',

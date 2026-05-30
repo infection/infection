@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture;
 
-final readonly class AnalysisResult
+final class NullObjectReturningConstant
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-    ) {
+    public function value(): bool
+    {
+        return false;
     }
 }

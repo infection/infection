@@ -257,6 +257,12 @@ parameters:
             identifier: offsetAccess.notFound
             count: 6
             path: ../src/TestFramework/PhpUnit/CommandLine/TestFrameworkExtraArgs.php
+
+        # This directory contains fixture. It still needs to be scanned by PHPStan though.
+        -
+            path: ../tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture
+            message: '#.+#'
+
     level: 8
     paths:
         - ../src

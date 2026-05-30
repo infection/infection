@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
+use Infection\Testing\SingletonContainer;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
@@ -84,7 +86,14 @@ final class InfectionSelector
 
     public static function hasTrivialImplementation(): HasTrivialImplementation
     {
-        return new HasTrivialImplementation();
+        $container = SingletonContainer::getContainer();
+
+        return new HasTrivialImplementation(
+            new Analyser(
+                $container->getParser(),
+                $container->getFileSystem(),
+            ),
+        );
     }
 
     public static function hasDocBlock(): HasDocBlock
