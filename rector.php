@@ -82,17 +82,20 @@ use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForCommo
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForJsonArrayRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\DocblockGetterReturnArrayFromPropertyDocblockVarRector;
 
-return RectorConfig::configure()
+$skippedPaths = [
+    __DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php',
+    __DIR__ . '/tests/benchmark/MutationGenerator/sources',
+    __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
+    __DIR__ . '/tests/benchmark/Tracing/coverage',
+];
+
+$config = RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/src',
         __DIR__ . '/tests/Architecture',
         __DIR__ . '/tests/benchmark',
         __DIR__ . '/tests/phpunit',
     ])
-    ->withSkipPath(__DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php')
-    ->withSkipPath(__DIR__ . '/tests/benchmark/MutationGenerator/sources')
-    ->withSkipPath(__DIR__ . '/tests/benchmark/Tracing/benchmark-source')
-    ->withSkipPath(__DIR__ . '/tests/benchmark/Tracing/coverage')
     ->withCache(
         cacheClass: FileCacheStorage::class,
         cacheDirectory: __DIR__ . '/var/cache/rector',
@@ -194,3 +197,11 @@ return RectorConfig::configure()
         ],
         VariableConstFetchToClassConstFetchRector::class,
     ]);
+
+foreach ($skippedPaths as $skippedPath) {
+    if (\file_exists($skippedPath)) {
+        $config = $config->withSkipPath($skippedPath);
+    }
+}
+
+return $config;
