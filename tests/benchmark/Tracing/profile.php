@@ -81,7 +81,6 @@ $input = new ArgvInput(
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
-/** @var positive-int $maxTraceCount */
 $maxTraceCount = (static function (InputInterface $input, string $optionName): int {
     $option = $input->getOption($optionName);
 
@@ -112,7 +111,6 @@ $maxTraceCount = (static function (InputInterface $input, string $optionName): i
     return $intValue;
 })($input, MAX_TRACE_COUNT_OPT);
 
-/** @var float $percentage */
 $percentage = (static function (InputInterface $input, string $optionName): float {
     $option = $input->getOption($optionName);
 

@@ -59,7 +59,7 @@ final class InfectionCode implements SelectorInterface
     {
         return $classReflection->getName() === 'Infection'
             || str_starts_with(
-                $classReflection->getName(),
+                (string) $classReflection->getName(),
                 'Infection\\',
             );
     }
