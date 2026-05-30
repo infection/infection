@@ -50,6 +50,7 @@ final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
     {
         if (!self::isConcreteClass($classReflection)
             || !InfectionSelector::sourceCode()->matches($classReflection)
+            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
         ) {
             return false;
         }

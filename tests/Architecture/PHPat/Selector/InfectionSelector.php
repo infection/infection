@@ -37,6 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
 use Infection\Tests\Architecture\PHPat\Selector\Support\ExtensionPoint;
+use Infection\Tests\Architecture\PHPat\Selector\Support\HasTrivialImplementation;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
@@ -81,6 +82,11 @@ final class InfectionSelector
     public static function phpunitTestSupportConcreteClassWithoutCanonicalTest(): PHPUnitTestSupportConcreteClassWithoutCanonicalTest
     {
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
+    }
+
+    public static function hasTrivialImplementation(): HasTrivialImplementation
+    {
+        return new HasTrivialImplementation();
     }
 
     public static function hasDocBlock(): HasDocBlock

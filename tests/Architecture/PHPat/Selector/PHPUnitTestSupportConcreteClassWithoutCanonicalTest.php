@@ -86,6 +86,7 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
             || self::isKnownPhpUnitDataProviderClass($classReflection)
             || self::isKnownPhpUnitScenarioClass($classReflection)
             || self::isKnownPHPUnitTestFixtureClass($classReflection)
+            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
             || !self::isPHPUnitTestSupportCode($classReflection)
         ) {
             return false;

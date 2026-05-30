@@ -39,13 +39,19 @@ use Infection\CannotBeInstantiated;
 use Infection\Command\BaseCommand;
 use Infection\Command\ConfigureCommand;
 use Infection\Engine;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\Mutator\Mutator;
+use Infection\TestFramework\Coverage\Locator\FakeLocator;
+use Infection\Tests\Architecture\PHPat\Selector\Support\HasTrivialImplementation;
 use Infection\Tests\EngineTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SourceConcreteClassWithoutCanonicalTest::class)]
+#[CoversClass(HasTrivialImplementation::class)]
 final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
     /**
@@ -69,6 +75,26 @@ final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
         yield 'source concrete class without canonical test' => [
             ConfigureCommand::class,
             true,
+        ];
+
+        yield 'source class with only constants' => [
+            ApplicationExecutionWasFinished::class,
+            false,
+        ];
+
+        yield 'source class with only promoted properties' => [
+            MutableFileWasProcessed::class,
+            false,
+        ];
+
+        yield 'source fake implementation with only unexpected calls' => [
+            FakeLocator::class,
+            false,
+        ];
+
+        yield 'source fake implementation with properties and only unexpected calls' => [
+            FakeFileSystem::class,
+            false,
         ];
 
         yield 'source concrete class with canonical test' => [
