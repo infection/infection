@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor;
 
-use Infection\Framework\ClassName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\ConstructorWithBody;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\EmptyClass;
@@ -56,15 +56,24 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteC
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallUsingFactory;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallWithDifferentException;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallWithDifferentMessage;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Webmozart\Assert\Assert;
 
 #[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
 final class DetectConcreteClassMeaningfulImplementationVisitorTest extends SelectorTestCase
 {
+    private Analyser $analyser;
+
+    protected function setUp(): void
+    {
+        $container = SingletonContainer::getContainer();
+
+        $this->analyser = new Analyser(
+            $container->getParser(),
+            $container->getFileSystem(),
+        );
+    }
+
     /**
      * @param class-string $className
      */
@@ -74,25 +83,12 @@ final class DetectConcreteClassMeaningfulImplementationVisitorTest extends Selec
         bool $expected,
     ): void {
         $classReflection = $this->createClassReflection($className);
-        $fileName = $classReflection->getFileName();
-        Assert::string($fileName);
 
-        $container = SingletonContainer::getContainer();
-        $nodes = $container->getParser()->parse(
-            $container->getFileSystem()->readFile($fileName),
-        );
-        Assert::isArray($nodes);
+        $actual = !$this->analyser
+            ->analyse($classReflection)
+            ->hasTrivialImplementation;
 
-        $visitor = new DetectConcreteClassMeaningfulImplementationVisitor(
-            ClassName::getShortClassName($className),
-        );
-
-        (new NodeTraverser(
-            new ParentConnectingVisitor(),
-            $visitor,
-        ))->traverse($nodes);
-
-        $this->assertSame($expected, $visitor->hasMeaningfulImplementation());
+        $this->assertSame($expected, $actual);
     }
 
     public static function classProvider(): iterable

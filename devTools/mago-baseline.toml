@@ -5071,18 +5071,6 @@ message = "Assigning `mixed` type to a variable may lead to unexpected behavior.
 count = 3
 
 [[issues]]
-file = "tests/benchmark/Tracing/profile.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$maxTraceCount`."
-count = 1
-
-[[issues]]
-file = "tests/benchmark/Tracing/profile.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$percentage`."
-count = 1
-
-[[issues]]
 file = "tests/phpunit/AutoReview/BuildConfigYmlTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesYamlFilesForTesting` is imprecise, equivalent to `iterable<mixed, mixed>`."
