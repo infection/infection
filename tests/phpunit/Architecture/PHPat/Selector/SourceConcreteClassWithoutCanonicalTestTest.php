@@ -44,20 +44,12 @@ use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasPro
 use Infection\FileSystem\FakeFileSystem;
 use Infection\Mutator\Mutator;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\AnalysisResult;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor;
 use Infection\Tests\EngineTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SourceConcreteClassWithoutCanonicalTest::class)]
-#[CoversClass(HasTrivialImplementation::class)]
-#[CoversClass(AnalysisResult::class)]
-#[CoversClass(Support\ConcreteClassReflection::class)]
-#[CoversClass(Analyser::class)]
-#[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
 final class SourceConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
     /**
