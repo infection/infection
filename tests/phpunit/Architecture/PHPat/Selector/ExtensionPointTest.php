@@ -33,26 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function in_array;
+use;
+use Architecture\PHPat\Selector\ExtensionPoint;
+use Infection\Engine;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class ExtensionPoint implements SelectorInterface
+#[CoversClass(ExtensionPoint::class)]
+final class ExtensionPointTest extends SelectorTestCase
 {
-    public function getName(): string
-    {
-        return 'Infection extension point';
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_extension_points(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new ExtensionPoint();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function matches(ClassReflection $classReflection): bool
+    public static function classProvider(): iterable
     {
-        return in_array(
-            $classReflection->getName(),
-            ProjectCodeProvider::EXTENSION_POINTS,
+        yield 'extension point' => [
+            ProjectCodeProvider::EXTENSION_POINTS[0],
             true,
-        );
+        ];
+
+        yield 'source class' => [
+            Engine::class,
+            false,
+        ];
+
+        yield 'architecture test class' => [
+            self::class,
+            false,
+        ];
+
+        yield 'project code provider' => [
+            ProjectCodeProvider::class,
+            false,
+        ];
+
+        yield 'vendor class' => [
+            TestCase::class,
+            false,
+        ];
+
+        yield 'phpat selector interface' => [
+            SelectorInterface::class,
+            false,
+        ];
     }
 }
