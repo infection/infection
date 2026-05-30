@@ -33,30 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
-use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use Infection\CannotBeInstantiated;
+use Infection\Command\BaseCommand;
+use Infection\Engine;
+use Infection\Mutator\Mutator;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+#[CoversClass(ConcreteClassReflection::class)]
+final class ConcreteClassReflectionTest extends SelectorTestCase
 {
-    public function getName(): string
-    {
-        return 'source concrete class without canonical test';
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_detects_concrete_classes(
+        string $className,
+        bool $expected,
+    ): void {
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = ConcreteClassReflection::isConcreteClass($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function matches(ClassReflection $classReflection): bool
+    public static function classProvider(): iterable
     {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-        ) {
-            return false;
-        }
+        yield 'concrete class' => [
+            Engine::class,
+            true,
+        ];
 
-        $className = $classReflection->getName();
+        yield 'abstract class' => [
+            BaseCommand::class,
+            false,
+        ];
 
-        return ClassName::getCanonicalTestClassName($className) === null;
+        yield 'interface' => [
+            Mutator::class,
+            false,
+        ];
+
+        yield 'trait' => [
+            CannotBeInstantiated::class,
+            false,
+        ];
     }
 }
