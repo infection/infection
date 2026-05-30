@@ -38,7 +38,6 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\Command\ConfigureCommand;
 use Infection\Engine;
 use Infection\Tests\Architecture\PHPat\Selector\HasDocBlock\ClassWithDocBlock;
-use Infection\Tests\Architecture\PHPat\Selector\Support\HasTrivialImplementation;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario;
 use Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider;
@@ -56,6 +55,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(PHPUnitTestSupportConcreteClassWithoutCanonicalTest::class)]
 #[CoversClass(HasTrivialImplementation::class)]
+#[CoversClass(Support\AnalysisResult::class)]
+#[CoversClass(Support\ConcreteClassReflection::class)]
+#[CoversClass(Support\FileAnalyser::class)]
+#[CoversClass(Support\TargetClassAnalysisVisitor::class)]
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
     public function test_it_does_not_match_anonymous_classes(): void

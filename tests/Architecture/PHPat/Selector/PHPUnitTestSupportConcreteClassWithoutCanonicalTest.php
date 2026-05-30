@@ -37,6 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use function in_array;
 use Infection\Framework\ClassName;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +81,7 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
     public function matches(ClassReflection $classReflection): bool
     {
         if (
-            !self::isConcreteClass($classReflection)
+            !ConcreteClassReflection::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
             || self::isPHPUnitTestClass($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)
@@ -95,13 +96,6 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
         $className = $classReflection->getName();
 
         return ClassName::getCanonicalTestClassName($className) === null;
-    }
-
-    private static function isConcreteClass(ClassReflection $classReflection): bool
-    {
-        return !$classReflection->isAbstract()
-            && !$classReflection->isInterface()
-            && !$classReflection->isTrait();
     }
 
     private static function isPHPUnitTestSupportCode(ClassReflection $classReflection): bool

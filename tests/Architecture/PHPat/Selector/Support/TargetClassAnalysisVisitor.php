@@ -36,12 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use function count;
-use Infection\Framework\ClassName;
-use PHPat\Selector\SelectorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\New_;
-use PhpParser\Node\Expr\Throw_;
+use PhpParser\Node\Expr\Throw_ as ThrowExpression;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\String_;
@@ -54,69 +52,109 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\Stmt\TraitUse;
-use PhpParser\NodeFinder;
-use PhpParser\ParserFactory;
-use PHPStan\Reflection\ClassReflection;
-use function Safe\file_get_contents;
+use PhpParser\NodeVisitorAbstract;
 use function str_starts_with;
-use Webmozart\Assert\Assert;
 
-final class HasTrivialImplementation implements SelectorInterface
+final class TargetClassAnalysisVisitor extends NodeVisitorAbstract
 {
     private const string UNEXPECTED_CALL_MESSAGE = 'Unexpected call.';
 
-    public function getName(): string
-    {
-        return 'class with trivial implementation';
+    private ?Class_ $targetClass = null;
+
+    private bool $foundTargetClass = false;
+
+    private bool $hasMeaningfulImplementation = false;
+
+    public function __construct(
+        private readonly string $targetShortClassName,
+    ) {
     }
 
-    public function matches(ClassReflection $classReflection): bool
+    public function enterNode(Node $node): ?int
     {
-        $class = self::getClassNode($classReflection);
+        if (!$this->foundTargetClass) {
+            if ($node instanceof Class_ && $this->isTargetClass($node)) {
+                $this->foundTargetClass = true;
+                $this->targetClass = $node;
 
-        if ($class === null) {
-            return false;
-        }
-
-        foreach ($class->stmts as $statement) {
-            if (self::isNonBehavioralClassStatement($statement, $class)) {
-                continue;
+                return null;
             }
 
+            return null;
+        }
+
+        if ($node === $this->targetClass) {
+            return null;
+        }
+
+        if (!$this->isInsideTargetClass($node)) {
+            return null;
+        }
+
+        if (!$this->isDirectTargetClassStatement($node)) {
+            return null;
+        }
+
+        $targetClass = $this->targetClass;
+
+        if ($targetClass === null) {
+            return null;
+        }
+
+        if (self::isNonBehavioralClassStatement($node, $targetClass)) {
+            return null;
+        }
+
+        $this->hasMeaningfulImplementation = true;
+
+        return null;
+    }
+
+    public function getAnalysisResult(): ?AnalysisResult
+    {
+        if (!$this->foundTargetClass) {
+            return null;
+        }
+
+        return new AnalysisResult(!$this->hasMeaningfulImplementation);
+    }
+
+    private function isTargetClass(Class_ $node): bool
+    {
+        return !$node->isAnonymous()
+            && $node->name?->toString() === $this->targetShortClassName;
+    }
+
+    private function isInsideTargetClass(Node $node): bool
+    {
+        $parent = $node->getAttribute('parent');
+
+        while ($parent instanceof Node) {
+            if ($parent === $this->targetClass) {
+                return true;
+            }
+
+            $parent = $parent->getAttribute('parent');
+        }
+
+        return false;
+    }
+
+    private function isDirectTargetClassStatement(Node $node): bool
+    {
+        $targetClass = $this->targetClass;
+
+        if ($targetClass === null) {
             return false;
         }
 
-        return true;
-    }
-
-    private static function getClassNode(ClassReflection $classReflection): ?Class_
-    {
-        $fileName = $classReflection->getFileName();
-
-        if ($fileName === null) {
-            return null;
+        foreach ($targetClass->stmts as $statement) {
+            if ($node === $statement) {
+                return true;
+            }
         }
 
-        $fileContent = file_get_contents($fileName);
-
-        Assert::string($fileContent);
-
-        $nodes = (new ParserFactory())->createForHostVersion()->parse($fileContent);
-
-        if ($nodes === null) {
-            return null;
-        }
-
-        $shortClassName = ClassName::getShortClassName($classReflection->getName());
-
-        $class = (new NodeFinder())->findFirst(
-            $nodes,
-            static fn (Node $node): bool => $node instanceof Class_
-                && !$node->isAnonymous()
-                && $node->name?->toString() === $shortClassName,
-        );
-
-        return $class instanceof Class_ ? $class : null;
+        return false;
     }
 
     private static function isNonBehavioralClassStatement(Node $statement, Class_ $class): bool
@@ -169,7 +207,7 @@ final class HasTrivialImplementation implements SelectorInterface
 
         return count($statements) === 1
             && $statements[0] instanceof Expression
-            && $statements[0]->expr instanceof Throw_
+            && $statements[0]->expr instanceof ThrowExpression
             && $statements[0]->expr->expr instanceof New_
             && self::isUnexpectedCallException($statements[0]->expr->expr);
     }

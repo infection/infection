@@ -33,31 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
-use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
-use PHPat\Selector\SelectorInterface;
+use Infection\CannotBeInstantiated;
 use PHPStan\Reflection\ClassReflection;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class ConcreteClassReflection
 {
-    public function getName(): string
+    use CannotBeInstantiated;
+
+    public static function isConcreteClass(ClassReflection $classReflection): bool
     {
-        return 'source concrete class without canonical test';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
-        ) {
-            return false;
-        }
-
-        $className = $classReflection->getName();
-
-        return ClassName::getCanonicalTestClassName($className) === null;
+        return !$classReflection->isAbstract()
+            && !$classReflection->isInterface()
+            && !$classReflection->isTrait();
     }
 }

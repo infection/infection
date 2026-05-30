@@ -33,31 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
-use PHPat\Selector\SelectorInterface;
+use Infection\Testing\SingletonContainer;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPStan\Reflection\ClassReflection;
+use Webmozart\Assert\Assert;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class FileAnalyser
 {
-    public function getName(): string
+    public static function analyse(ClassReflection $classReflection): ?AnalysisResult
     {
-        return 'source concrete class without canonical test';
-    }
+        Assert::true(
+            ConcreteClassReflection::isConcreteClass($classReflection),
+            // This limitation is enough for the current selectors and keeps the
+            // analysis rules narrow. It can be expanded when another use case needs it.
+            'Only concrete classes can be analysed.',
+        );
 
-    public function matches(ClassReflection $classReflection): bool
-    {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
-        ) {
-            return false;
+        $fileName = $classReflection->getFileName();
+
+        if ($fileName === null) {
+            return null;
         }
 
-        $className = $classReflection->getName();
+        $container = SingletonContainer::getContainer();
+        $nodes = $container->getParser()->parse(
+            $container->getFileSystem()->readFile($fileName),
+        );
 
-        return ClassName::getCanonicalTestClassName($className) === null;
+        if ($nodes === null) {
+            return null;
+        }
+
+        $visitor = new TargetClassAnalysisVisitor(
+            ClassName::getShortClassName($classReflection->getName()),
+        );
+
+        (new NodeTraverser(
+            new ParentConnectingVisitor(),
+            $visitor,
+        ))->traverse($nodes);
+
+        return $visitor->getAnalysisResult();
     }
 }

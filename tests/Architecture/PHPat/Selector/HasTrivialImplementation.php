@@ -35,29 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\FileAnalyser;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class HasTrivialImplementation implements SelectorInterface
 {
     public function getName(): string
     {
-        return 'source concrete class without canonical test';
+        return 'class with trivial implementation';
     }
 
     public function matches(ClassReflection $classReflection): bool
     {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
-        ) {
-            return false;
-        }
+        $analysisResult = FileAnalyser::analyse($classReflection);
 
-        $className = $classReflection->getName();
-
-        return ClassName::getCanonicalTestClassName($className) === null;
+        return $analysisResult !== null
+            && $analysisResult->hasTrivialImplementation;
     }
 }
