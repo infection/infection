@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9138a8466c454a43bc10d151b01db7eb",
+    "content-hash": "ddf82b7422ecc6d0567d1d56f2a43f8d",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -961,16 +961,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.1.15",
+            "version": "0.1.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "6fdff5805fb07f01898b3c33b6c53f0f6a1cc110"
+                "reference": "8b8a8859e992297259b220a92179439f9d185838"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/6fdff5805fb07f01898b3c33b6c53f0f6a1cc110",
-                "reference": "6fdff5805fb07f01898b3c33b6c53f0f6a1cc110",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/8b8a8859e992297259b220a92179439f9d185838",
+                "reference": "8b8a8859e992297259b220a92179439f9d185838",
                 "shasum": ""
             },
             "require": {
@@ -1028,7 +1028,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.1.15"
+                "source": "https://github.com/sanmai/di-container/tree/0.1.16"
             },
             "funding": [
                 {
@@ -1036,7 +1036,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-30T08:52:45+00:00"
+            "time": "2026-05-30T11:27:18+00:00"
         },
         {
             "name": "sanmai/duoclock",
