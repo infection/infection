@@ -17,3 +17,22 @@ services:
         XDEBUG_VERSION: '3.4.1'
     volumes:
       - .:/opt/infection
+
+  php84:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: '8.4'
+        XDEBUG_VERSION: '3.4.0'
+    volumes:
+      - .:/opt/infection
+
+  php85:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: '8.5'
+        XDEBUG_VERSION: '3.5.1'
+    volumes:
+      - .:/opt/infection
+

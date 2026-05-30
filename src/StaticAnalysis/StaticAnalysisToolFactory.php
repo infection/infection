@@ -38,9 +38,9 @@ namespace Infection\StaticAnalysis;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
+use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use InvalidArgumentException;
 use function sprintf;
 
@@ -52,7 +52,7 @@ final readonly class StaticAnalysisToolFactory
     public function __construct(
         private Configuration $infectionConfig,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private StaticAnalysisConfigLocator $staticAnalysisConfigLocator,
+        private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
     ) {
     }
 

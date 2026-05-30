@@ -13,6 +13,7 @@
 /.direnv/
 /.envrc.local
 /.php_cs.cache
+/.sbx/
 /.tools/
 /build/
 /devTools/Docker*.json

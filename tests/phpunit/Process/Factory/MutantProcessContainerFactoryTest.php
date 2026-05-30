@@ -37,7 +37,7 @@ namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
@@ -118,7 +118,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $executionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
 
-        $resultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
+        $resultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
             ->willReturn($executionResult)

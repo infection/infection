@@ -36,13 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
-use function array_flip;
-use function array_key_exists;
 use function array_map;
-use function in_array;
-use Infection\Framework\ClassName;
 use Infection\StreamWrapper\IncludeInterceptor;
-use Infection\Testing\SingletonContainer;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
@@ -66,132 +61,6 @@ final class ProjectCodeTest extends TestCase
 
         $this->assertFileExists($infectionFile);
         $this->assertTrue(is_executable($infectionFile));
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
-    public function test_all_concrete_classes_have_tests(string $className): void
-    {
-        $testClassName = ClassName::getCanonicalTestClassName($className);
-
-        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false
-            && in_array($className, ProjectCodeProvider::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION, true) === false
-        ) {
-            $this->assertNotNull(
-                $testClassName,
-                sprintf(
-                    'Could not find the test "%s" for the class "%s". Please either add it'
-                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES or ::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION',
-                    $testClassName,
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-
-            return;
-        }
-
-        $this->assertNull(
-            $testClassName,
-            sprintf(
-                'The class "%s" has a test "%s". Please remove it from the list of non '
-                . 'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
-                $className,
-                $testClassName,
-                ProjectCodeProvider::class,
-            ),
-        );
-
-        $this->markTestSkipped(sprintf(
-            'No test found for "%s". You can improve this by adding the test "%s".',
-            $className,
-            $testClassName,
-        ));
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
-    public function test_non_extension_points_are_internal(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $docBlock = DocBlockParser::parse((string) $reflectionClass->getDocComment());
-
-        if (in_array($className, ProjectCodeProvider::EXTENSION_POINTS, true)) {
-            if ($docBlock === '') {
-                $this->markTestSkipped(
-                    sprintf(
-                        'The "%s" class is an extension point, but does not have a PHP '
-                        . 'doc-block or an empty one. Consider adding one to improve usability.',
-                        $className,
-                    ),
-                );
-            }
-
-            $this->assertStringNotContainsString(
-                '@internal',
-                $docBlock,
-                sprintf(
-                    'The "%s" class is marked as an extension point in %s::EXTENSION_POINTS'
-                    . '; It should either not be tagged as "@internal" or not be listed there.',
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-
-            return;
-        }
-
-        $this->assertStringContainsString(
-            '@internal',
-            $docBlock,
-            sprintf(
-                'The "%s" class is not an extension point: it should be marked as internal'
-                . ' or listed as an extension point in %s::EXTENSION_POINTS.',
-                $className,
-                ProjectCodeProvider::class,
-            ),
-        );
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
-    public function test_non_extension_points_are_traits_interfaces_abstracts_or_finals(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $tagsAsKeys = array_flip(
-            SingletonContainer::getPHPDocParser()->parse(
-                (string) $reflectionClass->getDocComment(),
-            ),
-        );
-
-        $pass = $reflectionClass->isTrait()
-            || $reflectionClass->isInterface()
-            || $reflectionClass->isAbstract()
-            || $reflectionClass->isFinal()
-            || array_key_exists('@final', $tagsAsKeys)
-        ;
-
-        if (in_array($className, ProjectCodeProvider::NON_FINAL_EXTENSION_CLASSES, true)) {
-            $this->assertFalse(
-                $pass,
-                sprintf(
-                    'The class "%s" is registered to "%s::NON_FINAL_EXTENSION_CLASSES but '
-                    . 'this should not be necessary.',
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-        } else {
-            $this->assertTrue(
-                $pass,
-                sprintf(
-                    'Expected the class "%s" to be a trait, an interface, an abstract or final '
-                    . 'class. Either fix it or if it is an extension point, add it to '
-                    . '%s::NON_FINAL_EXTENSION_CLASSES.',
-                    $className,
-                    ProjectCodeProvider::class,
-                ),
-            );
-        }
     }
 
     #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
@@ -249,22 +118,6 @@ final class ProjectCodeTest extends TestCase
             sprintf(
                 'The class "%s" should not have any public properties declared. If it has '
                 . 'properties that needs to be accessed, getters should be used instead.',
-                $className,
-            ),
-        );
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
-    public function test_all_test_classes_are_trait_abstract_or_final(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $this->assertTrue(
-            $reflectionClass->isTrait()
-            || $reflectionClass->isAbstract()
-            || $reflectionClass->isFinal(),
-            sprintf(
-                'The test class "%s" should be a trait, an abstract or final class.',
                 $className,
             ),
         );

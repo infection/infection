@@ -55,9 +55,8 @@ use function version_compare;
 
 /**
  * @internal
- * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
     final public const string COVERAGE_DIR = 'coverage-xml';
 

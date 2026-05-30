@@ -42,16 +42,15 @@ use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
- * @final
  */
-class FilteringResultsCollector implements Collector
+final readonly class FilteringResultsCollector implements Collector
 {
     /**
      * @param DetectionStatus[] $targetDetectionStatuses
      */
     public function __construct(
-        private readonly Collector $targetCollector,
-        private readonly array $targetDetectionStatuses,
+        private Collector $targetCollector,
+        private array $targetDetectionStatuses,
     ) {
     }
 

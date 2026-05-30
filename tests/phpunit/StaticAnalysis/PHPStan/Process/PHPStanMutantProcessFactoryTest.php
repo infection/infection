@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\PHPStan\Process;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\Testing\MutatorName;
@@ -97,7 +97,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -194,7 +194,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
@@ -292,7 +292,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $phpStanMutantExecutionResultFactory = $this->createStub(PHPStanMutantExecutionResultFactory::class);
+        $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())

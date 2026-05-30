@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat;
 
-use PHPat\Selector\Selector;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
@@ -44,19 +44,10 @@ final class SrcShouldNotDependOnTestsTest
     public function testSrcDoesNotDependOnTestsOrBenchmarks(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace('Infection'))
-            ->excluding(
-                Selector::inNamespace('Infection\\Tests'),
-                Selector::inNamespace('Infection\\Benchmark'),
-            )
+            ->classes(InfectionSelector::sourceCode())
             ->shouldNot()
             ->dependOn()
-            ->classes(
-                Selector::AnyOf(
-                    Selector::inNamespace('Infection\\Tests'),
-                    Selector::inNamespace('Infection\\Benchmark'),
-                ),
-            )
-            ->because('Production code under src/ must not depend on tests/ or benchmarks.');
+            ->classes(InfectionSelector::testCode())
+            ->because('Production code under src/ must not depend on tests/ or benchmarks code.');
     }
 }
