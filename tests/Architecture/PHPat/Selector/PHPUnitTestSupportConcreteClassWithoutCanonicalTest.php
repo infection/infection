@@ -38,6 +38,11 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use function in_array;
 use Infection\Framework\ClassName;
 use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\FileSystem\Finder\MockVendor;
+use Infection\Tests\Framework\Iterable\GeneratorFactory\SimpleIteratorAggregate;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Reflection\ProtChild;
+use Infection\Tests\Reflection\ProtParent;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\TestCase;
@@ -47,28 +52,28 @@ use Symfony\Component\Filesystem\Path;
 
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements SelectorInterface
 {
-    private const PHPUNIT_TEST_FIXTURE_NAMESPACES = [
+    private const array PHPUNIT_TEST_FIXTURE_NAMESPACES = [
         'Infection\Tests\Architecture\PHPat\Selector',
         'Infection\Tests\Framework\Enum\EnumBucket',
         'Infection\Tests\Framework\Enum\ImplodableEnum',
     ];
 
-    private const PHPUNIT_TEST_FIXTURE_CLASSES = [
-        'Infection\Tests\FileSystem\Finder\MockVendor',
-        'Infection\Tests\Framework\Iterable\GeneratorFactory\SimpleIteratorAggregate',
-        'Infection\Tests\Reflection\ProtChild',
-        'Infection\Tests\Reflection\ProtParent',
+    private const array PHPUNIT_TEST_FIXTURE_CLASSES = [
+        MockVendor::class,
+        SimpleIteratorAggregate::class,
+        ProtChild::class,
+        ProtParent::class,
     ];
 
-    private const PHPUNIT_DATA_PROVIDER_NAMESPACES = [
+    private const array PHPUNIT_DATA_PROVIDER_NAMESPACES = [
         'Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider',
         'Infection\Tests\TestFramework\Coverage\XmlReport\SourceFileInfoProvider',
         'Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser',
         'Infection\Tests\TestFramework\Tracing\Tracer',
     ];
 
-    private const PHPUNIT_DATA_PROVIDER_CLASSES = [
-        'Infection\Tests\Mutator\MutatorFixturesProvider',
+    private const array PHPUNIT_DATA_PROVIDER_CLASSES = [
+        MutatorFixturesProvider::class,
     ];
 
     private const string PROJECT_ROOT = __DIR__ . '/../../../../';

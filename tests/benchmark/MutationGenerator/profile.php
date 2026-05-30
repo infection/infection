@@ -73,7 +73,6 @@ $input = new ArgvInput(
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
-/** @var positive-int $maxTraceCount */
 $maxMutationsCount = (static function (InputInterface $input, string $optionName): int {
     $option = $input->getOption($optionName);
 
