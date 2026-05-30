@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use;
-use Infection\Tests\Architecture\PHPat\Selector\ExtensionPoint;
 use Infection\Engine;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use PHPat\Selector\SelectorInterface;
