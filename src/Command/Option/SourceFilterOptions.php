@@ -118,6 +118,11 @@ final class SourceFilterOptions
         return $filter ?? $gitFilter;
     }
 
+    public static function isPlainFilterProvided(IO $io): bool
+    {
+        return self::getPlainFilter($io->getInput()) !== null;
+    }
+
     private static function getPlainFilter(InputInterface $input): ?PlainFilter
     {
         $value = trim((string) $input->getOption(self::PLAIN_FILTER_NAME));
