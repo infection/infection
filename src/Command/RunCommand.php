@@ -41,6 +41,7 @@ use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
+use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
@@ -152,6 +153,8 @@ final class RunCommand extends BaseCommand
         $this
             ->setName('run')
             ->setDescription('Runs the mutation testing.');
+
+        PathsArgument::addArgument($this);
 
         TestFrameworkOption::addOption($this)
             ->addOption(
@@ -505,6 +508,10 @@ final class RunCommand extends BaseCommand
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
+            positionalPathSlot1: PathsArgument::getSlot1($io),
+            positionalPathSlot2: PathsArgument::getSlot2($io),
+            isSourceFilterProvided: SourceFilterOptions::isPlainFilterProvided($io),
+            isTestFrameworkExtraArgsProvided: TestFrameworkExtraArgsOption::isProvided($io),
         );
     }
 

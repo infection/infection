@@ -41,6 +41,9 @@ use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(RunCommand::class)]
@@ -85,5 +88,96 @@ final class RunCommandTest extends TestCase
             '--test-framework-options' => '',
             '--test-framework-extra-args' => '',
         ]);
+    }
+
+    public function test_it_fails_when_positional_source_path_and_filter_option_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass source paths as positional arguments together with the "--filter" option.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => 'src/SomeFile.php',
+            '--filter' => 'src/OtherFile.php',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_test_path_and_test_framework_extra_args_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => 'tests/SomeTest.php',
+            '--test-framework-extra-args' => 'tests/OtherTest.php',
+        ]);
+    }
+
+    public function test_it_fails_when_both_positional_arguments_classify_as_source_paths(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Both positional arguments resolved to source paths. Combine same-kind source paths with commas in a single argument');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => 'src/A.php',
+            'secondary-path' => 'src/B.php',
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_argument_mixes_source_and_test_paths(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "<path>" argument mixes source and test paths.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => 'src/Foo.php,tests/FooTest.php',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_source_path_and_git_diff_filter_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines".');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => 'src/SomeFile.php',
+            '--git-diff-filter' => 'AM',
+        ]);
+    }
+
+    public function test_it_rejects_more_than_two_positional_arguments(): void
+    {
+        $app = new Application(SingletonContainer::getContainer());
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Too many arguments to "run" command');
+
+        // ArgvInput emulates real CLI parsing: the application validates positional
+        // argument counts at that layer and rejects ">2 args" natively for us.
+        $app->run(
+            new ArgvInput(['infection', 'run', 'src/A.php', 'src/B.php', 'src/C.php']),
+            new BufferedOutput(),
+        );
     }
 }

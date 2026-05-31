@@ -675,6 +675,8 @@ final class Container extends DIContainer
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'max'|null $dotsPerRow
+     * @param list<non-empty-string> $positionalPathSlot1
+     * @param list<non-empty-string> $positionalPathSlot2
      */
     public function withValues(
         LoggerInterface $logger,
@@ -716,6 +718,10 @@ final class Container extends DIContainer
         ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
+        array $positionalPathSlot1 = [],
+        array $positionalPathSlot2 = [],
+        bool $isSourceFilterProvided = false,
+        bool $isTestFrameworkExtraArgsProvided = false,
     ): self {
         $clone = clone $this;
 
@@ -800,6 +806,10 @@ final class Container extends DIContainer
                 projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
+                positionalPathSlot1: $positionalPathSlot1,
+                positionalPathSlot2: $positionalPathSlot2,
+                isSourceFilterProvided: $isSourceFilterProvided,
+                isTestFrameworkExtraArgsProvided: $isTestFrameworkExtraArgsProvided,
             ),
         );
 
