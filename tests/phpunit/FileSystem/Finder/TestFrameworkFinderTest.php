@@ -37,8 +37,8 @@ namespace Infection\Tests\FileSystem\Finder;
 
 use function explode;
 use function getenv;
-use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
@@ -169,41 +169,23 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         chdir($this->tmp);
 
-        $composerBinDir = $this->tmp . '/composer-bin';
-        mkdir($composerBinDir);
+        $composerBinDir = $this->createComposerExecutableFixture();
 
-        $this->fileSystem->dumpFile(
-            $this->tmp . '/composer.phar',
-            <<<'PHP'
-                #!/usr/bin/env php
-                <?php
-
-                if (($argv[1] ?? null) === 'config' && ($argv[2] ?? null) === 'bin-dir') {
-                    echo __DIR__ . '/composer-bin';
-
-                    exit(0);
-                }
-
-                fwrite(STDERR, 'Unexpected Composer command: ' . implode(' ', $argv));
-
-                exit(1);
-                PHP,
-        );
-        chmod($this->tmp . '/composer.phar', 0755);
-
-        $phpUnitPath = $composerBinDir . '/phpunit';
-        $this->fileSystem->dumpFile($phpUnitPath, '#!/usr/bin/env php');
-        chmod($phpUnitPath, 0755);
+        $phpUnitPath = $this->createPhpUnitExecutableFixture($composerBinDir);
 
         putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder(new ConcreteComposerExecutableFinder());
-
-        $this->assertSame(
-            Path::canonicalize($phpUnitPath),
-            Path::canonicalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
+        $frameworkFinder = new TestFrameworkFinder(
+            new ConcreteComposerExecutableFinder(),
         );
+
+        $expected = Path::canonicalize($phpUnitPath);
+        $actual = Path::canonicalize(
+            $frameworkFinder->find(TestFrameworkTypes::PHPUNIT),
+        );
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_finds_framework_executable(): void
@@ -255,5 +237,41 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         yield 'composer-bat' => ['setUpComposerBatchTest'];
 
         yield 'project-bat' => ['setUpProjectBatchTest'];
+    }
+
+    private function createComposerExecutableFixture(): string
+    {
+        $composerBinDir = $this->tmp . '/composer-bin';
+        mkdir($composerBinDir);
+
+        $this->fileSystem->dumpFile(
+            $this->tmp . '/composer.phar',
+            <<<'PHP'
+                #!/usr/bin/env php
+                <?php
+
+                if (($argv[1] ?? null) === 'config' && ($argv[2] ?? null) === 'bin-dir') {
+                    echo __DIR__ . '/composer-bin';
+
+                    exit(0);
+                }
+
+                fwrite(STDERR, 'Unexpected Composer command: ' . implode(' ', $argv));
+
+                exit(1);
+                PHP,
+        );
+        chmod($this->tmp . '/composer.phar', 0755);
+
+        return $composerBinDir;
+    }
+
+    private function createPhpUnitExecutableFixture(string $composerBinDir): string
+    {
+        $phpUnitPath = $composerBinDir . '/phpunit';
+        $this->fileSystem->dumpFile($phpUnitPath, '#!/usr/bin/env php');
+        chmod($phpUnitPath, 0755);
+
+        return $phpUnitPath;
     }
 }
