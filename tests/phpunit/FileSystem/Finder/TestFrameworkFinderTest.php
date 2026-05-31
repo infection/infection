@@ -38,6 +38,7 @@ namespace Infection\Tests\FileSystem\Finder;
 use function explode;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
@@ -50,6 +51,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\chdir;
+use function Safe\chmod;
+use function Safe\mkdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -95,7 +98,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
-            ->willReturn('/usr/bin/composer');
+            ->willReturn(['/usr/bin/composer']);
     }
 
     protected function tearDown(): void
@@ -162,6 +165,29 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
+    public function test_it_adds_vendor_bin_to_path_with_a_local_composer_phar(): void
+    {
+        chdir($this->tmp);
+
+        $composerBinDir = $this->createComposerExecutableFixture();
+
+        $phpUnitPath = $this->createPhpUnitExecutableFixture($composerBinDir);
+
+        putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
+        putenv('PATHEXT=');
+
+        $frameworkFinder = new TestFrameworkFinder(
+            new ConcreteComposerExecutableFinder(),
+        );
+
+        $expected = Path::canonicalize($phpUnitPath);
+        $actual = Path::canonicalize(
+            $frameworkFinder->find(TestFrameworkTypes::PHPUNIT),
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function test_it_finds_framework_executable(): void
     {
         $mock = new MockVendor($this->tmp, $this->fileSystem);
@@ -211,5 +237,41 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         yield 'composer-bat' => ['setUpComposerBatchTest'];
 
         yield 'project-bat' => ['setUpProjectBatchTest'];
+    }
+
+    private function createComposerExecutableFixture(): string
+    {
+        $composerBinDir = $this->tmp . '/composer-bin';
+        mkdir($composerBinDir);
+
+        $this->fileSystem->dumpFile(
+            $this->tmp . '/composer.phar',
+            <<<'PHP'
+                #!/usr/bin/env php
+                <?php
+
+                if (($argv[1] ?? null) === 'config' && ($argv[2] ?? null) === 'bin-dir') {
+                    echo __DIR__ . '/composer-bin';
+
+                    exit(0);
+                }
+
+                fwrite(STDERR, 'Unexpected Composer command: ' . implode(' ', $argv));
+
+                exit(1);
+                PHP,
+        );
+        chmod($this->tmp . '/composer.phar', 0755);
+
+        return $composerBinDir;
+    }
+
+    private function createPhpUnitExecutableFixture(string $composerBinDir): string
+    {
+        $phpUnitPath = $composerBinDir . '/phpunit';
+        $this->fileSystem->dumpFile($phpUnitPath, '#!/usr/bin/env php');
+        chmod($phpUnitPath, 0755);
+
+        return $phpUnitPath;
     }
 }

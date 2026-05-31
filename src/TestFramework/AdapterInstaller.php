@@ -64,7 +64,7 @@ final readonly class AdapterInstaller
         Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
 
         $process = new Process([
-            $this->composerExecutableFinder->find(),
+            ...$this->composerExecutableFinder->find(),
             'require',
             '--dev',
             self::OFFICIAL_ADAPTERS_MAP[$adapterName],

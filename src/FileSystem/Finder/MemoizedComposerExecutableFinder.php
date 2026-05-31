@@ -43,7 +43,7 @@ use function Later\later;
  */
 final readonly class MemoizedComposerExecutableFinder implements ComposerExecutableFinder
 {
-    /** @var Deferred<string> */
+    /** @var Deferred<list<string>> */
     private Deferred $result;
 
     public function __construct(
@@ -52,7 +52,10 @@ final readonly class MemoizedComposerExecutableFinder implements ComposerExecuta
         $this->result = later(fn () => yield $this->composerExecutableFinder->find());
     }
 
-    public function find(): string
+    /**
+     * @return list<string>
+     */
+    public function find(): array
     {
         return $this->result->get();
     }
