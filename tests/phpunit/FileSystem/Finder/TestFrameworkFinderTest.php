@@ -95,7 +95,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
-            ->willReturn('/usr/bin/composer');
+            ->willReturn(['/usr/bin/composer']);
     }
 
     protected function tearDown(): void

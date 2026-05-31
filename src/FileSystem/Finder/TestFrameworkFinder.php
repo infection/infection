@@ -111,7 +111,7 @@ class TestFrameworkFinder
 
         try {
             $process = new Process([
-                $this->findComposer(),
+                ...$this->findComposer(),
                 'config',
                 'bin-dir',
             ]);
@@ -132,7 +132,10 @@ class TestFrameworkFinder
         }
     }
 
-    private function findComposer(): string
+    /**
+     * @return list<string>
+     */
+    private function findComposer(): array
     {
         return $this->executableFinder->find();
     }
