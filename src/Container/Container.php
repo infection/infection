@@ -54,6 +54,7 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
@@ -155,6 +156,8 @@ use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Contracts\StaticAnalysisTestFramework;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -167,6 +170,8 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\LegacyStaticAnalysisBridge;
+use Infection\TestFramework\LegacyTestFrameworkBridge;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
@@ -587,7 +592,7 @@ final class Container extends DIContainer
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getMutantProcessContainerFactory(),
+                    $container->getTestFramework(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -663,6 +668,20 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
+            TestFramework::class => static fn (self $container) => new LegacyTestFrameworkBridge(
+                $container->getTestFrameworkAdapter(),
+                $container->get(ConsoleOutput::class),
+                $container->getCoverageChecker(),
+                $container->getInitialTestsRunner(),
+                $container->getConfiguration(),
+                $container->getMutantProcessContainerFactory(),
+                $container->getTestFrameworkExtraOptionsFilter(),
+            ),
+            StaticAnalysisTestFramework::class => static fn (self $container) => new LegacyStaticAnalysisBridge(
+                $container->getStaticAnalysisToolAdapter(),
+                $container->getInitialStaticAnalysisRunner(),
+                $container->get(ConsoleOutput::class),
+            ),
         ]);
 
         return $container->withValues(
@@ -722,6 +741,11 @@ final class Container extends DIContainer
         if ($forceProgress) {
             Assert::false($noProgress, 'Cannot force progress and set no progress at the same time');
         }
+
+        $clone->offsetSet(
+            ConsoleOutput::class,
+            static fn (): ConsoleOutput => new ConsoleOutput($logger),
+        );
 
         $clone->offsetSet(
             CiDetector::class,
@@ -909,6 +933,16 @@ final class Container extends DIContainer
     public function getFilteringResultsCollectorFactory(): FilteringResultsCollectorFactory
     {
         return $this->get(FilteringResultsCollectorFactory::class);
+    }
+
+    public function getTestFramework(): TestFramework
+    {
+        return $this->get(TestFramework::class);
+    }
+
+    public function getStaticAnalysisTestFramework(): TestFramework
+    {
+        return $this->get(StaticAnalysisTestFramework::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter

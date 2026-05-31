@@ -33,18 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final class IndexedMutantProcessContainer
+final readonly class InitialRunResults
 {
+    /**
+     * @param float|null $memoryUsage Memory usage in megabytes. Null if it cant be determined.
+     */
     public function __construct(
-        public int $threadIndex,
-        public MutantEvaluationPipe $mutantProcessContainer,
+        public string $output,
+        public ?float $memoryUsage,
     ) {
+        Assert::nullOrGreaterThan($memoryUsage, limit: 0);
     }
 }

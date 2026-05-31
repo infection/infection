@@ -33,18 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
+use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
-final class IndexedMutantProcessContainer
+interface MutantProcess
 {
-    public function __construct(
-        public int $threadIndex,
-        public MutantEvaluationPipe $mutantProcessContainer,
-    ) {
-    }
+    public function getMutant(): Mutant;
+
+    public function getProcess(): Process;
+
+    public function markAsTimedOut(): void;
+
+    public function isTimedOut(): bool;
+
+    public function markAsFinished(): void;
+
+    public function getFinishedAt(): float;
+
+    public function getResult(): MutantExecutionResult;
 }

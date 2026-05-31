@@ -33,18 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcess;
 
-/**
- * @internal
- */
-final class IndexedMutantProcessContainer
+interface MutantEvaluationPipe
 {
-    public function __construct(
-        public int $threadIndex,
-        public MutantEvaluationPipe $mutantProcessContainer,
-    ) {
-    }
+    public function getCurrent(): MutantProcess;
+
+    public function hasNext(): bool;
+
+    public function createNext(): MutantProcess;
 }

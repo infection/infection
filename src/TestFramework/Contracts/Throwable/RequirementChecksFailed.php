@@ -33,18 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts\Throwable;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Throwable;
 
-/**
- * @internal
- */
-final class IndexedMutantProcessContainer
+interface RequirementChecksFailed extends Throwable
 {
-    public function __construct(
-        public int $threadIndex,
-        public MutantEvaluationPipe $mutantProcessContainer,
-    ) {
-    }
 }

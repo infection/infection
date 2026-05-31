@@ -5071,18 +5071,6 @@ message = "Assigning `mixed` type to a variable may lead to unexpected behavior.
 count = 3
 
 [[issues]]
-file = "tests/benchmark/Tracing/profile.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$maxTraceCount`."
-count = 1
-
-[[issues]]
-file = "tests/benchmark/Tracing/profile.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$percentage`."
-count = 1
-
-[[issues]]
 file = "tests/phpunit/AutoReview/BuildConfigYmlTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesYamlFilesForTesting` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -7342,6 +7330,18 @@ count = 5
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "string-member-selector"
 message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest::createComposerExecutableFixture`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest::createPhpUnitExecutableFixture`.'
 count = 1
 
 [[issues]]
