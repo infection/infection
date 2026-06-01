@@ -1,6 +1,0 @@
-# Effects per Mutator
-
-| Mutator          | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out (Limit: 10 secs) | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-| ---------------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | -------------------------- | ------- | ------- | -------- | ---------------- |
-| Plus             |         2 |                        2 |  0.10 / 0.10 / 0.10 secs |                         0 |             0.00 / 0.00 / 0.00 secs |       0 |      0 |             0 |                          0 |       0 |       0 |   100.00 |           100.00 |
-| PublicVisibility |         4 |                        4 |  0.09 / 0.10 / 0.10 secs |                         0 |             0.00 / 0.00 / 0.00 secs |       0 |      0 |             0 |                          0 |       0 |       0 |   100.00 |           100.00 |

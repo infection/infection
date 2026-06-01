@@ -229,12 +229,6 @@ parameters:
 			path: ../src/FileSystem/Finder/ConcreteComposerExecutableFinder.php
 
 		-
-			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: ../src/FileSystem/Finder/ConcreteComposerExecutableFinder.php
-
-		-
 			rawMessage: Infection\FileSystem\Finder\NonExecutableFinder should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
