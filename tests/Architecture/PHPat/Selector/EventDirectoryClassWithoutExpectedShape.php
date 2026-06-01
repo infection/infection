@@ -35,11 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
-final class EventDirectoryClassWithoutExpectedShape implements SelectorInterface
+final readonly class EventDirectoryClassWithoutExpectedShape implements SelectorInterface
 {
+    public function __construct(
+        private EventArchitecture $eventArchitecture,
+    ) {
+    }
+
     public function getName(): string
     {
         return 'event directory class without expected shape';
@@ -47,8 +53,8 @@ final class EventDirectoryClassWithoutExpectedShape implements SelectorInterface
 
     public function matches(ClassReflection $classReflection): bool
     {
-        return EventArchitecture::isInEventDirectory($classReflection)
-            && !EventArchitecture::isEvent($classReflection)
-            && !EventArchitecture::isEventSubscriber($classReflection);
+        return $this->eventArchitecture->isInEventDirectory($classReflection)
+            && !$this->eventArchitecture->isEvent($classReflection)
+            && !$this->eventArchitecture->isSingleEventSubscriber($classReflection);
     }
 }

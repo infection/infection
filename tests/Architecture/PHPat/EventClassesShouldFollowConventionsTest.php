@@ -36,59 +36,56 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\Architecture\PHPat\Selector\EventClassWithoutCorrespondingSubscriber;
-use Infection\Tests\Architecture\PHPat\Selector\EventDirectoryClassWithoutExpectedShape;
-use Infection\Tests\Architecture\PHPat\Selector\EventSubscriberWithoutCorrespondingEvent;
-use Infection\Tests\Architecture\PHPat\Selector\EventSubscriberWithoutExpectedMethod;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
 final class EventClassesShouldFollowConventionsTest
 {
-    public function testEventsHaveACorrespondingSubscriber(): Rule
+    public function testEventsHaveACorrespondingSingleEventSubscriber(): Rule
     {
         return PHPat::rule()
-            ->classes(new EventClassWithoutCorrespondingSubscriber())
+            ->classes(InfectionSelector::eventClassWithoutCorrespondingSingleEventSubscriber())
             ->shouldNot()
             ->exist()
-            ->because('Each event should have a corresponding subscriber named after the event with the "Subscriber" suffix.');
+            ->because('Each event should have a corresponding single-event subscriber named after the event with the "Subscriber" suffix.');
     }
 
-    public function testEventSubscribersHaveACorrespondingEvent(): Rule
+    public function testSingleEventSubscribersHaveACorrespondingEvent(): Rule
     {
         return PHPat::rule()
-            ->classes(new EventSubscriberWithoutCorrespondingEvent())
+            ->classes(InfectionSelector::singleEventSubscriberWithoutCorrespondingEvent())
             ->shouldNot()
             ->exist()
-            ->because('Each event subscriber should be named after an existing event with the "Subscriber" suffix.');
+            ->because('Each single-event subscriber should be named after an existing event with the "Subscriber" suffix.');
     }
 
-    public function testEventSubscribersImplementEventSubscriber(): Rule
+    public function testSingleEventSubscribersImplementEventSubscriber(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::classname('#^Infection\\\\Event\\\\Events\\\\.*Subscriber$#', true))
+            ->classes(InfectionSelector::singleEventSubscriber())
             ->should()
             ->implement()
             ->classes(Selector::classname(EventSubscriber::class))
-            ->because('Event subscribers should implement the EventSubscriber interface.');
+            ->because('Single-event subscribers should implement the EventSubscriber interface.');
     }
 
-    public function testEventSubscribersDeclareASinglePublicMethodNamedAfterTheirEvent(): Rule
+    public function testSingleEventSubscribersDeclareASinglePublicMethodNamedAfterTheirEvent(): Rule
     {
         return PHPat::rule()
-            ->classes(new EventSubscriberWithoutExpectedMethod())
+            ->classes(InfectionSelector::singleEventSubscriberWithoutExpectedMethod())
             ->shouldNot()
             ->exist()
-            ->because('Event subscribers should declare a single public method named on<EventName>().');
+            ->because('Single-event subscribers should declare a single public non-static method named on<EventName>(<EventName> $event): void.');
     }
 
     public function testEventDirectoryContainsOnlyEventsAndSubscribers(): Rule
     {
         return PHPat::rule()
-            ->classes(new EventDirectoryClassWithoutExpectedShape())
+            ->classes(InfectionSelector::eventDirectoryClassWithoutExpectedShape())
             ->shouldNot()
             ->exist()
-            ->because('src/Event/Events should only contain events and their subscribers.');
+            ->because('src/Event/Events should only contain events and their single-event subscribers.');
     }
 }

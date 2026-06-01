@@ -895,18 +895,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
 
 		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/AutoReview/Event/SubscriberProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/Event/SubscriberTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations() should return string|null but returns string|false.'
 			identifier: return.type
 			count: 3
