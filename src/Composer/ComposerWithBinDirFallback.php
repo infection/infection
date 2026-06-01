@@ -33,48 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Composer;
 
-use Composer\Autoload\ClassLoader;
-use Infection\Composer\Composer;
-use Webmozart\Assert\Assert;
+use function file_exists;
+use Infection\Composer\Throwable\ComposerPackageInstallationFailed;
+use Infection\Composer\Throwable\IncompatibleComposerVersion;
+use Infection\Composer\Throwable\UndetectableComposerVersion;
 
 /**
  * @internal
  */
-final readonly class AdapterInstaller
+final readonly class ComposerWithBinDirFallback implements Composer
 {
-    public const array OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
-    ];
-
-    // 2 minutes
-    private const float TIMEOUT = 120.0;
-
+    /**
+     * @param non-empty-string $fallbackBinDir
+     */
     public function __construct(
-        private Composer $composer,
+        private Composer $decoratedComposer,
+        // TODO: inject the Configuration#projectDir instead
+        // TODO: to have an e2e test to ensure this is correct...
+        private string $fallbackBinDir,
     ) {
     }
 
-    // TODO: coudl enforce the string value to avoid the assert
-    public function install(string $adapterName): void
+    /**
+     * @throws UndetectableComposerVersion
+     */
+    public function getVersion(): string
     {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
+        return $this->decoratedComposer->getVersion();
+    }
 
-        $this->composer->requireDevPackage(self::OFFICIAL_ADAPTERS_MAP[$adapterName]);
+    /**
+     * @throws UndetectableComposerVersion
+     * @throws IncompatibleComposerVersion
+     */
+    public function checkVersion(): void
+    {
+        $this->decoratedComposer->checkVersion();
+    }
 
-        $loader = new ClassLoader();
+    /**
+     * @return non-empty-string|null The vendor-dir directory path relative to its composer.json.
+     */
+    public function getVendorDir(): ?string
+    {
+        return $this->decoratedComposer->getVendorDir();
+    }
 
-        // TODO: should use the vendor-bin here
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
+    /**
+     * @return non-empty-string|null The Composer bin-dir path.
+     */
+    public function getBinDir(): ?string
+    {
+        $binDir = $this->decoratedComposer->getBinDir();
 
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
+        if ($binDir !== null || !file_exists($this->fallbackBinDir)) {
+            return $binDir;
         }
 
-        $loader->register(false);
+        return $this->fallbackBinDir;
+    }
+
+    /**
+     * @throws ComposerPackageInstallationFailed
+     */
+    public function requireDevPackage(string $package): void
+    {
+        $this->decoratedComposer->requireDevPackage($package);
     }
 }

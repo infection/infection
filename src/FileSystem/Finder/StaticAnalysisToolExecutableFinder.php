@@ -39,11 +39,11 @@ use function array_key_exists;
 use function dirname;
 use function file_exists;
 use function getenv;
+use Infection\Composer\Composer;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function ltrim;
 use const PATH_SEPARATOR;
 use function rtrim;
-use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\preg_match;
@@ -51,7 +51,6 @@ use function Safe\putenv;
 use function Safe\realpath;
 use function substr;
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -69,7 +68,7 @@ class StaticAnalysisToolExecutableFinder
     private array $cachedPath = [];
 
     public function __construct(
-        private readonly ComposerExecutableFinder $executableFinder,
+        private readonly Composer $composer,
     ) {
     }
 
@@ -107,37 +106,12 @@ class StaticAnalysisToolExecutableFinder
 
     private function addVendorBinToPath(): void
     {
-        $vendorPath = null;
-
-        try {
-            $process = new Process([
-                ...$this->findComposer(),
-                'config',
-                'bin-dir',
-            ]);
-
-            $process->mustRun();
-            $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException) {
-            $candidate = getcwd() . '/vendor/bin';
-
-            if (file_exists($candidate)) {
-                $vendorPath = $candidate;
-            }
-        }
+        $vendorPath = $this->composer->getBinDir();
 
         if ($vendorPath !== null) {
             $pathName = getenv('PATH') !== false ? 'PATH' : 'Path';
             putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
         }
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function findComposer(): array
-    {
-        return $this->executableFinder->find();
     }
 
     private function findStaticAnalysisExecutable(string $staticAnalysisTool, string $customPath): string

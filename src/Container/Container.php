@@ -41,6 +41,11 @@ use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
+use Infection\Composer\CachedComposer;
+use Infection\Composer\Composer;
+use Infection\Composer\ComposerProcessFactory;
+use Infection\Composer\ComposerWithBinDirFallback;
+use Infection\Composer\ProcessBasedComposer;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
@@ -179,6 +184,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
@@ -602,6 +608,17 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            Composer::class => static fn (self $container): Composer => new CachedComposer(
+                new ComposerWithBinDirFallback(
+                    new ProcessBasedComposer(
+                        new ComposerProcessFactory(
+                            $container->getComposerExecutableFinder(),
+                        ),
+                        $container->getLogger(),
+                    ),
+                    getcwd() . '/vendor/bin',
+                ),
+            ),
             Git::class => static fn (self $container): Git => new CommandLineGit(
                 new ShellCommandLineExecutor(),
                 $container->getLogger(),

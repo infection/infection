@@ -33,48 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Composer;
 
-use Composer\Autoload\ClassLoader;
-use Infection\Composer\Composer;
-use Webmozart\Assert\Assert;
+use Infection\Composer\Throwable\ComposerPackageInstallationFailed;
+use Infection\Composer\Throwable\IncompatibleComposerVersion;
+use Infection\Composer\Throwable\UndetectableComposerVersion;
 
 /**
  * @internal
+ *
+ * Defines the contract for interacting with Composer.
  */
-final readonly class AdapterInstaller
+interface Composer
 {
-    public const array OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
-    ];
+    /**
+     * @throws UndetectableComposerVersion
+     */
+    public function getVersion(): string;
 
-    // 2 minutes
-    private const float TIMEOUT = 120.0;
+    /**
+     * @throws UndetectableComposerVersion
+     * @throws IncompatibleComposerVersion
+     */
+    public function checkVersion(): void;
 
-    public function __construct(
-        private Composer $composer,
-    ) {
-    }
+    /**
+     * @return non-empty-string|null The vendor-dir directory path relative to its composer.json.
+     */
+    public function getVendorDir(): ?string;
 
-    // TODO: coudl enforce the string value to avoid the assert
-    public function install(string $adapterName): void
-    {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
+    /**
+     * @return non-empty-string|null The Composer bin-dir path.
+     */
+    public function getBinDir(): ?string;
 
-        $this->composer->requireDevPackage(self::OFFICIAL_ADAPTERS_MAP[$adapterName]);
-
-        $loader = new ClassLoader();
-
-        // TODO: should use the vendor-bin here
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
-
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
-        }
-
-        $loader->register(false);
-    }
+    /**
+     * @throws ComposerPackageInstallationFailed
+     */
+    public function requireDevPackage(string $package): void;
 }
