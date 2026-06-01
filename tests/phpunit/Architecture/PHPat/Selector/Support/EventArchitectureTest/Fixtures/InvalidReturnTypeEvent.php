@@ -33,46 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitectureTest\Fixtures;
 
-use function array_filter;
-use function array_values;
-use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
-use function iterator_to_array;
-use ReflectionClass;
-
-final class SubscriberProvider
+final readonly class InvalidReturnTypeEvent
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @var string[]|null
-     */
-    private static ?array $subscriberClasses = null;
-
-    public static function provideSubscriberClasses(): iterable
-    {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
-
-            return;
-        }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static fn (string $class): bool => $class !== EventSubscriber::class
-                && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class)
-                && !(new ReflectionClass($class))->isAbstract(),
-        ));
-
-        yield from self::$subscriberClasses;
-    }
-
-    public static function subscriberClassesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(self::provideSubscriberClasses());
-    }
 }

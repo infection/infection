@@ -33,32 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function class_exists;
-use function in_array;
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitectureTest\Fixtures\CompleteEvent;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitectureTest\Fixtures\NotAnEventSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use function Safe\class_implements;
-use function sprintf;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(SubscriberProvider::class)]
-final class SubscriberProviderTest extends TestCase
+#[CoversClass(EventDirectoryClassWithoutExpectedShape::class)]
+final class EventDirectoryClassWithoutExpectedShapeTest extends EventSelectorTestCase
 {
-    #[DataProviderExternal(SubscriberProvider::class, 'subscriberClassesProvider')]
-    public function test_subscriber_class_provider_is_valid(string $className): void
+    private EventDirectoryClassWithoutExpectedShape $selector;
+
+    protected function setUp(): void
     {
-        $this->assertTrue(
-            class_exists($className, true)
-            && in_array(EventSubscriber::class, class_implements($className), true),
-            sprintf(
-                'The "%s" class was expected to be an event subscriber, but it is not a '
-                . '"%s".',
-                $className,
-                EventSubscriber::class,
-            ),
+        parent::setUp();
+
+        $this->selector = new EventDirectoryClassWithoutExpectedShape(
+            $this->eventArchitecture,
         );
+    }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_expected_classes(
+        string $className,
+        bool $expected): void
+    {
+        $this->assertSelectorMatches(
+            $this->selector,
+            $className,
+            $expected,
+        );
+    }
+
+    public static function classProvider(): iterable
+    {
+        yield 'class without expected shape' => [NotAnEventSubscriber::class, true];
+
+        yield 'event' => [CompleteEvent::class, false];
     }
 }

@@ -34,6 +34,10 @@ services:
         class: Infection\Tests\Architecture\PHPat\ConcretePHPUnitTestSupportClassesShouldHaveTestsTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\EventClassesShouldFollowConventionsTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan
@@ -269,6 +273,7 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
         - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php

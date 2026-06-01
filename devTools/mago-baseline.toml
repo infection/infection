@@ -5161,54 +5161,6 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `provideSubscriberClasses` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `subscriberClassesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberProvider.php"
-code = "mixed-property-type-coercion"
-message = "Mixed property type coercion"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberProvider.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberProvider.php"
-code = "yield-from-non-iterable"
-message = "Cannot `yield from` non-iterable type `null`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberTest.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\Event\SubscriberTest::assertIsSubscriptionMethod`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/Event/SubscriberTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\Event\SubscriberTest::test_subscription_methods_match_their_event_names`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
 code = "falsable-return-statement"
 message = '''Function `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
