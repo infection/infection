@@ -38,6 +38,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
@@ -45,6 +46,8 @@ use PHPat\Selector\SelectorInterface;
 final class InfectionSelector
 {
     use CannotBeInstantiated;
+
+    private static ?EventArchitecture $eventArchitecture = null;
 
     public static function code(): InfectionCode
     {
@@ -84,6 +87,31 @@ final class InfectionSelector
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
 
+    public static function eventClassWithoutCorrespondingSingleEventSubscriber(): EventClassWithoutCorrespondingSingleEventSubscriber
+    {
+        return new EventClassWithoutCorrespondingSingleEventSubscriber(self::eventArchitecture());
+    }
+
+    public static function singleEventSubscriberWithoutCorrespondingEvent(): SingleEventSubscriberWithoutCorrespondingEvent
+    {
+        return new SingleEventSubscriberWithoutCorrespondingEvent(self::eventArchitecture());
+    }
+
+    public static function singleEventSubscriber(): SingleEventSubscriberSelector
+    {
+        return new SingleEventSubscriberSelector(self::eventArchitecture());
+    }
+
+    public static function singleEventSubscriberWithoutExpectedMethod(): SingleEventSubscriberWithoutExpectedMethod
+    {
+        return new SingleEventSubscriberWithoutExpectedMethod(self::eventArchitecture());
+    }
+
+    public static function eventDirectoryClassWithoutExpectedShape(): EventDirectoryClassWithoutExpectedShape
+    {
+        return new EventDirectoryClassWithoutExpectedShape(self::eventArchitecture());
+    }
+
     public static function hasTrivialImplementation(): HasTrivialImplementation
     {
         $container = SingletonContainer::getContainer();
@@ -114,5 +142,10 @@ final class InfectionSelector
     public static function implementsAnyInterface(): ClassImplements
     {
         return Selector::implements('/.*/', true);
+    }
+
+    private static function eventArchitecture(): EventArchitecture
+    {
+        return self::$eventArchitecture ??= EventArchitecture::createDefault();
     }
 }

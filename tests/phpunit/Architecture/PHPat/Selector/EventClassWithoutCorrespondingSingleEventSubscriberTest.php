@@ -33,56 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Composer\Autoload\ClassLoader;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitectureTest\Fixtures\CompleteEvent;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitectureTest\Fixtures\MissingSubscriberEvent;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- */
-final readonly class AdapterInstaller
+#[CoversClass(EventClassWithoutCorrespondingSingleEventSubscriber::class)]
+final class EventClassWithoutCorrespondingSingleEventSubscriberTest extends EventSelectorTestCase
 {
-    public const array OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
-    ];
+    private EventClassWithoutCorrespondingSingleEventSubscriber $selector;
 
-    // 2 minutes
-    private const float TIMEOUT = 120.0;
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-    public function __construct(
-        private ComposerExecutableFinder $composerExecutableFinder,
-    ) {
+        $this->selector = new EventClassWithoutCorrespondingSingleEventSubscriber(
+            $this->eventArchitecture,
+        );
     }
 
-    public function install(string $adapterName): void
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_expected_classes(
+        string $className,
+        bool $expected,
+    ): void {
+        $this->assertSelectorMatches(
+            $this->selector,
+            $className,
+            $expected,
+        );
+    }
+
+    public static function classProvider(): iterable
     {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
+        yield 'event without single-event subscriber' => [MissingSubscriberEvent::class, true];
 
-        $process = new Process([
-            ...$this->composerExecutableFinder->find(),
-            'require',
-            '--dev',
-            self::OFFICIAL_ADAPTERS_MAP[$adapterName],
-        ]);
-
-        $process->setTimeout(self::TIMEOUT);
-
-        $process->run();
-
-        $loader = new ClassLoader();
-
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
-
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
-        }
-
-        $loader->register(false);
+        yield 'event with single-event subscriber' => [CompleteEvent::class, false];
     }
 }

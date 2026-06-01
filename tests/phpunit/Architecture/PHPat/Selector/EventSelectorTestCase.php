@@ -33,56 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Composer\Autoload\ClassLoader;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
+use PHPat\Selector\SelectorInterface;
 
-/**
- * @internal
- */
-final readonly class AdapterInstaller
+abstract class EventSelectorTestCase extends SelectorTestCase
 {
-    public const array OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
-    ];
+    protected EventArchitecture $eventArchitecture;
 
-    // 2 minutes
-    private const float TIMEOUT = 120.0;
-
-    public function __construct(
-        private ComposerExecutableFinder $composerExecutableFinder,
-    ) {
+    protected function setUp(): void
+    {
+        $this->eventArchitecture = new EventArchitecture(
+            __DIR__ . '/../../../../../',
+            'tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures',
+        );
     }
 
-    public function install(string $adapterName): void
-    {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
+    /**
+     * @param class-string $className
+     */
+    final protected function assertSelectorMatches(
+        SelectorInterface $selector,
+        string $className,
+        bool $expected,
+    ): void {
+        $classReflection = $this->createClassReflection($className);
+        $actual = $selector->matches($classReflection);
 
-        $process = new Process([
-            ...$this->composerExecutableFinder->find(),
-            'require',
-            '--dev',
-            self::OFFICIAL_ADAPTERS_MAP[$adapterName],
-        ]);
-
-        $process->setTimeout(self::TIMEOUT);
-
-        $process->run();
-
-        $loader = new ClassLoader();
-
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
-
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
-        }
-
-        $loader->register(false);
+        $this->assertSame($expected, $actual);
     }
 }

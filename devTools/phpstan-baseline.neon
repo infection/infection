@@ -187,12 +187,6 @@ parameters:
 			path: ../src/FileSystem/Finder/ConcreteComposerExecutableFinder.php
 
 		-
-			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: ../src/FileSystem/Finder/ConcreteComposerExecutableFinder.php
-
-		-
 			rawMessage: Infection\FileSystem\Finder\NonExecutableFinder should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -809,18 +803,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/AutoReview/Event/SubscriberProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/Event/SubscriberTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations() should return string|null but returns string|false.'
