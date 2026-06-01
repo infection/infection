@@ -79,12 +79,6 @@ parameters:
 			path: ../src/Configuration/Entry/Logs.php
 
 		-
-			rawMessage: Infection\Configuration\Entry\Source should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Configuration/Entry/Source.php
-
-		-
 			rawMessage: Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -107,24 +101,6 @@ parameters:
 			identifier: arrayFilter.strict
 			count: 1
 			path: ../src/Configuration/Schema/SchemaConfigurationFactory.php
-
-		-
-			rawMessage: Infection\Configuration\SourceFilter\FakeSourceFilter should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Configuration/SourceFilter/FakeSourceFilter.php
-
-		-
-			rawMessage: Infection\Configuration\SourceFilter\GitDiffFilter should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Configuration/SourceFilter/GitDiffFilter.php
-
-		-
-			rawMessage: Infection\Configuration\SourceFilter\IncompleteGitDiffFilter should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Configuration/SourceFilter/IncompleteGitDiffFilter.php
 
 		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
@@ -181,34 +157,16 @@ parameters:
 			path: ../src/Environment/BuildContextResolver.php
 
 		-
-			rawMessage: Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Event/Events/MutationAnalysis/MutationEvaluation/MutationEvaluationWasStarted.php
-
-		-
 			rawMessage: Infection\Event\Subscriber\DispatchPcntlSignalSubscriber should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Event/Subscriber/DispatchPcntlSignalSubscriber.php
 
 		-
-			rawMessage: Infection\Event\Subscriber\NullSubscriber should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Event/Subscriber/NullSubscriber.php
-
-		-
 			rawMessage: Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Event/Subscriber/StopInfectionOnSigintSignalSubscriber.php
-
-		-
-			rawMessage: Infection\FileSystem\FakeFileSystem should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/FileSystem/FakeFileSystem.php
 
 		-
 			rawMessage: Infection\FileSystem\FileSystem should not exist
@@ -335,18 +293,6 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Logger/MutationAnalysis/ConsoleProgressBarLogger.php
-
-		-
-			rawMessage: Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Logger/MutationAnalysis/MutationAnalysisLoggerName.php
-
-		-
-			rawMessage: Infection\Logger\MutationAnalysis\TeamCity\MessageName should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Logger/MutationAnalysis/TeamCity/MessageName.php
 
 		-
 			rawMessage: Infection\Metrics\MetricsCalculator should be final
@@ -604,12 +550,6 @@ parameters:
 			path: ../src/Resource/Processor/CpuCoresCountProvider.php
 
 		-
-			rawMessage: Infection\Source\Collector\FakeSourceCollector should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Source/Collector/FakeSourceCollector.php
-
-		-
 			rawMessage: Infection\Source\Collector\FixedSourceCollector should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -620,18 +560,6 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Source/Collector/GitDiffSourceCollector.php
-
-		-
-			rawMessage: Infection\Source\Matcher\FakeSourceLineMatcher should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Source/Matcher/FakeSourceLineMatcher.php
-
-		-
-			rawMessage: Infection\Source\Matcher\NullSourceLineMatcher should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/Source/Matcher/NullSourceLineMatcher.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
@@ -682,12 +610,6 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			rawMessage: Infection\TestFramework\Coverage\Locator\FakeLocator should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/Coverage/Locator/FakeLocator.php
-
-		-
 			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -710,12 +632,6 @@ parameters:
 			identifier: arrayFilter.strict
 			count: 1
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
-
-		-
-			rawMessage: Infection\TestFramework\MapSourceClassToTestStrategy should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
-			count: 1
-			path: ../src/TestFramework/MapSourceClassToTestStrategy.php
 
 		-
 			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string}.'
@@ -1159,12 +1075,6 @@ parameters:
 			path: ../tests/phpunit/Logger/DummyLogger.php
 
 		-
-			rawMessage: Infection\Tests\Logger\MutationAnalysis\FakeMutationAnalysisLogger should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Logger/MutationAnalysis/FakeMutationAnalysisLogger.php
-
-		-
 			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
 			identifier: argument.type
 			count: 1
@@ -1507,12 +1417,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
 
 		-
-			rawMessage: Infection\Tests\Process\Exception\GenericProcessException should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Process/Exception/GenericProcessException.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
 			identifier: missingType.generics
 			count: 1
@@ -1571,12 +1475,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
-
-		-
-			rawMessage: Infection\Tests\Reporter\FakeReporter should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/Reporter/FakeReporter.php
 
 		-
 			rawMessage: Infection\Tests\Reporter\FileLocationReporter\InvokableReporter should not exist
@@ -1691,12 +1589,6 @@ parameters:
 			identifier: div.rightNonNumeric
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Tracing\Trace\FakeTrace should not exist
-			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Trace/FakeTrace.php
 
 		-
 			rawMessage: Access to an undefined property PhpParser\NodeVisitor::$range.

@@ -5712,30 +5712,30 @@
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.15.5",
+            "version": "7.24.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
-                "reference": "2691151e75a64d2ffbe17fcfc38d410ab27a8241"
+                "reference": "4227331891f45ce9d10b995393f6cb90b9e3df37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/2691151e75a64d2ffbe17fcfc38d410ab27a8241",
-                "reference": "2691151e75a64d2ffbe17fcfc38d410ab27a8241",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/4227331891f45ce9d10b995393f6cb90b9e3df37",
+                "reference": "4227331891f45ce9d10b995393f6cb90b9e3df37",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1",
-                "phpunit/phpunit": "^9.4.3 || ^10.3 || ^11.0 || ^12.0"
+                "php": "^8.3",
+                "phpunit/phpunit": "^10.3 || ^11.0 || ^12.0"
             },
             "require-dev": {
                 "ergebnis/composer-normalize": "^2.28",
-                "infection/infection": "*"
+                "infection/infection": "^0.28.1"
             },
             "type": "library",
             "extra": {
                 "symfony": {
-                    "require": "6.*.*"
+                    "require": "7.*.*"
                 }
             },
             "autoload": {
@@ -5756,9 +5756,9 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.15.5"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.24.1"
             },
-            "time": "2025-03-24T18:37:38+00:00"
+            "time": "2026-03-20T11:41:56+00:00"
         }
     ],
     "aliases": [],

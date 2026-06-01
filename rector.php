@@ -87,6 +87,7 @@ $skippedPaths = [
     __DIR__ . '/tests/benchmark/MutationGenerator/sources',
     __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
     __DIR__ . '/tests/benchmark/Tracing/coverage',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture',
 ];
 
 $config = RectorConfig::configure()

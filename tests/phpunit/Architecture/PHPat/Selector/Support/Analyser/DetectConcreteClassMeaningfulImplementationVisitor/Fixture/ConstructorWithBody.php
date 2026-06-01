@@ -33,31 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture;
 
-use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use function trim;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class ConstructorWithBody
 {
-    public function getName(): string
-    {
-        return 'source concrete class without canonical test';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
-        ) {
-            return false;
-        }
-
-        $className = $classReflection->getName();
-
-        return ClassName::getCanonicalTestClassName($className) === null;
+    public function __construct(
+        private readonly string $value,
+    ) {
+        trim($this->value);
     }
 }

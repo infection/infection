@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
+use Infection\Testing\SingletonContainer;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
@@ -108,6 +110,18 @@ final class InfectionSelector
     public static function eventDirectoryClassWithoutExpectedShape(): EventDirectoryClassWithoutExpectedShape
     {
         return new EventDirectoryClassWithoutExpectedShape(self::eventArchitecture());
+    }
+
+    public static function hasTrivialImplementation(): HasTrivialImplementation
+    {
+        $container = SingletonContainer::getContainer();
+
+        return new HasTrivialImplementation(
+            new Analyser(
+                $container->getParser(),
+                $container->getFileSystem(),
+            ),
+        );
     }
 
     public static function hasDocBlock(): HasDocBlock

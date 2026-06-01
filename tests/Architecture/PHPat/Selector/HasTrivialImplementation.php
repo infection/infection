@@ -35,29 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Testing\SingletonContainer;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
-final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
+final class HasTrivialImplementation implements SelectorInterface
 {
+    private Analyser $analyser;
+
+    public function __construct(?Analyser $analyser = null)
+    {
+        if ($analyser !== null) {
+            $this->analyser = $analyser;
+
+            return;
+        }
+
+        $container = SingletonContainer::getContainer();
+
+        $this->analyser = new Analyser(
+            $container->getParser(),
+            $container->getFileSystem(),
+        );
+    }
+
     public function getName(): string
     {
-        return 'source concrete class without canonical test';
+        return 'class with trivial implementation';
     }
 
     public function matches(ClassReflection $classReflection): bool
     {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
-            || !InfectionSelector::sourceCode()->matches($classReflection)
-            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
-        ) {
-            return false;
-        }
+        $analysisResult = $this->analyser->analyse($classReflection);
 
-        $className = $classReflection->getName();
-
-        return ClassName::getCanonicalTestClassName($className) === null;
+        return $analysisResult->hasTrivialImplementation;
     }
 }
