@@ -33,41 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PHPUnit;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Exception;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\TestCase;
-use Throwable;
+use function str_ends_with;
 
-#[CoversTrait(ExpectsThrowables::class)]
-final class ExpectsThrowablesTest extends TestCase
+final class ConcretePHPUnitTestClass implements SelectorInterface
 {
-    use ExpectsThrowables;
-
-    public function test_it_fails_if_the_given_action_does_not_throw(): void
+    public function getName(): string
     {
-        $action = static fn () => null;
-        $fakeException = new Exception('This is not the exception we want to catch.');
-
-        try {
-            $this->expectToThrow($action);
-
-            // Traditionally we would use the $this->fail() here but since this is
-            // what is used by the trait we will avoid that.
-            throw $fakeException;
-        } catch (Throwable $throwable) {
-            $this->assertNotSame($fakeException, $throwable);
-        }
+        return 'concrete PHPUnit test class';
     }
 
-    public function test_it_returns_the_thrown_throwable(): void
+    public function matches(ClassReflection $classReflection): bool
     {
-        $expected = new Exception('The expected exception.');
-        $action = /** @throws Exception */ static fn () => throw $expected;
-
-        $actual = $this->expectToThrow($action);
-
-        $this->assertSame($expected, $actual);
+        return ConcreteClassReflection::isConcreteClass($classReflection)
+            && str_ends_with($classReflection->getName(), 'Test')
+            && $classReflection->isSubclassOf(TestCase::class);
     }
 }

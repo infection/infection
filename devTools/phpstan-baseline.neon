@@ -805,72 +805,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
 
 		-
-			rawMessage: 'Method Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations() should return string|null but returns string|false.'
-			identifier: return.type
-			count: 3
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Method Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestedClassForIoOperations() should return string|null but returns string|false.'
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $filename of function Safe\file_get_contents expects string, string|false given.'
-			identifier: argument.type
-			count: 3
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $func of method Pipeline\Standard<int,string>::map() expects (callable(): (array<class-string, string>|Generator<mixed, array<class-string, string>|Traversable<class-string, string>, mixed, mixed>|Traversable<class-string, string>))|(callable(string): (array<class-string, string>|Generator<mixed, array<class-string, string>|Traversable<class-string, string>, mixed, mixed>|Traversable<class-string, string>))|null, Closure(class-string): iterable<class-string, string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $sourceClassName of static method Infection\Framework\ClassName::getCanonicalTestClassName() expects class-string, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $values of method Pipeline\Standard<mixed,list<string>|null>::append() expects iterable<array{string, string}|null>|null, list<array{mixed, array<class-string, string>|Traversable<class-string, string>}> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Static property Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::$ioTestCaseClassesTuple (array<array<string>>|null) does not accept list<list<string>|null>.'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Unable to resolve the template type TMapKey in call to method Pipeline\Standard<int,string>::map()'
-			identifier: argument.templateType
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupTest.php
-
-		-
 			rawMessage: 'Cannot call method getPrerequisites() on Fidry\Makefile\Rule|null.'
 			identifier: method.nonObject
 			count: 2
@@ -1643,3 +1577,81 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/Process/TestPhpExecutableFinder.php
+
+		-
+			rawMessage: Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulationTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulationTest.php
+
+		-
+			rawMessage: Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProviderTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProviderTest.php
+
+		-
+			rawMessage: Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetectorTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetectorTest.php
+
+		-
+			rawMessage: Infection\Tests\AutoReview\Mutator\MutatorTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
+
+		-
+			rawMessage: Infection\Tests\AutoReview\ProjectCode\ProjectCodeTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
+
+		-
+			rawMessage: Infection\Tests\BenchmarkSmokeTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/BenchmarkSmokeTest.php
+
+		-
+			rawMessage: Infection\Tests\Framework\Enum\ImplodableEnum\ImplodableEnumTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Framework/Enum/ImplodableEnum/ImplodableEnumTest.php
+
+		-
+			rawMessage: Infection\Tests\Mutant\MutantAssertionsTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutant/MutantAssertionsTest.php
+
+		-
+			rawMessage: Infection\Tests\Mutant\MutantExecutionResultAssertionsTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutant/MutantExecutionResultAssertionsTest.php
+
+		-
+			rawMessage: Infection\Tests\Mutator\MutatorRobustnessTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: Infection\Tests\Mutator\ProfileListProviderTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListProviderTest.php
+
+		-
+			rawMessage: Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCaseTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
+
+		-
+			rawMessage: Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowablesTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowablesTest.php

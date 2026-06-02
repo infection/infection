@@ -33,41 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PHPUnit;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Exception;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 
-#[CoversTrait(ExpectsThrowables::class)]
-final class ExpectsThrowablesTest extends TestCase
+#[CoversClass(ConcretePHPUnitTestClass::class)]
+final class ConcretePHPUnitTestClassTest extends SelectorTestCase
 {
-    use ExpectsThrowables;
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_concrete_phpunit_test_classes(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new ConcretePHPUnitTestClass();
+        $classReflection = $this->createClassReflection($className);
 
-    public function test_it_fails_if_the_given_action_does_not_throw(): void
-    {
-        $action = static fn () => null;
-        $fakeException = new Exception('This is not the exception we want to catch.');
-
-        try {
-            $this->expectToThrow($action);
-
-            // Traditionally we would use the $this->fail() here but since this is
-            // what is used by the trait we will avoid that.
-            throw $fakeException;
-        } catch (Throwable $throwable) {
-            $this->assertNotSame($fakeException, $throwable);
-        }
-    }
-
-    public function test_it_returns_the_thrown_throwable(): void
-    {
-        $expected = new Exception('The expected exception.');
-        $action = /** @throws Exception */ static fn () => throw $expected;
-
-        $actual = $this->expectToThrow($action);
+        $actual = $selector->matches($classReflection);
 
         $this->assertSame($expected, $actual);
+    }
+
+    public static function classProvider(): iterable
+    {
+        yield 'concrete PHPUnit test' => [
+            self::class,
+            true,
+        ];
+
+        yield 'abstract PHPUnit test' => [
+            BaseVisitorTestCase::class,
+            false,
+        ];
+
+        yield 'PHPUnit support class' => [
+            ConcretePHPUnitTestClass::class,
+            false,
+        ];
+
+        yield 'vendor test case' => [
+            TestCase::class,
+            false,
+        ];
     }
 }

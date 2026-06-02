@@ -33,41 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PHPUnit;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-use Exception;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 
-#[CoversTrait(ExpectsThrowables::class)]
-final class ExpectsThrowablesTest extends TestCase
+#[CoversClass(CoveredClassWithIo::class)]
+final class FixtureWithCoveredClassWithIoTest extends TestCase
 {
-    use ExpectsThrowables;
-
-    public function test_it_fails_if_the_given_action_does_not_throw(): void
+    public function test_fixture(): void
     {
-        $action = static fn () => null;
-        $fakeException = new Exception('This is not the exception we want to catch.');
-
-        try {
-            $this->expectToThrow($action);
-
-            // Traditionally we would use the $this->fail() here but since this is
-            // what is used by the trait we will avoid that.
-            throw $fakeException;
-        } catch (Throwable $throwable) {
-            $this->assertNotSame($fakeException, $throwable);
-        }
-    }
-
-    public function test_it_returns_the_thrown_throwable(): void
-    {
-        $expected = new Exception('The expected exception.');
-        $action = /** @throws Exception */ static fn () => throw $expected;
-
-        $actual = $this->expectToThrow($action);
-
-        $this->assertSame($expected, $actual);
+        $this->assertNotSame(
+            '',
+            (new CoveredClassWithIo())->readFile(),
+        );
     }
 }
