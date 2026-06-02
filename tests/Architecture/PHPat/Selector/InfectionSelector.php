@@ -94,6 +94,13 @@ final class InfectionSelector
         );
     }
 
+    public static function phpunitTestNotRequiringIoWithIntegrationGroup(): PHPUnitTestNotRequiringIoWithIntegrationGroup
+    {
+        return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
+            SingletonContainer::getContainer()->getFileSystem(),
+        );
+    }
+
     public static function concretePHPUnitTestClass(): ConcretePHPUnitTestClass
     {
         return new ConcretePHPUnitTestClass();

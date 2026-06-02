@@ -40,7 +40,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirement
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
-final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
+final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
 {
     private PHPUnitTestIoRequirements $ioRequirements;
 
@@ -52,14 +52,15 @@ final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements Se
 
     public function getName(): string
     {
-        return 'PHPUnit test requiring I/O without integration group';
+        return 'PHPUnit test not requiring I/O with integration group';
     }
 
     public function matches(ClassReflection $classReflection): bool
     {
         return InfectionSelector::phpunitTestCode()->matches($classReflection)
             && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && !$this->ioRequirements->hasIntegrationGroup($classReflection);
+            && $this->ioRequirements->hasCoveredClass($classReflection)
+            && !$this->ioRequirements->requiresIntegrationGroup($classReflection)
+            && $this->ioRequirements->hasIntegrationGroup($classReflection);
     }
 }
