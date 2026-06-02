@@ -270,6 +270,7 @@ final class IoCodeDetector
         'XMLWriter::openUri(',
         'XMLWriter::toStream(',
         'XMLWriter::toUri(',
+        'use Infection\FileSystem\FileSystem;',
         'use Symfony\Component\Filesystem\Filesystem;',
     ];
 
