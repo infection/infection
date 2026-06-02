@@ -769,10 +769,58 @@ parameters:
 			path: ../tests/Architecture/PHPat/Selector/Support/PHPUnitTestIoRequirements.php
 
 		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures/FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest.php
+
+		-
 			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\PHPUnitTestNotRequiringIoWithIntegrationGroupTest should not exist
 			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
 			count: 1
 			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/PHPUnitTestNotRequiringIoWithIntegrationGroupTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithCoveredClassWithIoTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithCoversNothingWithoutIntegrationGroupTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithIoInTestCaseTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithMultipleCoveredClassesTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithSymfonyFileSystemInTestCaseTest.php
+
+		-
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\PHPUnitTestRequiringIoWithoutIntegrationGroupTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/PHPUnitTestRequiringIoWithoutIntegrationGroupTest.php
 
 		-
 			rawMessage: Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirementsTest should not exist

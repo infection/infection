@@ -47,9 +47,15 @@ final class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
         return PHPat::rule()
             ->classes(InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup())
             ->excluding(
-                Selector::withFilepath(
-                    '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/#',
-                    true,
+                Selector::AllOf(
+                    Selector::withFilepath(
+                        '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures/#',
+                        regex: true,
+                    ),
+                    Selector::withFilepath(
+                        '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/#',
+                        regex: true,
+                    ),
                 ),
             )
             ->shouldNot()
