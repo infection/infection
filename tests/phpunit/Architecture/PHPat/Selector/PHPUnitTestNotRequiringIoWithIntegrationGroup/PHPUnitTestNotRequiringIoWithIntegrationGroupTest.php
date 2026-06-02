@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup;
 
 use Infection\FileSystem\FileSystem;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest;
@@ -43,6 +44,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -58,8 +61,14 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
         string $className,
         bool $expected,
     ): void {
+        $container = SingletonContainer::getContainer();
         $selector = new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            new FileSystem(),
+            new PHPUnitTestIoRequirements(
+                new Analyser(
+                    $container->getParser(),
+                    new FileSystem(),
+                ),
+            ),
         );
         $classReflection = $this->createClassReflection($className);
 

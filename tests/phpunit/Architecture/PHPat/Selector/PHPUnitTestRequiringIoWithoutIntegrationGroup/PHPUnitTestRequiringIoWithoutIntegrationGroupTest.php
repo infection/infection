@@ -49,6 +49,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -66,9 +67,11 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
     ): void {
         $container = SingletonContainer::getContainer();
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new Analyser(
-                $container->getParser(),
-                new FileSystem(),
+            new PHPUnitTestIoRequirements(
+                new Analyser(
+                    $container->getParser(),
+                    new FileSystem(),
+                ),
             ),
         );
         $classReflection = $this->createClassReflection($className);
@@ -141,9 +144,11 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             ->willReturn('contents');
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new Analyser(
-                SingletonContainer::getContainer()->getParser(),
-                $fileSystemMock,
+            new PHPUnitTestIoRequirements(
+                new Analyser(
+                    SingletonContainer::getContainer()->getParser(),
+                    $fileSystemMock,
+                ),
             ),
         );
 
