@@ -44,16 +44,20 @@ use Infection\FileSystem\FileSystem;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use PhpParser\NodeVisitorAbstract;
 use function strtolower;
+use XMLReader;
+use XMLWriter;
 
 final class IoCodeDetector extends NodeVisitorAbstract
 {
-    // See https://www.php.net/manual/en/ref.filesystem.php
+    // See https://www.php.net/manual/en/ref.filesystem.php and newer PHP migration guides.
     private const array NATIVE_FUNCTIONS = [
         'basename',
         'chdir',
@@ -64,6 +68,41 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'clearstatcache',
         'closedir',
         'copy',
+        'curl_close',
+        'curl_copy_handle',
+        'curl_errno',
+        'curl_error',
+        'curl_escape',
+        'curl_exec',
+        'curl_file_create',
+        'curl_getinfo',
+        'curl_init',
+        'curl_multi_add_handle',
+        'curl_multi_close',
+        'curl_multi_errno',
+        'curl_multi_exec',
+        'curl_multi_getcontent',
+        'curl_multi_get_handles',
+        'curl_multi_info_read',
+        'curl_multi_init',
+        'curl_multi_remove_handle',
+        'curl_multi_select',
+        'curl_multi_setopt',
+        'curl_multi_strerror',
+        'curl_pause',
+        'curl_reset',
+        'curl_setopt',
+        'curl_setopt_array',
+        'curl_share_close',
+        'curl_share_errno',
+        'curl_share_init',
+        'curl_share_init_persistent',
+        'curl_share_setopt',
+        'curl_share_strerror',
+        'curl_strerror',
+        'curl_unescape',
+        'curl_upkeep',
+        'curl_version',
         'delete',
         'dir',
         'dirname',
@@ -71,6 +110,7 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'disk_total_space',
         'diskfreespace',
         'fclose',
+        'fdatasync',
         'feof',
         'fflush',
         'fgetc',
@@ -100,11 +140,27 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'fscanf',
         'fseek',
         'fstat',
+        'fsync',
         'ftell',
         'ftruncate',
         'fwrite',
+        'finfo_file',
         'getcwd',
+        'get_headers',
+        'get_meta_tags',
         'glob',
+        'gzfile',
+        'header',
+        'header_remove',
+        'headers_list',
+        'headers_sent',
+        'hash_file',
+        'hash_hmac_file',
+        'hash_update_file',
+        'highlight_file',
+        'http_clear_last_response_headers',
+        'http_get_last_response_headers',
+        'http_response_code',
         'is_dir',
         'is_executable',
         'is_file',
@@ -118,14 +174,29 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'link',
         'linkinfo',
         'lstat',
+        'md5_file',
         'mkdir',
         'move_uploaded_file',
+        'opcache_compile_file',
+        'opcache_invalidate',
+        'opcache_is_script_cached',
+        'opcache_is_script_cached_in_file_cache',
         'opendir',
         'parse_ini_file',
         'parse_ini_string',
         'pathinfo',
         'pclose',
         'popen',
+        'posix_access',
+        'posix_eaccess',
+        'posix_fpathconf',
+        'posix_getcwd',
+        'posix_isatty',
+        'posix_mkfifo',
+        'posix_mknod',
+        'posix_pathconf',
+        'posix_ttyname',
+        'readgzfile',
         'readfile',
         'readlink',
         'readdir',
@@ -133,18 +204,88 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'realpath_cache_size',
         'realpath',
         'rename',
+        'request_parse_body',
         'rewind',
         'rewinddir',
         'rmdir',
         'scandir',
         'set_file_buffer',
+        'setcookie',
+        'setrawcookie',
+        'sha1_file',
+        'simplexml_load_file',
+        'socket_atmark',
         'stat',
+        'stream_bucket_append',
+        'stream_bucket_make_writeable',
+        'stream_bucket_new',
+        'stream_bucket_prepend',
+        'stream_context_create',
+        'stream_context_get_default',
+        'stream_context_get_options',
+        'stream_context_get_params',
+        'stream_context_set_default',
+        'stream_context_set_options',
+        'stream_context_set_option',
+        'stream_context_set_params',
+        'stream_copy_to_stream',
+        'stream_filter_append',
+        'stream_filter_prepend',
+        'stream_filter_register',
+        'stream_filter_remove',
+        'stream_get_contents',
+        'stream_get_filters',
+        'stream_get_line',
+        'stream_get_meta_data',
+        'stream_get_transports',
+        'stream_get_wrappers',
+        'stream_is_local',
+        'stream_isatty',
+        'stream_register_wrapper',
+        'stream_resolve_include_path',
+        'stream_select',
+        'stream_set_blocking',
+        'stream_set_chunk_size',
+        'stream_set_read_buffer',
+        'stream_set_timeout',
+        'stream_set_write_buffer',
+        'stream_socket_accept',
+        'stream_socket_client',
+        'stream_socket_enable_crypto',
+        'stream_socket_get_name',
+        'stream_socket_pair',
+        'stream_socket_recvfrom',
+        'stream_socket_sendto',
+        'stream_socket_server',
+        'stream_socket_shutdown',
+        'stream_supports_lock',
+        'stream_wrapper_register',
+        'stream_wrapper_restore',
+        'stream_wrapper_unregister',
         'symlink',
         'tempnam',
         'tmpfile',
         'touch',
         'umask',
         'unlink',
+        'xmlwriter_flush',
+        'xmlwriter_open_uri',
+    ];
+
+    /**
+     * @var array<class-string, non-empty-list<string>>
+     */
+    private const array IO_STATIC_METHODS = [
+        XMLReader::class => [
+            'fromStream',
+            'fromUri',
+            'open',
+        ],
+        XMLWriter::class => [
+            'openUri',
+            'toStream',
+            'toUri',
+        ],
     ];
 
     /**
@@ -166,6 +307,11 @@ final class IoCodeDetector extends NodeVisitorAbstract
     private array $testCaseFileSystemClasses = [];
 
     /**
+     * @var array<string, array<string, true>>
+     */
+    private array $ioStaticMethods = [];
+
+    /**
      * @var array<string, string>
      */
     private array $classImports = [];
@@ -180,7 +326,13 @@ final class IoCodeDetector extends NodeVisitorAbstract
         }
 
         foreach (self::TEST_CASE_FILE_SYSTEM_CLASSES as $fileSystemClass) {
-            $this->testCaseFileSystemClasses[$fileSystemClass] = true;
+            $this->testCaseFileSystemClasses[strtolower($fileSystemClass)] = true;
+        }
+
+        foreach (self::IO_STATIC_METHODS as $className => $methodNames) {
+            foreach ($methodNames as $methodName) {
+                $this->ioStaticMethods[strtolower($className)][strtolower($methodName)] = true;
+            }
         }
     }
 
@@ -195,6 +347,10 @@ final class IoCodeDetector extends NodeVisitorAbstract
         }
 
         if ($node instanceof FuncCall && $this->isIoFunctionCall($node)) {
+            $this->hasIoOperations = true;
+        }
+
+        if ($node instanceof StaticCall && $this->isIoStaticCall($node)) {
             $this->hasIoOperations = true;
         }
 
@@ -259,24 +415,51 @@ final class IoCodeDetector extends NodeVisitorAbstract
             return false;
         }
 
-        $className = $new->class->toString();
+        $className = $this->resolveClassName($new->class);
 
-        if ($new->class->isFullyQualified()) {
-            return array_key_exists($className, $this->testCaseFileSystemClasses);
+        return $className !== null
+            && array_key_exists(strtolower($className), $this->testCaseFileSystemClasses);
+    }
+
+    private function isIoStaticCall(StaticCall $staticCall): bool
+    {
+        if (!$staticCall->class instanceof Name || !$staticCall->name instanceof Identifier) {
+            return false;
         }
 
-        $classNameParts = $new->class->getParts();
+        $className = $this->resolveClassName($staticCall->class);
+
+        if ($className === null) {
+            return false;
+        }
+
+        $methodNames = $this->ioStaticMethods[strtolower($className)] ?? null;
+
+        if ($methodNames === null) {
+            return false;
+        }
+
+        return array_key_exists(strtolower($staticCall->name->toString()), $methodNames);
+    }
+
+    private function resolveClassName(Name $className): ?string
+    {
+        if ($className->isFullyQualified()) {
+            return $className->toString();
+        }
+
+        $classNameParts = $className->getParts();
         $importedClassName = $this->classImports[$classNameParts[0]] ?? null;
 
         if ($importedClassName === null) {
-            return false;
+            return null;
         }
 
         $resolvedClassName = count($classNameParts) === 1
             ? $importedClassName
             : $importedClassName . '\\' . implode('\\', array_slice($classNameParts, 1));
 
-        return array_key_exists($resolvedClassName, $this->testCaseFileSystemClasses);
+        return $resolvedClassName;
     }
 
     private function getUsedName(UseItem $useItem, ?Name $prefix): string
