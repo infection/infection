@@ -85,6 +85,125 @@ final class IoCodeDetectorTest extends TestCase
             true,
         ];
 
+        yield 'fdatasync core function added in PHP 8.1' => [
+            <<<'PHP'
+                <?php
+
+                \fdatasync($stream);
+                PHP,
+            true,
+        ];
+
+        yield 'fsync core function added in PHP 8.1' => [
+            <<<'PHP'
+                <?php
+
+                \fsync($stream);
+                PHP,
+            true,
+        ];
+
+        yield 'I/O-related core function added in PHP 8.3' => [
+            <<<'PHP'
+                <?php
+
+                use function stream_context_set_options;
+
+                stream_context_set_options($context, []);
+                PHP,
+            true,
+        ];
+
+        yield 'directory core function' => [
+            <<<'PHP'
+                <?php
+
+                \scandir(__DIR__);
+                PHP,
+            true,
+        ];
+
+        yield 'cURL core function' => [
+            <<<'PHP'
+                <?php
+
+                \curl_exec($handle);
+                PHP,
+            true,
+        ];
+
+        yield 'stream socket core function' => [
+            <<<'PHP'
+                <?php
+
+                \stream_socket_client('tcp://127.0.0.1:80');
+                PHP,
+            true,
+        ];
+
+        yield 'HTTP output core function' => [
+            <<<'PHP'
+                <?php
+
+                \header('Content-Type: text/plain');
+                PHP,
+            true,
+        ];
+
+        yield 'XMLReader URI factory method' => [
+            <<<'PHP'
+                <?php
+
+                \XMLReader::fromUri('file.xml');
+                PHP,
+            true,
+        ];
+
+        yield 'XMLWriter URI core function' => [
+            <<<'PHP'
+                <?php
+
+                \xmlwriter_open_uri('file.xml');
+                PHP,
+            true,
+        ];
+
+        yield 'I/O-related core function added in PHP 8.4' => [
+            <<<'PHP'
+                <?php
+
+                \request_parse_body();
+                PHP,
+            true,
+        ];
+
+        yield 'cURL-related core function added in PHP 8.5' => [
+            <<<'PHP'
+                <?php
+
+                \curl_share_init_persistent([]);
+                PHP,
+            true,
+        ];
+
+        yield 'cURL multi core function added in PHP 8.5' => [
+            <<<'PHP'
+                <?php
+
+                \curl_multi_get_handles($multiHandle);
+                PHP,
+            true,
+        ];
+
+        yield 'file-cache-related core function added in PHP 8.5' => [
+            <<<'PHP'
+                <?php
+
+                \opcache_is_script_cached_in_file_cache(__FILE__);
+                PHP,
+            true,
+        ];
+
         yield 'Symfony FileSystem - use statement' => [
             <<<'PHP'
                 <?php
