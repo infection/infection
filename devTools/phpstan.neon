@@ -7,6 +7,10 @@ rules:
 
 services:
     -
+        class: Infection\Tests\Architecture\PHPStan\ResultCache\PHPatArchitectureResultCacheMetaExtension
+        tags:
+            - phpstan.resultCacheMetaExtension
+    -
         class: Infection\Tests\Architecture\PHPat\SrcShouldNotDependOnTestsTest
         tags:
             - phpat.test
