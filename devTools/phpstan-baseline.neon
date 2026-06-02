@@ -1591,12 +1591,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProviderTest.php
 
 		-
-			rawMessage: Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetectorTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetectorTest.php
-
-		-
 			rawMessage: Infection\Tests\AutoReview\Mutator\MutatorTest should not exist
 			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
 			count: 1

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup;
 
 use Infection\FileSystem\FileSystem;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
@@ -45,7 +46,9 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -61,8 +64,12 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         string $className,
         bool $expected,
     ): void {
+        $container = SingletonContainer::getContainer();
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new FileSystem(),
+            new Analyser(
+                $container->getParser(),
+                new FileSystem(),
+            ),
         );
         $classReflection = $this->createClassReflection($className);
 
@@ -93,9 +100,9 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             true,
         ];
 
-        yield 'test covering class with I/O behind FileSystem abstraction' => [
+        yield 'test covering class with FileSystem abstraction' => [
             FixtureWithCoveredClassWithFileSystemIoTest::class,
-            true,
+            false,
         ];
 
         yield 'test covering class with I/O behind FileSystem abstraction and direct I/O' => [
@@ -110,6 +117,11 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
 
         yield 'test case with I/O' => [
             FixtureWithIoInTestCaseTest::class,
+            true,
+        ];
+
+        yield 'test case with Symfony FileSystem' => [
+            FixtureWithSymfonyFileSystemInTestCaseTest::class,
             true,
         ];
 
@@ -128,7 +140,12 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             ->method('readFile')
             ->willReturn('contents');
 
-        $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup($fileSystemMock);
+        $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
+            new Analyser(
+                SingletonContainer::getContainer()->getParser(),
+                $fileSystemMock,
+            ),
+        );
 
         $selector->matches($this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class));
         $selector->matches($this->createClassReflection(FixtureWithCoveredClassWithIoTest::class));

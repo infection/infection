@@ -89,8 +89,13 @@ final class InfectionSelector
 
     public static function phpunitTestRequiringIoWithoutIntegrationGroup(): PHPUnitTestRequiringIoWithoutIntegrationGroup
     {
+        $container = SingletonContainer::getContainer();
+
         return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            SingletonContainer::getContainer()->getFileSystem(),
+            new Analyser(
+                $container->getParser(),
+                $container->getFileSystem(),
+            ),
         );
     }
 

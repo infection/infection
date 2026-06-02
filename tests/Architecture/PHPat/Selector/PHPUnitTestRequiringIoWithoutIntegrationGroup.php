@@ -37,8 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use function class_exists;
 use function count;
-use Infection\FileSystem\FileSystem;
-use Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use function interface_exists;
 use function is_string;
 use PHPat\Selector\SelectorInterface;
@@ -58,12 +57,12 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInt
     private const string GROUP_NAME = 'integration';
 
     /**
-     * @var array<class-string, bool>
+     * @var array<string, bool>
      */
     private array $classUsesIoCache = [];
 
     public function __construct(
-        private readonly FileSystem $fileSystem,
+        private readonly Analyser $analyser,
     ) {
     }
 
@@ -106,7 +105,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInt
      */
     private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
     {
-        if ($this->classUsesIo($testCaseReflection)) {
+        if ($this->classUsesIo($testCaseReflection, true)) {
             return true;
         }
 
@@ -116,7 +115,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInt
             $parentTestCaseClassReflection !== null
             && $parentTestCaseClassReflection->getName() !== TestCase::class
         ) {
-            if ($this->classUsesIo($parentTestCaseClassReflection)) {
+            if ($this->classUsesIo($parentTestCaseClassReflection, true)) {
                 return true;
             }
 
@@ -136,7 +135,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInt
         $classReflection = new ReflectionClass($sourceClassName);
 
         do {
-            if ($this->classUsesIo($classReflection)) {
+            if ($this->classUsesIo($classReflection, false)) {
                 return true;
             }
 
@@ -211,9 +210,9 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInt
     /**
      * @param ReflectionClass<object>|ClassReflection $classReflection
      */
-    private function classUsesIo(ReflectionClass|ClassReflection $classReflection): bool
+    private function classUsesIo(ReflectionClass|ClassReflection $classReflection, bool $testCaseCode): bool
     {
-        $className = $classReflection->getName();
+        $className = $classReflection->getName() . ($testCaseCode ? ':test' : ':source');
 
         if (isset($this->classUsesIoCache[$className])) {
             return $this->classUsesIoCache[$className];
@@ -223,7 +222,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInt
 
         return $this->classUsesIoCache[$className] = $fileName !== null
             && $fileName !== false
-            && IoCodeDetector::codeContainsIoOperations($this->fileSystem->readFile($fileName));
+            && $this->analyser->analyse($classReflection, $testCaseCode)->usesIo;
     }
 
     private static function hasIntegrationGroup(ClassReflection $classReflection): bool

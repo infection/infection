@@ -47,6 +47,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 #[CoversClass(Analyser::class)]
 #[CoversClass(AnalysisResult::class)]
 #[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
+#[CoversClass(IoCodeDetector::class)]
 final class AnalyserTest extends SelectorTestCase
 {
     private ClassReflection $classReflection;
@@ -96,5 +97,6 @@ final class AnalyserTest extends SelectorTestCase
         $actual = $this->analyser->analyse($this->classReflection);
 
         $this->assertTrue($actual->hasTrivialImplementation);
+        $this->assertFalse($actual->usesIo);
     }
 }

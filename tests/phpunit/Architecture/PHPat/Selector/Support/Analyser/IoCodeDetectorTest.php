@@ -33,8 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\IntegrationGroup;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use Infection\Testing\SingletonContainer;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -43,11 +45,15 @@ use PHPUnit\Framework\TestCase;
 final class IoCodeDetectorTest extends TestCase
 {
     #[DataProvider('codeProvider')]
-    public function test_it_can_detect_io_operations(string $code, bool $expected): void
+    public function test_it_can_detect_io_operations(string $code, bool $expected, bool $testCaseCode = false): void
     {
-        $actual = IoCodeDetector::codeContainsIoOperations($code);
+        $detector = new IoCodeDetector($testCaseCode);
+        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $traverser = new NodeTraverser($detector);
 
-        $this->assertSame($expected, $actual);
+        $traverser->traverse($nodes ?? []);
+
+        $this->assertSame($expected, $detector->hasIoOperations());
     }
 
     public static function codeProvider(): iterable
@@ -85,7 +91,7 @@ final class IoCodeDetectorTest extends TestCase
             true,
         ];
 
-        yield 'Symfony FileSystem - use statement' => [
+        yield 'Symfony FileSystem - source file' => [
             <<<'PHP'
                 <?php
 
@@ -93,6 +99,90 @@ final class IoCodeDetectorTest extends TestCase
 
                 (new Filesystem)->dumpFile('foo.php', '');
                 PHP,
+            false,
+        ];
+
+        yield 'Symfony FileSystem - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\Filesystem;
+
+                (new Filesystem)->dumpFile('foo.php', '');
+                PHP,
+            true,
+            true,
+        ];
+
+        yield 'Symfony FileSystem alias - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+
+                (new SymfonyFilesystem)->dumpFile('foo.php', '');
+                PHP,
+            true,
+            true,
+        ];
+
+        yield 'Symfony FileSystem mock - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\Filesystem;
+
+                $this->createMock(Filesystem::class);
+                PHP,
+            false,
+            true,
+        ];
+
+        yield 'Infection FileSystem - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\FileSystem;
+
+                (new FileSystem)->readFile('foo.php');
+                PHP,
+            true,
+            true,
+        ];
+
+        yield 'InMemoryFileSystem - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\InMemoryFileSystem;
+
+                (new InMemoryFileSystem())->readFile('foo.php');
+                PHP,
+            false,
+            true,
+        ];
+
+        yield 'FakeFileSystem - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\FakeFileSystem;
+
+                (new FakeFileSystem())->readFile('foo.php');
+                PHP,
+            false,
+            true,
+        ];
+
+        yield 'DummyFileSystem - test case' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\DummyFileSystem;
+
+                (new DummyFileSystem())->readFile('foo.php');
+                PHP,
+            false,
             true,
         ];
 
@@ -116,6 +206,39 @@ final class IoCodeDetectorTest extends TestCase
             true,
         ];
 
+        yield 'Safe directory function' => [
+            <<<'PHP'
+                <?php
+
+                use function Safe\getcwd;
+
+                getcwd();
+                PHP,
+            true,
+        ];
+
+        yield 'Safe variant of native function' => [
+            <<<'PHP'
+                <?php
+
+                use function Safe\basename;
+
+                basename('/etc/sudoers.d', '.d');
+                PHP,
+            true,
+        ];
+
+        yield 'directory function - use statement' => [
+            <<<'PHP'
+                <?php
+
+                use function opendir;
+
+                opendir(__DIR__);
+                PHP,
+            true,
+        ];
+
         yield 'Safe file-system function as fully-qualified call' => [
             <<<'PHP'
                 <?php
@@ -129,7 +252,7 @@ final class IoCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
 
-                use function Safe\sprintf();
+                use function Safe\sprintf;
 
                 sprintf('%s', 'foo');
                 PHP,

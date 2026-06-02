@@ -37,14 +37,15 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
+use ReflectionClass;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -56,27 +57,25 @@ final readonly class Analyser
     ) {
     }
 
-    public function analyse(ClassReflection $classReflection): AnalysisResult
+    /**
+     * @param ReflectionClass<object>|ClassReflection $classReflection
+     */
+    public function analyse(ReflectionClass|ClassReflection $classReflection, bool $testCaseCode = false): AnalysisResult
     {
-        Assert::true(
-            ConcreteClassReflection::isConcreteClass($classReflection),
-            // This limitation is enough for the current selectors and keeps the
-            // analysis rules narrow. It can be expanded when another use case needs it.
-            'Only concrete classes can be analysed.',
-        );
-
         $nodes = $this->parse($classReflection);
 
-        return $this->visit($classReflection, $nodes);
+        return $this->visit($classReflection, $nodes, $testCaseCode);
     }
 
     /**
+     * @param ReflectionClass<object>|ClassReflection $classReflection
+     *
      * @return Node[]
      */
-    private function parse(ClassReflection $classReflection): array
+    private function parse(ReflectionClass|ClassReflection $classReflection): array
     {
         $fileName = $classReflection->getFileName();
-        Assert::notNull(
+        Assert::string(
             $fileName,
             sprintf(
                 'Expected the class "%s" to have a file name.',
@@ -84,8 +83,16 @@ final readonly class Analyser
             ),
         );
 
+        return $this->parseCode($this->fileSystem->readFile($fileName));
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function parseCode(string $code): array
+    {
         $nodes = $this->parser->parse(
-            $this->fileSystem->readFile($fileName),
+            $code,
             new Throwing(),
         );
         Assert::notNull($nodes);
@@ -95,27 +102,32 @@ final readonly class Analyser
 
     /**
      * @param Node[] $nodes
+     * @param ReflectionClass<object>|ClassReflection $classReflection
      */
     private function visit(
-        ClassReflection $classReflection,
+        ReflectionClass|ClassReflection $classReflection,
         array $nodes,
+        bool $testCaseCode,
     ): AnalysisResult {
-        $visitor = new DetectConcreteClassMeaningfulImplementationVisitor(
+        $meaningfulImplementationVisitor = new DetectConcreteClassMeaningfulImplementationVisitor(
             ClassName::getShortClassName($classReflection->getName()),
         );
+        $ioCodeDetector = new IoCodeDetector($testCaseCode);
 
-        $this->createTraverser($visitor)->traverse($nodes);
+        $this->createTraverser($meaningfulImplementationVisitor)->traverse($nodes);
+        $this->createTraverser($ioCodeDetector)->traverse($nodes);
 
         return new AnalysisResult(
-            hasTrivialImplementation: !$visitor->hasMeaningfulImplementation(),
+            hasTrivialImplementation: !$meaningfulImplementationVisitor->hasMeaningfulImplementation(),
+            usesIo: $ioCodeDetector->hasIoOperations(),
         );
     }
 
-    private function createTraverser(DetectConcreteClassMeaningfulImplementationVisitor $visitor): NodeTraverserInterface
+    private function createTraverser(NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
             new ParentConnectingVisitor(),
-            $visitor,
+            ...$visitors,
         );
     }
 }
