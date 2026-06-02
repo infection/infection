@@ -35,6 +35,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\EventClassesShouldFollowConventionsTest
         tags:
             - phpat.test

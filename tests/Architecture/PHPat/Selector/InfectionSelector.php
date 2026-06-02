@@ -87,6 +87,18 @@ final class InfectionSelector
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
 
+    public static function phpunitTestRequiringIoWithoutIntegrationGroup(): PHPUnitTestRequiringIoWithoutIntegrationGroup
+    {
+        return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
+            SingletonContainer::getContainer()->getFileSystem(),
+        );
+    }
+
+    public static function concretePHPUnitTestClass(): ConcretePHPUnitTestClass
+    {
+        return new ConcretePHPUnitTestClass();
+    }
+
     public static function eventClassWithoutCorrespondingSingleEventSubscriber(): EventClassWithoutCorrespondingSingleEventSubscriber
     {
         return new EventClassWithoutCorrespondingSingleEventSubscriber(self::eventArchitecture());

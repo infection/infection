@@ -45,7 +45,6 @@ use Infection\Tests\Reflection\ProtChild;
 use Infection\Tests\Reflection\ProtParent;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
-use PHPUnit\Framework\TestCase;
 use function str_ends_with;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
@@ -88,7 +87,7 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
         if (
             !ConcreteClassReflection::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
-            || self::isPHPUnitTestClass($classReflection)
+            || InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)
             || self::isKnownPhpUnitScenarioClass($classReflection)
             || self::isKnownPHPUnitTestFixtureClass($classReflection)
@@ -112,35 +111,6 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
                 'tests/phpunit',
                 Path::makeRelative($fileName, self::PROJECT_ROOT),
             );
-    }
-
-    private static function isPHPUnitTestClass(ClassReflection $classReflection): bool
-    {
-        $testCaseClassReflection = self::findParentClassReflection($classReflection, TestCase::class);
-
-        return str_ends_with($classReflection->getName(), 'Test')
-            && $testCaseClassReflection !== null
-            && $classReflection->isSubclassOfClass($testCaseClassReflection);
-    }
-
-    /**
-     * @param class-string $parentClassName
-     */
-    private static function findParentClassReflection(
-        ClassReflection $classReflection,
-        string $parentClassName,
-    ): ?ClassReflection {
-        $parentClassReflection = $classReflection->getParentClass();
-
-        while ($parentClassReflection !== null) {
-            if ($parentClassReflection->getName() === $parentClassName) {
-                return $parentClassReflection;
-            }
-
-            $parentClassReflection = $parentClassReflection->getParentClass();
-        }
-
-        return null;
     }
 
     private static function isKnownPhpUnitDataProviderClass(ClassReflection $classReflection): bool

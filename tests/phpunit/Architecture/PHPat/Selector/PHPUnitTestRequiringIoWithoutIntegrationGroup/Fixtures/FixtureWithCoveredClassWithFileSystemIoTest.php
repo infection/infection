@@ -33,54 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\IntegrationGroup;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
-#[CoversNothing]
-final class IntegrationGroupTest extends TestCase
+#[CoversClass(CoveredClassWithFileSystemIo::class)]
+final class FixtureWithCoveredClassWithFileSystemIoTest extends TestCase
 {
-    #[DataProviderExternal(IntegrationGroupProvider::class, 'ioTestCaseTupleProvider')]
-    public function test_the_test_cases_requiring_io_operations_belongs_to_the_integration_group(
-        string $testCaseClassName,
-        string $fileWithIoOperations,
-    ): void {
-        $reflectionClass = new ReflectionClass($testCaseClassName);
-
-        $groupAttributes = $reflectionClass->getAttributes(Group::class);
-
-        if ($groupAttributes === []) {
-            $this->failWithIntegrationGroupMessage($testCaseClassName, $fileWithIoOperations);
-        }
-
-        foreach ($groupAttributes as $groupAttribute) {
-            /** @var Group $instance */
-            $instance = $groupAttribute->newInstance();
-
-            if ($instance->name() === 'integration') {
-                $this->expectNotToPerformAssertions();
-
-                return;
-            }
-        }
-
-        $this->failWithIntegrationGroupMessage($testCaseClassName, $fileWithIoOperations);
-    }
-
-    private function failWithIntegrationGroupMessage(string $testCaseClassName, string $fileWithIoOperations): never
+    public function test_fixture(): void
     {
-        $this->fail(sprintf(
-            <<<'TXT'
-                Expected the test case "%s" to have the attribute `#[Group('integration')]` as I/O operations have been
-                found in the file "%s".
-                TXT,
-            $testCaseClassName,
-            $fileWithIoOperations,
-        ));
+        $fileSystem = $this->createMock(Filesystem::class);
+        $fileSystem
+            ->method('exists')
+            ->with('/path')
+            ->willReturn(true);
+
+        $this->assertTrue(
+            (new CoveredClassWithFileSystemIo($fileSystem))->exists('/path'),
+        );
     }
 }

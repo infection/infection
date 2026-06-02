@@ -5161,126 +5161,6 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 3
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestedClassForIoOperations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `ioTestCaseTupleProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `provideIoTestCaseTuple` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "invalid-property-assignment-value"
-message = "Invalid property assignment value"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations`: expected `null|string`, but found `false|string`.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestedClassForIoOperations`: expected `null|string`, but found `false|string`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "less-specific-nested-argument-type"
-message = 'Argument type mismatch for argument #1 of `Pipeline\Standard::append`: expected `iterable<mixed, array{0: string, 1: string}|null>|null`, but provided type `list<array{0: mixed, 1: iterable<class-string, string>}>` is less specific.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of function `Safe\file_get_contents` is possibly `false`, but parameter type `string` does not accept it.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestCaseForIoOperations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::checkTestedClassForIoOperations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::classNameFileNameTuple`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php"
-code = "yield-from-non-iterable"
-message = "Cannot `yield from` non-iterable type `null`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProviderTest.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProviderTest.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProviderTest::test_io_test_case_classes_provider_is_valid`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupTest.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupTest.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$instance`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupTest::test_the_test_cases_requiring_io_operations_belongs_to_the_integration_group`.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
 code = "invalid-iterator"
 message = "The expression provided to `foreach` is not iterable. It resolved to type `mixed`, which is not iterable."
@@ -13806,12 +13686,6 @@ count = 1
 file = "tests/phpunit/TestingUtility/PHPUnit/DataProviderFactory.php"
 code = "mixed-operand"
 message = "Invalid right operand: template parameter `Key` is unconstrained (effectively `mixed`) and cannot be reliably used in string concatenation."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowablesTest.php"
-code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `Exception` in `{closure:tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowablesTest.php:67:19}`."
 count = 1
 
 [[issues]]

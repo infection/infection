@@ -33,55 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\IntegrationGroup;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-use function class_exists;
-use Infection\Tests\Console\E2ETest;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use function sprintf;
 
-#[CoversClass(IntegrationGroupProvider::class)]
-final class IntegrationGroupProviderTest extends TestCase
+#[CoversNothing]
+final class FixtureWithCoversNothingWithoutIntegrationGroupTest extends TestCase
 {
-    #[DataProviderExternal(IntegrationGroupProvider::class, 'ioTestCaseTupleProvider')]
-    public function test_io_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
+    public function test_fixture(): void
     {
-        $this->assertTrue(
-            class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName),
-        );
-
-        $testCaseReflection = new ReflectionClass($testCaseClassName);
-
-        $this->assertInstanceOf(
-            TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor(),
-        );
-
-        $this->assertFalse(
-            $testCaseReflection->isAbstract(),
-            sprintf(
-                'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName,
-            ),
-        );
-
-        $this->assertFileExists($fileWithIoOperations);
-    }
-
-    public function test_it_finds_e2e_test(): void
-    {
-        foreach (IntegrationGroupProvider::ioTestCaseTupleProvider() as $tuple) {
-            if ($tuple[0] === E2ETest::class) {
-                $this->expectNotToPerformAssertions();
-
-                return;
-            }
-        }
-
-        $this->fail('IntegrationGroupProvider could not find E2ETest, a known test case without a class but with a lot of IO');
+        $this->expectNotToPerformAssertions();
     }
 }

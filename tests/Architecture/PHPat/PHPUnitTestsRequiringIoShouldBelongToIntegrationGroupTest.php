@@ -33,41 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PHPUnit;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Exception;
-use PHPUnit\Framework\Attributes\CoversTrait;
-use PHPUnit\Framework\TestCase;
-use Throwable;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-#[CoversTrait(ExpectsThrowables::class)]
-final class ExpectsThrowablesTest extends TestCase
+final class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
 {
-    use ExpectsThrowables;
-
-    public function test_it_fails_if_the_given_action_does_not_throw(): void
+    public function testPHPUnitTestsRequiringIoBelongToIntegrationGroup(): Rule
     {
-        $action = static fn () => null;
-        $fakeException = new Exception('This is not the exception we want to catch.');
-
-        try {
-            $this->expectToThrow($action);
-
-            // Traditionally we would use the $this->fail() here but since this is
-            // what is used by the trait we will avoid that.
-            throw $fakeException;
-        } catch (Throwable $throwable) {
-            $this->assertNotSame($fakeException, $throwable);
-        }
-    }
-
-    public function test_it_returns_the_thrown_throwable(): void
-    {
-        $expected = new Exception('The expected exception.');
-        $action = /** @throws Exception */ static fn () => throw $expected;
-
-        $actual = $this->expectToThrow($action);
-
-        $this->assertSame($expected, $actual);
+        return PHPat::rule()
+            ->classes(InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup())
+            ->excluding(
+                Selector::withFilepath(
+                    '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/#',
+                    true,
+                ),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests using I/O should be marked with the integration group.');
     }
 }
