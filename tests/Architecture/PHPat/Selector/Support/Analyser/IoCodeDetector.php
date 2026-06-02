@@ -455,11 +455,9 @@ final class IoCodeDetector extends NodeVisitorAbstract
             return null;
         }
 
-        $resolvedClassName = count($classNameParts) === 1
+        return count($classNameParts) === 1
             ? $importedClassName
             : $importedClassName . '\\' . implode('\\', array_slice($classNameParts, 1));
-
-        return $resolvedClassName;
     }
 
     private function getUsedName(UseItem $useItem, ?Name $prefix): string
