@@ -39,6 +39,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
@@ -92,9 +93,25 @@ final class InfectionSelector
         $container = SingletonContainer::getContainer();
 
         return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new Analyser(
-                $container->getParser(),
-                $container->getFileSystem(),
+            new PHPUnitTestIoRequirements(
+                new Analyser(
+                    $container->getParser(),
+                    $container->getFileSystem(),
+                ),
+            ),
+        );
+    }
+
+    public static function phpunitTestNotRequiringIoWithIntegrationGroup(): PHPUnitTestNotRequiringIoWithIntegrationGroup
+    {
+        $container = SingletonContainer::getContainer();
+
+        return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
+            new PHPUnitTestIoRequirements(
+                new Analyser(
+                    $container->getParser(),
+                    $container->getFileSystem(),
+                ),
             ),
         );
     }

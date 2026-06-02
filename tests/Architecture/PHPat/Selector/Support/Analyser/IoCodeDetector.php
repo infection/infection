@@ -52,6 +52,7 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use PhpParser\NodeVisitorAbstract;
 use function strtolower;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use XMLReader;
 use XMLWriter;
 
@@ -293,7 +294,7 @@ final class IoCodeDetector extends NodeVisitorAbstract
      */
     private const array TEST_CASE_FILE_SYSTEM_CLASSES = [
         FileSystem::class,
-        \Symfony\Component\Filesystem\Filesystem::class,
+        SymfonyFilesystem::class,
     ];
 
     /**

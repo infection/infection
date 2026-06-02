@@ -33,29 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithoutIo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
+#[CoversClass(CoveredClassWithoutIo::class)]
+#[Group('integration')]
+final class FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest extends TestCase
 {
-    public function __construct(
-        private PHPUnitTestIoRequirements $ioRequirements,
-    ) {
-    }
-
-    public function getName(): string
+    public function test_fixture(): void
     {
-        return 'PHPUnit test requiring I/O without integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && !$this->ioRequirements->hasIntegrationGroup($classReflection);
+        $this->expectNotToPerformAssertions();
     }
 }

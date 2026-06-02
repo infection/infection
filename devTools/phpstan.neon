@@ -7,6 +7,10 @@ rules:
 
 services:
     -
+        class: Infection\Tests\Architecture\PHPStan\ResultCache\PHPatArchitectureResultCacheMetaExtension
+        tags:
+            - phpstan.resultCacheMetaExtension
+    -
         class: Infection\Tests\Architecture\PHPat\SrcShouldNotDependOnTestsTest
         tags:
             - phpat.test
@@ -36,6 +40,10 @@ services:
             - phpat.test
     -
         class: Infection\Tests\Architecture\PHPat\PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
+        tags:
+            - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\PHPUnitTestsNotRequiringIoShouldNotBelongToIntegrationGroupTest
         tags:
             - phpat.test
     -

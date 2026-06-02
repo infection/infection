@@ -33,29 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPStan\ResultCache;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use function hash_final;
+use function hash_init;
+use function hash_update;
+use PHPStan\Analyser\ResultCache\ResultCacheMetaExtension;
+use function Safe\md5_file;
+use function sprintf;
+use Symfony\Component\Finder\Finder;
 
-final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
+final class PHPatArchitectureResultCacheMetaExtension implements ResultCacheMetaExtension
 {
-    public function __construct(
-        private PHPUnitTestIoRequirements $ioRequirements,
-    ) {
+    private const string SELECTOR_DIRECTORY = __DIR__ . '/../../PHPat/Selector';
+
+    public function getKey(): string
+    {
+        return 'infection.phpatArchitecture';
     }
 
-    public function getName(): string
+    public function getHash(): string
     {
-        return 'PHPUnit test requiring I/O without integration group';
-    }
+        $context = hash_init('sha256');
 
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && !$this->ioRequirements->hasIntegrationGroup($classReflection);
+        $selectorFiles = Finder::create()
+            ->files()
+            ->name('*.php')
+            ->in(self::SELECTOR_DIRECTORY)
+            ->sortByName();
+
+        foreach ($selectorFiles as $selectorFile) {
+            $filePath = $selectorFile->getPathname();
+
+            hash_update(
+                $context,
+                sprintf(
+                    '%s:%s',
+                    $filePath,
+                    md5_file($filePath),
+                ),
+            );
+        }
+
+        return hash_final($context);
     }
 }

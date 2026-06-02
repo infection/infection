@@ -33,29 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
+final class PHPUnitTestsNotRequiringIoShouldNotBelongToIntegrationGroupTest
 {
-    public function __construct(
-        private PHPUnitTestIoRequirements $ioRequirements,
-    ) {
-    }
-
-    public function getName(): string
+    public function testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup(): Rule
     {
-        return 'PHPUnit test requiring I/O without integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && !$this->ioRequirements->hasIntegrationGroup($classReflection);
+        return PHPat::rule()
+            ->classes(InfectionSelector::phpunitTestNotRequiringIoWithIntegrationGroup())
+            ->excluding(
+                Selector::withFilepath(
+                    '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/#',
+                    true,
+                ),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests covering code without detected I/O should not be marked with the integration group.');
     }
 }
