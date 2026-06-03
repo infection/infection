@@ -40,6 +40,8 @@ use Infection\Engine;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithIo;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\PHPUnitTestRequiringIoWithoutIntegrationGroupTest;
+use LogicException;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -95,5 +97,17 @@ final class InfectionSelectorTest extends SelectorTestCase
         yield 'selector class' => [InfectionSelector::class, false];
 
         yield 'infection PHPUnit test class' => [self::class, false];
+    }
+
+    public function test_it_rejects_different_reflection_providers_for_phpunit_test_io_requirements(): void
+    {
+        InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup($this->getReflectionProvider());
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('PHPUnit test IO requirements must be requested with the same reflection provider.');
+
+        InfectionSelector::phpunitTestNotRequiringIoWithIntegrationGroup(
+            $this->createStub(ReflectionProvider::class),
+        );
     }
 }
