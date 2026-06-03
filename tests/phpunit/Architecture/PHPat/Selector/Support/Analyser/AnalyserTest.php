@@ -35,13 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use Infection\CannotBeInstantiated;
+use Infection\Command\BaseCommand;
 use Infection\FileSystem\FileSystem;
+use Infection\Mutator\Mutator;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Analyser::class)]
@@ -96,5 +100,41 @@ final class AnalyserTest extends SelectorTestCase
 
         $this->assertTrue($actual->hasTrivialImplementation);
         $this->assertFalse($actual->usesIo);
+    }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('nonConcreteClassProvider')]
+    public function test_it_treats_non_concrete_classes_as_non_trivial_without_parsing_them(string $className): void
+    {
+        $this->fileSystemMock
+            ->expects($this->never())
+            ->method('readFile');
+
+        $this->parserMock
+            ->expects($this->never())
+            ->method('parse');
+
+        $actual = $this->analyser->analyse(
+            $this->createClassReflection($className),
+        );
+
+        $this->assertFalse($actual->hasTrivialImplementation);
+    }
+
+    public static function nonConcreteClassProvider(): iterable
+    {
+        yield 'abstract class' => [
+            BaseCommand::class,
+        ];
+
+        yield 'interface' => [
+            Mutator::class,
+        ];
+
+        yield 'trait' => [
+            CannotBeInstantiated::class,
+        ];
     }
 }

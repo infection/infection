@@ -36,15 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 use PHPStan\Reflection\ReflectionProvider;
 
-final class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
+final readonly class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
 {
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -52,19 +51,7 @@ final class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
     {
         return PHPat::rule()
             ->classes(InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup($this->reflectionProvider))
-            ->excluding(
-                // TODO: introduce a custom select for paths
-                Selector::AllOf(
-                    Selector::withFilepath(
-                        '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures/#',
-                        regex: true,
-                    ),
-                    Selector::withFilepath(
-                        '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/#',
-                        regex: true,
-                    ),
-                ),
-            )
+            ->excluding(InfectionSelector::selectorFixtures())
             ->shouldNot()
             ->exist()
             ->because('PHPUnit tests using I/O should be marked with the integration group.');

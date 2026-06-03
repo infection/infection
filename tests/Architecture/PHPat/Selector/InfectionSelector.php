@@ -44,12 +44,17 @@ use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ReflectionProvider;
+use Webmozart\Assert\Assert;
 
 final class InfectionSelector
 {
     use CannotBeInstantiated;
 
     private static ?EventArchitecture $eventArchitecture = null;
+
+    private static ?PHPUnitTestIoRequirements $phpUnitTestIoRequirements = null;
+
+    private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
 
     public static function code(): InfectionCode
     {
@@ -74,6 +79,11 @@ final class InfectionSelector
         );
     }
 
+    public static function selectorFixtures(): SelectorInterface
+    {
+        return Selector::withFilepath('#/tests/phpunit/Architecture/PHPat/Selector/.+?/Fixture(s)?#', true);
+    }
+
     public static function extensionPoint(): ExtensionPoint
     {
         return new ExtensionPoint();
@@ -89,37 +99,21 @@ final class InfectionSelector
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
 
-    public static function phpunitTestRequiringIoWithoutIntegrationGroup(
-        ReflectionProvider $reflectionProvider,
-    ): PHPUnitTestRequiringIoWithoutIntegrationGroup
+    public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestRequiringIoWithoutIntegrationGroup
     {
         $container = SingletonContainer::getContainer();
 
         return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
-                new Analyser(
-                    $container->getParser(),
-                    $container->getFileSystem(),
-                ),
-                $reflectionProvider,
-            ),
+            self::phpUnitTestIoRequirements($reflectionProvider),
         );
     }
 
-    public static function phpunitTestNotRequiringIoWithIntegrationGroup(
-        ReflectionProvider $reflectionProvider,
-    ): PHPUnitTestNotRequiringIoWithIntegrationGroup
+    public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestNotRequiringIoWithIntegrationGroup
     {
         $container = SingletonContainer::getContainer();
 
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            new PHPUnitTestIoRequirements(
-                new Analyser(
-                    $container->getParser(),
-                    $container->getFileSystem(),
-                ),
-                $reflectionProvider,
-            ),
+            self::phpUnitTestIoRequirements($reflectionProvider),
         );
     }
 
@@ -188,5 +182,30 @@ final class InfectionSelector
     private static function eventArchitecture(): EventArchitecture
     {
         return self::$eventArchitecture ??= EventArchitecture::createDefault();
+    }
+
+    private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): PHPUnitTestIoRequirements
+    {
+        if (self::$phpUnitTestIoRequirements === null) {
+            self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
+
+            $container = SingletonContainer::getContainer();
+
+            return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
+                new Analyser(
+                    $container->getParser(),
+                    $container->getFileSystem(),
+                ),
+                $reflectionProvider,
+            );
+        }
+
+        Assert::same(
+            self::$phpUnitTestIoRequirementsReflectionProvider,
+            $reflectionProvider,
+            'PHPUnit test IO requirements must be requested with the same reflection provider.',
+        );
+
+        return self::$phpUnitTestIoRequirements;
     }
 }

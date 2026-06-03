@@ -37,6 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -46,6 +47,7 @@ use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
 use ReflectionClass;
+use function array_filter;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -109,16 +111,17 @@ final readonly class Analyser
 
     /**
      * @param Node[] $nodes
-     * @param ReflectionClass<object>|ClassReflection $classReflection
      */
     private function visit(
-        ReflectionClass|ClassReflection $classReflection,
+        ClassReflection $classReflection,
         array $nodes,
         bool $testCaseCode,
     ): AnalysisResult {
-        $meaningfulImplementationVisitor = new DetectConcreteClassMeaningfulImplementationVisitor(
-            ClassName::getShortClassName($classReflection->getName()),
-        );
+        $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
+            ? null
+                : new DetectConcreteClassMeaningfulImplementationVisitor(
+                ClassName::getShortClassName($classReflection->getName()),
+            );
         $ioCodeDetector = IoCodeDetector::create($testCaseCode);
 
         $this
@@ -129,16 +132,16 @@ final readonly class Analyser
             ->traverse($nodes);
 
         return new AnalysisResult(
-            hasTrivialImplementation: !$meaningfulImplementationVisitor->hasMeaningfulImplementation(),
+            hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),
             usesIo: $ioCodeDetector->hasIoOperations(),
         );
     }
 
-    private function createTraverser(NodeVisitor ...$visitors): NodeTraverserInterface
+    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
             new ParentConnectingVisitor(),
-            ...$visitors,
+            ...array_filter($visitors),
         );
     }
 }
