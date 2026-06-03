@@ -61,11 +61,10 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
         string $className,
         bool $expected,
     ): void {
-        $container = SingletonContainer::getContainer();
         $selector = new PHPUnitTestNotRequiringIoWithIntegrationGroup(
             new PHPUnitTestIoRequirements(
                 new Analyser(
-                    $container->getParser(),
+                    SingletonContainer::getContainer()->getParser(),
                     new FileSystem(),
                 ),
                 $this->getReflectionProvider(),

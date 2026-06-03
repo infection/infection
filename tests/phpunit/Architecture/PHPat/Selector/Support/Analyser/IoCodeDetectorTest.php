@@ -54,8 +54,9 @@ final class IoCodeDetectorTest extends TestCase
         $traverser = new NodeTraverser($detector);
 
         $traverser->traverse($nodes ?? []);
+        $actual = $detector->hasIoOperations();
 
-        $this->assertSame($expected, $detector->hasIoOperations());
+        $this->assertSame($expected, $actual);
     }
 
     public static function codeProvider(): iterable

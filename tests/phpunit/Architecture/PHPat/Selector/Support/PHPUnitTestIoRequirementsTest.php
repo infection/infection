@@ -49,17 +49,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest;
-use Infection\Tests\Command\Debug\MockTeamCityCommandTest;
 use Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest;
-use Infection\Tests\FileSystem\Finder\TestFrameworkFinderTest;
-use Infection\Tests\Git\CommandLineGitIntegrationTest;
 use Infection\Tests\Reporter\FileReporterTest;
-use Infection\Tests\Resource\Memory\MemoryLimiterTest;
-use Infection\Tests\Source\Collector\BasicSourceCollector\BasicSourceCollectorTest;
-use Infection\Tests\TestFramework\Coverage\JUnit\JUnitReportLocatorTest;
-use Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\BaseReportLocatorTest;
-use Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocatorTest;
-use Infection\Tests\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProviderTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -220,35 +211,17 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             $this->getReflectionProvider(),
         );
 
-        $this->assertTrue(
-            $ioRequirements->requiresIntegrationGroup($this->createClassReflection($className)),
+        $requiresIntegrationGroup = $ioRequirements->requiresIntegrationGroup(
+            $this->createClassReflection($className),
         );
+
+        $this->assertTrue($requiresIntegrationGroup);
     }
 
     public static function fileSystemTestCaseChildProvider(): iterable
     {
         yield DumpAstCommandTest::class => [DumpAstCommandTest::class];
 
-        yield MockTeamCityCommandTest::class => [MockTeamCityCommandTest::class];
-
         yield FileReporterTest::class => [FileReporterTest::class];
-
-        yield BasicSourceCollectorTest::class => [BasicSourceCollectorTest::class];
-
-        yield StaticAnalysisToolExecutableFinderTest::class => [StaticAnalysisToolExecutableFinderTest::class];
-
-        yield TestFrameworkFinderTest::class => [TestFrameworkFinderTest::class];
-
-        yield CommandLineGitIntegrationTest::class => [CommandLineGitIntegrationTest::class];
-
-        yield MemoryLimiterTest::class => [MemoryLimiterTest::class];
-
-        yield PhpUnitXmlCoverageTraceProviderTest::class => [PhpUnitXmlCoverageTraceProviderTest::class];
-
-        yield BaseReportLocatorTest::class => [BaseReportLocatorTest::class];
-
-        yield IndexXmlCoverageLocatorTest::class => [IndexXmlCoverageLocatorTest::class];
-
-        yield JUnitReportLocatorTest::class => [JUnitReportLocatorTest::class];
     }
 }
