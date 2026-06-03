@@ -49,7 +49,10 @@ final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements Se
         FileSystem $fileSystem,
         ReflectionProvider $reflectionProvider,
     ) {
-        $this->ioRequirements = new PHPUnitTestIoRequirements($fileSystem, $reflectionProvider);
+        $this->ioRequirements = new PHPUnitTestIoRequirements(
+            $fileSystem,
+            $reflectionProvider,
+        );
     }
 
     public function getName(): string

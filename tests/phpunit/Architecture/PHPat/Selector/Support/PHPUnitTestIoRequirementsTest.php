@@ -157,7 +157,10 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             ->method('readFile')
             ->willReturn('contents');
 
-        $ioRequirements = new PHPUnitTestIoRequirements($fileSystemMock, $this->getReflectionProvider());
+        $ioRequirements = new PHPUnitTestIoRequirements(
+            $fileSystemMock,
+            $this->getReflectionProvider(),
+        );
 
         $ioRequirements->requiresIntegrationGroup(
             $this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class),
