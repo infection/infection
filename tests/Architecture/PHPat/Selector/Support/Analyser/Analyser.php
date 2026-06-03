@@ -58,12 +58,11 @@ final readonly class Analyser
 
     public function analyse(ClassReflection $classReflection): AnalysisResult
     {
-        Assert::true(
-            ConcreteClassReflection::isConcreteClass($classReflection),
-            // This limitation is enough for the current selectors and keeps the
-            // analysis rules narrow. It can be expanded when another use case needs it.
-            'Only concrete classes can be analysed.',
-        );
+        if (!ConcreteClassReflection::isConcreteClass($classReflection)) {
+            return new AnalysisResult(
+                hasTrivialImplementation: false,
+            );
+        }
 
         $nodes = $this->parse($classReflection);
 
