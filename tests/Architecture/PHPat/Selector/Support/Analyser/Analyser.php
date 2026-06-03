@@ -46,7 +46,6 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
-use ReflectionClass;
 use function array_filter;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -59,32 +58,23 @@ final readonly class Analyser
     ) {
     }
 
-    /**
-     * @param ReflectionClass<object>|ClassReflection $classReflection
-     */
-    public function analyse(
-        ReflectionClass|ClassReflection $classReflection,
-        bool $testCaseCode = false,
-    ): AnalysisResult
+    public function analyse(ClassReflection $classReflection): AnalysisResult
     {
         $nodes = $this->parse($classReflection);
 
         return $this->visit(
             $classReflection,
             $nodes,
-            $testCaseCode,
         );
     }
 
     /**
-     * @param ReflectionClass<object>|ClassReflection $classReflection
-     *
      * @return Node[]
      */
-    private function parse(ReflectionClass|ClassReflection $classReflection): array
+    private function parse(ClassReflection $classReflection): array
     {
         $fileName = $classReflection->getFileName();
-        Assert::string(
+        Assert::notNull(
             $fileName,
             sprintf(
                 'Expected the class "%s" to have a file name.',
@@ -92,16 +82,8 @@ final readonly class Analyser
             ),
         );
 
-        return $this->parseCode($this->fileSystem->readFile($fileName));
-    }
-
-    /**
-     * @return Node[]
-     */
-    private function parseCode(string $code): array
-    {
         $nodes = $this->parser->parse(
-            $code,
+            $this->fileSystem->readFile($fileName),
             new Throwing(),
         );
         Assert::notNull($nodes);
@@ -115,14 +97,13 @@ final readonly class Analyser
     private function visit(
         ClassReflection $classReflection,
         array $nodes,
-        bool $testCaseCode,
     ): AnalysisResult {
         $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
             ? null
                 : new DetectConcreteClassMeaningfulImplementationVisitor(
                 ClassName::getShortClassName($classReflection->getName()),
             );
-        $ioCodeDetector = IoCodeDetector::create($testCaseCode);
+        $ioCodeDetector = IoCodeDetector::create();
 
         $this
             ->createTraverser(

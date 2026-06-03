@@ -105,7 +105,7 @@ final class PHPUnitTestIoRequirements
      */
     private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
     {
-        if ($this->classUsesIo($testCaseReflection, true)) {
+        if ($this->classUsesIo($testCaseReflection)) {
             return true;
         }
 
@@ -115,7 +115,7 @@ final class PHPUnitTestIoRequirements
             $parentTestCaseClassReflection !== null
             && $parentTestCaseClassReflection->getName() !== TestCase::class
         ) {
-            if ($this->classUsesIo($parentTestCaseClassReflection, true)) {
+            if ($this->classUsesIo($parentTestCaseClassReflection)) {
                 return true;
             }
 
@@ -135,7 +135,7 @@ final class PHPUnitTestIoRequirements
         $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
         do {
-            if ($this->classUsesIo($classReflection, false)) {
+            if ($this->classUsesIo($classReflection)) {
                 return true;
             }
 
@@ -203,10 +203,9 @@ final class PHPUnitTestIoRequirements
         );
     }
 
-    private function classUsesIo(ClassReflection $classReflection, bool $testCaseCode): bool
+    private function classUsesIo(ClassReflection $classReflection): bool
     {
-        // TODO: review this $testCaseCode
-        $className = $classReflection->getName() . ($testCaseCode ? ':test' : ':source');
+        $className = $classReflection->getName();
 
         if (isset($this->classUsesIoCache[$className])) {
             return $this->classUsesIoCache[$className];
@@ -216,7 +215,7 @@ final class PHPUnitTestIoRequirements
 
         return $this->classUsesIoCache[$className] = $fileName !== null
             && $fileName !== false
-            && $this->analyser->analyse($classReflection, $testCaseCode)->usesIo;
+            && $this->analyser->analyse($classReflection)->usesIo;
     }
 
     /**

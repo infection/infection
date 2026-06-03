@@ -37,10 +37,9 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
 use function array_key_exists;
 use function array_slice;
-use function count;
-use function explode;
 use function implode;
 use Infection\FileSystem\FileSystem;
+use Infection\Tests\TestingUtility\FS;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\New_;
@@ -61,13 +60,10 @@ final class IoCodeDetector extends NodeVisitorAbstract
     // See https://www.php.net/manual/en/ref.filesystem.php and newer PHP migration guides.
     private const array NATIVE_FUNCTIONS = [
         'basename',
-        'chdir',
         'chgrp',
         'chmod',
         'chown',
-        'chroot',
         'clearstatcache',
-        'closedir',
         'copy',
         'curl_close',
         'curl_copy_handle',
@@ -105,6 +101,9 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'curl_upkeep',
         'curl_version',
         'delete',
+        'chdir',
+        'chroot',
+        'closedir',
         'dir',
         'dirname',
         'disk_free_space',
@@ -198,9 +197,9 @@ final class IoCodeDetector extends NodeVisitorAbstract
         'posix_pathconf',
         'posix_ttyname',
         'readgzfile',
+        'readdir',
         'readfile',
         'readlink',
-        'readdir',
         'realpath_cache_get',
         'realpath_cache_size',
         'realpath',
@@ -292,6 +291,13 @@ final class IoCodeDetector extends NodeVisitorAbstract
     /**
      * @var array<class-string>
      */
+    private const array IO_STATIC_CLASSES = [
+        FS::class,
+    ];
+
+    /**
+     * @var array<class-string>
+     */
     private const array FILE_SYSTEM_CLASSES = [
         FileSystem::class,
         SymfonyFilesystem::class,
@@ -304,33 +310,46 @@ final class IoCodeDetector extends NodeVisitorAbstract
 
     private bool $hasIoOperations = false;
 
+    private int $currentUseDefaultType = Use_::TYPE_UNKNOWN;
+
+    private ?Name $currentUsePrefix = null;
+
     /**
      * @param array<string, true>                $nativeFunctions
      * @param array<string, true>                $fileSystemClasses
+     * @param array<string, true>                $ioStaticClasses
      * @param array<string, array<string, true>> $ioStaticMethods
      */
     public function __construct(
-        private readonly bool $testCaseCode,
         private readonly array $nativeFunctions,
         private readonly array $fileSystemClasses,
+        private readonly array $ioStaticClasses,
         private readonly array $ioStaticMethods,
     ) {
     }
 
-    // TODO: extract this refactoring
-    public static function create(bool $testCaseCode): self
+    public static function create(): self
     {
         $nativeFunctions = [];
         $fileSystemClasses = [];
+        $ioStaticClasses = [];
         $ioStaticMethods = [];
 
-        // TODO: we could construct the safe variants here instead instead of always computing it afterwards...
         foreach (self::NATIVE_FUNCTIONS as $nativeFunction) {
-            $nativeFunctions[strtolower($nativeFunction)] = true;
+            $nativeFunction = strtolower($nativeFunction);
+
+            $nativeFunctions[$nativeFunction] = true;
+            // Add the Safe\* variants; even if they do not exist it will not
+            // be an issue.
+            $nativeFunctions['safe\\' . $nativeFunction] = true;
         }
 
         foreach (self::FILE_SYSTEM_CLASSES as $fileSystemClass) {
             $fileSystemClasses[strtolower($fileSystemClass)] = true;
+        }
+
+        foreach (self::IO_STATIC_CLASSES as $ioStaticClass) {
+            $ioStaticClasses[strtolower($ioStaticClass)] = true;
         }
 
         foreach (self::IO_STATIC_METHODS as $className => $methodNames) {
@@ -340,9 +359,9 @@ final class IoCodeDetector extends NodeVisitorAbstract
         }
 
         return new self(
-            $testCaseCode,
             $nativeFunctions,
             $fileSystemClasses,
+            $ioStaticClasses,
             $ioStaticMethods,
         );
     }
@@ -350,11 +369,19 @@ final class IoCodeDetector extends NodeVisitorAbstract
     public function enterNode(Node $node): ?int
     {
         if ($node instanceof Use_) {
-            return $this->detectUseStatement($node->uses, $node->type, null);
+            $this->enterUseStatement($node->type, null);
+
+            return null;
         }
 
         if ($node instanceof GroupUse) {
-            return $this->detectUseStatement($node->uses, $node->type, $node->prefix);
+            $this->enterUseStatement($node->type, $node->prefix);
+
+            return null;
+        }
+
+        if ($node instanceof UseItem) {
+            $this->detectUseItem($node);
         }
 
         if ($node instanceof FuncCall && $this->isIoFunctionCall($node)) {
@@ -372,33 +399,41 @@ final class IoCodeDetector extends NodeVisitorAbstract
         return null;
     }
 
+    public function leaveNode(Node $node): null
+    {
+        if ($node instanceof Use_ || $node instanceof GroupUse) {
+            $this->currentUseDefaultType = Use_::TYPE_UNKNOWN;
+            $this->currentUsePrefix = null;
+        }
+
+        return null;
+    }
+
     public function hasIoOperations(): bool
     {
         return $this->hasIoOperations;
     }
 
-    /**
-     * @param UseItem[] $useItems
-     */
-    private function detectUseStatement(array $useItems, int $defaultType, ?Name $prefix): null
+    private function enterUseStatement(int $defaultType, ?Name $prefix): void
     {
-        // TODO: this seems incorrect: no need for a foreach, we will enter Use_->uses nodes eventually
-        foreach ($useItems as $useItem) {
-            $type = $useItem->type === Use_::TYPE_UNKNOWN ? $defaultType : $useItem->type;
-            $usedName = $this->getUsedName($useItem, $prefix);
+        $this->currentUseDefaultType = $defaultType;
+        $this->currentUsePrefix = $prefix;
+    }
 
-            if ($type === Use_::TYPE_FUNCTION && $this->isIoFunctionName($usedName)) {
-                $this->hasIoOperations = true;
+    private function detectUseItem(UseItem $useItem): void
+    {
+        $type = $useItem->type === Use_::TYPE_UNKNOWN ? $this->currentUseDefaultType : $useItem->type;
+        $usedName = $this->getUsedName($useItem, $this->currentUsePrefix);
 
-                return null;
-            }
+        if ($type === Use_::TYPE_FUNCTION && $this->isIoFunctionName($usedName)) {
+            $this->hasIoOperations = true;
 
-            if ($type === Use_::TYPE_NORMAL) {
-                $this->classImports[$useItem->getAlias()->toString()] = $usedName;
-            }
+            return;
         }
 
-        return null;
+        if ($type === Use_::TYPE_NORMAL) {
+            $this->classImports[$useItem->getAlias()->toString()] = $usedName;
+        }
     }
 
     private function isIoFunctionCall(FuncCall $funcCall): bool
@@ -410,25 +445,15 @@ final class IoCodeDetector extends NodeVisitorAbstract
 
     private function isIoFunctionName(string $functionName): bool
     {
-        $nameParts = explode('\\', strtolower($functionName));
-
-        return count($nameParts) === 1
-            ? array_key_exists(
-                $nameParts[0],
-                $this->nativeFunctions,
-            )
-            : count($nameParts) === 2
-                && $nameParts[0] === 'safe'
-                && array_key_exists($nameParts[1], $this->nativeFunctions);
+        return array_key_exists(
+            strtolower($functionName),
+            $this->nativeFunctions,
+        );
     }
 
     private function isFileSystemInstantiation(New_ $new): bool
     {
-        // TODO: review this "testCaseCode" check
-        if (
-            !$this->testCaseCode
-            || !$new->class instanceof Name
-        ) {
+        if (!$new->class instanceof Name) {
             return false;
         }
 
@@ -443,16 +468,21 @@ final class IoCodeDetector extends NodeVisitorAbstract
 
     private function isIoStaticCall(StaticCall $staticCall): bool
     {
-        if (
-            !$staticCall->class instanceof Name
-            || !$staticCall->name instanceof Identifier
-        ) {
+        if (!$staticCall->class instanceof Name) {
             return false;
         }
 
         $className = $this->resolveClassName($staticCall->class);
 
         if ($className === null) {
+            return false;
+        }
+
+        if (array_key_exists(strtolower($className), $this->ioStaticClasses)) {
+            return true;
+        }
+
+        if (!$staticCall->name instanceof Identifier) {
             return false;
         }
 

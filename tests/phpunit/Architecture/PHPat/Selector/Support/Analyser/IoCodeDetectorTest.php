@@ -48,10 +48,9 @@ final class IoCodeDetectorTest extends TestCase
     public function test_it_can_detect_io_operations(
         string $code,
         bool $expected,
-        bool $testCaseCode = false,
     ): void
     {
-        $detector = IoCodeDetector::create($testCaseCode);
+        $detector = IoCodeDetector::create();
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
         $traverser = new NodeTraverser($detector);
 
@@ -214,18 +213,16 @@ final class IoCodeDetectorTest extends TestCase
             true,
         ];
 
-        yield 'Symfony FileSystem - source file' => [
+        yield 'Symfony FileSystem import' => [
             <<<'PHP'
                 <?php
 
                 use Symfony\Component\Filesystem\Filesystem;
-
-                (new Filesystem)->dumpFile('foo.php', '');
                 PHP,
             false,
         ];
 
-        yield 'Symfony FileSystem - test case' => [
+        yield 'Symfony FileSystem instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -234,10 +231,9 @@ final class IoCodeDetectorTest extends TestCase
                 (new Filesystem)->dumpFile('foo.php', '');
                 PHP,
             true,
-            true,
         ];
 
-        yield 'Symfony FileSystem alias - test case' => [
+        yield 'Symfony FileSystem alias instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -246,10 +242,20 @@ final class IoCodeDetectorTest extends TestCase
                 (new SymfonyFilesystem)->dumpFile('foo.php', '');
                 PHP,
             true,
+        ];
+
+        yield 'Symfony FileSystem group use instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\{Filesystem};
+
+                (new Filesystem)->dumpFile('foo.php', '');
+                PHP,
             true,
         ];
 
-        yield 'Symfony FileSystem mock - test case' => [
+        yield 'Symfony FileSystem mock' => [
             <<<'PHP'
                 <?php
 
@@ -258,10 +264,9 @@ final class IoCodeDetectorTest extends TestCase
                 $this->createMock(Filesystem::class);
                 PHP,
             false,
-            true,
         ];
 
-        yield 'Infection FileSystem - test case' => [
+        yield 'Infection FileSystem instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -270,10 +275,9 @@ final class IoCodeDetectorTest extends TestCase
                 (new FileSystem)->readFile('foo.php');
                 PHP,
             true,
-            true,
         ];
 
-        yield 'InMemoryFileSystem - test case' => [
+        yield 'InMemoryFileSystem instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -282,10 +286,9 @@ final class IoCodeDetectorTest extends TestCase
                 (new InMemoryFileSystem())->readFile('foo.php');
                 PHP,
             false,
-            true,
         ];
 
-        yield 'FakeFileSystem - test case' => [
+        yield 'FakeFileSystem instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -294,10 +297,9 @@ final class IoCodeDetectorTest extends TestCase
                 (new FakeFileSystem())->readFile('foo.php');
                 PHP,
             false,
-            true,
         ];
 
-        yield 'DummyFileSystem - test case' => [
+        yield 'DummyFileSystem instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -306,7 +308,6 @@ final class IoCodeDetectorTest extends TestCase
                 (new DummyFileSystem())->readFile('foo.php');
                 PHP,
             false,
-            true,
         ];
 
         yield 'Symfony FileSystem - FQCN' => [
@@ -318,11 +319,62 @@ final class IoCodeDetectorTest extends TestCase
             false,
         ];
 
+        yield 'static FS utility class reference' => [
+            <<<'PHP'
+                <?php
+
+                echo \Infection\Tests\TestingUtility\FS::class;
+                PHP,
+            false,
+        ];
+
+        yield 'static FS utility method call' => [
+            <<<'PHP'
+                <?php
+
+                \Infection\Tests\TestingUtility\FS::tmpDir('test');
+                PHP,
+            true,
+        ];
+
+        yield 'static FS utility imported method call' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\Tests\TestingUtility\FS;
+
+                FS::tmpFile('test');
+                PHP,
+            true,
+        ];
+
+        yield 'static FS utility group use method call' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\Tests\TestingUtility\{FS};
+
+                FS::tmpFile('test');
+                PHP,
+            true,
+        ];
+
         yield 'Safe file-system function' => [
             <<<'PHP'
                 <?php
 
                 use function Safe\getcwd;
+
+                getcwd();
+                PHP,
+            true,
+        ];
+
+        yield 'Safe file-system group use function' => [
+            <<<'PHP'
+                <?php
+
+                use function Safe\{getcwd};
 
                 getcwd();
                 PHP,
