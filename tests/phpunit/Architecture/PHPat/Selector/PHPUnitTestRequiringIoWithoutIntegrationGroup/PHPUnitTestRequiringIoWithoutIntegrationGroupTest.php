@@ -48,9 +48,11 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PHPUnitTestRequiringIoWithoutIntegrationGroup::class)]
+#[Group('integration')]
 final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTestCase
 {
     /**
