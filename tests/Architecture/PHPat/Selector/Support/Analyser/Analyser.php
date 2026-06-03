@@ -58,8 +58,20 @@ final readonly class Analyser
     ) {
     }
 
-    public function analyse(ClassReflection $classReflection): AnalysisResult
-    {
+    public function analyse(
+        ClassReflection $classReflection,
+        bool $analyseNonConcreteClasses = false,
+    ): AnalysisResult {
+        if (
+            !ConcreteClassReflection::isConcreteClass($classReflection)
+            && !$analyseNonConcreteClasses
+        ) {
+            return new AnalysisResult(
+                hasTrivialImplementation: false,
+                usesIo: false,
+            );
+        }
+
         $nodes = $this->parse($classReflection);
 
         return $this->visit(

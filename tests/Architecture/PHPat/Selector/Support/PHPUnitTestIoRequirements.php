@@ -214,7 +214,7 @@ final class PHPUnitTestIoRequirements
         $fileName = $classReflection->getFileName();
 
         return $this->classUsesIoCache[$className] = $fileName !== null
-            && $this->analyser->analyse($classReflection)->usesIo;
+            && $this->analyser->analyse($classReflection, analyseNonConcreteClasses: true)->usesIo;
     }
 
     /**
