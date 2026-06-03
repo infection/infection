@@ -39,6 +39,7 @@ use Infection\FileSystem\FileSystem;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ReflectionProvider;
 
 final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
 {
@@ -46,8 +47,12 @@ final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements Se
 
     public function __construct(
         FileSystem $fileSystem,
+        ReflectionProvider $reflectionProvider,
     ) {
-        $this->ioRequirements = new PHPUnitTestIoRequirements($fileSystem);
+        $this->ioRequirements = new PHPUnitTestIoRequirements(
+            $fileSystem,
+            $reflectionProvider,
+        );
     }
 
     public function getName(): string

@@ -64,6 +64,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
     ): void {
         $ioRequirements = new PHPUnitTestIoRequirements(
             new FileSystem(),
+            $this->getReflectionProvider(),
         );
         $classReflection = $this->createClassReflection($className);
 
@@ -156,7 +157,10 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             ->method('readFile')
             ->willReturn('contents');
 
-        $ioRequirements = new PHPUnitTestIoRequirements($fileSystemMock);
+        $ioRequirements = new PHPUnitTestIoRequirements(
+            $fileSystemMock,
+            $this->getReflectionProvider(),
+        );
 
         $ioRequirements->requiresIntegrationGroup(
             $this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class),

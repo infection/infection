@@ -65,6 +65,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
     ): void {
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
             new FileSystem(),
+            $this->getReflectionProvider(),
         );
         $classReflection = $this->createClassReflection($className);
 
@@ -130,7 +131,10 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             ->method('readFile')
             ->willReturn('contents');
 
-        $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup($fileSystemMock);
+        $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
+            $fileSystemMock,
+            $this->getReflectionProvider(),
+        );
 
         $selector->matches($this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class));
         $selector->matches($this->createClassReflection(FixtureWithCoveredClassWithIoTest::class));
