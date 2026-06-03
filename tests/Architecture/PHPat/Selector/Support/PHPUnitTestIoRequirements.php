@@ -35,19 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
-use function class_exists;
 use function count;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use function interface_exists;
 use function is_string;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use function str_starts_with;
-use function trait_exists;
 
 final class PHPUnitTestIoRequirements
 {
@@ -62,6 +59,7 @@ final class PHPUnitTestIoRequirements
 
     public function __construct(
         private readonly Analyser $analyser,
+        private readonly ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -71,7 +69,7 @@ final class PHPUnitTestIoRequirements
             return true;
         }
 
-        $coveredClassNames = self::getCoveredClassNames($testCaseReflection);
+        $coveredClassNames = $this->getCoveredClassNames($testCaseReflection);
 
         if ($coveredClassNames === null) {
             return true;
@@ -88,7 +86,7 @@ final class PHPUnitTestIoRequirements
 
     public function hasCoveredClass(ClassReflection $testCaseReflection): bool
     {
-        return self::getCoveredClassNames($testCaseReflection) !== null;
+        return $this->getCoveredClassNames($testCaseReflection) !== null;
     }
 
     public function hasIntegrationGroup(ClassReflection $classReflection): bool
@@ -134,7 +132,7 @@ final class PHPUnitTestIoRequirements
      */
     private function testedClassUsesIo(string $sourceClassName): bool
     {
-        $classReflection = new ReflectionClass($sourceClassName);
+        $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
         do {
             if ($this->classUsesIo($classReflection, false)) {
@@ -142,7 +140,7 @@ final class PHPUnitTestIoRequirements
             }
 
             $classReflection = $classReflection->getParentClass();
-        } while ($classReflection !== false);
+        } while ($classReflection !== null);
 
         return false;
     }
@@ -150,7 +148,7 @@ final class PHPUnitTestIoRequirements
     /**
      * @return list<class-string>|null
      */
-    private static function getCoveredClassNames(ClassReflection $testCaseReflection): ?array
+    private function getCoveredClassNames(ClassReflection $testCaseReflection): ?array
     {
         $coveredClassNames = [];
         $hasCoverageAttribute = false;
@@ -162,7 +160,7 @@ final class PHPUnitTestIoRequirements
 
             $hasCoverageAttribute = true;
 
-            $coveredClassName = self::getCoveredClassName($attribute);
+            $coveredClassName = $this->getCoveredClassName($attribute);
 
             if ($coveredClassName === null) {
                 return null;
@@ -182,7 +180,7 @@ final class PHPUnitTestIoRequirements
      *
      * @return class-string|null
      */
-    private static function getCoveredClassName(ReflectionAttribute $attribute): ?string
+    private function getCoveredClassName(ReflectionAttribute $attribute): ?string
     {
         if ($attribute->getName() !== CoversClass::class) {
             return null;
@@ -191,14 +189,10 @@ final class PHPUnitTestIoRequirements
         $arguments = $attribute->getArguments();
         $coveredClassName = $arguments[0] ?? $arguments['className'] ?? null;
 
-        $classNameExists = !is_string($coveredClassName)
-            || (
-                !class_exists($coveredClassName)
-                && !interface_exists($coveredClassName)
-                && !trait_exists($coveredClassName)
-            );
+        $classNameExists = is_string($coveredClassName)
+            && $this->reflectionProvider->hasClass($coveredClassName);
 
-        return $classNameExists ? null : $coveredClassName;
+        return $classNameExists ? $coveredClassName : null;
     }
 
     private static function isCoverageAttribute(ReflectionAttribute $attribute): bool
@@ -209,11 +203,9 @@ final class PHPUnitTestIoRequirements
         );
     }
 
-    /**
-     * @param ReflectionClass<object>|ClassReflection $classReflection
-     */
-    private function classUsesIo(ReflectionClass|ClassReflection $classReflection, bool $testCaseCode): bool
+    private function classUsesIo(ClassReflection $classReflection, bool $testCaseCode): bool
     {
+        // TODO: review this $testCaseCode
         $className = $classReflection->getName() . ($testCaseCode ? ':test' : ':source');
 
         if (isset($this->classUsesIoCache[$className])) {

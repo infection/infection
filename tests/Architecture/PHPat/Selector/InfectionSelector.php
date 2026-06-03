@@ -43,6 +43,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirement
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ReflectionProvider;
 
 final class InfectionSelector
 {
@@ -88,7 +89,9 @@ final class InfectionSelector
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
 
-    public static function phpunitTestRequiringIoWithoutIntegrationGroup(): PHPUnitTestRequiringIoWithoutIntegrationGroup
+    public static function phpunitTestRequiringIoWithoutIntegrationGroup(
+        ReflectionProvider $reflectionProvider,
+    ): PHPUnitTestRequiringIoWithoutIntegrationGroup
     {
         $container = SingletonContainer::getContainer();
 
@@ -98,11 +101,14 @@ final class InfectionSelector
                     $container->getParser(),
                     $container->getFileSystem(),
                 ),
+                $reflectionProvider,
             ),
         );
     }
 
-    public static function phpunitTestNotRequiringIoWithIntegrationGroup(): PHPUnitTestNotRequiringIoWithIntegrationGroup
+    public static function phpunitTestNotRequiringIoWithIntegrationGroup(
+        ReflectionProvider $reflectionProvider,
+    ): PHPUnitTestNotRequiringIoWithIntegrationGroup
     {
         $container = SingletonContainer::getContainer();
 
@@ -112,6 +118,7 @@ final class InfectionSelector
                     $container->getParser(),
                     $container->getFileSystem(),
                 ),
+                $reflectionProvider,
             ),
         );
     }

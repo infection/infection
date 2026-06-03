@@ -45,9 +45,13 @@ use PHPUnit\Framework\TestCase;
 final class IoCodeDetectorTest extends TestCase
 {
     #[DataProvider('codeProvider')]
-    public function test_it_can_detect_io_operations(string $code, bool $expected, bool $testCaseCode = false): void
+    public function test_it_can_detect_io_operations(
+        string $code,
+        bool $expected,
+        bool $testCaseCode = false,
+    ): void
     {
-        $detector = new IoCodeDetector($testCaseCode);
+        $detector = IoCodeDetector::create($testCaseCode);
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
         $traverser = new NodeTraverser($detector);
 

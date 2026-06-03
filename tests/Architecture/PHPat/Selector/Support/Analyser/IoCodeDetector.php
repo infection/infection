@@ -292,25 +292,10 @@ final class IoCodeDetector extends NodeVisitorAbstract
     /**
      * @var array<class-string>
      */
-    private const array TEST_CASE_FILE_SYSTEM_CLASSES = [
+    private const array FILE_SYSTEM_CLASSES = [
         FileSystem::class,
         SymfonyFilesystem::class,
     ];
-
-    /**
-     * @var array<string, true>
-     */
-    private array $nativeFunctions = [];
-
-    /**
-     * @var array<string, true>
-     */
-    private array $testCaseFileSystemClasses = [];
-
-    /**
-     * @var array<string, array<string, true>>
-     */
-    private array $ioStaticMethods = [];
 
     /**
      * @var array<string, string>
@@ -319,22 +304,47 @@ final class IoCodeDetector extends NodeVisitorAbstract
 
     private bool $hasIoOperations = false;
 
+    /**
+     * @param array<string, true>                $nativeFunctions
+     * @param array<string, true>                $fileSystemClasses
+     * @param array<string, array<string, true>> $ioStaticMethods
+     */
     public function __construct(
         private readonly bool $testCaseCode,
+        private readonly array $nativeFunctions,
+        private readonly array $fileSystemClasses,
+        private readonly array $ioStaticMethods,
     ) {
+    }
+
+    // TODO: extract this refactoring
+    public static function create(bool $testCaseCode): self
+    {
+        $nativeFunctions = [];
+        $fileSystemClasses = [];
+        $ioStaticMethods = [];
+
+        // TODO: we could construct the safe variants here instead instead of always computing it afterwards...
         foreach (self::NATIVE_FUNCTIONS as $nativeFunction) {
-            $this->nativeFunctions[strtolower($nativeFunction)] = true;
+            $nativeFunctions[strtolower($nativeFunction)] = true;
         }
 
-        foreach (self::TEST_CASE_FILE_SYSTEM_CLASSES as $fileSystemClass) {
-            $this->testCaseFileSystemClasses[strtolower($fileSystemClass)] = true;
+        foreach (self::FILE_SYSTEM_CLASSES as $fileSystemClass) {
+            $fileSystemClasses[strtolower($fileSystemClass)] = true;
         }
 
         foreach (self::IO_STATIC_METHODS as $className => $methodNames) {
             foreach ($methodNames as $methodName) {
-                $this->ioStaticMethods[strtolower($className)][strtolower($methodName)] = true;
+                $ioStaticMethods[strtolower($className)][strtolower($methodName)] = true;
             }
         }
+
+        return new self(
+            $testCaseCode,
+            $nativeFunctions,
+            $fileSystemClasses,
+            $ioStaticMethods,
+        );
     }
 
     public function enterNode(Node $node): ?int
@@ -372,6 +382,7 @@ final class IoCodeDetector extends NodeVisitorAbstract
      */
     private function detectUseStatement(array $useItems, int $defaultType, ?Name $prefix): null
     {
+        // TODO: this seems incorrect: no need for a foreach, we will enter Use_->uses nodes eventually
         foreach ($useItems as $useItem) {
             $type = $useItem->type === Use_::TYPE_UNKNOWN ? $defaultType : $useItem->type;
             $usedName = $this->getUsedName($useItem, $prefix);
@@ -401,30 +412,41 @@ final class IoCodeDetector extends NodeVisitorAbstract
     {
         $nameParts = explode('\\', strtolower($functionName));
 
-        if (count($nameParts) === 1) {
-            return array_key_exists($nameParts[0], $this->nativeFunctions);
-        }
-
-        return count($nameParts) === 2
-            && $nameParts[0] === 'safe'
-            && array_key_exists($nameParts[1], $this->nativeFunctions);
+        return count($nameParts) === 1
+            ? array_key_exists(
+                $nameParts[0],
+                $this->nativeFunctions,
+            )
+            : count($nameParts) === 2
+                && $nameParts[0] === 'safe'
+                && array_key_exists($nameParts[1], $this->nativeFunctions);
     }
 
     private function isFileSystemInstantiation(New_ $new): bool
     {
-        if (!$this->testCaseCode || !$new->class instanceof Name) {
+        // TODO: review this "testCaseCode" check
+        if (
+            !$this->testCaseCode
+            || !$new->class instanceof Name
+        ) {
             return false;
         }
 
         $className = $this->resolveClassName($new->class);
 
         return $className !== null
-            && array_key_exists(strtolower($className), $this->testCaseFileSystemClasses);
+            && array_key_exists(
+                strtolower($className),
+                $this->fileSystemClasses,
+            );
     }
 
     private function isIoStaticCall(StaticCall $staticCall): bool
     {
-        if (!$staticCall->class instanceof Name || !$staticCall->name instanceof Identifier) {
+        if (
+            !$staticCall->class instanceof Name
+            || !$staticCall->name instanceof Identifier
+        ) {
             return false;
         }
 
@@ -440,7 +462,10 @@ final class IoCodeDetector extends NodeVisitorAbstract
             return false;
         }
 
-        return array_key_exists(strtolower($staticCall->name->toString()), $methodNames);
+        return array_key_exists(
+            strtolower($staticCall->name->toString()),
+            $methodNames,
+        );
     }
 
     private function resolveClassName(Name $className): ?string

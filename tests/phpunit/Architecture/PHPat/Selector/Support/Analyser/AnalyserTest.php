@@ -46,8 +46,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Analyser::class)]
 #[CoversClass(AnalysisResult::class)]
-#[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
-#[CoversClass(IoCodeDetector::class)]
 final class AnalyserTest extends SelectorTestCase
 {
     private ClassReflection $classReflection;

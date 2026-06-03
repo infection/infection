@@ -39,14 +39,21 @@ use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
+use PHPStan\Reflection\ReflectionProvider;
 
 final class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
 {
+    public function __construct(
+        private readonly ReflectionProvider $reflectionProvider,
+    ) {
+    }
+
     public function testPHPUnitTestsRequiringIoBelongToIntegrationGroup(): Rule
     {
         return PHPat::rule()
-            ->classes(InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup())
+            ->classes(InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup($this->reflectionProvider))
             ->excluding(
+                // TODO: introduce a custom select for paths
                 Selector::AllOf(
                     Selector::withFilepath(
                         '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures/#',

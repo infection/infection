@@ -84,6 +84,11 @@ abstract class SelectorTestCase extends TestCase
         return self::$reflectionProvider->getClass($className);
     }
 
+    final protected function getReflectionProvider(): ReflectionProvider
+    {
+        return self::$reflectionProvider;
+    }
+
     final protected function createAnonymousClassReflectionFromFile(string $file): ClassReflection
     {
         $anonymousClassReflection = null;

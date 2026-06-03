@@ -60,11 +60,18 @@ final readonly class Analyser
     /**
      * @param ReflectionClass<object>|ClassReflection $classReflection
      */
-    public function analyse(ReflectionClass|ClassReflection $classReflection, bool $testCaseCode = false): AnalysisResult
+    public function analyse(
+        ReflectionClass|ClassReflection $classReflection,
+        bool $testCaseCode = false,
+    ): AnalysisResult
     {
         $nodes = $this->parse($classReflection);
 
-        return $this->visit($classReflection, $nodes, $testCaseCode);
+        return $this->visit(
+            $classReflection,
+            $nodes,
+            $testCaseCode,
+        );
     }
 
     /**
@@ -112,10 +119,14 @@ final readonly class Analyser
         $meaningfulImplementationVisitor = new DetectConcreteClassMeaningfulImplementationVisitor(
             ClassName::getShortClassName($classReflection->getName()),
         );
-        $ioCodeDetector = new IoCodeDetector($testCaseCode);
+        $ioCodeDetector = IoCodeDetector::create($testCaseCode);
 
-        $this->createTraverser($meaningfulImplementationVisitor)->traverse($nodes);
-        $this->createTraverser($ioCodeDetector)->traverse($nodes);
+        $this
+            ->createTraverser(
+                $meaningfulImplementationVisitor,
+                $ioCodeDetector,
+            )
+            ->traverse($nodes);
 
         return new AnalysisResult(
             hasTrivialImplementation: !$meaningfulImplementationVisitor->hasMeaningfulImplementation(),

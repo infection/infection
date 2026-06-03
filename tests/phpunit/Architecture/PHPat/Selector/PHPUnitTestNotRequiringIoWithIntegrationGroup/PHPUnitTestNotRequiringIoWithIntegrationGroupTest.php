@@ -68,6 +68,7 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
                     $container->getParser(),
                     new FileSystem(),
                 ),
+                $this->getReflectionProvider(),
             ),
         );
         $classReflection = $this->createClassReflection($className);

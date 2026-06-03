@@ -72,6 +72,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
                     $container->getParser(),
                     new FileSystem(),
                 ),
+                $this->getReflectionProvider(),
             ),
         );
         $classReflection = $this->createClassReflection($className);
@@ -149,6 +150,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
                     SingletonContainer::getContainer()->getParser(),
                     $fileSystemMock,
                 ),
+                $this->getReflectionProvider(),
             ),
         );
 

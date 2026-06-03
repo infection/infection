@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use Infection\FileSystem\FileSystem;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
@@ -46,6 +47,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -63,7 +65,11 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
         bool $expectedHasIntegrationGroup,
     ): void {
         $ioRequirements = new PHPUnitTestIoRequirements(
-            new FileSystem(),
+            new Analyser(
+                SingletonContainer::getContainer()->getParser(),
+                new FileSystem(),
+            ),
+            $this->getReflectionProvider(),
         );
         $classReflection = $this->createClassReflection($className);
 
@@ -120,7 +126,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
 
         yield 'test covering class with I/O behind FileSystem abstraction' => [
             FixtureWithCoveredClassWithFileSystemIoTest::class,
-            true,
+            false,
             true,
             false,
         ];
@@ -156,7 +162,13 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             ->method('readFile')
             ->willReturn('contents');
 
-        $ioRequirements = new PHPUnitTestIoRequirements($fileSystemMock);
+        $ioRequirements = new PHPUnitTestIoRequirements(
+            new Analyser(
+                SingletonContainer::getContainer()->getParser(),
+                $fileSystemMock,
+            ),
+            $this->getReflectionProvider(),
+        );
 
         $ioRequirements->requiresIntegrationGroup(
             $this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class),
