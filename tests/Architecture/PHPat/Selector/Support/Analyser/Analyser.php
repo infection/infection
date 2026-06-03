@@ -99,10 +99,10 @@ final readonly class Analyser
         array $nodes,
     ): AnalysisResult {
         $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
-            ? null
-                : new DetectConcreteClassMeaningfulImplementationVisitor(
-                    ClassName::getShortClassName($classReflection->getName()),
-                );
+            ? new DetectConcreteClassMeaningfulImplementationVisitor(
+                ClassName::getShortClassName($classReflection->getName()),
+            )
+            : null;
         $ioCodeDetector = IoCodeDetector::create();
 
         $this

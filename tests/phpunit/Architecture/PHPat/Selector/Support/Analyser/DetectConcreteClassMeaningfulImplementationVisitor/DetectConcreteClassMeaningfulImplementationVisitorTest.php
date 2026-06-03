@@ -56,6 +56,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteC
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallUsingFactory;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallWithDifferentException;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor\Fixture\UnexpectedCallWithDifferentMessage;
+use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -175,6 +176,11 @@ final class DetectConcreteClassMeaningfulImplementationVisitorTest extends Selec
 
         yield 'unexpected call using factory' => [
             UnexpectedCallUsingFactory::class,
+            false,
+        ];
+
+        yield 'fake trace' => [
+            FakeTrace::class,
             false,
         ];
     }
