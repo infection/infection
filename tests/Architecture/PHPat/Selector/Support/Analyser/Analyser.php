@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use function array_filter;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
 use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
@@ -46,7 +47,6 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
-use function array_filter;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -101,8 +101,8 @@ final readonly class Analyser
         $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
             ? null
                 : new DetectConcreteClassMeaningfulImplementationVisitor(
-                ClassName::getShortClassName($classReflection->getName()),
-            );
+                    ClassName::getShortClassName($classReflection->getName()),
+                );
         $ioCodeDetector = IoCodeDetector::create();
 
         $this

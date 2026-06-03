@@ -48,8 +48,7 @@ final class IoCodeDetectorTest extends TestCase
     public function test_it_can_detect_io_operations(
         string $code,
         bool $expected,
-    ): void
-    {
+    ): void {
         $detector = IoCodeDetector::create();
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
         $traverser = new NodeTraverser($detector);

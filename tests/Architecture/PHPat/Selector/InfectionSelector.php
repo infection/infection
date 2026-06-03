@@ -101,7 +101,7 @@ final class InfectionSelector
 
     public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestRequiringIoWithoutIntegrationGroup
     {
-        $container = SingletonContainer::getContainer();
+        SingletonContainer::getContainer();
 
         return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
             self::phpUnitTestIoRequirements($reflectionProvider),
@@ -110,7 +110,7 @@ final class InfectionSelector
 
     public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestNotRequiringIoWithIntegrationGroup
     {
-        $container = SingletonContainer::getContainer();
+        SingletonContainer::getContainer();
 
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
             self::phpUnitTestIoRequirements($reflectionProvider),

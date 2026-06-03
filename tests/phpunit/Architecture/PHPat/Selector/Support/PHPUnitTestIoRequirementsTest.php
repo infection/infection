@@ -228,16 +228,27 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
     public static function fileSystemTestCaseChildProvider(): iterable
     {
         yield DumpAstCommandTest::class => [DumpAstCommandTest::class];
+
         yield MockTeamCityCommandTest::class => [MockTeamCityCommandTest::class];
+
         yield FileReporterTest::class => [FileReporterTest::class];
+
         yield BasicSourceCollectorTest::class => [BasicSourceCollectorTest::class];
+
         yield StaticAnalysisToolExecutableFinderTest::class => [StaticAnalysisToolExecutableFinderTest::class];
+
         yield TestFrameworkFinderTest::class => [TestFrameworkFinderTest::class];
+
         yield CommandLineGitIntegrationTest::class => [CommandLineGitIntegrationTest::class];
+
         yield MemoryLimiterTest::class => [MemoryLimiterTest::class];
+
         yield PhpUnitXmlCoverageTraceProviderTest::class => [PhpUnitXmlCoverageTraceProviderTest::class];
+
         yield BaseReportLocatorTest::class => [BaseReportLocatorTest::class];
+
         yield IndexXmlCoverageLocatorTest::class => [IndexXmlCoverageLocatorTest::class];
+
         yield JUnitReportLocatorTest::class => [JUnitReportLocatorTest::class];
     }
 }

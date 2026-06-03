@@ -37,6 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
 use function array_key_exists;
 use function array_slice;
+use function count;
 use function implode;
 use Infection\FileSystem\FileSystem;
 use Infection\Tests\TestingUtility\FS;
@@ -315,9 +316,9 @@ final class IoCodeDetector extends NodeVisitorAbstract
     private ?Name $currentUsePrefix = null;
 
     /**
-     * @param array<string, true>                $nativeFunctions
-     * @param array<string, true>                $fileSystemClasses
-     * @param array<string, true>                $ioStaticClasses
+     * @param array<string, true> $nativeFunctions
+     * @param array<string, true> $fileSystemClasses
+     * @param array<string, true> $ioStaticClasses
      * @param array<string, array<string, true>> $ioStaticMethods
      */
     public function __construct(
