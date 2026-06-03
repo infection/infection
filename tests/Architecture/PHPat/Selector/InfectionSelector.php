@@ -39,16 +39,22 @@ use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ReflectionProvider;
+use Webmozart\Assert\Assert;
 
 final class InfectionSelector
 {
     use CannotBeInstantiated;
 
     private static ?EventArchitecture $eventArchitecture = null;
+
+    private static ?PHPUnitTestIoRequirements $phpUnitTestIoRequirements = null;
+
+    private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
 
     public static function code(): InfectionCode
     {
@@ -96,16 +102,14 @@ final class InfectionSelector
     public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestRequiringIoWithoutIntegrationGroup
     {
         return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            SingletonContainer::getContainer()->getFileSystem(),
-            $reflectionProvider,
+            self::phpUnitTestIoRequirements($reflectionProvider),
         );
     }
 
     public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestNotRequiringIoWithIntegrationGroup
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            SingletonContainer::getContainer()->getFileSystem(),
-            $reflectionProvider,
+            self::phpUnitTestIoRequirements($reflectionProvider),
         );
     }
 
@@ -174,5 +178,25 @@ final class InfectionSelector
     private static function eventArchitecture(): EventArchitecture
     {
         return self::$eventArchitecture ??= EventArchitecture::createDefault();
+    }
+
+    private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): PHPUnitTestIoRequirements
+    {
+        if (self::$phpUnitTestIoRequirements === null) {
+            self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
+
+            return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
+                SingletonContainer::getContainer()->getFileSystem(),
+                $reflectionProvider,
+            );
+        }
+
+        Assert::same(
+            self::$phpUnitTestIoRequirementsReflectionProvider,
+            $reflectionProvider,
+            'PHPUnit test IO requirements must be requested with the same reflection provider.',
+        );
+
+        return self::$phpUnitTestIoRequirements;
     }
 }

@@ -46,6 +46,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -64,8 +65,10 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         bool $expected,
     ): void {
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new FileSystem(),
-            $this->getReflectionProvider(),
+            new PHPUnitTestIoRequirements(
+                new FileSystem(),
+                $this->getReflectionProvider(),
+            ),
         );
         $classReflection = $this->createClassReflection($className);
 
@@ -132,8 +135,10 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             ->willReturn('contents');
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            $fileSystemMock,
-            $this->getReflectionProvider(),
+            new PHPUnitTestIoRequirements(
+                $fileSystemMock,
+                $this->getReflectionProvider(),
+            ),
         );
 
         $selector->matches($this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class));
