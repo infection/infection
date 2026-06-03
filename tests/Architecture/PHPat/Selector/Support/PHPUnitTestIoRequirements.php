@@ -43,10 +43,10 @@ use function interface_exists;
 use function is_string;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use function str_starts_with;
 use function trait_exists;
 
@@ -63,6 +63,7 @@ final class PHPUnitTestIoRequirements
 
     public function __construct(
         private readonly FileSystem $fileSystem,
+        private readonly ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -135,7 +136,7 @@ final class PHPUnitTestIoRequirements
      */
     private function testedClassUsesIo(string $sourceClassName): bool
     {
-        $classReflection = new ReflectionClass($sourceClassName);
+        $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
         do {
             if ($this->classUsesIo($classReflection)) {
@@ -143,7 +144,7 @@ final class PHPUnitTestIoRequirements
             }
 
             $classReflection = $classReflection->getParentClass();
-        } while ($classReflection !== false);
+        } while ($classReflection !== null);
 
         return false;
     }
@@ -210,10 +211,7 @@ final class PHPUnitTestIoRequirements
         );
     }
 
-    /**
-     * @param ReflectionClass<object>|ClassReflection $classReflection
-     */
-    private function classUsesIo(ReflectionClass|ClassReflection $classReflection): bool
+    private function classUsesIo(ClassReflection $classReflection): bool
     {
         $className = $classReflection->getName();
 
@@ -224,7 +222,6 @@ final class PHPUnitTestIoRequirements
         $fileName = $classReflection->getFileName();
 
         return $this->classUsesIoCache[$className] = $fileName !== null
-            && $fileName !== false
             && IoCodeDetector::codeContainsIoOperations($this->fileSystem->readFile($fileName));
     }
 

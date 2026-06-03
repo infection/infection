@@ -60,6 +60,7 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
     ): void {
         $selector = new PHPUnitTestNotRequiringIoWithIntegrationGroup(
             new FileSystem(),
+            $this->getReflectionProvider(),
         );
         $classReflection = $this->createClassReflection($className);
 
