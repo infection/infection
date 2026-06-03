@@ -5161,6 +5161,48 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "invalid-iterator"
+message = "The expression provided to `foreach` is not iterable. It resolved to type `mixed`, which is not iterable."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "less-specific-return-statement"
+message = 'Returned type `list<array-key>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector::retrieveSafeFileSystemFunctions`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `Safe\preg_match_all`: expected `array<array-key, mixed>|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "possibly-null-array-access"
+message = "Cannot perform array access on possibly `null` value."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php"
+code = "possibly-undefined-variable"
+message = "Variable `$matches` might not have been defined on all execution paths leading to this point."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/IntegrationGroup/IoCodeDetectorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `codeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/AutoReview/Makefile/MakefileTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `rootTestTargetProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."

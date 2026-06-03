@@ -763,80 +763,26 @@ parameters:
 			path: ../src/Testing/SingletonContainer.php
 
 		-
-			rawMessage: 'Property Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements::$classUsesIoCache (array<class-string, bool>) does not accept array<string, bool>.'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/Architecture/PHPat/Selector/Support/PHPUnitTestIoRequirements.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures/FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest.php
-
-		-
 			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\PHPUnitTestNotRequiringIoWithIntegrationGroupTest should not exist
 			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
 			count: 1
 			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/PHPUnitTestNotRequiringIoWithIntegrationGroupTest.php
 
 		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest should not exist
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest should not exist
 			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
 			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest.php
+			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest.php
 
 		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest should not exist
+			rawMessage: Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\AnalyserTest should not exist
 			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
 			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithCoveredClassWithIoTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithCoversNothingWithoutIntegrationGroupTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithIoInTestCaseTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithMultipleCoveredClassesTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/FixtureWithSymfonyFileSystemInTestCaseTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\PHPUnitTestRequiringIoWithoutIntegrationGroupTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/PHPUnitTestRequiringIoWithoutIntegrationGroupTest.php
+			path: ../tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/AnalyserTest.php
 
 		-
 			rawMessage: Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirementsTest should not exist
 			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/Support/PHPUnitTestIoRequirementsTest.php
-
-		-
-			rawMessage: 'Parameter #1 $analyser of class Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements constructor expects Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser, Infection\FileSystem\FileSystem given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/Support/PHPUnitTestIoRequirementsTest.php
-
-		-
-			rawMessage: 'Parameter #1 $analyser of class Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements constructor expects Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser, Infection\FileSystem\FileSystem&PHPUnit\Framework\MockObject\MockObject given.'
-			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Architecture/PHPat/Selector/Support/PHPUnitTestIoRequirementsTest.php
 
@@ -1009,6 +955,12 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
 		-
+			rawMessage: Infection\Tests\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProviderTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Configuration/ProjectDirectoryProvider/EnvironmentVariableBasedProjectDirectoryProviderTest.php
+
+		-
 			rawMessage: Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1019,6 +971,12 @@ parameters:
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: ../tests/phpunit/Console/E2ETest.php
+
+		-
+			rawMessage: Infection\Tests\Container\Builder\IndexXmlCoverageParserBuilderTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Container/Builder/IndexXmlCoverageParserBuilderTest.php
 
 		-
 			rawMessage: Variable method call on Infection\Container\Container.
@@ -1045,16 +1003,10 @@ parameters:
 			path: ../tests/phpunit/Environment/StrykerApiKeyResolverTest.php
 
 		-
-			rawMessage: Infection\Tests\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			rawMessage: Infection\Tests\FileSystem\FileStoreTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
 			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberTest.php
+			path: ../tests/phpunit/FileSystem/FileStoreTest.php
 
 		-
 			rawMessage: 'Call to an undefined method object::setFilter().'
@@ -1211,6 +1163,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php
+
+		-
+			rawMessage: Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorTest.php
 
 		-
 			rawMessage: 'Parameter #2 $stmts of class PhpParser\Node\Stmt\Namespace_ constructor expects array<PhpParser\Node\Stmt>|null, array<int, PhpParser\Node\Scalar\Int_> given.'
@@ -1585,12 +1543,6 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/InitialTestsRunnerTest.php
 
 		-
-			rawMessage: Infection\Tests\Process\Runner\MutationTestingRunnerTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
 			identifier: missingType.generics
 			count: 1
@@ -1657,22 +1609,10 @@ parameters:
 			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
 
 		-
-			rawMessage: Infection\Tests\Report\Framework\Writer\FileWriterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Report/Framework/Writer/FileWriterTest.php
-
-		-
 			rawMessage: Infection\Tests\Reporter\FileLocationReporter\InvokableReporter should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
-
-		-
-			rawMessage: Infection\Tests\Reporter\FileReporterFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::assertRegisteredReportersAre() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
@@ -1747,6 +1687,12 @@ parameters:
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
+			rawMessage: Infection\Tests\Source\Matcher\GitDiffSourceLineMatcherTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Source/Matcher/GitDiffSourceLineMatcherTest.php
+
+		-
 			rawMessage: Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterFactoryTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
@@ -1757,30 +1703,6 @@ parameters:
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
 			path: ../tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\CoverageChecker\CoverageCheckerTest should not exist
@@ -1805,6 +1727,12 @@ parameters:
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
 			path: ../tests/phpunit/TestFramework/FactoryTest.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\PhpUnit\Adapter\PhpUnitAdapter\PhpUnitAdapterTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapter/PhpUnitAdapterTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
