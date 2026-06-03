@@ -72,6 +72,11 @@ final class InfectionSelector
         );
     }
 
+    public static function selectorFixtures(): SelectorInterface
+    {
+        return Selector::withFilepath('#/tests/phpunit/Architecture/PHPat/Selector/.+?/Fixture(s)?#', true);
+    }
+
     public static function extensionPoint(): ExtensionPoint
     {
         return new ExtensionPoint();

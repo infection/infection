@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
@@ -46,12 +45,7 @@ final class PHPUnitTestsRequiringIoShouldBelongToIntegrationGroupTest
     {
         return PHPat::rule()
             ->classes(InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup())
-            ->excluding(
-                Selector::withFilepath(
-                    '#/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/#',
-                    true,
-                ),
-            )
+            ->excluding(InfectionSelector::selectorFixtures())
             ->shouldNot()
             ->exist()
             ->because('PHPUnit tests using I/O should be marked with the integration group.');
