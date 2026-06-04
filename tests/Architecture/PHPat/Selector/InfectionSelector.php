@@ -36,6 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
+use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Factory;
+use Infection\TestFramework\VersionParser;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
@@ -66,9 +70,80 @@ final class InfectionSelector
         return new InfectionSourceCode();
     }
 
+    public static function nonSourceCode(): SelectorInterface
+    {
+        return Selector::Not(self::sourceCode());
+    }
+
     public static function testCode(): InfectionTestCode
     {
         return new InfectionTestCode();
+    }
+
+    public static function staticAnalysisContractCandidate(): SelectorInterface
+    {
+        return Selector::AllOf(
+            Selector::inNamespace('Infection\StaticAnalysis'),
+            Selector::NoneOf(
+                self::magoAdapterCandidate(),
+                self::phpStanAdapterCandidate(),
+                self::coreOrchestrationCandidate(),
+            ),
+        );
+    }
+
+    public static function staticAnalysisAdapterCandidate(): SelectorInterface
+    {
+        return Selector::AnyOf(
+            self::magoAdapterCandidate(),
+            self::phpStanAdapterCandidate(),
+        );
+    }
+
+    public static function magoAdapterCandidate(): SelectorInterface
+    {
+        return Selector::inNamespace('Infection\StaticAnalysis\Mago');
+    }
+
+    public static function phpStanAdapterCandidate(): SelectorInterface
+    {
+        return Selector::inNamespace('Infection\StaticAnalysis\PHPStan');
+    }
+
+    public static function testFrameworkContractCandidate(): SelectorInterface
+    {
+        return Selector::AllOf(
+            Selector::inNamespace('Infection\TestFramework'),
+            Selector::NoneOf(
+                self::phpUnitAdapterCandidate(),
+                self::coreOrchestrationCandidate(),
+                self::adapterUtilityCandidate(),
+            ),
+        );
+    }
+
+    public static function phpUnitAdapterCandidate(): SelectorInterface
+    {
+        return Selector::inNamespace('Infection\TestFramework\PhpUnit');
+    }
+
+    public static function adapterUtilityCandidate(): SelectorInterface
+    {
+        return new ClassNamedAny([
+            CannotBeInstantiated::class,
+            CommandLineBuilder::class,
+            VersionParser::class,
+        ]);
+    }
+
+    public static function coreOrchestrationCandidate(): SelectorInterface
+    {
+        return new ClassNamedAny(
+            [
+                StaticAnalysisToolFactory::class,
+                Factory::class,
+            ],
+        );
     }
 
     public static function phpunitTestCode(): SelectorInterface
