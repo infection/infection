@@ -63,7 +63,6 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\WithConsecutive;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -71,7 +70,6 @@ use ReflectionClass;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-#[Group('integration')]
 #[CoversClass(MutationTestingRunner::class)]
 final class MutationTestingRunnerTest extends TestCase
 {

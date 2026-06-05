@@ -38,12 +38,10 @@ namespace Infection\Tests\Process;
 use Infection\Process\ShellCommandLineExecutor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 #[CoversClass(ShellCommandLineExecutor::class)]
-#[Group('integration')]
 final class ShellCommandLineExecutorTest extends TestCase
 {
     private ShellCommandLineExecutor $executor;

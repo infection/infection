@@ -46,11 +46,9 @@ use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-#[Group('integration')]
 #[CoversClass(MagoMutantProcessFactory::class)]
 final class MagoMutantProcessFactoryTest extends TestCase
 {

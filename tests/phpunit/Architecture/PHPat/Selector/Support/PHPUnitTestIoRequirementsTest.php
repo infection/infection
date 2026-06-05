@@ -53,8 +53,10 @@ use Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest;
 use Infection\Tests\Reporter\FileReporterTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 #[CoversClass(PHPUnitTestIoRequirements::class)]
+#[Group('integration')]
 final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
 {
     /**

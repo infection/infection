@@ -50,14 +50,12 @@ use function microtime;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function usort;
 
 /**
  * Tagged as integration because it can be quite slow.
  */
-#[Group('integration')]
 #[CoversClass(TestLocationBucketSorter::class)]
 final class TestLocationBucketSorterTest extends TestCase
 {

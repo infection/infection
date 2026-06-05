@@ -37,10 +37,8 @@ namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
 #[CoversClass(MagoAdapterFactory::class)]
 final class MagoAdapterFactoryTest extends TestCase
 {

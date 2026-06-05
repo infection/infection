@@ -52,6 +52,7 @@ use Symfony\Component\Process\Process;
  */
 #[Group('benchmark')]
 #[CoversNothing]
+#[Group('integration')]
 final class BenchmarkSmokeTest extends TestCase
 {
     private const string BENCHMARK_DIR = __DIR__ . '/../benchmark';

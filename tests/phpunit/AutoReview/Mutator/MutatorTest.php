@@ -46,6 +46,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -62,6 +63,7 @@ use function sprintf;
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 #[CoversNothing]
+#[Group('integration')]
 final class MutatorTest extends TestCase
 {
     private const array KNOWN_MUTATOR_PUBLIC_METHODS = [

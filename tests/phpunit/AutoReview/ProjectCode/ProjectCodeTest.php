@@ -41,6 +41,7 @@ use Infection\StreamWrapper\IncludeInterceptor;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -53,6 +54,7 @@ use function sprintf;
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
 #[CoversNothing]
+#[Group('integration')]
 final class ProjectCodeTest extends TestCase
 {
     public function test_infection_bin_is_executable(): void

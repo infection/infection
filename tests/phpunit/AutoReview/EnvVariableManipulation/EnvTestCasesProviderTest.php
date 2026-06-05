@@ -38,11 +38,13 @@ namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 use function class_exists;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
 #[CoversClass(EnvTestCasesProvider::class)]
+#[Group('integration')]
 final class EnvTestCasesProviderTest extends TestCase
 {
     #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]

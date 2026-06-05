@@ -41,13 +41,11 @@ use const PHP_SAPI;
 use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\ini_get;
 use function Safe\ini_set;
 
-#[Group('integration')]
 #[CoversClass(MemoryLimiterEnvironment::class)]
 final class MemoryLimiterEnvironmentTest extends TestCase
 {

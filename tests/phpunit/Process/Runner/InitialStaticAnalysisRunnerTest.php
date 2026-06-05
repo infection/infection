@@ -47,12 +47,10 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[Group('integration')]
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
