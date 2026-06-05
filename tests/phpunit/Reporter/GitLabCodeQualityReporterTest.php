@@ -43,10 +43,12 @@ use Infection\Reporter\GitLabCodeQualityReporter;
 use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\json_decode;
 
+#[Group('integration')]
 #[CoversClass(GitLabCodeQualityReporter::class)]
 final class GitLabCodeQualityReporterTest extends TestCase
 {

@@ -1447,6 +1447,12 @@ parameters:
 			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
 
 		-
+			rawMessage: Infection\Tests\Reporter\GitLabCodeQualityReporterTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php
+
+		-
 			rawMessage: 'Parameter #2 $processOutput of class Infection\Mutant\MutantExecutionResult constructor expects string, string|null given.'
 			identifier: argument.type
 			count: 1
