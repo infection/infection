@@ -859,12 +859,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
-			rawMessage: Infection\Tests\BenchmarkSmokeTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/BenchmarkSmokeTest.php
-
-		-
 			rawMessage: Infection\Tests\CI\ConfigurableEnv should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -875,12 +869,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
-
-		-
-			rawMessage: Infection\Tests\Command\RunCommandTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Command/RunCommandTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationBuilder::withMutators() has parameter $mutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
@@ -941,18 +929,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Environment/StrykerApiKeyResolverTest.php
-
-		-
-			rawMessage: Infection\Tests\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberTest.php
 
 		-
 			rawMessage: 'Call to an undefined method object::setFilter().'
@@ -1099,12 +1075,6 @@ parameters:
 			path: ../tests/phpunit/Mutant/MutantExecutionResultAssertionsTest.php
 
 		-
-			rawMessage: Infection\Tests\Mutation\FileMutationGenerator\FileMutationGeneratorIntegrationTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php
-
-		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
@@ -1169,18 +1139,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/FunctionSignature/ProtectedVisibilityTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\FunctionSignature\PublicVisibilityTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/FunctionSignature/PublicVisibilityTest.php
 
 		-
 			rawMessage: 'Property Infection\Tests\Mutator\IgnoreMutatorTest::$mutatorMock with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
@@ -1315,12 +1273,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
-			rawMessage: Infection\Tests\Mutator\MutatorRobustnessTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
-
-		-
 			rawMessage: Instantiation of internal class PHPUnit\Framework\AssertionFailedError.
 			identifier: new.internalClass
 			count: 1
@@ -1363,46 +1315,10 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListProvider.php
 
 		-
-			rawMessage: Infection\Tests\Mutator\ProfileListProviderTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/ProfileListProviderTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Mutator\ProfileListTest::test_all_mutator_profiles_are_sorted_lexicographically() has parameter $profileOrMutators with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\Removal\ArrayItemRemovalTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\ReturnValue\ArrayOneItemTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/ReturnValue/ArrayOneItemTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\ReturnValue\FunctionCallTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/ReturnValue/FunctionCallTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\ReturnValue\NewObjectTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/ReturnValue/NewObjectTest.php
-
-		-
-			rawMessage: Infection\Tests\Mutator\ReturnValue\ThisTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Mutator/ReturnValue/ThisTest.php
 
 		-
 			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubjectStub with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
@@ -1441,18 +1357,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/MarkTraversedNodesAsVisitedVisitor/StopAtSkippedArgVisitor.php
 
 		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\MutationCollectorVisitorTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/MutationCollectorVisitorTest.php
-
-		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\MutatorVisitorTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
-
-		-
 			rawMessage: Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\IdNodeIgnorer should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1463,30 +1367,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
-
-		-
-			rawMessage: Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCaseTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/VisitorTestCaseTest.php
-
-		-
-			rawMessage: Infection\Tests\Process\Runner\InitialStaticAnalysisRunnerTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php
-
-		-
-			rawMessage: Infection\Tests\Process\Runner\InitialTestsRunnerTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Process/Runner/InitialTestsRunnerTest.php
-
-		-
-			rawMessage: Infection\Tests\Process\Runner\MutationTestingRunnerTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
@@ -1555,22 +1435,10 @@ parameters:
 			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
 
 		-
-			rawMessage: Infection\Tests\Report\Framework\Writer\FileWriterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Report/Framework/Writer/FileWriterTest.php
-
-		-
 			rawMessage: Infection\Tests\Reporter\FileLocationReporter\InvokableReporter should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
-
-		-
-			rawMessage: Infection\Tests\Reporter\FileReporterFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::assertRegisteredReportersAre() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
@@ -1583,12 +1451,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\Reporter\GitHubAnnotationsReporterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Reporter/GitHubAnnotationsReporterTest.php
 
 		-
 			rawMessage: Infection\Tests\Reporter\GitLabCodeQualityReporterTest should not exist
@@ -1609,28 +1471,10 @@ parameters:
 			path: ../tests/phpunit/Reporter/JsonReporterTest.php
 
 		-
-			rawMessage: Infection\Tests\Reporter\StrykerReporterFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Reporter/StrykerReporterFactoryTest.php
-
-		-
 			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Reporter/StrykerReporterFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\Reporter\SummaryJsonReporterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Reporter/SummaryJsonReporterTest.php
-
-		-
-			rawMessage: Infection\Tests\Resource\Memory\MemoryLimiterEnvironmentTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Resource/Memory/MemoryLimiterEnvironmentTest.php
 
 		-
 			rawMessage: 'Parameter $sourceDirectories of static method Infection\Source\Collector\BasicSourceCollector::create() expects array<non-empty-string>, array{string} given.'
@@ -1645,42 +1489,6 @@ parameters:
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
-			rawMessage: Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\Mago\Adapter\MagoAdapterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/Mago/Adapter/MagoAdapterTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\Mago\Process\MagoMutantProcessFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterTest.php
-
-		-
-			rawMessage: Infection\Tests\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\Coverage\CoverageChecker\CoverageCheckerTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/CoverageChecker/CoverageCheckerTest.php
-
-		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1691,12 +1499,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
-
-		-
-			rawMessage: Infection\Tests\TestFramework\FactoryTest should not exist
-			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/TestFramework/FactoryTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'

@@ -50,9 +50,7 @@ use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('integration')]
 #[CoversClass(MutatorVisitor::class)]
 final class MutatorVisitorTest extends BaseVisitorTestCase
 {

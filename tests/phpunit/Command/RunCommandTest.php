@@ -40,11 +40,9 @@ use Infection\Console\Application;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-#[Group('integration')]
 #[CoversClass(RunCommand::class)]
 final class RunCommandTest extends TestCase
 {

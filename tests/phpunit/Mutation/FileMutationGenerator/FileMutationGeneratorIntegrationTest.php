@@ -47,10 +47,8 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorIntegrationTest extends TestCase
 {
