@@ -38,12 +38,10 @@ namespace Infection\Tests\Mutant;
 use Infection\Mutant\Mutant;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
 #[CoversTrait(MutantAssertions::class)]
-#[Group('integration')]
 final class MutantAssertionsTest extends TestCase
 {
     use MutantAssertions;

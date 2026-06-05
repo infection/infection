@@ -50,7 +50,6 @@ use Symfony\Component\Process\Process;
 /**
  * Smoke test to ensure the benchmark profile scripts somewhat work.
  */
-#[Group('benchmark')]
 #[CoversNothing]
 #[Group('integration')]
 final class BenchmarkSmokeTest extends TestCase

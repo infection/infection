@@ -991,6 +991,12 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
+			rawMessage: Infection\Tests\Framework\Enum\ImplodableEnum\ImplodableEnumTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Framework/Enum/ImplodableEnum/ImplodableEnumTest.php
+
+		-
 			rawMessage: Infection\Tests\Logger\Console\BufferedOutputWithStdErrOutput should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1055,6 +1061,18 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/MockedContainer.php
+
+		-
+			rawMessage: Infection\Tests\Mutant\MutantAssertionsTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutant/MutantAssertionsTest.php
+
+		-
+			rawMessage: Infection\Tests\Mutant\MutantExecutionResultAssertionsTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Mutant/MutantExecutionResultAssertionsTest.php
 
 		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
@@ -1519,6 +1537,12 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Tracing/DummyTracer.php
 
 		-
+			rawMessage: Infection\Tests\TestFramework\Tracing\TestLocationBucketSorterTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
+
+		-
 			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
 			identifier: div.rightNonNumeric
 			count: 1
@@ -1571,6 +1595,12 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/Console/Command/TestOptionCommand.php
+
+		-
+			rawMessage: Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowablesTest should not exist
+			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/TestingUtility/PHPUnit/ExpectsThrowablesTest.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder should not exist

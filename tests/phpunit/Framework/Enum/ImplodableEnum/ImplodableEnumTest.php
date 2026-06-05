@@ -38,11 +38,9 @@ namespace Infection\Tests\Framework\Enum\ImplodableEnum;
 use Infection\Framework\Enum\ImplodableEnum;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversTrait(ImplodableEnum::class)]
-#[Group('integration')]
 final class ImplodableEnumTest extends TestCase
 {
     #[DataProvider('separatorProvider')]
