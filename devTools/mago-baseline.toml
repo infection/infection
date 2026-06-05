@@ -10895,7 +10895,7 @@ count = 2
 [[issues]]
 file = "tests/phpunit/Reporter/FileReporterFactoryTest.php"
 code = "mixed-return-statement"
-message = "Could not infer a precise return type for function `{closure:tests/phpunit/Reporter/FileReporterFactoryTest.php:364:13}`. Saw type `mixed`."
+message = "Could not infer a precise return type for function `{closure:tests/phpunit/Reporter/FileReporterFactoryTest.php:362:13}`. Saw type `mixed`."
 count = 1
 
 [[issues]]
