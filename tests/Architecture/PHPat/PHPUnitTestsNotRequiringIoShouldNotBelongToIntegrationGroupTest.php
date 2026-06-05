@@ -51,7 +51,10 @@ final readonly class PHPUnitTestsNotRequiringIoShouldNotBelongToIntegrationGroup
     {
         return PHPat::rule()
             ->classes(InfectionSelector::phpunitTestNotRequiringIoWithIntegrationGroup($this->reflectionProvider))
-            ->excluding(InfectionSelector::selectorFixtures())
+            ->excluding(
+                InfectionSelector::selectorFixtures(),
+                InfectionSelector::autoreviewTestCode(),
+            )
             ->shouldNot()
             ->exist()
             ->because('PHPUnit tests covering code without detected I/O should not be marked with the integration group.');
