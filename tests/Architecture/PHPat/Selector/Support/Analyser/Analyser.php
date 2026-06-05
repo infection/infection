@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use function array_filter;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
 use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
@@ -42,6 +43,7 @@ use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
@@ -56,17 +58,26 @@ final readonly class Analyser
     ) {
     }
 
-    public function analyse(ClassReflection $classReflection): AnalysisResult
-    {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)) {
+    public function analyse(
+        ClassReflection $classReflection,
+        bool $analyseNonConcreteClasses = false,
+    ): AnalysisResult {
+        if (
+            !ConcreteClassReflection::isConcreteClass($classReflection)
+            && !$analyseNonConcreteClasses
+        ) {
             return new AnalysisResult(
                 hasTrivialImplementation: false,
+                usesIo: false,
             );
         }
 
         $nodes = $this->parse($classReflection);
 
-        return $this->visit($classReflection, $nodes);
+        return $this->visit(
+            $classReflection,
+            $nodes,
+        );
     }
 
     /**
@@ -99,22 +110,31 @@ final readonly class Analyser
         ClassReflection $classReflection,
         array $nodes,
     ): AnalysisResult {
-        $visitor = new DetectConcreteClassMeaningfulImplementationVisitor(
-            ClassName::getShortClassName($classReflection->getName()),
-        );
+        $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
+            ? new DetectConcreteClassMeaningfulImplementationVisitor(
+                ClassName::getShortClassName($classReflection->getName()),
+            )
+            : null;
+        $ioCodeDetector = IoCodeDetector::create();
 
-        $this->createTraverser($visitor)->traverse($nodes);
+        $this
+            ->createTraverser(
+                $meaningfulImplementationVisitor,
+                $ioCodeDetector,
+            )
+            ->traverse($nodes);
 
         return new AnalysisResult(
-            hasTrivialImplementation: !$visitor->hasMeaningfulImplementation(),
+            hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),
+            usesIo: $ioCodeDetector->hasIoOperations(),
         );
     }
 
-    private function createTraverser(DetectConcreteClassMeaningfulImplementationVisitor $visitor): NodeTraverserInterface
+    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
             new ParentConnectingVisitor(),
-            $visitor,
+            ...array_filter($visitors),
         );
     }
 }

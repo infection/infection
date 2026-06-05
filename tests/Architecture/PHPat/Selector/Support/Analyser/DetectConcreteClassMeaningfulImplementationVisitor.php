@@ -209,7 +209,7 @@ final class DetectConcreteClassMeaningfulImplementationVisitor extends NodeVisit
 
         $this->meaningfulImplementation = true;
 
-        return NodeVisitor::STOP_TRAVERSAL;
+        return null;
     }
 
     private static function isTrivialExpression(Node\Expr $expression): bool

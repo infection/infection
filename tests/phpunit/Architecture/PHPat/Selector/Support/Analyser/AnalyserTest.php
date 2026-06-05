@@ -41,7 +41,10 @@ use Infection\FileSystem\FileSystem;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use PhpParser\ErrorHandler\Throwing;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -99,6 +102,7 @@ final class AnalyserTest extends SelectorTestCase
         $actual = $this->analyser->analyse($this->classReflection);
 
         $this->assertTrue($actual->hasTrivialImplementation);
+        $this->assertFalse($actual->usesIo);
     }
 
     /**
@@ -120,6 +124,41 @@ final class AnalyserTest extends SelectorTestCase
         );
 
         $this->assertFalse($actual->hasTrivialImplementation);
+        $this->assertFalse($actual->usesIo);
+    }
+
+    public function test_it_can_parse_non_concrete_classes_for_io_detection(): void
+    {
+        $fileContents = <<<'PHP'
+            <?php
+
+            \file_get_contents('php://memory');
+            PHP;
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->willReturn($fileContents);
+
+        $this->parserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->with(
+                $fileContents,
+                $this->isInstanceOf(Throwing::class),
+            )
+            ->willReturn([
+                new Class_('CannotBeInstantiated'),
+                new Expression(new FuncCall(new Name\FullyQualified('file_get_contents'))),
+            ]);
+
+        $actual = $this->analyser->analyse(
+            $this->createClassReflection(CannotBeInstantiated::class),
+            true,
+        );
+
+        $this->assertFalse($actual->hasTrivialImplementation);
+        $this->assertTrue($actual->usesIo);
     }
 
     public static function nonConcreteClassProvider(): iterable

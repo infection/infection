@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use Infection\FileSystem\FileSystem;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
@@ -46,6 +47,10 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest;
+use Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest;
+use Infection\Tests\Reporter\FileReporterTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -63,7 +68,10 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
         bool $expectedHasIntegrationGroup,
     ): void {
         $ioRequirements = new PHPUnitTestIoRequirements(
-            new FileSystem(),
+            new Analyser(
+                SingletonContainer::getContainer()->getParser(),
+                new FileSystem(),
+            ),
             $this->getReflectionProvider(),
         );
         $classReflection = $this->createClassReflection($className);
@@ -121,7 +129,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
 
         yield 'test covering class with I/O behind FileSystem abstraction' => [
             FixtureWithCoveredClassWithFileSystemIoTest::class,
-            true,
+            false,
             true,
             false,
         ];
@@ -146,6 +154,13 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             true,
             false,
         ];
+
+        yield 'test case extending FileSystemTestCase' => [
+            StaticAnalysisToolExecutableFinderTest::class,
+            true,
+            true,
+            true,
+        ];
     }
 
     public function test_it_caches_io_detection_per_class(): void
@@ -158,7 +173,10 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             ->willReturn('contents');
 
         $ioRequirements = new PHPUnitTestIoRequirements(
-            $fileSystemMock,
+            new Analyser(
+                SingletonContainer::getContainer()->getParser(),
+                $fileSystemMock,
+            ),
             $this->getReflectionProvider(),
         );
 
@@ -177,5 +195,33 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
         $ioRequirements->requiresIntegrationGroup(
             $this->createClassReflection(FixtureWithMultipleCoveredClassesTest::class),
         );
+    }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('fileSystemTestCaseChildProvider')]
+    public function test_file_system_test_case_children_require_integration_group(string $className): void
+    {
+        $ioRequirements = new PHPUnitTestIoRequirements(
+            new Analyser(
+                SingletonContainer::getContainer()->getParser(),
+                new FileSystem(),
+            ),
+            $this->getReflectionProvider(),
+        );
+
+        $requiresIntegrationGroup = $ioRequirements->requiresIntegrationGroup(
+            $this->createClassReflection($className),
+        );
+
+        $this->assertTrue($requiresIntegrationGroup);
+    }
+
+    public static function fileSystemTestCaseChildProvider(): iterable
+    {
+        yield DumpAstCommandTest::class => [DumpAstCommandTest::class];
+
+        yield FileReporterTest::class => [FileReporterTest::class];
     }
 }

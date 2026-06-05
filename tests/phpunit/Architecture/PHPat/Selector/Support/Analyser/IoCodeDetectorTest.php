@@ -33,8 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\IntegrationGroup;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use Infection\Testing\SingletonContainer;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -43,9 +45,16 @@ use PHPUnit\Framework\TestCase;
 final class IoCodeDetectorTest extends TestCase
 {
     #[DataProvider('codeProvider')]
-    public function test_it_can_detect_io_operations(string $code, bool $expected): void
-    {
-        $actual = IoCodeDetector::codeContainsIoOperations($code);
+    public function test_it_can_detect_io_operations(
+        string $code,
+        bool $expected,
+    ): void {
+        $detector = IoCodeDetector::create();
+        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $traverser = new NodeTraverser($detector);
+
+        $traverser->traverse($nodes ?? []);
+        $actual = $detector->hasIoOperations();
 
         $this->assertSame($expected, $actual);
     }
@@ -204,7 +213,16 @@ final class IoCodeDetectorTest extends TestCase
             true,
         ];
 
-        yield 'Symfony FileSystem - use statement' => [
+        yield 'Symfony FileSystem import' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\Filesystem;
+                PHP,
+            false,
+        ];
+
+        yield 'Symfony FileSystem instantiation' => [
             <<<'PHP'
                 <?php
 
@@ -213,6 +231,83 @@ final class IoCodeDetectorTest extends TestCase
                 (new Filesystem)->dumpFile('foo.php', '');
                 PHP,
             true,
+        ];
+
+        yield 'Symfony FileSystem alias instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+
+                (new SymfonyFilesystem)->dumpFile('foo.php', '');
+                PHP,
+            true,
+        ];
+
+        yield 'Symfony FileSystem group use instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\{Filesystem};
+
+                (new Filesystem)->dumpFile('foo.php', '');
+                PHP,
+            true,
+        ];
+
+        yield 'Symfony FileSystem mock' => [
+            <<<'PHP'
+                <?php
+
+                use Symfony\Component\Filesystem\Filesystem;
+
+                $this->createMock(Filesystem::class);
+                PHP,
+            false,
+        ];
+
+        yield 'Infection FileSystem instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\FileSystem;
+
+                (new FileSystem)->readFile('foo.php');
+                PHP,
+            true,
+        ];
+
+        yield 'InMemoryFileSystem instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\InMemoryFileSystem;
+
+                (new InMemoryFileSystem())->readFile('foo.php');
+                PHP,
+            false,
+        ];
+
+        yield 'FakeFileSystem instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\FakeFileSystem;
+
+                (new FakeFileSystem())->readFile('foo.php');
+                PHP,
+            false,
+        ];
+
+        yield 'DummyFileSystem instantiation' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\FileSystem\DummyFileSystem;
+
+                (new DummyFileSystem())->readFile('foo.php');
+                PHP,
+            false,
         ];
 
         yield 'Symfony FileSystem - FQCN' => [
@@ -224,6 +319,46 @@ final class IoCodeDetectorTest extends TestCase
             false,
         ];
 
+        yield 'static FS utility class reference' => [
+            <<<'PHP'
+                <?php
+
+                echo \Infection\Tests\TestingUtility\FS::class;
+                PHP,
+            false,
+        ];
+
+        yield 'static FS utility method call' => [
+            <<<'PHP'
+                <?php
+
+                \Infection\Tests\TestingUtility\FS::tmpDir('test');
+                PHP,
+            true,
+        ];
+
+        yield 'static FS utility imported method call' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\Tests\TestingUtility\FS;
+
+                FS::tmpFile('test');
+                PHP,
+            true,
+        ];
+
+        yield 'static FS utility group use method call' => [
+            <<<'PHP'
+                <?php
+
+                use Infection\Tests\TestingUtility\{FS};
+
+                FS::tmpFile('test');
+                PHP,
+            true,
+        ];
+
         yield 'Safe file-system function' => [
             <<<'PHP'
                 <?php
@@ -231,6 +366,50 @@ final class IoCodeDetectorTest extends TestCase
                 use function Safe\getcwd;
 
                 getcwd();
+                PHP,
+            true,
+        ];
+
+        yield 'Safe file-system group use function' => [
+            <<<'PHP'
+                <?php
+
+                use function Safe\{getcwd};
+
+                getcwd();
+                PHP,
+            true,
+        ];
+
+        yield 'Safe directory function' => [
+            <<<'PHP'
+                <?php
+
+                use function Safe\getcwd;
+
+                getcwd();
+                PHP,
+            true,
+        ];
+
+        yield 'Safe variant of native function' => [
+            <<<'PHP'
+                <?php
+
+                use function Safe\basename;
+
+                basename('/etc/sudoers.d', '.d');
+                PHP,
+            true,
+        ];
+
+        yield 'directory function - use statement' => [
+            <<<'PHP'
+                <?php
+
+                use function opendir;
+
+                opendir(__DIR__);
                 PHP,
             true,
         ];
@@ -248,7 +427,7 @@ final class IoCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
 
-                use function Safe\sprintf();
+                use function Safe\sprintf;
 
                 sprintf('%s', 'foo');
                 PHP,

@@ -33,13 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-final readonly class AnalysisResult
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+
+#[CoversClass(CoveredClassWithoutIo::class)]
+final class FixtureWithSymfonyFileSystemInTestCaseTest extends TestCase
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-    ) {
+    public function test_fixture(): void
+    {
+        $this->assertFalse((new Filesystem())->exists('/unlikely-to-exist'));
     }
 }

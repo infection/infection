@@ -185,8 +185,13 @@ final class InfectionSelector
         if (self::$phpUnitTestIoRequirements === null) {
             self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
 
+            $container = SingletonContainer::getContainer();
+
             return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
-                SingletonContainer::getContainer()->getFileSystem(),
+                new Analyser(
+                    $container->getParser(),
+                    $container->getFileSystem(),
+                ),
                 $reflectionProvider,
             );
         }
