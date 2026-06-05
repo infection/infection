@@ -37,9 +37,13 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\Benchmark\Instrumentor;
 use Infection\Engine;
+use Infection\Tests\Architecture\PHPat\ClassesShouldBeFinalTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithIo;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\PHPUnitTestRequiringIoWithoutIntegrationGroupTest;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeTest;
+use Infection\Tests\Logger\Console\BasicConsoleLoggerTest;
 use LogicException;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -68,6 +72,43 @@ final class InfectionSelectorTest extends SelectorTestCase
 
             $this->assertSame($expected, $actual, $message);
         }
+    }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('autoreviewTestCodeClassProvider')]
+    public function test_it_matches_autoreview_test_code(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = InfectionSelector::autoreviewTestCode();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function autoreviewTestCodeClassProvider(): iterable
+    {
+        yield 'PHPat architecture test class' => [ClassesShouldBeFinalTest::class, true];
+
+        yield 'PHPat custom selector' => [InfectionSelector::class, true];
+
+        yield 'PHPat selector PHPUnit test' => [self::class, true];
+
+        yield 'PHPat selector fixture for PHPUnit tests' => [FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest::class, false];
+
+        yield 'AutoReview PHPunit test' => [ProjectCodeTest::class, true];
+
+        yield 'AutoReview source code' => [ProjectCodeProvider::class, true];
+
+        yield 'infection source class' => [Engine::class, false];
+
+        yield 'regular PHPUnit test class' => [BasicConsoleLoggerTest::class, false];
+
+        yield 'vendor class' => [TestCase::class, false];
     }
 
     /**

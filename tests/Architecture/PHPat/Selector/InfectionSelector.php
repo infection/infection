@@ -99,10 +99,13 @@ final class InfectionSelector
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
 
-    public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestRequiringIoWithoutIntegrationGroup
+    public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): SelectorInterface
     {
-        return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            self::phpUnitTestIoRequirements($reflectionProvider),
+        return Selector::AllOf(
+            new PHPUnitTestRequiringIoWithoutIntegrationGroup(
+                self::phpUnitTestIoRequirements($reflectionProvider),
+            ),
+            Selector::Not(self::autoreviewTestCode()),
         );
     }
 
@@ -110,6 +113,17 @@ final class InfectionSelector
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
             self::phpUnitTestIoRequirements($reflectionProvider),
+        );
+    }
+
+    public static function autoreviewTestCode(): SelectorInterface
+    {
+        return Selector::AllOf(
+            Selector::AnyOf(
+                Selector::inNamespace('Infection\Tests\Architecture'),
+                Selector::inNamespace('Infection\Tests\AutoReview'),
+            ),
+            Selector::Not(self::selectorFixtures()),
         );
     }
 
