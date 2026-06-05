@@ -40,7 +40,6 @@ use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\ClassImplements;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ReflectionProvider;
@@ -56,17 +55,17 @@ final class InfectionSelector
 
     private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
 
-    public static function code(): InfectionCode
+    public static function code(): SelectorInterface
     {
         return new InfectionCode();
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public static function sourceCode(): SelectorInterface
     {
         return new InfectionSourceCode();
     }
 
-    public static function testCode(): InfectionTestCode
+    public static function testCode(): SelectorInterface
     {
         return new InfectionTestCode();
     }
@@ -84,17 +83,17 @@ final class InfectionSelector
         return Selector::withFilepath('#/tests/phpunit/Architecture/PHPat/Selector/.+?/Fixture(s)?#', true);
     }
 
-    public static function extensionPoint(): ExtensionPoint
+    public static function extensionPoint(): SelectorInterface
     {
         return new ExtensionPoint();
     }
 
-    public static function sourceConcreteClassWithoutCanonicalTest(): SourceConcreteClassWithoutCanonicalTest
+    public static function sourceConcreteClassWithoutCanonicalTest(): SelectorInterface
     {
         return new SourceConcreteClassWithoutCanonicalTest();
     }
 
-    public static function phpunitTestSupportConcreteClassWithoutCanonicalTest(): PHPUnitTestSupportConcreteClassWithoutCanonicalTest
+    public static function phpunitTestSupportConcreteClassWithoutCanonicalTest(): SelectorInterface
     {
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
@@ -109,7 +108,7 @@ final class InfectionSelector
         );
     }
 
-    public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestNotRequiringIoWithIntegrationGroup
+    public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): SelectorInterface
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
             self::phpUnitTestIoRequirements($reflectionProvider),
@@ -127,37 +126,37 @@ final class InfectionSelector
         );
     }
 
-    public static function concretePHPUnitTestClass(): ConcretePHPUnitTestClass
+    public static function concretePHPUnitTestClass(): SelectorInterface
     {
         return new ConcretePHPUnitTestClass();
     }
 
-    public static function eventClassWithoutCorrespondingSingleEventSubscriber(): EventClassWithoutCorrespondingSingleEventSubscriber
+    public static function eventClassWithoutCorrespondingSingleEventSubscriber(): SelectorInterface
     {
         return new EventClassWithoutCorrespondingSingleEventSubscriber(self::eventArchitecture());
     }
 
-    public static function singleEventSubscriberWithoutCorrespondingEvent(): SingleEventSubscriberWithoutCorrespondingEvent
+    public static function singleEventSubscriberWithoutCorrespondingEvent(): SelectorInterface
     {
         return new SingleEventSubscriberWithoutCorrespondingEvent(self::eventArchitecture());
     }
 
-    public static function singleEventSubscriber(): SingleEventSubscriberSelector
+    public static function singleEventSubscriber(): SelectorInterface
     {
         return new SingleEventSubscriberSelector(self::eventArchitecture());
     }
 
-    public static function singleEventSubscriberWithoutExpectedMethod(): SingleEventSubscriberWithoutExpectedMethod
+    public static function singleEventSubscriberWithoutExpectedMethod(): SelectorInterface
     {
         return new SingleEventSubscriberWithoutExpectedMethod(self::eventArchitecture());
     }
 
-    public static function eventDirectoryClassWithoutExpectedShape(): EventDirectoryClassWithoutExpectedShape
+    public static function eventDirectoryClassWithoutExpectedShape(): SelectorInterface
     {
         return new EventDirectoryClassWithoutExpectedShape(self::eventArchitecture());
     }
 
-    public static function hasTrivialImplementation(): HasTrivialImplementation
+    public static function hasTrivialImplementation(): SelectorInterface
     {
         $container = SingletonContainer::getContainer();
 
@@ -169,22 +168,22 @@ final class InfectionSelector
         );
     }
 
-    public static function hasDocBlock(): HasDocBlock
+    public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();
     }
 
-    public static function hasInternalDocBlock(): HasInternalDocBlock
+    public static function hasInternalDocBlock(): SelectorInterface
     {
         return new HasInternalDocBlock();
     }
 
-    public static function isAnonymousClass(): IsAnonymousClass
+    public static function isAnonymousClass(): SelectorInterface
     {
         return new IsAnonymousClass();
     }
 
-    public static function implementsAnyInterface(): ClassImplements
+    public static function implementsAnyInterface(): SelectorInterface
     {
         return Selector::implements('/.*/', true);
     }
