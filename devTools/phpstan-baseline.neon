@@ -1453,6 +1453,12 @@ parameters:
 			path: ../tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php
 
 		-
+			rawMessage: Infection\Tests\Reporter\JsonReporterTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Reporter/JsonReporterTest.php
+
+		-
 			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
 			identifier: argument.type
 			count: 1
