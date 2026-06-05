@@ -763,24 +763,6 @@ parameters:
 			path: ../src/Testing/SingletonContainer.php
 
 		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\PHPUnitTestNotRequiringIoWithIntegrationGroupTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/PHPUnitTestNotRequiringIoWithIntegrationGroupTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\PHPUnitTestRequiringIoWithoutIntegrationGroupTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/PHPUnitTestRequiringIoWithoutIntegrationGroupTest.php
-
-		-
-			rawMessage: Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirementsTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/Architecture/PHPat/Selector/Support/PHPUnitTestIoRequirementsTest.php
-
-		-
 			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -791,12 +773,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/ConcreteClassReflector.php
-
-		-
-			rawMessage: Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulationTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulationTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations() should return string|null but returns string|false.'
@@ -829,12 +805,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
 
 		-
-			rawMessage: Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProviderTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProviderTest.php
-
-		-
 			rawMessage: 'Cannot call method getPrerequisites() on Fidry\Makefile\Rule|null.'
 			identifier: method.nonObject
 			count: 2
@@ -845,12 +815,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: ../tests/phpunit/AutoReview/Mutator/MutatorProviderTest.php
-
-		-
-			rawMessage: Infection\Tests\AutoReview\Mutator\MutatorTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\AutoReview\Mutator\MutatorTest::getPublicMethods() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
@@ -887,12 +851,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
-
-		-
-			rawMessage: Infection\Tests\AutoReview\ProjectCode\ProjectCodeTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
-			count: 1
-			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
