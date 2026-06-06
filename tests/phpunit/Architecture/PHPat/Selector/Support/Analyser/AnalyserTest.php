@@ -105,6 +105,35 @@ final class AnalyserTest extends SelectorTestCase
         $this->assertFalse($actual->usesIo);
     }
 
+    public function test_it_caches_analysis_results(): void
+    {
+        $fileContents = 'PHP file contents';
+
+        $nodes = [
+            new Class_('RandomTestClass'),
+        ];
+
+        $this->fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->with(__FILE__)
+            ->willReturn($fileContents);
+
+        $this->parserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->with(
+                $fileContents,
+                $this->isInstanceOf(Throwing::class),
+            )
+            ->willReturn($nodes);
+
+        $firstAnalysis = $this->analyser->analyse($this->classReflection);
+        $secondAnalysis = $this->analyser->analyse($this->classReflection);
+
+        $this->assertSame($firstAnalysis, $secondAnalysis);
+    }
+
     /**
      * @param class-string $className
      */
