@@ -50,11 +50,16 @@ use PHPStan\Reflection\ClassReflection;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
-final readonly class Analyser
+final class Analyser
 {
+    /**
+     * @var array<string, AnalysisResult>
+     */
+    private array $analysisResultCache = [];
+
     public function __construct(
-        private Parser $parser,
-        private FileSystem $fileSystem,
+        private readonly Parser $parser,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -62,11 +67,22 @@ final readonly class Analyser
         ClassReflection $classReflection,
         bool $analyseNonConcreteClasses = false,
     ): AnalysisResult {
+        $cacheKey = self::createAnalysisResultCacheKey(
+            $classReflection,
+            $analyseNonConcreteClasses,
+        );
+
+        if (isset($this->analysisResultCache[$cacheKey])) {
+            return $this->analysisResultCache[$cacheKey];
+        }
+
+        $isConcreteClass = ConcreteClassReflection::isConcreteClass($classReflection);
+
         if (
-            !ConcreteClassReflection::isConcreteClass($classReflection)
+            !$isConcreteClass
             && !$analyseNonConcreteClasses
         ) {
-            return new AnalysisResult(
+            return $this->analysisResultCache[$cacheKey] = new AnalysisResult(
                 hasTrivialImplementation: false,
                 usesIo: false,
             );
@@ -74,7 +90,7 @@ final readonly class Analyser
 
         $nodes = $this->parse($classReflection);
 
-        return $this->visit(
+        return $this->analysisResultCache[$cacheKey] = $this->visit(
             $classReflection,
             $nodes,
         );
@@ -135,6 +151,17 @@ final readonly class Analyser
         return new NodeTraverser(
             new ParentConnectingVisitor(),
             ...array_filter($visitors),
+        );
+    }
+
+    private static function createAnalysisResultCacheKey(
+        ClassReflection $classReflection,
+        bool $analyseNonConcreteClasses,
+    ): string {
+        return sprintf(
+            '%s-%s',
+            $classReflection->getName(),
+            $analyseNonConcreteClasses ? '1' : '0',
         );
     }
 }
