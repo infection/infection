@@ -77,7 +77,6 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     }
 
     // This is a sanity check to ensure we have the test correctly configured.
-    #[CoversNothing]
     public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
     {
         $this->fileSystem->dumpFile(self::TEST_DEFAULT_RELATIVE_PATHNAME, '');
