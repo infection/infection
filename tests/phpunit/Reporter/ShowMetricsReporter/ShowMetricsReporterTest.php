@@ -340,48 +340,48 @@ final class ShowMetricsReporterTest extends TestCase
 
     private function createMetricsCalculator(MetricsScenario $scenario): MetricsCalculator
     {
-        $metricsCalculatorMock = $this->createStub(MetricsCalculator::class);
+        $metricsCalculatorStub = $this->createStub(MetricsCalculator::class);
 
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getKilledByTestsCount')
             ->willReturn($scenario->killedByTestsCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn($scenario->killedByStaticAnalysisCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getIgnoredCount')
             ->willReturn($scenario->ignoredCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getNotTestedCount')
             ->willReturn($scenario->notTestedCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getEscapedCount')
             ->willReturn($scenario->escapedCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getErrorCount')
             ->willReturn($scenario->errorCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getSyntaxErrorCount')
             ->willReturn($scenario->syntaxErrorCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getTimedOutCount')
             ->willReturn($scenario->timedOutCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getSkippedCount')
             ->willReturn($scenario->skippedCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getTotalMutantsCount')
             ->willReturn($scenario->totalMutantsCount);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getMutationScoreIndicator')
             ->willReturn($scenario->mutationScoreIndicator);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getCoverageRate')
             ->willReturn($scenario->coverageRate);
-        $metricsCalculatorMock
+        $metricsCalculatorStub
             ->method('getCoveredCodeMutationScoreIndicator')
             ->willReturn($scenario->coveredCodeMutationScoreIndicator);
 
-        return $metricsCalculatorMock;
+        return $metricsCalculatorStub;
     }
 }

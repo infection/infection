@@ -54,7 +54,7 @@ use Symfony\Component\Process\Process;
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
-    private InitialStaticAnalysisProcessFactory&Stub $processFactoryMock;
+    private InitialStaticAnalysisProcessFactory&Stub $processFactoryStub;
 
     private EventDispatcherCollector $eventDispatcher;
 
@@ -66,11 +66,11 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             $this->markTestSkipped('The processes do not work the same way in PGPDBG');
         }
 
-        $this->processFactoryMock = $this->createStub(InitialStaticAnalysisProcessFactory::class);
+        $this->processFactoryStub = $this->createStub(InitialStaticAnalysisProcessFactory::class);
 
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->runner = new InitialStaticAnalysisRunner($this->processFactoryMock, $this->eventDispatcher);
+        $this->runner = new InitialStaticAnalysisRunner($this->processFactoryStub, $this->eventDispatcher);
     }
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
@@ -81,7 +81,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             STR
         );
 
-        $this->processFactoryMock
+        $this->processFactoryStub
             ->method('createProcess')
             ->willReturn($process)
         ;

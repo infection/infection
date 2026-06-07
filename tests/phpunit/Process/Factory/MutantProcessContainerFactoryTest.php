@@ -120,8 +120,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $executionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
 
-        $resultFactoryMock = $this->createStub(MutantExecutionResultFactory::class);
-        $resultFactoryMock
+        $resultFactoryStub = $this->createStub(MutantExecutionResultFactory::class);
+        $resultFactoryStub
             ->method('createFromProcess')
             ->willReturn($executionResult)
         ;
@@ -133,7 +133,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
             $processFactoryTimeout,
-            $resultFactoryMock,
+            $resultFactoryStub,
             [],
             $configuration,
         );
