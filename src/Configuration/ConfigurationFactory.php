@@ -55,6 +55,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -79,7 +80,6 @@ use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
-use function var_dump;
 
 /**
  * @internal
@@ -103,6 +103,7 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -182,6 +183,7 @@ class ConfigurationFactory
             $positionalPathSlot1,
             $positionalPathSlot2,
             $schema,
+            $this->fileSystem,
         );
         $classifiedPaths->assertNoConflictWithExplicitOptions(
             $isSourceFilterProvided,
