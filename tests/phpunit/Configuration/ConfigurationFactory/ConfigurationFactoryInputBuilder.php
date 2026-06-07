@@ -44,6 +44,8 @@ final class ConfigurationFactoryInputBuilder
     /**
      * @param non-empty-string|null $projectDirectory
      * @param positive-int|'max'|null $dotsPerRow
+     * @param list<non-empty-string> $positionalPathSlot1
+     * @param list<non-empty-string> $positionalPathSlot2
      */
     public function __construct(
         private ?string $existingCoveragePath,
@@ -80,6 +82,8 @@ final class ConfigurationFactoryInputBuilder
         private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
+        private array $positionalPathSlot1,
+        private array $positionalPathSlot2,
     ) {
     }
 
@@ -389,7 +393,9 @@ final class ConfigurationFactoryInputBuilder
      *     31: string|null,
      *     32: non-empty-string|null,
      *     33: string|null,
-     *     34: string|null
+     *     34: string|null,
+     *     35: list<non-empty-string>,
+     *     36: list<non-empty-string>
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -430,6 +436,8 @@ final class ConfigurationFactoryInputBuilder
             $this->projectDirectory,
             $this->staticAnalysisTool,
             $this->mutantId,
+            $this->positionalPathSlot1,
+            $this->positionalPathSlot2,
         ];
     }
 }

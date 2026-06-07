@@ -50,6 +50,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
@@ -197,6 +198,8 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
+                positionalPathSlot1: [],
+                positionalPathSlot2: [],
             )
         ;
     }
@@ -269,6 +272,8 @@ final class ConfigurationFactoryTest extends TestCase
             projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
+            positionalPathSlot1: [],
+            positionalPathSlot2: [],
         );
 
         $defaultConfiguration = new Configuration(
@@ -1488,6 +1493,8 @@ final class ConfigurationFactoryTest extends TestCase
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
+                    positionalPathSlot1: [],
+                    positionalPathSlot2: [],
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
