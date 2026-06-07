@@ -73,7 +73,7 @@ final class EnvironmentVariableBasedProjectDirectoryProviderTest extends TestCas
             putenv('INFECTION_TEST_PROJECT_DIR=' . $directory);
         }
 
-        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock = $this->createStub(FileSystem::class);
         $fileSystemMock
             ->method('isAbsolutePath')
             ->willReturn($absolute);

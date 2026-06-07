@@ -46,7 +46,7 @@ use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -506,9 +506,9 @@ final class CoverageCheckerTest extends TestCase
         }
     }
 
-    private function createInvalidIndexLocatorMock(): ReportLocator&MockObject
+    private function createInvalidIndexLocatorMock(): ReportLocator&Stub
     {
-        $indexLocatorMock = $this->createMock(ReportLocator::class);
+        $indexLocatorMock = $this->createStub(ReportLocator::class);
         $indexLocatorMock
             ->method('locate')
             ->willThrowException(UnknownReportLocatorException::create('index.xml'))
@@ -517,9 +517,9 @@ final class CoverageCheckerTest extends TestCase
         return $indexLocatorMock;
     }
 
-    private function createInvalidJUnitReportLocatorMock(): ReportLocator&MockObject
+    private function createInvalidJUnitReportLocatorMock(): ReportLocator&Stub
     {
-        $jUnitLocatorMock = $this->createMock(ReportLocator::class);
+        $jUnitLocatorMock = $this->createStub(ReportLocator::class);
         $jUnitLocatorMock
             ->method('locate')
             ->willThrowException(UnknownReportLocatorException::create('JUnit'))

@@ -47,14 +47,14 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
-    private InitialStaticAnalysisProcessFactory&MockObject $processFactoryMock;
+    private InitialStaticAnalysisProcessFactory&Stub $processFactoryMock;
 
     private EventDispatcherCollector $eventDispatcher;
 
@@ -66,7 +66,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             $this->markTestSkipped('The processes do not work the same way in PGPDBG');
         }
 
-        $this->processFactoryMock = $this->createMock(InitialStaticAnalysisProcessFactory::class);
+        $this->processFactoryMock = $this->createStub(InitialStaticAnalysisProcessFactory::class);
 
         $this->eventDispatcher = new EventDispatcherCollector();
 

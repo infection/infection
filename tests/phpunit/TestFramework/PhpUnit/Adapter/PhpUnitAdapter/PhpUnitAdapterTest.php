@@ -51,6 +51,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,6 +59,7 @@ use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {

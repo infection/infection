@@ -46,9 +46,11 @@ use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorIntegrationTest extends TestCase
 {
@@ -98,7 +100,7 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
 
     private function createTraceMock(): Trace
     {
-        $traceMock = $this->createMock(Trace::class);
+        $traceMock = $this->createStub(Trace::class);
         $traceMock
             ->method('getAllTestsForMutation')
             ->willReturn([

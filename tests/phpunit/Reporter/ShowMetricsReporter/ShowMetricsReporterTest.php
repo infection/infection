@@ -340,7 +340,7 @@ final class ShowMetricsReporterTest extends TestCase
 
     private function createMetricsCalculator(MetricsScenario $scenario): MetricsCalculator
     {
-        $metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
+        $metricsCalculatorMock = $this->createStub(MetricsCalculator::class);
 
         $metricsCalculatorMock
             ->method('getKilledByTestsCount')

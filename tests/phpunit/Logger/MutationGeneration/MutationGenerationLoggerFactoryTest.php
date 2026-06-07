@@ -60,7 +60,7 @@ final class MutationGenerationLoggerFactoryTest extends TestCase
 
     public function test_it_creates_a_progress_bar_logger_if_does_not_skip_the_progress_bar(): void
     {
-        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock = $this->createStub(OutputInterface::class);
         $outputMock
             ->method('isDecorated')
             ->willReturn(false)

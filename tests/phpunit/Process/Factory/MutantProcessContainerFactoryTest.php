@@ -48,10 +48,12 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MutantProcessContainerFactory::class)]
 final class MutantProcessContainerFactoryTest extends TestCase
 {
@@ -118,7 +120,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $executionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
 
-        $resultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
+        $resultFactoryMock = $this->createStub(MutantExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
             ->willReturn($executionResult)

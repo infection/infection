@@ -41,7 +41,6 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Function_;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -125,9 +124,9 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    private function mockNode(mixed $returnValue): Node&MockObject
+    private function mockNode(mixed $returnValue): Node&Stub
     {
-        $mockNode = $this->createMock(Node::class);
+        $mockNode = $this->createStub(Node::class);
 
         $mockNode->method('getAttribute')
                  ->willReturn($returnValue);
@@ -135,12 +134,9 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         return $mockNode;
     }
 
-    private function mockFunction(mixed $returnValue): Function_&MockObject
+    private function mockFunction(mixed $returnValue): Function_&Stub
     {
-        $mockFunction = $this->getMockBuilder(Function_::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getReturnType'])
-            ->getMock();
+        $mockFunction = $this->createStub(Function_::class);
 
         $mockFunction->method('getReturnType')
             ->willReturn($returnValue);

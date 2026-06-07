@@ -633,7 +633,7 @@ final class ShowMutationsReporterTest extends TestCase
 
     private function createDiffColorizerMock(): DiffColorizer
     {
-        $diffColorizerMock = $this->createMock(DiffColorizer::class);
+        $diffColorizerMock = $this->createStub(DiffColorizer::class);
         $diffColorizerMock
             ->method('colorize')
             ->willReturnCallback(

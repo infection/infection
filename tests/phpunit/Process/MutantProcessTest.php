@@ -58,7 +58,7 @@ final class MutantProcessTest extends TestCase
     {
         $this->processStub = $this->createStub(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $mutantExecutionResultFactory = $this->createMock(MutantExecutionResultFactory::class);
+        $mutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processStub,
