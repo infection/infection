@@ -74,7 +74,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     private Filesystem $fileSystem;
 
-    private Stub $composerFinderStub;
+    private ComposerExecutableFinder&Stub $composerFinderStub;
 
     /**
      * Saves the current environment
