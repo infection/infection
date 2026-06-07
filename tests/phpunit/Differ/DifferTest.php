@@ -54,7 +54,7 @@ final class DifferTest extends TestCase
         $this->differ = SingletonContainer::getContainer()->getDiffer();
     }
 
-    #[DataProvider('diffProvider')]
+    #[DataProvider('diffStringProvider')]
     public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
         string $sourceA,
         string $sourceB,
@@ -81,6 +81,13 @@ final class DifferTest extends TestCase
         $actual = $this->differ->diffToArray($sourceA, $sourceB);
 
         $this->assertSame($expected, $actual);
+    }
+
+    public static function diffStringProvider(): iterable
+    {
+        foreach (self::diffProvider() as $label => [$sourceA, $sourceB, $expected]) {
+            yield $label => [$sourceA, $sourceB, $expected];
+        }
     }
 
     public static function diffProvider(): iterable

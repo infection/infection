@@ -55,7 +55,6 @@ final class ParentConnectorTest extends VisitorTestCase
     /**
      * This test is to ensure the integration of ParentConnectingVisitor works as expected.
      */
-    #[CoversNothing]
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_parent_nodes(
         string $code,

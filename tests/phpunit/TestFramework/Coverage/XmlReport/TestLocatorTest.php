@@ -84,7 +84,7 @@ final class TestLocatorTest extends TestCase
         $this->assertSame($expectedTests, TestLocationsNormalizer::normalize($tests));
     }
 
-    #[DataProvider('rangeProvider')]
+    #[DataProvider('rangeWithoutExpectedTestsProvider')]
     public function test_it_cannot_locate_any_tests_executing_the_given_range_if_no_tests_are_found(
         NodeLineRangeData $range,
         bool $onFunctionSignature,
@@ -96,6 +96,13 @@ final class TestLocatorTest extends TestCase
         $tests = $testLocator->getAllTestsForMutation($range, $onFunctionSignature);
 
         $this->assertSame([], TestLocationsNormalizer::normalize($tests));
+    }
+
+    public static function rangeWithoutExpectedTestsProvider(): iterable
+    {
+        foreach (self::rangeProvider() as $label => [$range, $onFunctionSignature]) {
+            yield $label => [$range, $onFunctionSignature];
+        }
     }
 
     public static function rangeProvider(): iterable

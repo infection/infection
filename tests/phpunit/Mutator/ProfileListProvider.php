@@ -77,6 +77,13 @@ final class ProfileListProvider
         }
     }
 
+    public static function implementedMutatorFileAndClassProvider(): iterable
+    {
+        foreach (self::implementedMutatorProvider() as $label => [$filePath, $className]) {
+            yield $label => [$filePath, $className];
+        }
+    }
+
     public static function implementedMutatorProvider(): iterable
     {
         if (self::$mutators !== null) {

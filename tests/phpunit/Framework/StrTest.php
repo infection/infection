@@ -112,11 +112,11 @@ final class StrTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    #[DataProvider('trimLinesProvider')]
+    #[DataProvider('cleanTrimLinesProvider')]
     public function test_it_rtrim_lines_trims_blank_lines_and_replaces_the_line_endings_by_the_unix_line_ending(
         string $value,
         string $expectedTrimmedLines,
-        ?string $expectedCleanedLines = null,
+        ?string $expectedCleanedLines,
     ): void {
         $expected = $expectedCleanedLines ?? $expectedTrimmedLines;
 
@@ -127,24 +127,35 @@ final class StrTest extends TestCase
 
     public static function trimLinesProvider(): iterable
     {
+        foreach (self::cleanTrimLinesProvider() as $label => [$value, $expectedTrimmedLines, $expectedCleanedLines]) {
+            yield $label => [$value, $expectedTrimmedLines];
+        }
+    }
+
+    public static function cleanTrimLinesProvider(): iterable
+    {
         yield 'empty' => [
             '',
             '',
+            null,
         ];
 
         yield 'blank string' => [
             '  ',
             '',
+            null,
         ];
 
         yield 'string without any line endings' => [
             'Hello!',
             'Hello!',
+            null,
         ];
 
         yield 'string without line endings with spaces' => [
             ' Hello world! ',
             ' Hello world!',
+            null,
         ];
 
         yield 'string with only Unix/Linux (LF) line endings' => [
