@@ -69,7 +69,7 @@ final class PathsArgument
             ->addArgument(
                 self::SLOT_1_NAME,
                 InputArgument::OPTIONAL,
-                'A source or test path to focus mutation testing on. Source paths can be comma-separated to mutate multiple files (e.g. "src/A.php,src/B.php") — same convention as --filter. Test paths must be a single file or directory. Source vs test is auto-detected against the configured "source.directories".',
+                'A source or test path to focus mutation testing on. Source paths can be comma-separated to mutate multiple files (e.g. "src/A.php,src/B.php") - same convention as --filter. Test paths must be a single file or directory. Source vs test is auto-detected against the configured "source.directories".',
             )
             ->addArgument(
                 self::SLOT_2_NAME,

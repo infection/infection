@@ -186,7 +186,7 @@ final readonly class PositionalPathsClassifier
      * @param list<non-empty-string> $slot
      * @param list<non-empty-string> $absoluteSourceDirs
      *
-     * @return self::KIND_*|null
+     * @return 'source'|'test'|null
      */
     private static function classifySlot(
         array $slot,
@@ -268,7 +268,9 @@ final readonly class PositionalPathsClassifier
     }
 
     /**
-     * @return self::KIND_
+     * @param list<non-empty-string> $absoluteSourceDirs
+     *
+     * @return 'source'|'test'
      */
     private static function classifyPathKind(
         string $path,
@@ -309,7 +311,7 @@ final readonly class PositionalPathsClassifier
             ));
         }
 
-        if (self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs, $configDir)) {
+        if (self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs)) {
             return self::KIND_SOURCE;
         }
 
@@ -317,6 +319,8 @@ final readonly class PositionalPathsClassifier
     }
 
     /**
+     * @param string $value
+     *
      * \SomeNamespace\Class
      * \SomeNamespace\Class::method
      * \SomeNamespace\Class::method::34
