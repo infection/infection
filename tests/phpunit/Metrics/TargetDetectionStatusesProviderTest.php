@@ -42,6 +42,7 @@ use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function array_values;
 
 #[CoversClass(TargetDetectionStatusesProvider::class)]
 final class TargetDetectionStatusesProviderTest extends TestCase
@@ -312,7 +313,10 @@ final class TargetDetectionStatusesProviderTest extends TestCase
      */
     private function assertProvides(array $expected, array $actual): void
     {
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEqualsCanonicalizing(
+            array_values($expected),
+            array_values($actual),
+        );
     }
 
     /**
@@ -323,6 +327,9 @@ final class TargetDetectionStatusesProviderTest extends TestCase
     {
         $expected = DetectionStatus::getCasesExcluding(...$excluding);
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEqualsCanonicalizing(
+            $expected,
+            array_values($actual),
+        );
     }
 }
