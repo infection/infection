@@ -43,7 +43,7 @@ use LogicException;
 use const PHP_OS;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use function stripos;
 
 #[Group('integration')]
@@ -52,16 +52,16 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 {
     private SourceDirsProvider $provider;
 
-    private MockObject&SourceDirGuesser $sourceDirGuesser;
+    private Stub&SourceDirGuesser $sourceDirGuesserStub;
 
     protected function setUp(): void
     {
-        $this->sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $this->sourceDirGuesserStub = $this->createStub(SourceDirGuesser::class);
 
         $this->provider = new SourceDirsProvider(
             $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
-            $this->sourceDirGuesser,
+            $this->sourceDirGuesserStub,
         );
     }
 
@@ -71,7 +71,7 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
             $this->markTestSkipped('Stty is not available');
         }
 
-        $this->sourceDirGuesser
+        $this->sourceDirGuesserStub
             ->method('guess')
             ->willReturn(['src']);
 
@@ -88,7 +88,7 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 
     public function test_it_uses_guesser_and_non_default_guessed_value(): void
     {
-        $this->sourceDirGuesser
+        $this->sourceDirGuesserStub
             ->method('guess')
             ->willReturn(['src/Namespace']);
 
@@ -105,7 +105,7 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 
     public function test_it_uses_guesser_and_multiple_guessed_dirs(): void
     {
-        $this->sourceDirGuesser
+        $this->sourceDirGuesserStub
             ->method('guess')
             ->willReturn(['foo', 'bar']);
 
@@ -122,7 +122,7 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 
     public function test_it_fills_choices_with_current_dir(): void
     {
-        $this->sourceDirGuesser
+        $this->sourceDirGuesserStub
             ->method('guess')
             ->willReturn(['src']);
 
@@ -139,7 +139,7 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 
     public function test_it_throws_exception_when_current_dir_is_selected_with_another_dir(): void
     {
-        $this->sourceDirGuesser
+        $this->sourceDirGuesserStub
             ->method('guess')
             ->willReturn(['src']);
 

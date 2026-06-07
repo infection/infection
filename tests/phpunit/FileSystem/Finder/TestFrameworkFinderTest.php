@@ -49,7 +49,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use function Safe\chdir;
 use function Safe\chmod;
 use function Safe\mkdir;
@@ -74,7 +74,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     private Filesystem $fileSystem;
 
-    private MockObject $composerFinder;
+    private Stub $composerFinderStub;
 
     /**
      * Saves the current environment
@@ -96,8 +96,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->fileSystem = new Filesystem();
 
-        $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
-        $this->composerFinder->method('find')
+        $this->composerFinderStub = $this->createStub(ComposerExecutableFinder::class);
+        $this->composerFinderStub->method('find')
             ->willReturn(['/usr/bin/composer']);
     }
 
@@ -112,7 +112,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinderStub);
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -123,7 +123,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinderStub);
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -135,7 +135,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $path = getenv(self::$pathName);
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinderStub);
 
         if (OperatingSystem::isWindows()) {
             // The main script must be found from the .bat file
@@ -197,7 +197,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinderStub);
 
         if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
@@ -223,7 +223,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinderStub);
 
         $this->assertSame(
             Path::canonicalize($mock->getPackageScript()),

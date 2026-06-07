@@ -1594,8 +1594,8 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $projectDirectory,
         CpuCoresCountProvider $cpuCoresCountProvider,
     ): ConfigurationFactory {
-        $projectDirectoryProviderMock = $this->createMock(ProjectDirectoryProvider::class);
-        $projectDirectoryProviderMock
+        $projectDirectoryProviderStub = $this->createStub(ProjectDirectoryProvider::class);
+        $projectDirectoryProviderStub
             ->method('provide')
             ->willReturn($projectDirectory);
 
@@ -1608,7 +1608,7 @@ final class ConfigurationFactoryTest extends TestCase
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
             ),
-            $projectDirectoryProviderMock,
+            $projectDirectoryProviderStub,
             $cpuCoresCountProvider,
         );
     }
