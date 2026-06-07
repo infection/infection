@@ -6349,6 +6349,24 @@ message = "Type `iterable` in return type of `diffProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Differ/DifferTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `diffStringProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Differ/DifferTest.php"
+code = "invalid-destructuring-source"
+message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Differ/DifferTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 4
+
+[[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Metrics\MaxTimeoutCountReached` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
@@ -7113,7 +7131,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\FileSystem\Finder\TestFrameworkFinder::__construct`: expected `Infection\FileSystem\Finder\ComposerExecutableFinder`, but possibly received `PHPUnit\Framework\MockObject\MockObject`.'
+message = 'Possible argument type mismatch for argument #1 of `Infection\FileSystem\Finder\TestFrameworkFinder::__construct`: expected `Infection\FileSystem\Finder\ComposerExecutableFinder`, but possibly received `PHPUnit\Framework\MockObject\Stub`.'
 count = 5
 
 [[issues]]
@@ -7365,6 +7383,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `enumClassNameProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `enumProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -7382,8 +7406,20 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
+code = "invalid-destructuring-source"
+message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\Framework\Enum\EnumBucket::take`: expected `BackedEnum`, but found `mixed`.'
+count = 3
+
+[[issues]]
+file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 3
 
 [[issues]]
@@ -7408,6 +7444,12 @@ count = 1
 file = "tests/phpunit/Framework/Iterable/GeneratorFactory/GeneratorFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `iterableProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/StrTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `cleanTrimLinesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -7439,6 +7481,18 @@ file = "tests/phpunit/Framework/StrTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `utf8StringConversionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/StrTest.php"
+code = "invalid-destructuring-source"
+message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/StrTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 4
 
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
@@ -7903,8 +7957,26 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `mutationOnlyProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `mutationProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "invalid-destructuring-source"
+message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutant/MutantCodePrinterTest.php"
@@ -9323,6 +9395,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `implementedMutatorFileAndClassProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/ProfileListProvider.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `implementedMutatorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -9342,7 +9420,7 @@ count = 1
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "invalid-destructuring-source"
 message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
-count = 1
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
@@ -9354,7 +9432,7 @@ count = 1
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 4
+count = 7
 
 [[issues]]
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
@@ -11693,7 +11771,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `Exception` in `{closure:tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php:171:19}`."
+message = "Potentially unhandled exception `Exception` in `{closure:tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php:173:19}`."
 count = 1
 
 [[issues]]
@@ -12370,9 +12448,27 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `rangeWithoutExpectedTestsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
+code = "invalid-destructuring-source"
+message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #1 of `Infection\TestFramework\Coverage\XmlReport\TestLocator::__construct`: expected `Infection\TestFramework\Tracing\Trace\TestLocations`, but found `mixed`.'
 count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
@@ -13223,13 +13319,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:139:30}`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:141:30}`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:142:30}`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:144:30}`.'
 count = 1
 
 [[issues]]
