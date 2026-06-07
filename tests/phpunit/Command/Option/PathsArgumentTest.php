@@ -61,6 +61,10 @@ final class PathsArgumentTest extends TestCase
         $this->assertFalse($command->getDefinition()->getArgument(PathsArgument::SLOT_2_NAME)->isRequired());
     }
 
+    /**
+     * @param array<string, string> $arguments
+     * @param list<non-empty-string> $expected
+     */
     #[DataProvider('slot1Provider')]
     public function test_it_reads_slot1(array $arguments, array $expected): void
     {
@@ -98,6 +102,10 @@ final class PathsArgumentTest extends TestCase
         ];
     }
 
+    /**
+     * @param array<string, string> $arguments
+     * @param list<non-empty-string> $expected
+     */
     #[DataProvider('slot2Provider')]
     public function test_it_reads_slot2(array $arguments, array $expected): void
     {

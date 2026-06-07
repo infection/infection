@@ -47,9 +47,11 @@ use Infection\FileSystem\FileSystem;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PositionalPathsClassifier::class)]
+#[Group('integration')]
 final class PositionalPathsClassifierTest extends TestCase
 {
     public function test_it_returns_empty_buckets_when_both_slots_are_empty(): void
@@ -469,7 +471,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectExceptionMessage('FQCN-style arguments like "Infection\Configuration\PositionalPathsClassifier" are not yet supported.');
 
         PositionalPathsClassifier::fromSlots(
-            ['Infection\Configuration\PositionalPathsClassifier'],
+            [PositionalPathsClassifier::class],
             [],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -550,6 +552,10 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->assertSame('tests/NonExistentTest.php', $classified->testPath);
     }
 
+    /**
+     * @param list<non-empty-string> $slot
+     * @param list<non-empty-string> $expectedSourcePaths
+     */
     #[DataProvider('provideSingleArgumentSourceCases')]
     public function test_cli_case_one_argument_source_values_are_routed_to_source(
         array $slot,
@@ -602,6 +608,9 @@ final class PositionalPathsClassifierTest extends TestCase
         ];
     }
 
+    /**
+     * @param list<non-empty-string> $slot
+     */
     #[DataProvider('provideSingleArgumentTestCases')]
     public function test_cli_case_one_argument_test_values_are_routed_to_test(
         array $slot,
@@ -649,6 +658,11 @@ final class PositionalPathsClassifierTest extends TestCase
         ];
     }
 
+    /**
+     * @param list<non-empty-string> $slot1
+     * @param list<non-empty-string> $slot2
+     * @param list<non-empty-string> $expectedSourcePaths
+     */
     #[DataProvider('provideTwoArgumentsSourceAndTestCases')]
     public function test_cli_case_two_arguments_source_and_test_are_classified_correctly(
         array $slot1,
