@@ -152,8 +152,9 @@ class ConfigurationFactory
         ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
-        array $positionalPathSlot1 = [],
-        array $positionalPathSlot2 = [],
+        array $positionalPathSlot1,
+        array $positionalPathSlot2,
+        // TODO remove default values
         bool $isSourceFilterProvided = false,
         bool $isTestFrameworkExtraArgsProvided = false,
     ): Configuration {
