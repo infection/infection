@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_values;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
@@ -42,7 +43,6 @@ use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function array_values;
 
 #[CoversClass(TargetDetectionStatusesProvider::class)]
 final class TargetDetectionStatusesProviderTest extends TestCase
