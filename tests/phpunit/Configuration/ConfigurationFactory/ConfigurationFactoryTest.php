@@ -50,6 +50,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -1619,6 +1620,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
+            new FakeFileSystem(),
         );
     }
 }

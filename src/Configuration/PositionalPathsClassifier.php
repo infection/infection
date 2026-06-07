@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use function basename;
+use function class_exists;
 use function count;
 use function dirname;
 use function implode;
@@ -43,6 +44,7 @@ use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\FileSystem;
 use InvalidArgumentException;
 use function rtrim;
 use function sprintf;
@@ -50,6 +52,7 @@ use function str_contains;
 use function str_ends_with;
 use function str_replace;
 use function str_starts_with;
+use function strtoupper;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -92,6 +95,7 @@ final readonly class PositionalPathsClassifier
         array $slot1,
         array $slot2,
         SchemaConfiguration $schema,
+        FileSystem $fileSystem,
     ): self {
         if ($slot1 === [] && $slot2 === []) {
             return new self([], null);
@@ -100,8 +104,8 @@ final readonly class PositionalPathsClassifier
         $configDir = dirname($schema->pathname);
         $absoluteSourceDirs = self::resolveAbsoluteSourceDirectories($schema, $configDir);
 
-        $slot1Kind = self::classifySlot($slot1, $absoluteSourceDirs, $configDir, PathsArgument::SLOT_1_NAME);
-        $slot2Kind = self::classifySlot($slot2, $absoluteSourceDirs, $configDir, PathsArgument::SLOT_2_NAME);
+        $slot1Kind = self::classifySlot($slot1, $absoluteSourceDirs, $configDir, $fileSystem, PathsArgument::SLOT_1_NAME);
+        $slot2Kind = self::classifySlot($slot2, $absoluteSourceDirs, $configDir, $fileSystem, PathsArgument::SLOT_2_NAME);
 
         self::assertTestSlotIsSinglePath($slot1Kind, $slot1, PathsArgument::SLOT_1_NAME);
         self::assertTestSlotIsSinglePath($slot2Kind, $slot2, PathsArgument::SLOT_2_NAME);
@@ -188,6 +192,7 @@ final readonly class PositionalPathsClassifier
         array $slot,
         array $absoluteSourceDirs,
         string $configDir,
+        FileSystem $fileSystem,
         string $slotName,
     ): ?string {
         if ($slot === []) {
@@ -197,7 +202,7 @@ final readonly class PositionalPathsClassifier
         $kind = null;
 
         foreach ($slot as $path) {
-            $itemKind = self::classifyPathKind($path, $absoluteSourceDirs, $configDir);
+            $itemKind = self::classifyPathKind($path, $absoluteSourceDirs, $configDir, $fileSystem);
 
             if ($kind === null) {
                 $kind = $itemKind;
@@ -246,21 +251,12 @@ final readonly class PositionalPathsClassifier
     private static function isInsideSourceDirectories(
         string $path,
         array $absoluteSourceDirs,
-        string $configDir,
     ): bool {
         if ($absoluteSourceDirs === []) {
             return false;
         }
 
-        // Relative paths are resolved against the configuration directory so
-        // they line up with how source.directories entries are interpreted.
-        // Users typically invoke Infection from the project root where cwd
-        // matches configDir, so this also matches user expectations.
-        $candidate = Path::isAbsolute($path)
-            ? $path
-            : Path::join($configDir, $path);
-
-        $candidate = rtrim(Path::canonicalize($candidate), '/');
+        $candidate = rtrim(Path::canonicalize($path), '/');
 
         foreach ($absoluteSourceDirs as $sourceDir) {
             if ($candidate === $sourceDir || str_starts_with($candidate, $sourceDir . '/')) {
@@ -272,35 +268,73 @@ final readonly class PositionalPathsClassifier
     }
 
     /**
-     * Classification priority:
-     *   1) likely test paths are test, even when bare (e.g. "FooTest.php") or
-     *      living under source.directories
-     *   2) non-path symbolic values behave like --filter and are source
-     *   3) remaining filesystem paths fall back to source.directories membership
+     * @return self::KIND_
      */
     private static function classifyPathKind(
         string $path,
         array $absoluteSourceDirs,
         string $configDir,
+        FileSystem $fileSystem,
     ): string {
+        // TODO: FQCN-style arguments (e.g. "\App\Foo" or "\App\Foo::method::45") will
+        // be supported via https://github.com/infection/infection/issues/2237
+        if (self::looksLikeFqcn($path)) {
+            throw new InvalidArgumentException(sprintf(
+                'FQCN-style arguments like "%s" are not yet supported. See https://github.com/infection/infection/issues/2237.',
+                $path,
+            ));
+        }
+
         if (self::looksLikeTestPath($path)) {
             return self::KIND_TEST;
         }
 
-        // like `SomeFile` or `SomeFile::method` in the future
-        if (!self::looksLikeFilesystemPath($path)) {
+        // like `SomeFile` or `SomeFile.php` - bare values behave as --filter values
+        if (self::looksLikeClassOrFileName($path)) {
             return self::KIND_SOURCE;
         }
 
-        return self::isInsideSourceDirectories($path, $absoluteSourceDirs, $configDir)
-            ? self::KIND_SOURCE
-            : self::KIND_TEST;
+        // at this point, both for `source` and for `test` slots we must have a real file path for provided value
+        $absolutePath = Path::isAbsolute($path)
+            ? $path
+            : Path::join($configDir, $path);
+
+        if (!$fileSystem->isReadableFile($absolutePath) && !$fileSystem->isReadableDirectory($absolutePath)) {
+            throw new InvalidArgumentException(sprintf(
+                'Positional path "%s" does not exist (resolved to "%s"). Check the path, or pass it via "--%s" / "--%s" explicitly.',
+                $path,
+                $absolutePath,
+                SourceFilterOptions::PLAIN_FILTER_NAME,
+                TestFrameworkExtraArgsOption::NAME,
+            ));
+        }
+
+        if (self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs, $configDir)) {
+            return self::KIND_SOURCE;
+        }
+
+        return self::KIND_TEST;
     }
 
-    private static function looksLikeFilesystemPath(string $value): bool
+    /**
+     * \SomeNamespace\Class
+     * \SomeNamespace\Class::method
+     * \SomeNamespace\Class::method::34
+     */
+    private static function looksLikeFqcn(string $value): bool
     {
-        return str_contains($value, '/')
-            || str_contains($value, '\\');
+        if (class_exists($value)) {
+            return true;
+        }
+
+        return str_starts_with($value, '\\') || str_contains($value, '::');
+    }
+
+    private static function looksLikeClassOrFileName(string $value): bool
+    {
+        return strtoupper($value[0]) === $value[0] // class and file name starts with Pascal Case
+            && !str_contains($value, '/')
+            && !str_contains($value, '\\');
     }
 
     /**

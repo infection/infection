@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
@@ -42,8 +43,10 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\FileSystem\FileSystem;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PositionalPathsClassifier::class)]
@@ -51,7 +54,7 @@ final class PositionalPathsClassifierTest extends TestCase
 {
     public function test_it_returns_empty_buckets_when_both_slots_are_empty(): void
     {
-        $classified = PositionalPathsClassifier::fromSlots([], [], $this->createSchema(['src']));
+        $classified = PositionalPathsClassifier::fromSlots([], [], $this->createSchema(['src']), $this->acceptingFileSystem());
 
         $this->assertSame([], $classified->sourcePaths);
         $this->assertNull($classified->testPath);
@@ -63,6 +66,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/SomeFile.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['src/SomeFile.php'], $classified->sourcePaths);
@@ -75,6 +79,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['tests/SomeTest.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -87,6 +92,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['lib/gocardless/tests/Unit/FooTest.php'],
             [],
             $this->createSchema(['src', 'lib']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -99,6 +105,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/tests/Unit/FooTest.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -111,6 +118,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/Unit/FooTest.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -123,6 +131,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/contest/Foo.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['src/contest/Foo.php'], $classified->sourcePaths);
@@ -137,6 +146,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['FooTest.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -149,6 +159,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['Plus.php'],
             ['PlusTest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['Plus.php'], $classified->sourcePaths);
@@ -161,6 +172,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['Plus'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['Plus'], $classified->sourcePaths);
@@ -173,6 +185,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['Plus.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['Plus.php'], $classified->sourcePaths);
@@ -185,6 +198,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/Foo.php'],
             ['tests/FooTest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['src/Foo.php'], $classified->sourcePaths);
@@ -197,6 +211,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['tests/FooTest.php'],
             ['src/Foo.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['src/Foo.php'], $classified->sourcePaths);
@@ -209,6 +224,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['Plus'],
             ['tests/FooTest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['Plus'], $classified->sourcePaths);
@@ -221,6 +237,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['Plus.php'],
             ['tests/phpunit/Mutator/Arithmetic/PlusTest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['Plus.php'], $classified->sourcePaths);
@@ -236,6 +253,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/A.php', 'src/B.php'],
             ['tests/ATest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['src/A.php', 'src/B.php'], $classified->sourcePaths);
@@ -248,6 +266,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['lib/B.php'],
             ['tests/CTest.php'],
             $this->createSchema(['src', 'lib']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame(['lib/B.php'], $classified->sourcePaths);
@@ -260,6 +279,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/SomeFile.php'],
             [],
             $this->createSchema([]),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -275,6 +295,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/Foo.php', 'tests/FooTest.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
     }
 
@@ -287,6 +308,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/Foo.php'],
             ['src/Bar.php', 'tests/BarTest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
     }
 
@@ -299,6 +321,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/A.php'],
             ['src/B.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
     }
 
@@ -311,6 +334,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['tests/ATest.php'],
             ['tests/BTest.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
     }
 
@@ -325,6 +349,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['tests/A.php', 'tests/B.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
     }
 
@@ -337,6 +362,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/A.php'],
             ['tests/A.php', 'tests/B.php'],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
     }
 
@@ -346,6 +372,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/Foo.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -360,6 +387,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['tests/FooTest.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -374,6 +402,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['src/Foo.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $classified->assertNoConflictWithExplicitOptions(false, true);
@@ -388,6 +417,7 @@ final class PositionalPathsClassifierTest extends TestCase
             ['test/Foo.php'],
             [],
             $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
@@ -400,10 +430,375 @@ final class PositionalPathsClassifierTest extends TestCase
             ['lib/vendor/test/Unit/Foo.php'],
             [],
             $this->createSchema(['src', 'lib']),
+            $this->acceptingFileSystem(),
         );
 
         $this->assertSame([], $classified->sourcePaths);
         $this->assertSame('lib/vendor/test/Unit/Foo.php', $classified->testPath);
+    }
+
+    public function test_it_rejects_fqcn_with_leading_backslash(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported. See https://github.com/infection/infection/issues/2237.');
+
+        PositionalPathsClassifier::fromSlots(
+            ['\App\Foo'],
+            [],
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+    }
+
+    public function test_it_rejects_fqcn_with_method_coordinate_separator(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('FQCN-style arguments like "App\Foo::method" are not yet supported.');
+
+        PositionalPathsClassifier::fromSlots(
+            ['App\Foo::method'],
+            [],
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+    }
+
+    public function test_it_rejects_existing_class_name_via_class_exists_check(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('FQCN-style arguments like "Infection\Configuration\PositionalPathsClassifier" are not yet supported.');
+
+        PositionalPathsClassifier::fromSlots(
+            ['Infection\Configuration\PositionalPathsClassifier'],
+            [],
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+    }
+
+    public function test_it_rejects_path_shaped_arguments_that_do_not_exist_on_disk(): void
+    {
+        // Catches typos like "scr/Foo.php" (a slip of "src/") at the classifier
+        // layer instead of letting them silently route to PHPUnit and surface
+        // as confusing test-framework errors downstream.
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Positional path "scr/Foo.php" does not exist (resolved to "/project/scr/Foo.php"). Check the path, or pass it via "--filter" / "--test-framework-extra-args" explicitly.');
+
+        PositionalPathsClassifier::fromSlots(
+            ['scr/Foo.php'],
+            [],
+            $this->createSchema(['src']),
+            $this->fileSystemWith([]),
+        );
+    }
+
+    public function test_it_classifies_an_existing_file_inside_source_directories_as_source(): void
+    {
+        $classified = PositionalPathsClassifier::fromSlots(
+            ['src/SomeFile.php'],
+            [],
+            $this->createSchema(['src']),
+            $this->fileSystemWith(['/project/src/SomeFile.php']),
+        );
+
+        $this->assertSame(['src/SomeFile.php'], $classified->sourcePaths);
+        $this->assertNull($classified->testPath);
+    }
+
+    public function test_it_classifies_an_existing_directory_inside_source_directories_as_source(): void
+    {
+        $classified = PositionalPathsClassifier::fromSlots(
+            ['src/SubTree'],
+            [],
+            $this->createSchema(['src']),
+            $this->fileSystemWith(['/project/src/SubTree']),
+        );
+
+        $this->assertSame(['src/SubTree'], $classified->sourcePaths);
+        $this->assertNull($classified->testPath);
+    }
+
+    public function test_it_classifies_an_existing_path_outside_source_directories_as_test(): void
+    {
+        // Real path on disk that isn't under any configured source directory:
+        // routed to the test-framework slot. This is what enables
+        // `infection run tests/SomeFolder` to behave like `phpunit tests/SomeFolder`.
+        $classified = PositionalPathsClassifier::fromSlots(
+            ['integration/SomeFolder'],
+            [],
+            $this->createSchema(['src']),
+            $this->fileSystemWith(['/project/integration/SomeFolder']),
+        );
+
+        $this->assertSame([], $classified->sourcePaths);
+        $this->assertSame('integration/SomeFolder', $classified->testPath);
+    }
+
+    public function test_it_skips_existence_check_for_name_classified_test_paths(): void
+    {
+        // Anything matching the test-name heuristic (tests/… , …Test.php, etc.)
+        // routes to the test-framework slot without touching the filesystem —
+        // PHPUnit will then complain clearly if the path is missing.
+        $classified = PositionalPathsClassifier::fromSlots(
+            ['tests/NonExistentTest.php'],
+            [],
+            $this->createSchema(['src']),
+            $this->fileSystemWith([]),
+        );
+
+        $this->assertSame([], $classified->sourcePaths);
+        $this->assertSame('tests/NonExistentTest.php', $classified->testPath);
+    }
+
+    #[DataProvider('provideSingleArgumentSourceCases')]
+    public function test_cli_case_one_argument_source_values_are_routed_to_source(
+        array $slot,
+        array $expectedSourcePaths,
+    ): void {
+        $classified = PositionalPathsClassifier::fromSlots(
+            $slot,
+            [],
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+
+        $this->assertSame($expectedSourcePaths, $classified->sourcePaths);
+        $this->assertNull($classified->testPath);
+    }
+
+    /**
+     * @return iterable<string, array{0: list<non-empty-string>, 1: list<non-empty-string>}>
+     */
+    public static function provideSingleArgumentSourceCases(): iterable
+    {
+        yield 'symbolic source token Plus_' => [
+            ['Plus_'],
+            ['Plus_'],
+        ];
+
+        yield 'symbolic php token Plus_.php' => [
+            ['Plus_.php'],
+            ['Plus_.php'],
+        ];
+
+        yield 'source file path' => [
+            ['src/Service/Mailer.php'],
+            ['src/Service/Mailer.php'],
+        ];
+
+        yield 'source directory path' => [
+            ['src/Service/'],
+            ['src/Service/'],
+        ];
+
+        yield 'comma separated source file paths' => [
+            ['src/Service/Mailer.php', 'src/Entity/Foobar.php'],
+            ['src/Service/Mailer.php', 'src/Entity/Foobar.php'],
+        ];
+
+        yield 'comma separated symbolic source values' => [
+            ['Mailer.php', 'Foobar.php'],
+            ['Mailer.php', 'Foobar.php'],
+        ];
+    }
+
+    #[DataProvider('provideSingleArgumentTestCases')]
+    public function test_cli_case_one_argument_test_values_are_routed_to_test(
+        array $slot,
+        string $expectedTestPath,
+    ): void {
+        $classified = PositionalPathsClassifier::fromSlots(
+            $slot,
+            [],
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+
+        $this->assertSame([], $classified->sourcePaths);
+        $this->assertSame($expectedTestPath, $classified->testPath);
+    }
+
+    /**
+     * @return iterable<string, array{0: list<non-empty-string>, 1: non-empty-string}>
+     */
+    public static function provideSingleArgumentTestCases(): iterable
+    {
+        yield 'test file path' => [
+            ['tests/Unit/Service/MailerTest.php'],
+            'tests/Unit/Service/MailerTest.php',
+        ];
+
+        yield 'test directory path with service segment' => [
+            ['tests/Unit/Service/'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'test directory unit segment' => [
+            ['tests/Unit/'],
+            'tests/Unit/',
+        ];
+
+        yield 'test directory with trailing slash' => [
+            ['tests/'],
+            'tests/',
+        ];
+
+        yield 'test directory token without slash' => [
+            ['tests'],
+            'tests',
+        ];
+    }
+
+    #[DataProvider('provideTwoArgumentsSourceAndTestCases')]
+    public function test_cli_case_two_arguments_source_and_test_are_classified_correctly(
+        array $slot1,
+        array $slot2,
+        array $expectedSourcePaths,
+        string $expectedTestPath,
+    ): void {
+        $classified = PositionalPathsClassifier::fromSlots(
+            $slot1,
+            $slot2,
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+
+        $this->assertSame($expectedSourcePaths, $classified->sourcePaths);
+        $this->assertSame($expectedTestPath, $classified->testPath);
+    }
+
+    /**
+     * @return iterable<string, array{0: list<non-empty-string>, 1: list<non-empty-string>, 2: list<non-empty-string>, 3: non-empty-string}>
+     */
+    public static function provideTwoArgumentsSourceAndTestCases(): iterable
+    {
+        yield 'source file + test file' => [
+            ['src/Service/Mailer.php'],
+            ['tests/Unit/Service/MailerTest.php'],
+            ['src/Service/Mailer.php'],
+            'tests/Unit/Service/MailerTest.php',
+        ];
+
+        yield 'source file + test folder' => [
+            ['src/Service/Mailer.php'],
+            ['tests/Unit/Service/'],
+            ['src/Service/Mailer.php'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'source folder + test file' => [
+            ['src/Service/'],
+            ['tests/Unit/Service/MailerTest.php'],
+            ['src/Service/'],
+            'tests/Unit/Service/MailerTest.php',
+        ];
+
+        yield 'source folder + test folder' => [
+            ['src/Service/'],
+            ['tests/Unit/Service/'],
+            ['src/Service/'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'symbolic php source + test folder' => [
+            ['Mailer.php'],
+            ['tests/Unit/Service/'],
+            ['Mailer.php'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'symbolic source + test folder' => [
+            ['Mailer'],
+            ['tests/Unit/Service/'],
+            ['Mailer'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'comma separated symbolic source + test folder' => [
+            ['Mailer', 'Plus_'],
+            ['tests/Unit/Service/'],
+            ['Mailer', 'Plus_'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'mirror: test file + source file' => [
+            ['tests/Unit/Service/MailerTest.php'],
+            ['src/Service/Mailer.php'],
+            ['src/Service/Mailer.php'],
+            'tests/Unit/Service/MailerTest.php',
+        ];
+
+        yield 'mirror: test folder + source file' => [
+            ['tests/Unit/Service/'],
+            ['src/Service/Mailer.php'],
+            ['src/Service/Mailer.php'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'mirror: test file + source folder' => [
+            ['tests/Unit/Service/MailerTest.php'],
+            ['src/Service/'],
+            ['src/Service/'],
+            'tests/Unit/Service/MailerTest.php',
+        ];
+
+        yield 'mirror: test folder + source folder' => [
+            ['tests/Unit/Service/'],
+            ['src/Service/'],
+            ['src/Service/'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'mirror: test folder + symbolic php source' => [
+            ['tests/Unit/Service/'],
+            ['Mailer.php'],
+            ['Mailer.php'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'mirror: test folder + symbolic source' => [
+            ['tests/Unit/Service/'],
+            ['Mailer'],
+            ['Mailer'],
+            'tests/Unit/Service/',
+        ];
+
+        yield 'mirror: test folder + comma separated symbolic source' => [
+            ['tests/Unit/Service/'],
+            ['Mailer', 'Plus_'],
+            ['Mailer', 'Plus_'],
+            'tests/Unit/Service/',
+        ];
+    }
+
+    /**
+     * Stand-in FileSystem that treats every path as present. Most classifier
+     * cases don't reach the existence check (handled by name heuristics or
+     * by the no-slash branch); for those that do, the test's intent is to
+     * exercise the source/test routing, not the existence guard.
+     */
+    private function acceptingFileSystem(): FileSystem
+    {
+        $fileSystem = $this->createMock(FileSystem::class);
+        $fileSystem->method('isReadableFile')->willReturn(true);
+        $fileSystem->method('isReadableDirectory')->willReturn(true);
+
+        return $fileSystem;
+    }
+
+    /**
+     * @param list<non-empty-string> $existingPaths Absolute paths the fake should report as existing.
+     */
+    private function fileSystemWith(array $existingPaths): FileSystem
+    {
+        $fileSystem = $this->createMock(FileSystem::class);
+
+        $isExistingPath = static fn (string $filename): bool => in_array($filename, $existingPaths, true);
+
+        $fileSystem->method('isReadableFile')->willReturnCallback($isExistingPath);
+        $fileSystem->method('isReadableDirectory')->willReturnCallback($isExistingPath);
+
+        return $fileSystem;
     }
 
     /**

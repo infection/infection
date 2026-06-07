@@ -100,8 +100,8 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/SomeFile.php',
-            '--filter' => 'src/OtherFile.php',
+            'path' => 'src/Engine.php',
+            '--filter' => 'src/Engine.php',
         ]);
     }
 
@@ -115,8 +115,8 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'tests/SomeTest.php',
-            '--test-framework-extra-args' => 'tests/OtherTest.php',
+            'path' => 'tests/phpunit/EngineTest.php',
+            '--test-framework-extra-args' => 'tests/phpunit/EngineTest.php',
         ]);
     }
 
@@ -130,8 +130,8 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/A.php',
-            'secondary-path' => 'src/B.php',
+            'path' => 'src/Engine.php',
+            'secondary-path' => 'src/Container/Container.php',
         ]);
     }
 
@@ -145,7 +145,7 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/Foo.php,tests/FooTest.php',
+            'path' => 'src/Engine.php,tests/phpunit/EngineTest.php',
         ]);
     }
 
@@ -159,8 +159,36 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/SomeFile.php',
+            'path' => 'src/Engine.php',
             '--git-diff-filter' => 'AM',
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_path_does_not_exist_on_disk(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Positional path "src/DefinitelyDoesNotExist.php" does not exist');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => 'src/DefinitelyDoesNotExist.php',
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_argument_is_an_fqcn(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'path' => '\App\Foo',
         ]);
     }
 
