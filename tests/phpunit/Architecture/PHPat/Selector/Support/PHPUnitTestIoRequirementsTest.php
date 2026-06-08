@@ -42,6 +42,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredFunctionTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredTraitWithoutIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
@@ -94,14 +96,14 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
     {
         yield 'test with CoversNothing without integration group' => [
             FixtureWithCoversNothingWithoutIntegrationGroupTest::class,
-            true,
+            false,
             false,
             false,
         ];
 
         yield 'test with CoversNothing with integration group' => [
             FixtureWithCoversNothingWithIntegrationGroupTest::class,
-            true,
+            false,
             false,
             true,
         ];
@@ -110,6 +112,20 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             FixtureWithCoveredClassWithoutIoTest::class,
             false,
             true,
+            false,
+        ];
+
+        yield 'test covering trait without I/O' => [
+            FixtureWithCoveredTraitWithoutIoTest::class,
+            false,
+            true,
+            false,
+        ];
+
+        yield 'test covering function' => [
+            FixtureWithCoveredFunctionTest::class,
+            false,
+            false,
             false,
         ];
 

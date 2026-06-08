@@ -42,14 +42,15 @@ use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function str_starts_with;
 
 final class PHPUnitTestIoRequirements
 {
-    private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
-
     private const string GROUP_NAME = 'integration';
 
     /**
@@ -65,18 +66,12 @@ final class PHPUnitTestIoRequirements
 
     public function requiresIntegrationGroup(ClassReflection $testCaseReflection): bool
     {
-        if ($this->testCaseUsesIo($testCaseReflection)) {
+        if ($this->isTestCaseUsingIo($testCaseReflection)) {
             return true;
         }
 
-        $coveredClassNames = $this->getCoveredClassNames($testCaseReflection);
-
-        if ($coveredClassNames === null) {
-            return true;
-        }
-
-        foreach ($coveredClassNames as $coveredClassName) {
-            if ($this->testedClassUsesIo($coveredClassName)) {
+        foreach ($this->getCoveredClassNames($testCaseReflection) as $coveredClassName) {
+            if ($this->isTestedClassUsingIo($coveredClassName)) {
                 return true;
             }
         }
@@ -86,7 +81,7 @@ final class PHPUnitTestIoRequirements
 
     public function hasCoveredClass(ClassReflection $testCaseReflection): bool
     {
-        return $this->getCoveredClassNames($testCaseReflection) !== null;
+        return count($this->getCoveredClassNames($testCaseReflection)) > 0;
     }
 
     public function hasIntegrationGroup(ClassReflection $classReflection): bool
@@ -103,9 +98,9 @@ final class PHPUnitTestIoRequirements
     /**
      * Check the test case code.
      */
-    private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
+    private function isTestCaseUsingIo(ClassReflection $testCaseReflection): bool
     {
-        if ($this->classUsesIo($testCaseReflection)) {
+        if ($this->isClassUsingIo($testCaseReflection)) {
             return true;
         }
 
@@ -115,7 +110,7 @@ final class PHPUnitTestIoRequirements
             $parentTestCaseClassReflection !== null
             && $parentTestCaseClassReflection->getName() !== TestCase::class
         ) {
-            if ($this->classUsesIo($parentTestCaseClassReflection)) {
+            if ($this->isClassUsingIo($parentTestCaseClassReflection)) {
                 return true;
             }
 
@@ -130,12 +125,12 @@ final class PHPUnitTestIoRequirements
      *
      * @param class-string $sourceClassName
      */
-    private function testedClassUsesIo(string $sourceClassName): bool
+    private function isTestedClassUsingIo(string $sourceClassName): bool
     {
         $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
         do {
-            if ($this->classUsesIo($classReflection)) {
+            if ($this->isClassUsingIo($classReflection)) {
                 return true;
             }
 
@@ -146,64 +141,59 @@ final class PHPUnitTestIoRequirements
     }
 
     /**
-     * @return list<class-string>|null
+     * @return list<class-string>
      */
-    private function getCoveredClassNames(ClassReflection $testCaseReflection): ?array
+    private function getCoveredClassNames(ClassReflection $testCaseReflection): array
     {
         $coveredClassNames = [];
-        $hasCoverageAttribute = false;
 
         foreach (self::getAttributes($testCaseReflection) as $attribute) {
-            if (!self::isCoverageAttribute($attribute)) {
-                continue;
-            }
-
-            $hasCoverageAttribute = true;
-
             $coveredClassName = $this->getCoveredClassName($attribute);
 
             if ($coveredClassName === null) {
-                return null;
+                continue;
             }
 
             $coveredClassNames[] = $coveredClassName;
         }
 
-        return $hasCoverageAttribute && count($coveredClassNames) > 0
-            ? $coveredClassNames
-            : null;
+        return $coveredClassNames;
     }
 
     /**
-     * TODO: eventually we should support functions, methods and traits too.
-     * @see CoversClass
+     * Gets the class-like target from a `#[Covers*]` PHPUnit attribute.
      *
      * @return class-string|null
      */
     private function getCoveredClassName(ReflectionAttribute $attribute): ?string
     {
-        if ($attribute->getName() !== CoversClass::class) {
+        $coveredClassName = match ($attribute->getName()) {
+            CoversClass::class,
+            CoversMethod::class => self::getStringArgument($attribute, 0, 'className'),
+            CoversTrait::class => self::getStringArgument($attribute, 0, 'traitName'),
+            CoversFunction::class,
+            CoversNothing::class => null,
+            default => null,
+        };
+
+        if (!is_string($coveredClassName)) {
             return null;
         }
 
-        $arguments = $attribute->getArguments();
-        $coveredClassName = $arguments[0] ?? $arguments['className'] ?? null;
-
-        $classNameExists = is_string($coveredClassName)
-            && $this->reflectionProvider->hasClass($coveredClassName);
-
-        return $classNameExists ? $coveredClassName : null;
+        return $this->reflectionProvider->hasClass($coveredClassName)
+            ? $coveredClassName
+            : null;
     }
 
-    private static function isCoverageAttribute(ReflectionAttribute $attribute): bool
+    private static function getStringArgument(ReflectionAttribute $attribute, int $index, string $name): ?string
     {
-        return str_starts_with(
-            $attribute->getName(),
-            self::COVERS_ATTRIBUTE_NAMESPACE,
-        );
+        $arguments = $attribute->getArguments();
+        $value = $arguments[$index] ?? $arguments[$name] ?? null;
+
+        return is_string($value) ? $value : null;
     }
 
-    private function classUsesIo(ClassReflection $classReflection): bool
+    private function isClassUsingIo(ClassReflection $classReflection): bool
     {
         $className = $classReflection->getName();
 
