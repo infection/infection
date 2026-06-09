@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
+use Infection\Tests\Command\CommandOptionTestCase;
 use Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -68,6 +69,11 @@ final class ConcretePHPUnitTestClassTest extends SelectorTestCase
 
         yield 'abstract PHPUnit test' => [
             BaseVisitorTestCase::class,
+            false,
+        ];
+
+        yield 'abstract PHPUnit test case suffix' => [
+            CommandOptionTestCase::class,
             false,
         ];
 

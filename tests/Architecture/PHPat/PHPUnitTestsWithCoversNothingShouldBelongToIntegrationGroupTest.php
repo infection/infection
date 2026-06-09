@@ -33,31 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
+final class PHPUnitTestsWithCoversNothingShouldBelongToIntegrationGroupTest
 {
-    public function __construct(
-        private PHPUnitTestIoRequirements $ioRequirements,
-    ) {
-    }
-
-    public function getName(): string
+    public function testPHPUnitTestsWithCoversNothingBelongToIntegrationGroup(): Rule
     {
-        return 'PHPUnit test not requiring I/O with integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->hasCoveredClass($classReflection)
-            && !$this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
+        return PHPat::rule()
+            ->classes(InfectionSelector::phpUnitTestsWithCoversNothing())
+            ->excluding(
+                InfectionSelector::integrationPhpUnitTests(),
+                InfectionSelector::selectorFixtures(),
+                InfectionSelector::autoreviewTestCode(),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests using CoversNothing should be marked with the integration group.');
     }
 }
