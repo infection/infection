@@ -136,10 +136,6 @@ final class PHPUnitTestIoRequirements
      */
     private function getCoveredClassNames(ClassReflection $testCaseReflection): ?array
     {
-        if (PHPUnitTestClassAnalysis::hasCoversNothing($testCaseReflection)) {
-            return null;
-        }
-
         $coveredClassNames = [];
         $hasCoverageAttribute = false;
 
