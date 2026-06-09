@@ -37,7 +37,6 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -47,12 +46,7 @@ final class PHPUnitTestClassAnalysis
 
     public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
     {
-        return $classReflection->is(TestCase::class);
-    }
-
-    public static function hasCoversNothing(ClassReflection $classReflection): bool
-    {
-        return $classReflection->getNativeReflection()->getAttributes(CoversNothing::class) !== [];
+        return $classReflection->isSubclassOf(TestCase::class);
     }
 
     public static function belongsToIntegrationGroup(ClassReflection $classReflection): bool
