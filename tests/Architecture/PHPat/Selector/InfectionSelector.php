@@ -51,6 +51,8 @@ final class InfectionSelector
 
     private static ?EventArchitecture $eventArchitecture = null;
 
+    private static ?Analyser $analyser = null;
+
     private static ?PHPUnitTestIoRequirements $phpUnitTestIoRequirements = null;
 
     private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
@@ -158,14 +160,7 @@ final class InfectionSelector
 
     public static function hasTrivialImplementation(): SelectorInterface
     {
-        $container = SingletonContainer::getContainer();
-
-        return new HasTrivialImplementation(
-            new Analyser(
-                $container->getParser(),
-                $container->getFileSystem(),
-            ),
-        );
+        return new HasTrivialImplementation(self::analyser());
     }
 
     public static function hasDocBlock(): SelectorInterface
@@ -193,18 +188,27 @@ final class InfectionSelector
         return self::$eventArchitecture ??= EventArchitecture::createDefault();
     }
 
+    private static function analyser(): Analyser
+    {
+        if (self::$analyser === null) {
+            $container = SingletonContainer::getContainer();
+
+            self::$analyser = new Analyser(
+                $container->getParser(),
+                $container->getFileSystem(),
+            );
+        }
+
+        return self::$analyser;
+    }
+
     private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): PHPUnitTestIoRequirements
     {
         if (self::$phpUnitTestIoRequirements === null) {
             self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
 
-            $container = SingletonContainer::getContainer();
-
             return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
-                new Analyser(
-                    $container->getParser(),
-                    $container->getFileSystem(),
-                ),
+                self::analyser(),
                 $reflectionProvider,
             );
         }
