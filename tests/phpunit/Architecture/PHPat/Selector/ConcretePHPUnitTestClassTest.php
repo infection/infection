@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
+use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
 use Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -73,6 +75,16 @@ final class ConcretePHPUnitTestClassTest extends SelectorTestCase
 
         yield 'PHPUnit support class' => [
             ConcretePHPUnitTestClass::class,
+            false,
+        ];
+
+        yield 'concrete PHPUnit helper class without Test suffix' => [
+            FixturePHPUnitTestCase::class,
+            false,
+        ];
+
+        yield 'concrete visitor test case helper class' => [
+            ConcreteVisitorTestCase::class,
             false,
         ];
 
