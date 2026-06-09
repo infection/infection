@@ -38,7 +38,9 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 use Infection\Command\ConfigureCommand;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\PHPUnitTestWithUnitGroupFixture;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -65,6 +67,16 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
         yield 'PHPUnit test case' => [
             self::class,
             true,
+        ];
+
+        yield 'concrete PHPUnit helper class without Test suffix' => [
+            FixturePHPUnitTestCase::class,
+            false,
+        ];
+
+        yield 'concrete visitor test case helper class' => [
+            ConcreteVisitorTestCase::class,
+            false,
         ];
 
         yield 'source class' => [
