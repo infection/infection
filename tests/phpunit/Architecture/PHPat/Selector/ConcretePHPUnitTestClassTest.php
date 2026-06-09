@@ -77,6 +77,11 @@ final class ConcretePHPUnitTestClassTest extends SelectorTestCase
             false,
         ];
 
+        yield 'concrete PHPUnit test case suffix' => [
+            FixturePHPUnitTestCase::class,
+            false,
+        ];
+
         yield 'PHPUnit support class' => [
             ConcretePHPUnitTestClass::class,
             false,

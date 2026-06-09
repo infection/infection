@@ -40,6 +40,7 @@ use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function str_ends_with;
 
 final class PHPUnitTestClassAnalysis
 {
@@ -47,7 +48,8 @@ final class PHPUnitTestClassAnalysis
 
     public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
     {
-        return $classReflection->is(TestCase::class);
+        return str_ends_with($classReflection->getName(), 'Test')
+            && $classReflection->is(TestCase::class);
     }
 
     public static function hasCoversNothing(ClassReflection $classReflection): bool
