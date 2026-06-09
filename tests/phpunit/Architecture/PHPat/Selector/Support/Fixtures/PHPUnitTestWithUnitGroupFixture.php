@@ -33,52 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures;
 
-use Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ConcretePHPUnitTestClass::class)]
-final class ConcretePHPUnitTestClassTest extends SelectorTestCase
+#[Group('unit')]
+final class PHPUnitTestWithUnitGroupFixture extends TestCase
 {
-    /**
-     * @param class-string $className
-     */
-    #[DataProvider('classProvider')]
-    public function test_it_matches_concrete_phpunit_test_classes(
-        string $className,
-        bool $expected,
-    ): void {
-        $selector = new ConcretePHPUnitTestClass();
-        $classReflection = $this->createClassReflection($className);
-
-        $actual = $selector->matches($classReflection);
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public static function classProvider(): iterable
-    {
-        yield 'concrete PHPUnit test' => [
-            self::class,
-            true,
-        ];
-
-        yield 'abstract PHPUnit test' => [
-            BaseVisitorTestCase::class,
-            false,
-        ];
-
-        yield 'PHPUnit support class' => [
-            ConcretePHPUnitTestClass::class,
-            false,
-        ];
-
-        yield 'vendor test case' => [
-            TestCase::class,
-            false,
-        ];
-    }
 }
