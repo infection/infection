@@ -33,31 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\SelectorInterface;
+use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
+final class PHPUnitTestClassAnalysis
 {
-    public function __construct(
-        private PHPUnitTestIoRequirements $ioRequirements,
-    ) {
+    private const string GROUP_NAME = 'integration';
+
+    public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
+    {
+        return $classReflection->isSubclassOf(TestCase::class);
     }
 
-    public function getName(): string
+    public static function belongsToIntegrationGroup(ClassReflection $classReflection): bool
     {
-        return 'PHPUnit test not requiring I/O with integration group';
+        foreach (self::getAttributes($classReflection) as $groupAttribute) {
+            if (self::isIntegrationGroup($groupAttribute)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public function matches(ClassReflection $classReflection): bool
+    /**
+     * @see Group
+     */
+    private static function isIntegrationGroup(ReflectionAttribute $attribute): bool
     {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->hasCoveredClass($classReflection)
-            && !$this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
+        if ($attribute->getName() !== Group::class) {
+            return false;
+        }
+
+        $arguments = $attribute->getArguments();
+        $groupName = $arguments[0] ?? $arguments['name'] ?? null;
+
+        return $groupName === self::GROUP_NAME;
+    }
+
+    /**
+     * @return iterable<ReflectionAttribute>
+     */
+    private static function getAttributes(ClassReflection $classReflection): iterable
+    {
+        $attributes = $classReflection->getNativeReflection()->getAttributes();
+
+        foreach ($attributes as $attribute) {
+            if ($attribute instanceof ReflectionAttribute) {
+                yield $attribute;
+            }
+        }
     }
 }
