@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
@@ -49,7 +48,6 @@ final class ConcretePHPUnitTestClass implements SelectorInterface
 
     public function matches(ClassReflection $classReflection): bool
     {
-        return ConcreteClassReflection::isConcreteClass($classReflection)
-            && PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection);
+        return PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection);
     }
 }

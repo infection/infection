@@ -43,6 +43,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\PHPUnitTestWith
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PHPUnitTestClassAnalysis::class)]
 final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
@@ -67,6 +68,11 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
         yield 'PHPUnit test case' => [
             self::class,
             true,
+        ];
+
+        yield 'abstract PHPUnit test' => [
+            AbstractPHPUnitTest::class,
+            false,
         ];
 
         yield 'concrete PHPUnit helper class without Test suffix' => [
@@ -117,4 +123,8 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
             false,
         ];
     }
+}
+
+abstract class AbstractPHPUnitTest extends TestCase
+{
 }
