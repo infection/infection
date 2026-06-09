@@ -51,7 +51,6 @@ final class ConcretePHPUnitTestClass implements SelectorInterface
     public function matches(ClassReflection $classReflection): bool
     {
         return ConcreteClassReflection::isConcreteClass($classReflection)
-            && str_ends_with($classReflection->getName(), 'Test')
             && PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection);
     }
 }
