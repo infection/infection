@@ -55,6 +55,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(PHPUnitTestIoRequirements::class)]
+#[CoversClass(PHPUnitTestClassAnalysis::class)]
 final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
 {
     /**
@@ -86,7 +87,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
         );
         $this->assertSame(
             $expectedHasIntegrationGroup,
-            $ioRequirements->hasIntegrationGroup($classReflection),
+            PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
         );
     }
 

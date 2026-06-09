@@ -42,15 +42,12 @@ use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function str_starts_with;
 
 final class PHPUnitTestIoRequirements
 {
     private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
-
-    private const string GROUP_NAME = 'integration';
 
     /**
      * @var array<class-string, bool>
@@ -87,17 +84,6 @@ final class PHPUnitTestIoRequirements
     public function hasCoveredClass(ClassReflection $testCaseReflection): bool
     {
         return $this->getCoveredClassNames($testCaseReflection) !== null;
-    }
-
-    public function hasIntegrationGroup(ClassReflection $classReflection): bool
-    {
-        foreach (self::getAttributes($classReflection) as $groupAttribute) {
-            if (self::isIntegrationGroup($groupAttribute)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -150,6 +136,10 @@ final class PHPUnitTestIoRequirements
      */
     private function getCoveredClassNames(ClassReflection $testCaseReflection): ?array
     {
+        if (PHPUnitTestClassAnalysis::hasCoversNothing($testCaseReflection)) {
+            return null;
+        }
+
         $coveredClassNames = [];
         $hasCoverageAttribute = false;
 
@@ -215,21 +205,6 @@ final class PHPUnitTestIoRequirements
 
         return $this->classUsesIoCache[$className] = $fileName !== null
             && $this->analyser->analyse($classReflection, analyseNonConcreteClasses: true)->usesIo;
-    }
-
-    /**
-     * @see Group
-     */
-    private static function isIntegrationGroup(ReflectionAttribute $attribute): bool
-    {
-        if ($attribute->getName() !== Group::class) {
-            return false;
-        }
-
-        $arguments = $attribute->getArguments();
-        $groupName = $arguments[0] ?? $arguments['name'] ?? null;
-
-        return $groupName === self::GROUP_NAME;
     }
 
     /**
