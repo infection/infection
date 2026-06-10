@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Command\CommandOptionTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
+use Infection\Tests\Command\CommandOptionTestCase;
 use Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
