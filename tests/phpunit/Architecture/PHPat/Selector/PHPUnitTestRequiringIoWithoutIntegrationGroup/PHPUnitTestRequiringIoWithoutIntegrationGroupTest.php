@@ -71,6 +71,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             $container->getParser(),
             new FileSystem(),
         );
+
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
             new PHPUnitTestIoRequirements(
                 $analyser,
@@ -78,6 +79,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             ),
             $analyser,
         );
+
         $classReflection = $this->createClassReflection($className);
 
         $actual = $selector->matches($classReflection);
