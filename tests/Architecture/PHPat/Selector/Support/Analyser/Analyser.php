@@ -39,6 +39,7 @@ use function array_filter;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
 use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -85,6 +86,9 @@ final class Analyser
             return $this->analysisResultCache[$cacheKey] = new AnalysisResult(
                 hasTrivialImplementation: false,
                 usesIo: false,
+                isAConcretePHPUnitTestCase: false,
+                hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
+                belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
             );
         }
 
@@ -143,6 +147,9 @@ final class Analyser
         return new AnalysisResult(
             hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),
             usesIo: $ioCodeDetector->hasIoOperations(),
+            isAConcretePHPUnitTestCase: PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection),
+            hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
+            belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
         );
     }
 

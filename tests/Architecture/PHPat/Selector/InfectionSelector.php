@@ -80,6 +80,16 @@ final class InfectionSelector
         );
     }
 
+    public static function phpUnitTestsWithCoversNothing(): SelectorInterface
+    {
+        return new PHPUnitTestWithCoversNothing(self::analyser());
+    }
+
+    public static function integrationPhpUnitTests(): SelectorInterface
+    {
+        return new IntegrationPHPUnitTest(self::analyser());
+    }
+
     public static function selectorFixtures(): SelectorInterface
     {
         return Selector::withFilepath('#/tests/phpunit/Architecture/PHPat/Selector/.+?/Fixture(s)?#', true);
@@ -105,6 +115,7 @@ final class InfectionSelector
         return Selector::AllOf(
             new PHPUnitTestRequiringIoWithoutIntegrationGroup(
                 self::phpUnitTestIoRequirements($reflectionProvider),
+                self::analyser(),
             ),
             Selector::Not(self::autoreviewTestCode()),
         );
