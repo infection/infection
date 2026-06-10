@@ -40,6 +40,7 @@ use PHPStan\Reflection\ClassReflection;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function count;
 use function str_ends_with;
 
 final class PHPUnitTestClassAnalysis
@@ -55,7 +56,7 @@ final class PHPUnitTestClassAnalysis
 
     public static function hasCoversNothing(ClassReflection $classReflection): bool
     {
-        return $classReflection->getNativeReflection()->getAttributes(CoversNothing::class) !== [];
+        return count($classReflection->getNativeReflection()->getAttributes(CoversNothing::class)) > 0;
     }
 
     public static function belongsToIntegrationGroup(ClassReflection $classReflection): bool

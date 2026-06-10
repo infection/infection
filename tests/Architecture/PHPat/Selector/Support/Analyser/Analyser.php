@@ -147,16 +147,10 @@ final class Analyser
         return new AnalysisResult(
             hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),
             usesIo: $ioCodeDetector->hasIoOperations(),
-            isAConcretePHPUnitTestCase: self::isAConcretePHPUnitTestCase($classReflection),
+            isAConcretePHPUnitTestCase: PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection),
             hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
             belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
         );
-    }
-
-    private static function isAConcretePHPUnitTestCase(ClassReflection $classReflection): bool
-    {
-        return ConcreteClassReflection::isConcreteClass($classReflection)
-            && PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection);
     }
 
     private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
