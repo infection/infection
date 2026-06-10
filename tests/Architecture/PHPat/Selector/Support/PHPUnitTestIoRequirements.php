@@ -46,13 +46,10 @@ use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\CoversTrait;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class PHPUnitTestIoRequirements
 {
-    private const string GROUP_NAME = 'integration';
-
     /**
      * @var array<class-string, bool>
      */
@@ -82,17 +79,6 @@ final class PHPUnitTestIoRequirements
     public function hasCoveredClass(ClassReflection $testCaseReflection): bool
     {
         return count($this->getCoveredClassNames($testCaseReflection)) > 0;
-    }
-
-    public function hasIntegrationGroup(ClassReflection $classReflection): bool
-    {
-        foreach (self::getAttributes($classReflection) as $groupAttribute) {
-            if (self::isIntegrationGroup($groupAttribute)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -205,21 +191,6 @@ final class PHPUnitTestIoRequirements
 
         return $this->classUsesIoCache[$className] = $fileName !== null
             && $this->analyser->analyse($classReflection, analyseNonConcreteClasses: true)->usesIo;
-    }
-
-    /**
-     * @see Group
-     */
-    private static function isIntegrationGroup(ReflectionAttribute $attribute): bool
-    {
-        if ($attribute->getName() !== Group::class) {
-            return false;
-        }
-
-        $arguments = $attribute->getArguments();
-        $groupName = $arguments[0] ?? $arguments['name'] ?? null;
-
-        return $groupName === self::GROUP_NAME;
     }
 
     /**

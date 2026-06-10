@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
@@ -43,6 +44,7 @@ final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements Se
 {
     public function __construct(
         private PHPUnitTestIoRequirements $ioRequirements,
+        private Analyser $analyser,
     ) {
     }
 
@@ -53,9 +55,12 @@ final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements Se
 
     public function matches(ClassReflection $classReflection): bool
     {
+        $analysisResult = $this->analyser->analyse($classReflection);
+
         return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
+            && $analysisResult->isAConcretePHPUnitTestCase
+            && !$analysisResult->hasCoversNothing
             && $this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && !$this->ioRequirements->hasIntegrationGroup($classReflection);
+            && !$analysisResult->belongsToIntegrationGroup;
     }
 }

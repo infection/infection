@@ -33,21 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use PHPUnit\Framework\TestCase;
 
-final class ConcretePHPUnitTestClass implements SelectorInterface
+final class FixturePHPUnitTestCase extends TestCase
 {
-    public function getName(): string
-    {
-        return 'concrete PHPUnit test class';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection);
-    }
 }

@@ -88,7 +88,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
         );
         $this->assertSame(
             $expectedHasIntegrationGroup,
-            $ioRequirements->hasIntegrationGroup($classReflection),
+            PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
         );
     }
 

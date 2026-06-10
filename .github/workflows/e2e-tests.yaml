@@ -123,6 +123,12 @@ jobs:
           ls tests/e2e/*/composer.json | xargs dirname |
              xargs -I{} -P 4 $CHRONIC composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
+      - name: Download mago used in some E2E tests
+        run: vendor/bin/mago --version
+        working-directory: tests/e2e/Mago_Integration
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run the Windows compatible subset of E2E tests
         if: runner.os == 'Windows'
         shell: bash
