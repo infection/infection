@@ -49,7 +49,8 @@ final class PHPUnitTestClassAnalysis
     public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
     {
         return str_ends_with($classReflection->getName(), 'Test')
-            && $classReflection->is(TestCase::class);
+            && ConcreteClassReflection::isConcreteClass($classReflection)
+            && $classReflection->isSubclassOf(TestCase::class);
     }
 
     public static function hasCoversNothing(ClassReflection $classReflection): bool

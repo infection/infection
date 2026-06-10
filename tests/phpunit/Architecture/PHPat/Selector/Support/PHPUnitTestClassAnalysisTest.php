@@ -33,59 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
-use Infection\Tests\Command\CommandOptionTestCase;
+use Infection\Command\ConfigureCommand;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
-use Infection\Tests\PhpParser\Visitor\BaseVisitorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\PHPUnitTestWithUnitGroupFixture;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ConcretePHPUnitTestClass::class)]
-final class ConcretePHPUnitTestClassTest extends SelectorTestCase
+#[CoversClass(PHPUnitTestClassAnalysis::class)]
+final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
 {
     /**
      * @param class-string $className
      */
-    #[DataProvider('classProvider')]
-    public function test_it_matches_concrete_phpunit_test_classes(
+    #[DataProvider('phpUnitTestCaseProvider')]
+    public function test_it_detects_phpunit_test_cases(
         string $className,
         bool $expected,
     ): void {
-        $selector = new ConcretePHPUnitTestClass();
-        $classReflection = $this->createClassReflection($className);
-
-        $actual = $selector->matches($classReflection);
+        $actual = PHPUnitTestClassAnalysis::isPHPUnitTestCase(
+            $this->createClassReflection($className),
+        );
 
         $this->assertSame($expected, $actual);
     }
 
-    public static function classProvider(): iterable
+    public static function phpUnitTestCaseProvider(): iterable
     {
-        yield 'concrete PHPUnit test' => [
+        yield 'PHPUnit test case' => [
             self::class,
             true,
         ];
 
         yield 'abstract PHPUnit test' => [
-            BaseVisitorTestCase::class,
-            false,
-        ];
-
-        yield 'abstract PHPUnit test case suffix' => [
-            CommandOptionTestCase::class,
-            false,
-        ];
-
-        yield 'concrete PHPUnit test case suffix' => [
-            FixturePHPUnitTestCase::class,
-            false,
-        ];
-
-        yield 'PHPUnit support class' => [
-            ConcretePHPUnitTestClass::class,
+            AbstractPHPUnitTest::class,
             false,
         ];
 
@@ -99,9 +85,46 @@ final class ConcretePHPUnitTestClassTest extends SelectorTestCase
             false,
         ];
 
-        yield 'vendor test case' => [
-            TestCase::class,
+        yield 'source class' => [
+            ConfigureCommand::class,
             false,
         ];
     }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('integrationGroupProvider')]
+    public function test_it_detects_integration_group(
+        string $className,
+        bool $expected,
+    ): void {
+        $actual = PHPUnitTestClassAnalysis::belongsToIntegrationGroup(
+            $this->createClassReflection($className),
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function integrationGroupProvider(): iterable
+    {
+        yield 'positional integration group' => [
+            FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest::class,
+            true,
+        ];
+
+        yield 'non-integration group' => [
+            PHPUnitTestWithUnitGroupFixture::class,
+            false,
+        ];
+
+        yield 'no group' => [
+            self::class,
+            false,
+        ];
+    }
+}
+
+abstract class AbstractPHPUnitTest extends TestCase
+{
 }
