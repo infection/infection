@@ -60,7 +60,6 @@ final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements Se
 
         return InfectionSelector::phpunitTestCode()->matches($classReflection)
             && $analysisResult->isAConcretePHPUnitTestCase
-            && !$analysisResult->hasCoversNothing
             && $this->ioRequirements->requiresIntegrationGroup($classReflection)
             && !PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
     }
