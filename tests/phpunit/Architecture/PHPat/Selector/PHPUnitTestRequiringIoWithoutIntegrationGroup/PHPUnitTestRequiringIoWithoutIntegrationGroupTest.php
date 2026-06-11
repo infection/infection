@@ -49,7 +49,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use Infection\Tests\Command\CommandOptionTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -73,7 +73,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 $analyser,
                 $this->getReflectionProvider(),
             ),
@@ -101,7 +101,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
 
         yield 'test covering class without I/O' => [
             FixtureWithCoveredClassWithoutIoTest::class,
-            false,
+            true,
         ];
 
         yield 'test covering class with I/O' => [
@@ -111,7 +111,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
 
         yield 'test covering class with FileSystem abstraction' => [
             FixtureWithCoveredClassWithFileSystemIoTest::class,
-            false,
+            true,
         ];
 
         yield 'test covering class with I/O behind FileSystem abstraction and direct I/O' => [
@@ -149,8 +149,8 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
     {
         $fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock
-            // Selector analysis + I/O analysis for 3 test cases and their covered classes.
-            ->expects($this->exactly(7))
+            // Selector analysis + I/O analysis for 3 test cases, their covered classes, and the shared PHPUnit parent class.
+            ->expects($this->exactly(9))
             ->method('readFile')
             ->willReturn('contents');
         $analyser = new Analyser(
@@ -159,7 +159,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 $analyser,
                 $this->getReflectionProvider(),
             ),

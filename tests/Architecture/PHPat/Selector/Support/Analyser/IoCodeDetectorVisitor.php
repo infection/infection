@@ -56,7 +56,7 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use XMLReader;
 use XMLWriter;
 
-final class IoCodeDetector extends NodeVisitorAbstract
+final class IoCodeDetectorVisitor extends NodeVisitorAbstract
 {
     // See https://www.php.net/manual/en/ref.filesystem.php and newer PHP migration guides.
     private const array NATIVE_FUNCTIONS = [
