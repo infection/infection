@@ -50,6 +50,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Command\CommandOptionTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -66,15 +67,19 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         bool $expected,
     ): void {
         $container = SingletonContainer::getContainer();
+        $analyser = new Analyser(
+            $container->getParser(),
+            new FileSystem(),
+        );
+
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
             new PHPUnitTestIoRequirements(
-                new Analyser(
-                    $container->getParser(),
-                    new FileSystem(),
-                ),
+                $analyser,
                 $this->getReflectionProvider(),
             ),
+            $analyser,
         );
+
         $classReflection = $this->createClassReflection($className);
 
         $actual = $selector->matches($classReflection);
@@ -86,7 +91,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
     {
         yield 'test with CoversNothing' => [
             FixtureWithCoversNothingWithoutIntegrationGroupTest::class,
-            true,
+            false,
         ];
 
         yield 'test without CoversClass with integration group' => [
@@ -133,25 +138,32 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
             TestCase::class,
             false,
         ];
+
+        yield 'abstract PHPUnit support test case' => [
+            CommandOptionTestCase::class,
+            false,
+        ];
     }
 
     public function test_it_caches_io_detection_per_class(): void
     {
         $fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock
-            // 3 tests cases + their respective covered
-            ->expects($this->exactly(5))
+            // Selector analysis + I/O analysis for 3 test cases and their covered classes.
+            ->expects($this->exactly(7))
             ->method('readFile')
             ->willReturn('contents');
+        $analyser = new Analyser(
+            SingletonContainer::getContainer()->getParser(),
+            $fileSystemMock,
+        );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
             new PHPUnitTestIoRequirements(
-                new Analyser(
-                    SingletonContainer::getContainer()->getParser(),
-                    $fileSystemMock,
-                ),
+                $analyser,
                 $this->getReflectionProvider(),
             ),
+            $analyser,
         );
 
         $selector->matches($this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class));

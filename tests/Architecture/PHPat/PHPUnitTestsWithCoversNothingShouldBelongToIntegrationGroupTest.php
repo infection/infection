@@ -33,21 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class ConcretePHPUnitTestClass implements SelectorInterface
+final class PHPUnitTestsWithCoversNothingShouldBelongToIntegrationGroupTest
 {
-    public function getName(): string
+    public function testPHPUnitTestsWithCoversNothingBelongToIntegrationGroup(): Rule
     {
-        return 'concrete PHPUnit test class';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection);
+        return PHPat::rule()
+            ->classes(InfectionSelector::phpUnitTestsWithCoversNothing())
+            ->excluding(
+                InfectionSelector::integrationPhpUnitTests(),
+                InfectionSelector::selectorFixtures(),
+                InfectionSelector::autoreviewTestCode(),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests using CoversNothing should be marked with the integration group.');
     }
 }

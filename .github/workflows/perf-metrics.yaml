@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           # When ref input is provided, checkout from upstream (where tags exist)
           repository: ${{ github.event.inputs.ref && 'infection/infection' || github.repository }}
@@ -136,7 +136,7 @@ jobs:
       - name: Checkout metrics repository
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         # zizmor: ignore[artipacked] This checkout persists the SSH key used by the later git push to the metrics repository.
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: infection/infection-metrics
           ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}

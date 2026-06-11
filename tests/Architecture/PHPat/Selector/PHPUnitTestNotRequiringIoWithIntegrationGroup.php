@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
@@ -57,6 +58,6 @@ final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements Se
             && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
             && $this->ioRequirements->hasCoveredClass($classReflection)
             && !$this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && $this->ioRequirements->hasIntegrationGroup($classReflection);
+            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
     }
 }

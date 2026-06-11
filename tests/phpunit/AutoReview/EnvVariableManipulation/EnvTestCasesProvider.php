@@ -176,6 +176,10 @@ final class EnvTestCasesProvider
         $parentClassReflection = $classReflection->getParentClass();
 
         while ($parentClassReflection !== false) {
+            if ($parentClassReflection->getName() === TestCase::class) {
+                break;
+            }
+
             $parentClassFileName = $parentClassReflection->getFileName();
 
             if ($parentClassFileName === false) {
