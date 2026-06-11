@@ -126,22 +126,22 @@ final class AbstractValueToNullReturnValueTest extends TestCase
 
     private function createNodeStub(mixed $returnValue): Node&Stub
     {
-        $nodeStub = $this->createStub(Node::class);
+        $mockNode = $this->createStub(Node::class);
 
-        $nodeStub->method('getAttribute')
+        $mockNode->method('getAttribute')
                  ->willReturn($returnValue);
 
-        return $nodeStub;
+        return $mockNode;
     }
 
     private function createFunctionStub(mixed $returnValue): Function_&Stub
     {
-        $functionStub = $this->createStub(Function_::class);
+        $mockFunction = $this->createStub(Function_::class);
 
-        $functionStub->method('getReturnType')
+        $mockFunction->method('getReturnType')
             ->willReturn($returnValue);
 
-        return $functionStub;
+        return $mockFunction;
     }
 
     private function invokeMethod(Node $mockNode): mixed
