@@ -777,7 +777,7 @@ parameters:
 		-
 			rawMessage: 'Method Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations() should return string|null but returns string|false.'
 			identifier: return.type
-			count: 1
+			count: 2
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
 
 		-
@@ -789,7 +789,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $filename of function Safe\file_get_contents expects string, string|false given.'
 			identifier: argument.type
-			count: 2
+			count: 3
 			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
 
 		-

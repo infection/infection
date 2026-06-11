@@ -39,8 +39,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function class_exists;
-use const DIRECTORY_SEPARATOR;
-use function dirname;
 use Infection\CannotBeInstantiated;
 use Infection\Framework\ClassName;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
@@ -48,7 +46,6 @@ use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\file_get_contents;
-use function str_starts_with;
 use Webmozart\Assert\Assert;
 
 final class EnvTestCasesProvider
@@ -141,10 +138,6 @@ final class EnvTestCasesProvider
         while ($parentTestCaseClassReflection->getName() !== TestCase::class) {
             $parentTestCaseFileName = $parentTestCaseClassReflection->getFileName();
 
-            if ($parentTestCaseFileName === false || !self::isProjectCodeFile($parentTestCaseFileName)) {
-                break;
-            }
-
             $testCaseCode = file_get_contents($parentTestCaseFileName);
 
             if (EnvManipulatorCodeDetector::codeManipulatesEnvVariables($testCaseCode)) {
@@ -186,10 +179,6 @@ final class EnvTestCasesProvider
                 break;
             }
 
-            if (!self::isProjectCodeFile($parentClassFileName)) {
-                break;
-            }
-
             $parentClassCode = file_get_contents($parentClassFileName);
 
             if (EnvManipulatorCodeDetector::codeManipulatesEnvVariables($parentClassCode)) {
@@ -200,13 +189,5 @@ final class EnvTestCasesProvider
         }
 
         return null;
-    }
-
-    private static function isProjectCodeFile(string $fileName): bool
-    {
-        $projectRoot = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR;
-
-        return str_starts_with($fileName, $projectRoot . 'src' . DIRECTORY_SEPARATOR)
-            || str_starts_with($fileName, $projectRoot . 'tests' . DIRECTORY_SEPARATOR);
     }
 }
