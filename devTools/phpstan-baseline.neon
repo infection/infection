@@ -860,7 +860,7 @@ parameters:
 
 		-
 			rawMessage: Infection\Tests\BenchmarkSmokeTest should not exist
-			identifier: phpat.testPHPUnitTestsRequiringIoBelongToIntegrationGroup
+			identifier: phpat.testPHPUnitTestsWithCoversNothingBelongToIntegrationGroup
 			count: 1
 			path: ../tests/phpunit/BenchmarkSmokeTest.php
 
