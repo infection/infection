@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Framework;
 
 use Infection\Framework\Str;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -127,9 +128,10 @@ final class StrTest extends TestCase
 
     public static function trimLinesProvider(): iterable
     {
-        foreach (self::cleanTrimLinesProvider() as $label => [$value, $expectedTrimmedLines, $expectedCleanedLines]) {
-            yield $label => [$value, $expectedTrimmedLines];
-        }
+        yield from DataProviderFactory::takeArguments(
+            2,
+            self::cleanTrimLinesProvider(),
+        );
     }
 
     public static function cleanTrimLinesProvider(): iterable

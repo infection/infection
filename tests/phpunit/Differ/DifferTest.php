@@ -39,6 +39,7 @@ use Infection\Differ\Differ;
 use Infection\Differ\Tokens;
 use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -85,9 +86,10 @@ final class DifferTest extends TestCase
 
     public static function diffStringProvider(): iterable
     {
-        foreach (self::diffProvider() as $label => [$sourceA, $sourceB, $expected]) {
-            yield $label => [$sourceA, $sourceB, $expected];
-        }
+        yield from DataProviderFactory::takeArguments(
+            3,
+            self::diffProvider(),
+        );
     }
 
     public static function diffProvider(): iterable

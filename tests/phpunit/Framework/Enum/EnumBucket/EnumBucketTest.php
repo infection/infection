@@ -61,6 +61,7 @@ namespace Infection\Tests\Framework\Enum\EnumBucket;
 use BackedEnum;
 use Exception;
 use Infection\Framework\Enum\EnumBucket;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -102,9 +103,10 @@ final class EnumBucketTest extends TestCase
 
     public static function enumClassNameProvider(): iterable
     {
-        foreach (self::enumProvider() as $label => [$enumClassName, $expected]) {
-            yield $label => [$enumClassName];
-        }
+        yield from DataProviderFactory::takeArguments(
+            1,
+            self::enumProvider(),
+        );
     }
 
     /**

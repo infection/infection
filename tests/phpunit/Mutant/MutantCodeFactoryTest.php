@@ -41,6 +41,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PhpParser\Node;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -132,9 +133,10 @@ final class MutantCodeFactoryTest extends TestCase
 
     public static function mutationOnlyProvider(): iterable
     {
-        foreach (self::mutationProvider() as $label => [$mutation]) {
-            yield $label => [$mutation];
-        }
+        yield from DataProviderFactory::takeArguments(
+            1,
+            self::mutationProvider(),
+        );
     }
 
     public static function mutationProvider(): iterable
