@@ -859,6 +859,12 @@ parameters:
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
+			rawMessage: Infection\Tests\BenchmarkSmokeTest should not exist
+			identifier: phpat.testPHPUnitTestsWithCoversNothingBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/BenchmarkSmokeTest.php
+
+		-
 			rawMessage: Infection\Tests\CI\ConfigurableEnv should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -964,12 +970,6 @@ parameters:
 			rawMessage: 'Only booleans are allowed in a ternary operator condition, string|false given.'
 			identifier: ternary.condNotBoolean
 			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			rawMessage: 'Parameter #1 $executableFinder of class Infection\FileSystem\Finder\TestFrameworkFinder constructor expects Infection\FileSystem\Finder\ComposerExecutableFinder, PHPUnit\Framework\MockObject\MockObject given.'
-			identifier: argument.type
-			count: 5
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-

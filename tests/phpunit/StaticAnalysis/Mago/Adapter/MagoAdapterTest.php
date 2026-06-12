@@ -40,6 +40,7 @@ use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MagoAdapter::class)]
 final class MagoAdapterTest extends TestCase
 {

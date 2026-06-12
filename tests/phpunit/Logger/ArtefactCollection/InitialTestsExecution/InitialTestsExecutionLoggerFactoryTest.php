@@ -39,12 +39,14 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Logger\ArtefactCollection\ConsoleNoProgressLogger;
 use Infection\Logger\ArtefactCollection\ConsoleProgressBarLogger;
 use Infection\Logger\ArtefactCollection\InitialTestsExecution\InitialTestsExecutionLoggerFactory;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(InitialTestsExecutionLoggerFactory::class)]
 final class InitialTestsExecutionLoggerFactoryTest extends TestCase
 {

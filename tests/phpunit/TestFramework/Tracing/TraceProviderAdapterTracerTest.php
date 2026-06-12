@@ -45,11 +45,13 @@ use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\TrackableIterator;
 use Infection\Tests\TestingUtility\Iterable\YieldOnceIterator;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(TraceProviderAdapterTracer::class)]
 final class TraceProviderAdapterTracerTest extends TestCase
 {

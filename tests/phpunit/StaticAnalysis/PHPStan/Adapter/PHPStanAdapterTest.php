@@ -40,6 +40,7 @@ use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -48,6 +49,7 @@ use RuntimeException;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PHPStanAdapter::class)]
 final class PHPStanAdapterTest extends TestCase
 {
