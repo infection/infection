@@ -55,6 +55,7 @@ use Override;
 use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use function trim;
 
@@ -85,6 +86,25 @@ final class Application extends BaseApplication
     ) {
         parent::__construct(self::NAME, $infectionVersion->prettyVersion());
         $this->setDefaultCommand('run');
+    }
+
+    #[Override]
+    public function doRun(InputInterface $input, OutputInterface $output): int
+    {
+        $firstArgument = $input->getFirstArgument();
+
+        // this allows to run `infection tests/` instead of `infection run tests/`
+        if ($firstArgument !== null && !$this->has($firstArgument)) {
+            $newInput = new StringInput('run ' . $input);
+
+            if (!$input->isInteractive()) {
+                $newInput->setInteractive(false);
+            }
+
+            $input = $newInput;
+        }
+
+        return parent::doRun($input, $output);
     }
 
     public function getContainer(): Container
