@@ -123,6 +123,11 @@ final class SourceFilterOptions
         return self::getPlainFilter($io->getInput()) !== null;
     }
 
+    public static function isGitDiffFilterProvided(IO $io): bool
+    {
+        return self::getGitFilter($io->getInput()) !== null;
+    }
+
     private static function getPlainFilter(InputInterface $input): ?PlainFilter
     {
         $value = trim((string) $input->getOption(self::PLAIN_FILTER_NAME));

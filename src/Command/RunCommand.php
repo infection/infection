@@ -517,6 +517,7 @@ final class RunCommand extends BaseCommand
     {
         $container->getPositionalPathsClassifier()->assertNoConflictWithExplicitOptions(
             SourceFilterOptions::isPlainFilterProvided($io),
+            SourceFilterOptions::isGitDiffFilterProvided($io),
             TestFrameworkExtraArgsOption::isProvided($io),
         );
     }
@@ -577,6 +578,8 @@ final class RunCommand extends BaseCommand
             $this->runConfigurationCommand($locator, $io);
         }
 
+        $this->assertPositionalPathsDoNotConflict($container, $io);
+
         $this->installTestFrameworkIfNeeded($container, $io);
 
         // Check if the application needs a restart _after_ configuring the command or adding
@@ -597,8 +600,6 @@ final class RunCommand extends BaseCommand
 
             $consoleOutput->logNotInControlOfExitCodes();
         }
-
-        $this->assertPositionalPathsDoNotConflict($container, $io);
 
         $container->getCoverageChecker()->checkCoverageRequirements();
 

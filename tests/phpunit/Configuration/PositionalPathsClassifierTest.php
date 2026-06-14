@@ -330,7 +330,7 @@ final class PositionalPathsClassifierTest extends TestCase
     public function test_it_rejects_two_slots_classifying_as_test(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Both positional arguments resolved to test paths. Pass a single test path');
+        $this->expectExceptionMessage('Both positional arguments resolved to test paths. Pass at most one test path as a positional argument');
 
         PositionalPathsClassifier::fromSlots(
             ['tests/ATest.php'],
@@ -380,7 +380,22 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot pass source paths as positional arguments together with the "--filter" option.');
 
-        $classified->assertNoConflictWithExplicitOptions(true, false);
+        $classified->assertNoConflictWithExplicitOptions(true, false, false);
+    }
+
+    public function test_assert_no_conflict_rejects_source_paths_with_git_diff_filter_option(): void
+    {
+        $classified = PositionalPathsClassifier::fromSlots(
+            ['src/Foo.php'],
+            [],
+            $this->createSchema(['src']),
+            $this->acceptingFileSystem(),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines".');
+
+        $classified->assertNoConflictWithExplicitOptions(false, true, false);
     }
 
     public function test_assert_no_conflict_rejects_test_paths_with_test_framework_extra_args(): void
@@ -395,7 +410,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option.');
 
-        $classified->assertNoConflictWithExplicitOptions(false, true);
+        $classified->assertNoConflictWithExplicitOptions(false, false, true);
     }
 
     public function test_assert_no_conflict_passes_when_unrelated_options_are_provided(): void
@@ -407,7 +422,7 @@ final class PositionalPathsClassifierTest extends TestCase
             $this->acceptingFileSystem(),
         );
 
-        $classified->assertNoConflictWithExplicitOptions(false, true);
+        $classified->assertNoConflictWithExplicitOptions(false, false, true);
 
         $this->assertSame(['src/Foo.php'], $classified->sourcePaths);
         $this->assertNull($classified->testPath);
