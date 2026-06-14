@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
-use Infection\Configuration\PositionalPathsClassifier;
+use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -81,7 +81,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
-        private PositionalPathsClassifier $classifiedPaths = new PositionalPathsClassifier([], null),
+        private ClassifiedPaths $classifiedPaths,
     ) {
     }
 
@@ -392,7 +392,7 @@ final class ConfigurationFactoryInputBuilder
      *     32: non-empty-string|null,
      *     33: string|null,
      *     34: string|null,
-     *     35: PositionalPathsClassifier
+     *     35: ClassifiedPaths
      * }
      */
     public function build(SchemaConfiguration $schema): array

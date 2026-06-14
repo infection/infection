@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
+use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -45,7 +46,6 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
-use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
@@ -197,7 +197,7 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-                classifiedPaths: new PositionalPathsClassifier([], null),
+                classifiedPaths: new ClassifiedPaths([], null),
             )
         ;
     }
@@ -270,7 +270,7 @@ final class ConfigurationFactoryTest extends TestCase
             projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
-            classifiedPaths: new PositionalPathsClassifier([], null),
+            classifiedPaths: new ClassifiedPaths([], null),
         );
 
         $defaultConfiguration = new Configuration(
@@ -1490,7 +1490,7 @@ final class ConfigurationFactoryTest extends TestCase
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
-                    classifiedPaths: new PositionalPathsClassifier([], null),
+                    classifiedPaths: new ClassifiedPaths([], null),
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)

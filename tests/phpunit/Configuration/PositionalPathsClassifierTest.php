@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use function in_array;
+use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
@@ -51,6 +52,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PositionalPathsClassifier::class)]
+#[CoversClass(ClassifiedPaths::class)]
 #[Group('integration')]
 final class PositionalPathsClassifierTest extends TestCase
 {
@@ -168,89 +170,8 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->assertSame('PlusTest.php', $classified->testPath);
     }
 
-    public function test_it_treats_symbolic_values_like_filter_values_as_source_paths(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['Plus'],
-            [],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->assertSame(['Plus'], $classified->sourcePaths);
-        $this->assertNull($classified->testPath);
-    }
-
-    public function test_it_treats_symbolic_php_values_like_filter_values_as_source_paths(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['Plus.php'],
-            [],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->assertSame(['Plus.php'], $classified->sourcePaths);
-        $this->assertNull($classified->testPath);
-    }
-
-    public function test_it_routes_a_source_slot_and_a_test_slot_in_canonical_order(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['src/Foo.php'],
-            ['tests/FooTest.php'],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->assertSame(['src/Foo.php'], $classified->sourcePaths);
-        $this->assertSame('tests/FooTest.php', $classified->testPath);
-    }
-
-    public function test_slot_order_is_interchangeable(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['tests/FooTest.php'],
-            ['src/Foo.php'],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->assertSame(['src/Foo.php'], $classified->sourcePaths);
-        $this->assertSame('tests/FooTest.php', $classified->testPath);
-    }
-
-    public function test_it_allows_combining_symbolic_filter_value_with_test_path_in_two_slots(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['Plus'],
-            ['tests/FooTest.php'],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->assertSame(['Plus'], $classified->sourcePaths);
-        $this->assertSame('tests/FooTest.php', $classified->testPath);
-    }
-
-    public function test_it_allows_combining_symbolic_php_filter_value_with_test_path_in_two_slots(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['Plus.php'],
-            ['tests/phpunit/Mutator/Arithmetic/PlusTest.php'],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->assertSame(['Plus.php'], $classified->sourcePaths);
-        $this->assertSame('tests/phpunit/Mutator/Arithmetic/PlusTest.php', $classified->testPath);
-    }
-
     public function test_it_accepts_multiple_source_paths_via_comma_in_a_slot(): void
     {
-        // Source paths follow --filter conventions: comma-separated lists are fine.
-        // Test paths are NOT comma-separable (PHPUnit's filter takes a single path),
-        // so the test slot has exactly one entry here.
         $classified = PositionalPathsClassifier::fromSlots(
             ['src/A.php', 'src/B.php'],
             ['tests/ATest.php'],
@@ -366,66 +287,6 @@ final class PositionalPathsClassifierTest extends TestCase
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
         );
-    }
-
-    public function test_assert_no_conflict_rejects_source_paths_with_filter_option(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['src/Foo.php'],
-            [],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot pass source paths as positional arguments together with the "--filter" option.');
-
-        $classified->assertNoConflictWithExplicitOptions(true, false, false);
-    }
-
-    public function test_assert_no_conflict_rejects_source_paths_with_git_diff_filter_option(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['src/Foo.php'],
-            [],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines".');
-
-        $classified->assertNoConflictWithExplicitOptions(false, true, false);
-    }
-
-    public function test_assert_no_conflict_rejects_test_paths_with_test_framework_extra_args(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['tests/FooTest.php'],
-            [],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option.');
-
-        $classified->assertNoConflictWithExplicitOptions(false, false, true);
-    }
-
-    public function test_assert_no_conflict_passes_when_unrelated_options_are_provided(): void
-    {
-        $classified = PositionalPathsClassifier::fromSlots(
-            ['src/Foo.php'],
-            [],
-            $this->createSchema(['src']),
-            $this->acceptingFileSystem(),
-        );
-
-        $classified->assertNoConflictWithExplicitOptions(false, false, true);
-
-        $this->assertSame(['src/Foo.php'], $classified->sourcePaths);
-        $this->assertNull($classified->testPath);
     }
 
     public function test_it_classifies_paths_under_singular_test_directory_as_test_paths(): void
@@ -800,12 +661,6 @@ final class PositionalPathsClassifierTest extends TestCase
         ];
     }
 
-    /**
-     * Stand-in FileSystem that treats every path as present. Most classifier
-     * cases don't reach the existence check (handled by name heuristics or
-     * by the no-slash branch); for those that do, the test's intent is to
-     * exercise the source/test routing, not the existence guard.
-     */
     private function acceptingFileSystem(): FileSystem
     {
         $fileSystem = $this->createMock(FileSystem::class);

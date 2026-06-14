@@ -515,11 +515,27 @@ final class RunCommand extends BaseCommand
 
     private function assertPositionalPathsDoNotConflict(Container $container, IO $io): void
     {
-        $container->getPositionalPathsClassifier()->assertNoConflictWithExplicitOptions(
-            SourceFilterOptions::isPlainFilterProvided($io),
-            SourceFilterOptions::isGitDiffFilterProvided($io),
-            TestFrameworkExtraArgsOption::isProvided($io),
-        );
+        $classified = $container->getClassifiedPaths();
+
+        if ($classified->sourcePaths !== [] && SourceFilterOptions::isPlainFilterProvided($io)) {
+            throw new InvalidArgumentException(sprintf(
+                'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
+                SourceFilterOptions::PLAIN_FILTER_NAME,
+            ));
+        }
+
+        if ($classified->sourcePaths !== [] && SourceFilterOptions::isGitDiffFilterProvided($io)) {
+            throw new InvalidArgumentException(
+                'Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
+            );
+        }
+
+        if ($classified->testPath !== null && TestFrameworkExtraArgsOption::isProvided($io)) {
+            throw new InvalidArgumentException(sprintf(
+                'Cannot pass test paths as positional arguments together with the "--%s" option. Use either form, not both.',
+                TestFrameworkExtraArgsOption::NAME,
+            ));
+        }
     }
 
     private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void

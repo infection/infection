@@ -40,6 +40,7 @@ use function class_exists;
 use function count;
 use function dirname;
 use function implode;
+use Infection\CannotBeInstantiated;
 use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
@@ -56,24 +57,18 @@ use function strtoupper;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * Classifies the positional `path` / `path2` slots into source-filter and
- * test-framework-extra-args buckets.
+ * Classifies the positional `path` / `secondary-path` slots into source-filter
+ * and test-framework-extra-args buckets
  *
  * @internal
  */
-final readonly class PositionalPathsClassifier
+final class PositionalPathsClassifier
 {
+    use CannotBeInstantiated;
+
     private const string KIND_SOURCE = 'source';
 
     private const string KIND_TEST = 'test';
-
-    public function __construct(
-        /** @var list<non-empty-string> */
-        public array $sourcePaths,
-        /** @var non-empty-string|null */
-        public ?string $testPath,
-    ) {
-    }
 
     /**
      * @param list<non-empty-string> $slot1
@@ -84,9 +79,9 @@ final readonly class PositionalPathsClassifier
         array $slot2,
         SchemaConfiguration $schema,
         FileSystem $fileSystem,
-    ): self {
+    ): ClassifiedPaths {
         if ($slot1 === [] && $slot2 === []) {
-            return new self([], null);
+            return new ClassifiedPaths([], null);
         }
 
         $configDir = dirname($schema->pathname);
@@ -127,39 +122,11 @@ final readonly class PositionalPathsClassifier
             $testPath = $slot2[0];
         }
 
-        return new self($sourcePaths, $testPath);
-    }
-
-    public function assertNoConflictWithExplicitOptions(
-        bool $isSourceFilterProvided,
-        bool $isGitDiffFilterProvided,
-        bool $isTestFrameworkExtraArgsProvided,
-    ): void {
-        if ($this->sourcePaths !== [] && $isSourceFilterProvided) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
-                SourceFilterOptions::PLAIN_FILTER_NAME,
-            ));
-        }
-
-        if ($this->sourcePaths !== [] && $isGitDiffFilterProvided) {
-            throw new InvalidArgumentException(
-                'Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
-            );
-        }
-
-        if ($this->testPath !== null && $isTestFrameworkExtraArgsProvided) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot pass test paths as positional arguments together with the "--%s" option. Use either form, not both.',
-                TestFrameworkExtraArgsOption::NAME,
-            ));
-        }
+        return new ClassifiedPaths($sourcePaths, $testPath);
     }
 
     /**
-     * Comma-separated lists are a "--filter"-style affordance for source paths
-     * only. PHPUnit's filter takes a single path (file or directory), so a test
-     * slot containing more than one path is treated as user error.
+     * Comma-separated lists are allowed only for source paths ("--filter" analogue).
      *
      * @param self::KIND_*|null $kind
      * @param list<non-empty-string> $slot
@@ -175,9 +142,6 @@ final readonly class PositionalPathsClassifier
     }
 
     /**
-     * Classify every item in the slot. Returns the kind shared by all items, or
-     * null when the slot is empty. Throws when items disagree.
-     *
      * @param list<non-empty-string> $slot
      * @param list<non-empty-string> $absoluteSourceDirs
      *
@@ -314,19 +278,18 @@ final readonly class PositionalPathsClassifier
     }
 
     /**
-     * @param string $value
-     *
      * \SomeNamespace\Class
      * \SomeNamespace\Class::method
      * \SomeNamespace\Class::method::34
+     * App\Foo (bare, unbackslashed)
      */
     private static function looksLikeFqcn(string $value): bool
     {
-        if (class_exists($value)) {
+        if (str_starts_with($value, '\\') || str_contains($value, '::')) {
             return true;
         }
 
-        return str_starts_with($value, '\\') || str_contains($value, '::');
+        return class_exists($value);
     }
 
     private static function looksLikeClassOrFileName(string $value): bool
@@ -336,13 +299,6 @@ final readonly class PositionalPathsClassifier
             && !str_contains($value, '\\');
     }
 
-    /**
-     * Recognises the conventional test directory layouts used by PHPUnit
-     * projects: "tests/" (Symfony, modern PSR-4) and "test/" (older PSR-0,
-     * some Composer setups). Anything past basename(Test.php) suffix is the
-     * universal naming convention. Paths that don't match still get a second
-     * chance via the source.directories fallback in classifyPathKind.
-     */
     private static function looksLikeTestPath(string $value): bool
     {
         $normalized = str_replace('\\', '/', $value);

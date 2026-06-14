@@ -67,7 +67,6 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
-use InvalidArgumentException;
 use function is_numeric;
 use function ltrim;
 use function max;
@@ -108,7 +107,6 @@ class ConfigurationFactory
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'max'|null $dotsPerRow
-    * @param PositionalPathsClassifier $classifiedPaths
      *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
@@ -149,7 +147,7 @@ class ConfigurationFactory
         ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
-        PositionalPathsClassifier $classifiedPaths,
+        ClassifiedPaths $classifiedPaths,
     ): Configuration {
         $configDir = dirname($schema->pathname);
 
@@ -193,9 +191,6 @@ class ConfigurationFactory
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
             testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
                 $testFrameworkExtraOptions,
-                // Conflicts between a positional test path and the explicit
-                // --test-framework-extra-args option were already rejected by the
-                // classifier, so at most one of these two is non-null at this point.
                 $classifiedPaths->testPath ?? $testFrameworkExtraArgs,
                 $schema,
                 $testFramework,
@@ -345,15 +340,6 @@ class ConfigurationFactory
     ): PlainFilter|IncompleteGitDiffFilter|null {
         if ($sourcePaths === []) {
             return $sourceFilter;
-        }
-
-        // Conflicts with an explicit --filter were already rejected by the classifier.
-        // A non-null $sourceFilter here would be an IncompleteGitDiffFilter, which
-        // is incompatible with explicit positional source paths.
-        if ($sourceFilter !== null) {
-            throw new InvalidArgumentException(
-                'Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
-            );
         }
 
         return new PlainFilter(array_values(array_unique($sourcePaths)));
