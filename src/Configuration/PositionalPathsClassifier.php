@@ -59,18 +59,6 @@ use Symfony\Component\Filesystem\Path;
  * Classifies the positional `path` / `path2` slots into source-filter and
  * test-framework-extra-args buckets.
  *
- * Rules enforced:
- *   - Each slot's items are classified against the configured
- *     "source.directories"; all items in a slot must classify as the same kind
- *     (all source, or all test). Mixing source and test paths within one slot
- *     is rejected — use the two separate slots for that.
- *   - When both slots are populated, they must classify as different kinds.
- *     Two source slots (or two test slots) are rejected — combine same-kind
- *     source paths with commas inside a single slot instead.
- *   - Comma-separated lists are supported for SOURCE paths only (mimicking
- *     the "--filter" option). Test slots must contain exactly one path
- *     (a single file or directory) — PHPUnit's filter accepts a single value.
- *
  * @internal
  */
 final readonly class PositionalPathsClassifier
@@ -113,7 +101,7 @@ final readonly class PositionalPathsClassifier
         if ($slot1Kind !== null && $slot2Kind !== null && $slot1Kind === $slot2Kind) {
             $hint = $slot1Kind === self::KIND_SOURCE
                 ? sprintf(' Combine same-kind source paths with commas in a single argument (e.g. "%s") instead of using two slots.', implode(',', [...$slot1, ...$slot2]))
-                : ' Pass a single test path (file or directory); comma-separated test paths are not supported.';
+                : ' Pass at most one test path as a positional argument; both slots cannot resolve to test paths.';
 
             throw new InvalidArgumentException(sprintf(
                 'Both positional arguments resolved to %s paths.%s',
@@ -144,6 +132,7 @@ final readonly class PositionalPathsClassifier
 
     public function assertNoConflictWithExplicitOptions(
         bool $isSourceFilterProvided,
+        bool $isGitDiffFilterProvided,
         bool $isTestFrameworkExtraArgsProvided,
     ): void {
         if ($this->sourcePaths !== [] && $isSourceFilterProvided) {
@@ -151,6 +140,12 @@ final readonly class PositionalPathsClassifier
                 'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
                 SourceFilterOptions::PLAIN_FILTER_NAME,
             ));
+        }
+
+        if ($this->sourcePaths !== [] && $isGitDiffFilterProvided) {
+            throw new InvalidArgumentException(
+                'Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
+            );
         }
 
         if ($this->testPath !== null && $isTestFrameworkExtraArgsProvided) {
