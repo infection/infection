@@ -55,7 +55,6 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
-use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -103,15 +102,13 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
-        private readonly FileSystem $fileSystem,
     ) {
     }
 
     /**
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'max'|null $dotsPerRow
-     * @param list<non-empty-string> $positionalPathSlot1
-     * @param list<non-empty-string> $positionalPathSlot2
+    * @param PositionalPathsClassifier $classifiedPaths
      *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
@@ -152,11 +149,7 @@ class ConfigurationFactory
         ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
-        array $positionalPathSlot1,
-        array $positionalPathSlot2,
-        // TODO remove default values
-        bool $isSourceFilterProvided = false,
-        bool $isTestFrameworkExtraArgsProvided = false,
+        PositionalPathsClassifier $classifiedPaths,
     ): Configuration {
         $configDir = dirname($schema->pathname);
 
@@ -179,17 +172,6 @@ class ConfigurationFactory
 
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
-
-        $classifiedPaths = PositionalPathsClassifier::fromSlots(
-            $positionalPathSlot1,
-            $positionalPathSlot2,
-            $schema,
-            $this->fileSystem,
-        );
-        $classifiedPaths->assertNoConflictWithExplicitOptions(
-            $isSourceFilterProvided,
-            $isTestFrameworkExtraArgsProvided,
-        );
 
         $sourceFilter = self::mergePositionalSourcePaths($sourceFilter, $classifiedPaths->sourcePaths);
 
