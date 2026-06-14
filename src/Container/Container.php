@@ -43,6 +43,7 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
@@ -720,8 +721,6 @@ final class Container extends DIContainer
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
         array $positionalPathSlot1 = [],
         array $positionalPathSlot2 = [],
-        bool $isSourceFilterProvided = false,
-        bool $isTestFrameworkExtraArgsProvided = false,
     ): self {
         $clone = clone $this;
 
@@ -761,6 +760,16 @@ final class Container extends DIContainer
             static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create(
                 $loggerName,
                 $container->getConfiguration()->dotsPerRow,
+            ),
+        );
+
+        $clone->offsetSet(
+            PositionalPathsClassifier::class,
+            static fn (self $container): PositionalPathsClassifier => PositionalPathsClassifier::fromSlots(
+                $positionalPathSlot1,
+                $positionalPathSlot2,
+                $container->getSchemaConfiguration(),
+                $container->getFileSystem(),
             ),
         );
 
@@ -806,10 +815,7 @@ final class Container extends DIContainer
                 projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
-                positionalPathSlot1: $positionalPathSlot1,
-                positionalPathSlot2: $positionalPathSlot2,
-                isSourceFilterProvided: $isSourceFilterProvided,
-                isTestFrameworkExtraArgsProvided: $isTestFrameworkExtraArgsProvided,
+                classifiedPaths: $container->getPositionalPathsClassifier(),
             ),
         );
 
@@ -974,6 +980,11 @@ final class Container extends DIContainer
     public function getSchemaConfiguration(): SchemaConfiguration
     {
         return $this->get(SchemaConfiguration::class);
+    }
+
+    public function getPositionalPathsClassifier(): PositionalPathsClassifier
+    {
+        return $this->get(PositionalPathsClassifier::class);
     }
 
     // Should throw all the exceptions ConfigurationFactory::create() can throw.

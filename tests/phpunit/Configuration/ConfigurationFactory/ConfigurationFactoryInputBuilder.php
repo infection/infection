@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -44,8 +45,6 @@ final class ConfigurationFactoryInputBuilder
     /**
      * @param non-empty-string|null $projectDirectory
      * @param positive-int|'max'|null $dotsPerRow
-     * @param list<non-empty-string> $positionalPathSlot1
-     * @param list<non-empty-string> $positionalPathSlot2
      */
     public function __construct(
         private ?string $existingCoveragePath,
@@ -82,8 +81,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
-        private array $positionalPathSlot1,
-        private array $positionalPathSlot2,
+        private PositionalPathsClassifier $classifiedPaths = new PositionalPathsClassifier([], null),
     ) {
     }
 
@@ -394,8 +392,7 @@ final class ConfigurationFactoryInputBuilder
      *     32: non-empty-string|null,
      *     33: string|null,
      *     34: string|null,
-     *     35: list<non-empty-string>,
-     *     36: list<non-empty-string>
+     *     35: PositionalPathsClassifier
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -436,8 +433,7 @@ final class ConfigurationFactoryInputBuilder
             $this->projectDirectory,
             $this->staticAnalysisTool,
             $this->mutantId,
-            $this->positionalPathSlot1,
-            $this->positionalPathSlot2,
+            $this->classifiedPaths,
         ];
     }
 }

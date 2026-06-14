@@ -510,8 +510,14 @@ final class RunCommand extends BaseCommand
             mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
             positionalPathSlot1: PathsArgument::getSlot1($io),
             positionalPathSlot2: PathsArgument::getSlot2($io),
-            isSourceFilterProvided: SourceFilterOptions::isPlainFilterProvided($io),
-            isTestFrameworkExtraArgsProvided: TestFrameworkExtraArgsOption::isProvided($io),
+        );
+    }
+
+    private function assertPositionalPathsDoNotConflict(Container $container, IO $io): void
+    {
+        $container->getPositionalPathsClassifier()->assertNoConflictWithExplicitOptions(
+            SourceFilterOptions::isPlainFilterProvided($io),
+            TestFrameworkExtraArgsOption::isProvided($io),
         );
     }
 
@@ -591,6 +597,8 @@ final class RunCommand extends BaseCommand
 
             $consoleOutput->logNotInControlOfExitCodes();
         }
+
+        $this->assertPositionalPathsDoNotConflict($container, $io);
 
         $container->getCoverageChecker()->checkCoverageRequirements();
 

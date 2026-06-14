@@ -45,13 +45,12 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
+use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
-use Infection\FileSystem\FileSystem;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -198,8 +197,7 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-                positionalPathSlot1: [],
-                positionalPathSlot2: [],
+                classifiedPaths: new PositionalPathsClassifier([], null),
             )
         ;
     }
@@ -272,8 +270,7 @@ final class ConfigurationFactoryTest extends TestCase
             projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
-            positionalPathSlot1: [],
-            positionalPathSlot2: [],
+            classifiedPaths: new PositionalPathsClassifier([], null),
         );
 
         $defaultConfiguration = new Configuration(
@@ -1493,8 +1490,7 @@ final class ConfigurationFactoryTest extends TestCase
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
-                    positionalPathSlot1: [],
-                    positionalPathSlot2: [],
+                    classifiedPaths: new PositionalPathsClassifier([], null),
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
@@ -1627,7 +1623,6 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
-            new FakeFileSystem(),
         );
     }
 }
