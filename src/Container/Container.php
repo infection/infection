@@ -41,6 +41,7 @@ use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
+use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\PositionalPathsClassifier;
@@ -764,8 +765,8 @@ final class Container extends DIContainer
         );
 
         $clone->offsetSet(
-            PositionalPathsClassifier::class,
-            static fn (self $container): PositionalPathsClassifier => PositionalPathsClassifier::fromSlots(
+            ClassifiedPaths::class,
+            static fn (self $container): ClassifiedPaths => PositionalPathsClassifier::fromSlots(
                 $positionalPathSlot1,
                 $positionalPathSlot2,
                 $container->getSchemaConfiguration(),
@@ -815,7 +816,7 @@ final class Container extends DIContainer
                 projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
-                classifiedPaths: $container->getPositionalPathsClassifier(),
+                classifiedPaths: $container->getClassifiedPaths(),
             ),
         );
 
@@ -982,9 +983,9 @@ final class Container extends DIContainer
         return $this->get(SchemaConfiguration::class);
     }
 
-    public function getPositionalPathsClassifier(): PositionalPathsClassifier
+    public function getClassifiedPaths(): ClassifiedPaths
     {
-        return $this->get(PositionalPathsClassifier::class);
+        return $this->get(ClassifiedPaths::class);
     }
 
     // Should throw all the exceptions ConfigurationFactory::create() can throw.
