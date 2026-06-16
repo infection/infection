@@ -37,11 +37,9 @@ namespace Infection\Configuration;
 
 use function basename;
 use function class_exists;
-use function count;
+use function ctype_upper;
 use function dirname;
-use function implode;
 use Infection\CannotBeInstantiated;
-use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -53,12 +51,12 @@ use function str_contains;
 use function str_ends_with;
 use function str_replace;
 use function str_starts_with;
-use function strtoupper;
+use function strtolower;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * Classifies the positional `path` / `secondary-path` slots into source-filter
- * and test-framework-extra-args buckets
+ * Classifies positional `path` arguments into source-filter and
+ * test-framework-extra-args buckets.
  *
  * @internal
  */
@@ -71,113 +69,34 @@ final class PositionalPathsClassifier
     private const string KIND_TEST = 'test';
 
     /**
-     * @param list<non-empty-string> $slot1
-     * @param list<non-empty-string> $slot2
+     * @param list<non-empty-string> $paths
      */
-    public static function fromSlots(
-        array $slot1,
-        array $slot2,
+    public static function fromPaths(
+        array $paths,
         SchemaConfiguration $schema,
         FileSystem $fileSystem,
     ): ClassifiedPaths {
-        if ($slot1 === [] && $slot2 === []) {
-            return new ClassifiedPaths([], null);
+        if ($paths === []) {
+            return new ClassifiedPaths([], []);
         }
 
         $configDir = dirname($schema->pathname);
         $absoluteSourceDirs = self::resolveAbsoluteSourceDirectories($schema, $configDir);
 
-        $slot1Kind = self::classifySlot($slot1, $absoluteSourceDirs, $configDir, $fileSystem, PathsArgument::SLOT_1_NAME);
-        $slot2Kind = self::classifySlot($slot2, $absoluteSourceDirs, $configDir, $fileSystem, PathsArgument::SLOT_2_NAME);
-
-        self::assertTestSlotIsSinglePath($slot1Kind, $slot1, PathsArgument::SLOT_1_NAME);
-        self::assertTestSlotIsSinglePath($slot2Kind, $slot2, PathsArgument::SLOT_2_NAME);
-
-        if ($slot1Kind !== null && $slot2Kind !== null && $slot1Kind === $slot2Kind) {
-            $hint = $slot1Kind === self::KIND_SOURCE
-                ? sprintf(' Combine same-kind source paths with commas in a single argument (e.g. "%s") instead of using two slots.', implode(',', [...$slot1, ...$slot2]))
-                : ' Pass at most one test path as a positional argument; both slots cannot resolve to test paths.';
-
-            throw new InvalidArgumentException(sprintf(
-                'Both positional arguments resolved to %s paths.%s',
-                $slot1Kind,
-                $hint,
-            ));
-        }
-
         $sourcePaths = [];
-        $testPath = null;
+        $testPaths = [];
 
-        if ($slot1Kind === self::KIND_SOURCE) {
-            $sourcePaths = $slot1;
-        } elseif ($slot1Kind === self::KIND_TEST) {
-            // assertTestSlotIsSinglePath above guarantees count($slot1) === 1.
-            $testPath = $slot1[0];
-        }
+        foreach ($paths as $path) {
+            $kind = self::classifyPathKind($path, $absoluteSourceDirs, $configDir, $fileSystem);
 
-        if ($slot2Kind === self::KIND_SOURCE) {
-            $sourcePaths = $slot2;
-        } elseif ($slot2Kind === self::KIND_TEST) {
-            // assertTestSlotIsSinglePath above guarantees count($slot2) === 1.
-            $testPath = $slot2[0];
-        }
-
-        return new ClassifiedPaths($sourcePaths, $testPath);
-    }
-
-    /**
-     * Comma-separated lists are allowed only for source paths ("--filter" analogue).
-     *
-     * @param self::KIND_*|null $kind
-     * @param list<non-empty-string> $slot
-     */
-    private static function assertTestSlotIsSinglePath(?string $kind, array $slot, string $slotName): void
-    {
-        if ($kind === self::KIND_TEST && count($slot) > 1) {
-            throw new InvalidArgumentException(sprintf(
-                'The "<%s>" argument lists multiple test paths separated by commas. Test paths must be a single file or directory; comma-separated test paths are not supported.',
-                $slotName,
-            ));
-        }
-    }
-
-    /**
-     * @param list<non-empty-string> $slot
-     * @param list<non-empty-string> $absoluteSourceDirs
-     *
-     * @return 'source'|'test'|null
-     */
-    private static function classifySlot(
-        array $slot,
-        array $absoluteSourceDirs,
-        string $configDir,
-        FileSystem $fileSystem,
-        string $slotName,
-    ): ?string {
-        if ($slot === []) {
-            return null;
-        }
-
-        $kind = null;
-
-        foreach ($slot as $path) {
-            $itemKind = self::classifyPathKind($path, $absoluteSourceDirs, $configDir, $fileSystem);
-
-            if ($kind === null) {
-                $kind = $itemKind;
-
-                continue;
-            }
-
-            if ($kind !== $itemKind) {
-                throw new InvalidArgumentException(sprintf(
-                    'The "<%s>" argument mixes source and test paths. Pass one kind per argument; use the second positional argument for the other kind (e.g. `infection run src/Foo.php tests/FooTest.php`).',
-                    $slotName,
-                ));
+            if ($kind === self::KIND_SOURCE) {
+                $sourcePaths[] = $path;
+            } else {
+                $testPaths[] = $path;
             }
         }
 
-        return $kind;
+        return new ClassifiedPaths($sourcePaths, $testPaths);
     }
 
     /**
@@ -294,7 +213,7 @@ final class PositionalPathsClassifier
 
     private static function looksLikeClassOrFileName(string $value): bool
     {
-        return strtoupper($value[0]) === $value[0] // class and file name starts with Pascal Case
+        return ctype_upper($value[0]) // class and file name starts with Pascal Case (A-Z only, not digits)
             && !str_contains($value, '/')
             && !str_contains($value, '\\');
     }
@@ -302,13 +221,14 @@ final class PositionalPathsClassifier
     private static function looksLikeTestPath(string $value): bool
     {
         $normalized = str_replace('\\', '/', $value);
+        $lowered = strtolower($normalized);
 
         foreach (['tests', 'test'] as $segment) {
-            if ($normalized === $segment || str_starts_with($normalized, $segment . '/')) {
+            if ($lowered === $segment || str_starts_with($lowered, $segment . '/')) {
                 return true;
             }
 
-            if (str_contains($normalized, '/' . $segment . '/')) {
+            if (str_contains($lowered, '/' . $segment . '/')) {
                 return true;
             }
         }

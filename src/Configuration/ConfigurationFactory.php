@@ -191,7 +191,7 @@ class ConfigurationFactory
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
             testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
                 $testFrameworkExtraOptions,
-                $classifiedPaths->testPath ?? $testFrameworkExtraArgs,
+                $classifiedPaths->testPaths !== [] ? implode(' ', $classifiedPaths->testPaths) : $testFrameworkExtraArgs,
                 $schema,
                 $testFramework,
             ),

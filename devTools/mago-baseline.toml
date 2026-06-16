@@ -339,19 +339,13 @@ count = 1
 [[issues]]
 file = "src/Command/Option/PathsArgument.php"
 code = "invalid-return-statement"
-message = '''Invalid return type for function `Infection\Command\Option\PathsArgument::addArgument`: expected `('T.infection\command\option\pathsargument::addargument() extends Symfony\Component\Console\Command\Command)`, but found `$this(Symfony\Component\Console\Command\Command)`.'''
+message = 'Invalid return type for function `Infection\Command\Option\PathsArgument::get`: expected `list<non-empty-string>`, but found `list<string>`.'
 count = 1
 
 [[issues]]
 file = "src/Command/Option/PathsArgument.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Command\Option\PathsArgument::readSlot`: expected `list<non-empty-string>`, but found `list<string>`.'
-count = 1
-
-[[issues]]
-file = "src/Command/Option/PathsArgument.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `array_filter`: expected `array<string, string>`, but found `mixed`."
 count = 1
 
 [[issues]]
@@ -968,6 +962,12 @@ count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$positionalPaths`."
+count = 1
+
+[[issues]]
+file = "src/Container/Container.php"
 code = "template-constraint-violation"
 message = "Argument type mismatch for template `T`."
 count = 3
@@ -1167,7 +1167,7 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:761:13}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:759:13}`.'
 count = 1
 
 [[issues]]
@@ -1365,7 +1365,7 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:761:13}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:759:13}`.'
 count = 1
 
 [[issues]]
@@ -5763,13 +5763,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/Option/PathsArgumentTest.php"
 code = "imprecise-type"
-message = "Type `iterable` in return type of `slot1Provider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/Option/PathsArgumentTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `slot2Provider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+message = "Type `iterable` in return type of `pathsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -5835,31 +5829,13 @@ count = 3
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Exception` in `Infection\Tests\Command\RunCommandTest::test_it_rejects_more_than_two_positional_arguments`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_a_positional_argument_is_an_fqcn`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_a_positional_argument_mixes_source_and_test_paths`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_a_positional_path_does_not_exist_on_disk`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_both_positional_arguments_classify_as_source_paths`.'
 count = 1
 
 [[issues]]
@@ -5896,12 +5872,6 @@ count = 1
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_threads_value_is_string_but_not_max`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_rejects_more_than_two_positional_arguments`.'
 count = 1
 
 [[issues]]

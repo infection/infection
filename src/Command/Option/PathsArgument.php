@@ -36,12 +36,9 @@ declare(strict_types=1);
 namespace Infection\Command\Option;
 
 use function array_filter;
-use function array_map;
 use function array_values;
-use function explode;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use function is_string;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use function trim;
@@ -53,62 +50,26 @@ final class PathsArgument
 {
     use CannotBeInstantiated;
 
-    public const string SLOT_1_NAME = 'path';
+    public const string NAME = 'paths';
 
-    public const string SLOT_2_NAME = 'secondary-path';
-
-    /**
-     * @template T of Command
-     * @param T $command
-     *
-     * @return T
-     */
     public static function addArgument(Command $command): Command
     {
-        return $command
-            ->addArgument(
-                self::SLOT_1_NAME,
-                InputArgument::OPTIONAL,
-                'A source or test path to focus mutation testing on. Source paths can be comma-separated to mutate multiple files (e.g. "src/A.php,src/B.php") - same convention as --filter. Test paths must be a single file or directory. Source vs test is auto-detected against the configured "source.directories".',
-            )
-            ->addArgument(
-                self::SLOT_2_NAME,
-                InputArgument::OPTIONAL,
-                'A source or test path of the opposite kind to the first argument. Same rules apply (commas allowed for source only). Argument order is interchangeable.',
-            );
+        return $command->addArgument(
+            self::NAME,
+            InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
+            'Source and/or test paths to focus mutation testing on. Source paths are forwarded to "--filter"; test paths are forwarded to "--test-framework-extra-args". Kind is auto-detected against the configured "source.directories". Pass as many paths as needed: `infection run src/A.php src/B.php tests/ATest.php`.',
+        );
     }
 
     /**
      * @return list<non-empty-string>
      */
-    public static function getSlot1(IO $io): array
+    public static function get(IO $io): array
     {
-        return self::readSlot($io, self::SLOT_1_NAME);
-    }
-
-    /**
-     * @return list<non-empty-string>
-     */
-    public static function getSlot2(IO $io): array
-    {
-        return self::readSlot($io, self::SLOT_2_NAME);
-    }
-
-    /**
-     * @return list<non-empty-string>
-     */
-    private static function readSlot(IO $io, string $name): array
-    {
-        $raw = $io->getInput()->getArgument($name);
-
-        if (!is_string($raw) || trim($raw) === '') {
-            return [];
-        }
-
         return array_values(
             array_filter(
-                array_map(trim(...), explode(',', $raw)),
-                static fn (string $path): bool => $path !== '',
+                $io->getInput()->getArgument(self::NAME),
+                static fn (string $path): bool => trim($path) !== '',
             ),
         );
     }
