@@ -677,8 +677,7 @@ final class Container extends DIContainer
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'max'|null $dotsPerRow
-     * @param list<non-empty-string> $positionalPathSlot1
-     * @param list<non-empty-string> $positionalPathSlot2
+     * @param list<non-empty-string> $positionalPaths
      */
     public function withValues(
         LoggerInterface $logger,
@@ -720,8 +719,7 @@ final class Container extends DIContainer
         ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
-        array $positionalPathSlot1 = [],
-        array $positionalPathSlot2 = [],
+        array $positionalPaths = [],
     ): self {
         $clone = clone $this;
 
@@ -766,9 +764,8 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             ClassifiedPaths::class,
-            static fn (self $container): ClassifiedPaths => PositionalPathsClassifier::fromSlots(
-                $positionalPathSlot1,
-                $positionalPathSlot2,
+            static fn (self $container): ClassifiedPaths => PositionalPathsClassifier::fromPaths(
+                $positionalPaths,
                 $container->getSchemaConfiguration(),
                 $container->getFileSystem(),
             ),

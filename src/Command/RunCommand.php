@@ -508,8 +508,7 @@ final class RunCommand extends BaseCommand
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
-            positionalPathSlot1: PathsArgument::getSlot1($io),
-            positionalPathSlot2: PathsArgument::getSlot2($io),
+            positionalPaths: PathsArgument::get($io),
         );
     }
 
@@ -530,7 +529,7 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        if ($classified->testPath !== null && TestFrameworkExtraArgsOption::isProvided($io)) {
+        if ($classified->testPaths !== [] && TestFrameworkExtraArgsOption::isProvided($io)) {
             throw new InvalidArgumentException(sprintf(
                 'Cannot pass test paths as positional arguments together with the "--%s" option. Use either form, not both.',
                 TestFrameworkExtraArgsOption::NAME,

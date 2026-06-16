@@ -48,98 +48,57 @@ use Symfony\Component\Console\Output\NullOutput;
 #[CoversClass(PathsArgument::class)]
 final class PathsArgumentTest extends TestCase
 {
-    public function test_it_adds_two_optional_arguments(): void
+    public function test_it_adds_a_single_is_array_argument(): void
     {
         $command = new Command('test');
 
         $returnedCommand = PathsArgument::addArgument($command);
 
         $this->assertSame($command, $returnedCommand);
-        $this->assertTrue($command->getDefinition()->hasArgument(PathsArgument::SLOT_1_NAME));
-        $this->assertTrue($command->getDefinition()->hasArgument(PathsArgument::SLOT_2_NAME));
-        $this->assertFalse($command->getDefinition()->getArgument(PathsArgument::SLOT_1_NAME)->isRequired());
-        $this->assertFalse($command->getDefinition()->getArgument(PathsArgument::SLOT_2_NAME)->isRequired());
+        $this->assertTrue($command->getDefinition()->hasArgument(PathsArgument::NAME));
+
+        $argument = $command->getDefinition()->getArgument(PathsArgument::NAME);
+        $this->assertFalse($argument->isRequired());
+        $this->assertTrue($argument->isArray());
     }
 
     /**
-     * @param array<string, string> $arguments
+     * @param array<string, list<string>> $arguments
      * @param list<non-empty-string> $expected
      */
-    #[DataProvider('slot1Provider')]
-    public function test_it_reads_slot1(array $arguments, array $expected): void
+    #[DataProvider('pathsProvider')]
+    public function test_it_reads_paths(array $arguments, array $expected): void
     {
         $io = $this->createIo(new ArrayInput($arguments));
 
-        $this->assertSame($expected, PathsArgument::getSlot1($io));
+        $this->assertSame($expected, PathsArgument::get($io));
     }
 
-    public static function slot1Provider(): iterable
+    public static function pathsProvider(): iterable
     {
         yield 'not provided' => [
             [],
             [],
         ];
 
-        yield 'blank value' => [
-            [
-                PathsArgument::SLOT_1_NAME => '   ',
-            ],
+        yield 'empty array' => [
+            [PathsArgument::NAME => []],
             [],
         ];
 
         yield 'single value' => [
-            [
-                PathsArgument::SLOT_1_NAME => 'src/Foo.php',
-            ],
+            [PathsArgument::NAME => ['src/Foo.php']],
             ['src/Foo.php'],
         ];
 
-        yield 'comma separated values are trimmed and empty items removed' => [
-            [
-                PathsArgument::SLOT_1_NAME => ' src/Foo.php, ,src/Bar.php ,',
-            ],
-            ['src/Foo.php', 'src/Bar.php'],
-        ];
-    }
-
-    /**
-     * @param array<string, string> $arguments
-     * @param list<non-empty-string> $expected
-     */
-    #[DataProvider('slot2Provider')]
-    public function test_it_reads_slot2(array $arguments, array $expected): void
-    {
-        $io = $this->createIo(new ArrayInput($arguments));
-
-        $this->assertSame($expected, PathsArgument::getSlot2($io));
-    }
-
-    public static function slot2Provider(): iterable
-    {
-        yield 'not provided' => [
-            [],
-            [],
+        yield 'multiple values' => [
+            [PathsArgument::NAME => ['src/Foo.php', 'tests/FooTest.php']],
+            ['src/Foo.php', 'tests/FooTest.php'],
         ];
 
-        yield 'blank value' => [
-            [
-                PathsArgument::SLOT_2_NAME => '   ',
-            ],
-            [],
-        ];
-
-        yield 'single value' => [
-            [
-                PathsArgument::SLOT_2_NAME => 'tests/FooTest.php',
-            ],
-            ['tests/FooTest.php'],
-        ];
-
-        yield 'comma separated values are trimmed and empty items removed' => [
-            [
-                PathsArgument::SLOT_2_NAME => ' tests/FooTest.php, ,tests/BarTest.php ,',
-            ],
-            ['tests/FooTest.php', 'tests/BarTest.php'],
+        yield 'many values including test directories' => [
+            [PathsArgument::NAME => ['src/A.php', 'src/B.php', 'tests/Unit/', 'tests/Integration/']],
+            ['src/A.php', 'src/B.php', 'tests/Unit/', 'tests/Integration/'],
         ];
     }
 

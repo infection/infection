@@ -41,9 +41,6 @@ use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(RunCommand::class)]
@@ -100,7 +97,7 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/Engine.php',
+            'paths' => ['src/Engine.php'],
             '--filter' => 'src/Engine.php',
         ]);
     }
@@ -115,37 +112,8 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'tests/phpunit/EngineTest.php',
+            'paths' => ['tests/phpunit/EngineTest.php'],
             '--test-framework-extra-args' => 'tests/phpunit/EngineTest.php',
-        ]);
-    }
-
-    public function test_it_fails_when_both_positional_arguments_classify_as_source_paths(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Both positional arguments resolved to source paths. Combine same-kind source paths with commas in a single argument');
-
-        $app = new Application(SingletonContainer::getContainer());
-
-        $tester = new CommandTester($app->find('run'));
-
-        $tester->execute([
-            'path' => 'src/Engine.php',
-            'secondary-path' => 'src/Container/Container.php',
-        ]);
-    }
-
-    public function test_it_fails_when_a_positional_argument_mixes_source_and_test_paths(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "<path>" argument mixes source and test paths.');
-
-        $app = new Application(SingletonContainer::getContainer());
-
-        $tester = new CommandTester($app->find('run'));
-
-        $tester->execute([
-            'path' => 'src/Engine.php,tests/phpunit/EngineTest.php',
         ]);
     }
 
@@ -159,7 +127,7 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/Engine.php',
+            'paths' => ['src/Engine.php'],
             '--git-diff-filter' => 'AM',
         ]);
     }
@@ -174,7 +142,7 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => 'src/DefinitelyDoesNotExist.php',
+            'paths' => ['src/DefinitelyDoesNotExist.php'],
         ]);
     }
 
@@ -188,24 +156,7 @@ final class RunCommandTest extends TestCase
         $tester = new CommandTester($app->find('run'));
 
         $tester->execute([
-            'path' => '\App\Foo',
+            'paths' => ['\App\Foo'],
         ]);
-    }
-
-    public function test_it_rejects_more_than_two_positional_arguments(): void
-    {
-        $app = new Application(SingletonContainer::getContainer());
-        $app->setAutoExit(false);
-        $app->setCatchExceptions(false);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Too many arguments to "run" command');
-
-        // ArgvInput emulates real CLI parsing: the application validates positional
-        // argument counts at that layer and rejects ">2 args" natively for us.
-        $app->run(
-            new ArgvInput(['infection', 'run', 'src/A.php', 'src/B.php', 'src/C.php']),
-            new BufferedOutput(),
-        );
     }
 }

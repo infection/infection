@@ -37,7 +37,7 @@ namespace Infection\Configuration;
 
 /**
  * Result of positional path classification: source paths (equivalent to --filter)
- * and an optional test path (equivalent to --test-framework-extra-args).
+ * and test paths (equivalent to --test-framework-extra-args, space-joined).
  *
  * @internal
  */
@@ -46,8 +46,8 @@ final readonly class ClassifiedPaths
     public function __construct(
         /** @var list<non-empty-string> */
         public array $sourcePaths,
-        /** @var non-empty-string|null */
-        public ?string $testPath,
+        /** @var list<non-empty-string> */
+        public array $testPaths,
     ) {
     }
 }

@@ -197,7 +197,7 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-                classifiedPaths: new ClassifiedPaths([], null),
+                classifiedPaths: new ClassifiedPaths([], []),
             )
         ;
     }
@@ -270,7 +270,7 @@ final class ConfigurationFactoryTest extends TestCase
             projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
-            classifiedPaths: new ClassifiedPaths([], null),
+            classifiedPaths: new ClassifiedPaths([], []),
         );
 
         $defaultConfiguration = new Configuration(
@@ -1490,7 +1490,7 @@ final class ConfigurationFactoryTest extends TestCase
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
-                    classifiedPaths: new ClassifiedPaths([], null),
+                    classifiedPaths: new ClassifiedPaths([], []),
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
