@@ -38,6 +38,7 @@ namespace Infection\Command\Option;
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Git\Git;
@@ -106,14 +107,21 @@ final class SourceFilterOptions
             );
     }
 
-    public static function get(IO $io): PlainFilter|IncompleteGitDiffFilter|null
+    /**
+     * @param list<non-empty-string> $positionalPaths
+     */
+    public static function get(IO $io, array $positionalPaths = []): PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null
     {
         $input = $io->getInput();
 
         $filter = self::getPlainFilter($input);
         $gitFilter = self::getGitFilter($input);
 
-        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter);
+        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter, $positionalPaths);
+
+        if ($positionalPaths !== []) {
+            return new PositionalPathsFilter($positionalPaths);
+        }
 
         return $filter ?? $gitFilter;
     }
@@ -242,9 +250,13 @@ final class SourceFilterOptions
         }
     }
 
+    /**
+     * @param list<non-empty-string> $positionalPaths
+     */
     private static function assertOnlyOneTypeOfFiltering(
         ?PlainFilter $plainFilter,
         ?IncompleteGitDiffFilter $gitFilter,
+        array $positionalPaths,
     ): void {
         if ($plainFilter !== null && $gitFilter !== null) {
             throw new InvalidArgumentException(
@@ -255,6 +267,21 @@ final class SourceFilterOptions
                     self::PLAIN_FILTER_NAME,
                     self::GIT_DIFF_FILTER_NAME,
                 ),
+            );
+        }
+
+        if ($positionalPaths !== [] && $plainFilter !== null) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
+                    self::PLAIN_FILTER_NAME,
+                ),
+            );
+        }
+
+        if ($positionalPaths !== [] && $gitFilter !== null) {
+            throw new InvalidArgumentException(
+                'Cannot pass positional paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
             );
         }
     }
