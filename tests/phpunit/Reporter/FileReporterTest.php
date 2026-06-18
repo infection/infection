@@ -40,13 +40,13 @@ use Infection\Reporter\FileReporter;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter;
 use Infection\Tests\Logger\DummyLogger;
-use function ob_get_clean;
-use function ob_start;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
+use function Safe\ob_get_clean;
+use function Safe\ob_start;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
