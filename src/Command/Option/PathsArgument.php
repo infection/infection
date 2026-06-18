@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command\Option;
 
 use function array_filter;
+use function array_map;
 use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
@@ -68,8 +69,8 @@ final class PathsArgument
     {
         return array_values(
             array_filter(
-                $io->getInput()->getArgument(self::NAME),
-                static fn (string $path): bool => trim($path) !== '',
+                array_map(trim(...), $io->getInput()->getArgument(self::NAME)),
+                static fn (string $path): bool => $path !== '',
             ),
         );
     }
