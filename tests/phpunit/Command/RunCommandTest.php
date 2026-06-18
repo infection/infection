@@ -135,7 +135,7 @@ final class RunCommandTest extends TestCase
     public function test_it_fails_when_a_positional_path_does_not_exist_on_disk(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Positional path "src/DefinitelyDoesNotExist.php" does not exist');
+        $this->expectExceptionMessage('Invalid path argument "src/DefinitelyDoesNotExist.php": multiple paths must be passed as separate arguments.');
 
         $app = new Application(SingletonContainer::getContainer());
 

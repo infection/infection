@@ -58,7 +58,7 @@ final class PathsArgument
         return $command->addArgument(
             self::NAME,
             InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
-            'Source and/or test paths to focus mutation testing on. Source paths are forwarded to "--filter"; test paths are forwarded to "--test-framework-extra-args". Kind is auto-detected against the configured "source.directories". Pass as many paths as needed: `infection run src/A.php src/B.php tests/ATest.php`.',
+            'Limit mutation testing to the given source and/or test paths. Path kind is inferred from the configured source directories and test-like paths. Pass as many paths as needed: `infection run src/A.php src/B.php tests/ATest.php`.',
         );
     }
 
