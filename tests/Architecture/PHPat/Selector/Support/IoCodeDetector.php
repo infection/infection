@@ -61,7 +61,11 @@ final class IoCodeDetector
      */
     public function isUsingIo(ClassReflection $classReflection): bool
     {
-        if ($this->isClassOrParentUsingIo($classReflection)) {
+        if (!PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection)) {
+            return $this->testedClassUsesIo($classReflection->getName());
+        }
+
+        if ($this->testCaseUsesIo($classReflection)) {
             return true;
         }
 
@@ -70,10 +74,12 @@ final class IoCodeDetector
             $this->reflectionProvider,
         );
 
-        foreach ($coveredClassNames as $coveredClassName) {
-            $coveredClassReflection = $this->reflectionProvider->getClass($coveredClassName);
+        if (count($coveredClassNames) === 0) {
+            return true;
+        }
 
-            if ($this->isClassOrParentUsingIo($coveredClassReflection)) {
+        foreach ($coveredClassNames as $coveredClassName) {
+            if ($this->testedClassUsesIo($coveredClassName)) {
                 return true;
             }
         }
@@ -91,15 +97,47 @@ final class IoCodeDetector
         return count($coveredClassNames) > 0;
     }
 
-    private function isClassOrParentUsingIo(ClassReflection $classReflection): bool
+    /**
+     * Check the test case code.
+     */
+    private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
     {
+        if ($this->isClassUsingIo($testCaseReflection)) {
+            return true;
+        }
+
+        $parentTestCaseClassReflection = $testCaseReflection->getParentClass();
+
+        while (
+            $parentTestCaseClassReflection !== null
+            && $parentTestCaseClassReflection->getName() !== TestCase::class
+        ) {
+            if ($this->isClassUsingIo($parentTestCaseClassReflection)) {
+                return true;
+            }
+
+            $parentTestCaseClassReflection = $parentTestCaseClassReflection->getParentClass();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check the source class code.
+     *
+     * @param class-string $sourceClassName
+     */
+    private function testedClassUsesIo(string $sourceClassName): bool
+    {
+        $classReflection = $this->reflectionProvider->getClass($sourceClassName);
+
         do {
             if ($this->isClassUsingIo($classReflection)) {
                 return true;
             }
 
             $classReflection = $classReflection->getParentClass();
-        } while ($classReflection !== null || $classReflection->getName() !== TestCase::class);
+        } while ($classReflection !== null);
 
         return false;
     }

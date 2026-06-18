@@ -120,14 +120,14 @@ final class IoCodeDetectorTest extends SelectorTestCase
 
         yield 'test covering class without I/O' => [
             FixtureWithCoveredClassWithoutIoTest::class,
-            true,
+            false,
             true,
             false,
         ];
 
         yield 'test covering class without I/O with integration group' => [
             FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest::class,
-            true,
+            false,
             true,
             true,
         ];
@@ -141,7 +141,7 @@ final class IoCodeDetectorTest extends SelectorTestCase
 
         yield 'test covering class with I/O behind FileSystem abstraction' => [
             FixtureWithCoveredClassWithFileSystemIoTest::class,
-            true,
+            false,
             true,
             false,
         ];
@@ -207,8 +207,8 @@ final class IoCodeDetectorTest extends SelectorTestCase
     {
         $fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock
-            // 3 tests cases + their covered classes and the shared PHPUnit parent class.
-            ->expects($this->exactly(7))
+            // 3 tests cases + their respective covered classes, with one covered class reused
+            ->expects($this->exactly(5))
             ->method('readFile')
             ->willReturn('contents');
 

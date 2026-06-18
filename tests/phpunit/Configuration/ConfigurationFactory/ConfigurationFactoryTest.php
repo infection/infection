@@ -398,6 +398,15 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'PHP output stream text file log path' => [
+            $defaultScenario
+                ->forValueForTextLogFilePath(
+                    'php://output',
+                    null,
+                    'php://output',
+                ),
+        ];
+
         yield 'override text file log path from CLI option with existing path from config file' => [
             $defaultScenario
                 ->forValueForTextLogFilePath(

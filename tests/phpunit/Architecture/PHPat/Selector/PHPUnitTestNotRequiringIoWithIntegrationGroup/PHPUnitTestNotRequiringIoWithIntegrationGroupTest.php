@@ -81,7 +81,7 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
     {
         yield 'test covering class without I/O with integration group' => [
             FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest::class,
-            false,
+            true,
         ];
 
         yield 'test covering class without I/O without integration group' => [

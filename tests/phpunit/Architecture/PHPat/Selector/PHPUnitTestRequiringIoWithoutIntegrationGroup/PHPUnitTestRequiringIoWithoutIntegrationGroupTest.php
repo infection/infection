@@ -101,7 +101,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
 
         yield 'test covering class without I/O' => [
             FixtureWithCoveredClassWithoutIoTest::class,
-            true,
+            false,
         ];
 
         yield 'test covering class with I/O' => [
@@ -111,7 +111,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
 
         yield 'test covering class with FileSystem abstraction' => [
             FixtureWithCoveredClassWithFileSystemIoTest::class,
-            true,
+            false,
         ];
 
         yield 'test covering class with I/O behind FileSystem abstraction and direct I/O' => [
@@ -149,8 +149,8 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
     {
         $fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock
-            // Selector analysis + I/O analysis for 3 test cases, their covered classes, and the shared PHPUnit parent class.
-            ->expects($this->exactly(9))
+            // Selector analysis + I/O analysis for 3 test cases and their covered classes.
+            ->expects($this->exactly(7))
             ->method('readFile')
             ->willReturn('contents');
         $analyser = new Analyser(
