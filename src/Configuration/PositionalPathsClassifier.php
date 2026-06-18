@@ -181,11 +181,8 @@ final class PositionalPathsClassifier
 
         if (self::isValidPath($fileSystem, $absolutePath)) {
             throw new InvalidArgumentException(sprintf(
-                'Positional path "%s" does not exist (resolved to "%s"). Check the path, or pass it via "--%s" / "--%s" explicitly.',
+                'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
                 $path,
-                $absolutePath,
-                SourceFilterOptions::PLAIN_FILTER_NAME,
-                TestFrameworkExtraArgsOption::NAME,
             ));
         }
 
