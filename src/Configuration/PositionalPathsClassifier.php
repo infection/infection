@@ -220,8 +220,7 @@ final class PositionalPathsClassifier
 
     private static function looksLikeTestPath(string $value): bool
     {
-        $normalized = str_replace('\\', '/', $value);
-        $lowered = strtolower($normalized);
+        $lowered = strtolower($value);
 
         foreach (['tests', 'test'] as $segment) {
             if ($lowered === $segment || str_starts_with($lowered, $segment . '/')) {
@@ -233,6 +232,6 @@ final class PositionalPathsClassifier
             }
         }
 
-        return str_ends_with(basename($normalized), 'Test.php');
+        return str_ends_with(basename($value), 'Test.php');
     }
 }
