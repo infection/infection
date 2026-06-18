@@ -158,7 +158,7 @@ final class PositionalPathsClassifier
     ): string {
         // TODO: FQCN-style arguments (e.g. "\App\Foo" or "\App\Foo::method::45") will
         // be supported via https://github.com/infection/infection/issues/2237
-        if (self::looksLikeFqcn($path)) {
+        if (self::looksLikeFqcnWithOptionalMethodOrLine($path)) {
             throw new InvalidArgumentException(sprintf(
                 'FQCN-style arguments like "%s" are not yet supported. See https://github.com/infection/infection/issues/2237.',
                 $path,
@@ -199,7 +199,7 @@ final class PositionalPathsClassifier
      * \SomeNamespace\Class::method::34
      * App\Foo (bare, unbackslashed)
      */
-    private static function looksLikeFqcn(string $value): bool
+    private static function looksLikeFqcnWithOptionalMethodOrLine(string $value): bool
     {
         if (str_starts_with($value, '\\') || str_contains($value, '::')) {
             return true;
