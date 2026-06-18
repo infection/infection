@@ -179,7 +179,7 @@ final class PositionalPathsClassifier
             ? $path
             : Path::join($configDir, $path);
 
-        if (!$fileSystem->isReadableFile($absolutePath) && !$fileSystem->isReadableDirectory($absolutePath)) {
+        if (self::isValidPath($fileSystem, $absolutePath)) {
             throw new InvalidArgumentException(sprintf(
                 'Positional path "%s" does not exist (resolved to "%s"). Check the path, or pass it via "--%s" / "--%s" explicitly.',
                 $path,
@@ -233,5 +233,10 @@ final class PositionalPathsClassifier
         }
 
         return str_ends_with(basename($value), 'Test.php');
+    }
+
+    private static function isValidPath(FileSystem $fileSystem, string $absolutePath): bool
+    {
+        return !$fileSystem->isReadableFile($absolutePath) && !$fileSystem->isReadableDirectory($absolutePath);
     }
 }
