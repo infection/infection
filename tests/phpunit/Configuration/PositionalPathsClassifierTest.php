@@ -225,7 +225,7 @@ final class PositionalPathsClassifierTest extends TestCase
         // "1Foo.php" does not match the Pascal-case heuristic (digits are excluded),
         // so it must exist on disk and be classified via directory lookup.
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Positional path "1Foo.php" does not exist');
+        $this->expectExceptionMessage('Invalid path argument "1Foo.php": multiple paths must be passed as separate arguments.');
 
         PositionalPathsClassifier::fromPaths(
             ['1Foo.php'],
@@ -362,7 +362,7 @@ final class PositionalPathsClassifierTest extends TestCase
         // layer instead of letting them silently route to PHPUnit and surface
         // as confusing test-framework errors downstream.
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Positional path "scr/Foo.php" does not exist (resolved to "/project/scr/Foo.php"). Check the path, or pass it via "--filter" / "--test-framework-extra-args" explicitly.');
+        $this->expectExceptionMessage('Invalid path argument "scr/Foo.php": multiple paths must be passed as separate arguments.');
 
         PositionalPathsClassifier::fromPaths(
             ['scr/Foo.php'],
