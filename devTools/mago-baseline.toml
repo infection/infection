@@ -10920,13 +10920,13 @@ count = 1
 file = "tests/phpunit/Reporter/FileReporterTest.php"
 code = "no-value"
 message = 'Argument #3 passed to method `Infection\Reporter\FileReporter::__construct` has type `never`, meaning it cannot produce a value.'
-count = 4
+count = 5
 
 [[issues]]
 file = "tests/phpunit/Reporter/FileReporterTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter` not found.'
-count = 4
+count = 5
 
 [[issues]]
 file = "tests/phpunit/Reporter/GitHubActionsLogTextFileReporterTest.php"

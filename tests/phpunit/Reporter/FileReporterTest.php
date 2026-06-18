@@ -40,10 +40,13 @@ use Infection\Reporter\FileReporter;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter;
 use Infection\Tests\Logger\DummyLogger;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
+use function Safe\ob_get_clean;
+use function Safe\ob_start;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -106,6 +109,23 @@ final class FileReporterTest extends FileSystemTestCase
         $this->assertSame([], $this->logger->getLogs());
     }
 
+    public function test_it_can_log_on_php_output_stream(): void
+    {
+        $reporter = new FileReporter(
+            'php://output',
+            $this->fileSystemMock,
+            new DummyLineMutationTestingResultsReporter(['foo', 'bar']),
+            $this->logger,
+        );
+
+        ob_start();
+
+        $reporter->report();
+
+        $this->assertSame('foo' . PHP_EOL . 'bar', ob_get_clean());
+        $this->assertSame([], $this->logger->getLogs());
+    }
+
     public function test_it_cannot_log_on_invalid_streams(): void
     {
         $reporter = new FileReporter(
@@ -121,7 +141,7 @@ final class FileReporterTest extends FileSystemTestCase
             [
                 [
                     LogLevel::ERROR,
-                    '<error>The only streams supported are "php://stdout" and "php://stderr". Got "php://memory"</error>',
+                    '<error>The only streams supported are "php://stdout", "php://stderr", "php://output". Got "php://memory"</error>',
                     [],
                 ],
             ],
