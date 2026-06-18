@@ -45,7 +45,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function str_starts_with;
 
-final class PHPUnitTestIoRequirements
+final class IoCodeDetector
 {
     private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
 
@@ -60,7 +60,7 @@ final class PHPUnitTestIoRequirements
     ) {
     }
 
-    public function requiresIntegrationGroup(ClassReflection $testCaseReflection): bool
+    public function isUsingIo(ClassReflection $testCaseReflection): bool
     {
         if ($this->testCaseUsesIo($testCaseReflection)) {
             return true;

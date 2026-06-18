@@ -39,7 +39,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ReflectionProvider;
@@ -53,7 +53,7 @@ final class InfectionSelector
 
     private static ?Analyser $analyser = null;
 
-    private static ?PHPUnitTestIoRequirements $phpUnitTestIoRequirements = null;
+    private static ?IoCodeDetector $phpUnitTestIoRequirements = null;
 
     private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
 
@@ -213,12 +213,12 @@ final class InfectionSelector
         return self::$analyser;
     }
 
-    private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): PHPUnitTestIoRequirements
+    private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): IoCodeDetector
     {
         if (self::$phpUnitTestIoRequirements === null) {
             self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
 
-            return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
+            return self::$phpUnitTestIoRequirements = new IoCodeDetector(
                 self::analyser(),
                 $reflectionProvider,
             );

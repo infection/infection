@@ -54,20 +54,20 @@ use Infection\Tests\Reporter\FileReporterTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(PHPUnitTestIoRequirements::class)]
-final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
+#[CoversClass(IoCodeDetector::class)]
+final class IoCodeDetectorTest extends SelectorTestCase
 {
     /**
      * @param class-string $className
      */
     #[DataProvider('classProvider')]
-    public function test_it_detects_phpunit_test_io_requirements(
+    public function test_it_detects_phpunit_test_io_usage(
         string $className,
         bool $expectedRequiresIntegrationGroup,
         bool $expectedHasCoveredClass,
         bool $expectedHasIntegrationGroup,
     ): void {
-        $ioRequirements = new PHPUnitTestIoRequirements(
+        $ioCodeDetector = new IoCodeDetector(
             new Analyser(
                 SingletonContainer::getContainer()->getParser(),
                 new FileSystem(),
@@ -78,11 +78,11 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
 
         $this->assertSame(
             $expectedRequiresIntegrationGroup,
-            $ioRequirements->requiresIntegrationGroup($classReflection),
+            $ioCodeDetector->isUsingIo($classReflection),
         );
         $this->assertSame(
             $expectedHasCoveredClass,
-            $ioRequirements->hasCoveredClass($classReflection),
+            $ioCodeDetector->hasCoveredClass($classReflection),
         );
         $this->assertSame(
             $expectedHasIntegrationGroup,
@@ -172,7 +172,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             ->method('readFile')
             ->willReturn('contents');
 
-        $ioRequirements = new PHPUnitTestIoRequirements(
+        $ioCodeDetector = new IoCodeDetector(
             new Analyser(
                 SingletonContainer::getContainer()->getParser(),
                 $fileSystemMock,
@@ -180,19 +180,19 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             $this->getReflectionProvider(),
         );
 
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithCoveredClassWithIoTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithCoveredClassWithIoTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithMultipleCoveredClassesTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithMultipleCoveredClassesTest::class),
         );
     }
@@ -201,9 +201,9 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
      * @param class-string $className
      */
     #[DataProvider('fileSystemTestCaseChildProvider')]
-    public function test_file_system_test_case_children_require_integration_group(string $className): void
+    public function test_file_system_test_case_children_uses_io(string $className): void
     {
-        $ioRequirements = new PHPUnitTestIoRequirements(
+        $ioCodeDetector = new IoCodeDetector(
             new Analyser(
                 SingletonContainer::getContainer()->getParser(),
                 new FileSystem(),
@@ -211,7 +211,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             $this->getReflectionProvider(),
         );
 
-        $requiresIntegrationGroup = $ioRequirements->requiresIntegrationGroup(
+        $requiresIntegrationGroup = $ioCodeDetector->isUsingIo(
             $this->createClassReflection($className),
         );
 
