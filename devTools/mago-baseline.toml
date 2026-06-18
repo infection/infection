@@ -345,7 +345,7 @@ count = 1
 [[issues]]
 file = "src/Command/Option/PathsArgument.php"
 code = "mixed-argument"
-message = "Invalid argument type for argument #1 of `array_filter`: expected `array<string, string>`, but found `mixed`."
+message = "Invalid argument type for argument #2 of `array_map`: expected `array<('K.array_map() extends array-key), string>`, but found `mixed`."
 count = 1
 
 [[issues]]
@@ -958,12 +958,6 @@ count = 1
 file = "src/Container/Container.php"
 code = "possibly-invalid-argument"
 message = '''Possible argument type mismatch for argument #2 of `DIContainer\Container::inject`: expected `('T.infection\container\container::clonewithservice() extends object)`, but possibly received `('T.infection\container\container::clonewithservice() extends object)|(closure(infection\container\container): ('T.infection\container\container::clonewithservice() extends object))`.'''
-count = 1
-
-[[issues]]
-file = "src/Container/Container.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$positionalPaths`."
 count = 1
 
 [[issues]]
