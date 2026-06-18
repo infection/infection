@@ -135,7 +135,7 @@ final class Analyser
                 ClassName::getShortClassName($classReflection->getName()),
             )
             : null;
-        $ioCodeDetector = IoCodeDetector::create();
+        $ioCodeDetector = IoCodeDetectorVisitor::create();
 
         $this
             ->createTraverser(
