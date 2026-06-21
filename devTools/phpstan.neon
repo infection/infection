@@ -160,7 +160,7 @@ parameters:
             identifier: missingType.iterableValue
             path: ../src/FileSystem/InMemoryFileSystem.php
 
-        # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
+        # PHPStan fails to detect that we have at least one loop hence the result cannot be null, because treatPhpDocTypesAsCertain: false
         -
             message: '#::profile\(\) should return int but returns int\|null#'
             path: ../tests/benchmark/BlackfireInstrumentor.php
