@@ -201,7 +201,7 @@ final class InfectionSelectorTest extends SelectorTestCase
         InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup($this->getReflectionProvider());
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('PHPUnit test IO requirements must be requested with the same reflection provider.');
+        $this->expectExceptionMessage('I/O code detector must be requested with the same reflection provider.');
 
         InfectionSelector::phpunitTestNotRequiringIoWithIntegrationGroup(
             $this->createStub(ReflectionProvider::class),
