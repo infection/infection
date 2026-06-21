@@ -54,7 +54,9 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -67,6 +69,7 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
 use function is_numeric;
 use function ltrim;
 use function max;
@@ -101,6 +104,7 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -132,7 +136,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
         ?int $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
@@ -147,7 +151,6 @@ class ConfigurationFactory
         ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
-        ClassifiedPaths $classifiedPaths,
     ): Configuration {
         $configDir = dirname($schema->pathname);
 
@@ -171,7 +174,13 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $sourceFilter = self::mergePositionalSourcePaths($sourceFilter, $classifiedPaths->sourcePaths);
+        if ($sourceFilter instanceof PositionalPathsFilter) {
+            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+                $sourceFilter,
+                $schema,
+                $testFrameworkExtraArgs,
+            );
+        }
 
         $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
 
@@ -191,7 +200,7 @@ class ConfigurationFactory
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
             testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
                 $testFrameworkExtraOptions,
-                $classifiedPaths->testPaths !== [] ? implode(' ', $classifiedPaths->testPaths) : $testFrameworkExtraArgs,
+                $testFrameworkExtraArgs,
                 $schema,
                 $testFramework,
             ),
@@ -331,20 +340,6 @@ class ConfigurationFactory
             : self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraOptions);
     }
 
-    /**
-     * @param list<non-empty-string> $sourcePaths
-     */
-    private static function mergePositionalSourcePaths(
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
-        array $sourcePaths,
-    ): PlainFilter|IncompleteGitDiffFilter|null {
-        if ($sourcePaths === []) {
-            return $sourceFilter;
-        }
-
-        return new PlainFilter(array_values(array_unique($sourcePaths)));
-    }
-
     private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
     {
         return implode(
@@ -415,6 +410,37 @@ class ConfigurationFactory
         }
 
         return $map;
+    }
+
+    /**
+     * @return array{0: PlainFilter|null, 1: string|null}
+     */
+    private function resolvePositionalPathsFilter(
+        PositionalPathsFilter $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        $classified = PositionalPathsClassifier::fromPaths(
+            $sourceFilter->paths,
+            $schema,
+            $this->fileSystem,
+        );
+
+        $resolvedFilter = $classified->sourcePaths !== []
+            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
+            : null;
+
+        if ($classified->testPaths !== []) {
+            if ($testFrameworkExtraArgs !== null) {
+                throw new InvalidArgumentException(
+                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                );
+            }
+
+            $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
+        }
+
+        return [$resolvedFilter, $testFrameworkExtraArgs];
     }
 
     private function refineFilterIfNecessary(

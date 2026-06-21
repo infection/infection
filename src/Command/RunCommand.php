@@ -492,7 +492,7 @@ final class RunCommand extends BaseCommand
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
-            sourceFilter: SourceFilterOptions::get($io),
+            sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
             threadCount: $commandHelper->getThreadCount(),
             dotsPerRow: $commandHelper->getDotsPerRow(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
@@ -508,33 +508,7 @@ final class RunCommand extends BaseCommand
             projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
-            positionalPaths: PathsArgument::get($io),
         );
-    }
-
-    private function assertPositionalPathsDoNotConflict(Container $container, IO $io): void
-    {
-        $classified = $container->getClassifiedPaths();
-
-        if ($classified->sourcePaths !== [] && SourceFilterOptions::isPlainFilterProvided($io)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
-                SourceFilterOptions::PLAIN_FILTER_NAME,
-            ));
-        }
-
-        if ($classified->sourcePaths !== [] && SourceFilterOptions::isGitDiffFilterProvided($io)) {
-            throw new InvalidArgumentException(
-                'Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
-            );
-        }
-
-        if ($classified->testPaths !== [] && TestFrameworkExtraArgsOption::isProvided($io)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot pass test paths as positional arguments together with the "--%s" option. Use either form, not both.',
-                TestFrameworkExtraArgsOption::NAME,
-            ));
-        }
     }
 
     private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
@@ -592,8 +566,6 @@ final class RunCommand extends BaseCommand
         } else {
             $this->runConfigurationCommand($locator, $io);
         }
-
-        $this->assertPositionalPathsDoNotConflict($container, $io);
 
         $this->installTestFrameworkIfNeeded($container, $io);
 

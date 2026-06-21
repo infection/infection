@@ -120,7 +120,7 @@ final class RunCommandTest extends TestCase
     public function test_it_fails_when_positional_source_path_and_git_diff_filter_are_both_provided(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot pass positional source paths together with "--git-diff-filter" / "--git-diff-lines".');
+        $this->expectExceptionMessage('Cannot pass positional paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.');
 
         $app = new Application(SingletonContainer::getContainer());
 

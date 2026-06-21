@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
-use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 
 final class ConfigurationFactoryInputBuilder
 {
@@ -66,7 +66,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $testFrameworkExtraOptions,
         private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
-        private PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        private PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
         private ?int $threadCount,
         private string|int|null $dotsPerRow,
         private bool $dryRun,
@@ -81,7 +81,6 @@ final class ConfigurationFactoryInputBuilder
         private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
-        private ClassifiedPaths $classifiedPaths,
     ) {
     }
 
@@ -221,6 +220,14 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    public function withTestFrameworkExtraArgs(?string $testFrameworkExtraArgs): self
+    {
+        $clone = clone $this;
+        $clone->testFrameworkExtraArgs = $testFrameworkExtraArgs;
+
+        return $clone;
+    }
+
     public function withStaticAnalysisToolOptions(?string $staticAnalysisToolOptions): self
     {
         $clone = clone $this;
@@ -229,7 +236,7 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|null $sourceFilter): self
+    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilter = $sourceFilter;
@@ -377,7 +384,7 @@ final class ConfigurationFactoryInputBuilder
      *     17: string|null,
      *     18: string|null,
      *     19: string|null,
-     *     20: PlainFilter|IncompleteGitDiffFilter|null,
+     *     20: PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null,
      *     21: int|null,
      *     22: positive-int|'max'|null,
      *     23: bool,
@@ -392,7 +399,6 @@ final class ConfigurationFactoryInputBuilder
      *     32: non-empty-string|null,
      *     33: string|null,
      *     34: string|null,
-     *     35: ClassifiedPaths
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -433,7 +439,6 @@ final class ConfigurationFactoryInputBuilder
             $this->projectDirectory,
             $this->staticAnalysisTool,
             $this->mutantId,
-            $this->classifiedPaths,
         ];
     }
 }

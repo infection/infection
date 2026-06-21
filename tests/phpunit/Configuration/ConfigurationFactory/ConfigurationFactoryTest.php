@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
-use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -50,7 +49,9 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -197,7 +198,6 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-                classifiedPaths: new ClassifiedPaths([], []),
             )
         ;
     }
@@ -270,7 +270,6 @@ final class ConfigurationFactoryTest extends TestCase
             projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
-            classifiedPaths: new ClassifiedPaths([], []),
         );
 
         $defaultConfiguration = new Configuration(
@@ -1368,6 +1367,64 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'positional source paths become a PlainFilter (with deduplication)' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php', 'Bar.php']))
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths become testFrameworkExtraOptions' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(null)
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional paths with both source and test paths' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php']))
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths with existing testFrameworkExtraArgs throws' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder
+                        ->withSourceFilter(new PositionalPathsFilter(['tests/FooTest.php']))
+                        ->withTestFrameworkExtraArgs('--stop-on-failure'),
+                )
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                    ),
+                ),
+        ];
+
         yield 'with git filters and base branch' => [
             $defaultScenario
                 ->forSourceFilter(
@@ -1490,7 +1547,6 @@ final class ConfigurationFactoryTest extends TestCase
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
-                    classifiedPaths: new ClassifiedPaths([], []),
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
@@ -1623,6 +1679,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
+            $this->createStub(FileSystem::class),
         );
     }
 }

@@ -41,10 +41,8 @@ use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
-use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
 use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
@@ -56,6 +54,7 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
@@ -677,7 +676,6 @@ final class Container extends DIContainer
      * @param non-empty-string|null $configFile
      * @param non-empty-string|null $projectDirectory Absolute path.
      * @param positive-int|'max'|null $dotsPerRow
-     * @param list<non-empty-string> $positionalPaths
      */
     public function withValues(
         LoggerInterface $logger,
@@ -704,7 +702,7 @@ final class Container extends DIContainer
         ?string $testFrameworkExtraOptions = null,
         ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,
@@ -719,7 +717,6 @@ final class Container extends DIContainer
         ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
-        array $positionalPaths = [],
     ): self {
         $clone = clone $this;
 
@@ -759,15 +756,6 @@ final class Container extends DIContainer
             static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create(
                 $loggerName,
                 $container->getConfiguration()->dotsPerRow,
-            ),
-        );
-
-        $clone->offsetSet(
-            ClassifiedPaths::class,
-            static fn (self $container): ClassifiedPaths => PositionalPathsClassifier::fromPaths(
-                $positionalPaths,
-                $container->getSchemaConfiguration(),
-                $container->getFileSystem(),
             ),
         );
 
@@ -813,7 +801,6 @@ final class Container extends DIContainer
                 projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
-                classifiedPaths: $container->getClassifiedPaths(),
             ),
         );
 
@@ -978,11 +965,6 @@ final class Container extends DIContainer
     public function getSchemaConfiguration(): SchemaConfiguration
     {
         return $this->get(SchemaConfiguration::class);
-    }
-
-    public function getClassifiedPaths(): ClassifiedPaths
-    {
-        return $this->get(ClassifiedPaths::class);
     }
 
     // Should throw all the exceptions ConfigurationFactory::create() can throw.
