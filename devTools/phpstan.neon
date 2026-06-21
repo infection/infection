@@ -265,12 +265,6 @@ parameters:
             rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
             path: ../src/PhpParser/NodeDumper/NodeDumper.php
 
-        # False-positives
-        -
-            message: '#TeamCity::escapeValue\(\) should return non-empty-string#'
-            identifier: return.type
-            path: ../src/Logger/MutationAnalysis/TeamCity/TeamCity.php
-
         # Fallback copy of Symfony's StringInput tokenization for versions before
         # ArgvInput::getRawTokens(). The regex matches guarantee these offsets.
         -
