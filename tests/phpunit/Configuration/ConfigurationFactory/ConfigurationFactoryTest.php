@@ -49,6 +49,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
@@ -1363,6 +1364,64 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
                     expectedSourceFilter: new GitDiffFilter('AD', 'reference(test/default)'),
+                ),
+        ];
+
+        yield 'positional source paths become a PlainFilter (with deduplication)' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php', 'Bar.php']))
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths become testFrameworkExtraOptions' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(null)
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional paths with both source and test paths' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php']))
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths with existing testFrameworkExtraArgs throws' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder
+                        ->withSourceFilter(new PositionalPathsFilter(['tests/FooTest.php']))
+                        ->withTestFrameworkExtraArgs('--stop-on-failure'),
+                )
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                    ),
                 ),
         ];
 
