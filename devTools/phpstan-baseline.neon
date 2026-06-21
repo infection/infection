@@ -295,12 +295,6 @@ parameters:
 			path: ../src/Logger/MutationAnalysis/ConsoleProgressBarLogger.php
 
 		-
-			rawMessage: 'Method Infection\Logger\MutationAnalysis\TeamCity\TeamCity::escapeValue() should return non-empty-string but returns string.'
-			identifier: return.type
-			count: 1
-			path: ../src/Logger/MutationAnalysis/TeamCity/TeamCity.php
-
-		-
 			rawMessage: Infection\Metrics\MetricsCalculator should be final
 			identifier: phpat.testInterfaceImplementationsAreFinal
 			count: 1
