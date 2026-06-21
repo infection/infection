@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Exception;
-use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -51,6 +50,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -197,7 +197,6 @@ final class ConfigurationFactoryTest extends TestCase
                 projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
-                classifiedPaths: new ClassifiedPaths([], []),
             )
         ;
     }
@@ -270,7 +269,6 @@ final class ConfigurationFactoryTest extends TestCase
             projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
-            classifiedPaths: new ClassifiedPaths([], []),
         );
 
         $defaultConfiguration = new Configuration(
@@ -1490,7 +1488,6 @@ final class ConfigurationFactoryTest extends TestCase
                     projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
-                    classifiedPaths: new ClassifiedPaths([], []),
                 ),
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
@@ -1623,6 +1620,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
+            $this->createStub(FileSystem::class),
         );
     }
 }
