@@ -126,16 +126,6 @@ final class SourceFilterOptions
         return $filter ?? $gitFilter;
     }
 
-    public static function isPlainFilterProvided(IO $io): bool
-    {
-        return self::getPlainFilter($io->getInput()) !== null;
-    }
-
-    public static function isGitDiffFilterProvided(IO $io): bool
-    {
-        return self::getGitFilter($io->getInput()) !== null;
-    }
-
     private static function getPlainFilter(InputInterface $input): ?PlainFilter
     {
         $value = trim((string) $input->getOption(self::PLAIN_FILTER_NAME));
@@ -281,7 +271,11 @@ final class SourceFilterOptions
 
         if ($positionalPaths !== [] && $gitFilter !== null) {
             throw new InvalidArgumentException(
-                'Cannot pass positional paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.',
+                sprintf(
+                    'Cannot pass positional paths together with "--%s" / "--%s". Use either form, not both.',
+                    self::GIT_DIFF_FILTER_NAME,
+                    self::GIT_DIFF_LINES_NAME,
+                ),
             );
         }
     }

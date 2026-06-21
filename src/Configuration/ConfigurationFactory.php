@@ -175,25 +175,11 @@ class ConfigurationFactory
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
         if ($sourceFilter instanceof PositionalPathsFilter) {
-            $classified = PositionalPathsClassifier::fromPaths(
-                $sourceFilter->paths,
+            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+                $sourceFilter,
                 $schema,
-                $this->fileSystem,
+                $testFrameworkExtraArgs,
             );
-
-            $sourceFilter = $classified->sourcePaths !== []
-                ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
-                : null;
-
-            if ($classified->testPaths !== []) {
-                if ($testFrameworkExtraArgs !== null) {
-                    throw new InvalidArgumentException(
-                        'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
-                    );
-                }
-
-                $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
-            }
         }
 
         $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
@@ -424,6 +410,37 @@ class ConfigurationFactory
         }
 
         return $map;
+    }
+
+    /**
+     * @return array{0: PlainFilter|null, 1: string|null}
+     */
+    private function resolvePositionalPathsFilter(
+        PositionalPathsFilter $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        $classified = PositionalPathsClassifier::fromPaths(
+            $sourceFilter->paths,
+            $schema,
+            $this->fileSystem,
+        );
+
+        $resolvedFilter = $classified->sourcePaths !== []
+            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
+            : null;
+
+        if ($classified->testPaths !== []) {
+            if ($testFrameworkExtraArgs !== null) {
+                throw new InvalidArgumentException(
+                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                );
+            }
+
+            $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
+        }
+
+        return [$resolvedFilter, $testFrameworkExtraArgs];
     }
 
     private function refineFilterIfNecessary(
