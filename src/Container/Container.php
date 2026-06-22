@@ -322,7 +322,7 @@ final class Container extends DIContainer
             MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
                 $container->getPrinter(),
             ),
-            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new StrictUnifiedDiffOutputBuilder(['fromFile' => 'Original', 'toFile' => 'New']))),
+            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new StrictUnifiedDiffOutputBuilder(['fromFile' => 'Original', 'toFile' => 'Mutated']))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,

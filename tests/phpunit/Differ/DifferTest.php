@@ -113,7 +113,7 @@ final class DifferTest extends TestCase
                 PHP,
             <<<'PHP'
                 --- Original
-                +++ New
+                +++ Mutated
                 @@ -1,5 +1,5 @@
 
                  public function echo(): void
@@ -212,7 +212,7 @@ final class DifferTest extends TestCase
                 PHP,
             <<<'PHP'
                 --- Original
-                +++ New
+                +++ Mutated
                 @@ -4,7 +4,7 @@
                  3
                  4
@@ -287,7 +287,7 @@ final class DifferTest extends TestCase
                 PHP,
             <<<'PHP'
                 --- Original
-                +++ New
+                +++ Mutated
                 @@ -4,10 +4,10 @@
                  3
                  4
@@ -347,7 +347,7 @@ final class DifferTest extends TestCase
                 PHP,
             <<<'PHP'
                 --- Original
-                +++ New
+                +++ Mutated
                 @@ -1,3 +1,3 @@
                  0
                 -1
@@ -381,7 +381,7 @@ final class DifferTest extends TestCase
                 PHP,
             <<<'PHP'
                 --- Original
-                +++ New
+                +++ Mutated
                 @@ -1,3 +1,3 @@
                  0
                 -1
