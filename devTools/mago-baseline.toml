@@ -1393,12 +1393,6 @@ message = "Assigning `mixed` type to a variable may lead to unexpected behavior.
 count = 1
 
 [[issues]]
-file = "src/Differ/Differ.php"
-code = "unused-parameter"
-message = "Parameter `$lcs` is never used."
-count = 1
-
-[[issues]]
 file = "src/Differ/Tokens.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Differ\Tokens::computeRange`: expected `array{0: int(0)|positive-int, 1: int(0)|positive-int}`, but found `list{non-negative-int, int}`.'

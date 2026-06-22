@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\LongestCommonSubsequenceCalculator;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -74,7 +73,7 @@ class Differ
      *
      * @return array{string, string}
      */
-    public function diffToArray(string $from, string $to, ?LongestCommonSubsequenceCalculator $lcs = null): array
+    public function diffToArray(string $from, string $to): array
     {
         $tokens = $this->differ->diffToArray($from, $to);
 
