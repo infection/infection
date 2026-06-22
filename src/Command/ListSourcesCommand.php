@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function array_map;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Logger\Console\ConsoleLogger;
@@ -58,6 +59,8 @@ final class ListSourcesCommand extends BaseCommand
 
     protected function configure(): void
     {
+        PathsArgument::addArgument($this);
+
         ConfigurationOption::addOption($this);
         SourceFilterOptions::addOption($this);
 
@@ -72,7 +75,7 @@ final class ListSourcesCommand extends BaseCommand
             logger: new ConsoleLogger($io),
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
-            sourceFilter: SourceFilterOptions::get($io),
+            sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
         );
 
         $filePaths = self::collectPaths(
