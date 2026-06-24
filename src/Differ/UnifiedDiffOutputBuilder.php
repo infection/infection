@@ -58,7 +58,7 @@ use SebastianBergmann\Diff\Output\DiffOutputBuilderInterface;
  *
  * @internal
  */
-final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
+final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
 {
     private const int COMMON_LINE_THRESHOLD = 6;
 
@@ -67,8 +67,8 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
     private const int DIFF_ENTRY_SIZE = 2;
 
     public function __construct(
-        private readonly string $header = "--- Original\n+++ New\n",
-        private readonly bool $addLineNumbers = false,
+        private string $header = "--- Original\n+++ New\n",
+        private bool $addLineNumbers = false,
     ) {
     }
 

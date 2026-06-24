@@ -1399,6 +1399,42 @@ message = 'Invalid return type for function `Infection\Differ\Tokens::computeRan
 count = 1
 
 [[issues]]
+file = "src/Differ/UnifiedDiffOutputBuilder.php"
+code = "impossible-condition"
+message = "This condition (type `false`) will always evaluate to false."
+count = 1
+
+[[issues]]
+file = "src/Differ/UnifiedDiffOutputBuilder.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\Differ\UnifiedDiffOutputBuilder::normalizeDiff`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but found `array{}|non-empty-list<list{string, int}>`.'
+count = 1
+
+[[issues]]
+file = "src/Differ/UnifiedDiffOutputBuilder.php"
+code = "missing-parameter-type"
+message = "Parameter `$output` is missing a type hint."
+count = 2
+
+[[issues]]
+file = "src/Differ/UnifiedDiffOutputBuilder.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "src/Differ/UnifiedDiffOutputBuilder.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Infection\Differ\UnifiedDiffOutputBuilder::writeHunk`: expected `list<array{0: string, 1: int(0)|int(1)|int(2)|int(3)|int(4)}>`, but possibly received `list<array{0: string, 1: int}|list{truthy-string, int}>`.'
+count = 2
+
+[[issues]]
+file = "src/Differ/UnifiedDiffOutputBuilder.php"
+code = "redundant-comparison"
+message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
+count = 1
+
+[[issues]]
 file = "src/Engine.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `infection\process\runner\initialstaticanalysisrunfailed` in `Infection\Engine::runInitialStaticAnalysis`.'
