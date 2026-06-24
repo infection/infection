@@ -11,30 +11,34 @@ namespace Infection\Differ;
 
 use function array_splice;
 use function count;
-use function fclose;
-use function fopen;
-use function fwrite;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_string;
 use function max;
 use function min;
+use function Safe\fclose;
+use function Safe\fopen;
+use function Safe\fwrite;
+use function Safe\stream_get_contents;
 use function str_ends_with;
-use function stream_get_contents;
 use function substr;
+use InvalidArgumentException;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\DiffOutputBuilderInterface;
 
 /**
  * Builds a diff string representation in unified diff format in chunks.
+ *
+ * @internal
  */
 final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
 {
-    private bool $collapseRanges = true;
+    private const int COMMON_LINE_THRESHOLD = 6;
 
-    private int $commonLineThreshold = 6;
+    private const int CONTEXT_LINES = 3;
 
-    /**
-     * @var positive-int
-     */
-    private int $contextLines = 3;
+    private const int DIFF_ENTRY_SIZE = 2;
 
     public function __construct(
         private readonly string $header = "--- Original\n+++ New\n",
@@ -42,8 +46,12 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
     ) {
     }
 
+    /**
+     * @param array<array-key, mixed> $diff
+     */
     public function getDiff(array $diff): string
     {
+        $diff = self::normalizeDiff($diff);
         $buffer = fopen('php://memory', 'r+b');
 
         if ('' !== $this->header) {
@@ -71,6 +79,10 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
             : $diff;
     }
 
+    /**
+     * @param resource $output
+     * @param list<array{string, Differ::*}> $diff
+     */
     private function writeDiffHunks($output, array $diff): void
     {
         // detect "No newline at end of file" and insert into `$diff` if needed
@@ -86,18 +98,23 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
         } else {
             // search back for the last `+` and `-` line,
             // check if it has trailing linebreak, else add a warning under it
-            $toFind = [1 => true, 2 => true];
+            $toFind = [
+                Differ::ADDED => true,
+                Differ::REMOVED => true,
+            ];
 
             for ($i = $upperLimit - 1; $i >= 0; $i--) {
-                if (isset($toFind[$diff[$i][1]])) {
-                    unset($toFind[$diff[$i][1]]);
+                $diffType = $diff[$i][1];
+
+                if (isset($toFind[$diffType])) {
+                    unset($toFind[$diffType]);
                     $lc = substr($diff[$i][0], -1);
 
                     if ("\n" !== $lc) {
                         array_splice($diff, $i + 1, 0, [["\n\\ No newline at end of file\n", Differ::NO_LINE_END_EOF_WARNING]]);
                     }
 
-                    if (!count($toFind)) {
+                    if (0 === count($toFind)) {
                         break;
                     }
                 }
@@ -106,14 +123,16 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
 
         // write hunks to output buffer
 
-        $cutOff = max($this->commonLineThreshold, $this->contextLines);
+        $cutOff = max(self::COMMON_LINE_THRESHOLD, self::CONTEXT_LINES);
         $hunkCapture = false;
         $sameCount = $toRange = $fromRange = 0;
         $toStart = $fromStart = 1;
-        $i = 0;
 
-        /** @var int $i */
+        $lastIndex = 0;
+
         foreach ($diff as $i => $entry) {
+            $lastIndex = $i;
+
             if (0 === $entry[1]) { // same
                 if (false === $hunkCapture) {
                     $fromStart++;
@@ -127,16 +146,16 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
                 $fromRange++;
 
                 if ($sameCount === $cutOff) {
-                    $contextStartOffset = ($hunkCapture - $this->contextLines) < 0
+                    $contextStartOffset = ($hunkCapture - self::CONTEXT_LINES) < 0
                         ? $hunkCapture
-                        : $this->contextLines;
+                        : self::CONTEXT_LINES;
 
-                    // note: $contextEndOffset = $this->contextLines;
+                    // note: $contextEndOffset = self::CONTEXT_LINES;
                     //
                     // because we never go beyond the end of the diff.
                     // with the cutoff/contextlines here the follow is never true;
                     //
-                    // if ($i - $cutOff + $this->contextLines + 1 > \count($diff)) {
+                    // if ($i - $cutOff + self::CONTEXT_LINES + 1 > \count($diff)) {
                     //    $contextEndOffset = count($diff) - 1;
                     // }
                     //
@@ -145,11 +164,11 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
                     $this->writeHunk(
                         $diff,
                         $hunkCapture - $contextStartOffset,
-                        $i - $cutOff + $this->contextLines + 1,
+                        $i - $cutOff + self::CONTEXT_LINES + 1,
                         $fromStart - $contextStartOffset,
-                        $fromRange - $cutOff + $contextStartOffset + $this->contextLines,
+                        $fromRange - $cutOff + $contextStartOffset + self::CONTEXT_LINES,
                         $toStart - $contextStartOffset,
-                        $toRange - $cutOff + $contextStartOffset + $this->contextLines,
+                        $toRange - $cutOff + $contextStartOffset + self::CONTEXT_LINES,
                         $output,
                     );
 
@@ -189,13 +208,13 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
         // we end here when cutoff (commonLineThreshold) was not reached, but we were capturing a hunk,
         // do not render hunk till end automatically because the number of context lines might be less than the commonLineThreshold
 
-        $contextStartOffset = $hunkCapture - $this->contextLines < 0
+        $contextStartOffset = $hunkCapture - self::CONTEXT_LINES < 0
             ? $hunkCapture
-            : $this->contextLines;
+            : self::CONTEXT_LINES;
 
         // prevent trying to write out more common lines than there are in the diff _and_
         // do not write more than configured through the context lines
-        $contextEndOffset = min($sameCount, $this->contextLines);
+        $contextEndOffset = min($sameCount, self::CONTEXT_LINES);
 
         $fromRange -= $sameCount;
         $toRange -= $sameCount;
@@ -203,7 +222,7 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
         $this->writeHunk(
             $diff,
             $hunkCapture - $contextStartOffset,
-            $i - $sameCount + $contextEndOffset + 1,
+            $lastIndex - $sameCount + $contextEndOffset + 1,
             $fromStart - $contextStartOffset,
             $fromRange + $contextStartOffset + $contextEndOffset,
             $toStart - $contextStartOffset,
@@ -212,6 +231,43 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
         );
     }
 
+    /**
+     * @param array<array-key, mixed> $diff
+     *
+     * @return list<array{string, Differ::*}>
+     */
+    private static function normalizeDiff(array $diff): array
+    {
+        $normalizedDiff = [];
+        $validDiffTypes = [
+            Differ::OLD,
+            Differ::ADDED,
+            Differ::REMOVED,
+            Differ::DIFF_LINE_END_WARNING,
+            Differ::NO_LINE_END_EOF_WARNING,
+        ];
+
+        foreach ($diff as $entry) {
+            if (!is_array($entry) || count($entry) !== self::DIFF_ENTRY_SIZE) {
+                throw new InvalidArgumentException('Diff entries must be pairs of token and diff type.');
+            }
+
+            [$token, $diffType] = $entry;
+
+            if (!is_string($token) || !is_int($diffType) || !in_array($diffType, $validDiffTypes, true)) {
+                throw new InvalidArgumentException('Diff entries must be pairs of token and diff type.');
+            }
+
+            $normalizedDiff[] = [$token, $diffType];
+        }
+
+        return $normalizedDiff;
+    }
+
+    /**
+     * @param list<array{string, Differ::*}> $diff
+     * @param resource $output
+     */
     private function writeHunk(
         array $diff,
         int $diffStartIndex,
@@ -225,13 +281,13 @@ final class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterface
         if ($this->addLineNumbers) {
             fwrite($output, '@@ -' . $fromStart);
 
-            if (!$this->collapseRanges || 1 !== $fromRange) {
+            if (1 !== $fromRange) {
                 fwrite($output, ',' . $fromRange);
             }
 
             fwrite($output, ' +' . $toStart);
 
-            if (!$this->collapseRanges || 1 !== $toRange) {
+            if (1 !== $toRange) {
                 fwrite($output, ',' . $toRange);
             }
 

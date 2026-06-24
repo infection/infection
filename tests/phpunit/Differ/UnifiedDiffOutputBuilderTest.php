@@ -37,10 +37,12 @@ namespace Infection\Tests\Differ;
 
 use Infection\Differ\UnifiedDiffOutputBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ;
 
 #[CoversClass(UnifiedDiffOutputBuilder::class)]
+#[Group('integration')]
 final class UnifiedDiffOutputBuilderTest extends TestCase
 {
     public function test_it_returns_an_empty_diff_when_there_is_no_header_or_diff(): void
@@ -358,6 +360,9 @@ final class UnifiedDiffOutputBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @return list<array{string, int}>
+     */
     private static function createTwoDistantChangesDiff(): array
     {
         $diff = [];
