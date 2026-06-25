@@ -9,8 +9,16 @@ ARG PHP_VERSION=8.4
 # PHP
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     set -o errexit -o nounset -o pipefail \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        lsb-release \
+        gnupg \
+    && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor > /usr/share/keyrings/php-sury.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/php-sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury-php.list \
+    && DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         # CLI SAPI
         php${PHP_VERSION}-cli \
         # Extensions used by infection to not have to rely on polyfills
