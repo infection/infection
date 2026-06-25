@@ -43,9 +43,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  *
- * Tiny adapter for Sebastian's differ. It is technically no longer necessary as of now, but there
- * has been several changes with Sebastian's differ hence having an adapter against which we test
- * the behaviour is always a nice to have.
+ * Builds mutation diffs through Sebastian's differ while keeping Infection's expected output shape under test.
  */
 class Differ
 {
