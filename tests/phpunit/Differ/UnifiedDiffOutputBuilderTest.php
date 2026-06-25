@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Infection\Differ\UnifiedDiffOutputBuilder;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -57,6 +58,20 @@ final class UnifiedDiffOutputBuilderTest extends TestCase
         $builder = new UnifiedDiffOutputBuilder();
 
         $this->assertSame($expected, $builder->getDiff($diff));
+    }
+
+    /**
+     * @param array<array-key, mixed> $diff
+     */
+    #[DataProvider('invalidDiffProvider')]
+    public function test_it_rejects_invalid_diff_entries(array $diff): void
+    {
+        $builder = new UnifiedDiffOutputBuilder();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Diff entries must be pairs of token and diff type.');
+
+        $builder->getDiff($diff);
     }
 
     public static function diffProvider(): iterable
@@ -127,6 +142,66 @@ final class UnifiedDiffOutputBuilderTest extends TestCase
             "@@ @@\n warning\r",
         ];
 
+        yield 'line ending warnings without line breaks are terminated' => [
+            [
+                ['warning', Differ::DIFF_LINE_END_WARNING],
+            ],
+            "@@ @@\n warning\n",
+        ];
+
+        yield 'missing line break warnings are added after the trailing unchanged line' => [
+            [
+                ["before\n", Differ::OLD],
+                ["changed\n", Differ::ADDED],
+                ['context', Differ::OLD],
+            ],
+            <<<'DIFF'
+                @@ @@
+                 before
+                +changed
+                 context
+
+                DIFF,
+        ];
+
+        yield 'carriage return terminated trailing unchanged lines get missing line break warnings' => [
+            [
+                ["before\n", Differ::OLD],
+                ["changed\n", Differ::ADDED],
+                ["context\r", Differ::OLD],
+            ],
+            "@@ @@\n before\n+changed\n context\r\n",
+        ];
+
+        yield 'trailing unchanged lines control their own missing line break warning' => [
+            [
+                ["before\n", Differ::OLD],
+                ['changed', Differ::ADDED],
+                ["context\n", Differ::OLD],
+            ],
+            <<<'DIFF'
+                @@ @@
+                 before
+                +changed context
+
+                DIFF,
+        ];
+
+        yield 'missing line break warnings are added after the latest added line' => [
+            [
+                ["before\n", Differ::OLD],
+                ["old\n", Differ::REMOVED],
+                ['new', Differ::ADDED],
+            ],
+            <<<'DIFF'
+                @@ @@
+                 before
+                -old
+                +new
+
+                DIFF,
+        ];
+
         yield 'missing line breaks are added for changed lines at the end of a file' => [
             [
                 ['old', Differ::REMOVED],
@@ -149,6 +224,23 @@ final class UnifiedDiffOutputBuilderTest extends TestCase
                 @@ @@
                 +new
                 -old
+
+                DIFF,
+        ];
+
+        yield 'only the latest added and removed lines get missing line break warnings' => [
+            [
+                ['earlier added', Differ::ADDED],
+                ["context\n", Differ::OLD],
+                ['earlier removed', Differ::REMOVED],
+                ["latest added\n", Differ::ADDED],
+                ["latest removed\n", Differ::REMOVED],
+            ],
+            <<<'DIFF'
+                @@ @@
+                +earlier added context
+                -earlier removed+latest added
+                -latest removed
 
                 DIFF,
         ];
@@ -189,6 +281,33 @@ final class UnifiedDiffOutputBuilderTest extends TestCase
                  15
 
                 DIFF,
+        ];
+    }
+
+    public static function invalidDiffProvider(): iterable
+    {
+        yield 'entry is not an array' => [
+            [
+                'diff entry',
+            ],
+        ];
+
+        yield 'entry has more than two elements' => [
+            [
+                ['line', Differ::OLD, 'extra'],
+            ],
+        ];
+
+        yield 'token is not a string' => [
+            [
+                [1, Differ::OLD],
+            ],
+        ];
+
+        yield 'diff type is unknown' => [
+            [
+                ['line', 123],
+            ],
         ];
     }
 
