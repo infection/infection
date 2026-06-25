@@ -6379,6 +6379,24 @@ message = "Type `iterable` in return type of `diffProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Differ/UnifiedDiffOutputBuilderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `diffProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Differ/UnifiedDiffOutputBuilderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `invalidDiffProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Differ/UnifiedDiffOutputBuilderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `unifiedDiffProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/EngineTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Metrics\MaxTimeoutCountReached` in `Infection\Tests\EngineTest::test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws`.'
