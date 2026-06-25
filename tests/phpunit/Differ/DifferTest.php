@@ -112,7 +112,9 @@ final class DifferTest extends TestCase
 
                 PHP,
             <<<'PHP'
-                @@ @@
+                --- Original
+                +++ Mutated
+                @@ -1,5 +1,5 @@
 
                  public function echo(): void
                  {
@@ -209,7 +211,9 @@ final class DifferTest extends TestCase
                 15
                 PHP,
             <<<'PHP'
-                @@ @@
+                --- Original
+                +++ Mutated
+                @@ -4,7 +4,7 @@
                  3
                  4
                  5
@@ -282,7 +286,9 @@ final class DifferTest extends TestCase
                 15
                 PHP,
             <<<'PHP'
-                @@ @@
+                --- Original
+                +++ Mutated
+                @@ -4,10 +4,10 @@
                  3
                  4
                  5
@@ -340,12 +346,14 @@ final class DifferTest extends TestCase
                 1{$windowsLineReturn}2
                 PHP,
             <<<'PHP'
-                @@ @@
-                 #Warning: Strings contain different line endings!
+                --- Original
+                +++ Mutated
+                @@ -1,3 +1,3 @@
                  0
                 -1
                 +1
                  2
+                \ No newline at end of file
 
                 PHP,
             [
@@ -372,12 +380,14 @@ final class DifferTest extends TestCase
                 (1){$windowsLineReturn}2
                 PHP,
             <<<'PHP'
-                @@ @@
-                 #Warning: Strings contain different line endings!
+                --- Original
+                +++ Mutated
+                @@ -1,3 +1,3 @@
                  0
                 -1
                 +(1)
                  2
+                \ No newline at end of file
 
                 PHP,
             [
