@@ -68,6 +68,7 @@ $finder = Finder::create()
     ])
     ->ignoreDotFiles(false)
     ->name('*php')
+    ->notPath('src/Differ/UnifiedDiffOutputBuilder.php')
     ->append([
         __DIR__ . '/bin/infection',
         __DIR__ . '/bin/infection-debug',
