@@ -47,7 +47,6 @@ use function Safe\fclose;
 use function Safe\fopen;
 use function Safe\fwrite;
 use function Safe\stream_get_contents;
-use function str_ends_with;
 use function substr;
 use InvalidArgumentException;
 use SebastianBergmann\Diff\Differ;
@@ -66,12 +65,6 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
 
     private const int DIFF_ENTRY_SIZE = 2;
 
-    public function __construct(
-        private string $header = "--- Original\n+++ New\n",
-        private bool $addLineNumbers = false,
-    ) {
-    }
-
     /**
      * @param array<array-key, mixed> $diff
      */
@@ -79,14 +72,6 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
     {
         $diff = self::normalizeDiff($diff);
         $buffer = fopen('php://memory', 'r+b');
-
-        if ('' !== $this->header) {
-            fwrite($buffer, $this->header);
-
-            if (!str_ends_with($this->header, "\n")) {
-                fwrite($buffer, "\n");
-            }
-        }
 
         if (0 !== count($diff)) {
             $this->writeDiffHunks($buffer, $diff);
@@ -152,7 +137,6 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
         $cutOff = max(self::COMMON_LINE_THRESHOLD, self::CONTEXT_LINES);
         $hunkCapture = false;
         $sameCount = $toRange = $fromRange = 0;
-        $toStart = $fromStart = 1;
 
         $lastIndex = 0;
 
@@ -161,9 +145,6 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
 
             if (0 === $entry[1]) { // same
                 if (false === $hunkCapture) {
-                    $fromStart++;
-                    $toStart++;
-
                     continue;
                 }
 
@@ -191,15 +172,8 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
                         $diff,
                         $hunkCapture - $contextStartOffset,
                         $i - $cutOff + self::CONTEXT_LINES + 1,
-                        $fromStart - $contextStartOffset,
-                        $fromRange - $cutOff + $contextStartOffset + self::CONTEXT_LINES,
-                        $toStart - $contextStartOffset,
-                        $toRange - $cutOff + $contextStartOffset + self::CONTEXT_LINES,
                         $output,
                     );
-
-                    $fromStart += $fromRange;
-                    $toStart += $toRange;
 
                     $hunkCapture = false;
                     $sameCount = $toRange = $fromRange = 0;
@@ -242,18 +216,11 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
         // do not write more than configured through the context lines
         $contextEndOffset = min($sameCount, self::CONTEXT_LINES);
 
-        $fromRange -= $sameCount;
-        $toRange -= $sameCount;
-
         $this->writeHunk(
-            $diff,
-            $hunkCapture - $contextStartOffset,
-            $lastIndex - $sameCount + $contextEndOffset + 1,
-            $fromStart - $contextStartOffset,
-            $fromRange + $contextStartOffset + $contextEndOffset,
-            $toStart - $contextStartOffset,
-            $toRange + $contextStartOffset + $contextEndOffset,
-            $output,
+            diff: $diff,
+            diffStartIndex: $hunkCapture - $contextStartOffset,
+            diffEndIndex: $lastIndex - $sameCount + $contextEndOffset + 1,
+            output: $output,
         );
     }
 
@@ -298,29 +265,9 @@ final readonly class UnifiedDiffOutputBuilder implements DiffOutputBuilderInterf
         array $diff,
         int $diffStartIndex,
         int $diffEndIndex,
-        int $fromStart,
-        int $fromRange,
-        int $toStart,
-        int $toRange,
         $output
     ): void {
-        if ($this->addLineNumbers) {
-            fwrite($output, '@@ -' . $fromStart);
-
-            if (1 !== $fromRange) {
-                fwrite($output, ',' . $fromRange);
-            }
-
-            fwrite($output, ' +' . $toStart);
-
-            if (1 !== $toRange) {
-                fwrite($output, ',' . $toRange);
-            }
-
-            fwrite($output, " @@\n");
-        } else {
-            fwrite($output, "@@ @@\n");
-        }
+        fwrite($output, "@@ @@\n");
 
         for ($i = $diffStartIndex; $i < $diffEndIndex; $i++) {
             if ($diff[$i][1] === Differ::ADDED) {
