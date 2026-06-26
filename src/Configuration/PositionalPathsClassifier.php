@@ -129,7 +129,7 @@ final class PositionalPathsClassifier
             return false;
         }
 
-        $candidate = rtrim(Path::canonicalize($path), '/');
+        $candidate = Path::canonicalize($path);
 
         foreach ($absoluteSourceDirs as $sourceDir) {
             if ($candidate === $sourceDir || str_starts_with($candidate, $sourceDir . '/')) {
