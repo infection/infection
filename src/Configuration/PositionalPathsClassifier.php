@@ -143,7 +143,7 @@ final class PositionalPathsClassifier
     /**
      * @param list<non-empty-string> $absoluteSourceDirs
      *
-     * @return 'source'|'test'
+     * @return self::KIND_SOURCE|self::KIND_TEST
      */
     private static function classifyPathKind(
         string $path,
