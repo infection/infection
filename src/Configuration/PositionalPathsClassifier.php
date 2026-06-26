@@ -106,11 +106,9 @@ final class PositionalPathsClassifier
         $absolute = [];
 
         foreach ($schema->source->directories as $directory) {
-            $resolved = Path::isAbsolute($directory)
-                ? $directory
+            $canonical = Path::isAbsolute($directory)
+                ? Path::canonicalize($directory)
                 : Path::join($configDir, $directory);
-
-            $canonical = Path::canonicalize($resolved);
 
             if ($canonical !== '') {
                 $absolute[] = $canonical;
