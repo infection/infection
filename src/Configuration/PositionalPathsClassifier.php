@@ -110,7 +110,7 @@ final class PositionalPathsClassifier
                 ? $directory
                 : Path::join($configDir, $directory);
 
-            $canonical = rtrim(Path::canonicalize($resolved), '/');
+            $canonical = Path::canonicalize($resolved);
 
             if ($canonical !== '') {
                 $absolute[] = $canonical;
