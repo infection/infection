@@ -33,65 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\TestFramework\Contracts;
 
-use function array_key_exists;
-use Infection\Mutant\DetectionStatus;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 
 /**
+ * A test framework is the tool that will be used to evaluate mutations to check if they are
+ * covered or escaped.
+ *
+ * It can be a standard test framework such as PHPUnit, PhpSpec, a static analyser like PHPStan
+ * or Psalm or something else entirely!
+ *
  * @internal
- * @final
  */
-class MutantProcessContainer implements MutantEvaluationPipe
+interface TestFramework
 {
-    /**
-     * @var list<MutantProcess>
-     */
-    private array $processes = [];
+    public function getName(): string;
 
-    private int $currentProcessIndex = 0;
-
-    public function __construct(
-        MutantProcess $phpUnitMutantProcess,
-        /**
-         * @var list<LazyMutantProcessFactory>
-         */
-        private readonly array $lazyMutantProcessCreators,
-    ) {
-        $this->processes[] = $phpUnitMutantProcess;
-    }
+    public function getVersion(): string;
 
     /**
-     * Container has a next process only if Mutant is Escaped
+     * Checks that the version of the tool used is compatible with the adapter.
+     *
+     * Additionally, Some test frameworks may require artefacts to work with. For example, PHPUnit
+     * requires a code coverage report. PHPStan will require an up-to-date cache.
+     *
+     * @throws RequirementChecksFailed
      */
-    public function hasNext(): bool
-    {
-        return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators)
-            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
-    }
+    public function checkRequirements(): void;
 
-    public function createNext(): MutantProcess
-    {
-        $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->create(
-            $this->processes[0]->getMutant(),
-        );
+    /**
+     * Initial test run. This allows tools like PHPUnit to ensure the tests are valid
+     * in the first place and generate the required code coverage or PHPStan to generate
+     * an up-to-date cache.
+     *
+     * @throws InitialTestsFailed
+     */
+    public function executeInitialRun(): InitialRunResults;
 
-        $this->processes[] = $newMutantProcess;
-
-        ++$this->currentProcessIndex;
-
-        return $newMutantProcess;
-    }
-
-    public function getCurrent(): MutantProcess
-    {
-        return $this->processes[$this->currentProcessIndex];
-    }
-
-    private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
-    {
-        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
-    }
+    /**
+     * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
+     * Psalm, or it requires to launch a process in which case the process execution is
+     * delegated to an orchestrator. How the result of the process is interpreted is
+     * encapsulated by a process.
+     */
+    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe;
 }

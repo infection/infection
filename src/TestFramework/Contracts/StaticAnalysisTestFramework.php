@@ -33,18 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
-
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+namespace Infection\TestFramework\Contracts;
 
 /**
+ * Temporary interface for the Container.
+ *
  * @internal
  */
-final class IndexedMutantProcessContainer
+interface StaticAnalysisTestFramework extends TestFramework
 {
-    public function __construct(
-        public int $threadIndex,
-        public MutantEvaluationPipe $mutantProcessContainer,
-    ) {
-    }
 }

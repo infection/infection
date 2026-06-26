@@ -40,6 +40,7 @@ use function count;
 use DuoClock\DuoClock;
 use Generator;
 use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Iterator;
 use function max;
 use function range;
@@ -84,8 +85,8 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @param iterable<MutantProcessContainer> $processContainers
-     * @return iterable<MutantProcessContainer>
+     * @param iterable<MutantEvaluationPipe> $processContainers
+     * @return iterable<MutantEvaluationPipe>
      */
     public function run(iterable $processContainers): iterable
     {
@@ -209,7 +210,7 @@ class ParallelProcessRunner implements ProcessRunner
         }
     }
 
-    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
+    private function startProcess(MutantEvaluationPipe $mutantProcessContainer, int $threadIndex): void
     {
         $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
