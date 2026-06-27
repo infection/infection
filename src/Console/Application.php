@@ -54,6 +54,7 @@ use OutOfBoundsException;
 use Override;
 use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -89,32 +90,16 @@ final class Application extends BaseApplication
     }
 
     #[Override]
-    public function doRun(InputInterface $input, OutputInterface $output): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
+        $input ??= new ArgvInput();
+
         // This allows to run `infection tests/` instead of `infection run tests/`.
         if ($this->isUnknownCommand($input)) {
             $input = $this->defaultToRunCommand($input);
         }
 
-        return parent::doRun($input, $output);
-    }
-
-    private function isUnknownCommand(InputInterface $input): bool
-    {
-        $firstArgument = $input->getFirstArgument();
-
-        return $firstArgument !== null && !$this->has($firstArgument);
-    }
-
-    private function defaultToRunCommand(InputInterface $input): InputInterface
-    {
-        $newInput = new StringInput('run ' . $input);
-
-        if (!$input->isInteractive()) {
-            $newInput->setInteractive(false);
-        }
-
-        return $newInput;
+        return parent::run($input, $output);
     }
 
     public function getContainer(): Container
@@ -172,5 +157,26 @@ final class Application extends BaseApplication
         }
 
         OutputFormatterStyleConfigurator::configure($output);
+    }
+
+    private function isUnknownCommand(InputInterface $input): bool
+    {
+        $firstArgument = $input->getFirstArgument();
+
+        return $firstArgument !== null && !$this->has($firstArgument);
+    }
+
+    private function defaultToRunCommand(InputInterface $input): InputInterface
+    {
+        $newInput = new StringInput('run ' . $input);
+
+        // preserve interactivity that was set programmatically on the input
+        // rather than through a flag (e.g. when the input is built by tests).
+        // Flag- and CI-based interactivity is handled by `configureIO()`.
+        if (!$input->isInteractive()) {
+            $newInput->setInteractive(false);
+        }
+
+        return $newInput;
     }
 }
