@@ -44,12 +44,15 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -77,6 +80,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function str_contains;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -1365,6 +1369,64 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'positional source paths become a PlainFilter (with deduplication)' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php', 'Bar.php']))
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths become testFrameworkExtraOptions' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(null)
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional paths with both source and test paths' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php']))
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths with existing testFrameworkExtraArgs throws' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder
+                        ->withSourceFilter(new PositionalPathsFilter(['tests/FooTest.php']))
+                        ->withTestFrameworkExtraArgs('--stop-on-failure'),
+                )
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                    ),
+                ),
+        ];
+
         yield 'with git filters and base branch' => [
             $defaultScenario
                 ->forSourceFilter(
@@ -1608,6 +1670,14 @@ final class ConfigurationFactoryTest extends TestCase
             ->method('provide')
             ->willReturn($projectDirectory);
 
+        // Report paths living under a "tests" directory as existing on disk so that the
+        // positional-paths scenarios can classify them as test paths, while bare values
+        // such as "Foo.php" stay unreadable and fall back to the source-filter heuristic.
+        $isTestPath = static fn (string $filename): bool => str_contains($filename, '/tests/');
+        $fileSystem = $this->createStub(FileSystem::class);
+        $fileSystem->method('isReadableFile')->willReturnCallback($isTestPath);
+        $fileSystem->method('isReadableDirectory')->willReturnCallback($isTestPath);
+
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
@@ -1619,6 +1689,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
+            new PositionalPathsClassifier($fileSystem),
         );
     }
 }
