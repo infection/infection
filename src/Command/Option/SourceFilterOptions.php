@@ -132,7 +132,7 @@ final class SourceFilterOptions
 
         if ($value !== '') {
             $io->warning(
-                'The "--filter" option is deprecated since 0.34.0 and will be removed in 0.35.0. Use positional arguments instead: infection <filter>',
+                'The "--filter" option is deprecated since 0.34.0 and will be removed in future versions. Use positional arguments instead: infection <filter>',
             );
         }
 
