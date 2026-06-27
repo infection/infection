@@ -37,18 +37,12 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use function count;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use function is_string;
-use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function str_starts_with;
 
 final class IoCodeDetector
 {
-    private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
-
     /**
      * @var array<class-string, bool>
      */
@@ -66,9 +60,12 @@ final class IoCodeDetector
             return true;
         }
 
-        $coveredClassNames = $this->getCoveredClassNames($testCaseReflection);
+        $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredClassNames(
+            $testCaseReflection,
+            $this->reflectionProvider,
+        );
 
-        if ($coveredClassNames === null) {
+        if (count($coveredClassNames) === 0) {
             return true;
         }
 
@@ -83,7 +80,12 @@ final class IoCodeDetector
 
     public function hasCoveredClass(ClassReflection $testCaseReflection): bool
     {
-        return $this->getCoveredClassNames($testCaseReflection) !== null;
+        $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredClassNames(
+            $testCaseReflection,
+            $this->reflectionProvider,
+        );
+
+        return count($coveredClassNames) > 0;
     }
 
     /**
@@ -131,64 +133,6 @@ final class IoCodeDetector
         return false;
     }
 
-    /**
-     * @return list<class-string>|null
-     */
-    private function getCoveredClassNames(ClassReflection $testCaseReflection): ?array
-    {
-        $coveredClassNames = [];
-        $hasCoverageAttribute = false;
-
-        foreach (self::getAttributes($testCaseReflection) as $attribute) {
-            if (!self::isCoverageAttribute($attribute)) {
-                continue;
-            }
-
-            $hasCoverageAttribute = true;
-
-            $coveredClassName = $this->getCoveredClassName($attribute);
-
-            if ($coveredClassName === null) {
-                return null;
-            }
-
-            $coveredClassNames[] = $coveredClassName;
-        }
-
-        return $hasCoverageAttribute && count($coveredClassNames) > 0
-            ? $coveredClassNames
-            : null;
-    }
-
-    /**
-     * TODO: eventually we should support functions, methods and traits too.
-     * @see CoversClass
-     *
-     * @return class-string|null
-     */
-    private function getCoveredClassName(ReflectionAttribute $attribute): ?string
-    {
-        if ($attribute->getName() !== CoversClass::class) {
-            return null;
-        }
-
-        $arguments = $attribute->getArguments();
-        $coveredClassName = $arguments[0] ?? $arguments['className'] ?? null;
-
-        $classNameExists = is_string($coveredClassName)
-            && $this->reflectionProvider->hasClass($coveredClassName);
-
-        return $classNameExists ? $coveredClassName : null;
-    }
-
-    private static function isCoverageAttribute(ReflectionAttribute $attribute): bool
-    {
-        return str_starts_with(
-            $attribute->getName(),
-            self::COVERS_ATTRIBUTE_NAMESPACE,
-        );
-    }
-
     private function doesClassUseIo(ClassReflection $classReflection): bool
     {
         $className = $classReflection->getName();
@@ -201,19 +145,5 @@ final class IoCodeDetector
 
         return $this->classUsesIoCache[$className] = $fileName !== null
             && $this->analyser->analyse($classReflection, analyseNonConcreteClasses: true)->usesIo;
-    }
-
-    /**
-     * @return iterable<ReflectionAttribute>
-     */
-    private static function getAttributes(ClassReflection $classReflection): iterable
-    {
-        $attributes = $classReflection->getNativeReflection()->getAttributes();
-
-        foreach ($attributes as $attribute) {
-            if ($attribute instanceof ReflectionAttribute) {
-                yield $attribute;
-            }
-        }
     }
 }
