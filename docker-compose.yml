@@ -3,7 +3,7 @@ services:
   # $ docker login ghcr.io --username=<username>
   # If you need a token, a short-lived classic token with read:packages is enough.
   zizmor:
-    image: ghcr.io/zizmorcore/zizmor:1.25.2
+    image: ghcr.io/zizmorcore/zizmor:1.26.1
     command: --quiet --quiet --min-severity=low .github
     working_dir: /opt/infection
     volumes:
