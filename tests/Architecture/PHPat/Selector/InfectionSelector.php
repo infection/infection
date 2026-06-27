@@ -114,7 +114,7 @@ final class InfectionSelector
     {
         return Selector::AllOf(
             new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-                self::ioCodeDetector($reflectionProvider),
+                self::getIoCodeDetector($reflectionProvider),
                 self::analyser(),
             ),
             Selector::Not(self::autoreviewTestCode()),
@@ -124,7 +124,7 @@ final class InfectionSelector
     public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): SelectorInterface
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            self::ioCodeDetector($reflectionProvider),
+            self::getIoCodeDetector($reflectionProvider),
         );
     }
 
@@ -213,7 +213,7 @@ final class InfectionSelector
         return self::$analyser;
     }
 
-    private static function ioCodeDetector(ReflectionProvider $reflectionProvider): IoCodeDetector
+    private static function getIoCodeDetector(ReflectionProvider $reflectionProvider): IoCodeDetector
     {
         if (self::$ioCodeDetector === null) {
             self::$ioCodeDetectorReflectionProvider = $reflectionProvider;
