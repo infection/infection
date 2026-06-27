@@ -196,7 +196,7 @@ final class InfectionSelectorTest extends SelectorTestCase
         yield 'vendor class' => [TestCase::class, false];
     }
 
-    public function test_it_rejects_different_reflection_providers_for_phpunit_test_io_requirements(): void
+    public function test_it_rejects_different_reflection_providers_for_io_code_detector(): void
     {
         InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup($this->getReflectionProvider());
 

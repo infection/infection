@@ -37,6 +37,11 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use Infection\Command\ConfigureCommand;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithIo;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithoutIo;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\PHPUnitTestWithUnitGroupFixture;
@@ -121,6 +126,51 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
         yield 'no group' => [
             self::class,
             false,
+        ];
+    }
+
+    /**
+     * @param class-string $className
+     * @param list<class-string> $expected
+     */
+    #[DataProvider('coveredClassNamesProvider')]
+    public function test_it_gets_covered_class_names(
+        string $className,
+        array $expected,
+    ): void {
+        $actual = PHPUnitTestClassAnalysis::getCoveredClassNames(
+            $this->createClassReflection($className),
+            $this->getReflectionProvider(),
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function coveredClassNamesProvider(): iterable
+    {
+        yield 'single covered class' => [
+            FixtureWithCoveredClassWithoutIoTest::class,
+            [
+                CoveredClassWithoutIo::class,
+            ],
+        ];
+
+        yield 'multiple covered classes' => [
+            FixtureWithMultipleCoveredClassesTest::class,
+            [
+                CoveredClassWithoutIo::class,
+                CoveredClassWithIo::class,
+            ],
+        ];
+
+        yield 'unsupported coverage attribute' => [
+            FixtureWithCoversNothingWithoutIntegrationGroupTest::class,
+            [],
+        ];
+
+        yield 'no coverage attribute' => [
+            AbstractPHPUnitTest::class,
+            [],
         ];
     }
 }
