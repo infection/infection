@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command\Option;
 
-use const E_USER_DEPRECATED;
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
@@ -48,7 +47,6 @@ use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use function trigger_error;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -116,7 +114,7 @@ final class SourceFilterOptions
     {
         $input = $io->getInput();
 
-        $filter = self::getPlainFilter($input);
+        $filter = self::getPlainFilter($io);
         $gitFilter = self::getGitFilter($input);
 
         self::assertOnlyOneTypeOfFiltering($filter, $gitFilter, $positionalPaths);
@@ -128,14 +126,13 @@ final class SourceFilterOptions
         return $filter ?? $gitFilter;
     }
 
-    private static function getPlainFilter(InputInterface $input): ?PlainFilter
+    private static function getPlainFilter(IO $io): ?PlainFilter
     {
-        $value = trim((string) $input->getOption(self::PLAIN_FILTER_NAME));
+        $value = trim((string) $io->getInput()->getOption(self::PLAIN_FILTER_NAME));
 
         if ($value !== '') {
-            trigger_error(
-                '--filter is deprecated since 0.34.0 and will be removed in 0.35.0. Use positional arguments instead: infection <filter>',
-                E_USER_DEPRECATED,
+            $io->warning(
+                'The "--filter" option is deprecated since 0.34.0 and will be removed in 0.35.0. Use positional arguments instead: infection <filter>',
             );
         }
 
