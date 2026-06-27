@@ -39,7 +39,10 @@ use Infection\Console\Application;
 use Infection\Framework\InfectionVersion;
 use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 #[CoversClass(Application::class)]
 final class ApplicationTest extends TestCase
@@ -58,5 +61,44 @@ final class ApplicationTest extends TestCase
         );
 
         $this->assertSame('1.2.3', $application->getVersion());
+    }
+
+    #[DataProvider('provideNonCommandArguments')]
+    public function test_it_routes_to_run_command_when_first_argument_is_not_a_known_command(string $argument): void
+    {
+        $application = new Application(SingletonContainer::getContainer());
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(true);
+
+        $output = new BufferedOutput();
+        $application->run(new StringInput($argument), $output);
+
+        $display = $output->fetch();
+
+        // Without this routing, running 'infection src/' would produce "Command 'src/' is not defined".
+        // With this routing, it forwards to the 'run' command instead.
+        self::assertStringNotContainsString(\sprintf('Command "%s" is not defined', $argument), $display);
+        self::assertStringNotContainsString(\sprintf("Command '%s' is not defined", $argument), $display);
+    }
+
+    public static function provideNonCommandArguments(): iterable
+    {
+        yield 'source directory' => ['src/'];
+        yield 'test directory' => ['tests/'];
+        yield 'nested path' => ['src/Foo/Bar/'];
+    }
+
+    public function test_it_does_not_alter_routing_for_known_commands(): void
+    {
+        $application = new Application(SingletonContainer::getContainer());
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(true);
+
+        $output = new BufferedOutput();
+        $application->run(new StringInput('run --help'), $output);
+
+        $display = $output->fetch();
+
+        self::assertStringContainsString('Runs the mutation testing', $display);
     }
 }
