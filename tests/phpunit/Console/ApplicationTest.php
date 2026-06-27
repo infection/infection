@@ -81,7 +81,6 @@ final class ApplicationTest extends TestCase
         $display = $output->fetch();
 
         $this->assertStringNotContainsString(sprintf('Command "%s" is not defined', $argument), $display);
-        $this->assertStringNotContainsString(sprintf("Command '%s' is not defined", $argument), $display);
     }
 
     public static function provideNonCommandArguments(): iterable
