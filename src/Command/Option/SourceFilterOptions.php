@@ -114,7 +114,7 @@ final class SourceFilterOptions
     {
         $input = $io->getInput();
 
-        $filter = self::getPlainFilter($input);
+        $filter = self::getPlainFilter($io);
         $gitFilter = self::getGitFilter($input);
 
         self::assertOnlyOneTypeOfFiltering($filter, $gitFilter, $positionalPaths);
@@ -126,9 +126,15 @@ final class SourceFilterOptions
         return $filter ?? $gitFilter;
     }
 
-    private static function getPlainFilter(InputInterface $input): ?PlainFilter
+    private static function getPlainFilter(IO $io): ?PlainFilter
     {
-        $value = trim((string) $input->getOption(self::PLAIN_FILTER_NAME));
+        $value = trim((string) $io->getInput()->getOption(self::PLAIN_FILTER_NAME));
+
+        if ($value !== '') {
+            $io->warning(
+                'The "--filter" option is deprecated since 0.34.0 and will be removed in future versions. Use positional arguments instead: infection <filter>',
+            );
+        }
 
         return PlainFilter::tryToCreate($value);
     }
