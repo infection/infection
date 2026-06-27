@@ -50,6 +50,7 @@ use function str_ends_with;
 use function str_starts_with;
 use function strtolower;
 use Symfony\Component\Filesystem\Path;
+use function var_dump;
 
 /**
  * Classifies positional `path` arguments into source-filter and
@@ -160,8 +161,19 @@ final class PositionalPathsClassifier
             ));
         }
 
-        if (self::looksLikeTestPath($path)) {
+        $absolutePath = Path::isAbsolute($path)
+            ? $path
+            : Path::join($configDir, $path);
+
+        $isValidPath = self::isValidPath($fileSystem, $absolutePath);
+        $isInsideSourceDirectories = self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs);
+
+        if ($isValidPath && !$isInsideSourceDirectories) {
             return self::KIND_TEST;
+        }
+
+        if ($isValidPath && $isInsideSourceDirectories) {
+            return self::KIND_SOURCE;
         }
 
         // like `SomeFile` or `SomeFile.php` - bare values behave as --filter values
@@ -169,20 +181,12 @@ final class PositionalPathsClassifier
             return self::KIND_SOURCE;
         }
 
-        // at this point, both for `source` and for `test` slots we must have a real file path for provided value
-        $absolutePath = Path::isAbsolute($path)
-            ? $path
-            : Path::join($configDir, $path);
-
-        if (self::isValidPath($fileSystem, $absolutePath)) {
+        // if it's neither valid path (source or test) and not a Class-like string, something is wrong
+        if (!$isValidPath) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
                 $path,
             ));
-        }
-
-        if (self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs)) {
-            return self::KIND_SOURCE;
         }
 
         return self::KIND_TEST;
@@ -210,25 +214,8 @@ final class PositionalPathsClassifier
             && !str_contains($value, '\\');
     }
 
-    private static function looksLikeTestPath(string $value): bool
-    {
-        $lowered = strtolower($value);
-
-        foreach (['tests', 'test'] as $segment) {
-            if ($lowered === $segment || str_starts_with($lowered, $segment . '/')) {
-                return true;
-            }
-
-            if (str_contains($lowered, '/' . $segment . '/')) {
-                return true;
-            }
-        }
-
-        return str_ends_with(basename($value), 'Test.php');
-    }
-
     private static function isValidPath(FileSystem $fileSystem, string $absolutePath): bool
     {
-        return !$fileSystem->isReadableFile($absolutePath) && !$fileSystem->isReadableDirectory($absolutePath);
+        return $fileSystem->isReadableFile($absolutePath) || $fileSystem->isReadableDirectory($absolutePath);
     }
 }
