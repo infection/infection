@@ -36,15 +36,21 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use function count;
+use function is_string;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ReflectionProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function str_ends_with;
+use function str_starts_with;
 
 final class PHPUnitTestClassAnalysis
 {
+    private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
+
     private const string GROUP_NAME = 'integration';
 
     public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
@@ -71,6 +77,30 @@ final class PHPUnitTestClassAnalysis
     }
 
     /**
+     * @return list<class-string>
+     */
+    public static function getCoveredClassNames(
+        ClassReflection $testCaseReflection,
+        ReflectionProvider $reflectionProvider,
+    ): array {
+        $coveredClassNames = [];
+
+        foreach (self::getAttributes($testCaseReflection) as $attribute) {
+            if (!self::isCoverageAttribute($attribute)) {
+                continue;
+            }
+
+            $coveredClassName = self::getCoveredClassName($attribute, $reflectionProvider);
+
+            if ($coveredClassName !== null) {
+                $coveredClassNames[] = $coveredClassName;
+            }
+        }
+
+        return $coveredClassNames;
+    }
+
+    /**
      * @see Group
      */
     private static function isIntegrationGroup(ReflectionAttribute $attribute): bool
@@ -83,6 +113,37 @@ final class PHPUnitTestClassAnalysis
         $groupName = $arguments[0] ?? $arguments['name'] ?? null;
 
         return $groupName === self::GROUP_NAME;
+    }
+
+    /**
+     * TODO: eventually we should support functions, methods and traits too.
+     * @see CoversClass
+     *
+     * @return class-string|null
+     */
+    private static function getCoveredClassName(
+        ReflectionAttribute $attribute,
+        ReflectionProvider $reflectionProvider,
+    ): ?string {
+        if ($attribute->getName() !== CoversClass::class) {
+            return null;
+        }
+
+        $arguments = $attribute->getArguments();
+        $coveredClassName = $arguments[0] ?? $arguments['className'] ?? null;
+
+        $classNameExists = is_string($coveredClassName)
+            && $reflectionProvider->hasClass($coveredClassName);
+
+        return $classNameExists ? $coveredClassName : null;
+    }
+
+    private static function isCoverageAttribute(ReflectionAttribute $attribute): bool
+    {
+        return str_starts_with(
+            $attribute->getName(),
+            self::COVERS_ATTRIBUTE_NAMESPACE,
+        );
     }
 
     /**
