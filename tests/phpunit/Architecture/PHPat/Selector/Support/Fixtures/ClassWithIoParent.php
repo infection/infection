@@ -43,6 +43,9 @@ final class ClassWithIoParent extends ParentClassWithIo
 
 abstract class ParentClassWithIo
 {
+    /**
+     * @phpstan-ignore shipmonk.deadMethod
+     */
     public function readFile(): string
     {
         return file_get_contents(__FILE__);
