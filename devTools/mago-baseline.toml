@@ -722,12 +722,6 @@ count = 1
 
 [[issues]]
 file = "src/Configuration/PositionalPathsClassifier.php"
-code = "redundant-condition"
-message = "This condition (type `true`) will always evaluate to true."
-count = 1
-
-[[issues]]
-file = "src/Configuration/PositionalPathsClassifier.php"
 code = "redundant-logical-operation"
 message = "Redundant `&&` operation: left operand is evaluated and right operand is always truthy."
 count = 1
@@ -5702,20 +5696,20 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `inputProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::runCommand`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_source_files`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_all_source_files`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/ListSourcesCommand/ListSourcesCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_source_files`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\ListSourcesCommand\ListSourcesCommandTest::test_it_lists_filtered_source_files_and_warns_about_the_deprecated_filter_option`.'
 count = 1
 
 [[issues]]
