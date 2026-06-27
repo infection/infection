@@ -91,7 +91,7 @@ final class IoCodeDetector
      */
     private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
     {
-        if ($this->classUsesIo($testCaseReflection)) {
+        if ($this->doesClassUseIo($testCaseReflection)) {
             return true;
         }
 
@@ -101,7 +101,7 @@ final class IoCodeDetector
             $parentTestCaseClassReflection !== null
             && $parentTestCaseClassReflection->getName() !== TestCase::class
         ) {
-            if ($this->classUsesIo($parentTestCaseClassReflection)) {
+            if ($this->doesClassUseIo($parentTestCaseClassReflection)) {
                 return true;
             }
 
@@ -121,7 +121,7 @@ final class IoCodeDetector
         $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
         do {
-            if ($this->classUsesIo($classReflection)) {
+            if ($this->doesClassUseIo($classReflection)) {
                 return true;
             }
 
@@ -189,7 +189,7 @@ final class IoCodeDetector
         );
     }
 
-    private function classUsesIo(ClassReflection $classReflection): bool
+    private function doesClassUseIo(ClassReflection $classReflection): bool
     {
         $className = $classReflection->getName();
 

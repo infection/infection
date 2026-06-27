@@ -61,9 +61,9 @@ final class IoCodeDetectorTest extends SelectorTestCase
      * @param class-string $className
      */
     #[DataProvider('classProvider')]
-    public function test_it_detects_phpunit_test_io_usage(
+    public function test_it_detects_whether_phpunit_tests_use_io(
         string $className,
-        bool $expectedRequiresIntegrationGroup,
+        bool $expectedIsUsingIo,
         bool $expectedHasCoveredClass,
         bool $expectedHasIntegrationGroup,
     ): void {
@@ -77,7 +77,7 @@ final class IoCodeDetectorTest extends SelectorTestCase
         $classReflection = $this->createClassReflection($className);
 
         $this->assertSame(
-            $expectedRequiresIntegrationGroup,
+            $expectedIsUsingIo,
             $ioCodeDetector->isUsingIo($classReflection),
         );
         $this->assertSame(
@@ -201,7 +201,7 @@ final class IoCodeDetectorTest extends SelectorTestCase
      * @param class-string $className
      */
     #[DataProvider('fileSystemTestCaseChildProvider')]
-    public function test_file_system_test_case_children_uses_io(string $className): void
+    public function test_file_system_test_case_children_are_detected_as_using_io(string $className): void
     {
         $ioCodeDetector = new IoCodeDetector(
             new Analyser(
@@ -211,11 +211,11 @@ final class IoCodeDetectorTest extends SelectorTestCase
             $this->getReflectionProvider(),
         );
 
-        $requiresIntegrationGroup = $ioCodeDetector->isUsingIo(
+        $isUsingIo = $ioCodeDetector->isUsingIo(
             $this->createClassReflection($className),
         );
 
-        $this->assertTrue($requiresIntegrationGroup);
+        $this->assertTrue($isUsingIo);
     }
 
     public static function fileSystemTestCaseChildProvider(): iterable
