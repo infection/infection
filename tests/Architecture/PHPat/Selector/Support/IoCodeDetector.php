@@ -54,14 +54,23 @@ final class IoCodeDetector
     ) {
     }
 
-    public function isUsingIo(ClassReflection $testCaseReflection): bool
+    /**
+     * Checks whether the class or related tested code uses I/O.
+     *
+     * For PHPUnit test cases, covered source classes are checked with their parent classes too.
+     */
+    public function isUsingIo(ClassReflection $classReflection): bool
     {
-        if ($this->testCaseUsesIo($testCaseReflection)) {
+        if (!PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection)) {
+            return $this->testedClassUsesIo($classReflection->getName());
+        }
+
+        if ($this->testCaseUsesIo($classReflection)) {
             return true;
         }
 
         $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredClassNames(
-            $testCaseReflection,
+            $classReflection,
             $this->reflectionProvider,
         );
 
@@ -93,7 +102,7 @@ final class IoCodeDetector
      */
     private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
     {
-        if ($this->doesClassUseIo($testCaseReflection)) {
+        if ($this->isClassUsingIo($testCaseReflection)) {
             return true;
         }
 
@@ -103,7 +112,7 @@ final class IoCodeDetector
             $parentTestCaseClassReflection !== null
             && $parentTestCaseClassReflection->getName() !== TestCase::class
         ) {
-            if ($this->doesClassUseIo($parentTestCaseClassReflection)) {
+            if ($this->isClassUsingIo($parentTestCaseClassReflection)) {
                 return true;
             }
 
@@ -123,7 +132,7 @@ final class IoCodeDetector
         $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
         do {
-            if ($this->doesClassUseIo($classReflection)) {
+            if ($this->isClassUsingIo($classReflection)) {
                 return true;
             }
 
@@ -133,7 +142,7 @@ final class IoCodeDetector
         return false;
     }
 
-    private function doesClassUseIo(ClassReflection $classReflection): bool
+    private function isClassUsingIo(ClassReflection $classReflection): bool
     {
         $className = $classReflection->getName();
 
@@ -141,9 +150,15 @@ final class IoCodeDetector
             return $this->classUsesIoCache[$className];
         }
 
-        $fileName = $classReflection->getFileName();
+        if ($className === TestCase::class) {
+            $usesIo = false;
+        } else {
+            $fileName = $classReflection->getFileName();
 
-        return $this->classUsesIoCache[$className] = $fileName !== null
-            && $this->analyser->analyse($classReflection, analyseNonConcreteClasses: true)->usesIo;
+            $usesIo = $fileName !== null
+                && $this->analyser->analyse($classReflection, analyseNonConcreteClasses: true)->usesIo;
+        }
+
+        return $this->classUsesIoCache[$className] = $usesIo;
     }
 }
