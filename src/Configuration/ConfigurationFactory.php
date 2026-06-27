@@ -415,7 +415,7 @@ class ConfigurationFactory
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
-        $classified = $this->positionalPathsClassifier->fromPaths(
+        $classified = $this->positionalPathsClassifier->classify(
             $sourceFilter->paths,
             $schema,
         );

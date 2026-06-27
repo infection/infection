@@ -66,7 +66,7 @@ final readonly class PositionalPathsClassifier
     /**
      * @param list<non-empty-string> $paths
      */
-    public function fromPaths(
+    public function classify(
         array $paths,
         SchemaConfiguration $schema,
     ): ClassifiedPaths {

@@ -613,7 +613,7 @@ final class PositionalPathsClassifierTest extends TestCase
      */
     private function classify(array $paths, SchemaConfiguration $schema, FileSystem $fileSystem): ClassifiedPaths
     {
-        return (new PositionalPathsClassifier($fileSystem))->fromPaths($paths, $schema);
+        return (new PositionalPathsClassifier($fileSystem))->classify($paths, $schema);
     }
 
     private function acceptingFileSystem(): FileSystem
