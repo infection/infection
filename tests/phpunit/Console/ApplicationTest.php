@@ -113,7 +113,7 @@ final class ApplicationTest extends TestCase
 
         $application = new Application(SingletonContainer::getContainer());
         $application->setAutoExit(false);
-        $application->addCommand($command);
+        $application->addCommands([$command]);
 
         $application->run(new StringInput('src/ --no-interaction'), new BufferedOutput());
 
@@ -126,7 +126,7 @@ final class ApplicationTest extends TestCase
 
         $application = new Application(SingletonContainer::getContainer());
         $application->setAutoExit(false);
-        $application->addCommand($command);
+        $application->addCommands([$command]);
 
         $input = new StringInput('src/');
         $input->setInteractive(false);
