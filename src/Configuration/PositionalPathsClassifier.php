@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function basename;
 use function class_exists;
 use function ctype_upper;
 use function dirname;
@@ -43,14 +42,10 @@ use Infection\CannotBeInstantiated;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\FileSystem;
 use InvalidArgumentException;
-use function rtrim;
 use function sprintf;
 use function str_contains;
-use function str_ends_with;
 use function str_starts_with;
-use function strtolower;
 use Symfony\Component\Filesystem\Path;
-use function var_dump;
 
 /**
  * Classifies positional `path` arguments into source-filter and

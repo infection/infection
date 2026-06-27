@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use function in_array;
 use Infection\Configuration\ClassifiedPaths;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
@@ -624,7 +623,6 @@ final class PositionalPathsClassifierTest extends TestCase
     private function fileSystemWith(array $existingPaths): FileSystem
     {
         $fileSystem = $this->createMock(FileSystem::class);
-
 
         $isExistingPath = static function (string $filename) use ($existingPaths): bool {
             foreach ($existingPaths as $existingPath) {

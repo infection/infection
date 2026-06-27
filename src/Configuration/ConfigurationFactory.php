@@ -174,15 +174,11 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        if ($sourceFilter instanceof PositionalPathsFilter) {
-            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
-                $sourceFilter,
-                $schema,
-                $testFrameworkExtraArgs,
-            );
-        }
-
-        $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
+        [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
+            $sourceFilter,
+            $schema,
+            $testFrameworkExtraArgs,
+        );
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
@@ -443,17 +439,30 @@ class ConfigurationFactory
         return [$resolvedFilter, $testFrameworkExtraArgs];
     }
 
+    /**
+     * @return array{0: SourceFilter|null, 1: string|null}
+     */
     private function refineFilterIfNecessary(
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
-    ): ?SourceFilter {
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        if ($sourceFilter instanceof PositionalPathsFilter) {
+            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+                $sourceFilter,
+                $schema,
+                $testFrameworkExtraArgs,
+            );
+        }
+
         if ($sourceFilter instanceof IncompleteGitDiffFilter) {
-            return new GitDiffFilter(
+            $sourceFilter = new GitDiffFilter(
                 $sourceFilter->value,
                 self::refineGitBase($sourceFilter->base),
             );
         }
 
-        return $sourceFilter;
+        return [$sourceFilter, $testFrameworkExtraArgs];
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
