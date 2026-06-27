@@ -176,15 +176,11 @@ final readonly class PositionalPathsClassifier
             return self::KIND_SOURCE;
         }
 
-        // if it's neither valid path (source or test) and not a Class-like string, something is wrong
-        if (!$isValidPath) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
-                $path,
-            ));
-        }
-
-        return self::KIND_TEST;
+        // reaching here means it's neither a valid path (source or test) nor a Class-like string, so something is wrong
+        throw new InvalidArgumentException(sprintf(
+            'Invalid path argument "%s": multiple paths must be passed as separate arguments.',
+            $path,
+        ));
     }
 
     /**
