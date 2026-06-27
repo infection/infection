@@ -91,20 +91,30 @@ final class Application extends BaseApplication
     #[Override]
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        $firstArgument = $input->getFirstArgument();
-
-        // this allows to run `infection tests/` instead of `infection run tests/`
-        if ($firstArgument !== null && !$this->has($firstArgument)) {
-            $newInput = new StringInput('run ' . $input);
-
-            if (!$input->isInteractive()) {
-                $newInput->setInteractive(false);
-            }
-
-            $input = $newInput;
+        // This allows to run `infection tests/` instead of `infection run tests/`.
+        if ($this->isUnknownCommand($input)) {
+            $input = $this->defaultToRunCommand($input);
         }
 
         return parent::doRun($input, $output);
+    }
+
+    private function isUnknownCommand(InputInterface $input): bool
+    {
+        $firstArgument = $input->getFirstArgument();
+
+        return $firstArgument !== null && !$this->has($firstArgument);
+    }
+
+    private function defaultToRunCommand(InputInterface $input): InputInterface
+    {
+        $newInput = new StringInput('run ' . $input);
+
+        if (!$input->isInteractive()) {
+            $newInput->setInteractive(false);
+        }
+
+        return $newInput;
     }
 
     public function getContainer(): Container

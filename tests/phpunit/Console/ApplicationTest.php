@@ -41,6 +41,7 @@ use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -75,16 +76,16 @@ final class ApplicationTest extends TestCase
 
         $display = $output->fetch();
 
-        // Without this routing, running 'infection src/' would produce "Command 'src/' is not defined".
-        // With this routing, it forwards to the 'run' command instead.
-        self::assertStringNotContainsString(\sprintf('Command "%s" is not defined', $argument), $display);
-        self::assertStringNotContainsString(\sprintf("Command '%s' is not defined", $argument), $display);
+        $this->assertStringNotContainsString(sprintf('Command "%s" is not defined', $argument), $display);
+        $this->assertStringNotContainsString(sprintf("Command '%s' is not defined", $argument), $display);
     }
 
     public static function provideNonCommandArguments(): iterable
     {
         yield 'source directory' => ['src/'];
+
         yield 'test directory' => ['tests/'];
+
         yield 'nested path' => ['src/Foo/Bar/'];
     }
 
@@ -99,6 +100,6 @@ final class ApplicationTest extends TestCase
 
         $display = $output->fetch();
 
-        self::assertStringContainsString('Runs the mutation testing', $display);
+        $this->assertStringContainsString('Runs the mutation testing', $display);
     }
 }
