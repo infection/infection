@@ -53,7 +53,7 @@ use Symfony\Component\Filesystem\Path;
  *
  * @internal
  */
-final class PositionalPathsClassifier
+final readonly class PositionalPathsClassifier
 {
     use CannotBeInstantiated;
 
