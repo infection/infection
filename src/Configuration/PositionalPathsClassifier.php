@@ -38,7 +38,6 @@ namespace Infection\Configuration;
 use function class_exists;
 use function ctype_upper;
 use function dirname;
-use Infection\CannotBeInstantiated;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\FileSystem;
 use InvalidArgumentException;
@@ -55,19 +54,21 @@ use Symfony\Component\Filesystem\Path;
  */
 final readonly class PositionalPathsClassifier
 {
-    use CannotBeInstantiated;
-
     private const string KIND_SOURCE = 'source';
 
     private const string KIND_TEST = 'test';
 
+    public function __construct(
+        private FileSystem $fileSystem,
+    ) {
+    }
+
     /**
      * @param list<non-empty-string> $paths
      */
-    public static function fromPaths(
+    public function fromPaths(
         array $paths,
         SchemaConfiguration $schema,
-        FileSystem $fileSystem,
     ): ClassifiedPaths {
         if ($paths === []) {
             return new ClassifiedPaths([], []);
@@ -80,7 +81,7 @@ final readonly class PositionalPathsClassifier
         $testPaths = [];
 
         foreach ($paths as $path) {
-            $kind = self::classifyPathKind($path, $absoluteSourceDirs, $configDir, $fileSystem);
+            $kind = $this->classifyPathKind($path, $absoluteSourceDirs, $configDir);
 
             if ($kind === self::KIND_SOURCE) {
                 $sourcePaths[] = $path;
@@ -141,11 +142,10 @@ final readonly class PositionalPathsClassifier
      *
      * @return self::KIND_SOURCE|self::KIND_TEST
      */
-    private static function classifyPathKind(
+    private function classifyPathKind(
         string $path,
         array $absoluteSourceDirs,
         string $configDir,
-        FileSystem $fileSystem,
     ): string {
         // TODO: FQCN-style arguments (e.g. "\App\Foo" or "\App\Foo::method::45") will
         // be supported via https://github.com/infection/infection/issues/2237
@@ -160,7 +160,7 @@ final readonly class PositionalPathsClassifier
             ? $path
             : Path::join($configDir, $path);
 
-        $isValidPath = self::isValidPath($fileSystem, $absolutePath);
+        $isValidPath = $this->isValidPath($absolutePath);
         $isInsideSourceDirectories = self::isInsideSourceDirectories($absolutePath, $absoluteSourceDirs);
 
         if ($isValidPath && !$isInsideSourceDirectories) {
@@ -209,8 +209,8 @@ final readonly class PositionalPathsClassifier
             && !str_contains($value, '\\');
     }
 
-    private static function isValidPath(FileSystem $fileSystem, string $absolutePath): bool
+    private function isValidPath(string $absolutePath): bool
     {
-        return $fileSystem->isReadableFile($absolutePath) || $fileSystem->isReadableDirectory($absolutePath);
+        return $this->fileSystem->isReadableFile($absolutePath) || $this->fileSystem->isReadableDirectory($absolutePath);
     }
 }

@@ -56,7 +56,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
-use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -104,7 +103,7 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
-        private readonly FileSystem $fileSystem,
+        private readonly PositionalPathsClassifier $positionalPathsClassifier,
     ) {
     }
 
@@ -416,10 +415,9 @@ class ConfigurationFactory
         SchemaConfiguration $schema,
         ?string $testFrameworkExtraArgs,
     ): array {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->positionalPathsClassifier->fromPaths(
             $sourceFilter->paths,
             $schema,
-            $this->fileSystem,
         );
 
         $resolvedFilter = $classified->sourcePaths !== []

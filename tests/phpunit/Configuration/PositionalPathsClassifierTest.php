@@ -58,7 +58,7 @@ final class PositionalPathsClassifierTest extends TestCase
 {
     public function test_it_returns_empty_buckets_when_paths_is_empty(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths([], $this->createSchema(['src']), $this->acceptingFileSystem());
+        $classified = $this->classify([], $this->createSchema(['src']), $this->acceptingFileSystem());
 
         $this->assertSame([], $classified->sourcePaths);
         $this->assertSame([], $classified->testPaths);
@@ -66,7 +66,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_single_source_path(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/SomeFile.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -78,7 +78,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_single_test_path(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['tests/SomeTest.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -90,7 +90,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_multiple_source_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/A.php', 'src/B.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -102,7 +102,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_multiple_test_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['tests/Unit/A', 'tests/Unit/B'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -114,7 +114,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_mixed_source_and_test_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/A.php', 'tests/ATest.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -126,7 +126,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_accepts_any_order_of_source_and_test_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['tests/ATest.php', 'src/A.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -138,7 +138,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_multiple_sources_and_multiple_tests(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/A.php', 'tests/ATest.php', 'src/B.php', 'tests/BTest.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -153,7 +153,7 @@ final class PositionalPathsClassifierTest extends TestCase
      */
     public function test_it_classifies_paths_containing_tests_segment_as_test_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['lib/gocardless/tests/Unit/FooTest.php'],
             $this->createSchema(['src', 'lib']),
             $this->fileSystemWith([
@@ -171,7 +171,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_classifies_capitalized_tests_directory_as_test_path(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['Tests/Unit/FooTest.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -183,7 +183,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_classifies_capitalized_tests_root_as_test_path(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['Tests/'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -200,7 +200,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid path argument "1Foo.php": multiple paths must be passed as separate arguments.');
 
-        PositionalPathsClassifier::fromPaths(
+        $this->classify(
             ['1Foo.php'],
             $this->createSchema(['src']),
             $this->fileSystemWith([]),
@@ -209,7 +209,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_does_not_treat_non_tests_word_fragments_as_test_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/contest/Foo.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -221,7 +221,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_routes_bare_source_filter_with_bare_test_filename(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['Plus.php', 'PlusTest.php'],
             $this->createSchema(['src']),
             $this->fileSystemWith([
@@ -235,7 +235,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_supports_multiple_configured_source_directories(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['lib/B.php', 'tests/CTest.php'],
             $this->createSchema(['src', 'lib']),
             $this->acceptingFileSystem(),
@@ -247,7 +247,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_treats_everything_as_test_path_when_no_source_directories_configured(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/SomeFile.php'],
             $this->createSchema([]),
             $this->acceptingFileSystem(),
@@ -259,7 +259,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_classifies_paths_under_singular_test_directory_as_test_paths(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['test/Foo.php'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -274,7 +274,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported. See https://github.com/infection/infection/issues/2237.');
 
-        PositionalPathsClassifier::fromPaths(
+        $this->classify(
             ['\App\Foo'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -286,7 +286,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('FQCN-style arguments like "App\Foo::method" are not yet supported.');
 
-        PositionalPathsClassifier::fromPaths(
+        $this->classify(
             ['App\Foo::method'],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -298,7 +298,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('FQCN-style arguments like "Infection\Configuration\PositionalPathsClassifier" are not yet supported.');
 
-        PositionalPathsClassifier::fromPaths(
+        $this->classify(
             [PositionalPathsClassifier::class],
             $this->createSchema(['src']),
             $this->acceptingFileSystem(),
@@ -313,7 +313,7 @@ final class PositionalPathsClassifierTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid path argument "scr/Foo.php": multiple paths must be passed as separate arguments.');
 
-        PositionalPathsClassifier::fromPaths(
+        $this->classify(
             ['scr/Foo.php'],
             $this->createSchema(['src']),
             $this->fileSystemWith([]),
@@ -322,7 +322,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_classifies_an_existing_file_inside_source_directories_as_source(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/SomeFile.php'],
             $this->createSchema(['src']),
             $this->fileSystemWith(['/project/src/SomeFile.php']),
@@ -334,7 +334,7 @@ final class PositionalPathsClassifierTest extends TestCase
 
     public function test_it_classifies_an_existing_directory_inside_source_directories_as_source(): void
     {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['src/SubTree'],
             $this->createSchema(['src']),
             $this->fileSystemWith(['/project/src/SubTree']),
@@ -349,7 +349,7 @@ final class PositionalPathsClassifierTest extends TestCase
         // Real path on disk that isn't under any configured source directory:
         // routed to the test-framework slot. This is what enables
         // `infection run tests/SomeFolder` to behave like `phpunit tests/SomeFolder`.
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             ['integration/SomeFolder'],
             $this->createSchema(['src']),
             $this->fileSystemWith(['/project/integration/SomeFolder']),
@@ -368,7 +368,7 @@ final class PositionalPathsClassifierTest extends TestCase
         array $paths,
         array $expectedSourcePaths,
     ): void {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             $paths,
             $this->createSchema(['src']),
             $this->fileSystemWith([
@@ -426,7 +426,7 @@ final class PositionalPathsClassifierTest extends TestCase
         array $paths,
         array $expectedTestPaths,
     ): void {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             $paths,
             $this->createSchema(['src']),
             $this->fileSystemWith([
@@ -505,7 +505,7 @@ final class PositionalPathsClassifierTest extends TestCase
         array $expectedSourcePaths,
         array $expectedTestPaths,
     ): void {
-        $classified = PositionalPathsClassifier::fromPaths(
+        $classified = $this->classify(
             $paths,
             $this->createSchema(['src']),
             $this->fileSystemWith([
@@ -606,6 +606,14 @@ final class PositionalPathsClassifierTest extends TestCase
             ['Mailer', 'Plus_'],
             ['tests/Unit/Service/'],
         ];
+    }
+
+    /**
+     * @param list<non-empty-string> $paths
+     */
+    private function classify(array $paths, SchemaConfiguration $schema, FileSystem $fileSystem): ClassifiedPaths
+    {
+        return (new PositionalPathsClassifier($fileSystem))->fromPaths($paths, $schema);
     }
 
     private function acceptingFileSystem(): FileSystem

@@ -44,6 +44,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\PositionalPathsClassifier;
 use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
@@ -79,6 +80,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function str_contains;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -1668,6 +1670,14 @@ final class ConfigurationFactoryTest extends TestCase
             ->method('provide')
             ->willReturn($projectDirectory);
 
+        // Report paths living under a "tests" directory as existing on disk so that the
+        // positional-paths scenarios can classify them as test paths, while bare values
+        // such as "Foo.php" stay unreadable and fall back to the source-filter heuristic.
+        $isTestPath = static fn (string $filename): bool => str_contains($filename, '/tests/');
+        $fileSystem = $this->createStub(FileSystem::class);
+        $fileSystem->method('isReadableFile')->willReturnCallback($isTestPath);
+        $fileSystem->method('isReadableDirectory')->willReturnCallback($isTestPath);
+
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
@@ -1679,7 +1689,7 @@ final class ConfigurationFactoryTest extends TestCase
             ),
             $projectDirectoryProviderMock,
             $cpuCoresCountProvider,
-            $this->createStub(FileSystem::class),
+            new PositionalPathsClassifier($fileSystem),
         );
     }
 }
