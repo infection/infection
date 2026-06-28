@@ -69,13 +69,13 @@ final class IoCodeDetector
             return true;
         }
 
-        $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredClassNames(
+        $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredSymbols(
             $classReflection,
             $this->reflectionProvider,
         );
 
         if (count($coveredClassNames) === 0) {
-            return !PHPUnitTestClassAnalysis::hasCoverageAttribute($classReflection);
+            return true;
         }
 
         foreach ($coveredClassNames as $coveredClassName) {
@@ -89,7 +89,7 @@ final class IoCodeDetector
 
     public function hasCoveredClass(ClassReflection $testCaseReflection): bool
     {
-        $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredClassNames(
+        $coveredClassNames = PHPUnitTestClassAnalysis::getCoveredSymbols(
             $testCaseReflection,
             $this->reflectionProvider,
         );

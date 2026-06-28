@@ -138,7 +138,7 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
         string $className,
         array $expected,
     ): void {
-        $actual = PHPUnitTestClassAnalysis::getCoveredClassNames(
+        $actual = PHPUnitTestClassAnalysis::getCoveredSymbols(
             $this->createClassReflection($className),
             $this->getReflectionProvider(),
         );
