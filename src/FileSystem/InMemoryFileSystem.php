@@ -36,10 +36,13 @@ declare(strict_types=1);
 namespace Infection\FileSystem;
 
 use function array_key_exists;
+use function array_keys;
 use DomainException;
+use function is_string;
 use Override;
 use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Traversable;
 use Webmozart\Assert\Assert;
@@ -54,10 +57,17 @@ final class InMemoryFileSystem extends FileSystem
      */
     private array $files = [];
 
+    /**
+     * @var array<string, true>
+     */
+    private array $directories = [];
+
     #[Override]
     public function dumpFile(string $filename, $content = ''): void
     {
         Assert::stringNotEmpty($content);
+        $this->assertDirectoryDoesNotExist($filename);
+
         $this->files[$filename] = $content;
     }
 
@@ -81,7 +91,7 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function isReadableDirectory(string $filename): bool
     {
-        throw new DomainException('Unexpected call.');
+        return array_key_exists(Path::canonicalize($filename), $this->directories);
     }
 
     #[Override]
@@ -97,9 +107,17 @@ final class InMemoryFileSystem extends FileSystem
     }
 
     #[Override]
-    public function mkdir(iterable|string $dirs, int $mode = 0o777): never
+    public function mkdir(iterable|string $dirs, int $mode = 0o777): void
     {
-        throw new DomainException('Unexpected call.');
+        $dirs = is_string($dirs) ? [$dirs] : $dirs;
+
+        foreach ($dirs as $dir) {
+            $canonicalDirectory = Path::canonicalize($dir);
+
+            $this->assertFileDoesNotExist($dir);
+
+            $this->directories[$canonicalDirectory] = true;
+        }
     }
 
     #[Override]
@@ -213,5 +231,33 @@ final class InMemoryFileSystem extends FileSystem
         }
 
         return $this->files[$filename];
+    }
+
+    private function assertDirectoryDoesNotExist(string $filename): void
+    {
+        $canonicalFilename = Path::canonicalize($filename);
+
+        if (array_key_exists($canonicalFilename, $this->directories)) {
+            throw new DomainException(
+                sprintf(
+                    'Cannot dump file "%s": a directory exists at the same path.',
+                    $filename,
+                ),
+            );
+        }
+    }
+
+    private function assertFileDoesNotExist(string $canonicalDirName): void
+    {
+        foreach (array_keys($this->files) as $filename) {
+            if ($filename === $canonicalDirName) {
+                throw new DomainException(
+                    sprintf(
+                        'Cannot create directory "%s": a file exists at the same path.',
+                        $canonicalDirName,
+                    ),
+                );
+            }
+        }
     }
 }

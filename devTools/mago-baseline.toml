@@ -1682,6 +1682,24 @@ count = 6
 
 [[issues]]
 file = "src/FileSystem/InMemoryFileSystem.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\FileSystem\InMemoryFileSystem::assertFileDoesNotExist`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/FileSystem/InMemoryFileSystem.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Symfony\Component\Filesystem\Path::canonicalize`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/FileSystem/InMemoryFileSystem.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/FileSystem/InMemoryFileSystem.php"
 code = "unused-parameter"
 message = "Parameter `$filename` is never used."
 count = 1
@@ -6085,6 +6103,24 @@ message = "Type `iterable` in return type of `branch_names_to_be_matched` is imp
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Configuration/PositionalPathsClassifier/PositionalPathsClassifierTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `provideClassifiablePaths` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/PositionalPathsClassifier/PositionalPathsClassifierTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `provideInvalidPaths` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Configuration/PositionalPathsClassifier/PositionalPathsClassifierTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Configuration\PositionalPathsClassifier\PositionalPathsClassifierTest::createExistingPaths`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Configuration/ProjectDirectoryProvider/ChainProjectDirectoryProviderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providerProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -7251,7 +7287,37 @@ count = 1
 [[issues]]
 file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_can_create_a_directory`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_can_create_multiple_directories`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_can_dump_and_read_a_file`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_cannot_create_a_directory_where_a_file_exists`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_cannot_dump_a_file_where_a_directory_exists`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_normalizes_directory_paths`.'
 count = 1
 
 [[issues]]

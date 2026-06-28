@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use DomainException;
 use Infection\FileSystem\InMemoryFileSystem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -57,6 +58,11 @@ final class InMemoryFileSystemTest extends TestCase
         $this->assertFalse($this->fileSystem->isReadableFile('/path/to/file.php'));
     }
 
+    public function test_a_directory_is_not_readable_when_it_has_not_been_created(): void
+    {
+        $this->assertFalse($this->fileSystem->isReadableDirectory('/path/to/directory'));
+    }
+
     public function test_it_can_dump_and_read_a_file(): void
     {
         $filename = '/path/to/file.php';
@@ -66,6 +72,55 @@ final class InMemoryFileSystemTest extends TestCase
 
         $this->assertTrue($this->fileSystem->isReadableFile($filename));
         $this->assertSame($content, $this->fileSystem->readFile($filename));
+    }
+
+    public function test_it_can_create_a_directory(): void
+    {
+        $directory = '/path/to/directory';
+
+        $this->fileSystem->mkdir($directory);
+
+        $this->assertTrue($this->fileSystem->isReadableDirectory($directory));
+        $this->assertFalse($this->fileSystem->isReadableFile($directory));
+    }
+
+    public function test_it_cannot_dump_a_file_where_a_directory_exists(): void
+    {
+        $this->fileSystem->mkdir('/path/to/directory');
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Cannot dump file "/path/to/directory": a directory exists at the same path.');
+
+        $this->fileSystem->dumpFile('/path/to/directory', 'content');
+    }
+
+    public function test_it_cannot_create_a_directory_where_a_file_exists(): void
+    {
+        $this->fileSystem->dumpFile('/path/to/file.php', 'content');
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Cannot create directory "/path/to/file.php": a file exists at the same path.');
+
+        $this->fileSystem->mkdir('/path/to/file.php');
+    }
+
+    public function test_it_can_create_multiple_directories(): void
+    {
+        $this->fileSystem->mkdir([
+            '/path/to/first-directory',
+            '/path/to/second-directory',
+        ]);
+
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/to/first-directory'));
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/to/second-directory'));
+    }
+
+    public function test_it_normalizes_directory_paths(): void
+    {
+        $this->fileSystem->mkdir('/path/to/directory/');
+
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/to/directory'));
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/to/directory/'));
     }
 
     public function test_it_overwrites_existing_files_on_dump(): void
