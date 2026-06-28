@@ -62,10 +62,10 @@ final class IoCodeDetector
     public function isUsingIo(ClassReflection $classReflection): bool
     {
         if (!PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection)) {
-            return $this->testedClassUsesIo($classReflection->getName());
+            return $this->isTestedClassUsingIo($classReflection->getName());
         }
 
-        if ($this->testCaseUsesIo($classReflection)) {
+        if ($this->isTestCaseUsingIo($classReflection)) {
             return true;
         }
 
@@ -79,7 +79,7 @@ final class IoCodeDetector
         }
 
         foreach ($coveredClassNames as $coveredClassName) {
-            if ($this->testedClassUsesIo($coveredClassName)) {
+            if ($this->isTestedClassUsingIo($coveredClassName)) {
                 return true;
             }
         }
@@ -100,7 +100,7 @@ final class IoCodeDetector
     /**
      * Check the test case code.
      */
-    private function testCaseUsesIo(ClassReflection $testCaseReflection): bool
+    private function isTestCaseUsingIo(ClassReflection $testCaseReflection): bool
     {
         if ($this->isClassUsingIo($testCaseReflection)) {
             return true;
@@ -127,7 +127,7 @@ final class IoCodeDetector
      *
      * @param class-string $sourceClassName
      */
-    private function testedClassUsesIo(string $sourceClassName): bool
+    private function isTestedClassUsingIo(string $sourceClassName): bool
     {
         $classReflection = $this->reflectionProvider->getClass($sourceClassName);
 
