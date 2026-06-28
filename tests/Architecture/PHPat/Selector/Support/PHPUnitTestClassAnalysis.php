@@ -36,15 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use function count;
+use function is_string;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ReflectionProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function str_ends_with;
+use function str_starts_with;
 
 final class PHPUnitTestClassAnalysis
 {
+    private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
+
     private const string GROUP_NAME = 'integration';
 
     public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
@@ -70,6 +78,41 @@ final class PHPUnitTestClassAnalysis
         return false;
     }
 
+    public static function hasCoverageAttribute(ClassReflection $classReflection): bool
+    {
+        foreach (self::getAttributes($classReflection) as $attribute) {
+            if (self::isCoverageAttribute($attribute)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return list<class-string>
+     */
+    public static function getCoveredClassNames(
+        ClassReflection $testCaseReflection,
+        ReflectionProvider $reflectionProvider,
+    ): array {
+        $coveredClassNames = [];
+
+        foreach (self::getAttributes($testCaseReflection) as $attribute) {
+            if (!self::isCoverageAttribute($attribute)) {
+                continue;
+            }
+
+            $coveredClassName = self::getCoveredClassName($attribute, $reflectionProvider);
+
+            if ($coveredClassName !== null) {
+                $coveredClassNames[] = $coveredClassName;
+            }
+        }
+
+        return $coveredClassNames;
+    }
+
     /**
      * @see Group
      */
@@ -83,6 +126,42 @@ final class PHPUnitTestClassAnalysis
         $groupName = $arguments[0] ?? $arguments['name'] ?? null;
 
         return $groupName === self::GROUP_NAME;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    private static function getCoveredClassName(
+        ReflectionAttribute $attribute,
+        ReflectionProvider $reflectionProvider,
+    ): ?string {
+        $coveredClassName = match ($attribute->getName()) {
+            CoversClass::class,
+            CoversMethod::class => self::getStringArgument($attribute, 0, 'className'),
+            CoversTrait::class => self::getStringArgument($attribute, 0, 'traitName'),
+            default => null,
+        };
+
+        $classNameExists = is_string($coveredClassName)
+            && $reflectionProvider->hasClass($coveredClassName);
+
+        return $classNameExists ? $coveredClassName : null;
+    }
+
+    private static function getStringArgument(ReflectionAttribute $attribute, int $index, string $name): ?string
+    {
+        $arguments = $attribute->getArguments();
+        $value = $arguments[$index] ?? $arguments[$name] ?? null;
+
+        return is_string($value) ? $value : null;
+    }
+
+    private static function isCoverageAttribute(ReflectionAttribute $attribute): bool
+    {
+        return str_starts_with(
+            $attribute->getName(),
+            self::COVERS_ATTRIBUTE_NAMESPACE,
+        );
     }
 
     /**

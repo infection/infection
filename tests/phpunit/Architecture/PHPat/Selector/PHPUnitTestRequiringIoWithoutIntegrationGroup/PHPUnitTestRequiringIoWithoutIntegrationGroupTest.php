@@ -51,7 +51,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use Infection\Tests\Command\CommandOptionTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -75,7 +75,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 $analyser,
                 $this->getReflectionProvider(),
             ),
@@ -171,7 +171,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 $analyser,
                 $this->getReflectionProvider(),
             ),

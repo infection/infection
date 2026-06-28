@@ -45,7 +45,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -62,7 +62,7 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
         bool $expected,
     ): void {
         $selector = new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 new Analyser(
                     SingletonContainer::getContainer()->getParser(),
                     new FileSystem(),

@@ -39,7 +39,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ReflectionProvider;
@@ -53,9 +53,9 @@ final class InfectionSelector
 
     private static ?Analyser $analyser = null;
 
-    private static ?PHPUnitTestIoRequirements $phpUnitTestIoRequirements = null;
+    private static ?IoCodeDetector $ioCodeDetector = null;
 
-    private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
+    private static ?ReflectionProvider $ioCodeDetectorReflectionProvider = null;
 
     public static function code(): SelectorInterface
     {
@@ -114,7 +114,7 @@ final class InfectionSelector
     {
         return Selector::AllOf(
             new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-                self::phpUnitTestIoRequirements($reflectionProvider),
+                self::getIoCodeDetector($reflectionProvider),
                 self::analyser(),
             ),
             Selector::Not(self::autoreviewTestCode()),
@@ -124,7 +124,7 @@ final class InfectionSelector
     public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): SelectorInterface
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            self::phpUnitTestIoRequirements($reflectionProvider),
+            self::getIoCodeDetector($reflectionProvider),
         );
     }
 
@@ -213,23 +213,23 @@ final class InfectionSelector
         return self::$analyser;
     }
 
-    private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): PHPUnitTestIoRequirements
+    private static function getIoCodeDetector(ReflectionProvider $reflectionProvider): IoCodeDetector
     {
-        if (self::$phpUnitTestIoRequirements === null) {
-            self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
+        if (self::$ioCodeDetector === null) {
+            self::$ioCodeDetectorReflectionProvider = $reflectionProvider;
 
-            return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
+            return self::$ioCodeDetector = new IoCodeDetector(
                 self::analyser(),
                 $reflectionProvider,
             );
         }
 
         Assert::same(
-            self::$phpUnitTestIoRequirementsReflectionProvider,
+            self::$ioCodeDetectorReflectionProvider,
             $reflectionProvider,
-            'PHPUnit test IO requirements must be requested with the same reflection provider.',
+            'I/O code detector must be requested with the same reflection provider.',
         );
 
-        return self::$phpUnitTestIoRequirements;
+        return self::$ioCodeDetector;
     }
 }

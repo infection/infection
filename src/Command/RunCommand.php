@@ -41,6 +41,7 @@ use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
+use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
@@ -152,6 +153,8 @@ final class RunCommand extends BaseCommand
         $this
             ->setName('run')
             ->setDescription('Runs the mutation testing.');
+
+        PathsArgument::addArgument($this);
 
         TestFrameworkOption::addOption($this)
             ->addOption(
@@ -489,7 +492,7 @@ final class RunCommand extends BaseCommand
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
             testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
-            sourceFilter: SourceFilterOptions::get($io),
+            sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
             threadCount: $commandHelper->getThreadCount(),
             dotsPerRow: $commandHelper->getDotsPerRow(),
             // To keep in sync with Container::DEFAULT_DRY_RUN

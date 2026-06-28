@@ -33,34 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use function Safe\file_get_contents;
 
-final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
+final class ClassWithIoParent extends ParentClassWithIo
 {
-    public function __construct(
-        private IoCodeDetector $ioCodeDetector,
-        private Analyser $analyser,
-    ) {
-    }
+}
 
-    public function getName(): string
+abstract class ParentClassWithIo
+{
+    /**
+     * @phpstan-ignore shipmonk.deadMethod
+     */
+    public function readFile(): string
     {
-        return 'PHPUnit test requiring I/O without integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        $analysisResult = $this->analyser->analyse($classReflection);
-
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && $analysisResult->isAConcretePHPUnitTestCase
-            && !$analysisResult->hasCoversNothing
-            && $this->ioCodeDetector->isUsingIo($classReflection)
-            && !$analysisResult->belongsToIntegrationGroup;
+        return file_get_contents(__FILE__);
     }
 }

@@ -38,6 +38,8 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 use Infection\FileSystem\FileSystem;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithIo;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithoutIo;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoAndDirectIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest;
@@ -50,26 +52,29 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\ClassWithIoParent;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
 use Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest;
 use Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest;
 use Infection\Tests\Reporter\FileReporterTest;
+use Infection\Tests\Reporter\ShowMutationsReporterTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(PHPUnitTestIoRequirements::class)]
-final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
+#[CoversClass(IoCodeDetector::class)]
+final class IoCodeDetectorTest extends SelectorTestCase
 {
     /**
      * @param class-string $className
      */
     #[DataProvider('classProvider')]
-    public function test_it_detects_phpunit_test_io_requirements(
+    public function test_it_detects_whether_phpunit_tests_use_io(
         string $className,
-        bool $expectedRequiresIntegrationGroup,
+        bool $expectedIsUsingIo,
         bool $expectedHasCoveredClass,
         bool $expectedHasIntegrationGroup,
     ): void {
-        $ioRequirements = new PHPUnitTestIoRequirements(
+        $ioCodeDetector = new IoCodeDetector(
             new Analyser(
                 SingletonContainer::getContainer()->getParser(),
                 new FileSystem(),
@@ -79,12 +84,12 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
         $classReflection = $this->createClassReflection($className);
 
         $this->assertSame(
-            $expectedRequiresIntegrationGroup,
-            $ioRequirements->requiresIntegrationGroup($classReflection),
+            $expectedIsUsingIo,
+            $ioCodeDetector->isUsingIo($classReflection),
         );
         $this->assertSame(
             $expectedHasCoveredClass,
-            $ioRequirements->hasCoveredClass($classReflection),
+            $ioCodeDetector->hasCoveredClass($classReflection),
         );
         $this->assertSame(
             $expectedHasIntegrationGroup,
@@ -106,6 +111,13 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             false,
             false,
             true,
+        ];
+
+        yield 'test without coverage attribute' => [
+            FixturePHPUnitTestCase::class,
+            true,
+            false,
+            false,
         ];
 
         yield 'test covering class without I/O' => [
@@ -177,6 +189,34 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             true,
             true,
         ];
+
+        yield 'test covering source without I/O' => [
+            ShowMutationsReporterTest::class,
+            false,
+            true,
+            false,
+        ];
+
+        yield 'source class with I/O' => [
+            CoveredClassWithIo::class,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'source class without I/O' => [
+            CoveredClassWithoutIo::class,
+            false,
+            false,
+            false,
+        ];
+
+        yield 'source class extending parent with I/O' => [
+            ClassWithIoParent::class,
+            true,
+            false,
+            false,
+        ];
     }
 
     public function test_it_caches_io_detection_per_class(): void
@@ -188,7 +228,7 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             ->method('readFile')
             ->willReturn('contents');
 
-        $ioRequirements = new PHPUnitTestIoRequirements(
+        $ioCodeDetector = new IoCodeDetector(
             new Analyser(
                 SingletonContainer::getContainer()->getParser(),
                 $fileSystemMock,
@@ -196,19 +236,19 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             $this->getReflectionProvider(),
         );
 
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithCoversNothingWithoutIntegrationGroupTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithCoveredClassWithIoTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithCoveredClassWithIoTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithMultipleCoveredClassesTest::class),
         );
-        $ioRequirements->requiresIntegrationGroup(
+        $ioCodeDetector->isUsingIo(
             $this->createClassReflection(FixtureWithMultipleCoveredClassesTest::class),
         );
     }
@@ -217,9 +257,9 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
      * @param class-string $className
      */
     #[DataProvider('fileSystemTestCaseChildProvider')]
-    public function test_file_system_test_case_children_require_integration_group(string $className): void
+    public function test_file_system_test_case_children_are_detected_as_using_io(string $className): void
     {
-        $ioRequirements = new PHPUnitTestIoRequirements(
+        $ioCodeDetector = new IoCodeDetector(
             new Analyser(
                 SingletonContainer::getContainer()->getParser(),
                 new FileSystem(),
@@ -227,11 +267,11 @@ final class PHPUnitTestIoRequirementsTest extends SelectorTestCase
             $this->getReflectionProvider(),
         );
 
-        $requiresIntegrationGroup = $ioRequirements->requiresIntegrationGroup(
+        $isUsingIo = $ioCodeDetector->isUsingIo(
             $this->createClassReflection($className),
         );
 
-        $this->assertTrue($requiresIntegrationGroup);
+        $this->assertTrue($isUsingIo);
     }
 
     public static function fileSystemTestCaseChildProvider(): iterable

@@ -41,20 +41,20 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(IoCodeDetector::class)]
-final class IoCodeDetectorTest extends TestCase
+#[CoversClass(IoCodeDetectorVisitor::class)]
+final class IoCodeDetectorVisitorTest extends TestCase
 {
     #[DataProvider('codeProvider')]
     public function test_it_can_detect_io_operations(
         string $code,
         bool $expected,
     ): void {
-        $detector = IoCodeDetector::create();
+        $visitor = IoCodeDetectorVisitor::create();
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-        $traverser = new NodeTraverser($detector);
+        $traverser = new NodeTraverser($visitor);
 
         $traverser->traverse($nodes ?? []);
-        $actual = $detector->hasIoOperations();
+        $actual = $visitor->hasIoOperations();
 
         $this->assertSame($expected, $actual);
     }

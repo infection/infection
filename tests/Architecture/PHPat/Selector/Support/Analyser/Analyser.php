@@ -135,18 +135,18 @@ final class Analyser
                 ClassName::getShortClassName($classReflection->getName()),
             )
             : null;
-        $ioCodeDetector = IoCodeDetector::create();
+        $ioCodeDetectorVisitor = IoCodeDetectorVisitor::create();
 
         $this
             ->createTraverser(
                 $meaningfulImplementationVisitor,
-                $ioCodeDetector,
+                $ioCodeDetectorVisitor,
             )
             ->traverse($nodes);
 
         return new AnalysisResult(
             hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),
-            usesIo: $ioCodeDetector->hasIoOperations(),
+            usesIo: $ioCodeDetectorVisitor->hasIoOperations(),
             isAConcretePHPUnitTestCase: PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection),
             hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
             belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
