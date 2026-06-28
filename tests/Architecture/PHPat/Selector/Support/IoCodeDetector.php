@@ -75,7 +75,7 @@ final class IoCodeDetector
         );
 
         if (count($coveredSymbols) === 0) {
-            return true;
+            return false;
         }
 
         foreach ($coveredSymbols as $coveredSymbol) {

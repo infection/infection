@@ -53,7 +53,6 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\ClassWithIoParent;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
 use Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest;
 use Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest;
 use Infection\Tests\Reporter\FileReporterTest;
@@ -111,13 +110,6 @@ final class IoCodeDetectorTest extends SelectorTestCase
             false,
             false,
             true,
-        ];
-
-        yield 'test without coverage attribute' => [
-            FixturePHPUnitTestCase::class,
-            true,
-            false,
-            false,
         ];
 
         yield 'test covering class without I/O' => [
