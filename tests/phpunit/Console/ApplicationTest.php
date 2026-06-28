@@ -41,7 +41,6 @@ use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -71,16 +70,15 @@ final class ApplicationTest extends TestCase
     #[DataProvider('provideNonCommandArguments')]
     public function test_it_routes_to_run_command_when_first_argument_is_not_a_known_command(string $argument): void
     {
+        $command = $this->createRunCommandSpy();
+
         $application = new Application(SingletonContainer::getContainer());
         $application->setAutoExit(false);
-        $application->setCatchExceptions(true);
+        $application->addCommands([$command]);
 
-        $output = new BufferedOutput();
-        $application->run(new StringInput($argument), $output);
+        $application->run(new StringInput($argument), new BufferedOutput());
 
-        $display = $output->fetch();
-
-        $this->assertStringNotContainsString(sprintf('Command "%s" is not defined', $argument), $display);
+        $this->assertTrue($command->wasExecuted);
     }
 
     public static function provideNonCommandArguments(): iterable
@@ -136,14 +134,17 @@ final class ApplicationTest extends TestCase
     }
 
     /**
-     * Replaces the real `run` command with a spy recording the interactivity of
-     * the input it ends up receiving.
+     * Replaces the real `run` command with a spy, so that routing can be asserted
+     * without actually executing a mutation run. It records whether it was reached
+     * and the interactivity of the input it ends up receiving.
      *
-     * @return Command&object{wasInteractive: bool|null}
+     * @return Command&object{wasExecuted: bool, wasInteractive: bool|null}
      */
     private function createRunCommandSpy(): Command
     {
         return new class extends Command {
+            public bool $wasExecuted = false;
+
             public ?bool $wasInteractive = null;
 
             protected function configure(): void
@@ -155,6 +156,7 @@ final class ApplicationTest extends TestCase
 
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
+                $this->wasExecuted = true;
                 $this->wasInteractive = $input->isInteractive();
 
                 return Command::SUCCESS;
