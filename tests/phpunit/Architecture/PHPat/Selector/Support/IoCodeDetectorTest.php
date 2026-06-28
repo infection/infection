@@ -71,7 +71,7 @@ final class IoCodeDetectorTest extends SelectorTestCase
     public function test_it_detects_whether_phpunit_tests_use_io(
         string $className,
         bool $expectedIsUsingIo,
-        bool $expectedHasCoveredClass,
+        bool $expectedIsCoveringCode,
         bool $expectedHasIntegrationGroup,
     ): void {
         $ioCodeDetector = new IoCodeDetector(
@@ -88,8 +88,8 @@ final class IoCodeDetectorTest extends SelectorTestCase
             $ioCodeDetector->isUsingIo($classReflection),
         );
         $this->assertSame(
-            $expectedHasCoveredClass,
-            $ioCodeDetector->hasCoveredClass($classReflection),
+            $expectedIsCoveringCode,
+            $ioCodeDetector->isCoveringCode($classReflection),
         );
         $this->assertSame(
             $expectedHasIntegrationGroup,
