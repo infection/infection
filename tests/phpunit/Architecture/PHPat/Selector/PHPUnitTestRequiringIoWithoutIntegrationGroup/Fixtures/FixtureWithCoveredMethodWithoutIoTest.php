@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-final class CoveredClassWithoutIo
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\TestCase;
+
+#[CoversMethod(CoveredClassWithoutIo::class, 'coveredMethod')]
+final class FixtureWithCoveredMethodWithoutIoTest extends TestCase
 {
-    /**
-     * @phpstan-ignore shipmonk.deadMethod
-     */
-    public function coveredMethod(): void
+    public function test_fixture(): void
     {
+        $this->expectNotToPerformAssertions();
     }
 }
