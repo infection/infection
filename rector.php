@@ -88,6 +88,7 @@ $skippedPaths = [
     __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
     __DIR__ . '/tests/benchmark/Tracing/coverage',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/CoveredClassWithoutIo.php',
 ];
 
 $config = RectorConfig::configure()

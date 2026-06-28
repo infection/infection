@@ -40,6 +40,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithIo;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithoutIo;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredFunctionTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredMethodWithoutIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithMultipleCoveredClassesTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
@@ -138,7 +140,7 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
         string $className,
         array $expected,
     ): void {
-        $actual = PHPUnitTestClassAnalysis::getCoveredClassNames(
+        $actual = PHPUnitTestClassAnalysis::getCoveredSymbols(
             $this->createClassReflection($className),
             $this->getReflectionProvider(),
         );
@@ -155,6 +157,13 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
             ],
         ];
 
+        yield 'covered method' => [
+            FixtureWithCoveredMethodWithoutIoTest::class,
+            [
+                CoveredClassWithoutIo::class,
+            ],
+        ];
+
         yield 'multiple covered classes' => [
             FixtureWithMultipleCoveredClassesTest::class,
             [
@@ -165,6 +174,11 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
 
         yield 'unsupported coverage attribute' => [
             FixtureWithCoversNothingWithoutIntegrationGroupTest::class,
+            [],
+        ];
+
+        yield 'covered function' => [
+            FixtureWithCoveredFunctionTest::class,
             [],
         ];
 
