@@ -36,23 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
 final class AdapterExtractionBoundariesTest
 {
-    public function testStaticAnalysisContractDoesNotDependOnConcreteStaticAnalysisAdapters(): Rule
-    {
-        return PHPat::rule()
-            ->classes(InfectionSelector::staticAnalysisContractCandidate())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::staticAnalysisAdapterCandidate())
-            ->because('The static analysis contract candidate must stay independent from concrete Mago and PHPStan adapters.');
-    }
-
-    public function testMagoAdapterOnlyDependsOnExtractionSurface(): Rule
+    public function testMagoAdapterStaysWithinFuturePackageBoundary(): Rule
     {
         return PHPat::rule()
             ->classes(InfectionSelector::magoAdapterCandidate())
@@ -60,15 +49,16 @@ final class AdapterExtractionBoundariesTest
             ->dependOn()
             ->classes(
                 InfectionSelector::magoAdapterCandidate(),
-                InfectionSelector::staticAnalysisContractCandidate(),
                 InfectionSelector::testFrameworkContractCandidate(),
-                InfectionSelector::adapterUtilityCandidate(),
+                InfectionSelector::adapterCommonCandidate(),
+                // Note that this is only true because adapters are not available
+                // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future Mago package should only depend on the static analysis contract, shared extraction utilities, and external packages.');
+            ->because('A future Mago package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, and external packages.');
     }
 
-    public function testPHPStanAdapterOnlyDependsOnExtractionSurface(): Rule
+    public function testPHPStanAdapterStaysWithinFuturePackageBoundary(): Rule
     {
         return PHPat::rule()
             ->classes(InfectionSelector::phpStanAdapterCandidate())
@@ -76,45 +66,31 @@ final class AdapterExtractionBoundariesTest
             ->dependOn()
             ->classes(
                 InfectionSelector::phpStanAdapterCandidate(),
-                InfectionSelector::staticAnalysisContractCandidate(),
                 InfectionSelector::testFrameworkContractCandidate(),
-                InfectionSelector::adapterUtilityCandidate(),
+                InfectionSelector::adapterCommonCandidate(),
+                // Note that this is only true because adapters are not available
+                // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future PHPStan package should only depend on the static analysis contract, shared extraction utilities, and external packages.');
+            ->because('A future PHPStan package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, and external packages.');
     }
 
-    public function testStaticAnalysisAdaptersDoNotDependOnEachOther(): Rule
-    {
-        return PHPat::rule()
-            ->classes(InfectionSelector::magoAdapterCandidate())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::phpStanAdapterCandidate())
-            ->because('Static analysis adapters must remain independently extractable.');
-    }
-
-    public function testPHPStanAdapterDoesNotDependOnMagoAdapter(): Rule
-    {
-        return PHPat::rule()
-            ->classes(InfectionSelector::phpStanAdapterCandidate())
-            ->shouldNot()
-            ->dependOn()
-            ->classes(InfectionSelector::magoAdapterCandidate())
-            ->because('Static analysis adapters must remain independently extractable.');
-    }
-
-    public function testTestFrameworkContractDoesNotDependOnPHPUnitAdapter(): Rule
+    public function testTestFrameworkContractsStayWithinFuturePackageBoundary(): Rule
     {
         return PHPat::rule()
             ->classes(InfectionSelector::testFrameworkContractCandidate())
-            ->shouldNot()
+            ->canOnly()
             ->dependOn()
-            ->classes(InfectionSelector::phpUnitAdapterCandidate())
-            ->because('The test framework contract candidate must stay independent from the concrete PHPUnit adapter.');
+            ->classes(
+                InfectionSelector::testFrameworkContractCandidate(),
+                // Note that this is only true because adapters are not available
+                // here, otherwise we would need to be stricter.
+                InfectionSelector::nonSourceCode(),
+            )
+            ->because('The future test framework contracts package should stay within its package boundary: the contracts themselves and external packages.');
     }
 
-    public function testPHPUnitAdapterOnlyDependsOnExtractionSurface(): Rule
+    public function testPHPUnitAdapterStaysWithinFuturePackageBoundary(): Rule
     {
         return PHPat::rule()
             ->classes(InfectionSelector::phpUnitAdapterCandidate())
@@ -123,10 +99,27 @@ final class AdapterExtractionBoundariesTest
             ->classes(
                 InfectionSelector::phpUnitAdapterCandidate(),
                 InfectionSelector::testFrameworkContractCandidate(),
-                InfectionSelector::adapterUtilityCandidate(),
-                Selector::inNamespace('Infection\AbstractTestFramework'),
+                InfectionSelector::adapterCommonCandidate(),
+                // Note that this is only true because adapters are not available
+                // here, otherwise we would need to be stricter.
                 InfectionSelector::nonSourceCode(),
             )
-            ->because('A future PHPUnit package should only depend on the test framework contract, shared extraction utilities, infection/abstract-testframework-adapter, and external packages.');
+            ->because('A future PHPUnit package should stay within its package boundary: the adapter itself, the test framework contracts, shared adapter utilities, infection/abstract-testframework-adapter, and external packages.');
+    }
+
+    public function testTestFrameworkCommonUtilitiesStayWithinFuturePackageBoundary(): Rule
+    {
+        return PHPat::rule()
+            ->classes(InfectionSelector::adapterCommonCandidate())
+            ->canOnly()
+            ->dependOn()
+            ->classes(
+                InfectionSelector::adapterCommonCandidate(),
+                InfectionSelector::testFrameworkContractCandidate(),
+                // Note that this is only true because adapters are not available
+                // here, otherwise we would need to be stricter.
+                InfectionSelector::nonSourceCode(),
+            )
+            ->because('A future test framework common package should stay within its package boundary: the common utilities themselves, the test framework contracts, and external packages.');
     }
 }
