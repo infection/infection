@@ -35,38 +35,69 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use function array_filter;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
 use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
-final readonly class Analyser
+final class Analyser
 {
+    /**
+     * @var array<string, AnalysisResult>
+     */
+    private array $analysisResultCache = [];
+
     public function __construct(
-        private Parser $parser,
-        private FileSystem $fileSystem,
+        private readonly Parser $parser,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
-    public function analyse(ClassReflection $classReflection): AnalysisResult
-    {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)) {
-            return new AnalysisResult(
+    public function analyse(
+        ClassReflection $classReflection,
+        bool $analyseNonConcreteClasses = false,
+    ): AnalysisResult {
+        $cacheKey = self::createAnalysisResultCacheKey(
+            $classReflection,
+            $analyseNonConcreteClasses,
+        );
+
+        if (isset($this->analysisResultCache[$cacheKey])) {
+            return $this->analysisResultCache[$cacheKey];
+        }
+
+        $isConcreteClass = ConcreteClassReflection::isConcreteClass($classReflection);
+
+        if (
+            !$isConcreteClass
+            && !$analyseNonConcreteClasses
+        ) {
+            return $this->analysisResultCache[$cacheKey] = new AnalysisResult(
                 hasTrivialImplementation: false,
+                usesIo: false,
+                isAConcretePHPUnitTestCase: false,
+                hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
+                belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
             );
         }
 
         $nodes = $this->parse($classReflection);
 
-        return $this->visit($classReflection, $nodes);
+        return $this->analysisResultCache[$cacheKey] = $this->visit(
+            $classReflection,
+            $nodes,
+        );
     }
 
     /**
@@ -99,22 +130,45 @@ final readonly class Analyser
         ClassReflection $classReflection,
         array $nodes,
     ): AnalysisResult {
-        $visitor = new DetectConcreteClassMeaningfulImplementationVisitor(
-            ClassName::getShortClassName($classReflection->getName()),
-        );
+        $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
+            ? new DetectConcreteClassMeaningfulImplementationVisitor(
+                ClassName::getShortClassName($classReflection->getName()),
+            )
+            : null;
+        $ioCodeDetectorVisitor = IoCodeDetectorVisitor::create();
 
-        $this->createTraverser($visitor)->traverse($nodes);
+        $this
+            ->createTraverser(
+                $meaningfulImplementationVisitor,
+                $ioCodeDetectorVisitor,
+            )
+            ->traverse($nodes);
 
         return new AnalysisResult(
-            hasTrivialImplementation: !$visitor->hasMeaningfulImplementation(),
+            hasTrivialImplementation: !($meaningfulImplementationVisitor?->hasMeaningfulImplementation() ?? true),
+            usesIo: $ioCodeDetectorVisitor->hasIoOperations(),
+            isAConcretePHPUnitTestCase: PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection),
+            hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
+            belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
         );
     }
 
-    private function createTraverser(DetectConcreteClassMeaningfulImplementationVisitor $visitor): NodeTraverserInterface
+    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
             new ParentConnectingVisitor(),
-            $visitor,
+            ...array_filter($visitors),
+        );
+    }
+
+    private static function createAnalysisResultCacheKey(
+        ClassReflection $classReflection,
+        bool $analyseNonConcreteClasses,
+    ): string {
+        return sprintf(
+            '%s-%s',
+            $classReflection->getName(),
+            $analyseNonConcreteClasses ? '1' : '0',
         );
     }
 }

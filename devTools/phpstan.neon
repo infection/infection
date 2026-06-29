@@ -43,6 +43,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\PHPUnitTestsWithCoversNothingShouldBelongToIntegrationGroupTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\PHPUnitTestsNotRequiringIoShouldNotBelongToIntegrationGroupTest
         tags:
             - phpat.test

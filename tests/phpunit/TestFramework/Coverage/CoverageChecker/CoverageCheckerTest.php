@@ -44,7 +44,6 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -59,7 +58,6 @@ use Symfony\Component\Filesystem\Path;
  * Requires some I/O operations
  */
 #[PreserveGlobalState(false)]
-#[Group('integration')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase

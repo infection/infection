@@ -35,14 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
 final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements SelectorInterface
 {
     public function __construct(
-        private PHPUnitTestIoRequirements $ioRequirements,
+        private IoCodeDetector $ioCodeDetector,
+        private Analyser $analyser,
     ) {
     }
 
@@ -53,9 +55,12 @@ final readonly class PHPUnitTestRequiringIoWithoutIntegrationGroup implements Se
 
     public function matches(ClassReflection $classReflection): bool
     {
+        $analysisResult = $this->analyser->analyse($classReflection);
+
         return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioRequirements->requiresIntegrationGroup($classReflection)
-            && !$this->ioRequirements->hasIntegrationGroup($classReflection);
+            && $analysisResult->isAConcretePHPUnitTestCase
+            && !$analysisResult->hasCoversNothing
+            && $this->ioCodeDetector->isUsingIo($classReflection)
+            && !$analysisResult->belongsToIntegrationGroup;
     }
 }

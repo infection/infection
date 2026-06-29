@@ -42,14 +42,12 @@ use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-#[Group('integration')]
 #[CoversClass(PHPStanAdapter::class)]
 final class PHPStanAdapterTest extends TestCase
 {

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup;
 
 use Infection\FileSystem\FileSystem;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest;
@@ -43,7 +44,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -60,8 +62,11 @@ final class PHPUnitTestNotRequiringIoWithIntegrationGroupTest extends SelectorTe
         bool $expected,
     ): void {
         $selector = new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            new PHPUnitTestIoRequirements(
-                new FileSystem(),
+            new IoCodeDetector(
+                new Analyser(
+                    SingletonContainer::getContainer()->getParser(),
+                    new FileSystem(),
+                ),
                 $this->getReflectionProvider(),
             ),
         );

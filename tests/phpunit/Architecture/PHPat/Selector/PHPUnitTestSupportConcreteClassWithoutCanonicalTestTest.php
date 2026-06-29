@@ -49,6 +49,7 @@ use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use Infection\Tests\Process\Exception\GenericProcessException;
 use Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit09Provider;
+use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
 use Infection\Tests\TestFramework\Tracing\Tracer\CodeceptionProvider;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
@@ -99,6 +100,11 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends Sele
 
         yield 'test support class with empty implementation' => [
             GenericProcessException::class,
+            false,
+        ];
+
+        yield 'test support fake with unsupported method implementations' => [
+            FakeTrace::class,
             false,
         ];
 

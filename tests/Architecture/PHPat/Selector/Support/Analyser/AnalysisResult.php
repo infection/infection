@@ -39,6 +39,10 @@ final readonly class AnalysisResult
 {
     public function __construct(
         public bool $hasTrivialImplementation,
+        public bool $usesIo,
+        public bool $isAConcretePHPUnitTestCase,
+        public bool $hasCoversNothing,
+        public bool $belongsToIntegrationGroup,
     ) {
     }
 }

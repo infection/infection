@@ -45,8 +45,6 @@ use Symfony\Component\Finder\Finder;
 
 final class PHPatArchitectureResultCacheMetaExtension implements ResultCacheMetaExtension
 {
-    private const string IO_CODE_DETECTOR_FILE = __DIR__ . '/../../../phpunit/AutoReview/IntegrationGroup/IoCodeDetector.php';
-
     private const string SELECTOR_DIRECTORY = __DIR__ . '/../../PHPat/Selector';
 
     public function getKey(): string
@@ -62,8 +60,7 @@ final class PHPatArchitectureResultCacheMetaExtension implements ResultCacheMeta
             ->files()
             ->name('*.php')
             ->in(self::SELECTOR_DIRECTORY)
-            ->sortByName()
-            ->append([self::IO_CODE_DETECTOR_FILE]);
+            ->sortByName();
 
         foreach ($selectorFiles as $selectorFile) {
             $filePath = $selectorFile->getPathname();

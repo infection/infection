@@ -43,8 +43,7 @@ use Infection\TestFramework\VersionParser;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
-use PHPat\Selector\ClassImplements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ReflectionProvider;
@@ -56,16 +55,18 @@ final class InfectionSelector
 
     private static ?EventArchitecture $eventArchitecture = null;
 
-    private static ?PHPUnitTestIoRequirements $phpUnitTestIoRequirements = null;
+    private static ?Analyser $analyser = null;
 
-    private static ?ReflectionProvider $phpUnitTestIoRequirementsReflectionProvider = null;
+    private static ?IoCodeDetector $ioCodeDetector = null;
 
-    public static function code(): InfectionCode
+    private static ?ReflectionProvider $ioCodeDetectorReflectionProvider = null;
+
+    public static function code(): SelectorInterface
     {
         return new InfectionCode();
     }
 
-    public static function sourceCode(): InfectionSourceCode
+    public static function sourceCode(): SelectorInterface
     {
         return new InfectionSourceCode();
     }
@@ -75,7 +76,7 @@ final class InfectionSelector
         return Selector::Not(self::sourceCode());
     }
 
-    public static function testCode(): InfectionTestCode
+    public static function testCode(): SelectorInterface
     {
         return new InfectionTestCode();
     }
@@ -154,98 +155,116 @@ final class InfectionSelector
         );
     }
 
+    public static function phpUnitTestsWithCoversNothing(): SelectorInterface
+    {
+        return new PHPUnitTestWithCoversNothing(self::analyser());
+    }
+
+    public static function integrationPhpUnitTests(): SelectorInterface
+    {
+        return new IntegrationPHPUnitTest(self::analyser());
+    }
+
     public static function selectorFixtures(): SelectorInterface
     {
         return Selector::withFilepath('#/tests/phpunit/Architecture/PHPat/Selector/.+?/Fixture(s)?#', true);
     }
 
-    public static function extensionPoint(): ExtensionPoint
+    public static function extensionPoint(): SelectorInterface
     {
         return new ExtensionPoint();
     }
 
-    public static function sourceConcreteClassWithoutCanonicalTest(): SourceConcreteClassWithoutCanonicalTest
+    public static function sourceConcreteClassWithoutCanonicalTest(): SelectorInterface
     {
         return new SourceConcreteClassWithoutCanonicalTest();
     }
 
-    public static function phpunitTestSupportConcreteClassWithoutCanonicalTest(): PHPUnitTestSupportConcreteClassWithoutCanonicalTest
+    public static function phpunitTestSupportConcreteClassWithoutCanonicalTest(): SelectorInterface
     {
         return new PHPUnitTestSupportConcreteClassWithoutCanonicalTest();
     }
 
-    public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestRequiringIoWithoutIntegrationGroup
+    public static function phpunitTestRequiringIoWithoutIntegrationGroup(ReflectionProvider $reflectionProvider): SelectorInterface
     {
-        return new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            self::phpUnitTestIoRequirements($reflectionProvider),
+        return Selector::AllOf(
+            new PHPUnitTestRequiringIoWithoutIntegrationGroup(
+                self::getIoCodeDetector($reflectionProvider),
+                self::analyser(),
+            ),
+            Selector::Not(self::autoreviewTestCode()),
         );
     }
 
-    public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): PHPUnitTestNotRequiringIoWithIntegrationGroup
+    public static function phpunitTestNotRequiringIoWithIntegrationGroup(ReflectionProvider $reflectionProvider): SelectorInterface
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
-            self::phpUnitTestIoRequirements($reflectionProvider),
+            self::getIoCodeDetector($reflectionProvider),
         );
     }
 
-    public static function concretePHPUnitTestClass(): ConcretePHPUnitTestClass
+    public static function autoreviewTestCode(): SelectorInterface
+    {
+        return Selector::AllOf(
+            Selector::AnyOf(
+                Selector::inNamespace('Infection\Tests\Architecture'),
+                Selector::inNamespace('Infection\Tests\AutoReview'),
+            ),
+            Selector::Not(self::selectorFixtures()),
+        );
+    }
+
+    public static function concretePHPUnitTestClass(): SelectorInterface
     {
         return new ConcretePHPUnitTestClass();
     }
 
-    public static function eventClassWithoutCorrespondingSingleEventSubscriber(): EventClassWithoutCorrespondingSingleEventSubscriber
+    public static function eventClassWithoutCorrespondingSingleEventSubscriber(): SelectorInterface
     {
         return new EventClassWithoutCorrespondingSingleEventSubscriber(self::eventArchitecture());
     }
 
-    public static function singleEventSubscriberWithoutCorrespondingEvent(): SingleEventSubscriberWithoutCorrespondingEvent
+    public static function singleEventSubscriberWithoutCorrespondingEvent(): SelectorInterface
     {
         return new SingleEventSubscriberWithoutCorrespondingEvent(self::eventArchitecture());
     }
 
-    public static function singleEventSubscriber(): SingleEventSubscriberSelector
+    public static function singleEventSubscriber(): SelectorInterface
     {
         return new SingleEventSubscriberSelector(self::eventArchitecture());
     }
 
-    public static function singleEventSubscriberWithoutExpectedMethod(): SingleEventSubscriberWithoutExpectedMethod
+    public static function singleEventSubscriberWithoutExpectedMethod(): SelectorInterface
     {
         return new SingleEventSubscriberWithoutExpectedMethod(self::eventArchitecture());
     }
 
-    public static function eventDirectoryClassWithoutExpectedShape(): EventDirectoryClassWithoutExpectedShape
+    public static function eventDirectoryClassWithoutExpectedShape(): SelectorInterface
     {
         return new EventDirectoryClassWithoutExpectedShape(self::eventArchitecture());
     }
 
-    public static function hasTrivialImplementation(): HasTrivialImplementation
+    public static function hasTrivialImplementation(): SelectorInterface
     {
-        $container = SingletonContainer::getContainer();
-
-        return new HasTrivialImplementation(
-            new Analyser(
-                $container->getParser(),
-                $container->getFileSystem(),
-            ),
-        );
+        return new HasTrivialImplementation(self::analyser());
     }
 
-    public static function hasDocBlock(): HasDocBlock
+    public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();
     }
 
-    public static function hasInternalDocBlock(): HasInternalDocBlock
+    public static function hasInternalDocBlock(): SelectorInterface
     {
         return new HasInternalDocBlock();
     }
 
-    public static function isAnonymousClass(): IsAnonymousClass
+    public static function isAnonymousClass(): SelectorInterface
     {
         return new IsAnonymousClass();
     }
 
-    public static function implementsAnyInterface(): ClassImplements
+    public static function implementsAnyInterface(): SelectorInterface
     {
         return Selector::implements('/.*/', true);
     }
@@ -255,23 +274,37 @@ final class InfectionSelector
         return self::$eventArchitecture ??= EventArchitecture::createDefault();
     }
 
-    private static function phpUnitTestIoRequirements(ReflectionProvider $reflectionProvider): PHPUnitTestIoRequirements
+    private static function analyser(): Analyser
     {
-        if (self::$phpUnitTestIoRequirements === null) {
-            self::$phpUnitTestIoRequirementsReflectionProvider = $reflectionProvider;
+        if (self::$analyser === null) {
+            $container = SingletonContainer::getContainer();
 
-            return self::$phpUnitTestIoRequirements = new PHPUnitTestIoRequirements(
-                SingletonContainer::getContainer()->getFileSystem(),
+            self::$analyser = new Analyser(
+                $container->getParser(),
+                $container->getFileSystem(),
+            );
+        }
+
+        return self::$analyser;
+    }
+
+    private static function getIoCodeDetector(ReflectionProvider $reflectionProvider): IoCodeDetector
+    {
+        if (self::$ioCodeDetector === null) {
+            self::$ioCodeDetectorReflectionProvider = $reflectionProvider;
+
+            return self::$ioCodeDetector = new IoCodeDetector(
+                self::analyser(),
                 $reflectionProvider,
             );
         }
 
         Assert::same(
-            self::$phpUnitTestIoRequirementsReflectionProvider,
+            self::$ioCodeDetectorReflectionProvider,
             $reflectionProvider,
-            'PHPUnit test IO requirements must be requested with the same reflection provider.',
+            'I/O code detector must be requested with the same reflection provider.',
         );
 
-        return self::$phpUnitTestIoRequirements;
+        return self::$ioCodeDetector;
     }
 }

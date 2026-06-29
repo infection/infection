@@ -37,9 +37,15 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\Benchmark\Instrumentor;
 use Infection\Engine;
+use Infection\Tests\Architecture\PHPat\ClassesShouldBeFinalTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestNotRequiringIoWithIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\CoveredClassWithIo;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithIntegrationGroupTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\PHPUnitTestRequiringIoWithoutIntegrationGroupTest;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeTest;
+use Infection\Tests\Logger\Console\BasicConsoleLoggerTest;
 use LogicException;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -73,6 +79,43 @@ final class InfectionSelectorTest extends SelectorTestCase
     /**
      * @param class-string $className
      */
+    #[DataProvider('autoreviewTestCodeClassProvider')]
+    public function test_it_matches_autoreview_test_code(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = InfectionSelector::autoreviewTestCode();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function autoreviewTestCodeClassProvider(): iterable
+    {
+        yield 'PHPat architecture test class' => [ClassesShouldBeFinalTest::class, true];
+
+        yield 'PHPat custom selector' => [InfectionSelector::class, true];
+
+        yield 'PHPat selector PHPUnit test' => [self::class, true];
+
+        yield 'PHPat selector fixture for PHPUnit tests' => [FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest::class, false];
+
+        yield 'AutoReview PHPunit test' => [ProjectCodeTest::class, true];
+
+        yield 'AutoReview source code' => [ProjectCodeProvider::class, true];
+
+        yield 'infection source class' => [Engine::class, false];
+
+        yield 'regular PHPUnit test class' => [BasicConsoleLoggerTest::class, false];
+
+        yield 'vendor class' => [TestCase::class, false];
+    }
+
+    /**
+     * @param class-string $className
+     */
     #[DataProvider('selectorFixturesClassProvider')]
     public function test_it_matches_selector_fixtures(
         string $className,
@@ -99,12 +142,66 @@ final class InfectionSelectorTest extends SelectorTestCase
         yield 'infection PHPUnit test class' => [self::class, false];
     }
 
-    public function test_it_rejects_different_reflection_providers_for_phpunit_test_io_requirements(): void
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('phpUnitTestsWithCoversNothingClassProvider')]
+    public function test_it_matches_phpunit_tests_with_covers_nothing(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = InfectionSelector::phpUnitTestsWithCoversNothing();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function phpUnitTestsWithCoversNothingClassProvider(): iterable
+    {
+        yield 'PHPUnit test with CoversNothing' => [FixtureWithCoversNothingWithIntegrationGroupTest::class, true];
+
+        yield 'PHPUnit test without CoversNothing' => [FixtureWithCoveredClassWithoutIoAndIntegrationGroupTest::class, false];
+
+        yield 'PHPat selector class' => [InfectionSelector::class, false];
+
+        yield 'vendor class' => [TestCase::class, false];
+    }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('integrationPhpUnitTestsClassProvider')]
+    public function test_it_matches_integration_phpunit_tests(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = InfectionSelector::integrationPhpUnitTests();
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function integrationPhpUnitTestsClassProvider(): iterable
+    {
+        yield 'PHPUnit test with integration group' => [FixtureWithCoversNothingWithIntegrationGroupTest::class, true];
+
+        yield 'PHPUnit test without integration group' => [FixtureWithCoversNothingWithoutIntegrationGroupTest::class, false];
+
+        yield 'PHPat selector class' => [InfectionSelector::class, false];
+
+        yield 'vendor class' => [TestCase::class, false];
+    }
+
+    public function test_it_rejects_different_reflection_providers_for_io_code_detector(): void
     {
         InfectionSelector::phpunitTestRequiringIoWithoutIntegrationGroup($this->getReflectionProvider());
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('PHPUnit test IO requirements must be requested with the same reflection provider.');
+        $this->expectExceptionMessage('I/O code detector must be requested with the same reflection provider.');
 
         InfectionSelector::phpunitTestNotRequiringIoWithIntegrationGroup(
             $this->createStub(ReflectionProvider::class),
