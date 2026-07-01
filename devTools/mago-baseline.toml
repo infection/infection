@@ -4891,6 +4891,96 @@ message = "Function `test` is missing a return type hint."
 count = 1
 
 [[issues]]
+file = "tests/benchmark/AstProcessing/AstProcessingBench.php"
+code = "invalid-callable"
+message = "Expression of type `mixed` cannot be called as a function or method."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/AstProcessingBench.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(): int(0)|positive-int))."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but possibly received `array<array-key, mixed>|array<array-key, string>|string`."
+count = 2
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "invalid-callable"
+message = "Expression of type `mixed` cannot be called as a function or method."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #1 of `Infection\Benchmark\Instrumentor::profile`: expected `(closure(): (closure(): int(0)|positive-int))`, but provided type `(closure(): mixed)` is less specific.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\Benchmark\InstrumentorFactory::create`: expected `bool`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
+count = 2
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$maxNodeCount`."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "redundant-docblock-type"
+message = "Redundant docblock type for variable `$percentage`."
+count = 1
+
+[[issues]]
 file = "tests/benchmark/BlackfireInstrumentor.php"
 code = "invalid-callable"
 message = "Expression of type `mixed` cannot be called as a function or method."
