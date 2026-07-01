@@ -33,31 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
-
-final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
+trait CoveredTraitWithoutIo
 {
-    public function __construct(
-        private IoCodeDetector $ioCodeDetector,
-    ) {
-    }
-
-    public function getName(): string
-    {
-        return 'PHPUnit test not requiring I/O with integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioCodeDetector->isCoveringCode($classReflection)
-            && !$this->ioCodeDetector->isUsingIo($classReflection)
-            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
-    }
 }

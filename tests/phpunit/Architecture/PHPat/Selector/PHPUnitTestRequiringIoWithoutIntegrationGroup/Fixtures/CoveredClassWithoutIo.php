@@ -37,4 +37,10 @@ namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWith
 
 final class CoveredClassWithoutIo
 {
+    /**
+     * @phpstan-ignore shipmonk.deadMethod
+     */
+    public function coveredMethod(): void
+    {
+    }
 }

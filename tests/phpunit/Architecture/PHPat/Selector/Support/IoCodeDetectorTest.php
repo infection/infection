@@ -44,6 +44,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredFunctionTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredTraitWithoutIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
@@ -51,7 +53,6 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\ClassWithIoParent;
-use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\FixturePHPUnitTestCase;
 use Infection\Tests\Command\Debug\DumpAstCommand\DumpAstCommandTest;
 use Infection\Tests\FileSystem\Finder\StaticAnalysisToolExecutableFinderTest;
 use Infection\Tests\Reporter\FileReporterTest;
@@ -69,7 +70,7 @@ final class IoCodeDetectorTest extends SelectorTestCase
     public function test_it_detects_whether_phpunit_tests_use_io(
         string $className,
         bool $expectedIsUsingIo,
-        bool $expectedHasCoveredClass,
+        bool $expectedIsCoveringCode,
         bool $expectedHasIntegrationGroup,
     ): void {
         $ioCodeDetector = new IoCodeDetector(
@@ -86,8 +87,8 @@ final class IoCodeDetectorTest extends SelectorTestCase
             $ioCodeDetector->isUsingIo($classReflection),
         );
         $this->assertSame(
-            $expectedHasCoveredClass,
-            $ioCodeDetector->hasCoveredClass($classReflection),
+            $expectedIsCoveringCode,
+            $ioCodeDetector->isCoveringCode($classReflection),
         );
         $this->assertSame(
             $expectedHasIntegrationGroup,
@@ -99,29 +100,36 @@ final class IoCodeDetectorTest extends SelectorTestCase
     {
         yield 'test with CoversNothing without integration group' => [
             FixtureWithCoversNothingWithoutIntegrationGroupTest::class,
-            true,
+            false,
             false,
             false,
         ];
 
         yield 'test with CoversNothing with integration group' => [
             FixtureWithCoversNothingWithIntegrationGroupTest::class,
-            true,
-            false,
-            true,
-        ];
-
-        yield 'test without coverage attribute' => [
-            FixturePHPUnitTestCase::class,
-            true,
             false,
             false,
+            true,
         ];
 
         yield 'test covering class without I/O' => [
             FixtureWithCoveredClassWithoutIoTest::class,
             false,
             true,
+            false,
+        ];
+
+        yield 'test covering trait without I/O' => [
+            FixtureWithCoveredTraitWithoutIoTest::class,
+            false,
+            true,
+            false,
+        ];
+
+        yield 'test covering function' => [
+            FixtureWithCoveredFunctionTest::class,
+            false,
+            false,
             false,
         ];
 

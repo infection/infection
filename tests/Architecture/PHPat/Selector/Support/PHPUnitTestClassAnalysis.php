@@ -41,7 +41,9 @@ use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function str_ends_with;
@@ -79,7 +81,7 @@ final class PHPUnitTestClassAnalysis
     /**
      * @return list<class-string>
      */
-    public static function getCoveredClassNames(
+    public static function getCoveredSymbols(
         ClassReflection $testCaseReflection,
         ReflectionProvider $reflectionProvider,
     ): array {
@@ -90,7 +92,7 @@ final class PHPUnitTestClassAnalysis
                 continue;
             }
 
-            $coveredClassName = self::getCoveredClassName($attribute, $reflectionProvider);
+            $coveredClassName = self::getCoveredSymbol($attribute, $reflectionProvider);
 
             if ($coveredClassName !== null) {
                 $coveredClassNames[] = $coveredClassName;
@@ -116,26 +118,41 @@ final class PHPUnitTestClassAnalysis
     }
 
     /**
-     * TODO: eventually we should support functions, methods and traits too.
-     * @see CoversClass
-     *
      * @return class-string|null
      */
-    private static function getCoveredClassName(
+    private static function getCoveredSymbol(
         ReflectionAttribute $attribute,
         ReflectionProvider $reflectionProvider,
     ): ?string {
-        if ($attribute->getName() !== CoversClass::class) {
-            return null;
-        }
+        $symbol = match ($attribute->getName()) {
+            CoversClass::class,
+            CoversMethod::class => self::getStringArgument(
+                attribute: $attribute,
+                index: 0,
+                name: 'className',
+            ),
+            CoversTrait::class => self::getStringArgument(
+                attribute: $attribute,
+                index: 0,
+                name: 'traitName',
+            ),
+            default => null,
+        };
 
+        $symbolExists = $symbol !== null && $reflectionProvider->hasClass($symbol);
+
+        return $symbolExists ? $symbol : null;
+    }
+
+    private static function getStringArgument(
+        ReflectionAttribute $attribute,
+        int $index,
+        string $name,
+    ): ?string {
         $arguments = $attribute->getArguments();
-        $coveredClassName = $arguments[0] ?? $arguments['className'] ?? null;
+        $value = $arguments[$index] ?? $arguments[$name] ?? null;
 
-        $classNameExists = is_string($coveredClassName)
-            && $reflectionProvider->hasClass($coveredClassName);
-
-        return $classNameExists ? $coveredClassName : null;
+        return is_string($value) ? $value : null;
     }
 
     private static function isCoverageAttribute(ReflectionAttribute $attribute): bool
