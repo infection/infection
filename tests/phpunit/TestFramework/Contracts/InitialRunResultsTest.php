@@ -45,18 +45,26 @@ final class InitialRunResultsTest extends TestCase
 {
     public function test_it_accepts_unknown_memory_usage(): void
     {
-        $results = new InitialRunResults('output', null);
+        $expected = new InitialRunResults(
+            output: 'output',
+            memoryUsage: null,
+        );
 
-        $this->assertSame('output', $results->output);
-        $this->assertNull($results->memoryUsage);
+        $actual = new InitialRunResults('output', null);
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function test_it_accepts_positive_memory_usage(): void
     {
-        $results = new InitialRunResults('output', 10.0);
+        $expected = new InitialRunResults(
+            output: 'output',
+            memoryUsage: 10.0,
+        );
 
-        $this->assertSame('output', $results->output);
-        $this->assertSame(10.0, $results->memoryUsage);
+        $actual = new InitialRunResults('output', 10.0);
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function test_it_rejects_negative_memory_usage(): void

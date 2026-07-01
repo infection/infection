@@ -42,7 +42,7 @@ use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 
 /**
  * A test framework is the tool that will be used to evaluate mutations to check if they are
- * covered or escaped.
+ * covered.
  *
  * It can be a standard test framework such as PHPUnit, PhpSpec, a static analyser like PHPStan
  * or Psalm or something else entirely!
@@ -51,6 +51,9 @@ use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
  */
 interface TestFramework
 {
+    /**
+     * Name of the test framework, e.g. "PHPUnit" or "PHPStan".
+     */
     public function getName(): string;
 
     /**
@@ -75,8 +78,8 @@ interface TestFramework
     /**
      * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
      * Psalm, or it requires to launch a process in which case the process execution is
-     * delegated to an orchestrator. How the result of the process is interpreted is
-     * encapsulated by a process.
+     * delegated to an orchestrator. A process encapsulates how the result of the process
+     * is interpreted.
      */
     public function test(Mutant $mutant): MutantProcessContainer;
 }

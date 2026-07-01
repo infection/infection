@@ -137,6 +137,11 @@ final readonly class Engine
         return $this->testFramework->executeInitialRun();
     }
 
+    /**
+     * This is needed for 2 purposes:
+     * 1. To warm up SA tool's cache
+     * 2. To make sure SA passes before using it inside Infection to kill Mutants
+     */
     private function runInitialStaticAnalysis(): void
     {
         if (!$this->config->isStaticAnalysisEnabled()) {
@@ -146,6 +151,12 @@ final readonly class Engine
         Assert::notNull($this->initialStaticAnalysisRunner);
         Assert::notNull($this->staticAnalysisToolAdapter);
 
+        //        if ($this->config->shouldSkipInitialTests()) {
+        //            $this->consoleOutput->logSkippingInitialTests();
+        //            $this->coverageChecker->checkCoverageExists();
+        //
+        //            return;
+        //        }
         $initialStaticAnalysisProcess = $this->initialStaticAnalysisRunner->run();
 
         if (!$initialStaticAnalysisProcess->isSuccessful()) {
@@ -154,6 +165,12 @@ final readonly class Engine
                 $this->staticAnalysisToolAdapter->getName(),
             );
         }
+
+        // todo [phpstan-integration] check cache has been generated
+        //        $this->coverageChecker->checkCoverageHasBeenGenerated(
+        //            $initialTestSuiteProcess->getCommandLine(),
+        //            $initialTestSuiteProcess->getOutput(),
+        //        );
     }
 
     /**

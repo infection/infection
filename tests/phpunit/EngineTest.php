@@ -56,6 +56,7 @@ use Infection\TestFramework\Contracts\TestFramework;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Process\Process;
@@ -77,7 +78,7 @@ final class EngineTest extends TestCase
 
     private MockObject&MaxTimeoutsChecker $maxTimeoutsChecker;
 
-    private \PHPUnit\Framework\MockObject\Stub&ConsoleOutput $consoleOutput;
+    private Stub&ConsoleOutput $consoleOutput;
 
     private MockObject&MetricsCalculator $metricsCalculator;
 
@@ -403,21 +404,21 @@ final class EngineTest extends TestCase
         ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ): Engine {
         return new Engine(
-            $config ?? ConfigurationBuilder::withMinimalTestData()
+            config: $config ?? ConfigurationBuilder::withMinimalTestData()
                 ->withSkipInitialTests(false)
                 ->withUncovered(true)
                 ->build(),
-            $this->testFramework,
-            $this->eventDispatcher,
-            $this->memoryLimiter,
-            $this->mutationGenerator,
-            $this->mutationTestingRunner,
-            $this->minMsiChecker,
-            $this->maxTimeoutsChecker,
-            $this->consoleOutput,
-            $this->metricsCalculator,
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
+            testFramework: $this->testFramework,
+            eventDispatcher: $this->eventDispatcher,
+            memoryLimiter: $this->memoryLimiter,
+            mutationGenerator: $this->mutationGenerator,
+            mutationTestingRunner: $this->mutationTestingRunner,
+            minMsiChecker: $this->minMsiChecker,
+            maxTimeoutsChecker: $this->maxTimeoutsChecker,
+            consoleOutput: $this->consoleOutput,
+            metricsCalculator: $this->metricsCalculator,
+            initialStaticAnalysisRunner: $initialStaticAnalysisRunner,
+            staticAnalysisToolAdapter: $staticAnalysisToolAdapter,
         );
     }
 }

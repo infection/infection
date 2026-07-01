@@ -75,7 +75,7 @@ final class MutationTestingRunnerTest extends TestCase
 {
     private const float TIMEOUT = 100.0;
 
-    private MockObject&TestFramework $testFramework;
+    private MockObject&TestFramework $testFrameworkMock;
 
     private MockObject&MutantFactory $mutantFactoryMock;
 
@@ -91,7 +91,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->testFramework = $this->createMock(TestFramework::class);
+        $this->testFrameworkMock = $this->createMock(TestFramework::class);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
@@ -99,7 +99,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->diffSourceCodeMatcher = $this->createMock(DiffSourceCodeMatcher::class);
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -176,7 +176,7 @@ final class MutationTestingRunnerTest extends TestCase
             ))
         ;
 
-        $this->testFramework
+        $this->testFrameworkMock
             ->method('test')
             ->with(...WithConsecutive::create(
                 [$mutant0],
@@ -254,7 +254,7 @@ final class MutationTestingRunnerTest extends TestCase
             ))
         ;
 
-        $this->testFramework
+        $this->testFrameworkMock
             ->method('test')
             ->with(...WithConsecutive::create(
                 [$mutant0],
@@ -272,7 +272,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -335,7 +335,7 @@ final class MutationTestingRunnerTest extends TestCase
             ))
         ;
 
-        $this->testFramework
+        $this->testFrameworkMock
             ->method('test')
             ->with(...WithConsecutive::create(
                 [$mutant0],
@@ -354,7 +354,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -404,7 +404,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        $this->testFramework
+        $this->testFrameworkMock
             ->expects($this->never())
             ->method($this->anything())
         ;
@@ -416,7 +416,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -468,7 +468,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        $this->testFramework
+        $this->testFrameworkMock
             ->expects($this->never())
             ->method($this->anything())
         ;
@@ -480,7 +480,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -513,7 +513,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->willReturn(false);
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -548,7 +548,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->method($this->anything())
         ;
 
-        $this->testFramework
+        $this->testFrameworkMock
             ->expects($this->never())
             ->method($this->anything())
         ;
@@ -560,7 +560,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->runner = new MutationTestingRunner(
-            $this->testFramework,
+            $this->testFrameworkMock,
             $this->mutantFactoryMock,
             $this->processRunnerMock,
             $this->eventDispatcher,
@@ -577,7 +577,7 @@ final class MutationTestingRunnerTest extends TestCase
     public function test_it_dispatches_events_even_when_no_mutations_is_given(): void
     {
         $mutations = [];
-        $this->testFramework
+        $this->testFrameworkMock
             ->expects($this->never())
             ->method($this->anything())
         ;

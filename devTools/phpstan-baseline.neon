@@ -820,6 +820,24 @@ parameters:
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
+			rawMessage: Property Infection\TestFramework\Contracts\InitialRunResults::$output is never read
+			identifier: shipmonk.deadProperty.neverRead
+			count: 1
+			path: ../src/TestFramework/Contracts/InitialRunResults.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Process\MutantProcessContainer
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1
