@@ -33,21 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-interface ProcessRunner
+#[CoversClass(InitialRunResults::class)]
+final class InitialRunResultsTest extends TestCase
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
+    public function test_it_accepts_unknown_memory_usage(): void
+    {
+        $results = new InitialRunResults(null);
 
-    public function stop(): void;
+        $this->assertNull($results->memoryUsage);
+    }
+
+    public function test_it_accepts_positive_memory_usage(): void
+    {
+        $results = new InitialRunResults(10.0);
+
+        $this->assertSame(10.0, $results->memoryUsage);
+    }
+
+    public function test_it_rejects_negative_memory_usage(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new InitialRunResults(-1.0);
+    }
 }

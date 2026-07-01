@@ -33,21 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-interface ProcessRunner
+final readonly class InitialRunResults
 {
     /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
+     * @param float|null $memoryUsage Memory usage in megabytes. Null if it cant be determined.
      */
-    public function run(iterable $processContainers): iterable;
-
-    public function stop(): void;
+    public function __construct(
+        public ?float $memoryUsage,
+    ) {
+        Assert::nullOrGreaterThan($memoryUsage, limit: 0);
+    }
 }

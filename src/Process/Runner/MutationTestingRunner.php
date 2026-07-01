@@ -47,10 +47,12 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Factory\MutantProcessContainerFactory;
-use Infection\Process\MutantProcessContainer;
+use Infection\Process\MutantProcess;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -62,7 +64,7 @@ class MutationTestingRunner
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly TestFramework $testFramework,
         private readonly MutantFactory $mutantFactory,
         private readonly ProcessRunner $processRunner,
         private readonly EventDispatcher $eventDispatcher,
@@ -78,7 +80,7 @@ class MutationTestingRunner
     /**
      * @param iterable<Mutation> $mutations
      */
-    public function run(iterable $mutations, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
@@ -93,7 +95,8 @@ class MutationTestingRunner
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
-            ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
+            ->tap($this->materializeMutant(...))
+            ->cast($this->testFramework->test(...))
         ;
 
         take($this->processRunner->run($processContainers))
@@ -176,15 +179,20 @@ class MutationTestingRunner
         return false;
     }
 
-    private function mutantToContainer(Mutant $mutant, string $testFrameworkExtraOptions): MutantProcessContainer
+    private function materializeMutant(Mutant $mutant): void
     {
-        $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
-
-        return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
+        $this->fileSystem->dumpFile(
+            $mutant->getFilePath(),
+            $mutant->getMutatedCode()->get(),
+        );
     }
 
-    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
+    private static function containerToFinishedEvent(MutantEvaluationPipe $container): MutantProcessWasFinished
     {
-        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
+        $mutantProcess = $container->getCurrent();
+
+        Assert::isInstanceOf($mutantProcess, MutantProcess::class);
+
+        return new MutantProcessWasFinished($mutantProcess->getMutantExecutionResult());
     }
 }

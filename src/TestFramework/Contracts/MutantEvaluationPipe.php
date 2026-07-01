@@ -33,21 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
-
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+namespace Infection\TestFramework\Contracts;
 
 /**
  * @internal
  */
-interface ProcessRunner
+interface MutantEvaluationPipe
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
+    public function getCurrent(): MutantProcess;
 
-    public function stop(): void;
+    public function hasNext(): bool;
+
+    public function createNext(): MutantProcess;
 }

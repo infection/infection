@@ -33,21 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
+use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 
 /**
+ * A test framework is the tool that will be used to evaluate mutations to check if they are
+ * covered or escaped.
+ *
+ * It can be a standard test framework such as PHPUnit, PhpSpec, a static analyser like PHPStan
+ * or Psalm or something else entirely!
+ *
  * @internal
  */
-interface ProcessRunner
+interface TestFramework
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
+    public function getName(): string;
 
-    public function stop(): void;
+    /**
+     * Checks that the version of the tool used is compatible with the adapter.
+     *
+     * Additionally, Some test frameworks may require artefacts to work with. For example, PHPUnit
+     * requires a code coverage report. PHPStan will require an up-to-date cache.
+     *
+     * @throws RequirementChecksFailed
+     */
+    public function checkRequirements(): void;
+
+    /**
+     * Initial test run. This allows tools like PHPUnit to ensure the tests are valid
+     * in the first place and generate the required code coverage or PHPStan to generate
+     * an up-to-date cache.
+     *
+     * @throws InitialTestsFailed
+     */
+    public function executeInitialRun(): InitialRunResults;
+
+    /**
+     * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
+     * Psalm, or it requires to launch a process in which case the process execution is
+     * delegated to an orchestrator. How the result of the process is interpreted is
+     * encapsulated by a process.
+     */
+    public function test(Mutant $mutant): MutantEvaluationPipe;
 }

@@ -33,21 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
  */
-interface ProcessRunner
+interface MutantProcess
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
+    public function getProcess(): Process;
 
-    public function stop(): void;
+    public function markAsTimedOut(): void;
+
+    public function markAsFinished(): void;
 }

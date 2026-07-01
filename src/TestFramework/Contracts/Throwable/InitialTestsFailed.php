@@ -33,21 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts\Throwable;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Throwable;
 
 /**
  * @internal
  */
-interface ProcessRunner
+interface InitialTestsFailed extends Throwable
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
-
-    public function stop(): void;
 }
