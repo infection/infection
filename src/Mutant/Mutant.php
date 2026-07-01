@@ -37,14 +37,13 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
-use Infection\TestFramework\Contracts\Mutant as TestFrameworkMutant;
 use Later\Interfaces\Deferred;
 
 /**
  * @internal
  * @final
  */
-class Mutant implements TestFrameworkMutant
+class Mutant
 {
     /**
      * @param Deferred<string> $mutatedCode

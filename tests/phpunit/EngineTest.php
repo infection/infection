@@ -120,7 +120,7 @@ final class EngineTest extends TestCase
 
     public function test_initial_test_run_succeeds(): void
     {
-        $initialRunResults = new InitialRunResults(10.0);
+        $initialRunResults = new InitialRunResults('testing', 10.0);
 
         $this->testFramework
             ->expects($this->once())
@@ -184,7 +184,7 @@ final class EngineTest extends TestCase
             ->withUncovered(true)
             ->build();
 
-        $initialRunResults = new InitialRunResults(20.0);
+        $initialRunResults = new InitialRunResults('test output', 20.0);
         $callOrder = [];
 
         $this->testFramework

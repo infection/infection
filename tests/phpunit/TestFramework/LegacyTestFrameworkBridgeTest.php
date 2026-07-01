@@ -98,6 +98,7 @@ final class LegacyTestFrameworkBridgeTest extends TestCase
             initialTestsRunner: $initialTestsRunner,
         )->executeInitialRun();
 
+        $this->assertSame('output', $results->output);
         $this->assertSame(42.0, $results->memoryUsage);
     }
 

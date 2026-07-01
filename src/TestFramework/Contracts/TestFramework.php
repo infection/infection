@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Infection\Mutant\Mutant;
+use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
 use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
 
@@ -76,5 +78,5 @@ interface TestFramework
      * delegated to an orchestrator. How the result of the process is interpreted is
      * encapsulated by a process.
      */
-    public function test(Mutant $mutant): MutantEvaluationPipe;
+    public function test(Mutant $mutant): MutantProcessContainer;
 }

@@ -78,7 +78,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory(new InitialRunResults(null));
+        $memoryLimiter->limitMemory(new InitialRunResults('', null));
     }
 
     public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void
@@ -87,7 +87,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory(new InitialRunResults(10.0));
+        $memoryLimiter->limitMemory(new InitialRunResults('', 10.0));
     }
 
     #[DataProvider('memoryLimitProvider')]
@@ -115,7 +115,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
 
-        $memoryLimiter->limitMemory(new InitialRunResults($memoryLimit));
+        $memoryLimiter->limitMemory(new InitialRunResults('foo', $memoryLimit));
     }
 
     public static function memoryLimitProvider(): iterable

@@ -45,15 +45,17 @@ final class InitialRunResultsTest extends TestCase
 {
     public function test_it_accepts_unknown_memory_usage(): void
     {
-        $results = new InitialRunResults(null);
+        $results = new InitialRunResults('output', null);
 
+        $this->assertSame('output', $results->output);
         $this->assertNull($results->memoryUsage);
     }
 
     public function test_it_accepts_positive_memory_usage(): void
     {
-        $results = new InitialRunResults(10.0);
+        $results = new InitialRunResults('output', 10.0);
 
+        $this->assertSame('output', $results->output);
         $this->assertSame(10.0, $results->memoryUsage);
     }
 
@@ -61,6 +63,6 @@ final class InitialRunResultsTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new InitialRunResults(-1.0);
+        new InitialRunResults('output', -1.0);
     }
 }

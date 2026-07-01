@@ -46,6 +46,7 @@ final readonly class InitialRunResults
      * @param float|null $memoryUsage Memory usage in megabytes. Null if it cant be determined.
      */
     public function __construct(
+        public string $output,
         public ?float $memoryUsage,
     ) {
         Assert::nullOrGreaterThan($memoryUsage, limit: 0);

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcessContainer;
 
 /**
  * @internal
@@ -44,7 +44,7 @@ final class IndexedMutantProcessContainer
 {
     public function __construct(
         public int $threadIndex,
-        public MutantEvaluationPipe $mutantProcessContainer,
+        public MutantProcessContainer $mutantProcessContainer,
     ) {
     }
 }

@@ -38,13 +38,12 @@ namespace Infection\Process;
 use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessContainer implements MutantEvaluationPipe
+class MutantProcessContainer
 {
     /**
      * @var list<MutantProcess>

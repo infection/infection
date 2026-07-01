@@ -737,11 +737,6 @@ final class Container extends DIContainer
         }
 
         $clone->offsetSet(
-            ConsoleOutput::class,
-            static fn (): ConsoleOutput => new ConsoleOutput($logger),
-        );
-
-        $clone->offsetSet(
             CiDetector::class,
             static fn (): CiDetector => $forceProgress ? new NullCiDetector() : new MemoizedCiDetector(),
         );

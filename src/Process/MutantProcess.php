@@ -38,7 +38,6 @@ namespace Infection\Process;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
-use Infection\TestFramework\Contracts\MutantProcess as TestFrameworkMutantProcess;
 use function microtime;
 use Symfony\Component\Process\Process;
 
@@ -46,7 +45,7 @@ use Symfony\Component\Process\Process;
  * @internal
  * @final
  */
-class MutantProcess implements TestFrameworkMutantProcess
+class MutantProcess
 {
     private bool $timedOut = false;
 

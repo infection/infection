@@ -47,12 +47,10 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\MutantProcess;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -187,12 +185,8 @@ class MutationTestingRunner
         );
     }
 
-    private static function containerToFinishedEvent(MutantEvaluationPipe $container): MutantProcessWasFinished
+    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
     {
-        $mutantProcess = $container->getCurrent();
-
-        Assert::isInstanceOf($mutantProcess, MutantProcess::class);
-
-        return new MutantProcessWasFinished($mutantProcess->getMutantExecutionResult());
+        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
     }
 }

@@ -40,16 +40,14 @@ use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
-use Infection\Mutant\Mutant as CoreMutant;
+use Infection\Mutant\Mutant;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\TestFramework\Contracts\InitialRunResults;
-use Infection\TestFramework\Contracts\Mutant;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -111,14 +109,13 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
             : null;
 
         return new InitialRunResults(
+            output: $output,
             memoryUsage: $memoryUsage === -1. ? null : $memoryUsage,
         );
     }
 
-    public function test(Mutant $mutant): MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantProcessContainer
     {
-        Assert::isInstanceOf($mutant, CoreMutant::class);
-
         return $this->processFactory->create(
             $mutant,
             $this->getFilteredExtraOptionsForMutant(),

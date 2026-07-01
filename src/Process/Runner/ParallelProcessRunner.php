@@ -39,7 +39,7 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcessContainer;
 use Iterator;
 use function max;
 use function range;
@@ -84,8 +84,8 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     * @return iterable<MutantEvaluationPipe>
+     * @param iterable<MutantProcessContainer> $processContainers
+     * @return iterable<MutantProcessContainer>
      */
     public function run(iterable $processContainers): iterable
     {
@@ -168,7 +168,7 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @return iterable<MutantEvaluationPipe>
+     * @return iterable<MutantProcessContainer>
      */
     private function tryToFreeNotRunningProcess(): iterable
     {
@@ -209,7 +209,7 @@ class ParallelProcessRunner implements ProcessRunner
         }
     }
 
-    private function startProcess(MutantEvaluationPipe $mutantProcessContainer, int $threadIndex): void
+    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
         $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
@@ -220,9 +220,9 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @param iterable<MutantEvaluationPipe> $input
+     * @param iterable<MutantProcessContainer> $input
      *
-     * @return Generator<MutantEvaluationPipe>
+     * @return Generator<MutantProcessContainer>
      */
     private static function toGenerator(iterable &$input): Generator
     {
