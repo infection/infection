@@ -168,12 +168,6 @@ parameters:
             message: '#::profile\(\) should return int but returns int.*\|null#'
             path: ../tests/benchmark/DummyInstrumentor.php
 
-        # This plugin does not seem to understand the PHPBench data providers
-        -
-            identifier: shipmonk.deadMethod
-            message: '#Unused .+Bench::provide*#'
-            path: ../tests/benchmark/*/*Bench.php
-
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod
@@ -183,12 +177,6 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Scenario.php
-
-        # PHPat test methods are invoked by the PHPStan container via the phpat.test tag,
-        # so shipmonk's dead-code detector cannot see the call sites.
-        -
-            identifier: shipmonk.deadMethod
-            path: ../tests/Architecture/PHPat/*
 
         # Test enum fixtures have cases that exist as test data, not all are used
         -
