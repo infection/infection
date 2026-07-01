@@ -6973,18 +6973,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Loc
 count = 1
 
 [[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "unused-parameter"
-message = "Parameter `$event` is never used."
-count = 6
-
-[[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "unused-parameter"
-message = "Parameter `$input` is never used."
-count = 6
-
-[[issues]]
 file = "tests/phpunit/Environment/BuildContextResolverTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideBlankOrEmptyString` is imprecise, equivalent to `iterable<mixed, mixed>`."
