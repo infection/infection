@@ -37,9 +37,8 @@ namespace Infection\Tests\Resource\Memory;
 
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -65,7 +64,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
         parent::setUp();
     }
 
-    public function test_it_does_nothing_when_adapter_is_not_memory_limit_aware(): void
+    public function test_it_does_nothing_when_initial_run_memory_usage_is_not_available(): void
     {
         $this->environmentMock
             ->expects($this->never())
@@ -77,11 +76,14 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->method('isUsingSystemIni')
         ;
 
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
+        $memoryLimiter = new MemoryLimiter(
+            $this->fileSystemMock,
+            'foo/bar',
+            $this->environmentMock,
+        );
 
         $memoryLimiter->limitMemory(
-            '',
-            $this->createStub(AbstractTestFrameworkAdapter::class),
+            new InitialRunResults(output: '', memoryUsage: null),
         );
     }
 
@@ -89,11 +91,14 @@ final class MemoryLimiterTest extends FileSystemTestCase
     {
         $this->configureEnvironmentToBeCalledOnce();
 
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
+        $memoryLimiter = new MemoryLimiter(
+            $this->fileSystemMock,
+            'foo/bar',
+            $this->environmentMock,
+        );
 
         $memoryLimiter->limitMemory(
-            '',
-            new FakeAwareAdapter(10),
+            new InitialRunResults(output: '', memoryUsage: 10.0),
         );
     }
 
@@ -120,24 +125,15 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $this->configureEnvironmentToBeCalledOnce();
 
-        $adapter = new FakeAwareAdapter($memoryLimit);
+        $memoryLimiter = new MemoryLimiter(
+            $this->fileSystemMock,
+            $filename,
+            $this->environmentMock,
+        );
 
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
-
-        $memoryLimiter->limitMemory('foo', $adapter);
-    }
-
-    public function test_it_does_nothing_when_the_adapter_cannot_detect_the_memory_used(): void
-    {
-        $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
-
-        $this->configureEnvironmentToBeCalledOnce();
-
-        $adapter = new FakeAwareAdapter(-1);
-
-        $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
-
-        $memoryLimiter->limitMemory('', $adapter);
+        $memoryLimiter->limitMemory(
+            new InitialRunResults(output: 'foo', memoryUsage: $memoryLimit),
+        );
     }
 
     public static function memoryLimitProvider(): iterable
@@ -145,18 +141,6 @@ final class MemoryLimiterTest extends FileSystemTestCase
         yield 'nominal' => [
             20.,
             40.,
-        ];
-
-        // This is a silly case. We do not care about it, it just to capture the current behaviour
-        yield 'negative' => [
-            -1.2,
-            -2.4,
-        ];
-
-        // This is a silly case. We do not care about it, it just to capture the current behaviour
-        yield 'no memory allowed' => [
-            0.,
-            0.,
         ];
     }
 

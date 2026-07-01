@@ -54,6 +54,10 @@ services:
         class: Infection\Tests\Architecture\PHPat\EventClassesShouldFollowConventionsTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\AdapterExtractionBoundariesTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan
