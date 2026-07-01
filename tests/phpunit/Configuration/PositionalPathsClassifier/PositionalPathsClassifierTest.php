@@ -105,7 +105,7 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'multiple test directories without trailing slashes' => [
             $baseScenario
                 ->withPaths(['tests/Unit/A', 'tests/Unit/B'])
-                ->withExistingDirectories(['/project/tests/Unit/A', '/project/tests/Unit/B'])
+                ->withExistingFiles(['/project/tests/Unit/A/Test.php', '/project/tests/Unit/B/Test.php'])
                 ->withExpected(new ClassifiedPaths([], ['tests/Unit/A', 'tests/Unit/B'])),
         ];
 
@@ -149,14 +149,14 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'capitalized Tests root directory' => [
             $baseScenario
                 ->withPaths(['Tests/'])
-                ->withExistingDirectories(['/project/Tests'])
+                ->withExistingFiles(['/project/Tests/Unit/FooTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['Tests/'])),
         ];
 
         yield 'capitalized Tests root directory without slash' => [
             $baseScenario
                 ->withPaths(['Tests'])
-                ->withExistingDirectories(['/project/Tests'])
+                ->withExistingFiles(['/project/Tests/Unit/FooTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['Tests'])),
         ];
 
@@ -200,14 +200,14 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'existing source directory path' => [
             $baseScenario
                 ->withPaths(['src/SubTree'])
-                ->withExistingDirectories(['/project/src/SubTree'])
+                ->withExistingFiles(['/project/src/SubTree/File.php'])
                 ->withExpected(new ClassifiedPaths(['src/SubTree'], [])),
         ];
 
         yield 'existing path outside source directories' => [
             $baseScenario
                 ->withPaths(['integration/SomeFolder'])
-                ->withExistingDirectories(['/project/integration/SomeFolder'])
+                ->withExistingFiles(['/project/integration/SomeFolder/File.php'])
                 ->withExpected(new ClassifiedPaths([], ['integration/SomeFolder'])),
         ];
 
@@ -226,7 +226,7 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'source directory path with trailing slash' => [
             $baseScenario
                 ->withPaths(['src/Service/'])
-                ->withExistingDirectories(['/project/src/Service'])
+                ->withExistingFiles(['/project/src/Service/Mailer.php'])
                 ->withExpected(new ClassifiedPaths(['src/Service/'], [])),
         ];
 
@@ -239,35 +239,35 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'test directory path with service segment' => [
             $baseScenario
                 ->withPaths(['tests/Unit/Service/'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['tests/Unit/Service/'])),
         ];
 
         yield 'test directory unit segment' => [
             $baseScenario
                 ->withPaths(['tests/Unit/'])
-                ->withExistingDirectories(['/project/tests/Unit'])
+                ->withExistingFiles(['/project/tests/Unit/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['tests/Unit/'])),
         ];
 
         yield 'multiple test directories with trailing slashes' => [
             $baseScenario
                 ->withPaths(['tests/Unit/', 'tests/Integration/'])
-                ->withExistingDirectories(['/project/tests/Unit', '/project/tests/Integration'])
+                ->withExistingFiles(['/project/tests/Unit/MailerTest.php', '/project/tests/Integration/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['tests/Unit/', 'tests/Integration/'])),
         ];
 
         yield 'test directory with trailing slash' => [
             $baseScenario
                 ->withPaths(['tests/'])
-                ->withExistingDirectories(['/project/tests'])
+                ->withExistingFiles(['/project/tests/Unit/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['tests/'])),
         ];
 
         yield 'test directory token without slash' => [
             $baseScenario
                 ->withPaths(['tests'])
-                ->withExistingDirectories(['/project/tests'])
+                ->withExistingFiles(['/project/tests/Unit/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['tests'])),
         ];
 
@@ -281,80 +281,77 @@ final class PositionalPathsClassifierTest extends TestCase
         yield 'capitalized Tests directory with slash' => [
             $baseScenario
                 ->withPaths(['Tests/Unit/'])
-                ->withExistingDirectories(['/project/Tests/Unit'])
+                ->withExistingFiles(['/project/Tests/Unit/FooTest.php'])
                 ->withExpected(new ClassifiedPaths([], ['Tests/Unit/'])),
         ];
 
         yield 'source file and test folder' => [
             $baseScenario
                 ->withPaths(['src/Service/Mailer.php', 'tests/Unit/Service/'])
-                ->withExistingFiles(['/project/src/Service/Mailer.php'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['src/Service/Mailer.php'], ['tests/Unit/Service/'])),
         ];
 
         yield 'source folder and test file' => [
             $baseScenario
                 ->withPaths(['src/Service/', 'tests/Unit/Service/MailerTest.php'])
-                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
-                ->withExistingDirectories(['/project/src/Service'])
+                ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['src/Service/'], ['tests/Unit/Service/MailerTest.php'])),
         ];
 
         yield 'source folder and test folder' => [
             $baseScenario
                 ->withPaths(['src/Service/', 'tests/Unit/Service/'])
-                ->withExistingDirectories(['/project/src/Service', '/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['src/Service/'], ['tests/Unit/Service/'])),
         ];
 
         yield 'symbolic php source and test folder' => [
             $baseScenario
                 ->withPaths(['Mailer.php', 'tests/Unit/Service/'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['Mailer.php'], ['tests/Unit/Service/'])),
         ];
 
         yield 'symbolic source and test folder' => [
             $baseScenario
                 ->withPaths(['Mailer', 'tests/Unit/Service/'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['Mailer'], ['tests/Unit/Service/'])),
         ];
 
         yield 'multiple symbolic sources and test folder' => [
             $baseScenario
                 ->withPaths(['Mailer', 'Plus_', 'tests/Unit/Service/'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['Mailer', 'Plus_'], ['tests/Unit/Service/'])),
         ];
 
         yield 'test folder and symbolic php source in reversed order' => [
             $baseScenario
                 ->withPaths(['tests/Unit/Service/', 'Mailer.php'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['Mailer.php'], ['tests/Unit/Service/'])),
         ];
 
         yield 'test folder and symbolic source in reversed order' => [
             $baseScenario
                 ->withPaths(['tests/Unit/Service/', 'Mailer'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['Mailer'], ['tests/Unit/Service/'])),
         ];
 
         yield 'test folder and multiple symbolic sources in reversed order' => [
             $baseScenario
                 ->withPaths(['tests/Unit/Service/', 'Mailer', 'Plus_'])
-                ->withExistingDirectories(['/project/tests/Unit/Service'])
+                ->withExistingFiles(['/project/tests/Unit/Service/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['Mailer', 'Plus_'], ['tests/Unit/Service/'])),
         ];
 
         yield 'multiple source files and multiple test directories' => [
             $baseScenario
                 ->withPaths(['src/Service/Mailer.php', 'src/Entity/Foobar.php', 'tests/Unit/Service/', 'tests/Integration/'])
-                ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/src/Entity/Foobar.php'])
-                ->withExistingDirectories(['/project/tests/Unit/Service', '/project/tests/Integration'])
+                ->withExistingFiles(['/project/src/Service/Mailer.php', '/project/src/Entity/Foobar.php', '/project/tests/Unit/Service/MailerTest.php', '/project/tests/Integration/MailerTest.php'])
                 ->withExpected(new ClassifiedPaths(['src/Service/Mailer.php', 'src/Entity/Foobar.php'], ['tests/Unit/Service/', 'tests/Integration/'])),
         ];
     }

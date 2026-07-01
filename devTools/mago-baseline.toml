@@ -7317,6 +7317,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_considers_parent_directories_of_dumped_files_readable`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/FileSystem/InMemoryFileSystemTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\FileSystem\InMemoryFileSystemTest::test_it_normalizes_directory_paths`.'
 count = 1
 

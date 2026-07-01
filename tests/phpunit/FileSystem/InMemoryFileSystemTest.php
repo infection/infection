@@ -84,6 +84,17 @@ final class InMemoryFileSystemTest extends TestCase
         $this->assertFalse($this->fileSystem->isReadableFile($directory));
     }
 
+    public function test_it_considers_parent_directories_of_dumped_files_readable(): void
+    {
+        $this->fileSystem->dumpFile('/path/to/file.php', 'content');
+
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path'));
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/to'));
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/to/'));
+        $this->assertTrue($this->fileSystem->isReadableDirectory('/path/../path/to'));
+        $this->assertFalse($this->fileSystem->isReadableDirectory('/path/to/file.php'));
+    }
+
     public function test_it_cannot_dump_a_file_where_a_directory_exists(): void
     {
         $this->fileSystem->mkdir('/path/to/directory');

@@ -37,10 +37,12 @@ namespace Infection\FileSystem;
 
 use function array_key_exists;
 use function array_keys;
+use function dirname;
 use DomainException;
 use function is_string;
 use Override;
 use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -58,6 +60,11 @@ final class InMemoryFileSystem extends FileSystem
     private array $files = [];
 
     /**
+     * @var array<string, string>
+     */
+    private array $canonicalFileNames = [];
+
+    /**
      * @var array<string, true>
      */
     private array $directories = [];
@@ -69,6 +76,7 @@ final class InMemoryFileSystem extends FileSystem
         $this->assertDirectoryDoesNotExist($filename);
 
         $this->files[$filename] = $content;
+        $this->canonicalFileNames[$filename] = Path::canonicalize($filename);
     }
 
     public function isReadable(string $filename): bool
@@ -91,7 +99,19 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function isReadableDirectory(string $filename): bool
     {
-        return array_key_exists(Path::canonicalize($filename), $this->directories);
+        $canonicalDirectory = Path::canonicalize($filename);
+
+        if (array_key_exists($canonicalDirectory, $this->directories)) {
+            return true;
+        }
+
+        foreach ($this->canonicalFileNames as $file) {
+            if (self::isParentDirectory($canonicalDirectory, $file)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     #[Override]
@@ -259,5 +279,13 @@ final class InMemoryFileSystem extends FileSystem
                 );
             }
         }
+    }
+
+    private static function isParentDirectory(string $directory, string $file): bool
+    {
+        $fileDirectory = dirname($file);
+
+        return $directory === $fileDirectory
+            || str_starts_with($fileDirectory, $directory . '/');
     }
 }
