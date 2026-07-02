@@ -33,48 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
-
-use Composer\Autoload\ClassLoader;
-use Infection\Composer\Composer;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
-final readonly class AdapterInstaller
+
+namespace Infection\Composer\Throwable;
+
+use RuntimeException;
+use function sprintf;
+
+final class IncompatibleComposerVersion extends RuntimeException
 {
-    public const array OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
-    ];
-
-    // 2 minutes
-    private const float TIMEOUT = 120.0;
-
-    public function __construct(
-        private Composer $composer,
-    ) {
-    }
-
-    // TODO: coudl enforce the string value to avoid the assert
-    public function install(string $adapterName): void
+    public static function create(string $version, string $constraints): self
     {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
-
-        $this->composer->requireDevPackage(self::OFFICIAL_ADAPTERS_MAP[$adapterName]);
-
-        $loader = new ClassLoader();
-
-        // TODO: should use the vendor-bin here
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
-
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
-        }
-
-        $loader->register(false);
+        return new self(
+            sprintf(
+                'The Composer version "%s" does not satisfy the constraint "%s".',
+                $version,
+                $constraints,
+            ),
+        );
     }
 }

@@ -33,48 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
-
-use Composer\Autoload\ClassLoader;
-use Infection\Composer\Composer;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
-final readonly class AdapterInstaller
+
+namespace Infection\Composer\Throwable;
+
+use function implode;
+use JetBrains\PhpStorm\Pure;
+use const PHP_EOL;
+use RuntimeException;
+use function sprintf;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+use Throwable;
+
+final class UndetectableComposerVersion extends RuntimeException
 {
-    public const array OFFICIAL_ADAPTERS_MAP = [
-        TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
-        TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
-        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
-    ];
-
-    // 2 minutes
-    private const float TIMEOUT = 120.0;
-
+    #[Pure]
     public function __construct(
-        private Composer $composer,
+        string $message,
+        public readonly ?Process $process = null,
+        int $code = 0,
+        ?Throwable $previous = null,
     ) {
+        parent::__construct($message, $code, $previous);
     }
 
-    // TODO: coudl enforce the string value to avoid the assert
-    public function install(string $adapterName): void
+    public static function forFailedProcess(Process $process): self
     {
-        Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
+        $previous = new ProcessFailedException($process);
 
-        $this->composer->requireDevPackage(self::OFFICIAL_ADAPTERS_MAP[$adapterName]);
+        return new self(
+            sprintf(
+                'Could not detect the Composer version: %s',
+                $previous->getMessage(),
+            ),
+            $process,
+            previous: $previous,
+        );
+    }
 
-        $loader = new ClassLoader();
-
-        // TODO: should use the vendor-bin here
-        /** @var array<string, string[]> $map */
-        $map = require 'vendor/composer/autoload_psr4.php';
-
-        foreach ($map as $namespace => $paths) {
-            $loader->setPsr4($namespace, $paths);
-        }
-
-        $loader->register(false);
+    public static function forOutput(Process $process, string $normalizedOutput): self
+    {
+        return new self(
+            implode(
+                PHP_EOL,
+                [
+                    'Could not determine the Composer version from the following output:',
+                    $normalizedOutput,
+                ],
+            ),
+            $process,
+        );
     }
 }

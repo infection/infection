@@ -37,8 +37,7 @@ namespace Infection\Tests\FileSystem\Finder;
 
 use function explode;
 use function getenv;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
+use Infection\Composer\Composer;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
@@ -74,7 +73,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     private Filesystem $fileSystem;
 
-    private MockObject $composerFinder;
+    private Composer&MockObject $composer;
 
     /**
      * Saves the current environment
@@ -96,9 +95,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->fileSystem = new Filesystem();
 
-        $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
-        $this->composerFinder->method('find')
-            ->willReturn(['/usr/bin/composer']);
+        $this->composer = $this->createMock(Composer::class);
+        $this->composer
+            ->method('getBinDir')
+            ->willReturn('vendor/bin');
     }
 
     protected function tearDown(): void
@@ -112,7 +112,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composer);
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -123,7 +123,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composer);
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -135,7 +135,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $path = getenv(self::$pathName);
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composer);
 
         if (OperatingSystem::isWindows()) {
             // The main script must be found from the .bat file
@@ -169,16 +169,19 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         chdir($this->tmp);
 
-        $composerBinDir = $this->createComposerExecutableFixture();
+        $composerBinDir = $this->createComposerBinDirFixture();
 
         $phpUnitPath = $this->createPhpUnitExecutableFixture($composerBinDir);
 
         putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder(
-            new ConcreteComposerExecutableFinder(),
-        );
+        $composer = $this->createMock(Composer::class);
+        $composer
+            ->method('getBinDir')
+            ->willReturn($composerBinDir);
+
+        $frameworkFinder = new TestFrameworkFinder($composer);
 
         $expected = Path::canonicalize($phpUnitPath);
         $actual = Path::canonicalize(
@@ -197,7 +200,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composer);
 
         if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
@@ -223,7 +226,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
+        $frameworkFinder = new TestFrameworkFinder($this->composer);
 
         $this->assertSame(
             Path::canonicalize($mock->getPackageScript()),
@@ -239,29 +242,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         yield 'project-bat' => ['setUpProjectBatchTest'];
     }
 
-    private function createComposerExecutableFixture(): string
+    private function createComposerBinDirFixture(): string
     {
         $composerBinDir = $this->tmp . '/composer-bin';
         mkdir($composerBinDir);
-
-        $this->fileSystem->dumpFile(
-            $this->tmp . '/composer.phar',
-            <<<'PHP'
-                #!/usr/bin/env php
-                <?php
-
-                if (($argv[1] ?? null) === 'config' && ($argv[2] ?? null) === 'bin-dir') {
-                    echo __DIR__ . '/composer-bin';
-
-                    exit(0);
-                }
-
-                fwrite(STDERR, 'Unexpected Composer command: ' . implode(' ', $argv));
-
-                exit(1);
-                PHP,
-        );
-        chmod($this->tmp . '/composer.phar', 0755);
 
         return $composerBinDir;
     }

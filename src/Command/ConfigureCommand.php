@@ -49,7 +49,6 @@ use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\IO;
-use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\InfectionVersion;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -156,7 +155,7 @@ final class ConfigureCommand extends BaseCommand
             $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
 
-        $phpUnitExecutableFinder = new TestFrameworkFinder($this->getApplication()->getContainer()->getComposerExecutableFinder());
+        $phpUnitExecutableFinder = $this->getApplication()->getContainer()->getTestFrameworkFinder();
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
