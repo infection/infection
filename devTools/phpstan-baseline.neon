@@ -568,6 +568,222 @@ parameters:
 			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
 
 		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\TestFramework\VersionParser
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\TestFramework\VersionParser
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 5
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\TestFramework\VersionParser
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\TestFramework\VersionParser
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 5
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
 			rawMessage: Unused Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory::create
 			identifier: shipmonk.deadMethod
 			count: 1
@@ -634,16 +850,100 @@ parameters:
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
 
 		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\AbstractTestFrameworkAdapter
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 6
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\InitialConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\MutationConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\ProvidesInitialRunOnlyOptions
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\VersionParser
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
 			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string}.'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\CommandLineBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\VersionParser
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
 			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder should not depend on Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder should not depend on Infection\Framework\ClassName
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder should not exist
@@ -658,10 +958,40 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
 
 		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\Config\InitialConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 4
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
 			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\Config\MutationConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 8
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not exist
@@ -674,6 +1004,18 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 21
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
 			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string, 2?: ''/phpunit''}.'
