@@ -160,7 +160,7 @@ parameters:
             identifier: missingType.iterableValue
             path: ../src/FileSystem/InMemoryFileSystem.php
 
-        # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
+        # PHPStan fails to detect that we have at least one loop hence the result cannot be null, because treatPhpDocTypesAsCertain: false
         -
             message: '#::profile\(\) should return int but returns int\|null#'
             path: ../tests/benchmark/BlackfireInstrumentor.php
@@ -252,12 +252,6 @@ parameters:
         -
             rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
             path: ../src/PhpParser/NodeDumper/NodeDumper.php
-
-        # False-positives
-        -
-            message: '#TeamCity::escapeValue\(\) should return non-empty-string#'
-            identifier: return.type
-            path: ../src/Logger/MutationAnalysis/TeamCity/TeamCity.php
 
         # Fallback copy of Symfony's StringInput tokenization for versions before
         # ArgvInput::getRawTokens(). The regex matches guarantee these offsets.
