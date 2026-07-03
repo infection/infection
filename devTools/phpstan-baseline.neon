@@ -763,6 +763,12 @@ parameters:
 			path: ../src/Testing/SingletonContainer.php
 
 		-
+			rawMessage: 'Path in require_once() __DIR__ . ''/sources/autoload.php'' is not a file or it does not exist.'
+			identifier: requireOnce.fileNotFound
+			count: 1
+			path: ../tests/benchmark/MutationGenerator/create-main.php
+
+		-
 			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1219,15 +1225,9 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
 
 		-
-			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<string, list<string>>|bool> given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
-
-		-
 			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<string, list<string>>|true> given.'
 			identifier: argument.type
-			count: 3
+			count: 4
 			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
 
 		-
