@@ -69,12 +69,21 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
-        ?string $version,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ?string $version = null,
     ) {
-        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version, $shellCommandLineExecutor);
+        parent::__construct(
+            $testFrameworkExecutable,
+            $initialConfigBuilder,
+            $mutationConfigBuilder,
+            $argumentsAndOptionsBuilder,
+            $shellCommandLineExecutor,
+            $versionParser,
+            $commandLineBuilder,
+            $version,
+        );
     }
 
     public function hasJUnitReport(): bool

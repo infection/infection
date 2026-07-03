@@ -72,7 +72,6 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             $timeout,
             $tmpDir,
             $staticAnalysisToolOptions,
-            null,
             $shellCommandLineExecutor,
         );
     }

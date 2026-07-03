@@ -52,10 +52,10 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         private readonly InitialConfigBuilder $initialConfigBuilder,
         private readonly MutationConfigBuilder $mutationConfigBuilder,
         private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
-        private ?string $version,
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ?string $version = null,
     ) {
     }
 

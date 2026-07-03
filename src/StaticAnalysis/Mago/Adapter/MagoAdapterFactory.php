@@ -69,8 +69,8 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
             new VersionParser(),
             $timeout,
             $staticAnalysisToolOptions,
-            null,
             $shellCommandLineExecutor,
+            null,
         );
     }
 }

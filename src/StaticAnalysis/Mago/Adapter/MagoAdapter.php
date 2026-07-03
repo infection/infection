@@ -67,8 +67,8 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
-        private ?string $version,
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ?string $version = null,
     ) {
     }
 

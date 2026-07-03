@@ -72,8 +72,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly float $timeout,
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
-        private ?string $version,
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ?string $version = null,
     ) {
     }
 

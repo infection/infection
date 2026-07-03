@@ -1641,10 +1641,10 @@ final class PhpUnitAdapterTest extends TestCase
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
             ),
+            $this->createStub(ShellCommandLineExecutor::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $version,
-            $this->createStub(ShellCommandLineExecutor::class),
         );
     }
 }

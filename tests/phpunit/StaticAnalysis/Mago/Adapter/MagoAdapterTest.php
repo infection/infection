@@ -72,8 +72,8 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             [],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
     }
 
@@ -108,8 +108,8 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             ['--sort'],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
 
         $this->commandLineBuilder
@@ -140,8 +140,8 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             ['--no-progress'],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
 
         $this->commandLineBuilder
@@ -173,8 +173,8 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             ['--no-stubs', '--baseline /path/to/baseline.toml'],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
 
         $this->commandLineBuilder
@@ -229,7 +229,6 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             [],
-            null,
             $shellCommandLineExecutor,
         );
 
@@ -257,8 +256,8 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             [],
-            $version,
             $this->shellCommandLineExecutor,
+            $version,
         );
 
         // This should not throw an exception
@@ -276,8 +275,8 @@ final class MagoAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             [],
-            $version,
             $this->shellCommandLineExecutor,
+            $version,
         );
 
         $this->expectException(RuntimeException::class);

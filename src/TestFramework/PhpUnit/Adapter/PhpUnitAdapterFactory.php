@@ -121,12 +121,11 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
             ),
+            $shellCommandLineExecutor,
             new VersionParser(),
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
-            null,
-            $shellCommandLineExecutor,
         );
     }
 

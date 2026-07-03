@@ -75,8 +75,8 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
     }
 
@@ -113,8 +113,8 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=1G'],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
 
         $this->commandLineBuilder
@@ -147,8 +147,8 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=-1', '--no-progress'],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
 
         $this->commandLineBuilder
@@ -183,8 +183,8 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=2G', '--level=max', '--no-progress'],
-            '9.0',
             $this->shellCommandLineExecutor,
+            '9.0',
         );
 
         $this->commandLineBuilder
@@ -242,7 +242,6 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
-            null,
             $shellCommandLineExecutor,
         );
 
@@ -272,8 +271,8 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=-1'],
-            $version,
             $this->shellCommandLineExecutor,
+            $version,
         );
 
         // This should not throw an exception
@@ -293,8 +292,8 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
-            $version,
             $this->shellCommandLineExecutor,
+            $version,
         );
 
         $this->expectException(RuntimeException::class);

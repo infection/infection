@@ -139,7 +139,8 @@ final class ConfigureCommand extends BaseCommand
             $this->abort();
         }
 
-        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
+        $container = $this->getApplication()->getContainer();
+        $fileSystem = $container->getFileSystem();
 
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
@@ -157,8 +158,8 @@ final class ConfigureCommand extends BaseCommand
         );
 
         $phpUnitExecutableFinder = new TestFrameworkFinder(
-            $this->getApplication()->getContainer()->getComposerExecutableFinder(),
-            $this->getApplication()->getContainer()->getShellCommandLineExecutor(),
+            $container->getComposerExecutableFinder(),
+            $container->getShellCommandLineExecutor(),
         );
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
