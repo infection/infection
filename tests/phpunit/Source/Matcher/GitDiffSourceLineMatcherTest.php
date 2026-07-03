@@ -39,12 +39,14 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(GitDiffSourceLineMatcher::class)]
 final class GitDiffSourceLineMatcherTest extends TestCase
 {

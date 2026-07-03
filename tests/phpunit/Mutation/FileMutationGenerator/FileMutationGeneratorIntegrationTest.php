@@ -46,9 +46,11 @@ use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorIntegrationTest extends TestCase
 {
@@ -57,13 +59,13 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
     public function test_it_generates_mutations_for_a_given_file(): void
     {
         $fileInfoMock = new MockSplFileInfo(realPath: self::FIXTURES_DIR . '/TwoAdditions.php');
-        $traceMock = $this->createTraceMock();
+        $traceStub = $this->createTraceStub();
 
         $tracerMock = $this->createMock(Tracer::class);
         $tracerMock
             ->method('trace')
             ->with($fileInfoMock)
-            ->willReturn($traceMock);
+            ->willReturn($traceStub);
 
         $mutators = [new Plus()];
 
@@ -96,10 +98,10 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
         );
     }
 
-    private function createTraceMock(): Trace
+    private function createTraceStub(): Trace
     {
-        $traceMock = $this->createMock(Trace::class);
-        $traceMock
+        $traceStub = $this->createStub(Trace::class);
+        $traceStub
             ->method('getAllTestsForMutation')
             ->willReturn([
                 new TestLocation(
@@ -109,6 +111,6 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
                 ),
             ]);
 
-        return $traceMock;
+        return $traceStub;
     }
 }

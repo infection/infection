@@ -39,6 +39,7 @@ use Infection\Differ\Differ;
 use Infection\Differ\Tokens;
 use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +55,7 @@ final class DifferTest extends TestCase
         $this->differ = SingletonContainer::getContainer()->getDiffer();
     }
 
-    #[DataProvider('diffProvider')]
+    #[DataProvider('diffStringProvider')]
     public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
         string $sourceA,
         string $sourceB,
@@ -81,6 +82,14 @@ final class DifferTest extends TestCase
         $actual = $this->differ->diffToArray($sourceA, $sourceB);
 
         $this->assertSame($expected, $actual);
+    }
+
+    public static function diffStringProvider(): iterable
+    {
+        yield from DataProviderFactory::takeArguments(
+            3,
+            self::diffProvider(),
+        );
     }
 
     public static function diffProvider(): iterable

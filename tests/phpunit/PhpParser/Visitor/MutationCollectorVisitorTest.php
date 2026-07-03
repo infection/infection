@@ -59,8 +59,8 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         $mutation3 = $this->createStub(Mutation::class);
         $mutation4 = $this->createStub(Mutation::class);
 
-        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
-        $nodeMutationGeneratorMock
+        $nodeMutationGeneratorStub = $this->createStub(NodeMutationGenerator::class);
+        $nodeMutationGeneratorStub
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
@@ -69,7 +69,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
         $this->traverse(
             self::parseCode(self::CODE)[0],
@@ -97,8 +97,8 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         $mutation3 = $this->createStub(Mutation::class);
         $mutation4 = $this->createStub(Mutation::class);
 
-        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
-        $nodeMutationGeneratorMock
+        $nodeMutationGeneratorStub = $this->createStub(NodeMutationGenerator::class);
+        $nodeMutationGeneratorStub
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
@@ -108,7 +108,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
         $this->traverse(
             self::parseCode(self::CODE)[0],

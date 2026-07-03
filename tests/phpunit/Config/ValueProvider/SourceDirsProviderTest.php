@@ -43,7 +43,7 @@ use LogicException;
 use const PHP_OS;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use function stripos;
 
 #[Group('integration')]
@@ -52,11 +52,11 @@ final class SourceDirsProviderTest extends BaseProviderTestCase
 {
     private SourceDirsProvider $provider;
 
-    private MockObject&SourceDirGuesser $sourceDirGuesser;
+    private Stub&SourceDirGuesser $sourceDirGuesser;
 
     protected function setUp(): void
     {
-        $this->sourceDirGuesser = $this->createMock(SourceDirGuesser::class);
+        $this->sourceDirGuesser = $this->createStub(SourceDirGuesser::class);
 
         $this->provider = new SourceDirsProvider(
             $this->createStub(ConsoleHelper::class),
