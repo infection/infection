@@ -86,4 +86,77 @@ final class RunCommandTest extends TestCase
             '--test-framework-extra-args' => '',
         ]);
     }
+
+    public function test_it_fails_when_positional_source_path_and_filter_option_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass source paths as positional arguments together with the "--filter" option. Use either form, not both.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['src/Engine.php'],
+            '--filter' => 'src/Engine.php',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_test_path_and_test_framework_extra_args_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['tests/phpunit/EngineTest.php'],
+            '--test-framework-extra-args' => 'tests/phpunit/EngineTest.php',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_source_path_and_git_diff_filter_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass positional paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['src/Engine.php'],
+            '--git-diff-filter' => 'AM',
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_path_does_not_exist_on_disk(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid path argument "src/DefinitelyDoesNotExist.php": multiple paths must be passed as separate arguments.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['src/DefinitelyDoesNotExist.php'],
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_argument_is_an_fqcn(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['\App\Foo'],
+        ]);
+    }
 }

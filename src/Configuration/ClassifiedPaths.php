@@ -33,31 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Configuration;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
-
-final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
+/**
+ * Result of positional path classification: source paths (equivalent to --filter)
+ * and test paths (equivalent to --test-framework-extra-args, space-joined).
+ *
+ * @internal
+ */
+final readonly class ClassifiedPaths
 {
     public function __construct(
-        private IoCodeDetector $ioCodeDetector,
+        /** @var list<non-empty-string> */
+        public array $sourcePaths,
+        /** @var list<non-empty-string> */
+        public array $testPaths,
     ) {
-    }
-
-    public function getName(): string
-    {
-        return 'PHPUnit test not requiring I/O with integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioCodeDetector->isCoveringCode($classReflection)
-            && !$this->ioCodeDetector->isUsingIo($classReflection)
-            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
     }
 }

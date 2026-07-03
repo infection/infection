@@ -42,6 +42,8 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithFileSystemIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredClassWithoutIoTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredFunctionTest;
+use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoveredTraitWithoutIoTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithCoversNothingWithoutIntegrationGroupTest;
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithIoInTestCaseTest;
@@ -49,7 +51,7 @@ use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutInt
 use Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures\FixtureWithSymfonyFileSystemInTestCaseTest;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestIoRequirements;
+use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use Infection\Tests\Command\CommandOptionTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -73,7 +75,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 $analyser,
                 $this->getReflectionProvider(),
             ),
@@ -101,6 +103,16 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
 
         yield 'test covering class without I/O' => [
             FixtureWithCoveredClassWithoutIoTest::class,
+            false,
+        ];
+
+        yield 'test covering trait without I/O' => [
+            FixtureWithCoveredTraitWithoutIoTest::class,
+            false,
+        ];
+
+        yield 'test covering function' => [
+            FixtureWithCoveredFunctionTest::class,
             false,
         ];
 
@@ -159,7 +171,7 @@ final class PHPUnitTestRequiringIoWithoutIntegrationGroupTest extends SelectorTe
         );
 
         $selector = new PHPUnitTestRequiringIoWithoutIntegrationGroup(
-            new PHPUnitTestIoRequirements(
+            new IoCodeDetector(
                 $analyser,
                 $this->getReflectionProvider(),
             ),

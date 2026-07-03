@@ -54,6 +54,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
@@ -67,6 +68,7 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
 use function is_numeric;
 use function ltrim;
 use function max;
@@ -101,6 +103,7 @@ class ConfigurationFactory
         private readonly Git $git,
         private readonly ProjectDirectoryProvider $projectDirectoryProvider,
         private readonly CpuCoresCountProvider $cpuCoresCountProvider,
+        private readonly PositionalPathsClassifier $positionalPathsClassifier,
     ) {
     }
 
@@ -132,7 +135,7 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
         ?int $threadCount,
         string|int|null $dotsPerRow,
         bool $dryRun,
@@ -170,7 +173,11 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
+        [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
+            $sourceFilter,
+            $schema,
+            $testFrameworkExtraArgs,
+        );
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
@@ -400,17 +407,60 @@ class ConfigurationFactory
         return $map;
     }
 
+    /**
+     * @return array{0: PlainFilter|null, 1: string|null}
+     */
+    private function resolvePositionalPathsFilter(
+        PositionalPathsFilter $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        $classified = $this->positionalPathsClassifier->classify(
+            $sourceFilter->paths,
+            $schema,
+        );
+
+        $resolvedFilter = $classified->sourcePaths !== []
+            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
+            : null;
+
+        if ($classified->testPaths !== []) {
+            if ($testFrameworkExtraArgs !== null) {
+                throw new InvalidArgumentException(
+                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                );
+            }
+
+            $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
+        }
+
+        return [$resolvedFilter, $testFrameworkExtraArgs];
+    }
+
+    /**
+     * @return array{0: SourceFilter|null, 1: string|null}
+     */
     private function refineFilterIfNecessary(
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
-    ): ?SourceFilter {
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        if ($sourceFilter instanceof PositionalPathsFilter) {
+            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+                $sourceFilter,
+                $schema,
+                $testFrameworkExtraArgs,
+            );
+        }
+
         if ($sourceFilter instanceof IncompleteGitDiffFilter) {
-            return new GitDiffFilter(
+            $sourceFilter = new GitDiffFilter(
                 $sourceFilter->value,
                 self::refineGitBase($sourceFilter->base),
             );
         }
 
-        return $sourceFilter;
+        return [$sourceFilter, $testFrameworkExtraArgs];
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs

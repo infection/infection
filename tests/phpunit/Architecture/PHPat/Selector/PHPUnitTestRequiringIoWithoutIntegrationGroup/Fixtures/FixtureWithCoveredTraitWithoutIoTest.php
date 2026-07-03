@@ -33,31 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestRequiringIoWithoutIntegrationGroup\Fixtures;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\TestCase;
 
-final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
+#[CoversTrait(CoveredTraitWithoutIo::class)]
+final class FixtureWithCoveredTraitWithoutIoTest extends TestCase
 {
-    public function __construct(
-        private IoCodeDetector $ioCodeDetector,
-    ) {
-    }
-
-    public function getName(): string
+    public function test_fixture(): void
     {
-        return 'PHPUnit test not requiring I/O with integration group';
-    }
+        $fixture = new class {
+            use CoveredTraitWithoutIo;
+        };
 
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioCodeDetector->isCoveringCode($classReflection)
-            && !$this->ioCodeDetector->isUsingIo($classReflection)
-            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
+        $this->assertIsObject($fixture);
     }
 }

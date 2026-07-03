@@ -33,31 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Command\Option;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
-use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
+use function array_filter;
+use function array_map;
+use function array_values;
+use Infection\CannotBeInstantiated;
+use Infection\Console\IO;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use function trim;
 
-final readonly class PHPUnitTestNotRequiringIoWithIntegrationGroup implements SelectorInterface
+/**
+ * @internal
+ */
+final class PathsArgument
 {
-    public function __construct(
-        private IoCodeDetector $ioCodeDetector,
-    ) {
+    use CannotBeInstantiated;
+
+    public const string NAME = 'paths';
+
+    public static function addArgument(Command $command): Command
+    {
+        return $command->addArgument(
+            self::NAME,
+            InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
+            'Limit mutation testing to the given source and/or test paths. Path kind is inferred from the configured source directories and test-like paths. Pass as many paths as needed: `infection run src/A.php src/B.php tests/ATest.php`.',
+        );
     }
 
-    public function getName(): string
+    /**
+     * @return list<non-empty-string>
+     */
+    public static function get(IO $io): array
     {
-        return 'PHPUnit test not requiring I/O with integration group';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        return InfectionSelector::phpunitTestCode()->matches($classReflection)
-            && InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
-            && $this->ioCodeDetector->isCoveringCode($classReflection)
-            && !$this->ioCodeDetector->isUsingIo($classReflection)
-            && PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection);
+        return array_values(
+            array_filter(
+                array_map(trim(...), $io->getInput()->getArgument(self::NAME)),
+                static fn (string $path): bool => $path !== '',
+            ),
+        );
     }
 }
