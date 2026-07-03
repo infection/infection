@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -1643,6 +1644,7 @@ final class PhpUnitAdapterTest extends TestCase
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $version,
+            $this->createStub(ShellCommandLineExecutor::class),
         );
     }
 }

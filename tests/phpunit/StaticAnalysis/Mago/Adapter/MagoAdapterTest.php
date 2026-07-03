@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
@@ -56,9 +57,12 @@ final class MagoAdapterTest extends TestCase
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
 
+    private ShellCommandLineExecutor $shellCommandLineExecutor;
+
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
+        $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
 
         $this->adapter = new MagoAdapter(
             $this->createStub(MutantExecutionResultFactory::class),
@@ -69,6 +73,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             '9.0',
+            $this->shellCommandLineExecutor,
         );
     }
 
@@ -104,6 +109,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             ['--sort'],
             '9.0',
+            $this->shellCommandLineExecutor,
         );
 
         $this->commandLineBuilder
@@ -135,6 +141,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             ['--no-progress'],
             '9.0',
+            $this->shellCommandLineExecutor,
         );
 
         $this->commandLineBuilder
@@ -167,6 +174,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             ['--no-stubs', '--baseline /path/to/baseline.toml'],
             '9.0',
+            $this->shellCommandLineExecutor,
         );
 
         $this->commandLineBuilder
@@ -195,6 +203,39 @@ final class MagoAdapterTest extends TestCase
         $this->assertSame('9.0', $this->adapter->getVersion());
     }
 
+    public function test_it_retrieves_version_with_the_shell_command_line_executor(): void
+    {
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/mago', [], ['--version'])
+            ->willReturn(['/path/to/mago', '--version'])
+        ;
+
+        $shellCommandLineExecutor
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['/path/to/mago', '--version'])
+            ->willReturn('mago 1.23.0')
+        ;
+
+        $adapter = new MagoAdapter(
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/mago-config-path',
+            '/path/to/mago',
+            $this->commandLineBuilder,
+            new VersionParser(),
+            31.0,
+            [],
+            null,
+            $shellCommandLineExecutor,
+        );
+
+        $this->assertSame('1.23.0', $adapter->getVersion());
+    }
+
     public function test_it_creates_mutant_process_creator(): void
     {
         $this->assertInstanceOf(
@@ -217,6 +258,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $version,
+            $this->shellCommandLineExecutor,
         );
 
         // This should not throw an exception
@@ -235,6 +277,7 @@ final class MagoAdapterTest extends TestCase
             31.0,
             [],
             $version,
+            $this->shellCommandLineExecutor,
         );
 
         $this->expectException(RuntimeException::class);

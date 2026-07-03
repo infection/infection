@@ -37,10 +37,10 @@ namespace Infection\TestFramework;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use function sprintf;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -54,7 +54,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
-        private ?string $version = null,
+        private ?string $version,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -170,9 +171,8 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
             ['--version'],
         );
 
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        return $this->versionParser->parse($process->getOutput());
+        return $this->versionParser->parse(
+            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+        );
     }
 }

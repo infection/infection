@@ -39,6 +39,7 @@ use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
@@ -75,8 +76,10 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         bool $executeOnlyCoveringTestCases = false,
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
+        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
+        Assert::notNull($shellCommandLineExecutor);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -122,6 +125,8 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             new CommandLineBuilder(
                 new PhpExecutableFinder(),
             ),
+            null,
+            $shellCommandLineExecutor,
         );
     }
 

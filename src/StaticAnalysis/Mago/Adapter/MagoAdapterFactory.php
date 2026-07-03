@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\Mago\Adapter;
 
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
@@ -56,6 +57,7 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
         float $timeout,
         string $tmpDir,
         array $staticAnalysisToolOptions,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
     ): StaticAnalysisToolAdapter {
         return new MagoAdapter(
             new MagoMutantExecutionResultFactory(),
@@ -67,6 +69,8 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
             new VersionParser(),
             $timeout,
             $staticAnalysisToolOptions,
+            null,
+            $shellCommandLineExecutor,
         );
     }
 }

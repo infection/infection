@@ -40,6 +40,7 @@ use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
@@ -70,9 +71,10 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
-        ?string $version = null,
+        ?string $version,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
-        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
+        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version, $shellCommandLineExecutor);
     }
 
     public function hasJUnitReport(): bool

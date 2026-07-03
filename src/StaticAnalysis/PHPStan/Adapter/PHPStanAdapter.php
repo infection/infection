@@ -39,6 +39,7 @@ use function array_merge;
 use function explode;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
@@ -47,7 +48,6 @@ use RuntimeException;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 use function version_compare;
 
 /**
@@ -72,7 +72,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly float $timeout,
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
-        private ?string $version = null,
+        private ?string $version,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -170,9 +171,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             ['--version'],
         );
 
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        return $this->versionParser->parse($process->getOutput());
+        return $this->versionParser->parse(
+            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+        );
     }
 }
