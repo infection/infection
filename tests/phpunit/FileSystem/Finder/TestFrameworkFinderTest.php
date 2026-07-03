@@ -49,7 +49,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use function Safe\chdir;
 use function Safe\chmod;
 use function Safe\mkdir;
@@ -74,7 +74,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     private Filesystem $fileSystem;
 
-    private MockObject $composerFinder;
+    private ComposerExecutableFinder&Stub $composerFinder;
 
     /**
      * Saves the current environment
@@ -96,7 +96,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->fileSystem = new Filesystem();
 
-        $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
+        $this->composerFinder = $this->createStub(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
             ->willReturn(['/usr/bin/composer']);
     }
