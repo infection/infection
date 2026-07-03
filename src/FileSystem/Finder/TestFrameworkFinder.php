@@ -92,12 +92,12 @@ class TestFrameworkFinder
         return $this->cachedPath[$testFrameworkName];
     }
 
-    public function getVendorDirProcess(): Process
+    private function getBinDirProcess(): Process
     {
         return new Process([
             ...$this->findComposer(),
             'config',
-            'vendor-dir',
+            'bin-dir',
         ]);
     }
 
@@ -202,7 +202,7 @@ class TestFrameworkFinder
     private function getComposerBinDir(): ?string
     {
         try {
-            $process = $this->getVendorDirProcess();
+            $process = $this->getBinDirProcess();
 
             $process->mustRun();
             $binDir = trim($process->getOutput());
