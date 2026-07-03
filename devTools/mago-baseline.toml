@@ -6535,6 +6535,18 @@ message = "Type `iterable` in return type of `diffProvider` is imprecise, equiva
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Differ/DifferTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `diffStringProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Differ/DifferTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Differ/UnifiedDiffOutputBuilderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `diffProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -6973,18 +6985,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Loc
 count = 1
 
 [[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "unused-parameter"
-message = "Parameter `$event` is never used."
-count = 6
-
-[[issues]]
-file = "tests/phpunit/EngineTest.php"
-code = "unused-parameter"
-message = "Parameter `$input` is never used."
-count = 6
-
-[[issues]]
 file = "tests/phpunit/Environment/BuildContextResolverTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideBlankOrEmptyString` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -7316,12 +7316,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #1 of `Infection\FileSystem\Finder\TestFrameworkFinder::__construct`: expected `Infection\FileSystem\Finder\ComposerExecutableFinder`, but possibly received `PHPUnit\Framework\MockObject\MockObject`.'
-count = 5
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "string-member-selector"
 message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
 count = 1
@@ -7605,6 +7599,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `enumClassNameProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `enumProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -7618,6 +7618,12 @@ count = 1
 file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nonExistentValueProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/Enum/EnumBucket/EnumBucketTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -7653,6 +7659,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Framework/StrTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `cleanTrimLinesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/StrTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `indentProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -7678,6 +7690,12 @@ count = 1
 file = "tests/phpunit/Framework/StrTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `utf8StringConversionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Framework/StrTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -8143,7 +8161,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `mutationOnlyProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `mutationProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutant/MutantCodeFactoryTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -9563,6 +9593,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `implementedMutatorFileAndClassProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/ProfileListProvider.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `implementedMutatorProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -9588,6 +9624,12 @@ count = 1
 file = "tests/phpunit/Mutator/ProfileListProvider.php"
 code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Tests\Mutator\ProfileListProvider::getProfiles`: expected `array<array-key, mixed>`, but found `array<string, array<array-key, string>>|null`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Mutator/ProfileListProvider.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -11933,7 +11975,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `Exception` in `{closure:tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php:171:19}`."
+message = "Potentially unhandled exception `Exception` in `{closure:tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php:173:19}`."
 count = 1
 
 [[issues]]
@@ -12606,6 +12648,18 @@ count = 1
 file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `rangeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `rangeWithoutExpectedTestsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory::takeArguments`: expected `iterable<array-key, array<array-key, mixed>>`, but provided type `iterable<mixed, mixed>` is less specific.'
 count = 1
 
 [[issues]]
@@ -13463,13 +13517,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:139:30}`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:141:30}`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:142:30}`.'
+message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `{closure:tests/phpunit/TestFramework/Tracing/TraceProviderAdapterTracerTest.php:144:30}`.'
 count = 1
 
 [[issues]]
@@ -13884,6 +13938,12 @@ count = 1
 file = "tests/phpunit/TestingUtility/PHPUnit/DataProviderFactory.php"
 code = "mixed-operand"
 message = "Invalid right operand: template parameter `Key` is unconstrained (effectively `mixed`) and cannot be reliably used in string concatenation."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestingUtility/PHPUnit/DataProviderFactoryTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `takeArgumentsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]

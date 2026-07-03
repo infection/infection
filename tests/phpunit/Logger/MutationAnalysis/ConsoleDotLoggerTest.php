@@ -43,6 +43,7 @@ use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +51,7 @@ use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Terminal;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ConsoleDotLogger::class)]
 final class ConsoleDotLoggerTest extends TestCase
 {

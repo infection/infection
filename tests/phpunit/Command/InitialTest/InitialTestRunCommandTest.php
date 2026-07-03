@@ -43,6 +43,7 @@ use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -53,6 +54,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Process\Process;
 
+#[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
 #[CoversClass(InitialTestRunCommand::class)]
 final class InitialTestRunCommandTest extends TestCase

@@ -46,6 +46,7 @@ use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\Parser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -55,6 +56,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 
+#[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
 #[CoversClass(FileParser::class)]
 final class FileParserTest extends TestCase

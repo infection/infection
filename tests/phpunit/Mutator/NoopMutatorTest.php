@@ -42,11 +42,13 @@ use Infection\Mutator\NoopMutator;
 use Infection\Testing\MutatorName;
 use function iterator_to_array;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(NoopMutator::class)]
 final class NoopMutatorTest extends TestCase
 {
