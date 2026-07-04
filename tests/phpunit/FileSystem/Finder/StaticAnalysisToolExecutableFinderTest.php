@@ -50,6 +50,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
+use RuntimeException;
 use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
@@ -164,6 +165,47 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
             strlen($path),
             strlen($pathAfterTest),
             'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.',
+        );
+    }
+
+    public function test_it_falls_back_to_local_vendor_bin_when_composer_command_fails(): void
+    {
+        chdir($this->tmp);
+
+        $mock = new MockVendor($this->tmp, $this->fileSystem);
+        $mock->setUpPlatformTest();
+
+        putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
+        putenv('PATHEXT=');
+
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['/usr/bin/composer', 'config', 'bin-dir'])
+            ->willThrowException(new RuntimeException())
+        ;
+
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $shellCommandLineExecutor);
+
+        if (OperatingSystem::isWindows()) {
+            // This .bat has no code, so main script will not be found
+            $expected = $mock->getVendorBinBat();
+        } else {
+            $expected = $mock->getVendorBinLink();
+        }
+
+        $this->assertSame(
+            Path::canonicalize($expected),
+            Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
+        );
+
+        $pathAfterTest = getenv(self::$pathName);
+        $pathList = explode(PATH_SEPARATOR, $pathAfterTest);
+
+        $this->assertSame(
+            Path::canonicalize($this->tmp . '/vendor/bin'),
+            Path::canonicalize($pathList[0]),
         );
     }
 
