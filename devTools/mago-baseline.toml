@@ -11537,6 +11537,12 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Source/Collector/MemoizedSourceCollectorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Source\Collector\MemoizedSourceCollectorTest::test_it_memoizes_the_collected_files`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Source/Collector/SourceCollectorFactoryTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `sourceFilterProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
