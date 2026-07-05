@@ -4,25 +4,34 @@
 
 The codebase uses both `Memoized*` and `Cached*` names for implementations that
 store a computed result on the object and reuse it for subsequent calls during
-that object's lifetime.
+that object lifetime.
 
 Examples include:
 
 - `MemoizedCiDetector`
 - `MemoizedComposerExecutableFinder`
 - `MemoizedTestFileDataProvider`
-- `MemoizedSourceCollector`
 
-These implementations are memoization: the stored value is local to the object
-lifetime, with no explicit invalidation, eviction, TTL, persistence or shared
-cache backend.
+These implementations perform memoization: the stored value is local to the
+object lifetime, with no explicit invalidation, eviction, TTL, persistence or
+shared cache backend.
 
-`Cache` is a broader term and can imply concerns that do not exist in these
-classes, such as storage backends, cache keys, invalidation, eviction, warmup,
+For example:
+
+- `MemoizedCiDetector` stores the detected CI server on the detector instance.
+  There is no cache key and no way for callers to clear or warm the value.
+- `MemoizedComposerExecutableFinder` wraps the finder result in a local deferred
+  value. A second finder instance computes and stores its own result.
+- `MemoizedTestFileDataProvider` stores results per test id in an object
+  property. The stored data is not shared outside that provider instance.
+
+`Cache` is a broader term. In this codebase it should describe a visible cache
+lifecycle, such as storage backends, cache keys, invalidation, eviction, warmup,
 cleanup, configuration, persistence across process runs or sharing across object
 instances. Infection already uses cache terminology for these broader concerns:
 PHPUnit result cache files, PHPStan cache, Rector cache and files under
-`var/cache`, for example.
+`var/cache`, for example. In practice, for this codebase, exposing such a
+lifecycle would mean using a [PSR-6] or [PSR-16] abstraction.
 
 Using `Cached*` for object-local memoization makes these classes appear closer
 to operational cache infrastructure than they are. `Memoized*` is more precise
@@ -32,8 +41,9 @@ cache lifecycle boundary.
 
 ## Decision
 
-Use `Memoized*` rather than `Cached*` when naming classes and decorators whose
-purpose is to reuse a previously computed value during the same object lifetime.
+Use `Memoized*` rather than `Cached*` when naming classes and decorators that
+hide a previous computation in their own object state and expose no cache
+lifecycle to callers.
 
 Reserve `Cached*` for implementations where the cache lifecycle is part of the
 design: cache keys, invalidation, eviction, storage, warmup, cleanup,
@@ -51,3 +61,6 @@ focused nomenclature cleanup.
 ## Status
 
 Accepted.
+
+[PSR-6]: https://www.php-fig.org/psr/psr-6/
+[PSR-16]: https://www.php-fig.org/psr/psr-16/
