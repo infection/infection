@@ -80,10 +80,13 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 - `tests/phpunit/AutoReview/` - convention tests run by `phpunit_autoreview.xml`: mutator
   API shape, Definition presence, env-var hygiene, Makefile consistency, no mutable public
   properties (DTO whitelist in `tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php`).
-- `tests/e2e/` - one directory per scenario: `README.md`, `infection.json5` (pin
-  `"threads": 1` - parallel output is non-deterministic), `expected-output.txt`, optional
-  `run_test.bash`. Runner: `./tests/e2e_tests bin/infection [NamePattern]`; scaffold with
-  `./tests/add_new_e2e`. Self-contained ones also run via `--group e2e`.
+- `tests/e2e/` - one directory per scenario: typically `expected-output.txt` plus an
+  `infection.json5` that pins `"threads"` (usually 1 - parallel output is
+  non-deterministic; the SA-integration scenarios deliberately use 4), often a `README.md`.
+  A custom `run_tests.bash` overrides the default `tests/e2e/standard_script.bash` - note
+  the plural: CONTRIBUTING.md's `run_test.bash` is stale (`tests/e2e_tests:20`). Runner:
+  `./tests/e2e_tests bin/infection [NamePattern]`; scaffold with `./tests/add_new_e2e`.
+  Self-contained ones also run via `--group e2e`.
 - `tests/benchmark/` - PHPBench suites (mutation generation, git-diff parsing, tracing).
   Performance PRs cite before/after numbers from these.
 - `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
@@ -103,6 +106,7 @@ make help                 # source of truth for targets
 make cs                   # PHP-CS-Fixer; ALWAYS this, never hand-format
 make autoreview           # cs-check + PHPStan(+PHPat) + Mago + composer validate
                           #   + AutoReview suite + Rector dry-run + collision detector
+                          #   + zizmor (locally only; CI skips it here)
 make test-unit            # default group, e2e excluded
 make test-unit-parallel   # paratest WrapperRunner
 make test-e2e             # PHPUnit-group e2e + scripted scenarios
@@ -405,7 +409,8 @@ machine-checked. Scaffold: `./bin/infection make:mutator` (templates in
    in the alphabetized mutators block. NOT machine-checked - reviewers look for it, and
    without it a user config referencing the mutator fails schema validation.
 4. `tests/phpunit/Mutator/<Category>/<Name>Test.php`.
-5. A doc PR to github.com/infection/site (checkbox in the PR template; label `Awaiting Docs`).
+5. A doc PR to github.com/infection/site (checkbox in the PR template; maintainers track
+   missing ones with an `Awaiting Docs` label).
 
 The class shape (see `src/Mutator/Arithmetic/Plus.php` for the canonical minimal example):
 
@@ -491,7 +496,8 @@ Notes that carry review weight:
   `ci`, `docs`; scopes are component names: `ast`, `tracing`, `logger`, `phpunit`). Any BC
   risk upgrades the prefix to `feat!:`/`fix!:` and gets a `BC break` label plus an
   enumerated "Breaking Changes" section in the body. Bare imperative titles survive on
-  headline features, but prefixed is the norm and a title check runs.
+  headline features, but prefixed is the norm; an external review bot (CodeRabbit) checks
+  titles - that gate lives GitHub-side, not in this repo.
 - Small, dependency-chained PRs are the house unit of work: "Depends on #NNNN",
   "Extracted from #NNNN", draft-until-dependency-merges. Refactors NEVER mix with behavior
   changes - the most repeated review demand across four years. Deletion PRs are prized.
@@ -501,7 +507,8 @@ Notes that carry review weight:
 - Labels are load-bearing (release notes are generated from them): one type label
   (`Feature`, `Bugfix`, `Internal`, `Performance`, `BC break`, `DX` for developer
   experience, `IDX` for IDE/integration work) plus component
-  labels (`Component / AST`, `TestFramework / PHPUnit`, ...). CHANGELOG.md is
+  labels (`Component / AST`, `TestFramework / PHPUnit`, ...). These are the GitHub-side
+  label names maintainers apply; the in-repo PR template spells them lowercase. CHANGELOG.md is
   maintainer-curated at release time - touch it only for deprecations or BC breaks,
   `[BC BREAK!]`-prefixed, when asked.
 - User-facing changes need a doc PR to github.com/infection/site (linked in the checklist);
@@ -533,8 +540,8 @@ The costliest traps, recollected:
    test-framework adapters must also be added to the PHAR bundle in the Makefile.
 9. Symfony `Process` argv arrays: one element = one token; never pre-join, never assume
    splitting.
-10. e2e fixtures pin `"threads": 1`; e2e composer.json pairs `minimum-stability: dev` with
-    `prefer-stable: true`.
+10. e2e fixtures pin `"threads"` (usually 1) for deterministic output; e2e composer.json
+    pairs `minimum-stability: dev` with `prefer-stable: true`.
 11. JIT makes mutation testing ~50% SLOWER; file-backed OPcache helps. Benchmark before
     "optimizing" (`make benchmark`), and re-validate old perf hacks before extending them.
 12. Escaped mutant on a literal? Extract a named constant. Escaped mutant on a loose mock?
