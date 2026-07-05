@@ -4,26 +4,67 @@
 
 The codebase uses both `Memoized*` and `Cached*` names for implementations that
 store a computed result on the object and reuse it for subsequent calls during
-that object lifetime.
+the object's lifetime.
 
-Examples include:
+`Memoized*` should describe object-local memoization. For example, a
+`MemoizedProjectConfigurationLoader` may look like this:
 
-- `MemoizedCiDetector`
-- `MemoizedComposerExecutableFinder`
-- `MemoizedTestFileDataProvider`
+```php
+final class MemoizedProjectConfigurationLoader implements ProjectConfigurationLoader
+{
+    private ?ProjectConfiguration $projectConfiguration = null;
 
-These implementations perform memoization: the stored value is local to the
-object lifetime, with no explicit invalidation, eviction, TTL, persistence or
-shared cache backend.
+    public function __construct(
+        private readonly ProjectConfigurationLoader $decoratedLoader,
+    ) {
+    }
 
-For example:
+    public function load(): ProjectConfiguration
+    {
+        return $this->projectConfiguration ??= $this->decoratedLoader->load();
+    }
+}
+```
 
-- `MemoizedCiDetector` stores the detected CI server on the detector instance.
-  There is no cache key and no way for callers to clear or warm the value.
-- `MemoizedComposerExecutableFinder` wraps the finder result in a local deferred
-  value. A second finder instance computes and stores its own result.
-- `MemoizedTestFileDataProvider` stores results per test id in an object
-  property. The stored data is not shared outside that provider instance.
+The decorated loader is called once per `MemoizedProjectConfigurationLoader`
+instance, and subsequent calls made to that same instance return the stored
+value. A second `MemoizedProjectConfigurationLoader` instance has its own stored
+value. There is no cache key, invalidation, eviction, TTL, persistence, warmup,
+cleanup or shared backend.
+
+`Cached*` should describe a cache lifecycle that is part of the design. For
+example, a `CachedProjectConfigurationLoader` may look like this:
+
+```php
+final class CachedProjectConfigurationLoader implements ProjectConfigurationLoader
+{
+    public function __construct(
+        private readonly ProjectConfigurationLoader $decoratedLoader,
+        private readonly CacheInterface $cache,
+    ) {
+    }
+
+    public function load(): ProjectConfiguration
+    {
+        $cacheKey = 'project-configuration';
+        $projectConfiguration = $this->cache->get($cacheKey);
+
+        if ($projectConfiguration instanceof ProjectConfiguration) {
+            return $projectConfiguration;
+        }
+
+        $projectConfiguration = $this->decoratedLoader->load();
+
+        $this->cache->set($cacheKey, $projectConfiguration);
+
+        return $projectConfiguration;
+    }
+}
+```
+
+The loader reads and writes values through a cache pool using explicit keys. The
+stored values may be shared by multiple loader instances, persisted beyond one
+object lifetime, configured, cleared, warmed or expired.
 
 `Cache` is a broader term. In this codebase it should describe a visible cache
 lifecycle, such as storage backends, cache keys, invalidation, eviction, warmup,
@@ -33,10 +74,10 @@ PHPUnit result cache files, PHPStan cache, Rector cache and files under
 `var/cache`, for example. In practice, for this codebase, exposing such a
 lifecycle would mean using a [PSR-6] or [PSR-16] abstraction.
 
-Using `Cached*` for object-local memoization makes these classes appear closer
-to operational cache infrastructure than they are. `Memoized*` is more precise
-and makes it clear that the behaviour is a local implementation detail, not a
-cache lifecycle boundary.
+Using `Cached*` for object-local memoization makes an implementation appear
+closer to operational cache infrastructure than it is. `Memoized*` is more
+precise: it communicates that the reuse is a local implementation detail, not a
+cache lifecycle boundary that callers can observe or manage.
 
 
 ## Decision
