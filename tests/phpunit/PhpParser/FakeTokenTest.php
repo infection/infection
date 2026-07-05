@@ -41,13 +41,13 @@ use function in_array;
 use Infection\Tests\UnsupportedMethod;
 use function is_string;
 use PhpParser\Token;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 
-#[CoversNothing]
+#[CoversClass(FakeToken::class)]
 final class FakeTokenTest extends TestCase
 {
     /**

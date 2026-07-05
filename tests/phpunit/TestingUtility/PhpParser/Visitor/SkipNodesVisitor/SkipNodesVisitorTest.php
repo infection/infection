@@ -39,10 +39,10 @@ use Infection\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversNothing]
+#[CoversClass(SkipNodesVisitor::class)]
 final class SkipNodesVisitorTest extends VisitorTestCase
 {
     /**

@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Mutation\Mutation;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-#[CoversNothing]
+#[CoversClass(MutationAssertions::class)]
 final class MutationAssertionsTest extends TestCase
 {
     #[DataProvider('mutationProvider')]

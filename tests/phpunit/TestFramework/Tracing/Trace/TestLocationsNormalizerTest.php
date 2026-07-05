@@ -38,11 +38,11 @@ namespace Infection\Tests\TestFramework\Tracing\Trace;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversNothing]
+#[CoversClass(TestLocationsNormalizer::class)]
 final class TestLocationsNormalizerTest extends TestCase
 {
     /**

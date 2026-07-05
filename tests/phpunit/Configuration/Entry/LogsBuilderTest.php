@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversNothing]
+#[CoversClass(LogsBuilder::class)]
 final class LogsBuilderTest extends TestCase
 {
     #[DataProvider('logsProvider')]

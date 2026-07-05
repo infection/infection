@@ -38,10 +38,10 @@ namespace Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttrib
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversNothing]
+#[CoversClass(KeepOnlyDesiredAttributesVisitor::class)]
 final class KeepOnlyDesiredAttributesVisitorTest extends VisitorTestCase
 {
     /**

@@ -38,11 +38,11 @@ namespace Infection\Tests\TestingUtility\Iterable;
 use ArrayIterator;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use function iterator_to_array;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversNothing]
+#[CoversClass(YieldOnceIterator::class)]
 final class YieldOnceIteratorTest extends TestCase
 {
     use ExpectsThrowables;

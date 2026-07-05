@@ -37,11 +37,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\Configuration;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversNothing]
+#[CoversClass(ConfigurationBuilder::class)]
 final class ConfigurationBuilderTest extends TestCase
 {
     #[DataProvider('configurationProvider')]
