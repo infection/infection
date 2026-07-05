@@ -6,8 +6,8 @@ The codebase uses both `Memoized*` and `Cached*` names for implementations that
 store a computed result on the object and reuse it for subsequent calls during
 the object's lifetime.
 
-`Memoized*` should describe object-local memoization. For example, a
-`MemoizedProjectConfigurationLoader` may look like this:
+`Memoized*` should describe object-local memoization. A
+`MemoizedProjectConfigurationLoader` is representative:
 
 ```php
 final class MemoizedProjectConfigurationLoader implements ProjectConfigurationLoader
@@ -26,14 +26,14 @@ final class MemoizedProjectConfigurationLoader implements ProjectConfigurationLo
 }
 ```
 
-The decorated loader is called once per `MemoizedProjectConfigurationLoader`
-instance, and subsequent calls made to that same instance return the stored
-value. A second `MemoizedProjectConfigurationLoader` instance has its own stored
-value. There is no cache key, invalidation, eviction, TTL, persistence, warmup,
-cleanup or shared backend.
+The decorated loader is called once for each `MemoizedProjectConfigurationLoader`
+instance. Later calls to the same instance return the stored value. A second
+`MemoizedProjectConfigurationLoader` instance has its own stored value. There is
+no cache key, invalidation, eviction, TTL, persistence, warmup, cleanup or shared
+backend.
 
 `Cached*` should describe a cache lifecycle that is part of the design. For
-example, a `CachedProjectConfigurationLoader` may look like this:
+example, a `CachedProjectConfigurationLoader` is representative:
 
 ```php
 final class CachedProjectConfigurationLoader implements ProjectConfigurationLoader
@@ -62,12 +62,12 @@ final class CachedProjectConfigurationLoader implements ProjectConfigurationLoad
 }
 ```
 
-The loader reads and writes values through a cache pool using explicit keys. The
-stored values may be shared by multiple loader instances, persisted beyond one
+The loader reads and writes values through a cache pool using explicit keys.
+Stored values may be shared by multiple loader instances, persisted beyond one
 object lifetime, configured, cleared, warmed or expired.
 
-`Cache` is a broader term. In this codebase it should describe a visible cache
-lifecycle, such as storage backends, cache keys, invalidation, eviction, warmup,
+`Cache` is broader. In this codebase it should describe a visible cache
+lifecycle, including storage backends, cache keys, invalidation, eviction, warmup,
 cleanup, configuration, persistence across process runs or sharing across object
 instances. Infection already uses cache terminology for these broader concerns:
 PHPUnit result cache files, PHPStan cache, Rector cache and files under
