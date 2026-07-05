@@ -45,9 +45,11 @@ use Infection\Mutator\ProfileList;
 use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[Group('integration')]
 #[CoversNothing]
 final class DefinitionTest extends TestCase
 {

@@ -41,10 +41,12 @@ use function array_values;
 use function in_array;
 use Infection\Mutator\MutatorCategory;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
+#[Group('integration')]
 #[CoversNothing]
 final class MutatorCategoryTest extends TestCase
 {
