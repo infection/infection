@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(RemoveInternalBlankLines::class)]
+#[CoversNothing]
 final class RemoveInternalBlankLinesTest extends TestCase
 {
     #[DataProvider('linesProvider')]

@@ -38,11 +38,11 @@ namespace Infection\Tests\TestingUtility\Iterable;
 use ArrayIterator;
 use DomainException;
 use Iterator;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(NonRewindableIterator::class)]
+#[CoversNothing]
 final class NonRewindableIteratorTest extends TestCase
 {
     /**

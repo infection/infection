@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\Locator\Throwable;
 
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(UnknownReportLocatorException::class)]
+#[CoversNothing]
 final class UnknownReportLocatorExceptionTest extends TestCase
 {
     public function test_it_can_create_an_exception_for_a_coverage_report(): void

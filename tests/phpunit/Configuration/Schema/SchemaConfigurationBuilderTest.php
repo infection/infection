@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SchemaConfigurationBuilder::class)]
+#[CoversNothing]
 final class SchemaConfigurationBuilderTest extends TestCase
 {
     #[DataProvider('configurationProvider')]

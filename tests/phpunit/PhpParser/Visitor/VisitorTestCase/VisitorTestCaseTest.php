@@ -39,11 +39,11 @@ use function in_array;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use PhpParser\Node;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(VisitorTestCase::class)]
+#[CoversNothing]
 #[Group('integration')]
 final class VisitorTestCaseTest extends TestCase
 {

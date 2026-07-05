@@ -40,10 +40,10 @@ use function array_keys;
 use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\NodeTraverser;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(MarkAllButIneligibleNodesAsVisitedVisitor::class)]
+#[CoversNothing]
 final class MarkAllButIneligibleNodesAsVisitedVisitorTest extends VisitorTestCase
 {
     /**

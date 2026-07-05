@@ -40,12 +40,12 @@ use function array_unique;
 use function array_values;
 use function in_array;
 use Infection\Mutator\MutatorCategory;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
 
-#[CoversClass(MutatorCategory::class)]
+#[CoversNothing]
 final class MutatorCategoryTest extends TestCase
 {
     private const string ALL_CONSTANT_KEY = 'ALL';

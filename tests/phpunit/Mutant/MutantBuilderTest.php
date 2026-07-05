@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\Mutant;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutantBuilder::class)]
+#[CoversNothing]
 final class MutantBuilderTest extends TestCase
 {
     use MutantAssertions;

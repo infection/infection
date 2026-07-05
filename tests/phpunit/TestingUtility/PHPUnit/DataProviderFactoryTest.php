@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 
-#[CoversClass(DataProviderFactory::class)]
+#[CoversNothing]
 final class DataProviderFactoryTest extends TestCase
 {
     public function test_it_creates_a_phpunit_data_provider_from_an_iterable(): void

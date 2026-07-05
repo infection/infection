@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestingUtility\PHPUnit;
 
 use Exception;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-#[CoversTrait(ExpectsThrowables::class)]
+#[CoversNothing]
 final class ExpectsThrowablesTest extends TestCase
 {
     use ExpectsThrowables;
