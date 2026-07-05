@@ -70,7 +70,7 @@ To add user-specific sandbox customisation, edit:
 devTools/sbx/kits/project-local/spec.yaml
 ```
 
-You can use the `--branch` or `--name` option to further adjust your setup.
+You can use the `--clone` or `--name` option to further adjust your setup.
 
 [docker sandbox]: https://www.docker.com/products/docker-sandboxes/
 [docker-sandbox-templates-codex]: https://hub.docker.com/layers/docker/sandbox-templates/codex-docker/images
