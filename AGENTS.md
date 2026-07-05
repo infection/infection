@@ -129,9 +129,11 @@ These were measured by having agents design the subsystems blind and diffing aga
 You will mark everything `final`. Here, hard `final` is for classes never mocked (mutators,
 visitors, value objects, leaf utilities); services that tests mock carry `/** @internal
 @final */` with NO keyword (e.g. `src/Mutation/Mutation.php`,
-`src/Configuration/ConfigurationFactory.php`, `src/Process/Runner/ParallelProcessRunner.php`).
-The PHPat finality rule accepts either form; adding the keyword to a mocked class breaks the
-suite. Mockability is the only sanctioned reason for `@final` - if no test mocks the class,
+`src/Configuration/ConfigurationFactory.php`). The PHPat finality rule accepts either form;
+adding the keyword to a mocked class breaks the suite. A third form exists for special cases:
+`ParallelProcessRunner` is plain `@internal` with a dedicated PHPat exemption whose test name
+states the reason ("intentionally non-final only to allow PHPUnit partial mocks",
+`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only sanctioned reason for `@final` - if no test mocks the class,
 use the keyword. Reviewers ask "is there a reason this is `@final` rather than `final`?" -
 have the answer ("it is mocked in X").
 
@@ -293,7 +295,8 @@ Memory is released by `unset()` of the container reference before freeing the sl
 
 ### 4. PHPUnit XML manipulation - a version matrix you must not simplify
 
-`XmlConfigurationManipulator` is ~20 one-edit public methods composed by two builders; the
+`XmlConfigurationManipulator` is ~15 small public methods, one edit each, composed by two
+builders; the
 `version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0) each carry a comment
 linking the phpunit.xsd change - keep them. Hard rules: PHPUnit >= 12's coverage/`<source>`
 config is authoritative - leave it untouched (#3043 regression); when the user has an
@@ -326,7 +329,7 @@ service has a typed getter (`getFileSystem(): FileSystem`); consumers never call
 directly. Wiring is explicit closures - reflection autowiring exists only as a fallback for
 zero-config leaves. Laziness is closure+memoize; there are no proxies and there will be no
 symfony/di or php-di (supply chain + PHAR scoping). After CLI parsing, `withValues(...)`
-(~40 named params, each defaulting to a `DEFAULT_*` const) CLONES the container and re-binds
+(~40 named params, most defaulting to `DEFAULT_*` consts) CLONES the container and re-binds
 config-derived services; option values live in the one `Configuration` object, never as
 container entries. Tests replace services with `$container->set(Id::class, fn () => $double)`
 or `cloneWithService()`. A meta-test asserts every registered factory is actually reachable -
@@ -379,8 +382,8 @@ including regexing `--initial-tests-php-options` for drivers only the child will
 throws `CoverageNotFound` with a heredoc listing copy-pasteable remedies. `MemoryLimiter`
 appends `memory_limit = 2x observed` to the xdebug-handler TEMP ini only - guarded by
 `MemoryLimiterEnvironment::isUsingSystemIni()`; and it must run AFTER static analysis
-(PHPStan OOMs otherwise, #2427). Every step is best-effort: six early returns, swallowed
-`IOException`.
+(PHPStan OOMs otherwise, #2427). Every step is best-effort: early-return guards for six
+can't-do-this conditions, swallowed `IOException`.
 
 ## Adding a mutator
 
