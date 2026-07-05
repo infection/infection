@@ -46,6 +46,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
+use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -184,6 +185,30 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $actual = Path::canonicalize(
             $frameworkFinder->find(TestFrameworkTypes::PHPUNIT),
         );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_falls_back_to_vendor_bin_when_composer_bin_dir_output_is_empty(): void
+    {
+        chdir($this->tmp);
+
+        $vendorBinDir = $this->tmp . '/vendor/bin';
+        $this->fileSystem->mkdir($vendorBinDir);
+
+        $expected = Path::canonicalize($this->createPhpUnitExecutableFixture($vendorBinDir));
+
+        putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
+        putenv('PATHEXT=');
+
+        $composerFinder = $this->createStub(ComposerExecutableFinder::class);
+        $composerFinder
+            ->method('find')
+            ->willReturn([PHP_BINARY, '-r', '']);
+
+        $frameworkFinder = new TestFrameworkFinder($composerFinder);
+
+        $actual = Path::canonicalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT));
 
         $this->assertSame($expected, $actual);
     }

@@ -92,6 +92,15 @@ class TestFrameworkFinder
         return $this->cachedPath[$testFrameworkName];
     }
 
+    private function getBinDirProcess(): Process
+    {
+        return new Process([
+            ...$this->findComposer(),
+            'config',
+            'bin-dir',
+        ]);
+    }
+
     private function shouldUseCustomPath(string $testFrameworkName, string $customPath): bool
     {
         if ($customPath === '') {
@@ -107,28 +116,11 @@ class TestFrameworkFinder
 
     private function addVendorBinToPath(): void
     {
-        $vendorPath = null;
+        $composerBinDir = $this->getComposerBinDir();
 
-        try {
-            $process = new Process([
-                ...$this->findComposer(),
-                'config',
-                'bin-dir',
-            ]);
-
-            $process->mustRun();
-            $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException) {
-            $candidate = getcwd() . '/vendor/bin';
-
-            if (file_exists($candidate)) {
-                $vendorPath = $candidate;
-            }
-        }
-
-        if ($vendorPath !== null) {
+        if ($composerBinDir !== null) {
             $pathName = getenv('PATH') !== false ? 'PATH' : 'Path';
-            putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
+            putenv($pathName . '=' . $composerBinDir . PATH_SEPARATOR . getenv($pathName));
         }
     }
 
@@ -205,5 +197,29 @@ class TestFrameworkFinder
         }
 
         return $path;
+    }
+
+    private function getComposerBinDir(): ?string
+    {
+        try {
+            $process = $this->getBinDirProcess();
+
+            $process->mustRun();
+            $binDir = trim($process->getOutput());
+
+            if ($binDir !== '') {
+                return $binDir;
+            }
+        } catch (RuntimeException) {
+            // Continue
+        }
+
+        $candidate = getcwd() . '/vendor/bin';
+
+        if (file_exists($candidate)) {
+            return $candidate;
+        }
+
+        return null;
     }
 }
