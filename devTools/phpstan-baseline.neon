@@ -957,7 +957,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
 
 		-
@@ -981,7 +981,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-

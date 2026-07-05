@@ -301,6 +301,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getShellCommandLineExecutor(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -310,6 +311,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
+                    $container->getShellCommandLineExecutor(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
