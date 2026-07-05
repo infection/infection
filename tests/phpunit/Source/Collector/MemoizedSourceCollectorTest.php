@@ -35,30 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Source\Collector;
 
-use Infection\Source\Collector\CachedSourceCollector;
+use Infection\Source\Collector\MemoizedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(CachedSourceCollector::class)]
-final class CachedSourceCollectorTest extends TestCase
+#[CoversClass(MemoizedSourceCollector::class)]
+final class MemoizedSourceCollectorTest extends TestCase
 {
     private SourceCollector&MockObject $decoratedCollectorMock;
 
-    private CachedSourceCollector $collector;
+    private MemoizedSourceCollector $collector;
 
     protected function setUp(): void
     {
         $this->decoratedCollectorMock = $this->createMock(SourceCollector::class);
 
-        $this->collector = new CachedSourceCollector(
+        $this->collector = new MemoizedSourceCollector(
             $this->decoratedCollectorMock,
         );
     }
 
-    public function test_it_caches_the_collected_files(): void
+    public function test_it_memoizes_the_collected_files(): void
     {
         $expected = [
             new MockSplFileInfo('src/File1.php'),

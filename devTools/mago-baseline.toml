@@ -11513,9 +11513,9 @@ message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Excepti
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Source/Collector/CachedSourceCollectorTest.php"
+file = "tests/phpunit/Source/Collector/MemoizedSourceCollectorTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Source\Collector\CachedSourceCollectorTest::test_it_caches_the_collected_files`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Source\Collector\MemoizedSourceCollectorTest::test_it_memoizes_the_collected_files`.'
 count = 1
 
 [[issues]]

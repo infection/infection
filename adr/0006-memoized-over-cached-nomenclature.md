@@ -11,7 +11,7 @@ Examples include:
 - `MemoizedCiDetector`
 - `MemoizedComposerExecutableFinder`
 - `MemoizedTestFileDataProvider`
-- `CachedSourceCollector`
+- `MemoizedSourceCollector`
 
 These implementations are memoization: the stored value is local to the object
 lifetime, with no explicit invalidation, eviction, TTL, persistence or shared

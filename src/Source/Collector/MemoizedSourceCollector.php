@@ -40,7 +40,7 @@ use SplFileInfo;
 /**
  * @internal
  */
-final class CachedSourceCollector implements SourceCollector
+final class MemoizedSourceCollector implements SourceCollector
 {
     /**
      * @var SplFileInfo[]
