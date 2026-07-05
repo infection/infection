@@ -70,7 +70,6 @@ final class MagoAdapterFactory implements StaticAnalysisToolAdapterFactory
             $timeout,
             $staticAnalysisToolOptions,
             $shellCommandLineExecutor,
-            null,
         );
     }
 }
