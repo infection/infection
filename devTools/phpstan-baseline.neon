@@ -199,7 +199,7 @@ parameters:
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-empty-string}.'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
@@ -211,7 +211,7 @@ parameters:
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-empty-string}.'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
@@ -526,7 +526,7 @@ parameters:
 			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
 
 		-
-			rawMessage: 'Offset ''name'' might not exist on array{}|array{0: non-falsy-string, name: non-falsy-string, 1: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
+			rawMessage: 'Offset ''name'' might not exist on array{0?: string, name?: non-falsy-string, 1?: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
@@ -634,7 +634,7 @@ parameters:
 			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-falsy-string}.'
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string}.'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
@@ -676,7 +676,7 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{0: non-falsy-string, 1: non-falsy-string, 2?: ''/phpunit''}.'
+			rawMessage: 'Offset 1 might not exist on list{0?: string, 1?: non-falsy-string, 2?: ''/phpunit''}.'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
