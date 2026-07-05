@@ -190,8 +190,11 @@ because the output was not Markdown.
 Expensive values hide behind `sanmai/later`: `lazy(generatorFn())` returns a memoized
 `Deferred`; `->get()` is safe to call repeatedly, unlike a raw generator which silently
 yields nothing the second time (`src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php`).
-Collection flows use `sanmai/pipeline`: `take($x)->filter(...)->cast(...)->toList()`
-(`cast` = map, `tap` = side effect). Streams of work are non-rewindable generators BY DESIGN
+Collection flows use `sanmai/pipeline`: `take($x)->filter(...)->cast(...)->toList()`.
+Mind the naming - it inverts your instinct: `cast()` is the strict 1:1 mapper
+(`array_map`); `map()` is 1:N - its callback may yield any number of values per input,
+and a returned generator is flattened into the stream; `tap()` is for side effects.
+Full API: `vendor/sanmai/pipeline/README.md`. Streams of work are non-rewindable generators BY DESIGN
 - `ParallelProcessRunner` converts iterables to a generator precisely so a rewind fails
 loudly, while letting `Iterator` test doubles pass through. Do not buffer, count, or rewind a
 mutant stream. For hot paths, by-reference returns are a sanctioned idiom with a comment
