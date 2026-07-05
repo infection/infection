@@ -1,1 +1,1 @@
-../../../devTools/ai/skills/docker-sandbox/SKILL.md
+../../../.codex/skills/docker-sandbox/SKILL.md
