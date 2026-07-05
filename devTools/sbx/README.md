@@ -10,7 +10,7 @@ It uses [container-structure-test][container-structure-test] for testing the ima
 
 Codex telemetry is optional. The OpenTelemetry settings live in
 `devTools/sbx/codex-otel.toml` and are merged into the Codex user-level config
-by the `devTools/sbx/codex-otel-kit` kit when the sandbox starts.
+by the `devTools/sbx/kits/codex-otel` kit when the sandbox starts.
 
 The provided template assumes the OTLP HTTP collector is reachable from
 the sandbox at `http://host.docker.internal:4318`. If it runs elsewhere,
@@ -39,6 +39,10 @@ sbx run codex-infection
 
 Be aware that this command will drop the existing `codex-infection` sandbox.
 
+The command also creates `devTools/sbx/kits/project-local/spec.yaml` from
+`devTools/sbx/project-local-kit.yaml` when the local file is missing. The
+generated file is ignored by Git and is always included as a kit.
+
 If you wish to only build the image:
 
 ```shell
@@ -53,11 +57,18 @@ To run a sandbox manually with the loaded template from the repository root:
 ```shell
 sbx run codex \
   --template=infection-sbx-php-8.4:latest \
-  --kit=./devTools/sbx/codex-otel-kit
+  --kit=./devTools/sbx/kits/codex-otel \
+  --kit=./devTools/sbx/kits/project-local
 ```
 
 The `--kit` flag only applies when the sandbox is created. For an existing
 sandbox, recreate it or apply the kit explicitly with `sbx kit add`.
+
+To add user-specific sandbox customisation, edit:
+
+```text
+devTools/sbx/kits/project-local/spec.yaml
+```
 
 You can use the `--branch` or `--name` option to further adjust your setup.
 
