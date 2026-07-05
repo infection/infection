@@ -33,17 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\PublicPropertyAnalysisTest\Fixtures;
 
-final readonly class AnalysisResult
+final class ChildWithInheritedPublicProperty extends ParentWithPublicProperty
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
-    ) {
-    }
 }

@@ -35,15 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
-final readonly class AnalysisResult
+use Infection\CannotBeInstantiated;
+use PHPStan\Reflection\ClassReflection;
+use ReflectionProperty;
+
+final class PublicPropertyAnalysis
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
-    ) {
+    use CannotBeInstantiated;
+
+    public static function hasDeclaredPublicNonReadonlyProperty(ClassReflection $classReflection): bool
+    {
+        $publicProperties = $classReflection
+            ->getNativeReflection()
+            ->getProperties(ReflectionProperty::IS_PUBLIC);
+
+        foreach ($publicProperties as $property) {
+            if (
+                $property->getDeclaringClass()->getName() === $classReflection->getName()
+                && !$property->isReadOnly()
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

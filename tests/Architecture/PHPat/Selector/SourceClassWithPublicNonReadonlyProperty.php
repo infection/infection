@@ -33,17 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-final readonly class AnalysisResult
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+
+final readonly class SourceClassWithPublicNonReadonlyProperty implements SelectorInterface
 {
     public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
+        private Analyser $analyser,
     ) {
+    }
+
+    public function getName(): string
+    {
+        return 'source class declaring a public non-readonly property';
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        return InfectionSelector::sourceCode()->matches($classReflection)
+            && $this->analyser->analyse(
+                $classReflection,
+                true,
+            )->declaresPublicNonReadonlyProperty;
     }
 }

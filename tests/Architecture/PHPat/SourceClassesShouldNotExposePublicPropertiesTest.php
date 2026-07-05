@@ -33,17 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat;
 
-final readonly class AnalysisResult
+use Infection\Process\Runner\IndexedMutantProcessContainer;
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+
+final class SourceClassesShouldNotExposePublicPropertiesTest
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
-    ) {
+    public function testSourceClassesDoNotExposePublicProperties(): Rule
+    {
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceClassWithPublicNonReadonlyProperty())
+            ->excluding(
+                // Having public properties on DTO is for performance reasons.
+                Selector::classname(TestLocations::class),
+                Selector::classname(SourceMethodLineRange::class),
+                Selector::classname(NodeLineRangeData::class),
+                Selector::classname(TestFileTimeData::class),
+                Selector::classname(IndexedMutantProcessContainer::class),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('Source classes should use getters instead of public properties.');
     }
 }
