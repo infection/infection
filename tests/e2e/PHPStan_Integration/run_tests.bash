@@ -6,10 +6,11 @@ readonly INFECTION=../../../${1}
 
 set -e pipefail
 
-if [ "${DRIVER:-}" = "phpdbg" ]
+if [ "${DRIVER:-}" != "xdebug" ]
 then
-    echo "PHPStan_Integration requires active Xdebug; phpdbg cannot exercise the MemoryLimiter tmp php.ini path." >&2
-    exit 1
+    # This regression requires Composer XdebugHandler's temporary php.ini.
+    # PCOV and phpdbg do not exercise that path.
+    exit 0
 fi
 
 if ! XDEBUG_MODE=coverage php -r 'exit(extension_loaded("xdebug") ? 0 : 1);'

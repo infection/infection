@@ -4,7 +4,7 @@ It also covers the regression where PHPStan mutant processes inherited the PHP m
 
 The test forces those preconditions in `run_tests.bash`:
 
-- phpdbg is rejected because it cannot exercise the temporary `php.ini` path.
+- non-Xdebug drivers are skipped because PCOV and phpdbg cannot exercise the temporary `php.ini` path.
 - Xdebug must be loadable with `XDEBUG_MODE=coverage`.
 - A small restart probe verifies that `XdebugHandler` restarted PHP, kept `memory_limit=-1`, and produced a temporary php.ini inherited by child PHP processes.
 
