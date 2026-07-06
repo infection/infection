@@ -69,11 +69,11 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 ## Repo map
 
 - `src/` - production code. PSR-4 `Infection\`. Nothing under `src/` may depend on `tests/`
-  or benchmarks - PHPat-enforced; shipped test helpers live in `src/Testing/` for exactly
+  or benchmarks
   this reason.
 - `tests/phpunit/` - unit/integration tests, mirroring `src/` one-to-one. Every concrete
   source class must have a canonical test named after it (PHPat rule).
-- `tests/Architecture/PHPat/` - architecture fitness rules (finality, `@internal`, canonical
+- `tests/Architecture/PHPat/` - architecture and convention fitness rules (finality, `@internal`, canonical
   tests, IO-vs-`integration`-group, event conventions, src-not-depending-on-tests). They run
   under PHPStan via `devTools/phpstan.neon`, not under PHPUnit. The selectors' own tests are
   in `tests/phpunit/Architecture/`.
