@@ -73,7 +73,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   this reason.
 - `tests/phpunit/` - unit/integration tests, mirroring `src/` one-to-one. Every concrete
   source class must have a canonical test named after it (PHPat rule).
-- `tests/Architecture/PHPat/` - architecture fitness rules (finality, `@internal`, canonical
+- `tests/Architecture/PHPat/` - architecture and convention fitness rules (finality, `@internal`, canonical
   tests, IO-vs-`integration`-group, event conventions, src-not-depending-on-tests). They run
   under PHPStan via `devTools/phpstan.neon`, not under PHPUnit. The selectors' own tests are
   in `tests/phpunit/Architecture/`.
@@ -83,7 +83,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 - `tests/e2e/` - one directory per scenario: typically `expected-output.txt` plus an
   `infection.json5` that pins `"threads"` (usually 1 - parallel output is
   non-deterministic; the SA-integration scenarios deliberately use 4), often a `README.md`.
-  A custom `run_tests.bash` overrides the default `tests/e2e/standard_script.bash` - note
+  A custom `run_tests.bash` overrides the default `tests/e2e/standard_script.bash`
   the plural: CONTRIBUTING.md's `run_test.bash` is stale (`tests/e2e_tests:20`). Runner:
   `./tests/e2e_tests bin/infection [NamePattern]`; scaffold with `./tests/add_new_e2e`.
   Self-contained ones also run via `--group e2e`.
