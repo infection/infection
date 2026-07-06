@@ -2,14 +2,18 @@
 
 Operating guide for AI agents contributing to Infection. It is read once per session, so it is
 dense on purpose: every line is load-bearing, and most lines exist because an agent's default
-instinct was observed to be wrong here. If a line stops being true, fix the line. Claims are
-anchored to files - trust the tree over your training data: this codebase was heavily
-re-architected through 2025-2026 and your priors about it are stale.
+instinct was observed to be wrong here. Claims are anchored to files - trust the tree over
+your training data: this codebase was heavily re-architected through 2025-2026 and your
+priors about it are stale. This file rots like everything else: when your change makes a
+line here false - a path moves, a version gate shifts, a convention evolves - updating that
+line is part of the same task, not a separate chore. If you catch a stale line while merely
+reading, fix it too.
 
 ## What you are working on
 
 Infection is the mutation testing framework for PHP - 29 million Packagist installs, running
-inside the CI of thousands of projects. It parses source into ASTs (nikic/php-parser), applies
+inside the CI of thousands of projects. It parses source into ASTs (nikic/php-parser - API
+refresher: `vendor/nikic/php-parser/README.md` and its `doc/` folder), applies
 small mutations, and checks whether the project's tests - and optionally a static analyser -
 notice. A bug here silently corrupts other projects' quality gates. A slowdown here multiplies
 by thousands of mutant processes per user run. Reviewers weigh correctness, memory, and
@@ -21,19 +25,13 @@ explains most of the house style below: code is shaped so that every mutation of
 
 ## Vocabulary
 
-`doc/nomenclature.md` is the canonical glossary (with citations to the mutation-testing
-literature). Use its terms in code, tests, and PR titles; reviewers rename code that does not.
+The canonical glossary (with citations to the mutation-testing literature) is transcluded
+below. Use its terms in code, tests, and PR titles; reviewers rename code that does not.
+Two Infection-specific notes on top of it: a `Mutation` object is a *serializable*
+description of a change (created during analysis, applied later, possibly in another
+process), and a mutator is concretely `canMutate()` + `mutate()`.
 
-- **Mutation** = the serializable *description of a change*. **Mutant** = the mutated program.
-  **Mutator** = the transformation definition (`canMutate()` + `mutate()`).
-- **AST enrichment** = the pre-mutation traversal that attaches context to nodes.
-  **Eligible node** = a node a mutation may be generated for. **Arid node** = a node whose
-  mutation would be unproductive.
-- **Heuristic suppression** = filtering out low-value mutations. **Mutant materialisation** =
-  writing mutated code to disk and spawning its process. **Mutant evaluation** = running tests
-  against it.
-- **Trace** = the binding between a piece of source and the tests that execute it, produced by
-  a **Tracer**.
+@doc/nomenclature.md
 
 ## The execution pipeline
 
@@ -69,7 +67,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 ## Repo map
 
 - `src/` - production code. PSR-4 `Infection\`. Nothing under `src/` may depend on `tests/`
-  or benchmarks
+  or benchmarks (PHPat-enforced); shipped test helpers live in `src/Testing/` for
   this reason.
 - `tests/phpunit/` - unit/integration tests, mirroring `src/` one-to-one. Every concrete
   source class must have a canonical test named after it (PHPat rule).
@@ -80,13 +78,11 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 - `tests/phpunit/AutoReview/` - convention tests run by `phpunit_autoreview.xml`: mutator
   API shape, Definition presence, env-var hygiene, Makefile consistency, no mutable public
   properties (DTO whitelist in `tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php`).
-- `tests/e2e/` - one directory per scenario: typically `expected-output.txt` plus an
-  `infection.json5` that pins `"threads"` (usually 1 - parallel output is
-  non-deterministic; the SA-integration scenarios deliberately use 4), often a `README.md`.
-  A custom `run_tests.bash` (note the plural - `tests/e2e_tests:20`) overrides the default
-  `tests/e2e/standard_script.bash`. Runner:
-  `./tests/e2e_tests bin/infection [NamePattern]`; scaffold with `./tests/add_new_e2e`.
-  Self-contained ones also run via `--group e2e`.
+- `tests/e2e/` - one directory per scenario; anatomy, the `tests/e2e_tests` runner, and the
+  `tests/add_new_e2e` scaffold are covered by CONTRIBUTING.md, transcluded at the end of
+  this section. On top of that: fixtures pin `"threads"` (usually 1 - parallel output is
+  non-deterministic; the SA-integration scenarios deliberately use 4), and self-contained
+  scenarios also run via `--group e2e`.
 - `tests/benchmark/` - PHPBench suites (mutation generation, git-diff parsing, tracing).
   Performance PRs cite before/after numbers from these.
 - `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
@@ -97,6 +93,11 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
   `// Infection specific` comment so it is greppable.
+
+The human contributor guide - e2e scenario anatomy, the e2e runner, the pre-push hook - is
+transcluded here:
+
+@.github/CONTRIBUTING.md
 
 ## Commands
 
