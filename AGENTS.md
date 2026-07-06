@@ -69,7 +69,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 ## Repo map
 
 - `src/` - production code. PSR-4 `Infection\`. Nothing under `src/` may depend on `tests/`
-  or benchmarks - PHPat-enforced; shipped test helpers live in `src/Testing/` for exactly
+  or benchmarks
   this reason.
 - `tests/phpunit/` - unit/integration tests, mirroring `src/` one-to-one. Every concrete
   source class must have a canonical test named after it (PHPat rule).
