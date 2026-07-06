@@ -1,4 +1,4 @@
-schemaVersion: "1"
+schemaVersion: "2"
 kind: mixin
 name: infection-codex-otel
 displayName: Infection Codex OTEL
