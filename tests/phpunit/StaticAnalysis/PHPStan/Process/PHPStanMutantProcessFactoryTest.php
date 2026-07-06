@@ -100,7 +100,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
                 '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
@@ -197,7 +197,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
                 '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
@@ -295,7 +295,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
                 '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',

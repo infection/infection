@@ -55,6 +55,8 @@ use function version_compare;
  */
 final class PHPStanAdapter implements StaticAnalysisToolAdapter
 {
+    private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
+
     private const int VERSION_1 = 1;
 
     private const int VERSION_2 = 2;
@@ -97,7 +99,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            self::PHP_EXTRA_ARGS,
             $options,
         );
     }
@@ -167,7 +169,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            self::PHP_EXTRA_ARGS,
             ['--version'],
         );
 
