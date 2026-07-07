@@ -86,6 +86,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Performance PRs cite before/after numbers from these.
 - `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
   are for pre-existing debt only; never baseline a finding your new code introduced.
+  Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
