@@ -44,7 +44,6 @@ use PhpParser\Node\Stmt\Function_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ParentConnector::class)]
@@ -55,7 +54,6 @@ final class ParentConnectorTest extends VisitorTestCase
     /**
      * This test is to ensure the integration of ParentConnectingVisitor works as expected.
      */
-    #[CoversNothing]
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_parent_nodes(
         string $code,

@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -51,6 +52,7 @@ use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,6 +60,7 @@ use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
@@ -112,6 +115,31 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('shallProvide');
 
         $this->assertTrue($this->adapter->hasJUnitReport());
+    }
+
+    public function test_it_retrieves_version(): void
+    {
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor
+            ->expects($this->once())
+            ->method('execute')
+            ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
+            ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
+
+        $expected = '10.5.1';
+
+        $adapter = $this->createAdapter(
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit/>
+                XML,
+            version: null,
+            shellCommandLineExecutor: $shellCommandLineExecutor,
+        );
+
+        $actual = $adapter->getVersion();
+
+        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('passOutputProvider')]
@@ -1590,10 +1618,11 @@ final class PhpUnitAdapterTest extends TestCase
      */
     private function createAdapter(
         string $testFrameworkConfigContent,
-        string $version = self::DEFAULT_PHPUNIT_VERSION,
+        ?string $version = self::DEFAULT_PHPUNIT_VERSION,
         array $filteredSourceFilesToMutate = [],
         bool $executeOnlyCoveringTestCases = false,
         ?string $mapSourceClassToTestStrategy = null,
+        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
     ): PhpUnitAdapter {
         $tmpDir = '/tmp';
         $projectDir = '/path/to/project';
@@ -1638,6 +1667,7 @@ final class PhpUnitAdapterTest extends TestCase
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
             ),
+            $shellCommandLineExecutor ?? $this->createStub(ShellCommandLineExecutor::class),
             new VersionParser(),    // won't be used since we pass the version
             new CommandLineBuilder($this->phpExecutableFinderMock),
             $version,

@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Execution Phases](#execution-phases)
+    - [Implementation Map](#implementation-map)
 - Index
     - [A](#a)
         - [Arid Node][arid-node]
@@ -112,6 +113,22 @@ flowchart TB
     style MutantMaterialisation fill:#fecdd3,stroke:#be123c
     style MutantEvaluation fill:#fecdd3,stroke:#be123c
 ```
+
+
+### Implementation map in Infection
+
+The following table maps the execution phases to the main implementation entry points in Infection:
+
+| Phase               | Main implementation points                                                                                | Notes                                                                         |
+|---------------------|-----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| CLI entry           | `bin/infection`, `src/Command/RunCommand.php`                                                             | Parses CLI input and prepares the runtime configuration.                      |
+| Orchestration       | `src/Engine.php`                                                                                          | Coordinates the mutation-testing run.                                         |
+| Source Collection   | `src/Source/`, `src/Configuration/PositionalPathsClassifier.php`                                          | Finds source and test files.                                                  |
+| Artefact Collection | `src/Process/OriginalPhpProcess.php`, `src/TestFramework/Coverage/`, `src/TestFramework/Tracing/`         | Runs the initial test suite and loads coverage and trace artefacts.           |
+| AST Processing      | `src/PhpParser/NodeTraverserFactory.php`                                                                  | Parses and enriches the AST, including node eligibility.                      |
+| Mutation Generation | `src/Mutation/FileMutationGenerator.php`, `src/Mutator/NodeMutationGenerator.php`, `src/Mutator/`         | Produces mutations from eligible nodes.                                       |
+| Mutant Analysis     | `src/Mutant/MutantCodeFactory.php`, `src/Process/Runner/ParallelProcessRunner.php`, `src/StaticAnalysis/` | Materialises and evaluates mutants, including static-analysis follow-up runs. |
+| Reporting           | `src/Metrics/`, `src/Logger/`, `src/Reporter/`, `src/Report/`                                             | Computes and emits mutation-testing results.                                  |
 
 
 ## A

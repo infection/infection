@@ -47,12 +47,14 @@ use Infection\Tests\CI\ConfigurableEnv;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\Logger\DummyLogger;
 use OndraM\CiDetector\CiDetector;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use function Safe\putenv;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(StrykerReporter::class)]
 final class StrykerReporterTest extends TestCase
 {

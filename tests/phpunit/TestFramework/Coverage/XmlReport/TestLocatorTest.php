@@ -42,6 +42,7 @@ use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -84,7 +85,7 @@ final class TestLocatorTest extends TestCase
         $this->assertSame($expectedTests, TestLocationsNormalizer::normalize($tests));
     }
 
-    #[DataProvider('rangeProvider')]
+    #[DataProvider('rangeWithoutExpectedTestsProvider')]
     public function test_it_cannot_locate_any_tests_executing_the_given_range_if_no_tests_are_found(
         NodeLineRangeData $range,
         bool $onFunctionSignature,
@@ -96,6 +97,14 @@ final class TestLocatorTest extends TestCase
         $tests = $testLocator->getAllTestsForMutation($range, $onFunctionSignature);
 
         $this->assertSame([], TestLocationsNormalizer::normalize($tests));
+    }
+
+    public static function rangeWithoutExpectedTestsProvider(): iterable
+    {
+        yield from DataProviderFactory::takeArguments(
+            2,
+            self::rangeProvider(),
+        );
     }
 
     public static function rangeProvider(): iterable

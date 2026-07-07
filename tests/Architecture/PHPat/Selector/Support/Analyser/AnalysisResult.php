@@ -43,6 +43,7 @@ final readonly class AnalysisResult
         public bool $isAConcretePHPUnitTestCase,
         public bool $hasCoversNothing,
         public bool $belongsToIntegrationGroup,
+        public bool $declaresPublicNonReadonlyProperty,
     ) {
     }
 }

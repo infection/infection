@@ -41,6 +41,7 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Reporter\DummyLineMutationTestingResultsReporter;
 use Infection\Tests\Logger\DummyLogger;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -50,6 +51,7 @@ use function Safe\ob_start;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
+#[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
 #[CoversClass(FileReporter::class)]
 final class FileReporterTest extends FileSystemTestCase
