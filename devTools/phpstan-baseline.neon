@@ -109,6 +109,24 @@ parameters:
 			path: ../src/Configuration/SourceFilter/PlainFilter.php
 
 		-
+			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Console/LogVerbosity.php
+
+		-
+			rawMessage: Fetching deprecated class constant NONE_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Console/LogVerbosity.php
+
+		-
+			rawMessage: Fetching deprecated class constant NORMAL_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Console/LogVerbosity.php
+
+		-
 			rawMessage: Infection\Console\XdebugHandler should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -307,6 +325,12 @@ parameters:
 			path: ../src/Metrics/MetricsCalculator.php
 
 		-
+			rawMessage: 'Call to deprecated method findRequired() of class Infection\Metrics\TargetDetectionStatusesProvider.'
+			identifier: method.deprecated
+			count: 1
+			path: ../src/Metrics/TargetDetectionStatusesProvider.php
+
+		-
 			rawMessage: Infection\Mutant\MutantExecutionResult should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -338,6 +362,42 @@ parameters:
 			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
 			count: 1
 			path: ../src/Mutator/Extensions/MBString.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PRIVATE of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PRIVATE instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PROTECTED of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PROTECTED instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PROTECTED of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PROTECTED instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PUBLIC of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PUBLIC instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
 
 		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
@@ -380,6 +440,15 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/Mutator/NodeMutationGenerator.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				This mutator is a semantic addition
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: ../src/Mutator/ProfileList.php
 
 		-
 			rawMessage: 'Impure yield in pure method Infection\Mutator\Unwrap\UnwrapArrayCombine::getParameterIndexes().'
@@ -562,6 +631,12 @@ parameters:
 			path: ../src/Source/Collector/GitDiffSourceCollector.php
 
 		-
+			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
+
+		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -596,6 +671,12 @@ parameters:
 			identifier: theCodingMachineSafe.function
 			count: 1
 			path: ../src/TestFramework/CommandLineBuilder.php
+
+		-
+			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
@@ -763,6 +844,15 @@ parameters:
 			path: ../src/Testing/SingletonContainer.php
 
 		-
+			rawMessage: '''
+				Call to deprecated method isSubclassOf() of class PHPStan\Reflection\ClassReflection:
+				Use isSubclassOfClass instead.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../tests/Architecture/PHPat/Selector/Support/PHPUnitTestClassAnalysis.php
+
+		-
 			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -901,6 +991,24 @@ parameters:
 			path: ../tests/phpunit/Console/E2ETest.php
 
 		-
+			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 2
+			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
+			rawMessage: Fetching deprecated class constant NONE_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
+			rawMessage: Fetching deprecated class constant NORMAL_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
 			rawMessage: Variable method call on Infection\Container\Container.
 			identifier: method.dynamicName
 			count: 1
@@ -979,6 +1087,12 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
+			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../tests/phpunit/FileSystem/Locator/FileOrDirectoryNotFoundTest.php
+
+		-
 			rawMessage: Infection\Tests\Logger\Console\BufferedOutputWithStdErrOutput should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1045,6 +1159,15 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 6
+			path: ../tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php
+
+		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
@@ -1061,6 +1184,15 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: ../tests/phpunit/Mutator/Arithmetic/PlusTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				This mutator is a semantic addition
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Mutator/Boolean/NotIdenticalNotEqualTest.php
 
 		-
 			rawMessage: 'Parameter #1 $settings of class Infection\Mutator\Boolean\TrueValueConfig constructor expects array<string, bool>, array<string, string> given.'
@@ -1175,6 +1307,15 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				This mutator is a semantic addition
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 3
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
 
 		-
 			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<int|string, array<int|string, bool|string>|string>|bool> given.'
@@ -1333,6 +1474,24 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
 
 		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 11
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
+
+		-
 			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
 			identifier: missingType.generics
 			count: 1
@@ -1451,6 +1610,42 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 5
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: ../tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 4
+			path: ../tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: ../tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
