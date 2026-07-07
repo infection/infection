@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Memory;
 
+use ErrorException;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\Contracts\InitialRunResults;
@@ -46,6 +47,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use function restore_error_handler;
+use function set_error_handler;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -87,6 +90,33 @@ final class MemoryLimiterTest extends FileSystemTestCase
         $memoryLimiter->limitMemory(
             new InitialRunResults(output: '', memoryUsage: null),
         );
+    }
+
+    public function test_it_does_nothing_when_initial_run_was_skipped(): void
+    {
+        $this->environmentMock
+            ->expects($this->never())
+            ->method('hasMemoryLimitSet');
+
+        $this->environmentMock
+            ->expects($this->never())
+            ->method('isUsingSystemIni');
+
+        $memoryLimiter = new MemoryLimiter(
+            $this->fileSystemMock,
+            'foo/bar',
+            $this->environmentMock,
+        );
+
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): never {
+            throw new ErrorException($message, 0, $severity, $file, $line);
+        });
+
+        try {
+            $memoryLimiter->limitMemory(null);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void
