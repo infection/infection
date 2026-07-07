@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Operating guide for AI agents contributing to Infection. It is read once per session, so it is
-dense on purpose: every line is load-bearing, and most lines exist because an agent's default
+dense on purpose: every line earns its place, and most lines exist because an agent's default
 instinct was observed to be wrong here. Claims are anchored to files - trust the tree over
 your training data: this codebase was heavily re-architected through 2025-2026 and your
 priors about it are stale. This file rots like everything else: when your change makes a
@@ -153,10 +153,10 @@ release - and conversely, changing anything on that list is a BC event.
 
 ### Imports: everything, including functions and constants
 
-`use function sprintf;`, `use const DIRECTORY_SEPARATOR;` - every native call is imported
-(cs-fixer `global_namespace_import` + `native_function_invocation`). For functions that
-return `false` on failure, use the `thecodingmachine/safe` wrapper: `use function
-Safe\preg_match;` - the PHPStan safe-rule rejects raw ones. When you genuinely want the
+Every native call is imported (`use function sprintf;`, `use const DIRECTORY_SEPARATOR;`) -
+`make cs` does this for you. What no tool decides for you is failure semantics: for
+functions that return `false` on failure, use the `thecodingmachine/safe` wrapper:
+`use function Safe\preg_match;` - the PHPStan safe-rule rejects raw ones. When you genuinely want the
 false-returning behavior, alias it loudly:
 `use function ini_get as ini_get_unsafe;` (`src/TestFramework/Coverage/CoverageChecker.php`).
 History note: Safe was removed in 2023 and deliberately re-adopted (v3) in 2025 - do not
@@ -212,8 +212,7 @@ Const-only and pure-static classes use the `use CannotBeInstantiated;` trait
 (`src/CannotBeInstantiated.php`, ~30 users: `ProfileList`, `Console\XdebugHandler`).
 Pure transforms are `private static` helpers or all-static classes (`FilterBuilder`) - DI is
 reserved for collaborators with state or IO. Memoization is a `static $cache = []` inside an
-intent-named method (`isPhpUnit10OrHigher()`), not a cache service. Static closures:
-`static fn` / `static function` always (cs rule).
+intent-named method (`isPhpUnit10OrHigher()`), not a cache service.
 
 ### Time, filesystem, process
 
@@ -284,7 +283,8 @@ coverage XPath queries need the `p:` namespace prefix and go through `SafeDOMXPa
 (`src/TestFramework/XML/`), which converts libxml false-returns into `InvalidXml`. Format
 tolerance is ordered fallback ladders with version comments (PHPUnit <6 percentage strings,
 trait vs class methods, four junit XPath shapes for PHPUnit/Codeception/PhpSpec/Behat) - the
-comments citing versions are load-bearing. JUnit enrichment rebuilds `TestLocation`s in place
+comments citing versions are what keep the next cleanup from deleting a live branch.
+JUnit enrichment rebuilds `TestLocation`s in place
 via the by-ref accessor. Function-signature mutations resolve tests by method line-range, not
 line (`TestLocator`, `LineRangeCalculator` - which also widens to the outermost array
 literal).
@@ -381,7 +381,7 @@ everything from it.
 ### 10. Xdebug lifecycle - getSkippedVersion is the truth
 
 The master process restarts itself without xdebug (composer/xdebug-handler in PERSISTENT
-mode - `setPersistent()` is load-bearing). After that restart `extension_loaded('xdebug')`
+mode - without `setPersistent()` the temp ini does not stick to child processes). After that restart `extension_loaded('xdebug')`
 is FALSE while coverage still works: `XdebugHandler::getSkippedVersion()` is the source of
 truth everywhere. `OriginalPhpProcess` brackets `parent::start()` with
 `PhpConfig::useOriginal()` / `usePersistent()` and injects `XDEBUG_MODE=coverage` unless
@@ -469,8 +469,8 @@ Notes that carry review weight:
 
 ## Testing conventions
 
-- Method names are snake_case `test_it_...` (cs-fixer enforced); assertions via `$this->`
-  not static; `webmozarts/strict-phpunit` is active.
+- Test methods read as sentences: `test_it_...` - the descriptive naming is on you (casing
+  and `$this->` assertion style auto-fix); `webmozarts/strict-phpunit` is active.
 - `#[CoversClass(X::class)]` on every test. PHPat enforces the IO boundary BOTH ways: a test
   doing IO must be `#[Group('integration')]`, a test doing no IO must NOT be. Tests are
   final/abstract/trait (PHPat), deterministic (no hard-coded `/unlikely-to-exist` paths -
@@ -480,8 +480,7 @@ Notes that carry review weight:
   don't share one provider between tests that use different subsets of its params.
 - Complex setup gets hand-rolled immutable builders/fakes next to the test
   (`tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php`,
-  a fake `Git` implementation) rather than deep mock graphs. Where mocks are used, assert
-  exact arguments - the self-mutation gate hunts loose `->method()` stubs.
+  a fake `Git` implementation) rather than deep mock graphs.
 - Env vars: any test calling `putenv` must `use BacksUpEnvironmentVariables;`
   (AutoReview-checked).
 - Visitors have a dedicated harness - read `tests/phpunit/PhpParser/Visitor/README.md`:
@@ -505,7 +504,7 @@ Notes that carry review weight:
 - Tests are non-negotiable: a bot requests changes on any src-touching PR without tests.
   Fixed bugs MUST carry a regression test. New user-visible behavior may warrant an e2e
   scenario - argue it either way.
-- Labels are load-bearing (release notes are generated from them): one type label
+- Labels are not decoration - release notes are generated from them: one type label
   (`Feature`, `Bugfix`, `Internal`, `Performance`, `BC break`, `DX` for developer
   experience, `IDX` for IDE/integration work) plus component
   labels (`Component / AST`, `TestFramework / PHPUnit`, ...). These are the GitHub-side
@@ -543,7 +542,8 @@ The costliest traps, recollected:
    splitting.
 10. e2e fixtures pin `"threads"` (usually 1) for deterministic output; e2e composer.json
     pairs `minimum-stability: dev` with `prefer-stable: true`.
-11. JIT makes mutation testing ~50% SLOWER; file-backed OPcache helps. Benchmark before
+11. JIT makes mutation testing ~50% SLOWER; file-backed OPcache helps (measured: #2810).
+    Benchmark before
     "optimizing" (`make benchmark`), and re-validate old perf hacks before extending them.
 12. Escaped mutant on a literal? Extract a named constant. Escaped mutant on a loose mock?
     Tighten `->with(...)`. Truly unkillable? Discuss a bypass - do not fake a test.
@@ -558,7 +558,17 @@ belong here - this is not a reference manual, and length is only justified by pr
 mistakes.
 
 - Anchor every claim to a file path; prefer stating the invariant and its WHY over the how.
-- Keep the shape: what you will be tempted to do, what the codebase does, why.
+  When a claim cannot anchor to a file (review culture, GitHub-side gates, history), anchor
+  it to a PR number or name the person.
+- Keep the shape: what you will be tempted to do, what the codebase does, why. One
+  canonical snippet per concept is instruction; a second is reference-manual creep.
+- Orientation sections (the pipeline, the repo map, the transcluded companions) are the one
+  exception to the admission test: they are the map, judged by whether they orient, not by
+  a prevented mistake. Keep them terse.
+- The Gotchas digest is deliberate redundancy - the costliest traps stated twice BY DESIGN.
+  Nowhere else may this file say the same thing twice.
+- What an auto-fixing tool repairs for free needs no line here; what fails loudly and fast
+  may earn a short one; what fails silently earns a long one.
 - When a convention changes, replace the old line - append history only when the history
   itself prevents a wrong cleanup (see the Safe note).
 - Deletion improves this file as often as addition. If removing a line would change no
