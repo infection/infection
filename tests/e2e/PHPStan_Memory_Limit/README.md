@@ -6,7 +6,7 @@ The test forces those preconditions in `run_tests.bash`:
 
 - non-Xdebug drivers are skipped because PCOV and phpdbg cannot exercise the temporary `php.ini` path.
 - Xdebug must be loadable with `XDEBUG_MODE=coverage`.
-- A small restart probe verifies that `XdebugHandler` restarted PHP, kept `memory_limit=-1`, and produced a temporary php.ini inherited by child PHP processes.
+- A small restart probe verifies that `XdebugHandler` restarted PHP, kept `memory_limit=-1`, and produced a loaded php.ini.
 
 The PHPUnit test prints `Memory: 16.00 MB` during the initial test run. PHPUnit's own final memory line may vary between environments, but Infection reads the first matching memory line from the process output. This makes `MemoryLimiter` append `memory_limit = 32M` to the temporary php.ini after the initial static analysis run and before mutant execution.
 
