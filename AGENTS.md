@@ -9,8 +9,9 @@ task. If you find a stale line while reading, fix it too.
 
 ## What you are working on
 
-Infection is the mutation testing framework for PHP - PHPUnit, PHP-CS-Fixer, and PHPStan are
-all developed with it. It parses source into ASTs (nikic/php-parser - API
+Infection is the mutation testing framework for PHP - millions of Packagist installs, and
+PHPUnit, PHP-CS-Fixer, and PHPStan are all developed with it. It parses source into ASTs
+(nikic/php-parser - API
 refresher: `vendor/nikic/php-parser/README.md` and its `doc/` folder), applies
 small mutations, and checks whether the project's tests - and optionally a static analyser -
 notice. A bug here silently corrupts other projects' quality gates. A slowdown here multiplies
