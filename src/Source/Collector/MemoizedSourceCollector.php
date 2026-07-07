@@ -33,46 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Source\Collector;
 
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\PhpExecutableFinder;
+use SplFileInfo;
 
 /**
  * @internal
  */
-final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
+final class MemoizedSourceCollector implements SourceCollector
 {
     /**
-     * @param list<string> $staticAnalysisToolOptions
+     * @var SplFileInfo[]
      */
-    public static function create(
-        string $staticAnalysisConfigPath,
-        string $staticAnalysisToolExecutable,
-        float $timeout,
-        string $tmpDir,
-        array $staticAnalysisToolOptions,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-    ): StaticAnalysisToolAdapter {
-        return new PHPStanAdapter(
-            new Filesystem(),
-            new PHPStanMutantExecutionResultFactory(),
-            $staticAnalysisConfigPath,
-            $staticAnalysisToolExecutable,
-            new CommandLineBuilder(
-                new PhpExecutableFinder(),
-            ),
-            new VersionParser(),
-            $timeout,
-            $tmpDir,
-            $staticAnalysisToolOptions,
-            $shellCommandLineExecutor,
-        );
+    private ?array $sourceFiles = null;
+
+    public function __construct(
+        private readonly SourceCollector $decoratedCollector,
+    ) {
+    }
+
+    public function collect(): array
+    {
+        if ($this->sourceFiles === null) {
+            $this->sourceFiles = $this->decoratedCollector->collect();
+        }
+
+        return $this->sourceFiles;
     }
 }

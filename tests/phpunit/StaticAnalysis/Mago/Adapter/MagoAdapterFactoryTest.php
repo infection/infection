@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +51,7 @@ final class MagoAdapterFactoryTest extends TestCase
             32.3,
             '/tmp',
             [],
+            new ShellCommandLineExecutor(),
         );
 
         $this->assertSame('Mago', $adapter->getName());

@@ -43,12 +43,14 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\ProfileList;
 use Infection\Testing\SingletonContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(Definition::class)]
+#[Group('integration')]
+#[CoversNothing]
 final class DefinitionTest extends TestCase
 {
     // TODO: address those
