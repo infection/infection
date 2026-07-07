@@ -33,38 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\ProjectCode;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function class_exists;
-use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
-use function interface_exists;
+use Infection\CannotBeInstantiated;
+use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use function sprintf;
-use function trait_exists;
 
-#[CoversClass(ProjectCodeProvider::class)]
-final class ProjectCodeProviderTest extends TestCase
+#[CoversClass(ClassNamedAny::class)]
+final class ClassNamedAnyTest extends SelectorTestCase
 {
-    #[DataProvider('sourceClassProvider')]
-    public function test_source_classes_provider_is_valid(string $className): void
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classProvider')]
+    public function test_it_matches_classes_named_in_the_list(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new ClassNamedAny([
+            CannotBeInstantiated::class,
+            CommandLineBuilder::class,
+        ]);
+        $classReflection = $this->createClassReflection($className);
+
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_exposes_the_selected_class_names_as_name(): void
     {
-        $this->assertTrue(
-            class_exists($className, true)
-                || interface_exists($className, true)
-                || trait_exists($className, true),
-            sprintf(
-                'Expected "%s" to be a class, an interface, or a trait.',
-                $className,
-            ),
+        $selector = new ClassNamedAny([
+            CannotBeInstantiated::class,
+            CommandLineBuilder::class,
+        ]);
+
+        $actual = $selector->getName();
+
+        $this->assertSame(
+            'Infection\CannotBeInstantiated, Infection\TestFramework\CommandLineBuilder',
+            $actual,
         );
     }
 
-    public static function sourceClassProvider(): iterable
+    public static function classProvider(): iterable
     {
-        yield from DataProviderFactory::fromIterable(
-            ProjectCodeProvider::provideSourceClasses(),
-        );
+        yield 'first selected class' => [
+            CannotBeInstantiated::class,
+            true,
+        ];
+
+        yield 'second selected class' => [
+            CommandLineBuilder::class,
+            true,
+        ];
+
+        yield 'unselected class' => [
+            VersionParser::class,
+            false,
+        ];
     }
 }

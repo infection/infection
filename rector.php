@@ -34,6 +34,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\BooleanNot\NegatedAndsToPositiveOrsRector;
 use Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector;
 use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetchRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
@@ -88,6 +89,7 @@ $skippedPaths = [
     __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
     __DIR__ . '/tests/benchmark/Tracing/coverage',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/CoveredClassWithoutIo.php',
 ];
 
@@ -161,6 +163,7 @@ $config = RectorConfig::configure()
         MergeWithCallableAndWillReturnRector::class => [
             __DIR__ . '/tests/phpunit/Mutation/FileMutationGeneratorTest.php',
         ],
+        NegatedAndsToPositiveOrsRector::class => null,
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Tracing/Trace/TestLocations.php',

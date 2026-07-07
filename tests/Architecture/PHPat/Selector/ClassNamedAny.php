@@ -33,17 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-final readonly class AnalysisResult
+use function implode;
+use function in_array;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+
+final readonly class ClassNamedAny implements SelectorInterface
 {
+    /**
+     * @param list<class-string> $classNames
+     */
     public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
+        private array $classNames,
     ) {
+    }
+
+    public function getName(): string
+    {
+        return implode(', ', $this->classNames);
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        return in_array($classReflection->getName(), $this->classNames, true);
     }
 }

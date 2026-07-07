@@ -67,9 +67,51 @@ final class InfectionSelector
         return new InfectionSourceCode();
     }
 
+    public static function nonSourceCode(): SelectorInterface
+    {
+        return Selector::Not(self::sourceCode());
+    }
+
     public static function testCode(): SelectorInterface
     {
         return new InfectionTestCode();
+    }
+
+    public static function magoAdapterCandidate(): SelectorInterface
+    {
+        return Selector::AnyOf(
+            Selector::inNamespace('Infection\StaticAnalysis\Mago'),
+            Selector::inNamespace('Infection\TestFramework\Mago'),
+        );
+    }
+
+    public static function phpStanAdapterCandidate(): SelectorInterface
+    {
+        return Selector::AnyOf(
+            Selector::inNamespace('Infection\StaticAnalysis\PHPStan'),
+            Selector::inNamespace('Infection\TestFramework\PhpStan'),
+        );
+    }
+
+    public static function testFrameworkContractCandidate(): SelectorInterface
+    {
+        return Selector::inNamespace('Infection\TestFramework\Contracts');
+    }
+
+    public static function phpUnitAdapterCandidate(): SelectorInterface
+    {
+        return Selector::inNamespace('Infection\TestFramework\PhpUnit');
+    }
+
+    public static function adapterCommonCandidate(): SelectorInterface
+    {
+        return Selector::AnyOf(
+            Selector::inNamespace('Infection\TestFramework\Common'),
+            new ClassNamedAny([
+                // This class can simply be copied when we need it.
+                CannotBeInstantiated::class,
+            ]),
+        );
     }
 
     public static function phpunitTestCode(): SelectorInterface
@@ -172,6 +214,11 @@ final class InfectionSelector
     public static function hasTrivialImplementation(): SelectorInterface
     {
         return new HasTrivialImplementation(self::analyser());
+    }
+
+    public static function sourceClassWithPublicNonReadonlyProperty(): SelectorInterface
+    {
+        return new SourceClassWithPublicNonReadonlyProperty(self::analyser());
     }
 
     public static function hasDocBlock(): SelectorInterface
