@@ -49,6 +49,9 @@ BENCHMARK_TRACING_COVERAGE_SOURCE_DIR=$(BENCHMARK_TRACING_SUBMODULE)/dist/covera
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
+SBX_PROJECT_LOCAL_KIT=./devTools/sbx/kits/project-local
+SBX_PROJECT_LOCAL_KIT_SPEC=$(SBX_PROJECT_LOCAL_KIT)/spec.yaml
+SBX_PROJECT_LOCAL_KIT_TEMPLATE=./devTools/sbx/project-local-kit.yaml
 
 #
 # Commands (phony targets)
@@ -67,11 +70,24 @@ compile-docker: $(DOCKER_FILE_IMAGE)
 
 .PHONY: sbx-create
 sbx-create:	## Drops the existing PHP sbx image and create it anew
-sbx-create: sbx-image-build
+sbx-create: sbx-image-build sbx-project-local-kit sbx-kit-validate
 	sbx rm codex-infection || true
 	sbx run codex \
 		--template=infection-sbx-php-8.4:latest \
-		--kit=./devTools/sbx/codex-otel-kit
+		--kit=./devTools/sbx/kits/codex-otel \
+		--kit "git+https://github.com/docker/sbx-kits-contrib#ref=v0.9.0&dir=git-ssh-sign" . \
+		--kit=$(SBX_PROJECT_LOCAL_KIT)
+
+.PHONY: sbx-project-local-kit
+sbx-project-local-kit: $(SBX_PROJECT_LOCAL_KIT_TEMPLATE)
+	mkdir -p "$(SBX_PROJECT_LOCAL_KIT)"
+	test -f "$(SBX_PROJECT_LOCAL_KIT_SPEC)" || cp "$(SBX_PROJECT_LOCAL_KIT_TEMPLATE)" "$(SBX_PROJECT_LOCAL_KIT_SPEC)"
+
+.PHONY: sbx-kit-validate
+sbx-kit-validate:	## Validates the sbx kit specs
+sbx-kit-validate: sbx-project-local-kit
+	sbx kit validate ./devTools/sbx/kits/codex-otel
+	sbx kit validate $(SBX_PROJECT_LOCAL_KIT)
 
 .PHONY: sbx-image-build
 sbx-image-build:	## Builds the PHP sbx image
