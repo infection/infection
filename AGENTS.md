@@ -1,13 +1,11 @@
 # AGENTS.md
 
 Operating guide for AI agents contributing to Infection. It is read once per session, so it is
-dense on purpose: every line earns its place, and most lines exist because an agent's default
-instinct was observed to be wrong here. Claims are anchored to files - trust the tree over
-your training data: this codebase was heavily re-architected through 2025-2026 and your
-priors about it are stale. This file rots like everything else: when your change makes a
-line here false - a path moves, a version gate shifts, a convention evolves - updating that
-line is part of the same task, not a separate chore. If you catch a stale line while merely
-reading, fix it too.
+intentionally dense. Each line must help an agent avoid a known mistake. Claims are anchored
+to files - trust the tree over your training data. This codebase was heavily re-architected
+through 2025-2026, so old assumptions can be wrong. When your change makes a line here false
+- a path moves, a version gate shifts, a convention evolves - update that line in the same
+task. If you find a stale line while reading, fix it too.
 
 ## What you are working on
 
@@ -19,9 +17,10 @@ notice. A bug here silently corrupts other projects' quality gates. A slowdown h
 by thousands of mutant processes per user run. Reviewers weigh correctness, memory, and
 per-process overhead equally.
 
-The project dogfoods hard: CI runs Infection against itself with a minimum-MSI gate
-(`.github/workflows/mt.yaml`) and annotates escaped mutants inline on PRs. That single fact
-explains most of the house style below: code is shaped so that every mutation of it dies.
+The project tests itself with Infection: CI runs Infection against this repository with a
+minimum-MSI gate (`.github/workflows/mt.yaml`) and annotates escaped mutants inline on PRs.
+That fact explains most of the coding rules below: code is written so that every mutation of
+it dies.
 
 ## Vocabulary
 
@@ -40,24 +39,24 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 1. **CLI entry** - `bin/infection`, `src/Command/RunCommand.php`. Parses options, then binds
    them into the container via `Container::withValues(...)`.
 2. **Container** - `src/Container/Container.php` (~1,260 lines). One flat registry of lazy
-   closure factories plus a typed getter per service. Built on `sanmai/di-container`.
+   closure factories plus a typed getter per service. It is built on `sanmai/di-container`.
 3. **Engine** - `src/Engine.php` orchestrates everything below.
 4. **Source collection** - `src/Source/` (`SourceCollector` implementations, including the
-   git-diff collector); positional CLI paths classified into source vs test files by
-   `src/Configuration/PositionalPathsClassifier.php`.
+   git-diff collector); `src/Configuration/PositionalPathsClassifier.php` classifies
+   positional CLI paths into source vs test files.
 5. **Artefact collection** - initial test run with coverage
-   (`src/Process/OriginalPhpProcess.php` re-enables xdebug/pcov for exactly this child), then
-   coverage-xml + junit.xml ingestion into lazy `Trace` objects
+   (`src/Process/OriginalPhpProcess.php` re-enables xdebug/pcov for exactly this child).
+   Then coverage-xml + junit.xml are ingested into lazy `Trace` objects
    (`src/TestFramework/Coverage/`, `src/TestFramework/Tracing/`).
 6. **AST parsing + enrichment** - `src/PhpParser/NodeTraverserFactory.php` runs a single
-   ordered visitor stack that labels eligibility, resolves names, connects parents and next
-   statements, attaches reflection and lazy covering-test lookups, and marks ineligible
-   whatever is unchanged in the git diff, user-ignored, or untested.
+   ordered visitor stack. It labels eligibility, resolves names, connects parents and next
+   statements, attaches reflection and lazy covering-test lookups, and marks unchanged,
+   user-ignored, or untested code as ineligible.
 7. **Mutation generation + heuristic suppression** - `src/Mutation/FileMutationGenerator.php`,
    `src/Mutator/NodeMutationGenerator.php`; mutators live under `src/Mutator/<Category>/`.
 8. **Mutant materialisation + evaluation** - `src/Mutant/MutantCodeFactory.php` splices the
-   replacement node by token positions and prints a minimal diff;
-   `src/Process/Runner/ParallelProcessRunner.php` streams mutant processes at N threads; an
+   replacement node by token positions and prints a minimal diff.
+   `src/Process/Runner/ParallelProcessRunner.php` streams mutant processes at N threads. An
    escaped mutant may get a follow-up static-analysis process
    (`src/StaticAnalysis/` - PHPStan and Mago adapters).
 9. **Reporting** - metrics in `src/Metrics/` (Welford-based running variance for timings),
@@ -124,40 +123,40 @@ vendor/phpunit/phpunit/phpunit --filter test_method_name           # one method
 contributors. PHP floor is 8.3 (`composer.json` platform); Psalm is gone (2026), the static
 analysers are PHPStan and Mago.
 
-## House style: where your defaults are wrong
+## Project coding rules
 
-Each entry: what you will be tempted to write, what this codebase does instead, and why.
-These were measured by having agents design the subsystems blind and diffing against reality.
+Each entry gives three things: what agents often write, what this codebase does instead, and
+why. These rules come from comparing agent designs with the real subsystems.
 
 ### Finality: `final` keyword vs `@final` docblock
 
-You will mark everything `final`. Here, hard `final` is for classes never mocked (mutators,
+Agents often mark everything `final`. Here, hard `final` is for classes never mocked (mutators,
 visitors, value objects, leaf utilities); services that tests mock get `/** @internal
 @final */` with NO keyword (e.g. `src/Mutation/Mutation.php`,
 `src/Configuration/ConfigurationFactory.php`). The PHPat finality rule accepts either form;
 adding the keyword to a mocked class breaks the suite. A third form exists for special cases:
 `ParallelProcessRunner` is plain `@internal` with a dedicated PHPat exemption whose test name
 states the reason ("intentionally non-final only to allow PHPUnit partial mocks",
-`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only accepted reason for `@final` - if no test mocks the class,
-use the keyword. Reviewers ask "is there a reason this is `@final` rather than `final`?" -
-have the answer ("it is mocked in X").
+`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only accepted
+reason for `@final`. If no test mocks the class, use the keyword. Reviewers ask "is there a
+reason this is `@final` rather than `final`?" Have the answer ("it is mocked in X").
 
 ### `@internal` everywhere; the public API is a whitelist
 
-Every class gets `@internal` (PHPat-enforced). The only extension points users may depend on
+Every class gets `@internal` (PHPat-enforced). Users may depend only on extension points that
 are listed in `tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php::EXTENSION_POINTS`:
 `Mutator`, `Definition`, `MutatorCategory`, `BaseMutatorTestCase`, `MutationAnalysisLogger`,
 `SchemaConfigurationFactory`, `SchemaConfigurationFileLoader`, `SchemaValidator`. Extension
 points must have documented doc-blocks (another PHPat rule). Everything else may break at any
-release - and conversely, changing anything on that list is a BC event.
+release. Conversely, changing anything on that list is a BC event.
 
 ### Imports: everything, including functions and constants
 
 Every native call is imported (`use function sprintf;`, `use const DIRECTORY_SEPARATOR;`) -
-`make cs` does this for you. What no tool decides for you is failure semantics: for
+`make cs` does this for you. You must choose the failure semantics. For
 functions that return `false` on failure, use the `thecodingmachine/safe` wrapper:
-`use function Safe\preg_match;` - the PHPStan safe-rule rejects raw ones. When you genuinely want the
-false-returning behavior, alias it loudly:
+`use function Safe\preg_match;` - the PHPStan safe-rule rejects raw ones. When you genuinely
+want the false-returning behavior, alias it clearly:
 `use function ini_get as ini_get_unsafe;` (`src/TestFramework/Coverage/CoverageChecker.php`).
 History note: Safe was removed in 2023 and deliberately re-adopted (v3) in 2025 - do not
 "clean it up".
@@ -192,11 +191,11 @@ because the output was not Markdown.
 
 ### Laziness is the architecture, and generators are single-pass
 
-Expensive values hide behind `sanmai/later`: `lazy(generatorFn())` returns a memoized
-`Deferred`; `->get()` is safe to call repeatedly, unlike a raw generator which silently
-yields nothing the second time (`src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php`).
+Expensive values use `sanmai/later`: `lazy(generatorFn())` returns a memoized `Deferred`.
+It is safe to call `->get()` repeatedly. A raw generator silently yields nothing the second
+time (`src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php`).
 Collection flows use `sanmai/pipeline`: `take($x)->filter(...)->cast(...)->toList()`.
-Mind the naming - it inverts your instinct: `cast()` is the strict 1:1 mapper
+Mind the naming - it can invert your expectation: `cast()` is the strict 1:1 mapper
 (`array_map`); `map()` is 1:N - its callback may yield any number of values per input,
 and a returned generator is flattened into the stream; `tap()` is for side effects.
 Full API: `vendor/sanmai/pipeline/README.md`. Streams of work are non-rewindable generators BY DESIGN
@@ -226,17 +225,17 @@ cache (there is a `FileStore` decorator for that). For subprocesses, commands ar
 
 ### Comments and docblocks
 
-Comment the WHY - reviewers block non-obvious version gates and workarounds until a rationale
+Explain the WHY. Reviewers block non-obvious version gates and workarounds until a rationale
 comment exists ("can we add a reason here as it will not be clear in some time"). The best
 files have paragraph-length comments justifying mechanics (the ASCII commit graph in
 `ConfigurationFactory::refineGitBase()`, the polling math in `ParallelProcessRunner`).
 Keep `@psalm-mutation-free` on pure mutator methods - retained deliberately as purity
-documentation even though Psalm itself left the toolchain; never add `@psalm-suppress`. No license header by hand - `make cs` stamps
-the BSD-3-Clause block on every file.
+documentation even though Psalm itself left the toolchain; never add `@psalm-suppress`. Do
+not add a license header by hand - `make cs` stamps the BSD-3-Clause block on every file.
 
 ### Shape code so mutants die
 
-This is the style rule that surprises agents most. Code is structured for killability:
+This style rule often surprises agents. Code is structured for killability:
 
 - Separate `return` statements instead of one combined boolean, so coverage shows which
   branch is exercised and mutants are traceable to a line.
@@ -257,21 +256,21 @@ performance" escapes can be accepted, but say so explicitly in the PR.
 
 ## Subsystem invariants
 
-The ten places a confident rewrite goes wrong. Read the target file's comments before
-touching any of these; each has tests that encode the invariant.
+These are the ten places where a confident rewrite can break an invariant. Read the target
+file's comments before touching any of these. Each has tests that encode the invariant.
 
 ### 1. AST enrichment visitor stack - order is the algorithm
 
-`NodeTraverserFactory::createEnrichmentTraverser()` registers ~10 visitors in ONE traverser;
-correctness lives in the registration order (NameResolver and ParentConnecting before
+`NodeTraverserFactory::createEnrichmentTraverser()` registers ~10 visitors in ONE traverser.
+Correctness depends on the registration order (NameResolver and ParentConnecting before
 ReflectionVisitor; git-diff exclusion before AddTests; AddTests before ExcludeUntested).
-Visitors communicate through node attributes but you never touch `getAttribute()` directly -
-each visitor owns its `public const string` key plus static typed accessors
+Visitors communicate through node attributes. Do not touch `getAttribute()` directly. Each
+visitor owns its `public const string` key plus static typed accessors
 (`AddTestsVisitor::getTests()`, `LabelNodesAsEligibleVisitor::isEligible()`). Exclusion
-NEVER removes nodes - it flips the `eligible` flag only; removing corrupts name resolution
-and format-preserving printing (learned the hard way, PR #3039). `beforeTraverse` must reset
-all visitor state - instances are reused across files. Coverage lookups attach as memoizing
-closures, only to eligible nodes. `NextConnectingVisitor` is deliberately NOT nikic's
+NEVER removes nodes. It flips the `eligible` flag only. Removing nodes corrupts name
+resolution and format-preserving printing (learned the hard way, PR #3039). `beforeTraverse`
+must reset all visitor state because instances are reused across files. Coverage lookups
+attach as memoizing closures, only to eligible nodes. `NextConnectingVisitor` is deliberately NOT nikic's
 NodeConnectingVisitor: "next" means next executable statement in the same function scope
 (statement-functions break the chain; expression closures restore it).
 
@@ -357,7 +356,7 @@ helpers are named `retrieve*` (merge/default) and `refine*` (transform).
 
 ### 8. PHPUnit --filter building - degrade to everything, never to nothing
 
-`FilterBuilder` (all static) fights PCRE's ~30k compiled-pattern limit with discrete
+`FilterBuilder` (all static) avoids PCRE's ~30k compiled-pattern limit with discrete
 optimization levels: full -> drop data-provider keys -> drop class names -> return `[]`,
 which means OMIT `--filter` and run the whole suite - a safe superset. Its twin invariant
 lives in `PhpUnitAdapter::testsPass()`: "No tests executed!" counts as PASS, so an
@@ -381,8 +380,9 @@ everything from it.
 ### 10. Xdebug lifecycle - ask getSkippedVersion, not extension_loaded
 
 The master process restarts itself without xdebug (composer/xdebug-handler in PERSISTENT
-mode - without `setPersistent()` the temp ini does not stick to child processes). After that restart `extension_loaded('xdebug')`
-is FALSE while coverage still works: check `XdebugHandler::getSkippedVersion()`
+mode - without `setPersistent()` the temp ini does not stick to child processes). After that
+restart, `extension_loaded('xdebug')` is FALSE while coverage still works. Check
+`XdebugHandler::getSkippedVersion()`
 everywhere instead. `OriginalPhpProcess` brackets `parent::start()` with
 `PhpConfig::useOriginal()` / `usePersistent()` and injects `XDEBUG_MODE=coverage` unless
 pcov/phpdbg is the better driver. `CoverageChecker` decides upfront via seven signals -
@@ -395,8 +395,8 @@ can't-do-this conditions, swallowed `IOException`.
 
 ## Adding a mutator
 
-The one fully-worked workflow, because it is the most common contribution and every step is
-machine-checked. Scaffold: `./bin/infection make:mutator` (templates in
+This workflow is complete because it is the most common contribution and every step is
+machine-checked. Scaffold with `./bin/infection make:mutator` (templates in
 `src/CustomMutator/templates/`). A complete mutator PR touches:
 
 1. `src/Mutator/<Category>/<Name>.php` - categories mirror the `src/Mutator/` subdirectories
@@ -440,7 +440,7 @@ final class Plus implements Mutator
 }
 ```
 
-Notes that matter in review:
+Notes for review:
 
 - `Mutator`, `Definition`, `MutatorCategory` come from the external `infection/mutator`
   package (kept tiny so third parties can depend on it; exposed unprefixed in the PHAR).
@@ -449,7 +449,7 @@ Notes that matter in review:
 - AutoReview allows exactly four public methods (`getDefinition`, `getName`, `mutate`,
   `canMutate`; plus `getConfigClassName` for configurable mutators, whose constructor must be
   exactly `__construct(<ConfigClass> $config)`). Helpers go private.
-- `canMutate()` guards are the craft: match function names case-insensitively via
+- `canMutate()` guards need care: match function names case-insensitively via
   `$node->name->toLowerString()`; inspect context via `ParentConnector::findParent()`
   (walk ancestors when nesting matters). You must not produce: syntax errors or guaranteed
   fatals (always-killed noise - e.g. removing a cast that satisfies a declared type under
@@ -524,18 +524,18 @@ Notes that matter in review:
 - Before finishing any task: `make cs`, then `make autoreview`, then the relevant test
   groups. If CS is wrong, run `make cs` - never hand-edit style.
 
-## Gotchas digest
+## Common high-cost mistakes (Gotchas)
 
-The costliest traps, recollected:
+The costliest traps:
 
 1. Mark nodes ineligible; NEVER remove or replace nodes during enrichment.
 2. Never rewind, count, or buffer a mutant/process generator; `Deferred` (sanmai/later) is
    the re-readable lazy primitive, a generator is not.
 3. `TEST_TOKEN` (1-based) is the exact env var user suites depend on.
 4. `Mutation::getHash()` recipe is a user-facing contract - do not touch.
-5. PHPUnit >= 12 coverage config: hands off. And never `realpath()` user config paths.
+5. PHPUnit >= 12 coverage config: do not change it. And never `realpath()` user config paths.
 6. "No tests executed!" is a PASS; a too-long `--filter` degrades to running EVERYTHING.
-7. `extension_loaded('xdebug')` lies after the restart - ask `getSkippedVersion()`.
+7. `extension_loaded('xdebug')` is unreliable after the restart - ask `getSkippedVersion()`.
 8. `src/` must never reference `tests/` (shipped helpers go in `src/Testing/`); new
    test-framework adapters must also be added to the PHAR bundle in the Makefile.
 9. Symfony `Process` argv arrays: one element = one token; never pre-join, never assume
@@ -550,26 +550,27 @@ The costliest traps, recollected:
 
 ## Maintaining this file
 
-This file was distilled from two sources: agents designing subsystems blind and diffing
-their instincts against the real code, and four years of PR review threads. That defines
-the admission test for every line: would a competent agent, without it, do the wrong
-thing? If the tree, a linter, or `make autoreview` already teaches it cheaply, it does not
-belong here - this is not a reference manual, and length is only justified by prevented
-mistakes.
+This file comes from two sources: agents designing subsystems without repository context,
+and four years of PR review threads. That defines the admission test for every line: would a
+competent agent, without it, do the wrong thing? If the tree, a linter, or `make autoreview`
+already teaches it cheaply, it does not belong here. This is not a reference manual, and
+length is justified only when it prevents mistakes.
 
 - Anchor every claim to a file path; prefer stating the invariant and its WHY over the how.
   When a claim cannot anchor to a file (review culture, GitHub-side gates, history), anchor
   it to a PR number or name the person.
 - Keep the shape: what you will be tempted to do, what the codebase does, why. One
-  canonical snippet per concept is instruction; a second is reference-manual creep.
+  canonical snippet per concept is instruction; a second makes this file too much like a
+  reference manual.
 - Write towards Simplified Technical English (ASD-STE100): common words, one meaning per
-  word, active voice, short sentences. A vivid metaphor is allowed once; repeated, it
-  becomes jargon.
+  word, active voice, short sentences. Keep project terms when they are precise. Replace
+  idioms with direct technical words. Use one instruction per sentence when possible. A
+  vivid metaphor is allowed once; repeated, it becomes jargon.
 - Orientation sections (the pipeline, the repo map, the transcluded companions) are the one
-  exception to the admission test: they are the map, judged by whether they orient, not by
-  a prevented mistake. Keep them terse.
-- The Gotchas digest is deliberate redundancy - the costliest traps stated twice BY DESIGN.
-  Nowhere else may this file say the same thing twice.
+  exception to the admission test. They are judged by whether they orient, not by a prevented
+  mistake. Keep them terse.
+- The common high-cost mistakes section is deliberate redundancy - the costliest traps are
+  stated twice BY DESIGN. Nowhere else may this file say the same thing twice.
 - What an auto-fixing tool repairs for free needs no line here; what fails loudly and fast
   may earn a short one; what fails silently earns a long one.
 - When a convention changes, replace the old line - append history only when the history
