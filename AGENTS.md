@@ -103,7 +103,7 @@ transcluded here:
 
 ```bash
 composer install
-make help                 # source of truth for targets
+make help                 # the definitive list of targets
 make cs                   # PHP-CS-Fixer; ALWAYS this, never hand-format
 make autoreview           # cs-check + PHPStan(+PHPat) + Mago + composer validate
                           #   + AutoReview suite + Rector dry-run + collision detector
@@ -132,13 +132,13 @@ These were measured by having agents design the subsystems blind and diffing aga
 ### Finality: `final` keyword vs `@final` docblock
 
 You will mark everything `final`. Here, hard `final` is for classes never mocked (mutators,
-visitors, value objects, leaf utilities); services that tests mock carry `/** @internal
+visitors, value objects, leaf utilities); services that tests mock get `/** @internal
 @final */` with NO keyword (e.g. `src/Mutation/Mutation.php`,
 `src/Configuration/ConfigurationFactory.php`). The PHPat finality rule accepts either form;
 adding the keyword to a mocked class breaks the suite. A third form exists for special cases:
 `ParallelProcessRunner` is plain `@internal` with a dedicated PHPat exemption whose test name
 states the reason ("intentionally non-final only to allow PHPUnit partial mocks",
-`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only sanctioned reason for `@final` - if no test mocks the class,
+`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only accepted reason for `@final` - if no test mocks the class,
 use the keyword. Reviewers ask "is there a reason this is `@final` rather than `final`?" -
 have the answer ("it is mocked in X").
 
@@ -228,7 +228,7 @@ cache (there is a `FileStore` decorator for that). For subprocesses, commands ar
 
 Comment the WHY - reviewers block non-obvious version gates and workarounds until a rationale
 comment exists ("can we add a reason here as it will not be clear in some time"). The best
-files carry paragraph-length comments justifying mechanics (the ASCII commit graph in
+files have paragraph-length comments justifying mechanics (the ASCII commit graph in
 `ConfigurationFactory::refineGitBase()`, the polling math in `ParallelProcessRunner`).
 Keep `@psalm-mutation-free` on pure mutator methods - retained deliberately as purity
 documentation even though Psalm itself left the toolchain; never add `@psalm-suppress`. No license header by hand - `make cs` stamps
@@ -305,7 +305,7 @@ Memory is released by `unset()` of the container reference before freeing the sl
 
 `XmlConfigurationManipulator` is ~15 small public methods, one edit each, composed by two
 builders; the
-`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0) each carry a comment
+`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0) each have a comment
 linking the phpunit.xsd change - keep them. Hard rules: PHPUnit >= 12's coverage/`<source>`
 config is authoritative - leave it untouched (#3043 regression); when the user has an
 include filter and no source filtering is requested, preserve their config rather than
@@ -316,7 +316,7 @@ wrapper. The per-mutant bootstrap is a generated PHP file using
 re-loads the PHAR and derives the scoped namespace prefix - PHP-Scoper is why the mechanism
 is packaged, not inlined.
 
-### 5. Mutant code generation - token positions and a sacred original AST
+### 5. Mutant code generation - token positions and an untouched original AST
 
 `MutatorVisitor` matches the target node by `startTokenPos`/`endTokenPos` + node class -
 not file positions, not object identity. `MutantCodeFactory` runs `CloningVisitor` as its
@@ -378,12 +378,12 @@ deliberately retains `global-ignoreSourceCodeByRegex` (`ConfigurationFactory`).
 `ProfileList` is the single source of truth for the mutator universe - AutoReview derives
 everything from it.
 
-### 10. Xdebug lifecycle - getSkippedVersion is the truth
+### 10. Xdebug lifecycle - ask getSkippedVersion, not extension_loaded
 
 The master process restarts itself without xdebug (composer/xdebug-handler in PERSISTENT
 mode - without `setPersistent()` the temp ini does not stick to child processes). After that restart `extension_loaded('xdebug')`
-is FALSE while coverage still works: `XdebugHandler::getSkippedVersion()` is the source of
-truth everywhere. `OriginalPhpProcess` brackets `parent::start()` with
+is FALSE while coverage still works: check `XdebugHandler::getSkippedVersion()`
+everywhere instead. `OriginalPhpProcess` brackets `parent::start()` with
 `PhpConfig::useOriginal()` / `usePersistent()` and injects `XDEBUG_MODE=coverage` unless
 pcov/phpdbg is the better driver. `CoverageChecker` decides upfront via seven signals -
 including regexing `--initial-tests-php-options` for drivers only the child will load - and
@@ -440,7 +440,7 @@ final class Plus implements Mutator
 }
 ```
 
-Notes that carry review weight:
+Notes that matter in review:
 
 - `Mutator`, `Definition`, `MutatorCategory` come from the external `infection/mutator`
   package (kept tiny so third parties can depend on it; exposed unprefixed in the PHAR).
@@ -502,7 +502,7 @@ Notes that carry review weight:
   "Extracted from #NNNN", draft-until-dependency-merges. Refactors NEVER mix with behavior
   changes - the most repeated review demand across four years. Deletion PRs are prized.
 - Tests are non-negotiable: a bot requests changes on any src-touching PR without tests.
-  Fixed bugs MUST carry a regression test. New user-visible behavior may warrant an e2e
+  Fixed bugs MUST include a regression test. New user-visible behavior may warrant an e2e
   scenario - argue it either way.
 - Labels are not decoration - release notes are generated from them: one type label
   (`Feature`, `Bugfix`, `Internal`, `Performance`, `BC break`, `DX` for developer
@@ -562,6 +562,9 @@ mistakes.
   it to a PR number or name the person.
 - Keep the shape: what you will be tempted to do, what the codebase does, why. One
   canonical snippet per concept is instruction; a second is reference-manual creep.
+- Write towards Simplified Technical English (ASD-STE100): common words, one meaning per
+  word, active voice, short sentences. A vivid metaphor is allowed once; repeated, it
+  becomes jargon.
 - Orientation sections (the pipeline, the repo map, the transcluded companions) are the one
   exception to the admission test: they are the map, judged by whether they orient, not by
   a prevented mistake. Keep them terse.
