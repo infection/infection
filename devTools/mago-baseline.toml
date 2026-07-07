@@ -11387,6 +11387,12 @@ message = "Type `iterable` in return type of `memoryLimitProvider` is imprecise,
 count = 1
 
 [[issues]]
+file = "tests/phpunit/Resource/Memory/MemoryLimiterTest.php"
+code = "unhandled-thrown-type"
+message = "Potentially unhandled exception `ErrorException` in `{closure:tests/phpunit/Resource/Memory/MemoryLimiterTest.php:111:27}`."
+count = 1
+
+[[issues]]
 file = "tests/phpunit/Resource/Time/StopwatchTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `timeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
