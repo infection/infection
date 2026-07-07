@@ -506,8 +506,10 @@ Notes for review:
   Fixed bugs MUST include a regression test. New user-visible behavior may warrant an e2e
   scenario - argue it either way.
 - Labels are not decoration - release notes are generated from them: one type label
-  (`Feature`, `Bugfix`, `Internal`, `Performance`, `BC break`, `DX` for developer
-  experience, `IDX` for IDE/integration work) plus component
+  (`Feature`, `Bugfix`, `Internal`, `Performance`, `BC break`, `DX` for user-facing
+  ergonomics - Infection's users are developers, so CLI options, output, and hints
+  get `DX` not UX - and `IDX` for Infection's own contributor experience, e.g.
+  `IDX / Docker Sandbox`) plus component
   labels (`Component / AST`, `TestFramework / PHPUnit`, ...). These are the GitHub-side
   label names maintainers apply; the in-repo PR template spells them lowercase. CHANGELOG.md is
   maintainer-curated at release time - touch it only for deprecations or BC breaks,
