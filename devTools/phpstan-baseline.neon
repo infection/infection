@@ -928,18 +928,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/ProjectCode/DocBlockParser.php
 
 		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
-
-		-
 			rawMessage: Infection\Tests\BenchmarkSmokeTest should not exist
 			identifier: phpat.testPHPUnitTestsWithCoversNothingBelongToIntegrationGroup
 			count: 1
@@ -1056,7 +1044,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
 
 		-
@@ -1080,7 +1068,7 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
