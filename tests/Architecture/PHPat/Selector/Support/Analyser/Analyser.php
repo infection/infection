@@ -89,6 +89,7 @@ final class Analyser
                 isAConcretePHPUnitTestCase: false,
                 hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
                 belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
+                declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
             );
         }
 
@@ -150,6 +151,7 @@ final class Analyser
             isAConcretePHPUnitTestCase: PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection),
             hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
             belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
+            declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
         );
     }
 

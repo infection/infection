@@ -27,6 +27,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\SourceClassesShouldNotExposePublicPropertiesTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\ExtensionPointsShouldHaveDocBlockTest
         tags:
             - phpat.test
@@ -277,6 +281,7 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
         - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
