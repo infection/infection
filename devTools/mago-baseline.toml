@@ -5409,67 +5409,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
 code = "imprecise-type"
-message = "Type `iterable` in return type of `provideSourceClassesToCheckForPublicProperties` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "imprecise-type"
 message = "Type `iterable` in return type of `provideSourceClasses` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
+file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProviderTest.php"
 code = "imprecise-type"
-message = "Type `iterable` in return type of `sourceClassesToCheckForPublicPropertiesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "mixed-property-type-coercion"
-message = "Mixed property type coercion"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php:131:13}`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php"
-code = "yield-from-non-iterable"
-message = "Cannot `yield from` non-iterable type `null`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
-code = "redundant-comparison"
-message = "Redundant `===` comparison: left-hand side is never identical to right-hand side."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
-code = "redundant-logical-operation"
-message = "Redundant `&&` operation: left operand is always falsy and right operand is not evaluated."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\ProjectCode\ProjectCodeTest::test_source_classes_do_not_expose_public_properties`.'
+message = "Type `iterable` in return type of `sourceClassProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]

@@ -33,17 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat;
 
-final readonly class AnalysisResult
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+
+final class SourceClassesShouldNotExposePublicPropertiesTest
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
-    ) {
+    public function testSourceClassesDoNotExposePublicProperties(): Rule
+    {
+        return PHPat::rule()
+            ->classes(InfectionSelector::sourceClassWithPublicNonReadonlyProperty())
+            ->shouldNot()
+            ->exist()
+            ->because('Source classes should use getters instead of public properties.');
     }
 }
