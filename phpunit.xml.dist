@@ -34,6 +34,7 @@
     <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
+            <directory>tests/phpunit</directory>
         </include>
     </source>
 

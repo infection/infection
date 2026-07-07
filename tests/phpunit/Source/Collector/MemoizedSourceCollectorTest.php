@@ -33,46 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Tests\Source\Collector;
 
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Infection\Source\Collector\MemoizedSourceCollector;
+use Infection\Source\Collector\SourceCollector;
+use Infection\Testing\FileSystem\MockSplFileInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
+#[CoversClass(MemoizedSourceCollector::class)]
+final class MemoizedSourceCollectorTest extends TestCase
 {
-    /**
-     * @param list<string> $staticAnalysisToolOptions
-     */
-    public static function create(
-        string $staticAnalysisConfigPath,
-        string $staticAnalysisToolExecutable,
-        float $timeout,
-        string $tmpDir,
-        array $staticAnalysisToolOptions,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
-    ): StaticAnalysisToolAdapter {
-        return new PHPStanAdapter(
-            new Filesystem(),
-            new PHPStanMutantExecutionResultFactory(),
-            $staticAnalysisConfigPath,
-            $staticAnalysisToolExecutable,
-            new CommandLineBuilder(
-                new PhpExecutableFinder(),
-            ),
-            new VersionParser(),
-            $timeout,
-            $tmpDir,
-            $staticAnalysisToolOptions,
-            $shellCommandLineExecutor,
+    private SourceCollector&MockObject $decoratedCollectorMock;
+
+    private MemoizedSourceCollector $collector;
+
+    protected function setUp(): void
+    {
+        $this->decoratedCollectorMock = $this->createMock(SourceCollector::class);
+
+        $this->collector = new MemoizedSourceCollector(
+            $this->decoratedCollectorMock,
         );
+    }
+
+    public function test_it_memoizes_the_collected_files(): void
+    {
+        $expected = [
+            new MockSplFileInfo('src/File1.php'),
+            new MockSplFileInfo('src/File2.php'),
+        ];
+
+        $this->decoratedCollectorMock
+            ->expects($this->once())
+            ->method('collect')
+            ->willReturn($expected);
+
+        $actual1 = $this->collector->collect();
+        $actual2 = $this->collector->collect();
+
+        $this->assertSame($expected, $actual1);
+        $this->assertSame($actual1, $actual2);
     }
 }
