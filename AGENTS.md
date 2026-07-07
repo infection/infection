@@ -501,7 +501,7 @@ Notes for review:
   titles - that gate lives GitHub-side, not in this repo.
 - Small, dependency-chained PRs are the house unit of work: "Depends on #NNNN",
   "Extracted from #NNNN", draft-until-dependency-merges. Refactors NEVER mix with behavior
-  changes - the most repeated review demand across four years. Deletion PRs are prized.
+  changes - the most repeated review demand across many years. Deletion PRs are prized.
 - Tests are non-negotiable: a bot requests changes on any src-touching PR without tests.
   Fixed bugs MUST include a regression test. New user-visible behavior may warrant an e2e
   scenario - argue it either way.
