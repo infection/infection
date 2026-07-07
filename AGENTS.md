@@ -562,10 +562,15 @@ length is justified only when it prevents mistakes.
 - Keep the shape: what you will be tempted to do, what the codebase does, why. One
   canonical snippet per concept is instruction; a second makes this file too much like a
   reference manual.
-- Write towards Simplified Technical English (ASD-STE100): common words, one meaning per
-  word, active voice, short sentences. Keep project terms when they are precise. Replace
-  idioms with direct technical words. Use one instruction per sentence when possible. A
-  vivid metaphor is allowed once; repeated, it becomes jargon.
+- Optimize this file for agent behavior first. Its goal is to help agents make correct,
+  repo-specific decisions with less guessing. Use Simplified Technical English
+  (ASD-STE100) as a north star, not as a compliance target. Prefer STE when it makes an
+  instruction clearer, shorter, or harder to misread. This helps human readers and gives AI
+  agents simpler problems to parse. Keep project terms, warnings, and review-culture
+  language when they prevent real mistakes.
+- Use these STE habits when they serve the goal: common words, one meaning per word, active
+  voice, short sentences, and one instruction per sentence when possible. Replace idioms with
+  direct technical words. A vivid metaphor is allowed once; repeated, it becomes jargon.
 - Orientation sections (the pipeline, the repo map, the transcluded companions) are the one
   exception to the admission test. They are judged by whether they orient, not by a prevented
   mistake. Keep them terse.
