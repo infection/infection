@@ -61,6 +61,7 @@ namespace Infection\Tests\Framework\Enum\EnumBucket;
 use BackedEnum;
 use Exception;
 use Infection\Framework\Enum\EnumBucket;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -100,10 +101,18 @@ final class EnumBucketTest extends TestCase
         ];
     }
 
+    public static function enumClassNameProvider(): iterable
+    {
+        yield from DataProviderFactory::takeArguments(
+            1,
+            self::enumProvider(),
+        );
+    }
+
     /**
      * @param class-string<BackedEnum> $enumClassName
      */
-    #[DataProvider('enumProvider')]
+    #[DataProvider('enumClassNameProvider')]
     public function test_taking_all_values_removes_values_from_the_bucket(
         string $enumClassName,
     ): void {
@@ -118,7 +127,7 @@ final class EnumBucketTest extends TestCase
     /**
      * @param class-string<BackedEnum> $enumClassName
      */
-    #[DataProvider('enumProvider')]
+    #[DataProvider('enumClassNameProvider')]
     public function test_it_is_empty_after_taking_all_values(
         string $enumClassName,
     ): void {

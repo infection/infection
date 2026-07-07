@@ -27,6 +27,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\SourceClassesShouldNotExposePublicPropertiesTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\ExtensionPointsShouldHaveDocBlockTest
         tags:
             - phpat.test
@@ -172,12 +176,6 @@ parameters:
             message: '#::profile\(\) should return int but returns int.*\|null#'
             path: ../tests/benchmark/DummyInstrumentor.php
 
-        # This plugin does not seem to understand the PHPBench data providers
-        -
-            identifier: shipmonk.deadMethod
-            message: '#Unused .+Bench::provide*#'
-            path: ../tests/benchmark/*/*Bench.php
-
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod
@@ -187,12 +185,6 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Scenario.php
-
-        # PHPat test methods are invoked by the PHPStan container via the phpat.test tag,
-        # so shipmonk's dead-code detector cannot see the call sites.
-        -
-            identifier: shipmonk.deadMethod
-            path: ../tests/Architecture/PHPat/*
 
         # Test enum fixtures have cases that exist as test data, not all are used
         -
@@ -269,12 +261,6 @@ parameters:
             rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
             path: ../src/PhpParser/NodeDumper/NodeDumper.php
 
-        # False-positives
-        -
-            message: '#TeamCity::escapeValue\(\) should return non-empty-string#'
-            identifier: return.type
-            path: ../src/Logger/MutationAnalysis/TeamCity/TeamCity.php
-
         # Fallback copy of Symfony's StringInput tokenization for versions before
         # ArgvInput::getRawTokens(). The regex matches guarantee these offsets.
         -
@@ -286,6 +272,25 @@ parameters:
         -
             path: ../tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture
             message: '#.+#'
+
+        # Having public properties on those DTOs for performance reasons.
+        -
+            rawMessage: 'Infection\Process\Runner\IndexedMutantProcessContainer should not exist'
+            identifier: phpat.testSourceClassesDoNotExposePublicProperties
+            count: 1
+            path: ../src/Process/Runner/IndexedMutantProcessContainer.php
+
+        -
+            rawMessage: 'Infection\TestFramework\Coverage\JUnit\TestFileTimeData should not exist'
+            identifier: phpat.testSourceClassesDoNotExposePublicProperties
+            count: 1
+            path: ../src/TestFramework/Coverage/JUnit/TestFileTimeData.php
+
+        -
+            rawMessage: 'Infection\TestFramework\Tracing\Trace\NodeLineRangeData should not exist'
+            identifier: phpat.testSourceClassesDoNotExposePublicProperties
+            count: 1
+            path: ../src/TestFramework/Tracing/Trace/NodeLineRangeData.php
 
     level: 8
     paths:
@@ -299,6 +304,7 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
         - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
@@ -306,6 +312,7 @@ parameters:
         - ../tests/phpunit/PhpParser/Visitor/EnrichmentTraverse/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
+        - %currentWorkingDirectory%/tests/benchmark/MutationGenerator/create-main.php
         - ../tests/benchmark/MutationGenerator/sources (?)
         - ../tests/benchmark/Tracing/coverage (?)
         - ../tests/benchmark/Tracing/sources (?)

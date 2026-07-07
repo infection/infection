@@ -216,6 +216,11 @@ final class InfectionSelector
         return new HasTrivialImplementation(self::analyser());
     }
 
+    public static function sourceClassWithPublicNonReadonlyProperty(): SelectorInterface
+    {
+        return new SourceClassWithPublicNonReadonlyProperty(self::analyser());
+    }
+
     public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();

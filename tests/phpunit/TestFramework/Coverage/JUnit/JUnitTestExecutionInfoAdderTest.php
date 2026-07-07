@@ -49,11 +49,13 @@ use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use function iterator_to_array;
 use function Later\lazy;
 use function Later\now;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {

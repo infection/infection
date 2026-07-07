@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -48,6 +50,7 @@ use RuntimeException;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PHPStanAdapter::class)]
 final class PHPStanAdapterTest extends TestCase
 {
@@ -55,9 +58,12 @@ final class PHPStanAdapterTest extends TestCase
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
 
+    private ShellCommandLineExecutor $shellCommandLineExecutor;
+
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
+        $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
 
         $this->adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
@@ -69,6 +75,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
     }
@@ -106,6 +113,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=1G'],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
 
@@ -139,6 +147,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=-1', '--no-progress'],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
 
@@ -174,6 +183,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=2G', '--level=max', '--no-progress'],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
 
@@ -204,6 +214,40 @@ final class PHPStanAdapterTest extends TestCase
         $this->assertSame('9.0', $this->adapter->getVersion());
     }
 
+    public function test_it_retrieves_version_with_the_shell_command_line_executor(): void
+    {
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], ['--version'])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version'])
+        ;
+
+        $shellCommandLineExecutor
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['/usr/bin/php', '/path/to/phpstan', '--version'])
+            ->willReturn('PHPStan 2.1.17')
+        ;
+
+        $adapter = new PHPStanAdapter(
+            $this->createStub(Filesystem::class),
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            $this->commandLineBuilder,
+            new VersionParser(),
+            31.0,
+            '/tmp',
+            [],
+            $shellCommandLineExecutor,
+        );
+
+        $this->assertSame('2.1.17', $adapter->getVersion());
+    }
+
     public function test_it_creates_mutant_process_creator(): void
     {
         $this->assertInstanceOf(
@@ -227,6 +271,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=-1'],
+            $this->shellCommandLineExecutor,
             $version,
         );
 
@@ -247,6 +292,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
+            $this->shellCommandLineExecutor,
             $version,
         );
 

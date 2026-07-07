@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestingUtility\PHPUnit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 
@@ -74,5 +75,49 @@ final class DataProviderFactoryTest extends TestCase
         $actual = take(DataProviderFactory::prefix('prefix:', $input))->toAssoc();
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param array<array-key, array<array-key, string>> $input
+     * @param array<array-key, list<string>> $expected
+     */
+    #[DataProvider('takeArgumentsProvider')]
+    public function test_it_can_limit_provider_scenarios_to_the_first_arguments(
+        int $count,
+        array $input,
+        array $expected,
+    ): void {
+        $actual = take(DataProviderFactory::takeArguments($count, $input))->toAssoc();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function takeArgumentsProvider(): iterable
+    {
+        yield 'keeps dataset names and first arguments' => [
+            2,
+            [
+                'a' => ['A', 'B', 'C'],
+                'b' => ['D', 'E', 'F'],
+            ],
+            [
+                'a' => ['A', 'B'],
+                'b' => ['D', 'E'],
+            ],
+        ];
+
+        yield 'reindexes associative scenarios as positional arguments' => [
+            2,
+            [
+                'scenario' => [
+                    'first' => 'A',
+                    'second' => 'B',
+                    'third' => 'C',
+                ],
+            ],
+            [
+                'scenario' => ['A', 'B'],
+            ],
+        ];
     }
 }
