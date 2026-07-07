@@ -174,6 +174,11 @@ final class InfectionSelector
         return new HasTrivialImplementation(self::analyser());
     }
 
+    public static function staticOrConstOnlyClass(): SelectorInterface
+    {
+        return new StaticOrConstOnlyClass();
+    }
+
     public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();

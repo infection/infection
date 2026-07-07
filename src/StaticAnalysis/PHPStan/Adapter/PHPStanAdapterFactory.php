@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use Infection\CannotBeInstantiated;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -49,6 +50,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
+    use CannotBeInstantiated;
+
     /**
      * @param list<string> $staticAnalysisToolOptions
      */
