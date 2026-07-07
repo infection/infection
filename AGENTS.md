@@ -547,3 +547,19 @@ The costliest traps, recollected:
     "optimizing" (`make benchmark`), and re-validate old perf hacks before extending them.
 12. Escaped mutant on a literal? Extract a named constant. Escaped mutant on a loose mock?
     Tighten `->with(...)`. Truly unkillable? Discuss a bypass - do not fake a test.
+
+## Maintaining this file
+
+This file was distilled from two sources: agents designing subsystems blind and diffing
+their instincts against the real code, and four years of PR review threads. That defines
+the admission test for every line: would a competent agent, without it, do the wrong
+thing? If the tree, a linter, or `make autoreview` already teaches it cheaply, it does not
+belong here - this is not a reference manual, and length is only justified by prevented
+mistakes.
+
+- Anchor every claim to a file path; prefer stating the invariant and its WHY over the how.
+- Keep the shape: what you will be tempted to do, what the codebase does, why.
+- When a convention changes, replace the old line - append history only when the history
+  itself prevents a wrong cleanup (see the Safe note).
+- Deletion improves this file as often as addition. If removing a line would change no
+  agent's behavior, remove it.
