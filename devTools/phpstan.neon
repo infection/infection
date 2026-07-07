@@ -269,6 +269,25 @@ parameters:
             path: ../tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture
             message: '#.+#'
 
+        # Having public properties on those DTOs for performance reasons.
+        -
+            rawMessage: 'Infection\Process\Runner\IndexedMutantProcessContainer should not exist'
+            identifier: phpat.testSourceClassesDoNotExposePublicProperties
+            count: 1
+            path: ../src/Process/Runner/IndexedMutantProcessContainer.php
+
+        -
+            rawMessage: 'Infection\TestFramework\Coverage\JUnit\TestFileTimeData should not exist'
+            identifier: phpat.testSourceClassesDoNotExposePublicProperties
+            count: 1
+            path: ../src/TestFramework/Coverage/JUnit/TestFileTimeData.php
+
+        -
+            rawMessage: 'Infection\TestFramework\Tracing\Trace\NodeLineRangeData should not exist'
+            identifier: phpat.testSourceClassesDoNotExposePublicProperties
+            count: 1
+            path: ../src/TestFramework/Tracing/Trace/NodeLineRangeData.php
+
     level: 8
     paths:
         - ../src
