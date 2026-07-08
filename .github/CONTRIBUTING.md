@@ -71,7 +71,7 @@ By default, it is structured as follows:
 - `expected-output.txt`: the expected output from the test process.
 - `var/infection.log` or `infection.log` (not committed): the actual output from
   the test process. The former is the recommendation, but not all tests were updated.
-- `run_test.bash` (optional): the script to use to execute the test. If none
+- `run_tests.bash` (optional): the script to use to execute the test. If none
   is provided, then the default `tests/e2e/standard_script.bash` one is used.
   Note that using a custom test script means the structure of the test may
   also change.
