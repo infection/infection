@@ -25,7 +25,7 @@ then
     exit 1
 fi
 
-XDEBUG_MODE=coverage php -d memory_limit=-1 $INFECTION --no-progress --threads=2
+XDEBUG_MODE=coverage php -d memory_limit=-1 $INFECTION --no-progress --threads=1
 
 if [ -n "$GOLDEN" ]; then
     cp -v infection.log expected-output.txt
