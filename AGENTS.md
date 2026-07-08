@@ -9,8 +9,9 @@ task. If you find a stale line while reading, fix it too.
 
 ## What you are working on
 
-Infection is the mutation testing framework for PHP - 29 million Packagist installs, running
-inside the CI of thousands of projects. It parses source into ASTs (nikic/php-parser - API
+Infection is the mutation testing framework for PHP - millions of Packagist installs, and
+PHPUnit, PHP-CS-Fixer, and PHPStan are all developed with it. It parses source into ASTs
+(nikic/php-parser - API
 refresher: `vendor/nikic/php-parser/README.md` and its `doc/` folder), applies
 small mutations, and checks whether the project's tests - and optionally a static analyser -
 notice. A bug here silently corrupts other projects' quality gates. A slowdown here multiplies
@@ -190,7 +191,11 @@ suffix, extend the semantically right SPL class (`FileNotFound extends RuntimeEx
 `MinMsiCheckFailed extends UnexpectedValueException`), grouped marker interfaces under
 `Throwable/` dirs. Names must describe the contract, not the implementation - reviewers
 renamed `OutputFormatter` to `MutationAnalysisLogger` and rejected `MarkdownTextFileLogger`
-because the output was not Markdown.
+because the output was not Markdown. `Memoized*` vs `Cached*` turns on whether callers can
+see the reuse: `Memoized*` is the `$this->x ??= $this->inner->compute()` idiom - compute once
+into its own property for the instance lifetime, invisible, no key or invalidation; `Cached*`
+is reserved for a caller-visible cache lifecycle (keys, invalidation, TTL, shared backend).
+See `adr/0006`.
 
 ### Laziness is the architecture, and generators are single-pass
 
