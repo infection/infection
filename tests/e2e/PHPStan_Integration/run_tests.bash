@@ -6,12 +6,7 @@ readonly INFECTION=../../../${1}
 
 set -e pipefail
 
-if [ "$DRIVER" = "phpdbg" ]
-then
-    phpdbg -qrr $INFECTION --no-progress --threads=2
-else
-    php -d memory_limit=-1 $INFECTION --no-progress --threads=2
-fi
+php $INFECTION --no-progress --threads=2
 
 if [ -n "$GOLDEN" ]; then
     cp -v infection.log expected-output.txt
