@@ -4,7 +4,7 @@ That memory limit is written by `MemoryLimiter` into the temporary php.ini creat
 
 The test forces those preconditions in `run_tests.bash`:
 
-- non-Xdebug drivers are skipped because PCOV and phpdbg cannot exercise the temporary `php.ini` path.
+- non-Xdebug drivers are skipped because PCOV and phpdbg cannot exercise the temporary `php.ini` path. If the `DRIVER` environment variable is not set, the script falls back to checking whether Xdebug is loadable with `XDEBUG_MODE=coverage`.
 - Xdebug must be loadable with `XDEBUG_MODE=coverage`.
 - A small restart probe verifies that `XdebugHandler` restarted PHP, kept `memory_limit=-1`, and produced a loaded php.ini.
 
