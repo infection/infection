@@ -4,4 +4,4 @@ Run Infection **without** git. This ensures it works and doesn't fail because of
 - If we point PATH at an empty directory then we will create an environment without git in PATH.
 - But we can't just unset or blank PATH because it will then reset to glibc's default of `/bin:/usr/bin` and `git` is there exactly.
 
-covers https://github.com/infection/infection/pull/1981 and https://github.com/infection/infection/pull/1982
+Covers https://github.com/infection/infection/pull/1981 and https://github.com/infection/infection/pull/1982
