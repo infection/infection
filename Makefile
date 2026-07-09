@@ -135,6 +135,7 @@ phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress
 
 .PHONY: phpstan-baseline
+phpstan-baseline:	## Regenerates the PHPStan baseline
 phpstan-baseline: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
 
@@ -143,6 +144,7 @@ mago: vendor $(MAGO)
 	$(MAGO) analyze
 
 .PHONY: mago-baseline
+mago-baseline:		## Regenerates the Mago baseline
 mago-baseline: vendor $(MAGO)
 	$(MAGO) analyze --generate-baseline || true
 
