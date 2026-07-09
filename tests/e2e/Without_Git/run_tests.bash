@@ -14,7 +14,7 @@ readonly PHP
 
 composer install
 
-PATH="$WITHOUT_GIT_PATH" "$PHP" "../../../${1:-bin/infection}" --coverage=infection-coverage
+PATH="$WITHOUT_GIT_PATH" "$PHP" "../../../${1:-bin/infection}"
 
 if [ -n "$GOLDEN" ]; then
     cp -v infection.log expected-output.txt
