@@ -66,6 +66,10 @@ services:
         class: Infection\Tests\Architecture\PHPat\StaticOrConstOnlySourceClassesShouldNotBeInstantiableTest
         tags:
             - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\PrivateConstructorsShouldUseCannotBeInstantiatedTest
+        tags:
+            - phpat.test
 
 parameters:
     tmpDir: ../var/cache/phpstan
@@ -310,6 +314,7 @@ parameters:
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Fixture/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
         - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php

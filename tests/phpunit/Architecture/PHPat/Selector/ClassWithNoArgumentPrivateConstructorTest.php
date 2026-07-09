@@ -35,33 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use DIContainer\Container;
 use Infection\CannotBeInstantiated;
-use Infection\Command\BaseCommand;
 use Infection\Differ\ChangedLinesRange;
-use Infection\Engine;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\ProfileList;
-use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\StaticOrConstOnlyClassWithoutDeclaredConstructor;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\StaticOrConstOnlyClassWithPublicConstructor;
+use Infection\Tests\Architecture\PHPat\Selector\Fixture\ClassUsingCannotBeInstantiated;
+use Infection\Tests\Architecture\PHPat\Selector\Fixture\ClassWithNoArgumentPrivateConstructor as ClassWithNoArgumentPrivateConstructorFixture;
+use Infection\Tests\Architecture\PHPat\Selector\Fixture\ClassWithPrivateConstructorArguments;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(StaticOrConstOnlyClass::class)]
-final class StaticOrConstOnlyClassTest extends SelectorTestCase
+#[CoversClass(ClassWithNoArgumentPrivateConstructor::class)]
+final class ClassWithNoArgumentPrivateConstructorTest extends SelectorTestCase
 {
     /**
      * @param class-string $className
      */
     #[DataProvider('classProvider')]
-    public function test_it_matches_static_or_const_only_classes(
+    public function test_it_matches_classes_with_a_no_argument_private_constructor(
         string $className,
         bool $expected,
     ): void {
-        $selector = new StaticOrConstOnlyClass();
+        $selector = new ClassWithNoArgumentPrivateConstructor();
 
         $actual = $selector->matches($this->createClassReflection($className));
 
@@ -70,63 +64,33 @@ final class StaticOrConstOnlyClassTest extends SelectorTestCase
 
     public static function classProvider(): iterable
     {
-        yield 'const and static source class' => [
-            ProfileList::class,
+        yield 'class declaring no-argument private constructor' => [
+            ClassWithNoArgumentPrivateConstructorFixture::class,
             true,
         ];
 
-        yield 'static utility source class' => [
-            FilterBuilder::class,
+        yield 'class using CannotBeInstantiated' => [
+            ClassUsingCannotBeInstantiated::class,
             true,
         ];
 
-        yield 'static utility class without declared constructor' => [
-            StaticOrConstOnlyClassWithoutDeclaredConstructor::class,
-            true,
-        ];
-
-        yield 'static utility class with public constructor' => [
-            StaticOrConstOnlyClassWithPublicConstructor::class,
+        yield 'class with private constructor arguments' => [
+            ClassWithPrivateConstructorArguments::class,
             false,
         ];
 
-        yield 'vendor container with public constructor' => [
-            Container::class,
-            false,
-        ];
-
-        yield 'empty marker class' => [
-            ApplicationExecutionWasFinished::class,
-            false,
-        ];
-
-        yield 'source class with object state' => [
+        yield 'class with private constructor arguments from source' => [
             ChangedLinesRange::class,
             false,
         ];
 
-        yield 'source class with instance methods' => [
-            Engine::class,
+        yield 'class without declared constructor' => [
+            ApplicationExecutionWasFinished::class,
             false,
         ];
 
-        yield 'source abstract class' => [
-            BaseCommand::class,
-            false,
-        ];
-
-        yield 'source interface' => [
-            Mutator::class,
-            false,
-        ];
-
-        yield 'source trait' => [
+        yield 'trait' => [
             CannotBeInstantiated::class,
-            false,
-        ];
-
-        yield 'source enum' => [
-            DetectionStatus::class,
             false,
         ];
     }

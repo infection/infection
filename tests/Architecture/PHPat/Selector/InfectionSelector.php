@@ -226,6 +226,11 @@ final class InfectionSelector
         return new StaticOrConstOnlyClass();
     }
 
+    public static function classWithNoArgumentPrivateConstructor(): SelectorInterface
+    {
+        return new ClassWithNoArgumentPrivateConstructor();
+    }
+
     public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();

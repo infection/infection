@@ -33,20 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\CannotBeInstantiated;
-use Infection\Container\Container;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-final class MockedContainer
+final class PrivateConstructorsShouldUseCannotBeInstantiatedTest
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @param array<class-string<object>, Closure(Container): object> $values
-     */
-    public static function createWithServices(array $values): Container
+    public function testNoArgumentPrivateConstructorsUseCannotBeInstantiated(): Rule
     {
-        return new Container($values);
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    InfectionSelector::sourceCode(),
+                    InfectionSelector::classWithNoArgumentPrivateConstructor(),
+                ),
+            )
+            ->should()
+            ->include()
+            ->classes(Selector::classname(CannotBeInstantiated::class))
+            ->because('No-argument private constructors should be expressed through the CannotBeInstantiated trait.');
     }
 }

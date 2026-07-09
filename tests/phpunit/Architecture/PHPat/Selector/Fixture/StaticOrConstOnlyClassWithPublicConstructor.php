@@ -33,20 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Architecture\PHPat\Selector\Fixture;
 
-use Infection\CannotBeInstantiated;
-use Infection\Container\Container;
-
-final class MockedContainer
+final class StaticOrConstOnlyClassWithPublicConstructor
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @param array<class-string<object>, Closure(Container): object> $values
-     */
-    public static function createWithServices(array $values): Container
+    public function __construct()
     {
-        return new Container($values);
+    }
+
+    public static function create(): self
+    {
+        return new self();
     }
 }

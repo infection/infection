@@ -33,20 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use Infection\Container\Container;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-final class MockedContainer
+final class ClassWithNoArgumentPrivateConstructor implements SelectorInterface
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @param array<class-string<object>, Closure(Container): object> $values
-     */
-    public static function createWithServices(array $values): Container
+    public function getName(): string
     {
-        return new Container($values);
+        return 'class with a no-argument private constructor';
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        if (
+            !ConcreteClassReflection::isConcreteClass($classReflection)
+            || $classReflection->isEnum()
+        ) {
+            return false;
+        }
+
+        $constructor = $classReflection->getNativeReflection()->getConstructor();
+
+        return $constructor !== null
+            && $constructor->isPrivate()
+            && $constructor->getNumberOfParameters() === 0;
     }
 }

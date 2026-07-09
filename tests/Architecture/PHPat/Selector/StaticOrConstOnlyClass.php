@@ -60,6 +60,7 @@ final class StaticOrConstOnlyClass implements SelectorInterface
         $nativeReflection = $classReflection->getNativeReflection();
 
         return self::hasStaticOrConstOnlyMembers($nativeReflection)
+            && !self::hasDeclaredPublicConstructor($nativeReflection)
             && self::hasOnlyStaticProperties($nativeReflection)
             && self::hasOnlyStaticMethods($nativeReflection);
     }
@@ -86,6 +87,14 @@ final class StaticOrConstOnlyClass implements SelectorInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param ReflectionClass<object> $classReflection
+     */
+    private static function hasDeclaredPublicConstructor(ReflectionClass $classReflection): bool
+    {
+        return $classReflection->getConstructor()?->isPublic() ?? false;
     }
 
     /**
