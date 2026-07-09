@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Fixture;
+namespace Infection\Tests\Architecture\PHPat\Selector\StaticOrConstOnlyClass\Fixtures;
 
 final class StaticOrConstOnlyClassWithPublicConstructor
 {

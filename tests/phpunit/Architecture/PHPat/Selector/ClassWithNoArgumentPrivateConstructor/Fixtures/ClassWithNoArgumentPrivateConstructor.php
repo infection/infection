@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Fixture;
+namespace Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures;
 
-use Infection\CannotBeInstantiated;
-
-final class ClassUsingCannotBeInstantiated
+final class ClassWithNoArgumentPrivateConstructor
 {
-    use CannotBeInstantiated;
+    private function __construct()
+    {
+    }
 }

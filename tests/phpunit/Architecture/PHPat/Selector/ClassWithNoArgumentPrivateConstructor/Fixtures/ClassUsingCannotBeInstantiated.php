@@ -33,12 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Fixture;
+namespace Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures;
 
-final class StaticOrConstOnlyClassWithoutDeclaredConstructor
+use Infection\CannotBeInstantiated;
+
+final class ClassUsingCannotBeInstantiated
 {
-    public static function create(): self
-    {
-        return new self();
-    }
+    use CannotBeInstantiated;
 }

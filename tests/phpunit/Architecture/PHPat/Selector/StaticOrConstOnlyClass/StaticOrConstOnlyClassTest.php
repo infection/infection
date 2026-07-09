@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\StaticOrConstOnlyClass;
 
 use DIContainer\Container;
 use Infection\CannotBeInstantiated;
@@ -45,8 +45,10 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\StaticOrConstOnlyClassWithoutDeclaredConstructor;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\StaticOrConstOnlyClassWithPublicConstructor;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\StaticOrConstOnlyClass;
+use Infection\Tests\Architecture\PHPat\Selector\StaticOrConstOnlyClass\Fixtures\StaticOrConstOnlyClassWithoutDeclaredConstructor;
+use Infection\Tests\Architecture\PHPat\Selector\StaticOrConstOnlyClass\Fixtures\StaticOrConstOnlyClassWithPublicConstructor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -62,8 +64,9 @@ final class StaticOrConstOnlyClassTest extends SelectorTestCase
         bool $expected,
     ): void {
         $selector = new StaticOrConstOnlyClass();
+        $classReflection = $this->createClassReflection($className);
 
-        $actual = $selector->matches($this->createClassReflection($className));
+        $actual = $selector->matches($classReflection);
 
         $this->assertSame($expected, $actual);
     }

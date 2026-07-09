@@ -33,14 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor;
 
-use Infection\CannotBeInstantiated;
-use Infection\Differ\ChangedLinesRange;
-use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\ClassUsingCannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\ClassWithNoArgumentPrivateConstructor as ClassWithNoArgumentPrivateConstructorFixture;
-use Infection\Tests\Architecture\PHPat\Selector\Fixture\ClassWithPrivateConstructorArguments;
+use Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor;
+use Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures\ClassUsingCannotBeInstantiated;
+use Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures\ClassWithNoArgumentPrivateConstructor as ClassWithNoArgumentPrivateConstructorFixture;
+use Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures\ClassWithoutDeclaredConstructor;
+use Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures\ClassWithPrivateConstructorArguments;
+use Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures\NoOpTrait;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -56,8 +57,9 @@ final class ClassWithNoArgumentPrivateConstructorTest extends SelectorTestCase
         bool $expected,
     ): void {
         $selector = new ClassWithNoArgumentPrivateConstructor();
+        $classReflection = $this->createClassReflection($className);
 
-        $actual = $selector->matches($this->createClassReflection($className));
+        $actual = $selector->matches($classReflection);
 
         $this->assertSame($expected, $actual);
     }
@@ -79,18 +81,13 @@ final class ClassWithNoArgumentPrivateConstructorTest extends SelectorTestCase
             false,
         ];
 
-        yield 'class with private constructor arguments from source' => [
-            ChangedLinesRange::class,
-            false,
-        ];
-
         yield 'class without declared constructor' => [
-            ApplicationExecutionWasFinished::class,
+            ClassWithoutDeclaredConstructor::class,
             false,
         ];
 
         yield 'trait' => [
-            CannotBeInstantiated::class,
+            NoOpTrait::class,
             false,
         ];
     }

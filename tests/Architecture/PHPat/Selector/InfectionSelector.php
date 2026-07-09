@@ -226,7 +226,7 @@ final class InfectionSelector
         return new StaticOrConstOnlyClass();
     }
 
-    public static function classWithNoArgumentPrivateConstructor(): SelectorInterface
+    public static function classesWithNoArgumentPrivateConstructor(): SelectorInterface
     {
         return new ClassWithNoArgumentPrivateConstructor();
     }

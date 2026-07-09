@@ -41,9 +41,9 @@ use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
-final class StaticOrConstOnlySourceClassesShouldNotBeInstantiableTest
+final class StaticOrConstOnlyClassesShouldNotBeInstantiableTest
 {
-    public function testStaticOrConstOnlySourceClassesUseCannotBeInstantiated(): Rule
+    public function testStaticOrConstOnlyClassesUseCannotBeInstantiated(): Rule
     {
         return PHPat::rule()
             ->classes(
@@ -55,6 +55,6 @@ final class StaticOrConstOnlySourceClassesShouldNotBeInstantiableTest
             ->should()
             ->include()
             ->classes(Selector::classname(CannotBeInstantiated::class))
-            ->because('Const-only and static utility source classes should make their non-instantiability explicit.');
+            ->because('Const-only and static utility classes should make their non-instantiability explicit.');
     }
 }

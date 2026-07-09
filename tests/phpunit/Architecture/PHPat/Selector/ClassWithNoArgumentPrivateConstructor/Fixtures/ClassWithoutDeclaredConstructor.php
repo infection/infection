@@ -33,28 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat;
+namespace Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures;
 
-use Infection\CannotBeInstantiated;
-use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
-use PHPat\Selector\Selector;
-use PHPat\Test\Builder\Rule;
-use PHPat\Test\PHPat;
-
-final class PrivateConstructorsShouldUseCannotBeInstantiatedTest
+final class ClassWithoutDeclaredConstructor
 {
-    public function testNoArgumentPrivateConstructorsUseCannotBeInstantiated(): Rule
-    {
-        return PHPat::rule()
-            ->classes(
-                Selector::AllOf(
-                    InfectionSelector::code(),
-                    InfectionSelector::classesWithNoArgumentPrivateConstructor(),
-                ),
-            )
-            ->should()
-            ->include()
-            ->classes(Selector::classname(CannotBeInstantiated::class))
-            ->because('No-argument private constructors should be expressed through the CannotBeInstantiated trait.');
-    }
 }

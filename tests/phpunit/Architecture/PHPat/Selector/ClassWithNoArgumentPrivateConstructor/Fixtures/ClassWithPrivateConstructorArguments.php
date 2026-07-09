@@ -33,11 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Fixture;
+namespace Infection\Tests\Architecture\PHPat\Selector\ClassWithNoArgumentPrivateConstructor\Fixtures;
 
-final class ClassWithNoArgumentPrivateConstructor
+final readonly class ClassWithPrivateConstructorArguments
 {
-    private function __construct()
+    private function __construct(
+        private string $value,
+    ) {
+    }
+
+    public static function fromString(string $value): self
     {
+        return new self($value);
     }
 }
