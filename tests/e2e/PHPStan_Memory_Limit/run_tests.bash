@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 
 readonly INFECTION=../../../${1}
 
-set -e pipefail
+set -eo pipefail
 
 rm -rf var/*
 
@@ -33,7 +33,7 @@ then
     exit 1
 fi
 
-XDEBUG_MODE=coverage php -d memory_limit=-1 $INFECTION --no-progress --threads=1
+XDEBUG_MODE=coverage php -d memory_limit=-1 "$INFECTION" --no-progress --threads=1
 
 if [ -n "$GOLDEN" ]; then
     cp -v var/infection.log expected-output.txt

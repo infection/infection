@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $isMutantAnalysis = false;
 
 foreach ($_SERVER['argv'] ?? [] as $argument) {
