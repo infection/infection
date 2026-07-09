@@ -5054,16 +5054,16 @@
         },
         {
             "name": "seld/jsonlint",
-            "version": "1.11.0",
+            "version": "1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/jsonlint.git",
-                "reference": "1748aaf847fc731cfad7725aec413ee46f0cc3a2"
+                "reference": "9a90eb5d32d5a500296bf43f946d60246444d5f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/1748aaf847fc731cfad7725aec413ee46f0cc3a2",
-                "reference": "1748aaf847fc731cfad7725aec413ee46f0cc3a2",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/9a90eb5d32d5a500296bf43f946d60246444d5f7",
+                "reference": "9a90eb5d32d5a500296bf43f946d60246444d5f7",
                 "shasum": ""
             },
             "require": {
@@ -5102,7 +5102,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/jsonlint/issues",
-                "source": "https://github.com/Seldaek/jsonlint/tree/1.11.0"
+                "source": "https://github.com/Seldaek/jsonlint/tree/1.12.1"
             },
             "funding": [
                 {
@@ -5114,20 +5114,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-11T14:55:45+00:00"
+            "time": "2026-06-12T11:32:29+00:00"
         },
         {
             "name": "shipmonk/dead-code-detector",
-            "version": "1.3.0",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/dead-code-detector.git",
-                "reference": "d5d4c221395228d9926320146c1c8273655326f5"
+                "reference": "bbd33fb7e70e7d2e57b85201d9fe05b70289e953"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/dead-code-detector/zipball/d5d4c221395228d9926320146c1c8273655326f5",
-                "reference": "d5d4c221395228d9926320146c1c8273655326f5",
+                "url": "https://api.github.com/repos/shipmonk-rnd/dead-code-detector/zipball/bbd33fb7e70e7d2e57b85201d9fe05b70289e953",
+                "reference": "bbd33fb7e70e7d2e57b85201d9fe05b70289e953",
                 "shasum": ""
             },
             "require": {
@@ -5201,9 +5201,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shipmonk-rnd/dead-code-detector/issues",
-                "source": "https://github.com/shipmonk-rnd/dead-code-detector/tree/1.3.0"
+                "source": "https://github.com/shipmonk-rnd/dead-code-detector/tree/1.3.1"
             },
-            "time": "2026-06-30T08:26:15+00:00"
+            "time": "2026-07-08T11:47:03+00:00"
         },
         {
             "name": "shipmonk/name-collision-detector",
@@ -5682,16 +5682,16 @@
         },
         {
             "name": "webmozarts/strict-phpunit",
-            "version": "7.24.1",
+            "version": "7.24.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/strict-phpunit.git",
-                "reference": "4227331891f45ce9d10b995393f6cb90b9e3df37"
+                "reference": "f060d33194dbd54f5ff0beaffe24a6464961e9f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/4227331891f45ce9d10b995393f6cb90b9e3df37",
-                "reference": "4227331891f45ce9d10b995393f6cb90b9e3df37",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/f060d33194dbd54f5ff0beaffe24a6464961e9f3",
+                "reference": "f060d33194dbd54f5ff0beaffe24a6464961e9f3",
                 "shasum": ""
             },
             "require": {
@@ -5700,7 +5700,7 @@
             },
             "require-dev": {
                 "ergebnis/composer-normalize": "^2.28",
-                "infection/infection": "^0.28.1"
+                "infection/infection": "^0.29.12"
             },
             "type": "library",
             "extra": {
@@ -5726,9 +5726,9 @@
             "description": "Enables type-safe comparisons of objects in PHPUnit",
             "support": {
                 "issues": "https://github.com/webmozarts/strict-phpunit/issues",
-                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.24.1"
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.24.2"
             },
-            "time": "2026-03-20T11:41:56+00:00"
+            "time": "2026-07-03T15:09:51+00:00"
         }
     ],
     "aliases": [],
