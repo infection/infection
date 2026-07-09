@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 
 readonly INFECTION=../../../${1}
 
-set -e pipefail
+set -eo pipefail
 
 php $INFECTION --no-progress --threads=2
 
