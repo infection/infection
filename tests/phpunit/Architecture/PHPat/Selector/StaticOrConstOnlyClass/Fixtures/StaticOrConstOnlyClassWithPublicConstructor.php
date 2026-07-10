@@ -33,29 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Tests\Architecture\PHPat\Selector\StaticOrConstOnlyClass\Fixtures;
 
-use Infection\CannotBeInstantiated;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- */
-final class NameResolver
+final class StaticOrConstOnlyClassWithPublicConstructor
 {
-    use CannotBeInstantiated;
-
-    public static function resolveName(Node\Name $name): Node\Name\FullyQualified
+    public function __construct()
     {
-        if ($name->toString() === 'self') {
-            $reflectionClass = ReflectionVisitor::findReflectionClass($name);
-            Assert::notNull($reflectionClass);
+    }
 
-            return new Node\Name\FullyQualified($reflectionClass->getName());
-        }
-
-        return $name->getAttribute('resolvedName');
+    public static function create(): self
+    {
+        return new self();
     }
 }

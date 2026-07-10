@@ -38,6 +38,7 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\CommandLineBuilder;
@@ -60,6 +61,8 @@ use Webmozart\Assert\Assert;
  */
 final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
+    use CannotBeInstantiated;
+
     /**
      * @param string[] $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
