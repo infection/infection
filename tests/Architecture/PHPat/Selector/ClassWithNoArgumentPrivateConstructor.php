@@ -33,29 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\CannotBeInstantiated;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-/**
- * @internal
- */
-final class NameResolver
+final class ClassWithNoArgumentPrivateConstructor implements SelectorInterface
 {
-    use CannotBeInstantiated;
-
-    public static function resolveName(Node\Name $name): Node\Name\FullyQualified
+    public function getName(): string
     {
-        if ($name->toString() === 'self') {
-            $reflectionClass = ReflectionVisitor::findReflectionClass($name);
-            Assert::notNull($reflectionClass);
+        return 'class with a no-argument private constructor';
+    }
 
-            return new Node\Name\FullyQualified($reflectionClass->getName());
+    public function matches(ClassReflection $classReflection): bool
+    {
+        if (
+            !ConcreteClassReflection::isConcreteClass($classReflection)
+            || $classReflection->isEnum()
+        ) {
+            return false;
         }
 
-        return $name->getAttribute('resolvedName');
+        $constructor = $classReflection->getNativeReflection()->getConstructor();
+
+        return $constructor !== null
+            && $constructor->isPrivate()
+            && $constructor->getNumberOfParameters() === 0;
     }
 }

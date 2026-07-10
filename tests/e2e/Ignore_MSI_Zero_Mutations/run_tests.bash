@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-set -e pipefail
+set -eo pipefail
 
 readonly INFECTION="../../../bin/infection --ignore-msi-with-no-mutations --min-msi=100"
 

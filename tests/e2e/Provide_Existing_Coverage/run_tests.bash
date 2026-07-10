@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-set -e pipefail
+set -eo pipefail
 
 readonly INFECTION="../../../bin/infection --coverage=infection-coverage --with-uncovered"
 readonly PHPUNIT="vendor/bin/phpunit  --coverage-xml=infection-coverage/coverage-xml --log-junit=infection-coverage/junit.xml"

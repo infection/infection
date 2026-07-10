@@ -88,6 +88,8 @@ $skippedPaths = [
     __DIR__ . '/tests/benchmark/MutationGenerator/sources',
     __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
     __DIR__ . '/tests/benchmark/Tracing/coverage',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/ClassWithNoArgumentPrivateConstructor/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/StaticOrConstOnlyClass/Fixtures',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/CoveredClassWithoutIo.php',

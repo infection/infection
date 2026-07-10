@@ -33,29 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Util;
+namespace Infection\Tests\Architecture\PHPat;
 
 use Infection\CannotBeInstantiated;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-/**
- * @internal
- */
-final class NameResolver
+final class PrivateConstructorsShouldUseCannotBeInstantiatedTest
 {
-    use CannotBeInstantiated;
-
-    public static function resolveName(Node\Name $name): Node\Name\FullyQualified
+    public function testNoArgumentPrivateConstructorsUseCannotBeInstantiated(): Rule
     {
-        if ($name->toString() === 'self') {
-            $reflectionClass = ReflectionVisitor::findReflectionClass($name);
-            Assert::notNull($reflectionClass);
-
-            return new Node\Name\FullyQualified($reflectionClass->getName());
-        }
-
-        return $name->getAttribute('resolvedName');
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    InfectionSelector::code(),
+                    InfectionSelector::classesWithNoArgumentPrivateConstructor(),
+                ),
+            )
+            ->should()
+            ->include()
+            ->classes(Selector::classname(CannotBeInstantiated::class))
+            ->because('No-argument private constructors should be expressed through the CannotBeInstantiated trait.');
     }
 }

@@ -215,8 +215,12 @@ an immutable rebuild would silently no-op).
 
 ### Statics are a feature
 
-Const-only and pure-static classes use the `use CannotBeInstantiated;` trait
-(`src/CannotBeInstantiated.php`, ~30 users: `ProfileList`, `Console\XdebugHandler`).
+Const-only and pure-static classes, in source or tests, use the `use CannotBeInstantiated;`
+trait (`src/CannotBeInstantiated.php`, `ProfileList`, `Console\XdebugHandler`). PHPat
+enforces this for concrete Infection classes. A declared public constructor means the class
+is intentionally instantiable and the static/const-only rule does not apply. A no-argument
+private constructor should be replaced by `CannotBeInstantiated`; private constructors with
+arguments remain valid for named-constructor/value-object patterns.
 Pure transforms are `private static` helpers or all-static classes (`FilterBuilder`) - DI is
 reserved for collaborators with state or IO. Memoization is a `static $cache = []` inside an
 intent-named method (`isPhpUnit10OrHigher()`), not a cache service.

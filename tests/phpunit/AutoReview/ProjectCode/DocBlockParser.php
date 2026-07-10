@@ -42,12 +42,15 @@ use function current;
 use function end;
 use function explode;
 use function implode;
+use Infection\CannotBeInstantiated;
 use function strlen;
 use function substr;
 use function trim;
 
 final class DocBlockParser
 {
+    use CannotBeInstantiated;
+
     public static function parse(string $docblock): string
     {
         $docblock = trim($docblock);
