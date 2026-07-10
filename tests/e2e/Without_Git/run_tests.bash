@@ -14,6 +14,11 @@ readonly PHP
 
 composer install
 
+if PATH="$WITHOUT_GIT_PATH" command -v git; then
+    echo "git is still reachable; improve this test" >&2
+    exit 1
+fi
+
 PATH="$WITHOUT_GIT_PATH" "$PHP" "../../../${1:-bin/infection}"
 
 if [ -n "$GOLDEN" ]; then
