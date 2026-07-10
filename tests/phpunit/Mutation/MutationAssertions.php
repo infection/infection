@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\CannotBeInstantiated;
 use Infection\Mutation\Mutation;
 use PhpParser\Node;
 use PhpParser\Token;
@@ -47,6 +48,8 @@ use PHPUnit\Framework\Assert;
  */
 final class MutationAssertions
 {
+    use CannotBeInstantiated;
+
     public static function assertEquals(
         Mutation $expected,
         Mutation $actual,

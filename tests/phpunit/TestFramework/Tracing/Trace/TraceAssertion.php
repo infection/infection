@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing\Trace;
 
+use Infection\CannotBeInstantiated;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use PHPUnit\Framework\Assert;
 
 final class TraceAssertion
 {
+    use CannotBeInstantiated;
+
     public static function assertEquals(
         Trace $expected,
         Trace $actual,

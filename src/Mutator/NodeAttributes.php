@@ -37,6 +37,7 @@ namespace Infection\Mutator;
 
 use function array_diff_key;
 use function array_flip;
+use Infection\CannotBeInstantiated;
 use PhpParser\Node;
 
 /**
@@ -44,6 +45,8 @@ use PhpParser\Node;
  */
 final class NodeAttributes
 {
+    use CannotBeInstantiated;
+
     /**
      * @return array<string, mixed>
      */

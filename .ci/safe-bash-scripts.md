@@ -73,7 +73,7 @@ After:
 
 ```
 #!/bin/bash
-set -o pipefail
+set -eo pipefail
 
 # 'foo' is a non-existing command
 foo | echo "a"
@@ -86,8 +86,31 @@ echo "bar"
 #
 # This time around the non-existing foo command causes an immediate exit, as
 # '-o pipefail' will prevent piping from causing non-zero exit codes to be
-# ignored.
+# ignored. Note that 'pipefail' only propagates the failure: '-e' is what
+# turns it into an exit.
 ```
+
+### Beware: `set -e pipefail` does NOT enable pipefail
+
+`pipefail` is an argument to `-o`, never a bare word. Written without it, bash
+enables `-e`, then takes `pipefail` as a **positional parameter**, silently
+overwriting `$1`:
+
+```
+#!/bin/bash
+set -e pipefail
+
+echo "$1"
+
+# output
+# ------
+# pipefail
+#
+# The pipeline option was never enabled, and the script's first argument is gone.
+```
+
+Both halves fail quietly. `shellcheck` does not report it - `set` really does
+accept arguments, so there is nothing to diagnose. Write `set -eo pipefail`.
 
 ## Set `-u`
 
@@ -98,7 +121,7 @@ Before:
 ```
 #!/bin/bash
 
-echo "$a
+echo "$a"
 echo "bar"
 
 # output
@@ -132,7 +155,7 @@ For cases where you want to deal with unset variables, check the
 [${a:-b}][unset variable assignment]
 
 
-## Set `-u`
+## Set `-x`
 
 Makes the bash script print each command before executing it.
 
