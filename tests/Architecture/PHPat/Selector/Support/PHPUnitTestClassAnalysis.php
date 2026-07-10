@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use function count;
+use Infection\CannotBeInstantiated;
 use function is_string;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
@@ -51,6 +52,8 @@ use function str_starts_with;
 
 final class PHPUnitTestClassAnalysis
 {
+    use CannotBeInstantiated;
+
     private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
 
     private const string GROUP_NAME = 'integration';

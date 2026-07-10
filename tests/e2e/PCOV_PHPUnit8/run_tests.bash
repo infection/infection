@@ -42,7 +42,7 @@ then
     exit 0
 fi
 
-set -e pipefail
+set -eo pipefail
 
 run "../../../bin/infection"
 

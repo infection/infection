@@ -221,6 +221,16 @@ final class InfectionSelector
         return new SourceClassWithPublicNonReadonlyProperty(self::analyser());
     }
 
+    public static function staticOrConstOnlyClass(): SelectorInterface
+    {
+        return new StaticOrConstOnlyClass();
+    }
+
+    public static function classesWithNoArgumentPrivateConstructor(): SelectorInterface
+    {
+        return new ClassWithNoArgumentPrivateConstructor();
+    }
+
     public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();
