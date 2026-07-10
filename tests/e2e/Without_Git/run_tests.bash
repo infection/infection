@@ -4,10 +4,9 @@ cd "$(dirname "$0")"
 
 set -eo pipefail
 
-# empty directory to emulate PATH without git while preventing the built-in fallback of /bin:/usr/bin
-WITHOUT_GIT_PATH="$(mktemp -d)"
-readonly WITHOUT_GIT_PATH
-trap 'rm -rf "$WITHOUT_GIT_PATH"' EXIT
+# an absolute path to a directory to emulate PATH without git while
+# preventing the built-in fallback of /bin:/usr/bin
+readonly WITHOUT_GIT_PATH="$PWD/bin"
 
 PHP="$(command -v php)"
 readonly PHP
