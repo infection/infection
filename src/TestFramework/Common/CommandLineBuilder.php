@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace Infection\TestFramework\Common;
 
 use function array_filter;
 use function array_merge;

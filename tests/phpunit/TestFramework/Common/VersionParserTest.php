@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\Common;
 
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Common\VersionParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

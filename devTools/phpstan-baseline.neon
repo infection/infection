@@ -667,18 +667,6 @@ parameters:
 			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\TestFramework\VersionParser
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -692,18 +680,6 @@ parameters:
 
 		-
 			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\TestFramework\VersionParser
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
@@ -757,12 +733,6 @@ parameters:
 			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
 			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -787,18 +757,6 @@ parameters:
 			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\TestFramework\VersionParser
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
 			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -812,18 +770,6 @@ parameters:
 
 		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\TestFramework\VersionParser
 			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
@@ -877,12 +823,6 @@ parameters:
 			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
-
-		-
 			rawMessage: Unused Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory::create
 			identifier: shipmonk.deadMethod
 			count: 1
@@ -904,13 +844,19 @@ parameters:
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 2
-			path: ../src/TestFramework/CommandLineBuilder.php
+			path: ../src/TestFramework/Common/CommandLineBuilder.php
 
 		-
 			rawMessage: Function shell_exec is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\shell_exec;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
 			identifier: theCodingMachineSafe.function
 			count: 1
-			path: ../src/TestFramework/CommandLineBuilder.php
+			path: ../src/TestFramework/Common/CommandLineBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\Common\CommandLineBuilder should not depend on Infection\FileSystem\Finder\Exception\FinderException
+			identifier: phpat.testTestFrameworkCommonUtilitiesStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Common/CommandLineBuilder.php
 
 		-
 			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
@@ -979,12 +925,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\InitialConfigBuilder
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -998,12 +938,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\ProvidesInitialRunOnlyOptions
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\VersionParser
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
@@ -1027,19 +961,7 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\CommandLineBuilder
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\VersionParser
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
