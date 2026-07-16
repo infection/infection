@@ -90,8 +90,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
-- `adr/` - Architecture Decision Records; short rationale for standing conventions (PHPUnit
-  `$this`-over-`self`, `@covers`, memoized-vs-cached naming). Read before challenging one.
+- `adr/` - Architecture Decision Records; short rationale for standing conventions. Read before challenging one. New
+  ADRs must follow `adr/0000-template.md`; keep its section order and leave Status last.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
