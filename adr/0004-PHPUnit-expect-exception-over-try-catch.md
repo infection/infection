@@ -71,9 +71,8 @@ final class ServiceTest extends TestCase
 
 ### Status
 
-Accepted ([#1192][1192])
+Accepted
 
 
 [sebastian-bergmann]: https://thephp.cc/company/consultants/sebastian-bergmann
 [phpunit-exception-best-practices]: https://thephp.cc/news/2016/02/questioning-phpunit-best-practices
-[1192]: https://github.com/infection/infection/pull/1192
