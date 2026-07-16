@@ -19,6 +19,12 @@ Do not use `@inheritdoc` tags or any of its variants. The `@inheritdoc` tags and
 be removed when submitting pull requests.
 
 
+### Enforcement
+
+`tests/Architecture/PHPat/SourceCodeShouldNotUseInheritDocTest.php` enforces this decision for
+source classes and their declared methods through PHPat as part of the PHPStan analysis.
+
+
 ### Status
 
 Accepted ([#860][860])
