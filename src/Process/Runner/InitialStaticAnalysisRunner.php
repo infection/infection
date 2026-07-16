@@ -39,8 +39,9 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Process\CompletedProcess;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Symfony\Component\Process\Process;
+use Infection\Process\ShellCommandLineExecutor;
 
 /**
  * @internal
@@ -50,19 +51,25 @@ readonly class InitialStaticAnalysisRunner
 {
     public function __construct(
         private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
         private EventDispatcher $eventDispatcher,
     ) {
     }
 
-    public function run(): Process
+    public function run(): CompletedProcess
     {
-        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
-
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
+        $process = $this->shellCommandLineExecutor->run(
+            $this->initialStaticAnalysisProcessFactory->createCommandLine(),
+            fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
+            null,
+            [],
+            null,
+            null,
+        );
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->stdout));
 
         return $process;
     }

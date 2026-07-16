@@ -35,30 +35,103 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Closure;
+use Stringable;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  *
  * @final
  *
- * Tiny wrapper around the Symfony Process component to easily get the output of a command.
+ * Tiny wrapper around the Symfony Process component to run blocking shell commands.
  */
 class ShellCommandLineExecutor
 {
     /**
-     * @param string[] $command
+     * @param list<string>                              $command
+     * @param (Closure('out'|'err', string): void)|null $callback
+     * @param array<string, string|Stringable|false>    $env
      *
      * @throws ProcessTimedOutException
      * @throws ProcessFailedException
      * @throws ProcessException
      */
-    public function execute(array $command): string
+    public function execute(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = 60.0,
+        ?float $idleTimeout = null,
+    ): CompletedProcess {
+        $process = new Process(
+            $command,
+            $cwd,
+            $env,
+            $input,
+            $timeout,
+        );
+
+        $process->setIdleTimeout($idleTimeout);
+        $process->mustRun($callback);
+
+        return self::createResult($command, $process);
+    }
+
+    /**
+     * @param list<string>                              $command
+     * @param (Closure('out'|'err', string): void)|null $callback
+     * @param array<string, string|Stringable|false>    $env
+     *
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
+     */
+    public function run(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = 60.0,
+        ?float $idleTimeout = null,
+    ): CompletedProcess {
+        $process = new Process(
+            $command,
+            $cwd,
+            $env,
+            $input,
+            $timeout,
+        );
+
+        $process->setIdleTimeout($idleTimeout);
+        $process->run($callback);
+
+        return self::createResult($command, $process);
+    }
+
+    /**
+     * @param list<string> $command
+     */
+    private function createResult(
+        array $command,
+        Process $process,
+    ): CompletedProcess
     {
-        return trim((new Process($command))->mustRun()->getOutput());
+        $exitCode = $process->getExitCode();
+        Assert::integer($exitCode);
+
+        return new CompletedProcess(
+            $command,
+            $exitCode,
+            trim($process->getOutput()),
+            trim($process->getErrorOutput()),
+        );
     }
 }

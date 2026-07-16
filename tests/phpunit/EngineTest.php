@@ -47,6 +47,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
+use Infection\Process\CompletedProcess;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -233,11 +234,12 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'test output');
 
-        $staticAnalysisProcess = $this->createMock(Process::class);
-        $staticAnalysisProcess
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn(true);
+        $staticAnalysisProcess = new CompletedProcess(
+            ['/path/to/phpstan', 'analyse'],
+            0,
+            '',
+            '',
+        );
 
         $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
         $initialStaticAnalysisRunner

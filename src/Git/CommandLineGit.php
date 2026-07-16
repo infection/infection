@@ -131,7 +131,7 @@ final readonly class CommandLineGit implements Git
                 'merge-base',
                 $base,
                 'HEAD',
-            ]);
+            ])->stdout;
 
             Assert::stringNotEmpty($reference);
 
@@ -159,7 +159,7 @@ final readonly class CommandLineGit implements Git
                 'git',
                 'rev-parse',
                 '--show-toplevel',
-            ]);
+            ])->stdout;
         } catch (ProcessException $exception) {
             throw NoGitProjectFound::create($exception);
         }
@@ -288,7 +288,7 @@ final readonly class CommandLineGit implements Git
                 array_filter($command),
                 $sourceDirectories,
             ),
-        );
+        )->stdout;
 
         if ($diff === '') {
             return [];
@@ -308,7 +308,7 @@ final readonly class CommandLineGit implements Git
                 'git',
                 'symbolic-ref',
                 $name,
-            ]);
+            ])->stdout;
 
             Assert::stringNotEmpty($reference);
 
