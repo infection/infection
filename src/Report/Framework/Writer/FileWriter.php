@@ -53,8 +53,6 @@ final readonly class FileWriter implements ReportWriter
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws IOException
      */
     public function write(iterable|string $contentOrLines): void
