@@ -1989,6 +1989,12 @@ count = 1
 [[issues]]
 file = "src/Mutation/FileMutationGenerator.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Mutation\FileMutationGenerator::generateMutations`.'
+count = 1
+
+[[issues]]
+file = "src/Mutation/FileMutationGenerator.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Mutation\FileMutationGenerator::generateMutations`.'
 count = 1
 
@@ -2779,6 +2785,12 @@ message = 'Could not infer a precise return type for function `Infection\PhpPars
 count = 1
 
 [[issues]]
+file = "src/PhpParser/Visitor/MutationCollectorVisitor.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\PhpParser\Visitor\MutationCollectorVisitor::leaveNode`.'
+count = 1
+
+[[issues]]
 file = "src/PhpParser/Visitor/ParentConnector.php"
 code = "mixed-return-statement"
 message = 'Could not infer a precise return type for function `Infection\PhpParser\Visitor\ParentConnector::findParent`. Saw type `mixed`.'
@@ -3202,6 +3214,24 @@ count = 1
 file = "src/TestFramework/Common/CommandLineBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\TestFramework\Common\CommandLineBuilder::findPhp`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Common/VersionParser.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `Infection\TestFramework\Common\VersionParser::parse`: expected `string`, but found `null|string`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Common/VersionParser.php"
+code = "nullable-return-statement"
+message = 'Function `Infection\TestFramework\Common\VersionParser::parse` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/Common/VersionParser.php"
+code = "possibly-null-array-access"
+message = "Cannot perform array access on possibly `null` value."
 count = 1
 
 [[issues]]
@@ -3763,24 +3793,6 @@ message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Loc
 count = 1
 
 [[issues]]
-file = "src/TestFramework/Common/VersionParser.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\TestFramework\Common\VersionParser::parse`: expected `string`, but found `null|string`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Common/VersionParser.php"
-code = "nullable-return-statement"
-message = 'Function `Infection\TestFramework\Common\VersionParser::parse` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Common/VersionParser.php"
-code = "possibly-null-array-access"
-message = "Cannot perform array access on possibly `null` value."
-count = 1
-
-[[issues]]
 file = "src/TestFramework/XML/SafeDOMXPath.php"
 code = "avoid-catching-error"
 message = "Avoid catching 'Error' class instances."
@@ -3832,6 +3844,12 @@ count = 1
 file = "src/Testing/BaseMutatorTestCase.php"
 code = "redundant-docblock-type"
 message = "Redundant docblock type for variable `$expectedCodeSample`."
+count = 1
+
+[[issues]]
+file = "src/Testing/BaseMutatorTestCase.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Testing\BaseMutatorTestCase::getMutationsFromCode`.'
 count = 1
 
 [[issues]]
@@ -10457,6 +10475,18 @@ message = 'Potentially unhandled exception `Infection\PhpParser\NodeDumper\Poten
 count = 1
 
 [[issues]]
+file = "tests/phpunit/PhpParser/Visitor/MutationCollectorVisitorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\PhpParser\Visitor\MutationCollectorVisitorTest::test_it_collects_the_generated_mutations`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/PhpParser/Visitor/MutationCollectorVisitorTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\PhpParser\Visitor\MutationCollectorVisitorTest::test_it_resets_its_state_between_two_traverse`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesMutationCases` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -11643,6 +11673,18 @@ file = "tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory
 code = "deprecated-method"
 message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
 count = 3
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `invalidVersionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `versionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Coverage/CoveredTraceProviderTest.php"
@@ -13544,18 +13586,6 @@ count = 1
 file = "tests/phpunit/TestFramework/Tracing/Tracer/TracerIntegrationTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Throwable\NoTraceFound` in `Infection\Tests\TestFramework\Tracing\Tracer\TracerIntegrationTest::test_it_can_create_a_trace`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `invalidVersionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `versionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
