@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use Infection\CannotBeInstantiated;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
@@ -44,6 +45,8 @@ use Webmozart\Assert\Assert;
  */
 final class NameResolver
 {
+    use CannotBeInstantiated;
+
     public static function resolveName(Node\Name $name): Node\Name\FullyQualified
     {
         if ($name->toString() === 'self') {

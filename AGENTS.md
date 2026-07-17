@@ -90,8 +90,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
-- `adr/` - Architecture Decision Records; short rationale for standing conventions (PHPUnit
-  `$this`-over-`self`, `@covers`, memoized-vs-cached naming). Read before challenging one.
+- `adr/` - Architecture Decision Records; short rationale for standing conventions. Read
+  before challenging one. New ADRs must follow the template `adr/0000-template.md`. Keep jargon to a minimum (ASD-STE100) when writing.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
@@ -215,8 +215,12 @@ an immutable rebuild would silently no-op).
 
 ### Statics are a feature
 
-Const-only and pure-static classes use the `use CannotBeInstantiated;` trait
-(`src/CannotBeInstantiated.php`, ~30 users: `ProfileList`, `Console\XdebugHandler`).
+Const-only and pure-static classes, in source or tests, use the `use CannotBeInstantiated;`
+trait (`src/CannotBeInstantiated.php`, `ProfileList`, `Console\XdebugHandler`). PHPat
+enforces this for concrete Infection classes. A declared public constructor means the class
+is intentionally instantiable and the static/const-only rule does not apply. A no-argument
+private constructor should be replaced by `CannotBeInstantiated`; private constructors with
+arguments remain valid for named-constructor/value-object patterns.
 Pure transforms are `private static` helpers or all-static classes (`FilterBuilder`) - DI is
 reserved for collaborators with state or IO. Memoization is a `static $cache = []` inside an
 intent-named method (`isPhpUnit10OrHigher()`), not a cache service.

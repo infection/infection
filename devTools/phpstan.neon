@@ -27,6 +27,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\SourceCodeShouldNotUseInheritDocTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\SourceClassesShouldNotExposePublicPropertiesTest
         tags:
             - phpat.test
@@ -60,6 +64,14 @@ services:
             - phpat.test
     -
         class: Infection\Tests\Architecture\PHPat\AdapterExtractionBoundariesTest
+        tags:
+            - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\StaticOrConstOnlyClassesShouldNotBeInstantiableTest
+        tags:
+            - phpat.test
+    -
+        class: Infection\Tests\Architecture\PHPat\PrivateConstructorsShouldUseCannotBeInstantiatedTest
         tags:
             - phpat.test
 
@@ -272,6 +284,9 @@ parameters:
         -
             path: ../tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture
             message: '#.+#'
+        -
+            path: ../tests/phpunit/Architecture/PHPat/Selector/HasInheritDoc/Fixtures
+            message: '#.+#'
 
         # Having public properties on those DTOs for performance reasons.
         -
@@ -306,6 +321,8 @@ parameters:
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/ClassWithNoArgumentPrivateConstructor/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/StaticOrConstOnlyClass/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
         - ../tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php

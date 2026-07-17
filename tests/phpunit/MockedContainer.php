@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\CannotBeInstantiated;
 use Infection\Container\Container;
 
 final class MockedContainer
 {
+    use CannotBeInstantiated;
+
     /**
      * @param array<class-string<object>, Closure(Container): object> $values
      */

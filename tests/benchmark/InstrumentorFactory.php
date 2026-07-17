@@ -35,8 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark;
 
+use Infection\CannotBeInstantiated;
+
 final class InstrumentorFactory
 {
+    use CannotBeInstantiated;
+
     public static function create(bool $debug): Instrumentor
     {
         return $debug
