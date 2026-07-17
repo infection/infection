@@ -35,8 +35,12 @@ any decision to defer or accelerate an upgrade, depends on the following conside
 - **Maintenance and CI cost.** We consider the extra CI jobs, conditional code, dependency
   constraints, and contributor effort required by the oldest version.
 - **Release timing and user impact.** A floor increase must be made deliberately in a release
-  that communicates the new requirement. Users unable to upgrade PHP can remain on the
-  latest compatible Infection release. This option reduces, but does not eliminate, the
+  that communicates the new requirement. Dropping support for a PHP minor version requires
+  a new Infection minor release; every patch release in an Infection minor line must retain
+  the PHP versions supported by the first release in that line. For example, if Infection
+  `0.34.0` supports PHP 8.3, every `0.34.x` release must continue to support it, and dropping
+  PHP 8.3 requires an Infection `0.35.0` release. Users unable to upgrade PHP can remain on
+  the latest compatible Infection release. This option reduces, but does not eliminate, the
   impact and must not replace an assessment of actual adoption.
 
 These considerations inform a documented decision rather than a scoring system. A proposal
