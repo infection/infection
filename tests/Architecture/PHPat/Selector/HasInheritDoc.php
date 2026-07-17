@@ -74,7 +74,7 @@ final readonly class HasInheritDoc implements SelectorInterface
         ReflectionMethod $methodReflection,
         ClassReflection $classReflection,
     ): bool {
-        return $methodReflection->getDeclaringClass()->getName() === $classReflection->getName();
+        return $methodReflection->getDeclaringClass()->getName() !== $classReflection->getName();
     }
 
     private static function containsInheritDoc(string|false $docComment): bool
