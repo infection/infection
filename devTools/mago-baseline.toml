@@ -3199,9 +3199,9 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
-file = "src/TestFramework/CommandLineBuilder.php"
+file = "src/TestFramework/Common/CommandLineBuilder.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\TestFramework\CommandLineBuilder::findPhp`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\TestFramework\Common\CommandLineBuilder::findPhp`.'
 count = 1
 
 [[issues]]
@@ -3763,19 +3763,19 @@ message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Loc
 count = 1
 
 [[issues]]
-file = "src/TestFramework/VersionParser.php"
+file = "src/TestFramework/Common/VersionParser.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\TestFramework\VersionParser::parse`: expected `string`, but found `null|string`.'
+message = 'Invalid return type for function `Infection\TestFramework\Common\VersionParser::parse`: expected `string`, but found `null|string`.'
 count = 1
 
 [[issues]]
-file = "src/TestFramework/VersionParser.php"
+file = "src/TestFramework/Common/VersionParser.php"
 code = "nullable-return-statement"
-message = 'Function `Infection\TestFramework\VersionParser::parse` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
+message = 'Function `Infection\TestFramework\Common\VersionParser::parse` is declared to return `string` but possibly returns a nullable value (inferred as `null|string`).'
 count = 1
 
 [[issues]]
-file = "src/TestFramework/VersionParser.php"
+file = "src/TestFramework/Common/VersionParser.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
 count = 1
@@ -13547,13 +13547,13 @@ message = 'Potentially unhandled exception `Infection\TestFramework\Tracing\Thro
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/VersionParserTest.php"
+file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `invalidVersionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/TestFramework/VersionParserTest.php"
+file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `versionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
