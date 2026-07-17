@@ -41,7 +41,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
