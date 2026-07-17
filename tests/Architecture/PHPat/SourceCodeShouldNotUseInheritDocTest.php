@@ -33,37 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Report\Framework\Writer;
+namespace Infection\Tests\Architecture\PHPat;
 
-use function implode;
-use function is_string;
-use function iterator_to_array;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Selector\Selector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
 
-/**
- * @internal
- */
-final readonly class FileWriter implements ReportWriter
+final class SourceCodeShouldNotUseInheritDocTest
 {
-    public function __construct(
-        private Filesystem $filesystem,
-        private string $filePath,
-    ) {
-    }
-
-    /**
-     * @throws IOException
-     */
-    public function write(iterable|string $contentOrLines): void
+    public function testSourceCodeDoesNotUseInheritDoc(): Rule
     {
-        $contents = is_string($contentOrLines)
-            ? $contentOrLines
-            : implode(
-                "\n",
-                iterator_to_array($contentOrLines),
-            );
-
-        $this->filesystem->dumpFile($this->filePath, $contents);
+        return PHPat::rule()
+            ->classes(
+                Selector::AllOf(
+                    InfectionSelector::sourceCode(),
+                    InfectionSelector::hasInheritDoc(),
+                ),
+            )
+            ->shouldNot()
+            ->exist()
+            ->because('PHPDoc is inherited implicitly therefore add no information. See ADR-0001.');
     }
 }

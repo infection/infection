@@ -33,37 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Report\Framework\Writer;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function implode;
-use function is_string;
-use function iterator_to_array;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
+use ReflectionMethod;
+use function Safe\preg_match;
 
-/**
- * @internal
- */
-final readonly class FileWriter implements ReportWriter
+final readonly class HasInheritDoc implements SelectorInterface
 {
-    public function __construct(
-        private Filesystem $filesystem,
-        private string $filePath,
-    ) {
+    private const string INHERIT_DOC_PATTERN = '/(?:\{\s*)?@inheritdoc\b(?:\s*\})?/i';
+
+    public function getName(): string
+    {
+        return 'has an inheritdoc PHPDoc tag';
     }
 
-    /**
-     * @throws IOException
-     */
-    public function write(iterable|string $contentOrLines): void
+    public function matches(ClassReflection $classReflection): bool
     {
-        $contents = is_string($contentOrLines)
-            ? $contentOrLines
-            : implode(
-                "\n",
-                iterator_to_array($contentOrLines),
-            );
+        $nativeReflection = $classReflection->getNativeReflection();
 
-        $this->filesystem->dumpFile($this->filePath, $contents);
+        if (self::containsInheritDoc($nativeReflection->getDocComment())) {
+            return true;
+        }
+
+        foreach ($nativeReflection->getMethods() as $methodReflection) {
+            if (self::isInheritedMethod($methodReflection, $classReflection)) {
+                continue;
+            }
+
+            if (self::containsInheritDoc($methodReflection->getDocComment())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function isInheritedMethod(
+        ReflectionMethod $methodReflection,
+        ClassReflection $classReflection,
+    ): bool {
+        return $methodReflection->getDeclaringClass()->getName() !== $classReflection->getName();
+    }
+
+    private static function containsInheritDoc(string|false $docComment): bool
+    {
+        return $docComment !== false
+            && preg_match(self::INHERIT_DOC_PATTERN, $docComment) === 1;
     }
 }

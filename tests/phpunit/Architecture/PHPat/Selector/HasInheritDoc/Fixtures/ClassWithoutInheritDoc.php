@@ -33,37 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Report\Framework\Writer;
+namespace Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc\Fixtures;
 
-use function implode;
-use function is_string;
-use function iterator_to_array;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
-
-/**
- * @internal
- */
-final readonly class FileWriter implements ReportWriter
+/** The word inheritdoc without an at-sign is not a tag. */
+final class ClassWithoutInheritDoc
 {
-    public function __construct(
-        private Filesystem $filesystem,
-        private string $filePath,
-    ) {
-    }
-
-    /**
-     * @throws IOException
-     */
-    public function write(iterable|string $contentOrLines): void
-    {
-        $contents = is_string($contentOrLines)
-            ? $contentOrLines
-            : implode(
-                "\n",
-                iterator_to_array($contentOrLines),
-            );
-
-        $this->filesystem->dumpFile($this->filePath, $contents);
-    }
 }

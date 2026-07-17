@@ -241,6 +241,11 @@ final class InfectionSelector
         return new HasInternalDocBlock();
     }
 
+    public static function hasInheritDoc(): SelectorInterface
+    {
+        return new HasInheritDoc();
+    }
+
     public static function isAnonymousClass(): SelectorInterface
     {
         return new IsAnonymousClass();

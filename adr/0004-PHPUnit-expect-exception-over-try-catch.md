@@ -2,14 +2,17 @@
 
 ### Context
 
-When executing code that is expected to fail in a test case, there is two ways to do this:
+There are two common ways to test code that is expected to throw an exception:
 
 ```php
-function test_something(): void {
+function test_something(): void
+{
     // ...
 
     try {
-        // the statement that fail
+        // The statement that fails
+
+        // This assertion is required if the statement does not throw.
         $this->fail();
     } catch (Exception $e) {
         // ...
@@ -17,34 +20,59 @@ function test_something(): void {
 }
 ```
 
-Or:
+Alternatively, use PHPUnit's exception-expectation API:
 
 ```php
-function test_something(): void {
+function test_something(): void
+{
     // ...
 
-    $this->expectException($exception)
+    // Other expectException*() assertions may also be used.
+    $this->expectException($exception);
 
-    // the statement that fail
+    // The statement that fails
 }
 ```
+
+This decision addresses concerns about readability and maintainability.
 
 
 ### Decision
 
-As recommended by [Sebastian Bergmann][sebastian-bergmann] in
-[this article][phpunit-exception-best-practices], since in both cases a PHPUnit specific API is
-necessary, the decision taken is to leverage the `expectException*()` API when possible.
+Following the recommendation from [Sebastian Bergmann][sebastian-bergmann] in
+[this article][phpunit-exception-best-practices], use the `expectException*()` API when the test
+only needs to assert the exception type, message, or code.
 
-A pull request to fix this practice in the whole codebase may be done but has not been made
-mandatory. New pull requests though should stick to this practice.
+When the test must inspect the exception object or perform further assertions after catching it,
+use the `ExpectsThrowables` test utility. Pass only the statement expected to throw to
+`expectToThrow()`. This prevents an exception raised during test setup from causing the test to
+pass accidentally. Do not write a `try-catch` block directly in a test.
+
+```php
+final class ServiceTest extends TestCase
+{
+    use ExpectsThrowables;
+
+    public function test_something(): void
+    {
+        $previous = new RuntimeException();
+        $service = $this->createService($previous);
+
+        $exception = $this->expectToThrow(
+            static fn () => $service->execute(),
+        );
+
+        $this->assertInstanceOf(DomainException::class, $exception);
+        $this->assertSame($previous, $exception->getPrevious());
+    }
+}
+```
 
 
 ### Status
 
-Accepted ([#1090][1090])
+Accepted
 
 
 [sebastian-bergmann]: https://thephp.cc/company/consultants/sebastian-bergmann
 [phpunit-exception-best-practices]: https://thephp.cc/news/2016/02/questioning-phpunit-best-practices
-[1090]: https://github.com/infection/infection/pull/1061

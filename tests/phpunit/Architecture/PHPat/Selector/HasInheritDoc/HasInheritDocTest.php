@@ -33,52 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use Infection\Source\Exception\NoSourceFound;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc;
+use Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc\Fixtures\ChildWithoutInheritDoc;
+use Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc\Fixtures\ClassWithInheritDoc;
+use Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc\Fixtures\ClassWithInlineInheritDoc;
+use Infection\Tests\Architecture\PHPat\Selector\HasInheritDoc\Fixtures\ClassWithoutInheritDoc;
+use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @internal
- */
-final class MutationCollectorVisitor extends NodeVisitorAbstract
+#[CoversClass(HasInheritDoc::class)]
+final class HasInheritDocTest extends SelectorTestCase
 {
     /**
-     * @var array<iterable<Mutation>>
+     * @param class-string $className
      */
-    private array $mutationChunks = [];
+    #[DataProvider('classProvider')]
+    public function test_it_matches_classes_declaring_inheritdoc(
+        string $className,
+        bool $expected,
+    ): void {
+        $selector = new HasInheritDoc();
+        $classReflection = $this->createClassReflection($className);
 
-    public function __construct(
-        private readonly NodeMutationGenerator $mutationGenerator,
-    ) {
+        $actual = $selector->matches($classReflection);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function beforeTraverse(array $nodes): ?array
+    public static function classProvider(): iterable
     {
-        $this->mutationChunks = [];
+        yield 'class-level tag' => [
+            ClassWithInheritDoc::class,
+            true,
+        ];
 
-        return null;
-    }
+        yield 'inline method tag with different casing' => [
+            ClassWithInlineInheritDoc::class,
+            true,
+        ];
 
-    public function leaveNode(Node $node): ?Node
-    {
-        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
+        yield 'inherited tag' => [
+            ChildWithoutInheritDoc::class,
+            false,
+        ];
 
-        return null;
-    }
-
-    /**
-     * @throws NoSourceFound
-     *
-     * @return iterable<Mutation>
-     */
-    public function getMutations(): iterable
-    {
-        foreach ($this->mutationChunks as $mutations) {
-            yield from $mutations;
-        }
+        yield 'without tag' => [
+            ClassWithoutInheritDoc::class,
+            false,
+        ];
     }
 }
