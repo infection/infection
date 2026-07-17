@@ -145,15 +145,6 @@ states the reason ("intentionally non-final only to allow PHPUnit partial mocks"
 reason for `@final`. If no test mocks the class, use the keyword. Reviewers ask "is there a
 reason this is `@final` rather than `final`?" Have the answer ("it is mocked in X").
 
-### `@internal` everywhere; the public API is a whitelist
-
-Every class gets `@internal` (PHPat-enforced). Users may depend only on extension points that
-are listed in `tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php::EXTENSION_POINTS`:
-`Mutator`, `Definition`, `MutatorCategory`, `BaseMutatorTestCase`, `MutationAnalysisLogger`,
-`SchemaConfigurationFactory`, `SchemaConfigurationFileLoader`, `SchemaValidator`. Extension
-points must have documented doc-blocks (another PHPat rule). Everything else may break at any
-release. Conversely, changing anything on that list is a BC event.
-
 ### Imports: everything, including functions and constants
 
 Every native call is imported (`use function sprintf;`, `use const DIRECTORY_SEPARATOR;`) -
