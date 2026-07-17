@@ -37,6 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
+use ReflectionMethod;
 use function Safe\preg_match;
 
 final readonly class HasInheritDoc implements SelectorInterface
@@ -56,17 +57,24 @@ final readonly class HasInheritDoc implements SelectorInterface
             return true;
         }
 
-        foreach ($nativeReflection->getMethods() as $method) {
-            if ($method->getDeclaringClass()->getName() !== $classReflection->getName()) {
+        foreach ($nativeReflection->getMethods() as $methodReflection) {
+            if (self::isInheritedMethod($methodReflection, $classReflection)) {
                 continue;
             }
 
-            if (self::containsInheritDoc($method->getDocComment())) {
+            if (self::containsInheritDoc($methodReflection->getDocComment())) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static function isInheritedMethod(
+        ReflectionMethod $methodReflection,
+        ClassReflection $classReflection,
+    ): bool {
+        return $methodReflection->getDeclaringClass()->getName() === $classReflection->getName();
     }
 
     private static function containsInheritDoc(string|false $docComment): bool
