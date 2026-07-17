@@ -132,13 +132,6 @@ analysers are PHPStan and Mago.
 Each entry gives three things: what agents often write, what this codebase does instead, and
 why. These rules come from comparing agent designs with the real subsystems.
 
-### Finality: `final` keyword vs `@final` docblock
-
-The canonical finality convention, its rationale, exceptions and enforcement are documented
-in the following ADR:
-
-@adr/0012-final-classes-over-final-docblock.md
-
 ### `@internal` everywhere; the public API is a whitelist
 
 Every class gets `@internal` (PHPat-enforced). Users may depend only on extension points that
