@@ -60,9 +60,6 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
         return $node->hasAttribute(self::NEXT_ATTRIBUTE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function beforeTraverse(array $nodes)
     {
         $this->previous = null;
@@ -71,9 +68,6 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\FunctionLike) {
@@ -99,9 +93,6 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function leaveNode(Node $node)
     {
         if (!$node instanceof Node\FunctionLike) {

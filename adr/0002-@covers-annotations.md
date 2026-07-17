@@ -28,10 +28,14 @@ process.
 
 ### Status
 
-Accepted ([#1060][1060])
+Deprecated.
+
+It was accepted in [#1060][1060] and superseded by [ADR 0007][ADR-0007]
+
 
 
 [code-coverage-listener]: https://symfony.com/doc/current/components/phpunit_bridge.html#code-coverage-listener
 [phpunit-bridge]: https://packagist.org/packages/symfony/phpunit-bridge
 [php-cs-fixer]: https://github.com/FriendsOfPHP/PHP-CS-Fixer
 [1060]: https://github.com/infection/infection/pull/1060
+[ADR-0007]: ./0007-declare-phpunit-coverage-metadata.md
