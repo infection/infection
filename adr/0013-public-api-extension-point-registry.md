@@ -68,7 +68,7 @@ rejected because accidental omissions could silently expand the supported API.
 
 ## Status
 
-Proposed.
+Accepted.
 
 [339]: https://github.com/infection/infection/pull/339
 [753]: https://github.com/infection/infection/pull/753
