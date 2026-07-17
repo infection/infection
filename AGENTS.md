@@ -91,8 +91,7 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. Read
-  before challenging one. New ADRs must follow `adr/0000-template.md`; keep its section
-  order and leave Status last. Keep jargon to a minimum (ASD-STE100) when writing.
+  before challenging one. New ADRs must follow the template `adr/0000-template.md`. Keep jargon to a minimum (ASD-STE100) when writing.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
