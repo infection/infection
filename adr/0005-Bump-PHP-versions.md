@@ -26,7 +26,7 @@ version is fine.
 
 ## Status
 
-Accepted ([#1760]).
+Superseded by [ADR 0008](0008-PHP-version-support-policy.md). Was accepted in Accepted [#1760].
 
 
 [#1760]: https://github.com/infection/infection/issues/1760
