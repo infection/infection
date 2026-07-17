@@ -5118,16 +5118,16 @@
         },
         {
             "name": "shipmonk/dead-code-detector",
-            "version": "1.3.1",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/dead-code-detector.git",
-                "reference": "bbd33fb7e70e7d2e57b85201d9fe05b70289e953"
+                "reference": "2c376b3cbcb20422c3d46bb67cdb85b68b3137f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/dead-code-detector/zipball/bbd33fb7e70e7d2e57b85201d9fe05b70289e953",
-                "reference": "bbd33fb7e70e7d2e57b85201d9fe05b70289e953",
+                "url": "https://api.github.com/repos/shipmonk-rnd/dead-code-detector/zipball/2c376b3cbcb20422c3d46bb67cdb85b68b3137f0",
+                "reference": "2c376b3cbcb20422c3d46bb67cdb85b68b3137f0",
                 "shasum": ""
             },
             "require": {
@@ -5201,9 +5201,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shipmonk-rnd/dead-code-detector/issues",
-                "source": "https://github.com/shipmonk-rnd/dead-code-detector/tree/1.3.1"
+                "source": "https://github.com/shipmonk-rnd/dead-code-detector/tree/1.3.2"
             },
-            "time": "2026-07-08T11:47:03+00:00"
+            "time": "2026-07-15T12:28:33+00:00"
         },
         {
             "name": "shipmonk/name-collision-detector",
