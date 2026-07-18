@@ -41,7 +41,7 @@ use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Tests\Process\Exception\GenericProcessException;
 use function is_string;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -56,7 +56,7 @@ use Psr\Log\Test\TestLogger;
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
 {
-    private ShellCommandLineExecutor&MockObject $commandLineMock;
+    private ShellCommandRunner&MockObject $commandLineMock;
 
     private TestLogger $logger;
 
@@ -64,7 +64,7 @@ final class CommandLineGitTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $this->commandLineMock = $this->createMock(ShellCommandRunner::class);
         $this->logger = new TestLogger();
 
         $this->git = new CommandLineGit(
@@ -76,7 +76,7 @@ final class CommandLineGitTest extends TestCase
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
         $this->commandLineMock
-            ->method('execute')
+            ->method('mustRun')
             ->willReturn('');
 
         $this->expectException(NoSourceFound::class);
@@ -89,7 +89,7 @@ final class CommandLineGitTest extends TestCase
         $expected = 'af25a159143aadacf4d875a3114014e99053430';
 
         $this->commandLineMock
-            ->method('execute')
+            ->method('mustRun')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
             ->willReturn($expected);
 
@@ -111,7 +111,7 @@ final class CommandLineGitTest extends TestCase
         ];
 
         $this->commandLineMock
-            ->method('execute')
+            ->method('mustRun')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
             ->willThrowException($exception);
 
@@ -124,7 +124,7 @@ final class CommandLineGitTest extends TestCase
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
     {
         $this->commandLineMock
-            ->method('execute')
+            ->method('mustRun')
             ->with(
                 [
                     'git',
@@ -169,7 +169,7 @@ final class CommandLineGitTest extends TestCase
         }
 
         $this->commandLineMock
-            ->method('execute')
+            ->method('mustRun')
             ->with([
                 'git',
                 '--no-pager',
@@ -626,7 +626,7 @@ final class CommandLineGitTest extends TestCase
 
         if (is_string($shellOutputOrException)) {
             $this->commandLineMock
-                ->method('execute')
+                ->method('mustRun')
                 ->willReturn($shellOutputOrException);
         } else {
             $expectedRecords[] = [
@@ -636,7 +636,7 @@ final class CommandLineGitTest extends TestCase
             ];
 
             $this->commandLineMock
-                ->method('execute')
+                ->method('mustRun')
                 ->willThrowException($shellOutputOrException);
         }
 
@@ -675,7 +675,7 @@ final class CommandLineGitTest extends TestCase
 
         $this->commandLineMock
             ->expects($this->once())
-            ->method('execute')
+            ->method('mustRun')
             ->willReturn($expected);
 
         $actual = $this->git->getProjectDirectory();

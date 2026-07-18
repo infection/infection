@@ -35,19 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\ParseGitDiff;
 
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
  * @internal
  */
-final readonly class DummyShellCommandLineExecutor implements ShellCommandLineExecutor
+final readonly class DummyShellCommandRunner implements ShellCommandRunner
 {
     public function __construct(
         public string $executeResult,
     ) {
     }
 
-    public function execute(array $command): string
+    public function mustRun(array $command): string
     {
         return $this->executeResult;
     }

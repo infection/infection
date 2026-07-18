@@ -33,29 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
-use function trim;
+use DomainException;
 
 /**
  * @internal
  */
-final readonly class SymfonyProcessShellCommandLineExecutor implements ShellCommandLineExecutor
+final readonly class FakeShellCommandRunner implements ShellCommandRunner
 {
-    /**
-     * @param string[] $command
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws ProcessException
-     */
-    public function execute(array $command): string
+    public function mustRun(array $command): string
     {
-        return trim((new Process($command))->mustRun()->getOutput());
+        throw new DomainException('Unexpected call.');
     }
 }

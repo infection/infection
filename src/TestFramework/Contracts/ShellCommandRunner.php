@@ -44,7 +44,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
  *
  * Provides test framework adapters with a testable boundary for running blocking shell commands.
  */
-interface ShellCommandLineExecutor
+interface ShellCommandRunner
 {
     /**
      * @param string[] $command
@@ -53,5 +53,5 @@ interface ShellCommandLineExecutor
      * @throws ProcessFailedException
      * @throws ProcessException
      */
-    public function execute(array $command): string;
+    public function mustRun(array $command): string;
 }

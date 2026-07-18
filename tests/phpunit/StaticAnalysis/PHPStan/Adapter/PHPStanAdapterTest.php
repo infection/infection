@@ -40,7 +40,7 @@ use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,12 +58,12 @@ final class PHPStanAdapterTest extends TestCase
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
 
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
+    private ShellCommandRunner $shellCommandRunner;
 
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
-        $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
+        $this->shellCommandRunner = $this->createStub(ShellCommandRunner::class);
 
         $this->adapter = new PHPStanAdapter(
             $this->createStub(Filesystem::class),
@@ -75,7 +75,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
             '9.0',
         );
     }
@@ -113,7 +113,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=1G'],
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
             '9.0',
         );
 
@@ -147,7 +147,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=-1', '--no-progress'],
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
             '9.0',
         );
 
@@ -183,7 +183,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=2G', '--level=max', '--no-progress'],
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
             '9.0',
         );
 
@@ -216,7 +216,7 @@ final class PHPStanAdapterTest extends TestCase
 
     public function test_it_retrieves_version_with_the_shell_command_line_executor(): void
     {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
 
         $this->commandLineBuilder
             ->expects($this->once())
@@ -225,9 +225,9 @@ final class PHPStanAdapterTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version'])
         ;
 
-        $shellCommandLineExecutor
+        $shellCommandRunner
             ->expects($this->once())
-            ->method('execute')
+            ->method('mustRun')
             ->with(['/usr/bin/php', '/path/to/phpstan', '--version'])
             ->willReturn('PHPStan 2.1.17')
         ;
@@ -242,7 +242,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
         );
 
         $this->assertSame('2.1.17', $adapter->getVersion());
@@ -271,7 +271,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             ['--memory-limit=-1'],
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
             $version,
         );
 
@@ -292,7 +292,7 @@ final class PHPStanAdapterTest extends TestCase
             31.0,
             '/tmp',
             [],
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
             $version,
         );
 

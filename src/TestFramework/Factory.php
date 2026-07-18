@@ -42,7 +42,7 @@ use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
@@ -67,7 +67,7 @@ final readonly class Factory
         private Configuration $infectionConfig,
         private SourceCollector $sourceCollector,
         private array $installedExtensions,
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandRunner $shellCommandRunner,
     ) {
     }
 
@@ -91,7 +91,7 @@ final readonly class Factory
                 $this->infectionConfig->executeOnlyCoveringTestCases,
                 $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
-                $this->shellCommandLineExecutor,
+                $this->shellCommandRunner,
             );
         }
 
