@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -48,7 +49,7 @@ use function trim;
  *
  * Tiny wrapper around the Symfony Process component to easily get the output of a command.
  */
-class ShellCommandLineExecutor
+class SymfonyProcessShellCommandLineExecutor implements ShellCommandLineExecutor
 {
     /**
      * @param string[] $command

@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis;
 
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;

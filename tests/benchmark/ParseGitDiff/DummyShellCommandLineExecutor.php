@@ -33,29 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Benchmark\ParseGitDiff;
 
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 
-#[Group('integration')]
-#[CoversClass(PHPStanAdapterFactory::class)]
-final class PHPStanAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class DummyShellCommandLineExecutor implements ShellCommandLineExecutor
 {
-    public function test_it_can_create_an_adapter(): void
-    {
-        $adapter = PHPStanAdapterFactory::create(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
-            32.3,
-            '/tmp',
-            [],
-            new SymfonyProcessShellCommandLineExecutor(),
-        );
+    public function __construct(
+        public string $executeResult,
+    ) {
+    }
 
-        $this->assertSame('PHPStan', $adapter->getName());
+    public function execute(array $command): string
+    {
+        return $this->executeResult;
     }
 }

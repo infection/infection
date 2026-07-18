@@ -33,29 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use DomainException;
 
-#[Group('integration')]
-#[CoversClass(PHPStanAdapterFactory::class)]
-final class PHPStanAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class FakeShellCommandLineExecutor implements ShellCommandLineExecutor
 {
-    public function test_it_can_create_an_adapter(): void
+    public function execute(array $command): string
     {
-        $adapter = PHPStanAdapterFactory::create(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
-            32.3,
-            '/tmp',
-            [],
-            new SymfonyProcessShellCommandLineExecutor(),
-        );
-
-        $this->assertSame('PHPStan', $adapter->getName());
+        throw new DomainException('Unexpected call.');
     }
 }

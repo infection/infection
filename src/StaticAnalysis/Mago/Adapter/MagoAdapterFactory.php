@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\Mago\Adapter;
 
 use Infection\CannotBeInstantiated;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**

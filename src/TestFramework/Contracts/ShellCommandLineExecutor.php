@@ -33,29 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
-#[Group('integration')]
-#[CoversClass(PHPStanAdapterFactory::class)]
-final class PHPStanAdapterFactoryTest extends TestCase
+/**
+ * @internal
+ *
+ * Provides test framework adapters with a testable boundary for running blocking shell commands.
+ */
+interface ShellCommandLineExecutor
 {
-    public function test_it_can_create_an_adapter(): void
-    {
-        $adapter = PHPStanAdapterFactory::create(
-            '/path/to/phpstan-config-path',
-            '/path/to/phpstan',
-            32.3,
-            '/tmp',
-            [],
-            new SymfonyProcessShellCommandLineExecutor(),
-        );
-
-        $this->assertSame('PHPStan', $adapter->getName());
-    }
+    /**
+     * @param string[] $command
+     *
+     * @throws ProcessTimedOutException
+     * @throws ProcessFailedException
+     * @throws ProcessException
+     */
+    public function execute(array $command): string;
 }
