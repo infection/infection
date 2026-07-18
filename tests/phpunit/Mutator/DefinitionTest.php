@@ -153,6 +153,7 @@ final class DefinitionTest extends TestCase
         'YieldValue',
         'Spaceship',
         'DoWhile',
+        'ForeachKeyRemoval',
         'Foreach_',
         'For_',
         'While_',
