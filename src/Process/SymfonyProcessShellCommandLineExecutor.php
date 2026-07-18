@@ -44,12 +44,8 @@ use function trim;
 
 /**
  * @internal
- *
- * @final
- *
- * Tiny wrapper around the Symfony Process component to easily get the output of a command.
  */
-class SymfonyProcessShellCommandLineExecutor implements ShellCommandLineExecutor
+final readonly class SymfonyProcessShellCommandLineExecutor implements ShellCommandLineExecutor
 {
     /**
      * @param string[] $command
