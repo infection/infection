@@ -46,7 +46,7 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
@@ -69,7 +69,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ShellCommandRunner $shellCommandRunner,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
@@ -79,7 +79,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $argumentsAndOptionsBuilder,
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
             $versionParser,
             $commandLineBuilder,
             $version,

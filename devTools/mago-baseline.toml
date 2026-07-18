@@ -855,7 +855,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFile.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$decodedContents` (null|stdClass)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$decodedContents` (null|stdClass)."
 count = 1
 
 [[issues]]
@@ -1485,7 +1485,7 @@ count = 2
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
+message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
 count = 1
 
 [[issues]]
@@ -1609,6 +1609,12 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exceptio
 count = 1
 
 [[issues]]
+file = "src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder::addVendorBinToPath`.'
+count = 1
+
+[[issues]]
 file = "src/FileSystem/Finder/TestFrameworkFinder.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
@@ -1648,6 +1654,12 @@ count = 1
 file = "src/FileSystem/Finder/TestFrameworkFinder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\FileSystem\Finder\TestFrameworkFinder::shouldUseCustomPath`.'
+count = 1
+
+[[issues]]
+file = "src/FileSystem/Finder/TestFrameworkFinder.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\FileSystem\Finder\TestFrameworkFinder::addVendorBinToPath`.'
 count = 1
 
 [[issues]]
@@ -1803,25 +1815,19 @@ count = 2
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Git\CommandLineGit::diff`.'
+count = 1
+
+[[issues]]
+file = "src/Git/CommandLineGit.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Git\CommandLineGit::diff`.'
 count = 1
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Git\CommandLineGit::diff`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Git\CommandLineGit::diff`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Git\CommandLineGit::diff`.'
 count = 1
 
 [[issues]]
@@ -2085,7 +2091,7 @@ count = 3
 [[issues]]
 file = "src/Mutator/Boolean/TrueValue.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array<string, array-key>` is being assigned to property `$allowedFunctions` (array<string, int>)."
+message = "A value of a less specific type `array<string, array-key>` is being assigned to property `$$allowedFunctions` (array<string, int>)."
 count = 1
 
 [[issues]]
@@ -2157,7 +2163,7 @@ count = 1
 [[issues]]
 file = "src/Mutator/Extensions/MBString.php"
 code = "mixed-property-type-coercion"
-message = 'A value with a less specific type `array<string, (closure(...mixed): mixed)>` is being assigned to property `$converters` (array<string, (closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)>).'
+message = 'A value with a less specific type `array<string, (closure(...mixed): mixed)>` is being assigned to property `$$converters` (array<string, (closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)>).'
 count = 1
 
 [[issues]]
@@ -2175,7 +2181,7 @@ count = 1
 [[issues]]
 file = "src/Mutator/IgnoreConfig.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$hashtable` (array<string, int>)."
+message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$$hashtable` (array<string, int>)."
 count = 1
 
 [[issues]]
@@ -2625,31 +2631,31 @@ count = 1
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$decorateNodes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$decorateNodes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$dumpOtherAttributes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$dumpOtherAttributes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$dumpPositions` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$dumpPositions` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$onlyVisitedNodes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$onlyVisitedNodes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$showLineNumbers` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$showLineNumbers` (bool)."
 count = 1
 
 [[issues]]
@@ -2685,7 +2691,7 @@ count = 1
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array{'comments': true, 'endFilePos': true, 'endLine': true, 'endTokenPos': true, 'startFilePos': true, 'startLine': true, 'startTokenPos': true, ...<array-key, true>}` is being assigned to property `$ignoredAttributesByKey` (array<string, true>)."
+message = "A value of a less specific type `array{'comments': true, 'endFilePos': true, 'endLine': true, 'endTokenPos': true, 'startFilePos': true, 'startLine': true, 'startTokenPos': true, ...<array-key, true>}` is being assigned to property `$$ignoredAttributesByKey` (array<string, true>)."
 count = 1
 
 [[issues]]
@@ -3073,9 +3079,21 @@ message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrD
 count = 1
 
 [[issues]]
+file = "src/StaticAnalysis/Mago/Adapter/MagoAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\StaticAnalysis\Mago\Adapter\MagoAdapter::retrieveVersion`.'
+count = 1
+
+[[issues]]
 file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::assertMinimumVersionSatisfied`.'
+count = 1
+
+[[issues]]
+file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
@@ -3087,19 +3105,7 @@ count = 1
 [[issues]]
 file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
@@ -3141,25 +3147,19 @@ count = 1
 [[issues]]
 file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
+count = 1
+
+[[issues]]
+file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
 file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AbstractTestFrameworkAdapter.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\TestFramework\AbstractTestFrameworkAdapter::retrieveVersion`.'
 count = 1
 
 [[issues]]
@@ -3645,7 +3645,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Path/PathReplacer.php"
 code = "invalid-property-write"
-message = "Cannot write to private property `$nodeValue` on class `DOMNameSpaceNode`."
+message = "Cannot modify a readonly property after initialization."
 count = 1
 
 [[issues]]
@@ -4935,13 +4935,13 @@ count = 1
 [[issues]]
 file = "tests/benchmark/MutationGenerator/MutationGeneratorBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/MutationGenerator/MutationGeneratorBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
@@ -4995,26 +4995,20 @@ count = 2
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
 code = "impossible-condition"
 message = "This condition (type `false`) will always evaluate to false."
-count = 11
-
-[[issues]]
-file = "tests/benchmark/ParseGitDiff/generator.php"
-code = "redundant-comparison"
-message = "Redundant `<=` comparison: left-hand side is never less than or equal to right-hand side."
-count = 8
+count = 3
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
@@ -5067,13 +5061,13 @@ count = 1
 [[issues]]
 file = "tests/benchmark/Tracing/TracingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/Tracing/TracingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
@@ -7707,19 +7701,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
 count = 1
 
 [[issues]]
@@ -10883,105 +10871,81 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `commandProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]
@@ -13968,8 +13932,20 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
+code = "docblock-type-mismatch"
+message = 'Docblock return type `PhpParser\Node|array<array-key, PhpParser\Node>|int` is incompatible with native return type `void`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
+code = "missing-return-statement"
+message = "Missing return statement in function `enternode`"
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array<array-key, mixed>` is being assigned to property `$desiredAttributeKeys` (array<string, mixed>)."
+message = "A value of a less specific type `array<array-key, mixed>` is being assigned to property `$$desiredAttributeKeys` (array<string, mixed>)."
 count = 1
 
 [[issues]]

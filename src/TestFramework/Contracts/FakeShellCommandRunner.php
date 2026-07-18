@@ -33,22 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\ParseGitDiff;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use DomainException;
 
 /**
  * @internal
  */
-final readonly class DummyShellCommandLineExecutor implements ShellCommandLineExecutor
+final readonly class FakeShellCommandRunner implements ShellCommandRunner
 {
-    public function __construct(
-        public string $executeResult,
-    ) {
-    }
-
-    public function execute(array $command): string
+    public function mustRun(array $command): string
     {
-        return $this->executeResult;
+        throw new DomainException('Unexpected call.');
     }
 }

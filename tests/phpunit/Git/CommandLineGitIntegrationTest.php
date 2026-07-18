@@ -41,7 +41,7 @@ use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoGitProjectFound;
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -60,12 +60,12 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     // At minimum we will have the following files in the entire output:
     // - src/Git/CommandLineGit.php
     // - src/Git/Git.php
-    // - src/Process/ShellCommandLineExecutor.php
+    // - src/Process/SymfonyProcessShellCommandRunner.php
     // - tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
     // - tests/phpunit/Differ/FilesDiffChangedLinesTest.php
     // - tests/phpunit/Git/CommandLineGitIntegrationTest.php
     // - tests/phpunit/Git/CommandLineGitTest.php
-    // - tests/phpunit/Process/ShellCommandLineExecutorTest.php
+    // - tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php
     private const string COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
     private const string BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
@@ -87,7 +87,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         chdir($this->cwd);
 
         $this->git = new CommandLineGit(
-            new SymfonyProcessShellCommandLineExecutor(),
+            new SymfonyProcessShellCommandRunner(),
         );
     }
 
@@ -250,7 +250,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     private static function checkIfCommitReferenceExists(): bool
     {
         try {
-            (new SymfonyProcessShellCommandLineExecutor())->execute([
+            (new SymfonyProcessShellCommandRunner())->mustRun([
                 'git',
                 'cat-file',
                 '-e',
