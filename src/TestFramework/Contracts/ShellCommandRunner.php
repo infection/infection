@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Closure;
+use Stringable;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -58,17 +60,27 @@ interface ShellCommandRunner
 
     /**
      * @param string[] $command
+     * @param array<string, string|Stringable|false> $env
      *
      * @throws ProcessFailedException When process didn't terminate successfully.
      * @throws RuntimeException When process can't be launched.
      * @throws ProcessTimedOutException When process timed out.
      * @throws ProcessSignaledException When process stopped after receiving signal.
      */
-    public function mustRun(array $command): string;
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string;
 
     /**
      * @param list<string> $command
      * @param (Closure('out'|'err', string): void)|null $callback
+     * @param array<string, string|Stringable|false> $env
      *
      * @throws RuntimeException When process can't be launched.
      * @throws ProcessTimedOutException When process timed out.
@@ -77,6 +89,10 @@ interface ShellCommandRunner
     public function run(
         array $command,
         ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
     ): CompletedProcess;
 }
