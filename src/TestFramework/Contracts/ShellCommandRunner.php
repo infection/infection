@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Contracts;
 
 use Closure;
+use Stringable;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -50,30 +51,44 @@ interface ShellCommandRunner
 {
     /**
      * The default timeout used by Symfony Process.
+     *
+     * @see Process
      */
     public const float DEFAULT_TIMEOUT = 60.0;
 
     /**
      * @param string[] $command
+     * @param array<string, string|Stringable|false> $env
      *
      * @throws ProcessTimedOutException
      * @throws ProcessFailedException
      * @throws ProcessException
      */
-    public function mustRun(array $command): string;
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string;
 
     /**
      * @param list<string> $command
      * @param (Closure('out'|'err', string): void)|null $callback
+     * @param array<string, string|Stringable|false> $env
      *
      * @throws ProcessTimedOutException
      * @throws ProcessException
-     *
-     * @see Process
      */
     public function run(
         array $command,
         ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
     ): CompletedProcess;
 }

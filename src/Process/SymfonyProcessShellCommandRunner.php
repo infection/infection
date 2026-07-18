@@ -38,6 +38,7 @@ namespace Infection\Process;
 use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Stringable;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -52,29 +53,76 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
 {
     /**
      * @param string[] $command
+     * @param array<string, string|Stringable|false> $env
      *
      * @throws ProcessTimedOutException
      * @throws ProcessFailedException
      * @throws ProcessException
      */
-    public function mustRun(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string {
+        $process = self::createProcess(
+            $command,
+            $cwd,
+            $env,
+            $input,
+            $timeout,
+            $idleTimeout,
+        );
+
+        return trim($process->mustRun($callback)->getOutput());
     }
 
+    /**
+     * @param list<string> $command
+     * @param array<string, string|Stringable|false> $env
+     */
     public function run(
         array $command,
         ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
     ): CompletedProcess {
-        $process = new Process(
+        $process = self::createProcess(
             $command,
-            timeout: $timeout,
+            $cwd,
+            $env,
+            $input,
+            $timeout,
+            $idleTimeout,
         );
 
         $process->run($callback);
 
         return self::createResult($command, $process);
+    }
+
+    /**
+     * @param string[] $command
+     * @param array<string, string|Stringable|false> $env
+     */
+    private static function createProcess(
+        array $command,
+        ?string $cwd,
+        array $env,
+        mixed $input,
+        ?float $timeout,
+        ?float $idleTimeout,
+    ): Process {
+        $process = new Process($command, $cwd, $env, $input, $timeout);
+        $process->setIdleTimeout($idleTimeout);
+
+        return $process;
     }
 
     /**

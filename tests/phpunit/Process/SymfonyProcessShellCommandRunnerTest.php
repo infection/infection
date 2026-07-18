@@ -131,6 +131,33 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->assertSame('no input', $output);
     }
 
+    public function test_it_runs_a_command_with_the_given_execution_context(): void
+    {
+        $callbackOutput = '';
+        $callback = static function (string $type, string $buffer) use (&$callbackOutput): void {
+            if ($type === Process::OUT) {
+                $callbackOutput .= $buffer;
+            }
+        };
+
+        $output = $this->runner->mustRun(
+            [
+                'php',
+                '-r',
+                'echo getcwd(), "|", getenv("INFECTION_TEST_ENV"), "|", stream_get_contents(STDIN);',
+            ],
+            callback: $callback,
+            cwd: __DIR__,
+            env: ['INFECTION_TEST_ENV' => 'environment'],
+            input: 'input',
+        );
+
+        $expectedOutput = __DIR__ . '|environment|input';
+
+        $this->assertSame($expectedOutput, $output);
+        $this->assertSame($expectedOutput, $callbackOutput);
+    }
+
     public function test_it_runs_a_successful_command(): void
     {
         $command = [
@@ -145,6 +172,29 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             ->withCommand($command)
             ->withStdout('stdout content')
             ->withStderr('stderr content')
+            ->build();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_it_returns_a_process_run_with_the_given_execution_context(): void
+    {
+        $command = [
+            'php',
+            '-r',
+            'echo getcwd(), "|", getenv("INFECTION_TEST_ENV"), "|", stream_get_contents(STDIN);',
+        ];
+
+        $result = $this->runner->run(
+            $command,
+            cwd: __DIR__,
+            env: ['INFECTION_TEST_ENV' => 'environment'],
+            input: 'input',
+        );
+
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->withStdout(__DIR__ . '|environment|input')
             ->build();
 
         $this->assertEquals($expected, $result);
@@ -206,6 +256,17 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->runner->run(
             ['php', '-r', 'sleep(1);'],
             timeout: 0.01,
+        );
+    }
+
+    public function test_it_uses_the_given_idle_timeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+
+        $this->runner->run(
+            ['php', '-r', 'echo "started"; sleep(1);'],
+            timeout: null,
+            idleTimeout: 0.01,
         );
     }
 }
