@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
+use Closure;
 use DomainException;
 
 /**
@@ -44,6 +45,14 @@ final readonly class FakeShellCommandRunner implements ShellCommandRunner
 {
     public function mustRun(array $command): string
     {
+        throw new DomainException('Unexpected call.');
+    }
+
+    public function run(
+        array $command,
+        ?Closure $callback = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+    ): CompletedProcess {
         throw new DomainException('Unexpected call.');
     }
 }
