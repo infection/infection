@@ -37,7 +37,9 @@ namespace Infection\TestFramework;
 
 use Composer\Autoload\ClassLoader;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Symfony\Component\Process\Process;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -56,23 +58,27 @@ final readonly class AdapterInstaller
 
     public function __construct(
         private ComposerExecutableFinder $composerExecutableFinder,
+        private ShellCommandRunner $shellCommandRunner,
     ) {
     }
 
+    /**
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
+     */
     public function install(string $adapterName): void
     {
         Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
 
-        $process = new Process([
-            ...$this->composerExecutableFinder->find(),
-            'require',
-            '--dev',
-            self::OFFICIAL_ADAPTERS_MAP[$adapterName],
-        ]);
-
-        $process->setTimeout(self::TIMEOUT);
-
-        $process->run();
+        $this->shellCommandRunner->run(
+            [
+                ...$this->composerExecutableFinder->find(),
+                'require',
+                '--dev',
+                self::OFFICIAL_ADAPTERS_MAP[$adapterName],
+            ],
+            timeout: self::TIMEOUT,
+        );
 
         $loader = new ClassLoader();
 

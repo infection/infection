@@ -33,65 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
-
-use Closure;
-use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
+namespace Infection\TestFramework\Contracts;
 
 /**
  * @internal
  */
-final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
+final readonly class CompletedProcess
 {
-    /**
-     * @param string[] $command
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws ProcessException
-     */
-    public function mustRun(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
-    }
-
-    public function run(
-        array $command,
-        ?Closure $callback = null,
-        ?float $timeout = self::DEFAULT_TIMEOUT,
-    ): CompletedProcess {
-        $process = new Process(
-            $command,
-            timeout: $timeout,
-        );
-
-        $process->run($callback);
-
-        return self::createResult($command, $process);
-    }
-
     /**
      * @param list<string> $command
      */
-    private function createResult(
-        array $command,
-        Process $process,
-    ): CompletedProcess {
-        $exitCode = $process->getExitCode();
-        Assert::integer($exitCode);
+    public function __construct(
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public array $command,
+        public int $exitCode,
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public string $stdout,
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public string $stderr,
+    ) {
+    }
 
-        return new CompletedProcess(
-            $command,
-            $exitCode,
-            trim($process->getOutput()),
-            trim($process->getErrorOutput()),
-        );
+    public function isSuccessful(): bool
+    {
+        return $this->exitCode === 0;
     }
 }

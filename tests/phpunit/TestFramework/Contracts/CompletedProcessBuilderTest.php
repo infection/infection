@@ -33,65 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
+#[CoversClass(CompletedProcessBuilder::class)]
+final class CompletedProcessBuilderTest extends TestCase
 {
-    /**
-     * @param string[] $command
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws ProcessException
-     */
-    public function mustRun(array $command): string
+    public function test_it_builds_with_minimal_test_data(): void
     {
-        return trim((new Process($command))->mustRun()->getOutput());
+        $expected = new CompletedProcess(
+            command: [],
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
+        );
+        $actual = CompletedProcessBuilder::withMinimalTestData()->build();
+
+        $this->assertEquals($expected, $actual);
     }
 
-    public function run(
-        array $command,
-        ?Closure $callback = null,
-        ?float $timeout = self::DEFAULT_TIMEOUT,
-    ): CompletedProcess {
-        $process = new Process(
-            $command,
-            timeout: $timeout,
+    public function test_it_builds_with_overridden_data_without_changing_the_original_builder(): void
+    {
+        $originalBuilder = CompletedProcessBuilder::withMinimalTestData();
+
+        $expectedOverriddenCompletedProcess = new CompletedProcess(
+            ['php', '--version'],
+            1,
+            'stdout',
+            'stderr',
         );
+        $actualOverriddenCompletedProcess = $originalBuilder
+            ->withCommand(['php', '--version'])
+            ->withExitCode(1)
+            ->withStdout('stdout')
+            ->withStderr('stderr')
+            ->build();
 
-        $process->run($callback);
-
-        return self::createResult($command, $process);
-    }
-
-    /**
-     * @param list<string> $command
-     */
-    private function createResult(
-        array $command,
-        Process $process,
-    ): CompletedProcess {
-        $exitCode = $process->getExitCode();
-        Assert::integer($exitCode);
-
-        return new CompletedProcess(
-            $command,
-            $exitCode,
-            trim($process->getOutput()),
-            trim($process->getErrorOutput()),
+        $expectedOriginalCompletedProcess = new CompletedProcess(
+            command: [],
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
         );
+        $actualOriginalCompletedProcess = $originalBuilder->build();
+
+        $this->assertEquals($expectedOverriddenCompletedProcess, $actualOverriddenCompletedProcess);
+        $this->assertEquals($expectedOriginalCompletedProcess, $actualOriginalCompletedProcess);
     }
 }

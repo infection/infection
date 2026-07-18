@@ -3187,30 +3187,6 @@ message = 'Possible argument type mismatch for argument #2 of `Composer\Autoload
 count = 1
 
 [[issues]]
-file = "src/TestFramework/AdapterInstaller.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\TestFramework\AdapterInstaller::install`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AdapterInstaller.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessStartFailedException` in `Infection\TestFramework\AdapterInstaller::install`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AdapterInstaller.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\AdapterInstaller::install`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AdapterInstaller.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\TestFramework\AdapterInstaller::install`.'
-count = 1
-
-[[issues]]
 file = "src/TestFramework/Common/CommandLineBuilder.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Finder\Exception\FinderException` in `Infection\TestFramework\Common\CommandLineBuilder::findPhp`.'
@@ -10897,7 +10873,31 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_returns_an_unsuccessful_command_without_throwing`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_runs_a_successful_command`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_streams_output_to_the_callback`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_uses_the_given_timeout`.'
 count = 1
 
 [[issues]]
@@ -10945,7 +10945,31 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_returns_an_unsuccessful_command_without_throwing`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_runs_a_successful_command`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_streams_output_to_the_callback`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_uses_the_given_timeout`.'
 count = 1
 
 [[issues]]
@@ -11669,6 +11693,36 @@ message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::mat
 count = 3
 
 [[issues]]
+file = "tests/phpunit/TestFramework/AdapterInstallerTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `adapterProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/AdapterInstallerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\TestFramework\AdapterInstallerTest::test_it_installs_the_adapter`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/AdapterInstallerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\TestFramework\AdapterInstallerTest::test_it_rejects_an_unknown_adapter_before_running_composer`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/AdapterInstallerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\TestFramework\AdapterInstallerTest::test_it_installs_the_adapter`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/AdapterInstallerTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\TestFramework\AdapterInstallerTest::test_it_rejects_an_unknown_adapter_before_running_composer`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `invalidVersionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -11678,6 +11732,12 @@ count = 1
 file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `versionProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/Contracts/CompletedProcessTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `exitCodeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]

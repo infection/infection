@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(SymfonyProcessShellCommandRunner::class)]
 #[Group('integration')]
@@ -126,5 +129,83 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         ]);
 
         $this->assertSame('no input', $output);
+    }
+
+    public function test_it_runs_a_successful_command(): void
+    {
+        $command = [
+            'php',
+            '-r',
+            'fwrite(STDOUT, "  stdout content  "); fwrite(STDERR, "  stderr content  ");',
+        ];
+
+        $result = $this->runner->run($command);
+
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->withStdout('stdout content')
+            ->withStderr('stderr content')
+            ->build();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_it_returns_an_unsuccessful_command_without_throwing(): void
+    {
+        $command = [
+            'php',
+            '-r',
+            'fwrite(STDOUT, "stdout content"); fwrite(STDERR, "stderr content"); exit(7);',
+        ];
+
+        $result = $this->runner->run($command);
+
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->withExitCode(7)
+            ->withStdout('stdout content')
+            ->withStderr('stderr content')
+            ->build();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_it_streams_output_to_the_callback(): void
+    {
+        $output = [
+            Process::OUT => '',
+            Process::ERR => '',
+        ];
+
+        $command = [
+            'php',
+            '-r',
+            'fwrite(STDOUT, "stdout content"); fwrite(STDERR, "stderr content");',
+        ];
+        $callback = static function (string $type, string $buffer) use (&$output): void {
+            $output[$type] .= $buffer;
+        };
+
+        $expected = [
+            Process::OUT => 'stdout content',
+            Process::ERR => 'stderr content',
+        ];
+
+        $this->runner->run(
+            $command,
+            $callback,
+        );
+
+        $this->assertSame($expected, $output);
+    }
+
+    public function test_it_uses_the_given_timeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+
+        $this->runner->run(
+            ['php', '-r', 'sleep(1);'],
+            timeout: 0.01,
+        );
     }
 }
