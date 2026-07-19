@@ -10883,105 +10883,105 @@ message = 'Potentially unhandled exception `ReflectionException` in `Infection\T
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `commandProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_include_stderr_in_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_include_stderr_in_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_does_not_provide_interactive_input`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_does_not_provide_interactive_input`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_executes_command_and_returns_trimmed_output`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_executes_command_and_returns_trimmed_output`.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php"
+file = "tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest::test_it_throws_exception_on_command_failure`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest::test_it_throws_exception_on_command_failure`.'
 count = 1
 
 [[issues]]

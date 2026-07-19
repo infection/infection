@@ -43,7 +43,7 @@ use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
@@ -72,7 +72,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly float $timeout,
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private readonly ShellCommandRunner $shellCommandRunner,
         private ?string $version = null,
     ) {
     }
@@ -172,7 +172,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         );
 
         return $this->versionParser->parse(
-            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+            $this->shellCommandRunner->mustRun($testFrameworkVersionExecutable),
         );
     }
 }
