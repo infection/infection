@@ -51,6 +51,8 @@ interface ShellCommandRunner
 {
     /**
      * The default timeout used by Symfony Process.
+     *
+     * @see Process::__construct
      */
     public const float DEFAULT_TIMEOUT = 60.0;
 
@@ -71,8 +73,6 @@ interface ShellCommandRunner
      * @throws RuntimeException When process can't be launched.
      * @throws ProcessTimedOutException When process timed out.
      * @throws ProcessSignaledException When process stopped after receiving signal.
-     *
-     * @see Process
      */
     public function run(
         array $command,

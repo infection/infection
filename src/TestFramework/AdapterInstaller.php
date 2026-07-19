@@ -38,8 +38,6 @@ namespace Infection\TestFramework;
 use Composer\Autoload\ClassLoader;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -62,10 +60,6 @@ final readonly class AdapterInstaller
     ) {
     }
 
-    /**
-     * @throws ProcessTimedOutException
-     * @throws ProcessException
-     */
     public function install(string $adapterName): void
     {
         Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
