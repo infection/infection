@@ -38,6 +38,7 @@ namespace Infection\Benchmark\ParseGitDiff;
 use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Stringable;
 
 /**
  * @internal
@@ -49,15 +50,32 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
     ) {
     }
 
-    public function mustRun(array $command): string
-    {
+    /**
+     * @param array<string, string|Stringable|false> $env
+     */
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string {
         return $this->executeResult;
     }
 
+    /**
+     * @param array<string, string|Stringable|false> $env
+     */
     public function run(
         array $command,
         ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
     ): CompletedProcess {
         return new CompletedProcess($command, 0, $this->executeResult, '');
     }
