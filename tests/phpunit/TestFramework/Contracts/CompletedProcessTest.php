@@ -33,55 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
+#[CoversClass(CompletedProcess::class)]
+final class CompletedProcessTest extends TestCase
 {
-    public function mustRun(array $command): string
+    #[DataProvider('exitCodeProvider')]
+    public function test_it_reports_whether_the_process_was_successful(
+        CompletedProcess $completedProcess,
+        bool $expected,
+    ): void {
+        $actual = $completedProcess->isSuccessful();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function exitCodeProvider(): iterable
     {
-        return trim((new Process($command))->mustRun()->getOutput());
+        yield 'zero exit code' => [
+            self::createCompletedProcess(0),
+            true,
+        ];
+
+        yield 'positive exit code' => [
+            self::createCompletedProcess(1),
+            false,
+        ];
+
+        yield 'negative exit code' => [
+            self::createCompletedProcess(-1),
+            false,
+        ];
     }
 
-    public function run(
-        array $command,
-        ?Closure $callback = null,
-        ?float $timeout = self::DEFAULT_TIMEOUT,
-    ): CompletedProcess {
-        $process = new Process(
-            $command,
-            timeout: $timeout,
-        );
-
-        $process->run($callback);
-
-        return self::createResult($command, $process);
-    }
-
-    /**
-     * @param list<string> $command
-     */
-    private function createResult(
-        array $command,
-        Process $process,
-    ): CompletedProcess {
-        $exitCode = $process->getExitCode();
-        Assert::integer($exitCode);
-
-        return new CompletedProcess(
-            $command,
-            $exitCode,
-            trim($process->getOutput()),
-            trim($process->getErrorOutput()),
-        );
+    private static function createCompletedProcess(int $exitCode): CompletedProcess
+    {
+        return CompletedProcessBuilder::withMinimalTestData()
+            ->withExitCode($exitCode)
+            ->build();
     }
 }

@@ -33,55 +33,75 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests\TestFramework\Contracts;
 
-use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
+final class CompletedProcessBuilder
 {
-    public function mustRun(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
+    /**
+     * @param list<string> $command
+     */
+    private function __construct(
+        private array $command,
+        private int $exitCode,
+        private string $stdout,
+        private string $stderr,
+    ) {
     }
 
-    public function run(
-        array $command,
-        ?Closure $callback = null,
-        ?float $timeout = self::DEFAULT_TIMEOUT,
-    ): CompletedProcess {
-        $process = new Process(
-            $command,
-            timeout: $timeout,
+    public static function withMinimalTestData(): self
+    {
+        return new self(
+            command: [],
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
         );
-
-        $process->run($callback);
-
-        return self::createResult($command, $process);
     }
 
     /**
      * @param list<string> $command
      */
-    private function createResult(
-        array $command,
-        Process $process,
-    ): CompletedProcess {
-        $exitCode = $process->getExitCode();
-        Assert::integer($exitCode);
+    public function withCommand(array $command): self
+    {
+        $clone = clone $this;
+        $clone->command = $command;
 
+        return $clone;
+    }
+
+    public function withExitCode(int $exitCode): self
+    {
+        $clone = clone $this;
+        $clone->exitCode = $exitCode;
+
+        return $clone;
+    }
+
+    public function withStdout(string $stdout): self
+    {
+        $clone = clone $this;
+        $clone->stdout = $stdout;
+
+        return $clone;
+    }
+
+    public function withStderr(string $stderr): self
+    {
+        $clone = clone $this;
+        $clone->stderr = $stderr;
+
+        return $clone;
+    }
+
+    public function build(): CompletedProcess
+    {
         return new CompletedProcess(
-            $command,
-            $exitCode,
-            trim($process->getOutput()),
-            trim($process->getErrorOutput()),
+            $this->command,
+            $this->exitCode,
+            $this->stdout,
+            $this->stderr,
         );
     }
 }
