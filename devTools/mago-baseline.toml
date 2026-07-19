@@ -855,7 +855,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFile.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$decodedContents` (null|stdClass)."
+message = "A value with a less specific type `mixed` is being assigned to property `$decodedContents` (null|stdClass)."
 count = 1
 
 [[issues]]
@@ -1485,7 +1485,7 @@ count = 2
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
+message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
 count = 1
 
 [[issues]]
@@ -2085,7 +2085,7 @@ count = 3
 [[issues]]
 file = "src/Mutator/Boolean/TrueValue.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array<string, array-key>` is being assigned to property `$$allowedFunctions` (array<string, int>)."
+message = "A value of a less specific type `array<string, array-key>` is being assigned to property `$allowedFunctions` (array<string, int>)."
 count = 1
 
 [[issues]]
@@ -2157,7 +2157,7 @@ count = 1
 [[issues]]
 file = "src/Mutator/Extensions/MBString.php"
 code = "mixed-property-type-coercion"
-message = 'A value with a less specific type `array<string, (closure(...mixed): mixed)>` is being assigned to property `$$converters` (array<string, (closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)>).'
+message = 'A value with a less specific type `array<string, (closure(...mixed): mixed)>` is being assigned to property `$converters` (array<string, (closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)>).'
 count = 1
 
 [[issues]]
@@ -2175,7 +2175,7 @@ count = 1
 [[issues]]
 file = "src/Mutator/IgnoreConfig.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$$hashtable` (array<string, int>)."
+message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$hashtable` (array<string, int>)."
 count = 1
 
 [[issues]]
@@ -2625,31 +2625,31 @@ count = 1
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$decorateNodes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$decorateNodes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$dumpOtherAttributes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$dumpOtherAttributes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$dumpPositions` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$dumpPositions` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$onlyVisitedNodes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$onlyVisitedNodes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$showLineNumbers` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$showLineNumbers` (bool)."
 count = 1
 
 [[issues]]
@@ -2685,7 +2685,7 @@ count = 1
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array{'comments': true, 'endFilePos': true, 'endLine': true, 'endTokenPos': true, 'startFilePos': true, 'startLine': true, 'startTokenPos': true, ...<array-key, true>}` is being assigned to property `$$ignoredAttributesByKey` (array<string, true>)."
+message = "A value of a less specific type `array{'comments': true, 'endFilePos': true, 'endLine': true, 'endTokenPos': true, 'startFilePos': true, 'startLine': true, 'startTokenPos': true, ...<array-key, true>}` is being assigned to property `$ignoredAttributesByKey` (array<string, true>)."
 count = 1
 
 [[issues]]
@@ -3645,7 +3645,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Path/PathReplacer.php"
 code = "invalid-property-write"
-message = "Cannot modify a readonly property after initialization."
+message = "Cannot write to private property `$nodeValue` on class `DOMNameSpaceNode`."
 count = 1
 
 [[issues]]
@@ -4935,13 +4935,13 @@ count = 1
 [[issues]]
 file = "tests/benchmark/MutationGenerator/MutationGeneratorBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/MutationGenerator/MutationGeneratorBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
@@ -4995,20 +4995,26 @@ count = 2
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
 code = "impossible-condition"
 message = "This condition (type `false`) will always evaluate to false."
-count = 3
+count = 11
+
+[[issues]]
+file = "tests/benchmark/ParseGitDiff/generator.php"
+code = "redundant-comparison"
+message = "Redundant `<=` comparison: left-hand side is never less than or equal to right-hand side."
+count = 8
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
@@ -5061,13 +5067,13 @@ count = 1
 [[issues]]
 file = "tests/benchmark/Tracing/TracingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/Tracing/TracingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
@@ -13962,20 +13968,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
-code = "docblock-type-mismatch"
-message = 'Docblock return type `PhpParser\Node|array<array-key, PhpParser\Node>|int` is incompatible with native return type `void`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
-code = "missing-return-statement"
-message = "Missing return statement in function `enternode`"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array<array-key, mixed>` is being assigned to property `$$desiredAttributeKeys` (array<string, mixed>)."
+message = "A value of a less specific type `array<array-key, mixed>` is being assigned to property `$desiredAttributeKeys` (array<string, mixed>)."
 count = 1
 
 [[issues]]
