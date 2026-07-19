@@ -132,19 +132,6 @@ analysers are PHPStan and Mago.
 Each entry gives three things: what agents often write, what this codebase does instead, and
 why. These rules come from comparing agent designs with the real subsystems.
 
-### Finality: `final` keyword vs `@final` docblock
-
-Agents often mark everything `final`. Here, hard `final` is for classes never mocked (mutators,
-visitors, value objects, leaf utilities); services that tests mock get `/** @internal
-@final */` with NO keyword (e.g. `src/Mutation/Mutation.php`,
-`src/Configuration/ConfigurationFactory.php`). The PHPat finality rule accepts either form;
-adding the keyword to a mocked class breaks the suite. A third form exists for special cases:
-`ParallelProcessRunner` is plain `@internal` with a dedicated PHPat exemption whose test name
-states the reason ("intentionally non-final only to allow PHPUnit partial mocks",
-`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only accepted
-reason for `@final`. If no test mocks the class, use the keyword. Reviewers ask "is there a
-reason this is `@final` rather than `final`?" Have the answer ("it is mocked in X").
-
 ### `@internal` everywhere; the public API is a whitelist
 
 Every class gets `@internal` (PHPat-enforced). Users may depend only on extension points that
