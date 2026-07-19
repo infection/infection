@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function array_values;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Symfony\Component\Process\Process;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Contracts\CompletedProcess;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 
 /**
  * @internal
@@ -49,21 +52,27 @@ use Symfony\Component\Process\Process;
 readonly class InitialStaticAnalysisRunner
 {
     public function __construct(
-        private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
+        private ShellCommandRunner $shellCommandRunner,
+        private StaticAnalysisToolAdapter $adapter,
         private EventDispatcher $eventDispatcher,
     ) {
     }
 
-    public function run(): Process
+    /**
+     * @throws ProcessException
+     */
+    public function run(): CompletedProcess
     {
-        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
-
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
+        $result = $this->shellCommandRunner->run(
+            command: array_values($this->adapter->getInitialRunCommandLine()),
+            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
+            timeout: null, // Ignore the default timeout of 60 seconds
+        );
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($result->stdout));
 
-        return $process;
+        return $result;
     }
 }

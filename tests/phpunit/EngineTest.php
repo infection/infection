@@ -57,11 +57,13 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -108,6 +110,9 @@ final class EngineTest extends TestCase
         $this->testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_initial_test_run_fails(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -152,6 +157,9 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_initial_test_run_succeeds(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -213,6 +221,9 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_memory_limiter_is_applied_after_static_analysis_when_enabled(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -233,11 +244,7 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'test output');
 
-        $staticAnalysisProcess = $this->createMock(Process::class);
-        $staticAnalysisProcess
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn(true);
+        $staticAnalysisProcess = CompletedProcessBuilder::withMinimalTestData()->build();
 
         $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
         $initialStaticAnalysisRunner
@@ -301,6 +308,9 @@ final class EngineTest extends TestCase
         $this->assertSame(['limitMemory', 'generate'], $callOrder);
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_memory_limiter_is_not_applied_when_initial_tests_are_skipped(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -355,6 +365,9 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_max_timeouts_checker_receives_correct_timed_out_count(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -416,6 +429,9 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -468,6 +484,9 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
+    /**
+     * @throws ProcessException
+     */
     public function test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
