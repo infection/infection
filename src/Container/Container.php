@@ -118,7 +118,6 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\InfectionPrettyPrinter;
 use Infection\PhpParser\NodeDumper\NodeDumper;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
@@ -551,11 +550,9 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
-                $container->getStaticAnalysisToolAdapter(),
-            ),
             InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getShellCommandRunner(),
+                $container->getStaticAnalysisToolAdapter(),
                 $container->getEventDispatcher(),
             ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
@@ -929,11 +926,6 @@ final class Container extends DIContainer
     public function getInitialTestRunProcessFactory(): InitialTestsRunProcessFactory
     {
         return $this->get(InitialTestsRunProcessFactory::class);
-    }
-
-    public function getInitialStaticAnalysisProcessFactory(): InitialStaticAnalysisProcessFactory
-    {
-        return $this->get(InitialStaticAnalysisProcessFactory::class);
     }
 
     public function getInitialTestsRunProcessFactory(): InitialTestsRunProcessFactory

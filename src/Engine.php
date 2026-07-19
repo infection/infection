@@ -64,6 +64,7 @@ use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -102,6 +103,7 @@ final readonly class Engine
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
      * @throws TestNotFound
+     * @throws ProcessException
      */
     public function execute(): void
     {
@@ -167,6 +169,9 @@ final readonly class Engine
      * 1. To warm up SA tool's cache
      * 2. To make sure SA passes before using it inside Infection to kill Mutants
      */
+    /**
+     * @throws ProcessException
+     */
     private function runInitialStaticAnalysis(): void
     {
         if (!$this->config->isStaticAnalysisEnabled()) {
@@ -185,7 +190,7 @@ final readonly class Engine
         $initialStaticAnalysisProcess = $this->initialStaticAnalysisRunner->run();
 
         if (!$initialStaticAnalysisProcess->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
+            throw InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter(
                 $initialStaticAnalysisProcess,
                 $this->staticAnalysisToolAdapter->getName(),
             );

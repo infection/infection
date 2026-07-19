@@ -37,23 +37,24 @@ namespace Infection\Tests\Process\Runner;
 
 use function implode;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 #[CoversClass(InitialStaticAnalysisRunFailed::class)]
 final class InitialStaticAnalysisRunFailedTest extends TestCase
 {
     public function test_log_initial_tests_do_not_pass(): void
     {
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('getExitCode')->willReturn(0);
-        $process->expects($this->once())->method('getOutput')->willReturn('output string');
-        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
+        $process = CompletedProcessBuilder::withMinimalTestData()
+            ->withExitCode(1)
+            ->withStdout('output string')
+            ->withStderr('error string')
+            ->build();
 
         $error = implode("\n", [
             'Project static analysis must be in a passing state before running Infection.',
-            'PHPStan reported an exit code of 0.',
+            'PHPStan reported an exit code of 1.',
             'Refer to the PHPStan\'s output below:',
             'STDOUT:',
             'output string',
@@ -61,7 +62,7 @@ final class InitialStaticAnalysisRunFailedTest extends TestCase
             'error string',
         ]);
 
-        $exception = InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, 'PHPStan');
+        $exception = InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter($process, 'PHPStan');
 
         $this->assertSame($error, $exception->getMessage());
     }

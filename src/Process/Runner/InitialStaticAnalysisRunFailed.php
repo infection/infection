@@ -37,26 +37,24 @@ namespace Infection\Process\Runner;
 
 use Exception;
 use function implode;
+use Infection\TestFramework\Contracts\CompletedProcess;
 use function sprintf;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
 final class InitialStaticAnalysisRunFailed extends Exception
 {
-    public static function fromProcessAndAdapter(Process $initialTestSuiteProcess, string $staticAnalysisTool): self
-    {
-        $exitCode = $initialTestSuiteProcess->getExitCode();
-        Assert::notNull($exitCode);
-
+    public static function fromCompletedProcessAndAdapter(
+        CompletedProcess $initialTestSuiteCompletedProcess,
+        string $staticAnalysisTool,
+    ): self {
         $lines = [
             'Project static analysis must be in a passing state before running Infection.',
             sprintf(
                 '%s reported an exit code of %d.',
                 $staticAnalysisTool,
-                $exitCode,
+                $initialTestSuiteCompletedProcess->exitCode,
             ),
             sprintf(
                 'Refer to the %s\'s output below:',
@@ -64,14 +62,14 @@ final class InitialStaticAnalysisRunFailed extends Exception
             ),
         ];
 
-        $stdOut = $initialTestSuiteProcess->getOutput();
+        $stdOut = $initialTestSuiteCompletedProcess->stdout;
 
         if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
 
-        $stdError = $initialTestSuiteProcess->getErrorOutput();
+        $stdError = $initialTestSuiteCompletedProcess->stderr;
 
         if ($stdError !== '') {
             $lines[] = 'STDERR:';
