@@ -4,7 +4,21 @@ set -euo pipefail
 
 agents_md=${1:-AGENTS.md}
 
-adr_list=$(
+# Bail out before writing anything: without exactly one of each marker the
+# splice below would silently duplicate or truncate the file.
+for marker in 'adr-list:start' 'adr-list:end'; do
+    if [[ "$(grep -c "<!-- $marker -->" "$agents_md")" != '1' ]]; then
+        echo "$0: expected exactly one <!-- $marker --> in $agents_md" >&2
+        exit 1
+    fi
+done
+
+tmp_file=$(mktemp)
+trap 'rm -f "$tmp_file"' EXIT
+
+{
+    sed '/<!-- adr-list:start -->/q' "$agents_md"
+
     for file in adr/[0-9][0-9][0-9][0-9]-*.md; do
         if [[ "$file" == 'adr/0000-template.md' ]]; then
             continue
@@ -14,18 +28,8 @@ adr_list=$(
 
         printf -- "- [\`%s\`](%s) - %s\n" "$file" "$file" "$title"
     done
-)
 
-tmp_file=$(mktemp)
-trap 'rm -f "$tmp_file"' EXIT
-
-# Replace everything between the markers with the generated list, and fail if
-# the markers are missing or unbalanced so a broken AGENTS.md is never written.
-adr_list="$adr_list" awk '
-    /^<!-- adr-list:start -->$/ { print; print ENVIRON["adr_list"]; in_block = 1; found_start = 1; next }
-    /^<!-- adr-list:end -->$/ { in_block = 0 }
-    !in_block
-    END { exit !(found_start && !in_block) }
-' "$agents_md" > "$tmp_file"
+    sed -n '/<!-- adr-list:end -->/,$p' "$agents_md"
+} > "$tmp_file"
 
 mv "$tmp_file" "$agents_md"
