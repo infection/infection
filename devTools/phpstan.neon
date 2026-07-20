@@ -321,6 +321,7 @@ parameters:
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures/*
+        - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/Support/ClassReflectionPredicatesTest/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/ClassWithNoArgumentPrivateConstructor/Fixtures/*
         - %currentWorkingDirectory%/tests/phpunit/Architecture/PHPat/Selector/StaticOrConstOnlyClass/Fixtures/*
         - ../tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php
