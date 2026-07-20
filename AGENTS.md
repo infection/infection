@@ -116,6 +116,19 @@ Do not suggest ADRs for implementation descriptions, subsystem invariants, contr
 workflows, command lists, or one-off details. Put those in architecture documentation,
 contributor documentation, or code comments as appropriate.
 
+Consult this generated index before reading the ADRs relevant to the task:
+
+<!-- adr-index:start -->
+- [ADR 0001: Inheritdoc usage](adr/0001-inheritdoc.md) — Accepted
+- [ADR 0002: `@covers` annotations usage](adr/0002-@covers-annotations.md) — Deprecated
+- [ADR 0003: Use `$this` instead of `self` for PHPUnit assertions](adr/0003-PHPUnit-this-over-self.md) — Accepted
+- [ADR 0004: Use PHPUnit `expectException*()` API over `try-catch`](adr/0004-PHPUnit-expect-exception-over-try-catch.md) — Accepted
+- [ADR 0005: Bumping PHP version requirements](adr/0005-Bump-PHP-versions.md) — Superseded by ADR 0008
+- [ADR 0006: Use `Memoized` over `Cached` for object-local result reuse](adr/0006-memoized-over-cached-nomenclature.md) — Accepted
+- [ADR 0007: Declare PHPUnit coverage metadata explicitly](adr/0007-declare-phpunit-coverage-metadata.md) — Accepted
+- [ADR 0008: PHP version support policy](adr/0008-PHP-version-support-policy.md) — Accepted
+<!-- adr-index:end -->
+
 ## Commands
 
 ```bash

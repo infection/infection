@@ -5155,6 +5155,90 @@ message = "Assigning `mixed` type to a variable may lead to unexpected behavior.
 count = 3
 
 [[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexGenerator.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `UnexpectedValueException` in `Infection\Tests\AutoReview\AI\AdrIndexGenerator::generateEntry`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexGenerator.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `UnexpectedValueException` in `Infection\Tests\AutoReview\AI\AdrIndexGenerator::normalizeStatus`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexGenerator.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `UnexpectedValueException` in `Infection\Tests\AutoReview\AI\AdrIndexGenerator::replace`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexGeneratorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `invalidAdrProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexGeneratorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `invalidIndexProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexGeneratorTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `statusProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdater.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdater::findAdrs`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::test_it_accepts_an_up_to_date_index_in_check_mode`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::test_it_rejects_an_outdated_index_in_check_mode`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::test_it_updates_the_index`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::setUp`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::test_it_accepts_an_up_to_date_index_in_check_mode`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::test_it_rejects_an_outdated_index_in_check_mode`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/AutoReview/AI/AdrIndexUpdaterTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\AutoReview\AI\AdrIndexUpdaterTest::test_it_updates_the_index`.'
+count = 1
+
+[[issues]]
 file = "tests/phpunit/AutoReview/BuildConfigYmlTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesYamlFilesForTesting` is imprecise, equivalent to `iterable<mixed, mixed>`."
