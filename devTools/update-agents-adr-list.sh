@@ -4,18 +4,7 @@ set -euo pipefail
 
 agents_md=${1:-AGENTS.md}
 
-tmp_file=$(mktemp)
-adr_list_file=$(mktemp)
-
-cleanup() {
-    rm -f "$tmp_file" "$adr_list_file"
-}
-
-trap cleanup EXIT
-
-{
-    printf '<!-- adr-list:start -->\n'
-
+adr_list=$(
     for file in adr/[0-9][0-9][0-9][0-9]-*.md; do
         if [[ "$file" == 'adr/0000-template.md' ]]; then
             continue
@@ -25,34 +14,18 @@ trap cleanup EXIT
 
         printf -- "- [\`%s\`](%s) - %s\n" "$file" "$file" "$title"
     done
+)
 
-    printf '<!-- adr-list:end -->\n'
-} > "$adr_list_file"
+tmp_file=$(mktemp)
+trap 'rm -f "$tmp_file"' EXIT
 
-awk \
-    -v adr_list_file="$adr_list_file" \
-    'BEGIN {
-        while ((getline line < adr_list_file) > 0) {
-            generated = generated line "\n";
-        }
-    }
-    /^<!-- adr-list:start -->$/ {
-        printf "%s", generated;
-        in_block = 1;
-        found_start = 1;
-        next;
-    }
-    /^<!-- adr-list:end -->$/ && in_block {
-        in_block = 0;
-        found_end = 1;
-        next;
-    }
-    !in_block { print }
-    END {
-        if (!found_start || !found_end || in_block) {
-            exit 1;
-        }
-    }' \
-    "$agents_md" > "$tmp_file"
+# Replace everything between the markers with the generated list, and fail if
+# the markers are missing or unbalanced so a broken AGENTS.md is never written.
+adr_list="$adr_list" awk '
+    /^<!-- adr-list:start -->$/ { print; print ENVIRON["adr_list"]; in_block = 1; found_start = 1; next }
+    /^<!-- adr-list:end -->$/ { in_block = 0 }
+    !in_block
+    END { exit !(found_start && !in_block) }
+' "$agents_md" > "$tmp_file"
 
 mv "$tmp_file" "$agents_md"
