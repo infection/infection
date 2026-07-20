@@ -40,11 +40,15 @@ use Infection\Command\BaseCommand;
 use Infection\Engine;
 use Infection\Mutator\Mutator;
 use Infection\Tests\Architecture\PHPat\Selector\SelectorTestCase;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicatesTest\Fixtures\ChildWithInheritedMembers;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicatesTest\Fixtures\ParentWithDeclaredMembers;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionMethod;
+use ReflectionProperty;
 
-#[CoversClass(ConcreteClassReflection::class)]
-final class ConcreteClassReflectionTest extends SelectorTestCase
+#[CoversClass(ClassReflectionPredicates::class)]
+final class ClassReflectionPredicatesTest extends SelectorTestCase
 {
     /**
      * @param class-string $className
@@ -56,7 +60,7 @@ final class ConcreteClassReflectionTest extends SelectorTestCase
     ): void {
         $classReflection = $this->createClassReflection($className);
 
-        $actual = ConcreteClassReflection::isConcreteClass($classReflection);
+        $actual = ClassReflectionPredicates::isConcreteClass($classReflection);
 
         $this->assertSame($expected, $actual);
     }
@@ -82,5 +86,45 @@ final class ConcreteClassReflectionTest extends SelectorTestCase
             CannotBeInstantiated::class,
             false,
         ];
+    }
+
+    public function test_it_detects_inherited_methods(): void
+    {
+        $childClassReflection = $this->createClassReflection(ChildWithInheritedMembers::class);
+        $parentClassReflection = $this->createClassReflection(ParentWithDeclaredMembers::class);
+        $methodReflection = new ReflectionMethod(ChildWithInheritedMembers::class, 'execute');
+
+        $this->assertTrue(
+            ClassReflectionPredicates::isInheritedMethod(
+                $methodReflection,
+                $childClassReflection,
+            ),
+        );
+        $this->assertFalse(
+            ClassReflectionPredicates::isInheritedMethod(
+                $methodReflection,
+                $parentClassReflection,
+            ),
+        );
+    }
+
+    public function test_it_detects_inherited_properties(): void
+    {
+        $childClassReflection = $this->createClassReflection(ChildWithInheritedMembers::class);
+        $parentClassReflection = $this->createClassReflection(ParentWithDeclaredMembers::class);
+        $propertyReflection = new ReflectionProperty(ChildWithInheritedMembers::class, 'value');
+
+        $this->assertTrue(
+            ClassReflectionPredicates::isInheritedProperty(
+                $propertyReflection,
+                $childClassReflection,
+            ),
+        );
+        $this->assertFalse(
+            ClassReflectionPredicates::isInheritedProperty(
+                $propertyReflection,
+                $parentClassReflection,
+            ),
+        );
     }
 }

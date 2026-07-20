@@ -86,6 +86,6 @@ final class ClassesShouldBeFinalTest
             ->classes(Selector::extends(ParallelProcessRunner::class))
             ->shouldNot()
             ->exist()
-            ->because('ParallelProcessRunner is intentionally non-final only to allow PHPUnit partial mocks.');
+            ->because('ParallelProcessRunner is intentionally soft-final only to allow PHPUnit partial mocks.');
     }
 }

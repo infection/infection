@@ -102,6 +102,20 @@ transcluded here:
 
 @.github/CONTRIBUTING.md
 
+## Suggest ADRs for durable decisions
+
+When a task exposes an undocumented, durable choice about architecture, public API,
+dependencies, testing strategy, or a project-wide convention, tell the contributor that it
+is a candidate for an ADR. Suggest an ADR especially when credible alternatives exist or the
+same decision is likely to recur in reviews. First search `adr/`: update or supersede an
+existing decision instead of creating a competing record. Follow the criteria and workflow
+in `adr/README.md` and the template in `adr/0000-template.md`.
+
+Suggest the ADR; do not expand the task by writing one unless the contributor asks for it.
+Do not suggest ADRs for implementation descriptions, subsystem invariants, contribution
+workflows, command lists, or one-off details. Put those in architecture documentation,
+contributor documentation, or code comments as appropriate.
+
 ## Commands
 
 ```bash
@@ -134,16 +148,13 @@ why. These rules come from comparing agent designs with the real subsystems.
 
 ### Finality: `final` keyword vs `@final` docblock
 
-Agents often mark everything `final`. Here, hard `final` is for classes never mocked (mutators,
-visitors, value objects, leaf utilities); services that tests mock get `/** @internal
-@final */` with NO keyword (e.g. `src/Mutation/Mutation.php`,
-`src/Configuration/ConfigurationFactory.php`). The PHPat finality rule accepts either form;
-adding the keyword to a mocked class breaks the suite. A third form exists for special cases:
-`ParallelProcessRunner` is plain `@internal` with a dedicated PHPat exemption whose test name
-states the reason ("intentionally non-final only to allow PHPUnit partial mocks",
-`tests/Architecture/PHPat/ClassesShouldBeFinalTest.php`). Mockability is the only accepted
-reason for `@final`. If no test mocks the class, use the keyword. Reviewers ask "is there a
-reason this is `@final` rather than `final`?" Have the answer ("it is mocked in X").
+Agents often mark everything `final`. Here, hard `final` is only for classes never mocked
+(mutators, visitors, value objects, leaf utilities); services that tests mock get `/** @internal
+@final */` with NO keyword. The PHPat finality rule accepts either form; adding the keyword
+to a mocked class breaks the suite. Mockability is the only accepted reason for `@final`.
+If no test mocks the class, use the keyword. Do not expect `BypassFinals`. Do not add interfaces
+just to mock a single class. Reviewers ask "is there a reason this is `@final` rather
+than `final`?" Have the answer ("it is mocked in X").
 
 ### `@internal` everywhere; the public API is a whitelist
 
