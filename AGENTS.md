@@ -102,6 +102,20 @@ transcluded here:
 
 @.github/CONTRIBUTING.md
 
+## Suggest ADRs for durable decisions
+
+When a task exposes an undocumented, durable choice about architecture, public API,
+dependencies, testing strategy, or a project-wide convention, tell the contributor that it
+is a candidate for an ADR. Suggest an ADR especially when credible alternatives exist or the
+same decision is likely to recur in reviews. First search `adr/`: update or supersede an
+existing decision instead of creating a competing record. Follow the criteria and workflow
+in `adr/README.md` and the template in `adr/0000-template.md`.
+
+Suggest the ADR; do not expand the task by writing one unless the contributor asks for it.
+Do not suggest ADRs for implementation descriptions, subsystem invariants, contribution
+workflows, command lists, or one-off details. Put those in architecture documentation,
+contributor documentation, or code comments as appropriate.
+
 ## Commands
 
 ```bash
