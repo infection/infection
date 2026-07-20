@@ -131,6 +131,7 @@ Current ADRs:
 - [`adr/0006-memoized-over-cached-nomenclature.md`](adr/0006-memoized-over-cached-nomenclature.md) - Use `Memoized` over `Cached` for object-local result reuse
 - [`adr/0007-declare-phpunit-coverage-metadata.md`](adr/0007-declare-phpunit-coverage-metadata.md) - Declare PHPUnit coverage metadata explicitly
 - [`adr/0008-PHP-version-support-policy.md`](adr/0008-PHP-version-support-policy.md) - PHP version support policy
+- [`adr/0010-compare-objects-with-assert-equals.md`](adr/0010-compare-objects-with-assert-equals.md) - Compare objects with PHPUnit `assertEquals()`
 <!-- adr-list:end -->
 
 ## Commands
