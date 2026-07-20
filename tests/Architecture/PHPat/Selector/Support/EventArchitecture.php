@@ -74,7 +74,7 @@ final readonly class EventArchitecture
     public function isEvent(ClassReflection $classReflection): bool
     {
         return $this->isInEventDirectory($classReflection)
-            && ConcreteClassReflection::isConcreteClass($classReflection)
+            && ClassReflectionPredicates::isConcreteClass($classReflection)
             && !$this->isSubscriberName($classReflection->getName());
     }
 

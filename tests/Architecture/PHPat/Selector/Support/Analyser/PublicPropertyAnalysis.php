@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
 use Infection\CannotBeInstantiated;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use PHPStan\Reflection\ClassReflection;
 use ReflectionProperty;
 
@@ -51,7 +52,7 @@ final class PublicPropertyAnalysis
 
         foreach ($publicProperties as $property) {
             if (
-                $property->getDeclaringClass()->getName() === $classReflection->getName()
+                !ClassReflectionPredicates::isInheritedProperty($property, $classReflection)
                 && !$property->isReadOnly()
             ) {
                 return true;
