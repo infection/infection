@@ -37,8 +37,10 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
 use Infection\CannotBeInstantiated;
 use PHPStan\Reflection\ClassReflection;
+use ReflectionMethod;
+use ReflectionProperty;
 
-final class ConcreteClassReflection
+final class ClassReflectionPredicates
 {
     use CannotBeInstantiated;
 
@@ -47,5 +49,19 @@ final class ConcreteClassReflection
         return !$classReflection->isAbstract()
             && !$classReflection->isInterface()
             && !$classReflection->isTrait();
+    }
+
+    public static function isInheritedMethod(
+        ReflectionMethod $methodReflection,
+        ClassReflection $classReflection,
+    ): bool {
+        return $methodReflection->getDeclaringClass()->getName() !== $classReflection->getName();
+    }
+
+    public static function isInheritedProperty(
+        ReflectionProperty $propertyReflection,
+        ClassReflection $classReflection,
+    ): bool {
+        return $propertyReflection->getDeclaringClass()->getName() !== $classReflection->getName();
     }
 }

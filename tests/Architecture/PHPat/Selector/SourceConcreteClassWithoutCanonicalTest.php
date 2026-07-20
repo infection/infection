@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
@@ -49,7 +49,7 @@ final class SourceConcreteClassWithoutCanonicalTest implements SelectorInterface
 
     public function matches(ClassReflection $classReflection): bool
     {
-        if (!ConcreteClassReflection::isConcreteClass($classReflection)
+        if (!ClassReflectionPredicates::isConcreteClass($classReflection)
             || !InfectionSelector::sourceCode()->matches($classReflection)
             || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
         ) {

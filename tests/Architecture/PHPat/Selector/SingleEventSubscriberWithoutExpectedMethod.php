@@ -38,6 +38,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use function array_filter;
 use function array_values;
 use function count;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
@@ -89,7 +90,7 @@ final readonly class SingleEventSubscriberWithoutExpectedMethod implements Selec
      */
     private function getDeclaredPublicMethods(ClassReflection $classReflection): array
     {
-        $isDeclaredByTheSubscriber = static fn (ReflectionMethod $method): bool => $method->getDeclaringClass()->getName() === $classReflection->getName();
+        $isDeclaredByTheSubscriber = static fn (ReflectionMethod $method): bool => !ClassReflectionPredicates::isInheritedMethod($method, $classReflection);
 
         return array_values(
             array_filter(
