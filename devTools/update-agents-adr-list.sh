@@ -4,8 +4,7 @@ set -euo pipefail
 
 agents_md=${1:-AGENTS.md}
 
-# Bail out before writing anything: without exactly one of each marker the
-# splice below would silently duplicate or truncate the file.
+# There should be just one marker of each kind
 for marker in 'adr-list:start' 'adr-list:end'; do
     if [[ "$(grep -c "<!-- $marker -->" "$agents_md")" != '1' ]]; then
         echo "$0: expected exactly one <!-- $marker --> in $agents_md" >&2
