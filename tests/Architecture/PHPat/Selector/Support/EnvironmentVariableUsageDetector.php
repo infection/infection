@@ -60,7 +60,7 @@ final readonly class EnvironmentVariableUsageDetector
 
         $coveredSymbols = PHPUnitTestClassAnalysis::getCoveredSymbols(
             $testCaseReflection,
-            $this->reflectionProvider
+            $this->reflectionProvider,
         );
 
         foreach ($coveredSymbols as $coveredSymbol) {

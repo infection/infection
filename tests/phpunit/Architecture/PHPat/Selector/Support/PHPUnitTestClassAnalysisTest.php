@@ -195,7 +195,7 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
             $this->createClassReflection(PHPUnitTestWithEnvironmentVariables::class),
         );
 
-        $this->assertSame(['FOO', 'BAR'], $actual);
+        $this->assertSame(['FOO', 'BAR', 'BAZ'], $actual);
     }
 }
 
@@ -207,4 +207,6 @@ abstract class AbstractPHPUnitTest extends TestCase
 #[WithEnvironmentVariable('BAR', 'value')]
 abstract class PHPUnitTestWithEnvironmentVariables extends TestCase
 {
+    #[WithEnvironmentVariable('BAZ')]
+    abstract public function test_with_environment_variable(): void;
 }
