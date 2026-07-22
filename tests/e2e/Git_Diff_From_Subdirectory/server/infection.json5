@@ -10,6 +10,9 @@
     "logs": {
         "summary": ".var/infection.log"
     },
+    "phpUnit": {
+        "customPath": "vendor/bin/phpunit"
+    },
     "mutators": {
         "TrueValue": true
     },

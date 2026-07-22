@@ -39,6 +39,7 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @internal
@@ -52,6 +53,7 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
      * @param non-empty-string $gitDiffBase
      * @param non-empty-string $gitDiffFilter
      * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string $workingDirectory
      */
     public function __construct(
         private readonly Git $git,
@@ -59,6 +61,7 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
         private readonly string $gitDiffBase,
         private readonly string $gitDiffFilter,
         private readonly array $sourceDirectories,
+        private readonly string $workingDirectory,
     ) {
     }
 
@@ -96,12 +99,15 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
             $this->gitDiffFilter,
             $this->gitDiffBase,
             $this->sourceDirectories,
+            $this->workingDirectory,
         );
 
         $changedLinesByAbsolutePaths = [];
 
         foreach ($changedLinesByRelativePaths as $relativeFilePath => $changedLines) {
-            $changedLinesByAbsolutePaths[$this->filesystem->realPath($relativeFilePath)] = $changedLines;
+            $changedLinesByAbsolutePaths[$this->filesystem->realPath(
+                Path::join($this->workingDirectory, $relativeFilePath),
+            )] = $changedLines;
         }
 
         return $changedLinesByAbsolutePaths;

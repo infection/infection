@@ -58,6 +58,7 @@ final readonly class ConfigurationFactoryGit implements Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        string $workingDirectory,
     ): string {
         throw new DomainException('Not implemented.');
     }
@@ -66,6 +67,7 @@ final readonly class ConfigurationFactoryGit implements Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        string $workingDirectory,
     ): never {
         throw new DomainException('Not implemented.');
     }

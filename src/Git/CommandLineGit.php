@@ -83,12 +83,17 @@ final readonly class CommandLineGit implements Git
         return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
-    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
-    {
+    public function getChangedFileRelativePaths(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+        string $workingDirectory,
+    ): string {
         $lines = $this->diff(
             $diffFilter,
             $base,
             $sourceDirectories,
+            $workingDirectory,
             nameOnly: true,
         );
 
@@ -103,11 +108,13 @@ final readonly class CommandLineGit implements Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        string $workingDirectory,
     ): array {
         $lines = $this->diff(
             $diffFilter,
             $base,
             $sourceDirectories,
+            $workingDirectory,
             noContext: true,
         );
         $changedLines = self::parsedChangedLines($lines);
@@ -267,16 +274,21 @@ final readonly class CommandLineGit implements Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        string $workingDirectory,
         bool $nameOnly = false,
         bool $noContext = false,
     ): array {
         $command = [
             'git',
+            '-C',
+            $workingDirectory,
             '--no-pager',
             'diff',
             $base,
             '--no-ext-diff',
             '--no-color',
+            // Git otherwise reports paths relative to the repository root instead of the requested working directory.
+            '--relative',
             $nameOnly ? '--name-only' : null,
             $noContext ? '--unified=0' : null,
             '--diff-filter=' . $diffFilter,

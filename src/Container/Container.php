@@ -38,6 +38,7 @@ namespace Infection\Container;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
+use function dirname;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -620,6 +621,7 @@ final class Container extends DIContainer
                         $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
+                        dirname($configuration->configurationPathname),
                     )
                     : new NullSourceLineMatcher();
             },

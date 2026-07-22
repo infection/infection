@@ -58,7 +58,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
         $this->fileSystemStub
             ->method('realPath')
             ->willReturnCallback(
-                static fn (string $path): string => '/path/to/' . $path,
+                static fn (string $path): string => $path,
             );
     }
 
@@ -70,6 +70,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
             'main',
             'AM',
             ['src', 'lib'],
+            '/path/to',
         );
 
         $matcher->touches('/path/to/File.php', 1, 1);
@@ -97,6 +98,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
             'main',
             'AM',
             ['src', 'lib'],
+            '/path/to',
         );
 
         $actual = $matcher->touches(
@@ -188,7 +190,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
         $git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'main', ['src', 'lib'])
+            ->with('AM', 'main', ['src', 'lib'], '/path/to')
             ->willReturn($changedLinesRangesByFilePathname);
 
         return $git;

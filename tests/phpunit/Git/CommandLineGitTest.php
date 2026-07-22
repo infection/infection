@@ -81,7 +81,7 @@ final class CommandLineGitTest extends TestCase
 
         $this->expectException(NoSourceFound::class);
 
-        $this->git->getChangedFileRelativePaths('AM', 'master', ['src/']);
+        $this->git->getChangedFileRelativePaths('AM', 'master', ['src/'], '/project');
     }
 
     public function test_it_gets_the_merge_base(): void
@@ -128,11 +128,14 @@ final class CommandLineGitTest extends TestCase
             ->with(
                 [
                     'git',
+                    '-C',
+                    '/project',
                     '--no-pager',
                     'diff',
                     'main',
                     '--no-ext-diff',
                     '--no-color',
+                    '--relative',
                     '--name-only',
                     '--diff-filter=AM',
                     '--',
@@ -151,7 +154,7 @@ final class CommandLineGitTest extends TestCase
 
         $expected = 'app/A.php,my lib/B.php';
 
-        $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/']);
+        $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/'], '/project');
 
         $this->assertSame($expected, $actual);
     }
@@ -172,11 +175,14 @@ final class CommandLineGitTest extends TestCase
             ->method('execute')
             ->with([
                 'git',
+                '-C',
+                '/project',
                 '--no-pager',
                 'diff',
                 'main',
                 '--no-ext-diff',
                 '--no-color',
+                '--relative',
                 '--unified=0',
                 '--diff-filter=AM',
                 '--',
@@ -189,6 +195,7 @@ final class CommandLineGitTest extends TestCase
             'AM',
             'main',
             ['src', 'lib'],
+            '/project',
         );
 
         if (!is_string($expected)) {

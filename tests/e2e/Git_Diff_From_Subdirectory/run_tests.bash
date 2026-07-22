@@ -2,8 +2,9 @@
 
 set -eo pipefail
 
-readonly INFECTION=../../../../${1}
 readonly TEST_DIRECTORY=$PWD
+INFECTION=$(realpath "../../../${1}")
+readonly INFECTION
 
 composer install --working-dir=server --no-interaction --quiet
 
@@ -28,8 +29,18 @@ cp server/src/SourceClass.php server/src/SourceClass.php.original
 sed -i.bak 's/return true;/return true; \/\/ Changed/' server/src/SourceClass.php
 rm server/src/SourceClass.php.bak
 
-cd server
+run_infection() {
+    local working_directory=$1
+    local configuration=$2
 
-php "$INFECTION" --git-diff-base=HEAD --git-diff-filter=M
+    (
+        cd "$working_directory"
+        php "$INFECTION" --configuration="$configuration" --git-diff-base=HEAD --git-diff-filter=M
+    )
 
-diff -u --ignore-all-space ../expected-output.txt .var/infection.log
+    diff --unified --ignore-all-space expected-output.txt server/.var/infection.log
+}
+
+run_infection server infection.json5
+run_infection . server/infection.json5
+run_infection frontend ../server/infection.json5

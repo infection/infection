@@ -47,6 +47,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Webmozart\Assert\Assert;
 
 /**
  * This is an integration to smoke test that the adapter works. More accurate
@@ -99,6 +100,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'AM',
             self::COMMIT_REFERENCE,
             ['src/Git'],
+            $this->getWorkingDirectory(),
         );
         $paths = explode(',', $output);
 
@@ -142,6 +144,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             // This cannot be a correct revision.
             $badCommitReference,
             ['src'],
+            $this->getWorkingDirectory(),
         );
     }
 
@@ -153,6 +156,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'AM',
             self::COMMIT_REFERENCE,
             ['src', 'tests'],
+            $this->getWorkingDirectory(),
         );
 
         $this->assertArrayHasKey('src/Git/Git.php', $actual);
@@ -167,6 +171,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'AM',
             self::COMMIT_REFERENCE,
             ['src'],
+            $this->getWorkingDirectory(),
         );
 
         $this->assertArrayHasKey('src/Git/Git.php', $actual);
@@ -198,6 +203,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'AM',
             $badCommitReference,
             ['src'],
+            $this->getWorkingDirectory(),
         );
     }
 
@@ -234,6 +240,14 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $this->expectException(NoGitProjectFound::class);
 
         $this->git->getProjectDirectory();
+    }
+
+    /** @return non-empty-string */
+    private function getWorkingDirectory(): string
+    {
+        Assert::stringNotEmpty($this->cwd);
+
+        return $this->cwd;
     }
 
     private function skipIfCommitReferenceIsNotAvailable(): void

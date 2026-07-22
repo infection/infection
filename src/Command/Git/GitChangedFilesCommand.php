@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command\Git;
 
+use function dirname;
 use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
@@ -59,7 +60,7 @@ final class GitChangedFilesCommand extends BaseCommand
     protected function configure(): void
     {
         $this->setDescription(
-            'Finds the list of relative paths (relative to the current working directory) of the changed files that changed compared to the base branch used and matching the given filter.',
+            'Finds the list of relative paths (relative to the configuration directory) of the changed files that changed compared to the base branch used and matching the given filter.',
         );
 
         ConfigurationOption::addOption($this);
@@ -108,6 +109,7 @@ final class GitChangedFilesCommand extends BaseCommand
                 $sourceFilter->value,
                 $sourceFilter->base,
                 $container->getConfiguration()->source->directories,
+                dirname($container->getConfiguration()->configurationPathname),
             ),
         );
 

@@ -78,7 +78,7 @@ interface Git
     public function getDefaultBase(): string;
 
     /**
-     * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
+     * Finds the list of relative paths (relative to the requested working directory) of the changed files that changed
      * compared to the base branch used and matching the given filter.
      *
      * Returns a comma-separated list of the relative paths.
@@ -86,6 +86,7 @@ interface Git
      * @param non-empty-string $diffFilter E.g. 'AM'.
      * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
      * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string $workingDirectory Directory from which to interpret source paths and report changed paths.
      *
      * @throws NoSourceFound
      *
@@ -95,6 +96,7 @@ interface Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        string $workingDirectory,
     ): string;
 
     /**
@@ -113,6 +115,7 @@ interface Git
      * @param non-empty-string $diffFilter E.g. 'AM'.
      * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
      * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string $workingDirectory Directory from which to interpret source paths and report changed paths.
      *
      * @throws NoSourceFound
      *
@@ -122,6 +125,7 @@ interface Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        string $workingDirectory,
     ): array;
 
     /**
