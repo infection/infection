@@ -105,11 +105,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->shellCommandLineExecutor = new ShellCommandLineExecutor();
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-    }
-
     public function test_it_can_load_a_custom_path(): void
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
