@@ -504,8 +504,8 @@ Notes for review:
 - Complex setup gets hand-rolled immutable builders/fakes next to the test
   (`tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php`,
   a fake `Git` implementation) rather than deep mock graphs.
-- Env vars: any test calling `putenv` must `use BacksUpEnvironmentVariables;`
-  (AutoReview-checked).
+- Env vars: tests exercising code that uses a statically identifiable environment variable
+  must declare it with `#[WithEnvironmentVariable]` (PHPat-enforced).
 - Visitors have a dedicated harness - read `tests/phpunit/PhpParser/Visitor/README.md`:
   extend `VisitorTestCase`, `addIdsToNodes()`, traverse with your visitor +
   `MarkTraversedNodesAsVisitedVisitor`, dump with the configured `NodeDumper`, `assertSame`

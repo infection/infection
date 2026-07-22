@@ -46,6 +46,7 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use function str_ends_with;
 use function str_starts_with;
@@ -103,6 +104,32 @@ final class PHPUnitTestClassAnalysis
         }
 
         return $coveredClassNames;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function getEnvironmentVariables(ClassReflection $testCaseReflection): array
+    {
+        $environmentVariables = [];
+
+        foreach (self::getAttributes($testCaseReflection) as $attribute) {
+            if ($attribute->getName() !== WithEnvironmentVariable::class) {
+                continue;
+            }
+
+            $environmentVariable = self::getStringArgument(
+                attribute: $attribute,
+                index: 0,
+                name: 'environmentVariableName',
+            );
+
+            if ($environmentVariable !== null) {
+                $environmentVariables[] = $environmentVariable;
+            }
+        }
+
+        return $environmentVariables;
     }
 
     /**

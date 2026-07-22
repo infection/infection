@@ -33,41 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function class_exists;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use function sprintf;
+use function array_diff;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-#[CoversClass(EnvTestCasesProvider::class)]
-final class EnvTestCasesProviderTest extends TestCase
+final readonly class PHPUnitTestMissingEnvironmentVariable implements SelectorInterface
 {
-    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
-    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
+    public function __construct(
+        private EnvironmentVariableUsageDetector $environmentVariableUsageDetector,
+    ) {
+    }
+
+    public function getName(): string
     {
-        $this->assertTrue(
-            class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName),
-        );
+        return 'PHPUnit test missing a `WithEnvironmentVariable` attribute';
+    }
 
-        $testCaseReflection = new ReflectionClass($testCaseClassName);
+    public function matches(ClassReflection $classReflection): bool
+    {
+        if (!PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection)) {
+            return false;
+        }
 
-        $this->assertInstanceOf(
-            TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor(),
-        );
+        $usedEnvironmentVariables = $this->environmentVariableUsageDetector->getEnvironmentVariables($classReflection);
+        $declaredEnvironmentVariables = PHPUnitTestClassAnalysis::getEnvironmentVariables($classReflection);
 
-        $this->assertFalse(
-            $testCaseReflection->isAbstract(),
-            sprintf(
-                'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName,
-            ),
-        );
-
-        $this->assertFileExists($fileWithIoOperations);
+        return array_diff($usedEnvironmentVariables, $declaredEnvironmentVariables) !== [];
     }
 }

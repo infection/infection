@@ -1153,36 +1153,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/ConcreteClassReflector.php
 
 		-
-			rawMessage: 'Method Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations() should return string|null but returns string|false.'
-			identifier: return.type
-			count: 2
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
-
-		-
-			rawMessage: 'Method Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations() should return string|null but returns string|false.'
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $filename of function Safe\file_get_contents expects string, string|false given.'
-			identifier: argument.type
-			count: 3
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
-
-		-
-			rawMessage: 'Parameter #1 $sourceClassName of static method Infection\Framework\ClassName::getCanonicalTestClassName() expects class-string, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
-
-		-
 			rawMessage: 'Cannot call method getPrerequisites() on Fidry\Makefile\Rule|null.'
 			identifier: method.nonObject
 			count: 2

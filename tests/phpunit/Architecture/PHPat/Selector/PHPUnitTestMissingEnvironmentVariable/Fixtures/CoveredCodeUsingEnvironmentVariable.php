@@ -33,51 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestMissingEnvironmentVariable\Fixtures;
 
-use Infection\CannotBeInstantiated;
-use function sprintf;
-use function str_contains;
+use function Safe\putenv;
 
-final class EnvManipulatorCodeDetector
+final class CoveredCodeUsingEnvironmentVariable
 {
-    use CannotBeInstantiated;
-
-    private const array FUNCTIONS = [
-        'putenv',
-        'Safe\putenv',
-    ];
-
-    /**
-     * @var string[]|null
-     */
-    private static ?array $statements = null;
-
-    public static function codeManipulatesEnvVariables(string $code): bool
+    public function __construct()
     {
-        foreach (self::getStatements() as $statement) {
-            if (str_contains($code, $statement)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function getStatements(): array
-    {
-        if (self::$statements !== null) {
-            return self::$statements;
-        }
-
-        foreach (self::FUNCTIONS as $safeFunctionName) {
-            self::$statements[] = sprintf('use function %s', $safeFunctionName);
-            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
-        }
-
-        return self::$statements;
+        putenv('FIXED_NAME=value');
     }
 }

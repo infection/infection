@@ -33,31 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestMissingEnvironmentVariable\Fixtures;
 
-use Webmozart\Assert\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-trait BacksUpEnvironmentVariables
+#[CoversClass(CoveredCodeUsingDynamicEnvironmentVariable::class)]
+final class TestCoveringDynamicEnvironmentVariableTest extends TestCase
 {
-    /**
-     * @var EnvBackup
-     */
-    private $snapshot;
-
-    private function backupEnvironmentVariables(): void
+    public function test_it_is_a_fixture(): void
     {
-        $this->snapshot = EnvBackup::createSnapshot();
-    }
-
-    private function restoreEnvironmentVariables(): void
-    {
-        $value = $this->snapshot;
-
-        Assert::notNull(
-            $value,
-            'Attempted to restore a backup but no backup has been created',
-        );
-
-        $value->restore();
+        $this->expectNotToPerformAssertions();
     }
 }

@@ -33,40 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function sprintf;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+use PHPStan\Reflection\ReflectionProvider;
 
-#[CoversNothing]
-final class EnvManipulationTest extends TestCase
+final readonly class PHPUnitTestsUsingEnvironmentVariablesShouldDeclareThemTest
 {
-    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
-    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
-        string $testCaseClassName,
-        string $fileWithEnvManipulations,
-    ): void {
-        $import = sprintf(
-            'use %s;',
-            BacksUpEnvironmentVariables::class,
-        );
+    public function __construct(
+        private ReflectionProvider $reflectionProvider,
+    ) {
+    }
 
-        $this->assertStringContainsString(
-            $import,
-            file_get_contents($fileWithEnvManipulations),
-            sprintf(
-                <<<'TXT'
-                        Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
-                        been found in the file "%s".
-                    TXT,
-                $testCaseClassName,
-                BacksUpEnvironmentVariables::class,
-                $fileWithEnvManipulations,
-            ),
-        );
+    public function testPHPUnitTestsUsingEnvironmentVariablesDeclareThem(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                InfectionSelector::phpunitTestMissingEnvironmentVariable($this->reflectionProvider),
+            )
+            ->excluding(InfectionSelector::selectorFixtures())
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests exercising code that uses environment variables should declare them with WithEnvironmentVariable.');
     }
 }

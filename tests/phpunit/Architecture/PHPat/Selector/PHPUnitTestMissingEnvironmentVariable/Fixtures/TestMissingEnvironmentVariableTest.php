@@ -33,19 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestMissingEnvironmentVariable\Fixtures;
 
-final readonly class AnalysisResult
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(CoveredCodeUsingEnvironmentVariable::class)]
+final class TestMissingEnvironmentVariableTest extends TestCase
 {
-    public function __construct(
-        public bool $hasTrivialImplementation,
-        public bool $usesIo,
-        public bool $isAConcretePHPUnitTestCase,
-        public bool $hasCoversNothing,
-        public bool $belongsToIntegrationGroup,
-        public bool $declaresPublicNonReadonlyProperty,
-        /** @var list<string> */
-        public array $environmentVariables,
-    ) {
+    public function test_it_is_a_fixture(): void
+    {
+        $this->expectNotToPerformAssertions();
     }
 }
