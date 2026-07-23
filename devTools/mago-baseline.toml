@@ -1767,19 +1767,13 @@ count = 1
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Git\CommandLineGit::getChangedFileRelativePaths`: expected `non-empty-string`, but found `string`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Git\CommandLineGit::parseFilePathFromLine`: expected `string`, but found `null|string`.'
 count = 1
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "less-specific-nested-return-statement"
-message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
+message = '''Returned type `list<mixed>` is less specific than the declared return type `list<string>` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
 count = 1
 
 [[issues]]
@@ -7707,7 +7701,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_relative_paths_of_the_changed_files_as_a_string`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_relative_paths_of_the_changed_files`.'
 count = 1
 
 [[issues]]

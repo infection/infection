@@ -81,21 +81,19 @@ interface Git
      * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
      * compared to the base branch used and matching the given filter.
      *
-     * Returns a comma-separated list of the relative paths.
-     *
      * @param non-empty-string $diffFilter E.g. 'AM'.
      * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
      * @param non-empty-string[] $sourceDirectories
      *
      * @throws NoSourceFound
      *
-     * @return non-empty-string
+     * @return non-empty-list<non-empty-string>
      */
     public function getChangedFileRelativePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-    ): string;
+    ): array;
 
     /**
      * Gets the modifications with their line numbers of the files that changed compared to the base branch used and

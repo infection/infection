@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Git;
 
-use function explode;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
@@ -91,7 +90,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         );
     }
 
-    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
+    public function test_it_gets_the_relative_paths_of_the_changed_files(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
@@ -100,7 +99,6 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             self::COMMIT_REFERENCE,
             ['src/Git'],
         );
-        $paths = explode(',', $output);
 
         $expectedFiles = [
             'src/Git/CommandLineGit.php',
@@ -110,8 +108,8 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         foreach ($expectedFiles as $expectedFile) {
             $this->assertContains(
                 $expectedFile,
-                $paths,
-                implode("\n", $paths),
+                $output,
+                implode("\n", $output),
             );
         }
     }

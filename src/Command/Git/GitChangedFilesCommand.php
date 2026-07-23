@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command\Git;
 
-use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
@@ -102,13 +101,10 @@ final class GitChangedFilesCommand extends BaseCommand
             ),
         );
 
-        $files = explode(
-            ',',
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $container->getConfiguration()->source->directories,
-            ),
+        $files = $git->getChangedFileRelativePaths(
+            $sourceFilter->value,
+            $sourceFilter->base,
+            $container->getConfiguration()->source->directories,
         );
 
         $io->writeln($files);

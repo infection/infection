@@ -58,7 +58,7 @@ final readonly class ConfigurationFactoryGit implements Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-    ): string {
+    ): array {
         throw new DomainException('Not implemented.');
     }
 
