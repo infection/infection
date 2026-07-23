@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use function array_map;
 use function dirname;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
-use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -96,44 +94,17 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         GitDiffFilter $sourceFilter,
         array $sourceDirectories,
         string $configurationPathname,
-    ): ?PlainFilter {
+    ): PlainFilter {
         $workingDirectory = dirname($configurationPathname);
         Assert::stringNotEmpty($workingDirectory);
 
-        $filter = PlainFilter::tryToCreate(
-            $git->getChangedFileRelativePaths(
+        return new PlainFilter(
+            $git->getChangedFilePaths(
                 $sourceFilter->value,
                 $sourceFilter->base,
                 $sourceDirectories,
                 $workingDirectory,
             ),
         );
-
-        if ($filter === null) {
-            return null;
-        }
-
-        $absolutePaths = array_map(
-            static fn (string $path): string => self::makeAbsolutePath($workingDirectory, $path),
-            $filter->values,
-        );
-        Assert::notEmpty($absolutePaths);
-        Assert::allStringNotEmpty($absolutePaths);
-
-        return new PlainFilter($absolutePaths);
-    }
-
-    /**
-     * @param non-empty-string $workingDirectory
-     * @return non-empty-string
-     */
-    private static function makeAbsolutePath(string $workingDirectory, string $path): string
-    {
-        Assert::stringNotEmpty($path);
-
-        $absolutePath = Path::join($workingDirectory, $path);
-        Assert::stringNotEmpty($absolutePath);
-
-        return $absolutePath;
     }
 }

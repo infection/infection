@@ -52,6 +52,7 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(GitChangedLinesCommand::class)]
@@ -78,7 +79,7 @@ final class GitChangedLinesCommandTest extends TestCase
 
     /**
      * @param array<string, string> $arguments
-     * @param array<string, ChangedLinesRange[]> $changedLines
+     * @param array<string, list<ChangedLinesRange>> $changedLines
      */
     #[DataProvider('commandExecutionProvider')]
     public function test_it_outputs_changed_lines(
@@ -98,9 +99,9 @@ final class GitChangedLinesCommandTest extends TestCase
             ->with($expectedBase)
             ->willReturn(self::REFERENCE);
         $gitMock
-            ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with($expectedFilter, self::REFERENCE, self::SOURCE_DIRECTORIES)
-            ->willReturn($changedLines);
+            ->method('getChangedLinesRangesByFilePaths')
+            ->with($expectedFilter, self::REFERENCE, self::SOURCE_DIRECTORIES, self::FIXTURES_DIR)
+            ->willReturn(self::makePathsAbsolute($changedLines));
 
         $tester = $this->createCommandTester($gitMock);
 
@@ -273,6 +274,22 @@ final class GitChangedLinesCommandTest extends TestCase
         $command->setApplication($application);
 
         return new CommandTester($command);
+    }
+
+    /**
+     * @param array<string, list<ChangedLinesRange>> $changedLines
+     *
+     * @return array<string, list<ChangedLinesRange>>
+     */
+    private static function makePathsAbsolute(array $changedLines): array
+    {
+        $absoluteChangedLines = [];
+
+        foreach ($changedLines as $path => $lines) {
+            $absoluteChangedLines[Path::join(self::FIXTURES_DIR, $path)] = $lines;
+        }
+
+        return $absoluteChangedLines;
     }
 
     private function createSchemaConfiguration(): SchemaConfiguration

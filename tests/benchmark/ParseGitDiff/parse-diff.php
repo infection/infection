@@ -63,4 +63,4 @@ $git = new CommandLineGit($executorMock);
 /**
  * @return Closure(): positive-int|0
  */
-return static fn (): int => count($git->getChangedLinesRangesByFileRelativePaths('AM', 'unknown', [], __DIR__));
+return static fn (): int => count($git->getChangedLinesRangesByFilePaths('AM', 'unknown', [], __DIR__));

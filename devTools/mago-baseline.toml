@@ -169,6 +169,12 @@ message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceF
 count = 1
 
 [[issues]]
+file = "src/Command/Git/GitChangedFilesCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Command\Git\GitChangedFilesCommand::getFiles`.'
+count = 1
+
+[[issues]]
 file = "src/Command/Git/GitChangedLinesCommand.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\Command\Git\GitChangedLinesCommand::executeCommand`.'
@@ -1137,25 +1143,25 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:632:17}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:631:17}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:644:32}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:643:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:648:53}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:647:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:760:13}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:759:13}`.'
 count = 1
 
 [[issues]]
@@ -1335,25 +1341,25 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:632:17}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:631:17}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:644:32}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:643:32}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:648:53}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:647:53}`.'
 count = 1
 
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:760:13}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:759:13}`.'
 count = 1
 
 [[issues]]
@@ -1767,13 +1773,13 @@ count = 1
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Git\CommandLineGit::getChangedFileRelativePaths`: expected `non-empty-string`, but found `string`.'
+message = 'Invalid return type for function `Infection\Git\CommandLineGit::parseFilePathFromLine`: expected `string`, but found `null|string`.'
 count = 1
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Git\CommandLineGit::parseFilePathFromLine`: expected `string`, but found `null|string`.'
+code = "less-specific-nested-return-statement"
+message = '''Returned type `list{string, list<mixed>}` is less specific than the declared return type `array{0: string, 1: list<string>}` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
 count = 1
 
 [[issues]]
@@ -3052,12 +3058,6 @@ count = 1
 file = "src/Source/Collector/GitDiffSourceCollector.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Source\Collector\GitDiffSourceCollector::create`.'
-count = 1
-
-[[issues]]
-file = "src/Source/Matcher/GitDiffSourceLineMatcher.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Source\Matcher\GitDiffSourceLineMatcher::getFilesChangedLinesRanges`.'
 count = 1
 
 [[issues]]
@@ -7701,12 +7701,6 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_relative_paths_of_the_changed_files_as_a_string`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
 count = 1
 
@@ -7738,12 +7732,6 @@ count = 1
 file = "tests/phpunit/Git/CommandLineGitTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_get_the_changed_lines_ranges_by_files_relative_paths`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_gets_the_relative_paths_of_the_changed_files_as_a_string`.'
 count = 1
 
 [[issues]]

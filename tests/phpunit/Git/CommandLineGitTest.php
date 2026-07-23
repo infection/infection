@@ -81,7 +81,7 @@ final class CommandLineGitTest extends TestCase
 
         $this->expectException(NoSourceFound::class);
 
-        $this->git->getChangedFileRelativePaths('AM', 'master', ['src/'], '/project');
+        $this->git->getChangedFilePaths('AM', 'master', ['src/'], '/project');
     }
 
     public function test_it_gets_the_merge_base(): void
@@ -121,7 +121,8 @@ final class CommandLineGitTest extends TestCase
         $this->assertEquals($expectedRecords, $this->logger->records);
     }
 
-    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
+    /** @throws NoSourceFound */
+    public function test_it_gets_the_absolute_paths_of_the_changed_files(): void
     {
         $this->configureDiffCommands(
             [
@@ -145,12 +146,15 @@ final class CommandLineGitTest extends TestCase
                     project/my lib/B.php
                     EOF,
             ),
-            'project/',
+            '/repository',
         );
 
-        $expected = 'app/A.php,my lib/B.php';
+        $expected = [
+            '/repository/project/app/A.php',
+            '/repository/project/my lib/B.php',
+        ];
 
-        $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/'], '/project');
+        $actual = $this->git->getChangedFilePaths('AM', 'main', ['app/', 'my lib/'], '/project');
 
         $this->assertSame($expected, $actual);
     }
@@ -186,7 +190,7 @@ final class CommandLineGitTest extends TestCase
             $diff,
         );
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
+        $actual = $this->git->getChangedLinesRangesByFilePaths(
             'AM',
             'main',
             ['src', 'lib'],
@@ -194,7 +198,13 @@ final class CommandLineGitTest extends TestCase
         );
 
         if (!is_string($expected)) {
-            $this->assertEquals($expected, $actual);
+            $absoluteExpected = [];
+
+            foreach ($expected as $path => $changedLines) {
+                $absoluteExpected['/' . $path] = $changedLines;
+            }
+
+            $this->assertEquals($absoluteExpected, $actual);
         }
     }
 
@@ -691,7 +701,7 @@ final class CommandLineGitTest extends TestCase
     private function configureDiffCommands(
         array $diffCommand,
         string $diff,
-        string $workingDirectoryPrefix = '',
+        string $projectDirectory = '/',
     ): void {
         $commands = [
             [
@@ -699,11 +709,11 @@ final class CommandLineGitTest extends TestCase
                 '-C',
                 '/project',
                 'rev-parse',
-                '--show-prefix',
+                '--show-toplevel',
             ],
             $diffCommand,
         ];
-        $outputs = [$workingDirectoryPrefix, $diff];
+        $outputs = [$projectDirectory, $diff];
         $callIndex = 0;
 
         $this->commandLineMock

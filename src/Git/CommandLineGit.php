@@ -42,13 +42,13 @@ use function count;
 use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
-use Infection\Framework\Str;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
 use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use function Safe\preg_match;
+use function Safe\preg_split;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
@@ -84,44 +84,44 @@ final readonly class CommandLineGit implements Git
         return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
-    public function getChangedFileRelativePaths(
+    public function getChangedFilePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
         string $workingDirectory,
-    ): string {
-        [$workingDirectoryPrefix, $lines] = $this->diff(
+    ): array {
+        [$projectDirectory, $lines] = $this->diff(
             $diffFilter,
             $base,
             $sourceDirectories,
             $workingDirectory,
             nameOnly: true,
         );
-        $lines = self::makePathsRelativeToWorkingDirectory($lines, $workingDirectoryPrefix);
+        $paths = self::makePathsAbsolute($lines, $projectDirectory);
 
-        if (count($lines) === 0) {
+        if (count($paths) === 0) {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
-        return implode(',', $lines);
+        return $paths;
     }
 
-    public function getChangedLinesRangesByFileRelativePaths(
+    public function getChangedLinesRangesByFilePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
         string $workingDirectory,
     ): array {
-        [$workingDirectoryPrefix, $lines] = $this->diff(
+        [$projectDirectory, $lines] = $this->diff(
             $diffFilter,
             $base,
             $sourceDirectories,
             $workingDirectory,
             noContext: true,
         );
-        $changedLines = self::makeChangedPathsRelativeToWorkingDirectory(
+        $changedLines = self::makeChangedPathsAbsolute(
             self::parsedChangedLines($lines),
-            $workingDirectoryPrefix,
+            $projectDirectory,
         );
 
         if (count($changedLines) === 0) {
@@ -207,22 +207,27 @@ final readonly class CommandLineGit implements Git
     }
 
     /**
-     * @param string[] $paths
+     * @param list<string> $paths
      *
-     * @return string[]
+     * @return list<non-empty-string>
      */
-    private static function makePathsRelativeToWorkingDirectory(
+    private static function makePathsAbsolute(
         array $paths,
-        string $workingDirectoryPrefix,
+        string $projectDirectory,
     ): array {
-        if ($workingDirectoryPrefix === '') {
-            return $paths;
-        }
-
         return array_map(
-            static fn (string $path): string => Path::makeRelative($path, $workingDirectoryPrefix),
+            static fn (string $path): string => self::makePathAbsolute($projectDirectory, $path),
             $paths,
         );
+    }
+
+    /** @return non-empty-string */
+    private static function makePathAbsolute(string $projectDirectory, string $path): string
+    {
+        $absolutePath = Path::join($projectDirectory, $path);
+        Assert::stringNotEmpty($absolutePath);
+
+        return $absolutePath;
     }
 
     /**
@@ -230,18 +235,14 @@ final readonly class CommandLineGit implements Git
      *
      * @return array<string, list<ChangedLinesRange>>
      */
-    private static function makeChangedPathsRelativeToWorkingDirectory(
+    private static function makeChangedPathsAbsolute(
         array $changedLinesByPath,
-        string $workingDirectoryPrefix,
+        string $projectDirectory,
     ): array {
-        if ($workingDirectoryPrefix === '') {
-            return $changedLinesByPath;
-        }
-
         $result = [];
 
         foreach ($changedLinesByPath as $path => $changedLines) {
-            $result[Path::makeRelative($path, $workingDirectoryPrefix)] = $changedLines;
+            $result[Path::join($projectDirectory, $path)] = $changedLines;
         }
 
         return $result;
@@ -314,7 +315,7 @@ final readonly class CommandLineGit implements Git
     /**
      * @param string[] $sourceDirectories
      *
-     * @return array{string, string[]}
+     * @return array{string, list<string>}
      */
     private function diff(
         string $diffFilter,
@@ -324,12 +325,12 @@ final readonly class CommandLineGit implements Git
         bool $nameOnly = false,
         bool $noContext = false,
     ): array {
-        $workingDirectoryPrefix = $this->shellCommandLineExecutor->execute([
+        $projectDirectory = $this->shellCommandLineExecutor->execute([
             'git',
             '-C',
             $workingDirectory,
             'rev-parse',
-            '--show-prefix',
+            '--show-toplevel',
         ]);
 
         $command = [
@@ -355,12 +356,12 @@ final readonly class CommandLineGit implements Git
         );
 
         if ($diff === '') {
-            return [$workingDirectoryPrefix, []];
+            return [$projectDirectory, []];
         }
 
         return [
-            $workingDirectoryPrefix,
-            explode("\n", Str::toUnixLineEndings($diff)),
+            $projectDirectory,
+            preg_split('/\n|\r\n?/', $diff),
         ];
     }
 

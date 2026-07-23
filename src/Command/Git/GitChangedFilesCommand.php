@@ -35,16 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Command\Git;
 
+use function array_map;
 use function dirname;
-use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
+use Infection\Git\Git;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -103,18 +106,36 @@ final class GitChangedFilesCommand extends BaseCommand
             ),
         );
 
-        $files = explode(
-            ',',
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $container->getConfiguration()->source->directories,
-                dirname($container->getConfiguration()->configurationPathname),
-            ),
+        $files = self::getFiles(
+            $container->getConfiguration(),
+            $git,
+            $sourceFilter,
         );
 
         $io->writeln($files);
 
         return true;
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function getFiles(
+        Configuration $configuration,
+        Git $git,
+        GitDiffFilter $sourceFilter,
+    ): array {
+        $configurationDirectory = dirname($configuration->configurationPathname);
+        Assert::stringNotEmpty($configurationDirectory);
+
+        return array_map(
+            static fn (string $path): string => Path::makeRelative($path, $configurationDirectory),
+            $git->getChangedFilePaths(
+                $sourceFilter->value,
+                $sourceFilter->base,
+                $configuration->source->directories,
+                $configurationDirectory,
+            ),
+        );
     }
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Git;
 
+use function array_map;
 use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -51,6 +52,7 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(GitChangedFilesCommand::class)]
@@ -77,12 +79,13 @@ final class GitChangedFilesCommandTest extends TestCase
 
     /**
      * @param array<string, string> $arguments
+     * @param list<non-empty-string> $files
      */
     #[DataProvider('commandExecutionProvider')]
     public function test_it_outputs_changed_files(
         array $arguments,
         string $defaultBase,
-        string $files,
+        array $files,
         string $expectedBase,
         string $expectedFilter,
         string $expectedStdout,
@@ -96,9 +99,12 @@ final class GitChangedFilesCommandTest extends TestCase
             ->with($expectedBase)
             ->willReturn(self::REFERENCE);
         $gitMock
-            ->method('getChangedFileRelativePaths')
-            ->with($expectedFilter, self::REFERENCE, ['src', 'lib'])
-            ->willReturn($files);
+            ->method('getChangedFilePaths')
+            ->with($expectedFilter, self::REFERENCE, ['src', 'lib'], self::FIXTURES_DIR)
+            ->willReturn(array_map(
+                static fn (string $path): string => Path::join(self::FIXTURES_DIR, $path),
+                $files,
+            ));
 
         $tester = $this->createCommandTester($gitMock);
 
@@ -132,7 +138,7 @@ final class GitChangedFilesCommandTest extends TestCase
                 '--base' => 'origin/main',
             ],
             'defaultBase' => 'origin/default',
-            'files' => 'src/File1.php,src/File2.php',
+            'files' => ['src/File1.php', 'src/File2.php'],
             'expectedBase' => 'origin/main',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -155,7 +161,7 @@ final class GitChangedFilesCommandTest extends TestCase
         yield 'default base and default filter' => [
             [],
             'defaultBase' => 'origin/default',
-            'files' => 'tests/File1Test.php',
+            'files' => ['tests/File1Test.php'],
             'expectedBase' => 'origin/default',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -180,7 +186,7 @@ final class GitChangedFilesCommandTest extends TestCase
                 '--base' => '  feature/test  ',
             ],
             'defaultBase' => 'origin/default',
-            'files' => 'src/Test.php',
+            'files' => ['src/Test.php'],
             'expectedBase' => 'feature/test',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -204,7 +210,7 @@ final class GitChangedFilesCommandTest extends TestCase
                 '--filter' => '  D  ',
             ],
             'defaultBase' => 'origin/default',
-            'files' => 'src/Deleted.php',
+            'files' => ['src/Deleted.php'],
             'expectedBase' => 'origin/main',
             'expectedFilter' => 'D',
             'expectedStdout' => <<<STDOUT
@@ -225,7 +231,7 @@ final class GitChangedFilesCommandTest extends TestCase
         yield 'single file' => [
             [],
             'defaultBase' => 'origin/main',
-            'files' => 'src/SingleFile.php',
+            'files' => ['src/SingleFile.php'],
             'expectedBase' => 'origin/main',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT

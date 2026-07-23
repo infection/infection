@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Git;
 
-use function explode;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
@@ -97,28 +96,27 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         );
     }
 
-    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
+    /** @throws NoSourceFound */
+    public function test_it_gets_the_absolute_paths_of_the_changed_files(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
-        $output = $this->git->getChangedFileRelativePaths(
+        $output = $this->git->getChangedFilePaths(
             'AM',
             self::COMMIT_REFERENCE,
             ['src/Git'],
             $this->getWorkingDirectory(),
         );
-        $paths = explode(',', $output);
-
         $expectedFiles = [
-            'src/Git/CommandLineGit.php',
-            'src/Git/Git.php',
+            $this->cwd . '/src/Git/CommandLineGit.php',
+            $this->cwd . '/src/Git/Git.php',
         ];
 
         foreach ($expectedFiles as $expectedFile) {
             $this->assertContains(
                 $expectedFile,
-                $paths,
-                implode("\n", $paths),
+                $output,
+                implode("\n", $output),
             );
         }
     }
@@ -157,14 +155,17 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         $filesystem->dumpFile($projectDirectory . '/src/SourceClass.php', 'after');
         $filesystem->dumpFile($this->tmp . '/shared/SharedClass.php', 'after');
 
-        $actual = $this->git->getChangedFileRelativePaths(
+        $actual = $this->git->getChangedFilePaths(
             'M',
             'HEAD',
             ['src', '../shared'],
             $projectDirectory,
         );
 
-        $this->assertSame('src/SourceClass.php,../shared/SharedClass.php', $actual);
+        $this->assertSame([
+            $projectDirectory . '/src/SourceClass.php',
+            $this->tmp . '/shared/SharedClass.php',
+        ], $actual);
     }
 
     public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
@@ -188,7 +189,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             ),
         );
 
-        $this->git->getChangedFileRelativePaths(
+        $this->git->getChangedFilePaths(
             'AM',
             // This cannot be a correct revision.
             $badCommitReference,
@@ -201,30 +202,30 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
+        $actual = $this->git->getChangedLinesRangesByFilePaths(
             'AM',
             self::COMMIT_REFERENCE,
             ['src', 'tests'],
             $this->getWorkingDirectory(),
         );
 
-        $this->assertArrayHasKey('src/Git/Git.php', $actual);
-        $this->assertArrayHasKey('tests/phpunit/Git/CommandLineGitTest.php', $actual);
+        $this->assertArrayHasKey($this->cwd . '/src/Git/Git.php', $actual);
+        $this->assertArrayHasKey($this->cwd . '/tests/phpunit/Git/CommandLineGitTest.php', $actual);
     }
 
     public function test_it_get_the_changed_lines_excluding_the_files_that_are_not_part_of_the_source_directories(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
+        $actual = $this->git->getChangedLinesRangesByFilePaths(
             'AM',
             self::COMMIT_REFERENCE,
             ['src'],
             $this->getWorkingDirectory(),
         );
 
-        $this->assertArrayHasKey('src/Git/Git.php', $actual);
-        $this->assertArrayNotHasKey('tests/phpunit/Git/CommandLineGitTest.php', $actual);
+        $this->assertArrayHasKey($this->cwd . '/src/Git/Git.php', $actual);
+        $this->assertArrayNotHasKey($this->cwd . '/tests/phpunit/Git/CommandLineGitTest.php', $actual);
     }
 
     public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
@@ -248,7 +249,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             ),
         );
 
-        $this->git->getChangedLinesRangesByFileRelativePaths(
+        $this->git->getChangedLinesRangesByFilePaths(
             'AM',
             $badCommitReference,
             ['src'],
