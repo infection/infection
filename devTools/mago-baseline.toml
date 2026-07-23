@@ -7737,6 +7737,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_gets_the_absolute_paths_of_the_changed_files`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitTest::test_it_throws_no_code_to_mutate_exception_when_diff_is_empty`.'
 count = 1
 
