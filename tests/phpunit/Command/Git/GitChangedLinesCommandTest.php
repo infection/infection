@@ -59,8 +59,6 @@ final class GitChangedLinesCommandTest extends TestCase
 {
     private const string REFERENCE = 'xyz1234';
 
-    private const string CONFIGURATION_PATHNAME = '/configuration/infection.json5';
-
     private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     private const array SOURCE_DIRECTORIES = ['src', 'lib'];
@@ -80,7 +78,7 @@ final class GitChangedLinesCommandTest extends TestCase
 
     /**
      * @param array<string, string> $arguments
-     * @param array<string, list<ChangedLinesRange>> $changedLines
+     * @param array<string, ChangedLinesRange[]> $changedLines
      */
     #[DataProvider('commandExecutionProvider')]
     public function test_it_outputs_changed_lines(
@@ -100,13 +98,8 @@ final class GitChangedLinesCommandTest extends TestCase
             ->with($expectedBase)
             ->willReturn(self::REFERENCE);
         $gitMock
-            ->method('getChangedLinesRangesByFilePaths')
-            ->with(
-                $expectedFilter,
-                self::REFERENCE,
-                self::SOURCE_DIRECTORIES,
-                self::FIXTURES_DIR,
-            )
+            ->method('getChangedLinesRangesByFileRelativePaths')
+            ->with($expectedFilter, self::REFERENCE, self::SOURCE_DIRECTORIES)
             ->willReturn($changedLines);
 
         $tester = $this->createCommandTester($gitMock);
@@ -142,8 +135,8 @@ final class GitChangedLinesCommandTest extends TestCase
             ],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                self::FIXTURES_DIR . '/src/File1.php' => [ChangedLinesRange::create(1, 5), ChangedLinesRange::create(10, 15)],
-                self::FIXTURES_DIR . '/src/File2.php' => [ChangedLinesRange::create(20, 20)],
+                'src/File1.php' => [ChangedLinesRange::create(1, 5), ChangedLinesRange::create(10, 15)],
+                'src/File2.php' => [ChangedLinesRange::create(20, 20)],
             ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
@@ -170,7 +163,7 @@ final class GitChangedLinesCommandTest extends TestCase
             [],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                self::FIXTURES_DIR . '/tests/File1Test.php' => [ChangedLinesRange::create(1, 10)],
+                'tests/File1Test.php' => [ChangedLinesRange::create(1, 10)],
             ],
             'expectedBase' => 'origin/default',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
@@ -197,7 +190,7 @@ final class GitChangedLinesCommandTest extends TestCase
             ],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                self::FIXTURES_DIR . '/src/Test.php' => [ChangedLinesRange::create(1, 1)],
+                'src/Test.php' => [ChangedLinesRange::create(1, 1)],
             ],
             'expectedBase' => 'feature/test',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
@@ -223,7 +216,7 @@ final class GitChangedLinesCommandTest extends TestCase
             ],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                self::FIXTURES_DIR . '/src/Deleted.php' => [ChangedLinesRange::create(1, 100)],
+                'src/Deleted.php' => [ChangedLinesRange::create(1, 100)],
             ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => 'D',
@@ -285,7 +278,6 @@ final class GitChangedLinesCommandTest extends TestCase
     private function createSchemaConfiguration(): SchemaConfiguration
     {
         return SchemaConfigurationBuilder::withMinimalTestData()
-            ->withPathname(self::CONFIGURATION_PATHNAME)
             ->withSource(
                 new Source(
                     self::SOURCE_DIRECTORIES,
