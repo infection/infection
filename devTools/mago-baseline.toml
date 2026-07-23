@@ -5031,7 +5031,7 @@ count = 1
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/parse-diff.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:tests/benchmark/ParseGitDiff/parse-diff.php:66:8}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:tests/benchmark/ParseGitDiff/parse-diff.php:72:8}`.'
 count = 1
 
 [[issues]]
