@@ -54,20 +54,18 @@ final readonly class ConfigurationFactoryGit implements Git
         return $this->defaultBaseBranch;
     }
 
-    public function getChangedFilePaths(
+    public function getChangedFileRelativePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-        string $workingDirectory,
     ): array {
         throw new DomainException('Not implemented.');
     }
 
-    public function getChangedLinesRangesByFilePaths(
+    public function getChangedLinesRangesByFileRelativePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-        string $workingDirectory,
     ): never {
         throw new DomainException('Not implemented.');
     }

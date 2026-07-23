@@ -78,22 +78,21 @@ interface Git
     public function getDefaultBase(): string;
 
     /**
-     * Finds the absolute paths of the changed files compared to the base branch and matching the given filter.
+     * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
+     * compared to the base branch used and matching the given filter.
      *
      * @param non-empty-string $diffFilter E.g. 'AM'.
      * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
      * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string $workingDirectory Directory from which to interpret source paths.
      *
      * @throws NoSourceFound
      *
      * @return non-empty-list<non-empty-string>
      */
-    public function getChangedFilePaths(
+    public function getChangedFileRelativePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-        string $workingDirectory,
     ): array;
 
     /**
@@ -104,25 +103,23 @@ interface Git
      *
      * ```php
      * [
-     *     /path/to/project/src/File1.php => [ChangedLinesRange(1, 2)],
-     *     /path/to/project/src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
+     *     src/File1.php => [ChangedLinesRange(1, 2)],
+     *     src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
      * ]
      * ```
      *
      * @param non-empty-string $diffFilter E.g. 'AM'.
      * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
      * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string $workingDirectory Directory from which to interpret source paths.
      *
      * @throws NoSourceFound
      *
      * @return non-empty-array<string, list<ChangedLinesRange>>
      */
-    public function getChangedLinesRangesByFilePaths(
+    public function getChangedLinesRangesByFileRelativePaths(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-        string $workingDirectory,
     ): array;
 
     /**
