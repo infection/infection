@@ -221,7 +221,9 @@ final readonly class CommandLineGit implements Git
         );
     }
 
-    /** @return non-empty-string */
+    /**
+     * @return non-empty-string
+     */
     private static function makePathAbsolute(string $projectDirectory, string $path): string
     {
         $absolutePath = Path::join($projectDirectory, $path);

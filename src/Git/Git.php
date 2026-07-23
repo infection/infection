@@ -104,8 +104,8 @@ interface Git
      *
      * ```php
      * [
-     *     /project/src/File1.php => [ChangedLinesRange(1, 2)],
-     *     /project/src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
+     *     /path/to/project/src/File1.php => [ChangedLinesRange(1, 2)],
+     *     /path/to/project/src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
      * ]
      * ```
      *

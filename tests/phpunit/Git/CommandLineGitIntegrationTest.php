@@ -43,11 +43,11 @@ use Infection\Git\NoGitProjectFound;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
+use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -107,6 +107,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             ['src/Git'],
             $this->getWorkingDirectory(),
         );
+
         $expectedFiles = [
             $this->cwd . '/src/Git/CommandLineGit.php',
             $this->cwd . '/src/Git/Git.php',
@@ -131,9 +132,9 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     public function test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory(): void
     {
         $projectDirectory = $this->tmp . '/project';
-        $filesystem = new Filesystem();
-        $filesystem->dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
-        $filesystem->dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
+
+        FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
+        FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
 
         $executor = new ShellCommandLineExecutor();
         $executor->execute(['git', '-C', $this->tmp, 'init', '--quiet']);
@@ -152,8 +153,13 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             'baseline',
         ]);
 
-        $filesystem->dumpFile($projectDirectory . '/src/SourceClass.php', 'after');
-        $filesystem->dumpFile($this->tmp . '/shared/SharedClass.php', 'after');
+        FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'after');
+        FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'after');
+
+        $expected = [
+            $projectDirectory . '/src/SourceClass.php',
+            $this->tmp . '/shared/SharedClass.php',
+        ];
 
         $actual = $this->git->getChangedFilePaths(
             'M',
@@ -162,10 +168,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
             $projectDirectory,
         );
 
-        $this->assertSame([
-            $projectDirectory . '/src/SourceClass.php',
-            $this->tmp . '/shared/SharedClass.php',
-        ], $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
