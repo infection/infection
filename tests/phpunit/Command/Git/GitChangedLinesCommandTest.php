@@ -52,7 +52,6 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(GitChangedLinesCommand::class)]
@@ -101,7 +100,7 @@ final class GitChangedLinesCommandTest extends TestCase
         $gitMock
             ->method('getChangedLinesRangesByFilePaths')
             ->with($expectedFilter, self::REFERENCE, self::SOURCE_DIRECTORIES, self::FIXTURES_DIR)
-            ->willReturn(self::makePathsAbsolute($changedLines));
+            ->willReturn($changedLines);
 
         $tester = $this->createCommandTester($gitMock);
 
@@ -136,8 +135,8 @@ final class GitChangedLinesCommandTest extends TestCase
             ],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                'src/File1.php' => [ChangedLinesRange::create(1, 5), ChangedLinesRange::create(10, 15)],
-                'src/File2.php' => [ChangedLinesRange::create(20, 20)],
+                self::FIXTURES_DIR . '/src/File1.php' => [ChangedLinesRange::create(1, 5), ChangedLinesRange::create(10, 15)],
+                self::FIXTURES_DIR . '/src/File2.php' => [ChangedLinesRange::create(20, 20)],
             ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
@@ -164,7 +163,7 @@ final class GitChangedLinesCommandTest extends TestCase
             [],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                'tests/File1Test.php' => [ChangedLinesRange::create(1, 10)],
+                self::FIXTURES_DIR . '/tests/File1Test.php' => [ChangedLinesRange::create(1, 10)],
             ],
             'expectedBase' => 'origin/default',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
@@ -191,7 +190,7 @@ final class GitChangedLinesCommandTest extends TestCase
             ],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                'src/Test.php' => [ChangedLinesRange::create(1, 1)],
+                self::FIXTURES_DIR . '/src/Test.php' => [ChangedLinesRange::create(1, 1)],
             ],
             'expectedBase' => 'feature/test',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
@@ -217,7 +216,7 @@ final class GitChangedLinesCommandTest extends TestCase
             ],
             'defaultBase' => 'origin/default',
             'changedLines' => [
-                'src/Deleted.php' => [ChangedLinesRange::create(1, 100)],
+                self::FIXTURES_DIR . '/src/Deleted.php' => [ChangedLinesRange::create(1, 100)],
             ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => 'D',
@@ -274,22 +273,6 @@ final class GitChangedLinesCommandTest extends TestCase
         $command->setApplication($application);
 
         return new CommandTester($command);
-    }
-
-    /**
-     * @param array<string, list<ChangedLinesRange>> $changedLines
-     *
-     * @return array<string, list<ChangedLinesRange>>
-     */
-    private static function makePathsAbsolute(array $changedLines): array
-    {
-        $absoluteChangedLines = [];
-
-        foreach ($changedLines as $path => $lines) {
-            $absoluteChangedLines[Path::join(self::FIXTURES_DIR, $path)] = $lines;
-        }
-
-        return $absoluteChangedLines;
     }
 
     private function createSchemaConfiguration(): SchemaConfiguration

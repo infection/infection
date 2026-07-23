@@ -101,10 +101,12 @@ final class GitChangedFilesCommandTest extends TestCase
         $gitMock
             ->method('getChangedFilePaths')
             ->with($expectedFilter, self::REFERENCE, ['src', 'lib'], self::FIXTURES_DIR)
-            ->willReturn(array_map(
-                static fn (string $path): string => Path::join(self::FIXTURES_DIR, $path),
-                $files,
-            ));
+            ->willReturn(
+                array_map(
+                    static fn (string $path): string => Path::join(self::FIXTURES_DIR, $path),
+                    $files,
+                ),
+            );
 
         $tester = $this->createCommandTester($gitMock);
 
