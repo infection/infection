@@ -51,12 +51,15 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(GitChangedFilesCommand::class)]
 final class GitChangedFilesCommandTest extends TestCase
 {
     private const string REFERENCE = 'xyz1234';
+
+    private const string CONFIGURATION_PATHNAME = '/configuration/infection.json5';
 
     private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
@@ -77,7 +80,7 @@ final class GitChangedFilesCommandTest extends TestCase
 
     /**
      * @param array<string, string> $arguments
-     * @param non-empty-list<non-empty-string> $files
+     * @param list<string> $files
      */
     #[DataProvider('commandExecutionProvider')]
     public function test_it_outputs_changed_files(
@@ -97,8 +100,8 @@ final class GitChangedFilesCommandTest extends TestCase
             ->with($expectedBase)
             ->willReturn(self::REFERENCE);
         $gitMock
-            ->method('getChangedFileRelativePaths')
-            ->with($expectedFilter, self::REFERENCE, ['src', 'lib'])
+            ->method('getChangedFilePaths')
+            ->with($expectedFilter, self::REFERENCE, ['src', 'lib'], self::FIXTURES_DIR)
             ->willReturn($files);
 
         $tester = $this->createCommandTester($gitMock);
@@ -133,7 +136,10 @@ final class GitChangedFilesCommandTest extends TestCase
                 '--base' => 'origin/main',
             ],
             'defaultBase' => 'origin/default',
-            'files' => ['src/File1.php', 'src/File2.php'],
+            'files' => [
+                Path::canonicalize(self::FIXTURES_DIR . '/src/File1.php'),
+                Path::canonicalize(self::FIXTURES_DIR . '/src/File2.php'),
+            ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -156,7 +162,9 @@ final class GitChangedFilesCommandTest extends TestCase
         yield 'default base and default filter' => [
             [],
             'defaultBase' => 'origin/default',
-            'files' => ['tests/File1Test.php'],
+            'files' => [
+                Path::canonicalize(self::FIXTURES_DIR . '/tests/File1Test.php'),
+            ],
             'expectedBase' => 'origin/default',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -181,7 +189,9 @@ final class GitChangedFilesCommandTest extends TestCase
                 '--base' => '  feature/test  ',
             ],
             'defaultBase' => 'origin/default',
-            'files' => ['src/Test.php'],
+            'files' => [
+                Path::canonicalize(self::FIXTURES_DIR . '/src/Test.php'),
+            ],
             'expectedBase' => 'feature/test',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -205,7 +215,9 @@ final class GitChangedFilesCommandTest extends TestCase
                 '--filter' => '  D  ',
             ],
             'defaultBase' => 'origin/default',
-            'files' => ['src/Deleted.php'],
+            'files' => [
+                Path::canonicalize(self::FIXTURES_DIR . '/src/Deleted.php'),
+            ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => 'D',
             'expectedStdout' => <<<STDOUT
@@ -226,7 +238,9 @@ final class GitChangedFilesCommandTest extends TestCase
         yield 'single file' => [
             [],
             'defaultBase' => 'origin/main',
-            'files' => ['src/SingleFile.php'],
+            'files' => [
+                Path::canonicalize(self::FIXTURES_DIR . '/src/SingleFile.php'),
+            ],
             'expectedBase' => 'origin/main',
             'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
             'expectedStdout' => <<<STDOUT
@@ -289,6 +303,7 @@ final class GitChangedFilesCommandTest extends TestCase
     private function createSchemaConfiguration(): SchemaConfiguration
     {
         return SchemaConfigurationBuilder::withMinimalTestData()
+            ->withPathname(self::CONFIGURATION_PATHNAME)
             ->withSource(
                 new Source(
                     self::SOURCE_DIRECTORIES,
