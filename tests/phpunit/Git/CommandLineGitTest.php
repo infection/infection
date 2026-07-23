@@ -123,34 +123,30 @@ final class CommandLineGitTest extends TestCase
 
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
     {
-        $this->commandLineMock
-            ->method('execute')
-            ->with(
-                [
-                    'git',
-                    '-C',
-                    '/project',
-                    '--no-pager',
-                    'diff',
-                    'main',
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--relative',
-                    '--name-only',
-                    '--diff-filter=AM',
-                    '--',
-                    'app/',
-                    'my lib/',
-                ],
-            )
-            ->willReturn(
-                Str::toSystemLineEndings(
-                    <<<'EOF'
-                        app/A.php
-                        my lib/B.php
-                        EOF,
-                ),
-            );
+        $this->configureDiffCommands(
+            [
+                'git',
+                '-C',
+                '/project',
+                '--no-pager',
+                'diff',
+                'main',
+                '--no-ext-diff',
+                '--no-color',
+                '--name-only',
+                '--diff-filter=AM',
+                '--',
+                'app/',
+                'my lib/',
+            ],
+            Str::toSystemLineEndings(
+                <<<'EOF'
+                    project/app/A.php
+                    project/my lib/B.php
+                    EOF,
+            ),
+            'project/',
+        );
 
         $expected = 'app/A.php,my lib/B.php';
 
@@ -171,9 +167,8 @@ final class CommandLineGitTest extends TestCase
             $this->expectException($expected);
         }
 
-        $this->commandLineMock
-            ->method('execute')
-            ->with([
+        $this->configureDiffCommands(
+            [
                 'git',
                 '-C',
                 '/project',
@@ -182,14 +177,14 @@ final class CommandLineGitTest extends TestCase
                 'main',
                 '--no-ext-diff',
                 '--no-color',
-                '--relative',
                 '--unified=0',
                 '--diff-filter=AM',
                 '--',
                 'src',
                 'lib',
-            ])
-            ->willReturn($diff);
+            ],
+            $diff,
+        );
 
         $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
             'AM',
@@ -688,5 +683,36 @@ final class CommandLineGitTest extends TestCase
         $actual = $this->git->getProjectDirectory();
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param list<string> $diffCommand
+     */
+    private function configureDiffCommands(
+        array $diffCommand,
+        string $diff,
+        string $workingDirectoryPrefix = '',
+    ): void {
+        $commands = [
+            [
+                'git',
+                '-C',
+                '/project',
+                'rev-parse',
+                '--show-prefix',
+            ],
+            $diffCommand,
+        ];
+        $outputs = [$workingDirectoryPrefix, $diff];
+        $callIndex = 0;
+
+        $this->commandLineMock
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturnCallback(function (array $command) use (&$callIndex, $commands, $outputs): string {
+                $this->assertSame($commands[$callIndex], $command);
+
+                return $outputs[$callIndex++];
+            });
     }
 }

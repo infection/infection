@@ -1778,12 +1778,6 @@ count = 1
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
-code = "less-specific-nested-return-statement"
-message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
 code = "mixed-argument"
 message = 'Invalid argument type for argument #3 of `Safe\preg_match`: expected `array<array-key, string>|null`, but found `mixed`.'
 count = 2

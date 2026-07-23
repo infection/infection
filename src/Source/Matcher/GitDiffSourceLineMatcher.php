@@ -105,9 +105,11 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
         $changedLinesByAbsolutePaths = [];
 
         foreach ($changedLinesByRelativePaths as $relativeFilePath => $changedLines) {
-            $changedLinesByAbsolutePaths[$this->filesystem->realPath(
+            $realPath = $this->filesystem->realPath(
                 Path::join($this->workingDirectory, $relativeFilePath),
-            )] = $changedLines;
+            );
+
+            $changedLinesByAbsolutePaths[$realPath] = $changedLines;
         }
 
         return $changedLinesByAbsolutePaths;

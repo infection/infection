@@ -14,6 +14,10 @@ cleanup() {
     if [ -f "$TEST_DIRECTORY/server/src/SourceClass.php.original" ]; then
         mv "$TEST_DIRECTORY/server/src/SourceClass.php.original" "$TEST_DIRECTORY/server/src/SourceClass.php"
     fi
+
+    if [ -f "$TEST_DIRECTORY/shared/SharedClass.php.original" ]; then
+        mv "$TEST_DIRECTORY/shared/SharedClass.php.original" "$TEST_DIRECTORY/shared/SharedClass.php"
+    fi
 }
 
 trap cleanup EXIT
@@ -26,8 +30,11 @@ git add .
 git commit --quiet -m baseline
 
 cp server/src/SourceClass.php server/src/SourceClass.php.original
+cp shared/SharedClass.php shared/SharedClass.php.original
 sed -i.bak 's/return true;/return true; \/\/ Changed/' server/src/SourceClass.php
+sed -i.bak 's/return true;/return true; \/\/ Changed/' shared/SharedClass.php
 rm server/src/SourceClass.php.bak
+rm shared/SharedClass.php.bak
 
 run_infection() {
     local working_directory=$1

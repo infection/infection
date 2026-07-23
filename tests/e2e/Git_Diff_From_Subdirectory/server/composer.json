@@ -4,7 +4,8 @@
     },
     "autoload": {
         "psr-4": {
-            "GitDiffFromSubdirectory\\": "src/"
+            "GitDiffFromSubdirectory\\": "src/",
+            "GitDiffFromSubdirectory\\Shared\\": "../shared/"
         }
     },
     "autoload-dev": {

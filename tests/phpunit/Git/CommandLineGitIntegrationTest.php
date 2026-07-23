@@ -42,11 +42,16 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoGitProjectFound;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -116,6 +121,50 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
                 implode("\n", $paths),
             );
         }
+    }
+
+    /**
+     * @throws IOException
+     * @throws NoSourceFound
+     * @throws ProcessException
+     * @throws ProcessFailedException
+     * @throws ProcessTimedOutException
+     */
+    public function test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory(): void
+    {
+        $projectDirectory = $this->tmp . '/project';
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
+        $filesystem->dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
+
+        $executor = new ShellCommandLineExecutor();
+        $executor->execute(['git', '-C', $this->tmp, 'init', '--quiet']);
+        $executor->execute(['git', '-C', $this->tmp, 'add', '.']);
+        $executor->execute([
+            'git',
+            '-C',
+            $this->tmp,
+            '-c',
+            'user.name=Infection',
+            '-c',
+            'user.email=infection@infection.github.io',
+            'commit',
+            '--quiet',
+            '-m',
+            'baseline',
+        ]);
+
+        $filesystem->dumpFile($projectDirectory . '/src/SourceClass.php', 'after');
+        $filesystem->dumpFile($this->tmp . '/shared/SharedClass.php', 'after');
+
+        $actual = $this->git->getChangedFileRelativePaths(
+            'M',
+            'HEAD',
+            ['src', '../shared'],
+            $projectDirectory,
+        );
+
+        $this->assertSame('src/SourceClass.php,../shared/SharedClass.php', $actual);
     }
 
     public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void

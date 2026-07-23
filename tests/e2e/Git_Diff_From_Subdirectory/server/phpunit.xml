@@ -14,6 +14,7 @@
     <source>
         <include>
             <directory>src</directory>
+            <directory>../shared</directory>
         </include>
     </source>
 </phpunit>
