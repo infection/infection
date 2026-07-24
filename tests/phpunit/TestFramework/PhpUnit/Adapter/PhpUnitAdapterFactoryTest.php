@@ -54,7 +54,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/config-dir',
             '/path/to/junit.xml',
             '/path/to/project',
-            [],
+            ['src'],
             true,
             shellCommandLineExecutor: new ShellCommandLineExecutor(),
             sourceDirectoryBasePath: '/path/to/project',
