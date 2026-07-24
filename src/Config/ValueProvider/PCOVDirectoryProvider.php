@@ -57,7 +57,7 @@ use function Safe\ini_get;
 readonly class PCOVDirectoryProvider
 {
     // https://github.com/krakjoe/pcov/blob/57e143363aa6ba3c4d1e1b0a2e68556e28f38950/pcov.c#L80-L83
-    private const string DEFAULT_DIRECTORY = '.';
+    private const string DEFAULT_DIRECTORY = '';
 
     private ?string $phpConfiguredPcovDirectory;
 
