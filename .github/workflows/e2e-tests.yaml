@@ -24,6 +24,7 @@ jobs:
       contents: read
 
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ ubuntu-latest ]
         php-version: [ '8.3' ]
