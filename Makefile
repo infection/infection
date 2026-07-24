@@ -109,6 +109,16 @@ sbx-image-test:
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
 
+.PHONY: adr-index-update
+adr-index-update:	## Updates the ADR index in AGENTS.md
+adr-index-update: vendor
+	php devTools/update-adr-index.php
+
+.PHONY: adr-index-check
+adr-index-check:	## Checks that the ADR index in AGENTS.md is up to date
+adr-index-check: vendor
+	php devTools/update-adr-index.php --check
+
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
@@ -234,7 +244,7 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions $(if $(CI),,zizmor)
+autoreview: adr-index-check cs-check phpstan mago validate test-autoreview rector-check detect-collisions $(if $(CI),,zizmor)
 
 .PHONY: test
 test:		 	## Runs all the tests
