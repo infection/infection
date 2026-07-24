@@ -45,8 +45,10 @@ use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+#[Group('integration')]
 #[CoversClass(Factory::class)]
 final class FactoryTest extends TestCase
 {
