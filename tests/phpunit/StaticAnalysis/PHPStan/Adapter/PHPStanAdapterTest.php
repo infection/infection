@@ -90,7 +90,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], ['--configuration=/path/to/phpstan-config-path'])
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], ['--configuration=/path/to/phpstan-config-path'])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
         ;
 
@@ -120,7 +120,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 '--configuration=/path/to/phpstan-config-path',
                 '--memory-limit=1G',
             ])
@@ -154,7 +154,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 '--configuration=/path/to/phpstan-config-path',
                 '--memory-limit=-1',
                 '--no-progress',
@@ -190,7 +190,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 '--configuration=/path/to/phpstan-config-path',
                 '--memory-limit=2G',
                 '--level=max',
@@ -221,7 +221,7 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], ['--version'])
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], ['--version'])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--version'])
         ;
 
