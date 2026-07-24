@@ -139,6 +139,24 @@ parameters:
 			path: ../src/Container/Container.php
 
 		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 2
@@ -857,6 +875,24 @@ parameters:
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
+
+		-
+			rawMessage: Property Infection\TestFramework\Contracts\InitialRunResults::$output is never read
+			identifier: shipmonk.deadProperty.neverRead
+			count: 1
+			path: ../src/TestFramework/Contracts/InitialRunResults.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
+
+		-
+			rawMessage: Infection\TestFramework\Contracts\TestFramework should not depend on Infection\Process\MutantProcessContainer
+			identifier: phpat.testTestFrameworkContractsStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Contracts/TestFramework.php
 
 		-
 			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
@@ -1946,6 +1982,78 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method __construct() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method checkRequirements() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 2
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method executeInitialRun() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 5
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method getName() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Call to method test() of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: method.deprecatedClass
+			count: 2
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Instantiation of deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: new.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
+
+		-
+			rawMessage: '''
+				Return type of method Infection\Tests\TestFramework\LegacyTestFrameworkBridgeTest::createTestFramework() has typehint with deprecated class Infection\TestFramework\LegacyTestFrameworkBridge:
+				This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
+			'''
+			identifier: return.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/TestFramework/LegacyTestFrameworkBridgeTest.php
 
 		-
 			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
