@@ -86,6 +86,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notNull($shellCommandLineExecutor);
+        Assert::notNull($sourceDirectoryBasePath);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -97,22 +98,16 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkConfigDir,
         );
 
-        $sourceDirectoryBasePath ??= $projectDir;
-        $sourceDirectoryPaths = array_values(
-            array_map(
-                static fn (string $sourceDirectory): string => Path::makeAbsolute(
-                    $sourceDirectory,
-                    $sourceDirectoryBasePath,
-                ),
-                $sourceDirectories,
-            ),
-        );
-
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider($sourceDirectoryPaths),
+            new PCOVDirectoryProvider(
+                self::makeSourcePathsAbsolute(
+                    $sourceDirectoryBasePath,
+                    $sourceDirectories,
+                ),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
@@ -154,5 +149,25 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     *
+     * @return list<string>
+     */
+    private static function makeSourcePathsAbsolute(
+        string $sourceDirectoryBasePath,
+        array $sourceDirectories,
+    ): array {
+        return array_values(
+            array_map(
+                static fn (string $sourceDirectory): string => Path::makeAbsolute(
+                    $sourceDirectory,
+                    $sourceDirectoryBasePath,
+                ),
+                $sourceDirectories,
+            ),
+        );
     }
 }

@@ -37,6 +37,7 @@ namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use function Safe\ini_get;
@@ -44,45 +45,26 @@ use function Safe\ini_get;
 #[CoversClass(PCOVDirectoryProvider::class)]
 final class PCOVDirectoryProviderTest extends TestCase
 {
-    public function test_it_provides_a_directory_when_pcov_directory_is_unset(): void
-    {
-        $provider = new PCOVDirectoryProvider([], '');
+    /**
+     * @param list<string> $sourceDirectoryPaths
+     */
+    #[DataProvider('sourceDirectoryPathsProvider')]
+    public function test_it_provides_the_source_directory(
+        array $sourceDirectoryPaths,
+        string $expectedDirectory,
+        bool $expectedShouldProvide = true,
+        string $iniValue = '',
+    ): void {
+        $provider = new PCOVDirectoryProvider($sourceDirectoryPaths, $iniValue);
 
-        $this->assertTrue($provider->shouldProvide());
-        $this->assertSame('.', $provider->getDirectory());
-    }
-
-    public function test_it_provides_the_common_source_directory(): void
-    {
-        $provider = new PCOVDirectoryProvider(
-            [
-                '/project/server/src',
-                '/project/shared',
-            ],
-            '',
-        );
-
-        $this->assertSame('/project', $provider->getDirectory());
-    }
-
-    public function test_it_provides_the_parent_directory_for_one_source_file(): void
-    {
-        $provider = new PCOVDirectoryProvider(['/project/src'], '');
-
-        $this->assertSame('/project/src', $provider->getDirectory());
-    }
-
-    public function test_it_does_not_provide_a_directory_when_pcov_directory_is_configured(): void
-    {
-        $provider = new PCOVDirectoryProvider([], 'example');
-
-        $this->assertFalse($provider->shouldProvide());
+        $this->assertSame($expectedShouldProvide, $provider->shouldProvide());
+        $this->assertSame($expectedDirectory, $provider->getDirectory());
     }
 
     #[RequiresPhpExtension('pcov')]
     public function test_it_reads_pcov_directory_from_the_ini_configuration(): void
     {
-        $provider = new PCOVDirectoryProvider([], null);
+        $provider = new PCOVDirectoryProvider([]);
 
         // Note that `pcov.directory` is a `PHP_INI_SYSTEM | PHP_INI_PERDIR` so
         // it cannot be set at runtime.
@@ -92,5 +74,43 @@ final class PCOVDirectoryProviderTest extends TestCase
         $expected = ini_get('pcov.directory') === '';
 
         $this->assertSame($expected, $provider->shouldProvide());
+    }
+
+    public static function sourceDirectoryPathsProvider(): iterable
+    {
+        yield 'no source directory paths' => [
+            'sourceDirectoryPaths' => [],
+            'expectedDirectory' => '.',
+        ];
+
+        yield 'source directory paths with a common base path' => [
+            'sourceDirectoryPaths' => [
+                '/path/to/project/src',
+                '/path/to/project/packages/package-a/src',
+                '/path/to/project/packages/package-b/src',
+            ],
+            'expectedDirectory' => '/path/to/project',
+        ];
+
+        yield 'one source directory path' => [
+            'sourceDirectoryPaths' => ['/project/src'],
+            'expectedDirectory' => '/project/src',
+        ];
+
+        yield 'incompatible source directory paths' => [
+            'sourceDirectoryPaths' => [
+                '/project/src',
+                'relative/src',
+            ],
+            // TODO: this is incorrect... And we should issue a warning about this, or fail.
+            'expectedDirectory' => '.',
+        ];
+
+        yield 'configured PCOV directory' => [
+            'sourceDirectoryPaths' => [],
+            'expectedDirectory' => '.',
+            'expectedShouldProvide' => false,
+            'iniValue' => 'example',
+        ];
     }
 }
