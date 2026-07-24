@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
-use function escapeshellarg;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
@@ -126,7 +125,10 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             // all target source code in the coverage report.
             if ($this->pcovDirectoryProvider->shouldProvide()) {
                 $phpExtraArgs[] = '-d';
-                $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
+                $phpExtraArgs[] = sprintf(
+                    'pcov.directory=%s',
+                    $this->pcovDirectoryProvider->getDirectory(),
+                );
             }
         }
 
