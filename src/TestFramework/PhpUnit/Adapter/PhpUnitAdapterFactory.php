@@ -112,7 +112,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider($sourceDirectoryPaths, null),
+            new PCOVDirectoryProvider($sourceDirectoryPaths),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,

@@ -66,8 +66,8 @@ readonly class PCOVDirectoryProvider
      * @param list<string> $sourceDirectoryPaths
      */
     public function __construct(
-        private readonly array $sourceDirectoryPaths,
-        ?string $iniValue,
+        private array $sourceDirectoryPaths,
+        ?string $iniValue = null,
     ) {
         try {
             $this->phpConfiguredPcovDirectory = $iniValue ?? ini_get('pcov.directory');
@@ -88,8 +88,8 @@ readonly class PCOVDirectoryProvider
             return '.';
         }
 
-        return Path::getLongestCommonBasePath(
-            ...$this->sourceDirectoryPaths,
-        ) ?? '.';
+        $longestCommonBasePath = Path::getLongestCommonBasePath(...$this->sourceDirectoryPaths);
+
+        return $longestCommonBasePath ?? '.';
     }
 }
