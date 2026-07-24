@@ -44,8 +44,10 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Differ\ChangedLinesRange;
+use function Safe\getcwd;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**

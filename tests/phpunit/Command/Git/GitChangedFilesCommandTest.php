@@ -52,12 +52,15 @@ use function Safe\chdir;
 use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(GitChangedFilesCommand::class)]
 final class GitChangedFilesCommandTest extends TestCase
 {
     private const string REFERENCE = 'xyz1234';
+
+    private const string CONFIGURATION_PATHNAME = '/configuration/infection.json5';
 
     private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
@@ -78,7 +81,7 @@ final class GitChangedFilesCommandTest extends TestCase
 
     /**
      * @param array<string, string> $arguments
-     * @param non-empty-list<non-empty-string> $files
+     * @param list<string> $files
      */
     #[DataProvider('commandExecutionProvider')]
     public function test_it_outputs_changed_files(
@@ -301,6 +304,7 @@ final class GitChangedFilesCommandTest extends TestCase
     private function createSchemaConfiguration(): SchemaConfiguration
     {
         return SchemaConfigurationBuilder::withMinimalTestData()
+            ->withPathname(self::CONFIGURATION_PATHNAME)
             ->withSource(
                 new Source(
                     self::SOURCE_DIRECTORIES,

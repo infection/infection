@@ -35,10 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use function dirname;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -67,7 +69,12 @@ final readonly class GitDiffSourceCollector implements SourceCollector
                 $configurationPathname,
                 $sourceDirectories,
                 $excludedFilesOrDirectories,
-                self::convertToPlainFilter($git, $filter, $sourceDirectories),
+                self::convertToPlainFilter(
+                    $git,
+                    $filter,
+                    $sourceDirectories,
+                    $configurationPathname,
+                ),
             ),
         );
     }
@@ -86,12 +93,17 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         Git $git,
         GitDiffFilter $sourceFilter,
         array $sourceDirectories,
+        string $configurationPathname,
     ): PlainFilter {
+        $workingDirectory = dirname($configurationPathname);
+        Assert::stringNotEmpty($workingDirectory);
+
         return new PlainFilter(
-            $git->getChangedFileRelativePaths(
+            $git->getChangedFilePaths(
                 $sourceFilter->value,
                 $sourceFilter->base,
                 $sourceDirectories,
+                $workingDirectory,
             ),
         );
     }
