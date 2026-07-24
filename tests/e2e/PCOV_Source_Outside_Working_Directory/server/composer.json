@@ -1,0 +1,19 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "PCOVSourceOutsideWorkingDirectory\\": "src/",
+            "PCOVSourceOutsideWorkingDirectory\\Shared\\": "../shared/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PCOVSourceOutsideWorkingDirectory\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
