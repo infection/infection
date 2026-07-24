@@ -37,6 +37,7 @@ namespace Infection\Config\ValueProvider;
 
 use Safe\Exceptions\InfoException;
 use function Safe\ini_get;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * When used as the coverage driver, PCOV selects the first existing directory
@@ -61,8 +62,13 @@ readonly class PCOVDirectoryProvider
 
     private ?string $phpConfiguredPcovDirectory;
 
-    public function __construct(?string $iniValue = null)
-    {
+    /**
+     * @param list<string> $sourceDirectoryPaths
+     */
+    public function __construct(
+        private array $sourceDirectoryPaths,
+        ?string $iniValue = null,
+    ) {
         try {
             $this->phpConfiguredPcovDirectory = $iniValue ?? ini_get('pcov.directory');
         } catch (InfoException) {
@@ -78,7 +84,12 @@ readonly class PCOVDirectoryProvider
 
     public function getDirectory(): string
     {
-        // Returning CWD simplicity's sake.
-        return '.';
+        if ($this->sourceDirectoryPaths === []) {
+            return '.';
+        }
+
+        $longestCommonBasePath = Path::getLongestCommonBasePath(...$this->sourceDirectoryPaths);
+
+        return $longestCommonBasePath ?? '.';
     }
 }

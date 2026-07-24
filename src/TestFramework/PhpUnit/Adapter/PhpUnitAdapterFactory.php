@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\CannotBeInstantiated;
@@ -53,6 +54,7 @@ use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
@@ -80,9 +82,11 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?string $sourceDirectoryBasePath = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notNull($shellCommandLineExecutor);
+        Assert::notNull($sourceDirectoryBasePath);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -98,7 +102,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider(),
+            new PCOVDirectoryProvider(
+                self::makeSourcePathsAbsolute(
+                    $sourceDirectoryBasePath,
+                    $sourceDirectories,
+                ),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
@@ -140,5 +149,25 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     *
+     * @return list<string>
+     */
+    private static function makeSourcePathsAbsolute(
+        string $sourceDirectoryBasePath,
+        array $sourceDirectories,
+    ): array {
+        return array_values(
+            array_map(
+                static fn (string $sourceDirectory): string => Path::makeAbsolute(
+                    $sourceDirectory,
+                    $sourceDirectoryBasePath,
+                ),
+                $sourceDirectories,
+            ),
+        );
     }
 }
