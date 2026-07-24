@@ -38,6 +38,7 @@ namespace Infection\Config\ValueProvider;
 use Safe\Exceptions\InfoException;
 use function Safe\ini_get;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 /**
  * When used as the coverage driver, PCOV selects the first existing directory
@@ -90,6 +91,11 @@ readonly class PCOVDirectoryProvider
 
         $longestCommonBasePath = Path::getLongestCommonBasePath(...$this->sourceDirectoryPaths);
 
-        return $longestCommonBasePath ?? '.';
+        Assert::notNull(
+            $longestCommonBasePath,
+            'Cannot configure PCOV coverage: the source directories do not have a common filesystem root. Correct the source directories or configure the PHP ini setting `pcov.directory` explicitly.',
+        );
+
+        return $longestCommonBasePath;
     }
 }
