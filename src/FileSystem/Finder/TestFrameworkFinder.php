@@ -40,7 +40,7 @@ use function dirname;
 use function file_exists;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use const PATH_SEPARATOR;
