@@ -224,6 +224,7 @@ final class ParentConnectorTest extends VisitorTestCase
             'Expected a root node to not have any parent.',
         );
 
+        $this->expectException();
         $failure = $this->expectToThrow(
             static fn () => ParentConnector::getParent($functionNode),
         );

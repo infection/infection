@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -92,6 +93,7 @@ final readonly class Factory
                 $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
                 $this->shellCommandLineExecutor,
+                sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
             );
         }
 

@@ -47,20 +47,40 @@ final class PCOVDirectoryProviderTest extends TestCase
 {
     public function test_it_shall_provide_directory_for_default_value(): void
     {
-        $provider = new PCOVDirectoryProvider('');
+        $provider = new PCOVDirectoryProvider([], '');
         $this->assertTrue($provider->shallProvide());
         $this->assertSame('.', $provider->getDirectory());
     }
 
+    public function test_it_provides_the_common_source_directory(): void
+    {
+        $provider = new PCOVDirectoryProvider(
+            [
+                '/project/server/src',
+                '/project/shared',
+            ],
+            '',
+        );
+
+        $this->assertSame('/project', $provider->getDirectory());
+    }
+
+    public function test_it_provides_the_parent_directory_for_one_source_file(): void
+    {
+        $provider = new PCOVDirectoryProvider(['/project/src'], '');
+
+        $this->assertSame('/project/src', $provider->getDirectory());
+    }
+
     public function test_it_shall_not_provide_directory_for_non_default_value(): void
     {
-        $provider = new PCOVDirectoryProvider('example');
+        $provider = new PCOVDirectoryProvider([], 'example');
         $this->assertFalse($provider->shallProvide());
     }
 
     public function test_it_loads_current_value_from_environment(): void
     {
-        $provider = new PCOVDirectoryProvider();
+        $provider = new PCOVDirectoryProvider([], null);
 
         try {
             $this->assertSame(ini_get('pcov.directory') === '', $provider->shallProvide());

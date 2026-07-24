@@ -37,6 +37,7 @@ namespace Infection\Config\ValueProvider;
 
 use Safe\Exceptions\InfoException;
 use function Safe\ini_get;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Provides value for pcov.directory configuration option. Can be injected with a configuration object to provide a better, precise, value.
@@ -48,8 +49,13 @@ class PCOVDirectoryProvider
 {
     private ?string $phpConfiguredPcovDirectory = null;
 
-    public function __construct(?string $iniValue = null)
-    {
+    /**
+     * @param list<string> $sourceDirectoryPaths
+     */
+    public function __construct(
+        private readonly array $sourceDirectoryPaths,
+        ?string $iniValue,
+    ) {
         try {
             $this->phpConfiguredPcovDirectory = $iniValue ?? ini_get('pcov.directory');
         } catch (InfoException) {
@@ -67,7 +73,12 @@ class PCOVDirectoryProvider
 
     public function getDirectory(): string
     {
-        // Returning CWD simplicity's sake.
-        return '.';
+        if ($this->sourceDirectoryPaths === []) {
+            return '.';
+        }
+
+        return Path::getLongestCommonBasePath(
+            ...$this->sourceDirectoryPaths,
+        ) ?? '.';
     }
 }
