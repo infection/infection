@@ -3483,7 +3483,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "falsable-return-statement"
-message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:110:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
+message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:124:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
 count = 1
 
 [[issues]]
@@ -3495,7 +3495,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:110:21}`: expected `string`, but found `false|string`."
+message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:124:21}`: expected `string`, but found `false|string`."
 count = 1
 
 [[issues]]

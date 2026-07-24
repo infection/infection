@@ -46,15 +46,35 @@ final class PCOVDirectoryProviderTest extends TestCase
 {
     public function test_it_provides_a_directory_when_pcov_directory_is_unset(): void
     {
-        $provider = new PCOVDirectoryProvider('');
+        $provider = new PCOVDirectoryProvider([], '');
 
         $this->assertTrue($provider->shouldProvide());
         $this->assertSame('.', $provider->getDirectory());
     }
 
+    public function test_it_provides_the_common_source_directory(): void
+    {
+        $provider = new PCOVDirectoryProvider(
+            [
+                '/project/server/src',
+                '/project/shared',
+            ],
+            '',
+        );
+
+        $this->assertSame('/project', $provider->getDirectory());
+    }
+
+    public function test_it_provides_the_parent_directory_for_one_source_file(): void
+    {
+        $provider = new PCOVDirectoryProvider(['/project/src'], '');
+
+        $this->assertSame('/project/src', $provider->getDirectory());
+    }
+
     public function test_it_does_not_provide_a_directory_when_pcov_directory_is_configured(): void
     {
-        $provider = new PCOVDirectoryProvider('example');
+        $provider = new PCOVDirectoryProvider([], 'example');
 
         $this->assertFalse($provider->shouldProvide());
     }
@@ -62,7 +82,7 @@ final class PCOVDirectoryProviderTest extends TestCase
     #[RequiresPhpExtension('pcov')]
     public function test_it_reads_pcov_directory_from_the_ini_configuration(): void
     {
-        $provider = new PCOVDirectoryProvider();
+        $provider = new PCOVDirectoryProvider([], null);
 
         // Note that `pcov.directory` is a `PHP_INI_SYSTEM | PHP_INI_PERDIR` so
         // it cannot be set at runtime.

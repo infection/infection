@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\CannotBeInstantiated;
@@ -53,6 +54,7 @@ use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
@@ -80,6 +82,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?string $sourceDirectoryBasePath = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notNull($shellCommandLineExecutor);
@@ -94,11 +97,22 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkConfigDir,
         );
 
+        $sourceDirectoryBasePath ??= $projectDir;
+        $sourceDirectoryPaths = array_values(
+            array_map(
+                static fn (string $sourceDirectory): string => Path::makeAbsolute(
+                    $sourceDirectory,
+                    $sourceDirectoryBasePath,
+                ),
+                $sourceDirectories,
+            ),
+        );
+
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider(),
+            new PCOVDirectoryProvider($sourceDirectoryPaths, null),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
