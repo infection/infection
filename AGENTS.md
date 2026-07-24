@@ -90,8 +90,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
-- `adr/` - Architecture Decision Records; short rationale for standing conventions. Read
-  before challenging one. New ADRs must follow the template `adr/0000-template.md`. Keep jargon to a minimum (ASD-STE100) when writing.
+- `adr/` - Architecture Decision Records; short rationale for standing conventions. See
+  `## Suggest Architecture Decision Records` for when to read, update, or create one.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
@@ -102,19 +102,37 @@ transcluded here:
 
 @.github/CONTRIBUTING.md
 
-## Suggest ADRs for durable decisions
+## Suggest Architecture Decision Records (ADRs)
+
+`AGENTS.md` reflects the current outcomes agents usually need, so ADRs are mainly for
+durable rationale. Read an ADR when changing, challenging, or extending one of its decisions.
 
 When a task exposes an undocumented, durable choice about architecture, public API,
 dependencies, testing strategy, or a project-wide convention, tell the contributor that it
 is a candidate for an ADR. Suggest an ADR especially when credible alternatives exist or the
 same decision is likely to recur in reviews. First search `adr/`: update or supersede an
 existing decision instead of creating a competing record. Follow the criteria and workflow
-in `adr/README.md` and the template in `adr/0000-template.md`.
+in `adr/README.md` and the template in `adr/0000-template.md`. Keep jargon to a minimum
+(follow ASD-STE100) when writing.
 
 Suggest the ADR; do not expand the task by writing one unless the contributor asks for it.
 Do not suggest ADRs for implementation descriptions, subsystem invariants, contribution
 workflows, command lists, or one-off details. Put those in architecture documentation,
 contributor documentation, or code comments as appropriate.
+
+Current ADRs:
+
+<!-- adr-list:start -->
+- [`adr/0001-inheritdoc.md`](adr/0001-inheritdoc.md) - Inheritdoc usage
+- [`adr/0002-@covers-annotations.md`](adr/0002-@covers-annotations.md) - `@covers` annotations usage
+- [`adr/0003-PHPUnit-this-over-self.md`](adr/0003-PHPUnit-this-over-self.md) - Use `$this` instead of `self` for PHPUnit assertions
+- [`adr/0004-PHPUnit-expect-exception-over-try-catch.md`](adr/0004-PHPUnit-expect-exception-over-try-catch.md) - Use PHPUnit `expectException*()` API over `try-catch`
+- [`adr/0005-Bump-PHP-versions.md`](adr/0005-Bump-PHP-versions.md) - Bumping PHP version requirements
+- [`adr/0006-memoized-over-cached-nomenclature.md`](adr/0006-memoized-over-cached-nomenclature.md) - Use `Memoized` over `Cached` for object-local result reuse
+- [`adr/0007-declare-phpunit-coverage-metadata.md`](adr/0007-declare-phpunit-coverage-metadata.md) - Declare PHPUnit coverage metadata explicitly
+- [`adr/0008-PHP-version-support-policy.md`](adr/0008-PHP-version-support-policy.md) - PHP version support policy
+- [`adr/0010-compare-objects-with-assert-equals.md`](adr/0010-compare-objects-with-assert-equals.md) - Compare objects with PHPUnit `assertEquals()`
+<!-- adr-list:end -->
 
 ## Commands
 
