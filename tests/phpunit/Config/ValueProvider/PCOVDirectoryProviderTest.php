@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
-use function extension_loaded;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use Safe\Exceptions\InfoException;
 use function Safe\ini_get;
 
 #[CoversClass(PCOVDirectoryProvider::class)]
 final class PCOVDirectoryProviderTest extends TestCase
 {
-    public function test_it_shall_provide_directory_for_default_value(): void
+    public function test_it_provides_a_directory_when_pcov_directory_is_unset(): void
     {
         $provider = new PCOVDirectoryProvider([], '');
-        $this->assertTrue($provider->shallProvide());
+
+        $this->assertTrue($provider->shouldProvide());
         $this->assertSame('.', $provider->getDirectory());
     }
 
@@ -72,24 +72,25 @@ final class PCOVDirectoryProviderTest extends TestCase
         $this->assertSame('/project/src', $provider->getDirectory());
     }
 
-    public function test_it_shall_not_provide_directory_for_non_default_value(): void
+    public function test_it_does_not_provide_a_directory_when_pcov_directory_is_configured(): void
     {
         $provider = new PCOVDirectoryProvider([], 'example');
-        $this->assertFalse($provider->shallProvide());
+
+        $this->assertFalse($provider->shouldProvide());
     }
 
-    public function test_it_loads_current_value_from_environment(): void
+    #[RequiresPhpExtension('pcov')]
+    public function test_it_reads_pcov_directory_from_the_ini_configuration(): void
     {
         $provider = new PCOVDirectoryProvider([], null);
 
-        try {
-            $this->assertSame(ini_get('pcov.directory') === '', $provider->shallProvide());
-        } catch (InfoException $e) {
-            if (extension_loaded('pcov')) {
-                throw $e;
-            }
+        // Note that `pcov.directory` is a `PHP_INI_SYSTEM | PHP_INI_PERDIR` so
+        // it cannot be set at runtime.
+        // As a result, this test is a bit light, but being more thorough would
+        // be too expensive infrastructure-wise.
+        // See https://github.com/krakjoe/pcov/blob/57e143363aa6ba3c4d1e1b0a2e68556e28f38950/pcov.c#L80-L83
+        $expected = ini_get('pcov.directory') === '';
 
-            $this->markTestSkipped('Skipped without PCOV');
-        }
+        $this->assertSame($expected, $provider->shouldProvide());
     }
 }
