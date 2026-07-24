@@ -40,6 +40,7 @@ use Infection\Framework\InfectionVersion;
 use Infection\Testing\SingletonContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -49,6 +50,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[CoversClass(Application::class)]
+#[WithEnvironmentVariable('LINES')]
+#[WithEnvironmentVariable('COLUMNS')]
+#[WithEnvironmentVariable('SHELL_VERBOSITY')]
 final class ApplicationTest extends TestCase
 {
     public function test_it_uses_the_infection_version(): void

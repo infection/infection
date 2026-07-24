@@ -44,12 +44,12 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\MockObject\Stub;
 use RuntimeException;
 use function Safe\chdir;
@@ -68,10 +68,10 @@ use Symfony\Component\Filesystem\Path;
  */
 #[Group('integration')]
 #[CoversClass(TestFrameworkFinder::class)]
+#[WithEnvironmentVariable('PATH', '')]
+#[WithEnvironmentVariable('PATHEXT')]
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
-    use BacksUpEnvironmentVariables;
-
     private static string $pathName;
 
     private Filesystem $fileSystem;
@@ -90,8 +90,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     protected function setUp(): void
     {
-        $this->backupEnvironmentVariables();
-
         parent::setUp();
 
         // This test relies on the current working directory to be the project
@@ -105,13 +103,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             ->willReturn(['/usr/bin/composer']);
 
         $this->shellCommandLineExecutor = new ShellCommandLineExecutor();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_can_load_a_custom_path(): void
