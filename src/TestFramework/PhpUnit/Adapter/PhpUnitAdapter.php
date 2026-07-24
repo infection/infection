@@ -122,7 +122,9 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
                 ),
             );
 
-            if ($this->pcovDirectoryProvider->shallProvide()) {
+            // PCOV may require an adjusted `pcov.directory` setting to include
+            // all target source code in the coverage report.
+            if ($this->pcovDirectoryProvider->shouldProvide()) {
                 $phpExtraArgs[] = '-d';
                 $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
             }
