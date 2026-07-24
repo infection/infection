@@ -59,6 +59,8 @@ final class GitChangedLinesCommandTest extends TestCase
 {
     private const string REFERENCE = 'xyz1234';
 
+    private const string CONFIGURATION_PATHNAME = '/configuration/infection.json5';
+
     private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     private const array SOURCE_DIRECTORIES = ['src', 'lib'];
@@ -99,7 +101,12 @@ final class GitChangedLinesCommandTest extends TestCase
             ->willReturn(self::REFERENCE);
         $gitMock
             ->method('getChangedLinesRangesByFilePaths')
-            ->with($expectedFilter, self::REFERENCE, self::SOURCE_DIRECTORIES, self::FIXTURES_DIR)
+            ->with(
+                $expectedFilter,
+                self::REFERENCE,
+                self::SOURCE_DIRECTORIES,
+                self::FIXTURES_DIR,
+            )
             ->willReturn($changedLines);
 
         $tester = $this->createCommandTester($gitMock);
@@ -278,6 +285,7 @@ final class GitChangedLinesCommandTest extends TestCase
     private function createSchemaConfiguration(): SchemaConfiguration
     {
         return SchemaConfigurationBuilder::withMinimalTestData()
+            ->withPathname(self::CONFIGURATION_PATHNAME)
             ->withSource(
                 new Source(
                     self::SOURCE_DIRECTORIES,

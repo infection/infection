@@ -46,7 +46,6 @@ use Infection\Console\IO;
 use Infection\Differ\ChangedLinesRange;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -105,17 +104,16 @@ final class GitChangedLinesCommand extends BaseCommand
             ),
         );
 
-        $configurationDirectory = dirname($container->getConfiguration()->configurationPathname);
-        Assert::stringNotEmpty($configurationDirectory);
+        $workingDirectory = getcwd();
 
         $changedLines = $git->getChangedLinesRangesByFilePaths(
             $sourceFilter->value,
             $sourceFilter->base,
             $container->getConfiguration()->source->directories,
-            $configurationDirectory,
+            $workingDirectory,
         );
 
-        self::printChangedLines($changedLines, $configurationDirectory, $io);
+        self::printChangedLines($changedLines, $workingDirectory, $io);
 
         return true;
     }
@@ -125,11 +123,11 @@ final class GitChangedLinesCommand extends BaseCommand
      */
     private static function printChangedLines(
         array $changedLines,
-        string $configurationDirectory,
+        string $workingDirectory,
         OutputInterface $output,
     ): void {
         foreach ($changedLines as $file => $fileChangedLines) {
-            $relativePath = Path::makeRelative($file, $configurationDirectory);
+            $relativePath = Path::makeRelative($file, $workingDirectory);
 
             foreach ($fileChangedLines as $fileChangedLine) {
                 $output->writeln(
