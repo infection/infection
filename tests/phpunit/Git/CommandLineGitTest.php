@@ -40,6 +40,7 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Process\CompletedProcess;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\Process\Exception\GenericProcessException;
@@ -77,7 +78,7 @@ final class CommandLineGitTest extends TestCase
     {
         $this->commandLineMock
             ->method('execute')
-            ->willReturn('');
+            ->willReturn(self::completedProcess(''));
 
         $this->expectException(NoSourceFound::class);
 
@@ -91,7 +92,7 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('execute')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
-            ->willReturn($expected);
+            ->willReturn(self::completedProcess($expected));
 
         $actual = $this->git->getBaseReference('main');
 
@@ -140,14 +141,14 @@ final class CommandLineGitTest extends TestCase
                     'my lib/',
                 ],
             )
-            ->willReturn(
+            ->willReturn(self::completedProcess(
                 Str::toSystemLineEndings(
                     <<<'EOF'
                         app/A.php
                         my lib/B.php
                         EOF,
                 ),
-            );
+            ));
 
         $expected = ['app/A.php', 'my lib/B.php'];
 
@@ -183,7 +184,7 @@ final class CommandLineGitTest extends TestCase
                 'src',
                 'lib',
             ])
-            ->willReturn($diff);
+            ->willReturn(self::completedProcess($diff));
 
         $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
             'AM',
@@ -627,7 +628,7 @@ final class CommandLineGitTest extends TestCase
         if (is_string($shellOutputOrException)) {
             $this->commandLineMock
                 ->method('execute')
-                ->willReturn($shellOutputOrException);
+                ->willReturn(self::completedProcess($shellOutputOrException));
         } else {
             $expectedRecords[] = [
                 'level' => LogLevel::INFO,
@@ -676,10 +677,15 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->once())
             ->method('execute')
-            ->willReturn($expected);
+            ->willReturn(self::completedProcess($expected));
 
         $actual = $this->git->getProjectDirectory();
 
         $this->assertSame($expected, $actual);
+    }
+
+    private static function completedProcess(string $stdout): CompletedProcess
+    {
+        return new CompletedProcess([], 0, $stdout, '');
     }
 }

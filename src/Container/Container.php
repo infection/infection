@@ -555,6 +555,7 @@ final class Container extends DIContainer
             ),
             InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
                 $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getShellCommandLineExecutor(),
                 $container->getEventDispatcher(),
             ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
@@ -605,6 +606,10 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            AdapterInstaller::class => static fn (self $container): AdapterInstaller => new AdapterInstaller(
+                $container->getComposerExecutableFinder(),
+                $container->getShellCommandLineExecutor(),
+            ),
             Git::class => static fn (self $container): Git => new CommandLineGit(
                 new ShellCommandLineExecutor(),
                 $container->getLogger(),
