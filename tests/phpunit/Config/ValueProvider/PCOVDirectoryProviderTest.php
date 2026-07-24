@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -76,6 +77,24 @@ final class PCOVDirectoryProviderTest extends TestCase
         $this->assertSame($expected, $provider->shouldProvide());
     }
 
+    public function test_it_throws_when_the_source_directories_do_not_have_a_common_filesystem_root(): void
+    {
+        $provider = new PCOVDirectoryProvider(
+            [
+                '/project/src',
+                'relative/src',
+            ],
+            '',
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot configure PCOV coverage: the source directories do not have a common filesystem root. Correct the source directories or configure "pcov.directory" explicitly.',
+        );
+
+        $provider->getDirectory();
+    }
+
     public static function sourceDirectoryPathsProvider(): iterable
     {
         yield 'no source directory paths' => [
@@ -95,15 +114,6 @@ final class PCOVDirectoryProviderTest extends TestCase
         yield 'one source directory path' => [
             'sourceDirectoryPaths' => ['/project/src'],
             'expectedDirectory' => '/project/src',
-        ];
-
-        yield 'incompatible source directory paths' => [
-            'sourceDirectoryPaths' => [
-                '/project/src',
-                'relative/src',
-            ],
-            // TODO: this is incorrect... And we should issue a warning about this, or fail.
-            'expectedDirectory' => '.',
         ];
 
         yield 'configured PCOV directory' => [
