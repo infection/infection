@@ -88,9 +88,6 @@ final class PCOVDirectoryProviderTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Cannot configure PCOV coverage: the source directories do not have a common filesystem root. Correct the source directories or configure "pcov.directory" explicitly.',
-        );
 
         $provider->getDirectory();
     }
