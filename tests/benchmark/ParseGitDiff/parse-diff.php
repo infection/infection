@@ -55,11 +55,17 @@ $executorMock = new class($diff, __DIR__) extends ShellCommandLineExecutor {
 
     public function execute(array $command): string
     {
-        if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
-            return $this->workingDirectory;
-        }
+        $isFindRepositoryRootCommand = $command === [
+            'git',
+            '-C',
+            $this->workingDirectory,
+            'rev-parse',
+            '--show-toplevel',
+        ];
 
-        return $this->diff;
+        return $isFindRepositoryRootCommand
+            ? $this->workingDirectory
+            : $this->diff;
     }
 };
 

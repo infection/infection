@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Git;
 
-use function array_map;
 use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -102,7 +101,12 @@ final class GitChangedFilesCommandTest extends TestCase
             ->willReturn(self::REFERENCE);
         $gitMock
             ->method('getChangedFilePaths')
-            ->with($expectedFilter, self::REFERENCE, ['src', 'lib'], self::FIXTURES_DIR)
+            ->with(
+                $expectedFilter,
+                self::REFERENCE,
+                ['src', 'lib'],
+                self::FIXTURES_DIR,
+            )
             ->willReturn($files);
 
         $tester = $this->createCommandTester($gitMock);
@@ -260,6 +264,41 @@ final class GitChangedFilesCommandTest extends TestCase
 
                 DISPLAY,
         ];
+    }
+
+    public function test_it_outputs_paths_relative_to_the_current_working_directory(): void
+    {
+        chdir(__DIR__);
+
+        $gitMock = $this->createMock(Git::class);
+        $gitMock->method('getDefaultBase')->willReturn('origin/main');
+        $gitMock
+            ->method('getBaseReference')
+            ->with('origin/main')
+            ->willReturn(self::REFERENCE);
+        $gitMock
+            ->method('getChangedFilePaths')
+            ->with(
+                Git::DEFAULT_GIT_DIFF_FILTER,
+                self::REFERENCE,
+                self::SOURCE_DIRECTORIES,
+                self::FIXTURES_DIR,
+            )
+            ->willReturn([self::FIXTURES_DIR . '/src/File1.php']);
+
+        $tester = $this->createCommandTester($gitMock);
+
+        $tester->execute(
+            [
+                '--configuration' => self::FIXTURES_DIR . '/infection.json5',
+            ],
+            [
+                'capture_stderr_separately' => true,
+            ],
+        );
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame("Fixtures/src/File1.php\n", $tester->getDisplay(normalize: true));
     }
 
     public function test_it_rejects_blank_base_option(): void

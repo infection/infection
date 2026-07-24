@@ -46,6 +46,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Git\Git;
+use function Safe\getcwd;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
@@ -63,7 +64,7 @@ final class GitChangedFilesCommand extends BaseCommand
     protected function configure(): void
     {
         $this->setDescription(
-            'Finds the list of relative paths (relative to the configuration directory) of the changed files that changed compared to the base branch used and matching the given filter.',
+            'Finds the list of relative paths (relative to the current working directory) of the changed files that changed compared to the base branch used and matching the given filter.',
         );
 
         ConfigurationOption::addOption($this);
@@ -128,8 +129,10 @@ final class GitChangedFilesCommand extends BaseCommand
         $configurationDirectory = dirname($configuration->configurationPathname);
         Assert::stringNotEmpty($configurationDirectory);
 
+        $workingDirectory = getcwd();
+
         return array_map(
-            static fn (string $path): string => Path::makeRelative($path, $configurationDirectory),
+            static fn (string $path): string => Path::makeRelative($path, $workingDirectory),
             $git->getChangedFilePaths(
                 $sourceFilter->value,
                 $sourceFilter->base,

@@ -5031,7 +5031,7 @@ count = 1
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/parse-diff.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:tests/benchmark/ParseGitDiff/parse-diff.php:72:8}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:tests/benchmark/ParseGitDiff/parse-diff.php:78:8}`.'
 count = 1
 
 [[issues]]
@@ -5626,6 +5626,12 @@ count = 1
 file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitChangedFilesCommandTest::test_it_outputs_changed_files`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/Git/GitChangedFilesCommandTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\Git\GitChangedFilesCommandTest::test_it_outputs_paths_relative_to_the_current_working_directory`.'
 count = 1
 
 [[issues]]
@@ -7701,13 +7707,49 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_absolute_paths_of_the_changed_files`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessFailedException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::checkIfCommitReferenceExists`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory`.'
 count = 1
 
 [[issues]]

@@ -80,23 +80,13 @@ final class GitDiffSourceLineMatcher implements SourceLineMatcher
      */
     private function getChangedLinesRanges(string $fileRealPath): array
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->getFilesChangedLinesRanges();
-
-        return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
-    }
-
-    /**
-     * @throws NoSourceFound
-     *
-     * @return array<string, list<ChangedLinesRange>>
-     */
-    private function getFilesChangedLinesRanges(): array
-    {
-        return $this->git->getChangedLinesRangesByFilePaths(
+        $this->memoizedFilesChangedLinesMap ??= $this->git->getChangedLinesRangesByFilePaths(
             $this->gitDiffFilter,
             $this->gitDiffBase,
             $this->sourceDirectories,
             $this->workingDirectory,
         );
+
+        return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
     }
 }

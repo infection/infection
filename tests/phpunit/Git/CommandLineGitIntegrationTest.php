@@ -41,16 +41,12 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoGitProjectFound;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -96,7 +92,6 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         );
     }
 
-    /** @throws NoSourceFound */
     public function test_it_gets_the_absolute_paths_of_the_changed_files(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
@@ -122,13 +117,6 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         }
     }
 
-    /**
-     * @throws IOException
-     * @throws NoSourceFound
-     * @throws ProcessException
-     * @throws ProcessFailedException
-     * @throws ProcessTimedOutException
-     */
     public function test_it_gets_changed_files_from_a_source_directory_outside_the_working_directory(): void
     {
         $projectDirectory = $this->tmp . '/project';
