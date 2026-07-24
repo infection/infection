@@ -43,8 +43,10 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Differ\ChangedLinesRange;
+use function Safe\getcwd;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -103,13 +105,16 @@ final class GitChangedLinesCommand extends BaseCommand
             ),
         );
 
-        $changedLines = $git->getChangedLinesRangesByFileRelativePaths(
+        $workingDirectory = getcwd();
+
+        $changedLines = $git->getChangedLinesRangesByFilePaths(
             $sourceFilter->value,
             $sourceFilter->base,
             $container->getConfiguration()->source->directories,
+            $workingDirectory,
         );
 
-        self::printChangedLines($changedLines, $io);
+        self::printChangedLines($changedLines, $workingDirectory, $io);
 
         return true;
     }
@@ -119,14 +124,17 @@ final class GitChangedLinesCommand extends BaseCommand
      */
     private static function printChangedLines(
         array $changedLines,
+        string $workingDirectory,
         OutputInterface $output,
     ): void {
         foreach ($changedLines as $file => $fileChangedLines) {
+            $relativePath = Path::makeRelative($file, $workingDirectory);
+
             foreach ($fileChangedLines as $fileChangedLine) {
                 $output->writeln(
                     sprintf(
                         '%s: [%s,%s]',
-                        $file,
+                        $relativePath,
                         $fileChangedLine->startLine,
                         $fileChangedLine->endLine,
                     ),

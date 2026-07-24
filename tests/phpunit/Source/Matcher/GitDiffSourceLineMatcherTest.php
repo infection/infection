@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Source\Matcher;
 
 use Infection\Differ\ChangedLinesRange;
-use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -50,26 +49,14 @@ use function sprintf;
 #[CoversClass(GitDiffSourceLineMatcher::class)]
 final class GitDiffSourceLineMatcherTest extends TestCase
 {
-    private FileSystem&MockObject $fileSystemStub;
-
-    protected function setUp(): void
-    {
-        $this->fileSystemStub = $this->createMock(FileSystem::class);
-        $this->fileSystemStub
-            ->method('realPath')
-            ->willReturnCallback(
-                static fn (string $path): string => '/path/to/' . $path,
-            );
-    }
-
     public function test_it_memoizes_parsed_results(): void
     {
         $matcher = new GitDiffSourceLineMatcher(
             $this->createGitStub([]),
-            $this->fileSystemStub,
             'main',
             'AM',
             ['src', 'lib'],
+            '/path/to',
         );
 
         $matcher->touches('/path/to/File.php', 1, 1);
@@ -93,10 +80,10 @@ final class GitDiffSourceLineMatcherTest extends TestCase
     ): void {
         $matcher = new GitDiffSourceLineMatcher(
             $this->createGitStub($changedLinesRangesByFilePathname),
-            $this->fileSystemStub,
             'main',
             'AM',
             ['src', 'lib'],
+            '/path/to',
         );
 
         $actual = $matcher->touches(
@@ -116,7 +103,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
     {
         yield 'the mutation touches no changed line' => [
             [
-                'src/File.php' => [ChangedLinesRange::forLine(3)],
+                '/path/to/src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             1,
@@ -126,7 +113,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
 
         yield 'the mutation touches a changed line' => [
             [
-                'src/File.php' => [ChangedLinesRange::forLine(3)],
+                '/path/to/src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             2,
@@ -136,7 +123,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
 
         yield 'the mutation touches none of the changed lines' => [
             [
-                'src/File1.php' => [
+                '/path/to/src/File1.php' => [
                     ChangedLinesRange::forLine(10),
                     ChangedLinesRange::create(30, 50),
                 ],
@@ -149,7 +136,7 @@ final class GitDiffSourceLineMatcherTest extends TestCase
 
         yield 'the mutation touches one of the changed lines' => [
             [
-                'src/File1.php' => [
+                '/path/to/src/File1.php' => [
                     ChangedLinesRange::forLine(10),
                     ChangedLinesRange::create(30, 50),
                 ],
@@ -162,11 +149,11 @@ final class GitDiffSourceLineMatcherTest extends TestCase
 
         yield 'the mutation touches one of the changed lines of a different file' => [
             [
-                'src/File1.php' => [
+                '/path/to/src/File1.php' => [
                     ChangedLinesRange::forLine(10),
                     ChangedLinesRange::create(30, 50),
                 ],
-                'src/File2.php' => [
+                '/path/to/src/File2.php' => [
                     ChangedLinesRange::create(1, 1),
                     ChangedLinesRange::create(3, 5),
                 ],
@@ -187,8 +174,8 @@ final class GitDiffSourceLineMatcherTest extends TestCase
         $git = $this->createMock(Git::class);
         $git
             ->expects($this->once())
-            ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'main', ['src', 'lib'])
+            ->method('getChangedLinesRangesByFilePaths')
+            ->with('AM', 'main', ['src', 'lib'], '/path/to')
             ->willReturn($changedLinesRangesByFilePathname);
 
         return $git;

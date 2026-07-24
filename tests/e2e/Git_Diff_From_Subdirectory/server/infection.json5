@@ -1,0 +1,21 @@
+{
+    "$schema": "../../../../resources/schema.json",
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src",
+            "../shared"
+        ]
+    },
+    "logs": {
+        "summary": ".var/infection.log"
+    },
+    "phpUnit": {
+        "customPath": "vendor/bin/phpunit"
+    },
+    "mutators": {
+        "TrueValue": true
+    },
+    "tmpDir": ".var/infection-tmp"
+}
