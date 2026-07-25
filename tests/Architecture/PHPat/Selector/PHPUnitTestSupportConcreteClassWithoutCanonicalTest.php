@@ -37,7 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use function in_array;
 use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use Infection\Tests\FileSystem\Finder\MockVendor;
 use Infection\Tests\Framework\Iterable\GeneratorFactory\SimpleIteratorAggregate;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
@@ -85,7 +85,7 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
     public function matches(ClassReflection $classReflection): bool
     {
         if (
-            !ConcreteClassReflection::isConcreteClass($classReflection)
+            !ClassReflectionPredicates::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
             || InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)

@@ -33,32 +33,8 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Architecture\PHPat\Selector;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicatesTest\Fixtures;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
-use PHPat\Selector\SelectorInterface;
-use PHPStan\Reflection\ClassReflection;
-
-final class ClassWithNoArgumentPrivateConstructor implements SelectorInterface
+final class ChildWithInheritedMembers extends ParentWithDeclaredMembers
 {
-    public function getName(): string
-    {
-        return 'class with a no-argument private constructor';
-    }
-
-    public function matches(ClassReflection $classReflection): bool
-    {
-        if (
-            !ClassReflectionPredicates::isConcreteClass($classReflection)
-            || $classReflection->isEnum()
-        ) {
-            return false;
-        }
-
-        $constructor = $classReflection->getNativeReflection()->getConstructor();
-
-        return $constructor !== null
-            && $constructor->isPrivate()
-            && $constructor->getNumberOfParameters() === 0;
-    }
 }

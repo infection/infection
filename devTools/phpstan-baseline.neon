@@ -535,18 +535,6 @@ parameters:
 			path: ../src/Process/OriginalPhpProcess.php
 
 		-
-			rawMessage: Infection\Process\Runner\ParallelProcessRunner should be final
-			identifier: phpat.testInterfaceImplementationsAreFinal
-			count: 1
-			path: ../src/Process/Runner/ParallelProcessRunner.php
-
-		-
-			rawMessage: Infection\Process\Runner\ParallelProcessRunner should not exist
-			identifier: phpat.testSourceConcreteClassesAreFinals
-			count: 1
-			path: ../src/Process/Runner/ParallelProcessRunner.php
-
-		-
 			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
 			identifier: missingType.generics
 			count: 1

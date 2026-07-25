@@ -83,7 +83,7 @@ final readonly class CommandLineGit implements Git
         return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
-    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
+    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): array
     {
         $lines = $this->diff(
             $diffFilter,
@@ -96,7 +96,9 @@ final readonly class CommandLineGit implements Git
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
-        return implode(',', $lines);
+        Assert::allStringNotEmpty($lines);
+
+        return $lines;
     }
 
     public function getChangedLinesRangesByFileRelativePaths(
@@ -261,7 +263,7 @@ final readonly class CommandLineGit implements Git
     /**
      * @param string[] $sourceDirectories
      *
-     * @return string[]
+     * @return list<string>
      */
     private function diff(
         string $diffFilter,
