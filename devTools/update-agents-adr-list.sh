@@ -16,8 +16,10 @@ tmp_file=$(mktemp)
 trap 'rm -f "$tmp_file"' EXIT
 
 {
+    # read the chunk before the marker
     sed '/<!-- adr-list:start -->/q' "$agents_md"
 
+    # build a new list
     for file in adr/[0-9][0-9][0-9][0-9]-*.md; do
         if [[ "$file" == 'adr/0000-template.md' ]]; then
             continue
@@ -28,6 +30,7 @@ trap 'rm -f "$tmp_file"' EXIT
         printf -- "- [\`%s\`](%s) - %s\n" "$file" "$file" "$title"
     done
 
+    # read the chunk after the marker
     sed -n '/<!-- adr-list:end -->/,$p' "$agents_md"
 } > "$tmp_file"
 
