@@ -33,51 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat;
 
-use Infection\CannotBeInstantiated;
-use function sprintf;
-use function str_contains;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+use PHPStan\Reflection\ReflectionProvider;
 
-final class EnvManipulatorCodeDetector
+final readonly class PHPUnitTestsUsingEnvironmentVariablesShouldDeclareThemTest
 {
-    use CannotBeInstantiated;
-
-    private const array FUNCTIONS = [
-        'putenv',
-        'Safe\putenv',
-    ];
-
-    /**
-     * @var string[]|null
-     */
-    private static ?array $statements = null;
-
-    public static function codeManipulatesEnvVariables(string $code): bool
-    {
-        foreach (self::getStatements() as $statement) {
-            if (str_contains($code, $statement)) {
-                return true;
-            }
-        }
-
-        return false;
+    public function __construct(
+        private ReflectionProvider $reflectionProvider,
+    ) {
     }
 
-    /**
-     * @return string[]
-     */
-    private static function getStatements(): array
+    public function testPHPUnitTestsUsingEnvironmentVariablesDeclareThem(): Rule
     {
-        if (self::$statements !== null) {
-            return self::$statements;
-        }
-
-        foreach (self::FUNCTIONS as $safeFunctionName) {
-            self::$statements[] = sprintf('use function %s', $safeFunctionName);
-            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
-        }
-
-        return self::$statements;
+        return PHPat::rule()
+            ->classes(
+                InfectionSelector::phpunitTestMissingEnvironmentVariable($this->reflectionProvider),
+            )
+            ->excluding(InfectionSelector::selectorFixtures())
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests exercising code that uses environment variables should declare them with WithEnvironmentVariable.');
     }
 }

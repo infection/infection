@@ -59,6 +59,10 @@ services:
         tags:
             - phpat.test
     -
+        class: Infection\Tests\Architecture\PHPat\PHPUnitTestsUsingEnvironmentVariablesShouldDeclareThemTest
+        tags:
+            - phpat.test
+    -
         class: Infection\Tests\Architecture\PHPat\EventClassesShouldFollowConventionsTest
         tags:
             - phpat.test
@@ -114,9 +118,6 @@ parameters:
             path: ../tests/*
         -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with ''[a-zA-Z\\]+'' and [a-zA-Z\\]+ will always evaluate to (false|true)\.$#'
-            path: ../tests/*
-        -
-            message: '#^Call to static method Webmozart\\Assert\\[a-zA-Z]+::[a-zA-Z]+\(\) with .* will always evaluate to true\.$#'
             path: ../tests/*
         -
             message: '#^Comparison operation "\<" between int\<.*, .*\> and .* is always false\.$#'

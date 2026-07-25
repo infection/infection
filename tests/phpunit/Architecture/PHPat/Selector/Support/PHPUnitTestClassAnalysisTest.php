@@ -50,6 +50,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\Fixtures\PHPUnitTestWith
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PHPUnitTestClassAnalysis::class)]
@@ -187,8 +188,25 @@ final class PHPUnitTestClassAnalysisTest extends SelectorTestCase
             [],
         ];
     }
+
+    public function test_it_gets_declared_environment_variables(): void
+    {
+        $actual = PHPUnitTestClassAnalysis::getEnvironmentVariables(
+            $this->createClassReflection(PHPUnitTestWithEnvironmentVariables::class),
+        );
+
+        $this->assertSame(['FOO', 'BAR', 'BAZ'], $actual);
+    }
 }
 
 abstract class AbstractPHPUnitTest extends TestCase
 {
+}
+
+#[WithEnvironmentVariable('FOO')]
+#[WithEnvironmentVariable('BAR', 'value')]
+abstract class PHPUnitTestWithEnvironmentVariables extends TestCase
+{
+    #[WithEnvironmentVariable('BAZ')]
+    abstract public function test_with_environment_variable(): void;
 }

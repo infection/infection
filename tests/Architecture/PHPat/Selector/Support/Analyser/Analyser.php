@@ -90,6 +90,7 @@ final class Analyser
                 hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
                 belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
                 declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
+                environmentVariables: [],
             );
         }
 
@@ -137,11 +138,13 @@ final class Analyser
             )
             : null;
         $ioCodeDetectorVisitor = IoCodeDetectorVisitor::create();
+        $environmentVariableUsageVisitor = new EnvironmentVariableUsageVisitor();
 
         $this
             ->createTraverser(
                 $meaningfulImplementationVisitor,
                 $ioCodeDetectorVisitor,
+                $environmentVariableUsageVisitor,
             )
             ->traverse($nodes);
 
@@ -152,6 +155,7 @@ final class Analyser
             hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
             belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
             declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
+            environmentVariables: $environmentVariableUsageVisitor->getEnvironmentVariables(),
         );
     }
 
