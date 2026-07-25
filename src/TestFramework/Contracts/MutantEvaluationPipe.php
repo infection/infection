@@ -37,6 +37,12 @@ namespace Infection\TestFramework\Contracts;
 
 use Infection\Process\MutantProcess;
 
+/**
+ * Represents a mutant evaluation as a chain of processes that may require follow-up stages.
+ * It exposes the current process and controls whether the evaluation advances to the next one.
+ *
+ * @internal
+ */
 interface MutantEvaluationPipe
 {
     public function getCurrent(): MutantProcess;

@@ -39,6 +39,12 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Symfony\Component\Process\Process;
 
+/**
+ * Represents a single process that evaluates a mutant and records its execution state.
+ * It allows process runners to track completion and obtain the resulting mutation evaluation.
+ *
+ * @internal
+ */
 interface MutantProcess
 {
     public function getMutant(): Mutant;

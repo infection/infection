@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use Generator;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
@@ -47,7 +48,6 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use function Pipeline\take;
@@ -96,7 +96,7 @@ class MutationTestingRunner
             ->filter($this->takingTooLong(...))
             ->tap($this->materializeMutant(...))
             ->cast($this->testFramework->test(...))
-            ->filter($this->processEvaluatedMutants(...))
+            ->map($this->processEvaluatedMutants(...))
         ;
 
         take($this->processRunner->run($processContainers))
@@ -187,20 +187,23 @@ class MutationTestingRunner
         );
     }
 
-    private function processEvaluatedMutants(MutantExecutionResult|MutantEvaluationPipe $resultCandidate): bool
+    /**
+     * @return Generator<int, MutantEvaluationPipe>
+     */
+    private function processEvaluatedMutants(MutantExecutionResult|MutantEvaluationPipe $resultCandidate): Generator
     {
         if ($resultCandidate instanceof MutantEvaluationPipe) {
-            return true;
+            yield $resultCandidate;
+
+            return;
         }
 
         $this->eventDispatcher->dispatch(
             new MutantProcessWasFinished($resultCandidate),
         );
-
-        return false;
     }
 
-    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
+    private static function containerToFinishedEvent(MutantEvaluationPipe $container): MutantProcessWasFinished
     {
         return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
     }

@@ -39,7 +39,6 @@ use function array_shift;
 use function count;
 use DuoClock\DuoClock;
 use Generator;
-use Infection\Process\MutantProcessContainer;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Iterator;
 use function max;
@@ -170,7 +169,7 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @return iterable<MutantProcessContainer>
+     * @return iterable<MutantEvaluationPipe>
      */
     private function tryToFreeNotRunningProcess(): iterable
     {
@@ -222,9 +221,9 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @param iterable<MutantProcessContainer> $input
+     * @param iterable<MutantEvaluationPipe> $input
      *
-     * @return Generator<MutantProcessContainer>
+     * @return Generator<array-key, MutantEvaluationPipe>
      */
     private static function toGenerator(iterable &$input): Generator
     {

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\TestFramework\Contracts\MutantProcess;
 use const DIRECTORY_SEPARATOR;
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
