@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use function array_diff;
+use function count;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
 use PHPat\Selector\SelectorInterface;
@@ -62,6 +63,8 @@ final readonly class PHPUnitTestMissingEnvironmentVariable implements SelectorIn
         $usedEnvironmentVariables = $this->environmentVariableUsageDetector->getEnvironmentVariables($classReflection);
         $declaredEnvironmentVariables = PHPUnitTestClassAnalysis::getEnvironmentVariables($classReflection);
 
-        return array_diff($usedEnvironmentVariables, $declaredEnvironmentVariables) !== [];
+        $nonDeclaredUsedEnvironmentVariables = array_diff($usedEnvironmentVariables, $declaredEnvironmentVariables);
+
+        return count($nonDeclaredUsedEnvironmentVariables) > 0;
     }
 }

@@ -108,7 +108,7 @@ final class PHPUnitTestClassAnalysis
     }
 
     /**
-     * @return list<string>
+     * @return list<string|null>
      */
     public static function getEnvironmentVariables(ClassReflection $testCaseReflection): array
     {
@@ -128,7 +128,7 @@ final class PHPUnitTestClassAnalysis
     /**
      * @param iterable<object> $attributes
      *
-     * @return list<string>
+     * @return list<string|null>
      */
     private static function getEnvironmentVariablesFromAttributes(iterable $attributes): array
     {
