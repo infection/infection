@@ -131,7 +131,10 @@ Current ADRs:
 - [`adr/0006-memoized-over-cached-nomenclature.md`](adr/0006-memoized-over-cached-nomenclature.md) - Use `Memoized` over `Cached` for object-local result reuse
 - [`adr/0007-declare-phpunit-coverage-metadata.md`](adr/0007-declare-phpunit-coverage-metadata.md) - Declare PHPUnit coverage metadata explicitly
 - [`adr/0008-PHP-version-support-policy.md`](adr/0008-PHP-version-support-policy.md) - PHP version support policy
+- [`adr/0009-event-and-subscriber-naming.md`](adr/0009-event-and-subscriber-naming.md) - Event and subscriber naming conventions
+- [`adr/0009-use-phpunit-environment-variable-attribute.md`](adr/0009-use-phpunit-environment-variable-attribute.md) - Use PHPUnit attributes for test environment variables
 - [`adr/0010-compare-objects-with-assert-equals.md`](adr/0010-compare-objects-with-assert-equals.md) - Compare objects with PHPUnit `assertEquals()`
+- [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
 <!-- adr-list:end -->
 
 ## Commands
