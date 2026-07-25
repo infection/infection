@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function explode;
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\EventDispatcher\EventDispatcher;
@@ -51,19 +49,17 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Contracts\InitialRunResults;
+use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Webmozart\Assert\Assert;
 
 /**
@@ -73,10 +69,8 @@ final readonly class Engine
 {
     public function __construct(
         private Configuration $config,
-        private TestFrameworkAdapter $adapter,
-        private CoverageChecker $coverageChecker,
+        private TestFramework $testFramework,
         private EventDispatcher $eventDispatcher,
-        private InitialTestsRunner $initialTestsRunner,
         private MemoryLimiter $memoryLimiter,
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
@@ -84,7 +78,6 @@ final readonly class Engine
         private MaxTimeoutsChecker $maxTimeoutsChecker,
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
-        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
         private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ) {
@@ -105,7 +98,7 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $initialTestSuiteOutput = $this->runInitialTestSuite();
+        $initialRunResults = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
 
         /*
@@ -113,9 +106,7 @@ final readonly class Engine
          * used for the initial test run.
          * This is done AFTER static analysis to avoid restricting PHPStan's memory.
          */
-        if ($initialTestSuiteOutput !== null) {
-            $this->memoryLimiter->limitMemory($initialTestSuiteOutput, $this->adapter);
-        }
+        $this->memoryLimiter->limitMemory($initialRunResults);
 
         $this->runMutationAnalysis();
 
@@ -135,31 +126,15 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): ?string
+    private function runInitialTestSuite(): ?InitialRunResults
     {
-        if ($this->config->skipInitialTests) {
-            $this->consoleOutput->logSkippingInitialTests();
-            $this->coverageChecker->checkCoverageExists();
+        $this->testFramework->checkRequirements();
 
+        if ($this->config->skipInitialTests) {
             return null;
         }
 
-        $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->config->testFrameworkExtraOptions,
-            $this->getInitialTestsPhpOptionsArray(),
-            $this->config->skipCoverage,
-        );
-
-        if (!$initialTestSuiteProcess->isSuccessful()) {
-            throw InitialTestsFailed::fromProcessAndAdapter($initialTestSuiteProcess, $this->adapter);
-        }
-
-        $this->coverageChecker->checkCoverageHasBeenGenerated(
-            $initialTestSuiteProcess->getCommandLine(),
-            $initialTestSuiteProcess->getOutput(),
-        );
-
-        return $initialTestSuiteProcess->getOutput();
+        return $this->testFramework->executeInitialRun();
     }
 
     /**
@@ -199,14 +174,6 @@ final readonly class Engine
     }
 
     /**
-     * @return string[]
-     */
-    private function getInitialTestsPhpOptionsArray(): array
-    {
-        return explode(' ', (string) $this->config->initialTestsPhpOptions);
-    }
-
-    /**
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
@@ -222,21 +189,6 @@ final readonly class Engine
             $this->config->mutateOnlyCoveredCode(),
         );
 
-        $this->mutationTestingRunner->run(
-            $mutations,
-            $this->getFilteredExtraOptionsForMutant(),
-        );
-    }
-
-    private function getFilteredExtraOptionsForMutant(): string
-    {
-        if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
-            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
-                $this->adapter->getInitialRunOnlyOptions(),
-            );
-        }
-
-        return $this->config->testFrameworkExtraOptions;
+        $this->mutationTestingRunner->run($mutations);
     }
 }

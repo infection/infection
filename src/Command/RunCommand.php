@@ -391,10 +391,8 @@ final class RunCommand extends BaseCommand
 
             $engine = new Engine(
                 $container->getConfiguration(),
-                $container->getTestFrameworkAdapter(),
-                $container->getCoverageChecker(),
+                $container->getTestFramework(),
                 $container->getEventDispatcher(),
-                $container->getInitialTestsRunner(),
                 $container->getMemoryLimiter(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
@@ -402,7 +400,6 @@ final class RunCommand extends BaseCommand
                 $container->getMaxTimeoutsChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
-                $container->getTestFrameworkExtraOptionsFilter(),
                 // do not create a chain of classes for SA if not enabled
                 $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
                 $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
