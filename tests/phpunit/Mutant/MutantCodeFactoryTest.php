@@ -41,6 +41,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PhpParser\Node;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -117,7 +118,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($expectedMutantCode, $mutantCode);
     }
 
-    #[DataProvider('mutationProvider')]
+    #[DataProvider('mutationOnlyProvider')]
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation,
     ): void {
@@ -128,6 +129,14 @@ final class MutantCodeFactoryTest extends TestCase
         $originalNodesDumpAfterMutation = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
+    }
+
+    public static function mutationOnlyProvider(): iterable
+    {
+        yield from DataProviderFactory::takeArguments(
+            1,
+            self::mutationProvider(),
+        );
     }
 
     public static function mutationProvider(): iterable

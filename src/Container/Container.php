@@ -54,6 +54,7 @@ use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
@@ -61,6 +62,7 @@ use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
+use Infection\Differ\UnifiedDiffOutputBuilder;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -142,8 +144,8 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
-use Infection\Source\Collector\CachedSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
+use Infection\Source\Collector\MemoizedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
@@ -185,7 +187,6 @@ use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
@@ -305,6 +306,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getShellCommandLineExecutor(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -314,6 +316,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
+                    $container->getShellCommandLineExecutor(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -327,7 +330,7 @@ final class Container extends DIContainer
             MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
                 $container->getPrinter(),
             ),
-            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
+            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,
@@ -632,7 +635,7 @@ final class Container extends DIContainer
                 static function () use ($container): SourceCollector {
                     $configuration = $container->getConfiguration();
 
-                    return new CachedSourceCollector(
+                    return new MemoizedSourceCollector(
                         $container->get(SourceCollectorFactory::class)->create(
                             $configuration->configurationPathname,
                             $configuration->source,
@@ -720,7 +723,7 @@ final class Container extends DIContainer
         ?string $testFrameworkExtraOptions = null,
         ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,

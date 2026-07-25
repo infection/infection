@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function class_exists;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
+use function interface_exists;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use function trait_exists;
@@ -45,15 +47,24 @@ use function trait_exists;
 #[CoversClass(ProjectCodeProvider::class)]
 final class ProjectCodeProviderTest extends TestCase
 {
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
-    public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
+    #[DataProvider('sourceClassProvider')]
+    public function test_source_classes_provider_is_valid(string $className): void
     {
         $this->assertTrue(
-            class_exists($className, true) || trait_exists($className, true),
+            class_exists($className, true)
+                || interface_exists($className, true)
+                || trait_exists($className, true),
             sprintf(
-                'Expected "%s" to be either a class or a trait.',
+                'Expected "%s" to be a class, an interface, or a trait.',
                 $className,
             ),
+        );
+    }
+
+    public static function sourceClassProvider(): iterable
+    {
+        yield from DataProviderFactory::fromIterable(
+            ProjectCodeProvider::provideSourceClasses(),
         );
     }
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
@@ -44,10 +45,8 @@ use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
 #[CoversClass(Factory::class)]
 final class FactoryTest extends TestCase
 {
@@ -62,6 +61,7 @@ final class FactoryTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()->build(),
             new FakeSourceCollector(),
             [],
+            $this->createStub(ShellCommandLineExecutor::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -85,6 +85,7 @@ final class FactoryTest extends TestCase
                     'version' => '1.0.0',
                 ],
             ],
+            $this->createStub(ShellCommandLineExecutor::class),
         );
 
         $adapter = $factory->create('dummy', false);

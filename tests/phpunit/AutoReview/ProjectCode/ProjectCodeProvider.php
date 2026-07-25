@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use function array_filter;
 use const DIRECTORY_SEPARATOR;
-use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
@@ -46,16 +44,8 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
-use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
-use function iterator_to_array;
 use function Pipeline\take;
-use ReflectionClass;
 use function sort;
 use const SORT_STRING;
 use function sprintf;
@@ -86,11 +76,6 @@ final class ProjectCodeProvider
      */
     private static ?array $sourceClasses = null;
 
-    /**
-     * @var string[]|null
-     */
-    private static ?array $sourceClassesToCheckForPublicProperties = null;
-
     public static function provideSourceClasses(): iterable
     {
         if (self::$sourceClasses !== null) {
@@ -116,47 +101,6 @@ final class ProjectCodeProvider
         sort(self::$sourceClasses, SORT_STRING);
 
         yield from self::$sourceClasses;
-    }
-
-    public static function provideSourceClassesToCheckForPublicProperties(): iterable
-    {
-        if (self::$sourceClassesToCheckForPublicProperties !== null) {
-            yield from self::$sourceClassesToCheckForPublicProperties;
-
-            return;
-        }
-
-        self::$sourceClassesToCheckForPublicProperties = array_filter(
-            iterator_to_array(self::provideSourceClasses(), true),
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !$reflectionClass->isEnum()
-                    && !in_array(
-                        $className,
-                        [
-                            // having public properties on DTO is for performance reasons
-                            TestLocations::class,
-                            SourceMethodLineRange::class,
-                            NodeLineRangeData::class,
-                            TestFileTimeData::class,
-                            IndexedMutantProcessContainer::class,
-                        ],
-                        true,
-                    )
-                ;
-            },
-        );
-
-        yield from self::$sourceClassesToCheckForPublicProperties;
-    }
-
-    public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(
-            self::provideSourceClassesToCheckForPublicProperties(),
-        );
     }
 
     private static function castSplFileInfoToFQCN(SplFileInfo $file): string

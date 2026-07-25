@@ -46,10 +46,12 @@ use Infection\Testing\MutatorName;
 use Infection\Tests\WithConsecutive;
 use function iterator_to_array;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(IgnoreMutator::class)]
 final class IgnoreMutatorTest extends TestCase
 {

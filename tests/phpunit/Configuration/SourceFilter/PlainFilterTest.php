@@ -75,7 +75,7 @@ final class PlainFilterTest extends TestCase
             '  src/Foo.php,, , src/Bar.php , src/File withSpace.php ',
             new PlainFilter([
                 'src/Foo.php',
-                'src/Bar.php',
+                3 => 'src/Bar.php',
                 'src/File withSpace.php',
             ]),
         ];

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+use Infection\Process\ShellCommandLineExecutor;
+
 /**
  * @internal
  */
@@ -49,5 +51,6 @@ interface StaticAnalysisToolAdapterFactory
         float $timeout,
         string $tmpDir,
         array $staticAnalysisToolOptions,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
     ): StaticAnalysisToolAdapter;
 }

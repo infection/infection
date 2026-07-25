@@ -44,7 +44,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
@@ -78,7 +77,6 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     }
 
     // This is a sanity check to ensure we have the test correctly configured.
-    #[CoversNothing]
     public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
     {
         $this->fileSystem->touch(self::TEST_DEFAULT_JUNIT);

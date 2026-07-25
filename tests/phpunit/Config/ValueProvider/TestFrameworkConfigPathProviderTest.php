@@ -40,11 +40,13 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Console\IO;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\StringInput;
 
+#[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
 #[CoversClass(TestFrameworkConfigPathProvider::class)]
 final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase

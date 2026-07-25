@@ -41,16 +41,14 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-#[Group('integration')]
 #[CoversClass(MagoMutantProcessFactory::class)]
 final class MagoMutantProcessFactoryTest extends TestCase
 {

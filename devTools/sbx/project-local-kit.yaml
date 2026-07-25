@@ -1,0 +1,5 @@
+schemaVersion: "2"
+kind: mixin
+name: infection-project-local
+displayName: Infection Project (local)
+description: Uncommitted, developer-local sandbox customisation. Add an environment block (or any other kit section) to enrich your own sandbox; this file is gitignored.

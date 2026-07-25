@@ -40,6 +40,7 @@ use function dirname;
 use function file_exists;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use const PATH_SEPARATOR;
@@ -52,7 +53,6 @@ use function Safe\putenv;
 use function Safe\realpath;
 use function substr;
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -70,6 +70,7 @@ class TestFrameworkFinder
 
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -110,14 +111,11 @@ class TestFrameworkFinder
         $vendorPath = null;
 
         try {
-            $process = new Process([
+            $vendorPath = $this->shellCommandLineExecutor->execute([
                 ...$this->findComposer(),
                 'config',
                 'bin-dir',
             ]);
-
-            $process->mustRun();
-            $vendorPath = trim($process->getOutput());
         } catch (RuntimeException) {
             $candidate = getcwd() . '/vendor/bin';
 

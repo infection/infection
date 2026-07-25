@@ -37,7 +37,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use function in_array;
 use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use Infection\Tests\FileSystem\Finder\MockVendor;
 use Infection\Tests\Framework\Iterable\GeneratorFactory\SimpleIteratorAggregate;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
@@ -45,7 +45,6 @@ use Infection\Tests\Reflection\ProtChild;
 use Infection\Tests\Reflection\ProtParent;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
-use PHPUnit\Framework\TestCase;
 use function str_ends_with;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Path;
@@ -86,12 +85,13 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
     public function matches(ClassReflection $classReflection): bool
     {
         if (
-            !ConcreteClassReflection::isConcreteClass($classReflection)
+            !ClassReflectionPredicates::isConcreteClass($classReflection)
             || InfectionSelector::isAnonymousClass()->matches($classReflection)
-            || self::isPHPUnitTestClass($classReflection)
+            || InfectionSelector::concretePHPUnitTestClass()->matches($classReflection)
             || self::isKnownPhpUnitDataProviderClass($classReflection)
             || self::isKnownPhpUnitScenarioClass($classReflection)
             || self::isKnownPHPUnitTestFixtureClass($classReflection)
+            || InfectionSelector::hasTrivialImplementation()->matches($classReflection)
             || !self::isPHPUnitTestSupportCode($classReflection)
         ) {
             return false;
@@ -111,35 +111,6 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTest implements Selec
                 'tests/phpunit',
                 Path::makeRelative($fileName, self::PROJECT_ROOT),
             );
-    }
-
-    private static function isPHPUnitTestClass(ClassReflection $classReflection): bool
-    {
-        $testCaseClassReflection = self::findParentClassReflection($classReflection, TestCase::class);
-
-        return str_ends_with($classReflection->getName(), 'Test')
-            && $testCaseClassReflection !== null
-            && $classReflection->isSubclassOfClass($testCaseClassReflection);
-    }
-
-    /**
-     * @param class-string $parentClassName
-     */
-    private static function findParentClassReflection(
-        ClassReflection $classReflection,
-        string $parentClassName,
-    ): ?ClassReflection {
-        $parentClassReflection = $classReflection->getParentClass();
-
-        while ($parentClassReflection !== null) {
-            if ($parentClassReflection->getName() === $parentClassName) {
-                return $parentClassReflection;
-            }
-
-            $parentClassReflection = $parentClassReflection->getParentClass();
-        }
-
-        return null;
     }
 
     private static function isKnownPhpUnitDataProviderClass(ClassReflection $classReflection): bool

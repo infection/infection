@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\LongestCommonSubsequenceCalculator;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -44,9 +43,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  *
- * Tiny adapter for Sebastian's differ. It is technically no longer necessary as of now, but there
- * has been several changes with Sebastian's differ hence having an adapter against which we test
- * the behaviour is always a nice to have.
+ * Builds mutation diffs through Sebastian's differ while keeping Infection's expected output shape under test.
  */
 class Differ
 {
@@ -74,7 +71,7 @@ class Differ
      *
      * @return array{string, string}
      */
-    public function diffToArray(string $from, string $to, ?LongestCommonSubsequenceCalculator $lcs = null): array
+    public function diffToArray(string $from, string $to): array
     {
         $tokens = $this->differ->diffToArray($from, $to);
 

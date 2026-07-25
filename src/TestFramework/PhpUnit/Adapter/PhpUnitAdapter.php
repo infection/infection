@@ -40,13 +40,14 @@ use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\VersionParser;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
@@ -68,11 +69,21 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
     ) {
-        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
+        parent::__construct(
+            $testFrameworkExecutable,
+            $initialConfigBuilder,
+            $mutationConfigBuilder,
+            $argumentsAndOptionsBuilder,
+            $shellCommandLineExecutor,
+            $versionParser,
+            $commandLineBuilder,
+            $version,
+        );
     }
 
     public function hasJUnitReport(): bool

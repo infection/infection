@@ -45,6 +45,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\SyntaxError;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function ksort;
 use ReflectionClass;
 use function Safe\realpath;
@@ -75,6 +76,14 @@ final class ProfileListProvider
         foreach (self::implementedMutatorProvider() as [$filePath, $className, $shortClassName]) {
             yield [$shortClassName, $className];
         }
+    }
+
+    public static function implementedMutatorFileAndClassProvider(): iterable
+    {
+        yield from DataProviderFactory::takeArguments(
+            2,
+            self::implementedMutatorProvider(),
+        );
     }
 
     public static function implementedMutatorProvider(): iterable

@@ -63,11 +63,13 @@ $finder = Finder::create()
         'tests/benchmark/Tracing/sources',
         'tests/benchmark/Tracing/benchmark-source',
         'tests/e2e',
+        'tests/phpunit/Architecture/PHPat/Selector/HasInheritDoc/Fixtures',
         'tests/phpunit/Fixtures',
         'var',
     ])
     ->ignoreDotFiles(false)
     ->name('*php')
+    ->notPath('src/Differ/UnifiedDiffOutputBuilder.php')
     ->append([
         __DIR__ . '/bin/infection',
         __DIR__ . '/bin/infection-debug',

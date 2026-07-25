@@ -38,8 +38,11 @@ namespace Infection\TestFramework\PhpUnit\Adapter;
 use function array_map;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\Process\ShellCommandLineExecutor;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -47,7 +50,6 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
-use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
@@ -59,6 +61,8 @@ use Webmozart\Assert\Assert;
  */
 final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
+    use CannotBeInstantiated;
+
     /**
      * @param string[] $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
@@ -75,8 +79,10 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         bool $executeOnlyCoveringTestCases = false,
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
+        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
+        Assert::notNull($shellCommandLineExecutor);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -118,6 +124,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
             ),
+            $shellCommandLineExecutor,
             new VersionParser(),
             new CommandLineBuilder(
                 new PhpExecutableFinder(),

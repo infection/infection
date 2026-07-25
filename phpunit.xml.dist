@@ -8,11 +8,7 @@
          failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
-         displayDetailsOnIncompleteTests="true"
-         displayDetailsOnPhpunitDeprecations="true"
-         displayDetailsOnSkippedTests="true"
-         displayDetailsOnTestsThatTriggerDeprecations="true"
-         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnAllIssues="true"
          cacheDirectory="./var/cache/phpunit"
 >
 
@@ -38,6 +34,7 @@
     <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
+            <directory>tests/phpunit</directory>
         </include>
     </source>
 

@@ -48,6 +48,7 @@ use function ksort;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use const SORT_STRING;
@@ -57,6 +58,7 @@ use Symfony\Component\Finder\Finder;
 use Throwable;
 
 #[CoversNothing]
+#[Group('integration')]
 final class MutatorRobustnessTest extends TestCase
 {
     private const string FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-code-samples';

@@ -17,6 +17,7 @@
 /.tools/
 /build/
 /devTools/Docker*.json
+/devTools/sbx/kits/project-local/spec.yaml
 /dist/
 /infection-cache
 /infection.log

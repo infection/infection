@@ -67,7 +67,7 @@ final class ShowMutationsReporterTest extends TestCase
         $this->output = new BufferedOutput();
 
         $this->resultsCollector = new ResultsCollector();
-        $this->diffColorizer = $this->createDiffColorizerMock();
+        $this->diffColorizer = $this->createDiffColorizerStub();
     }
 
     /**
@@ -631,10 +631,10 @@ final class ShowMutationsReporterTest extends TestCase
         return $name;
     }
 
-    private function createDiffColorizerMock(): DiffColorizer
+    private function createDiffColorizerStub(): DiffColorizer
     {
-        $diffColorizerMock = $this->createMock(DiffColorizer::class);
-        $diffColorizerMock
+        $diffColorizerStub = $this->createStub(DiffColorizer::class);
+        $diffColorizerStub
             ->method('colorize')
             ->willReturnCallback(
                 static fn (string $diff): string => sprintf(
@@ -645,6 +645,6 @@ final class ShowMutationsReporterTest extends TestCase
                 ),
             );
 
-        return $diffColorizerMock;
+        return $diffColorizerStub;
     }
 }

@@ -40,9 +40,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('integration')]
 #[CoversClass(MutationCollectorVisitor::class)]
 final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
@@ -61,8 +59,8 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         $mutation3 = $this->createStub(Mutation::class);
         $mutation4 = $this->createStub(Mutation::class);
 
-        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
-        $nodeMutationGeneratorMock
+        $nodeMutationGeneratorStub = $this->createStub(NodeMutationGenerator::class);
+        $nodeMutationGeneratorStub
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
@@ -71,7 +69,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
         $this->traverse(
             self::parseCode(self::CODE)[0],
@@ -99,8 +97,8 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         $mutation3 = $this->createStub(Mutation::class);
         $mutation4 = $this->createStub(Mutation::class);
 
-        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
-        $nodeMutationGeneratorMock
+        $nodeMutationGeneratorStub = $this->createStub(NodeMutationGenerator::class);
+        $nodeMutationGeneratorStub
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
@@ -110,7 +108,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
         $this->traverse(
             self::parseCode(self::CODE)[0],

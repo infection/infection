@@ -51,6 +51,7 @@ use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function iterator_count;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -58,6 +59,7 @@ use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {

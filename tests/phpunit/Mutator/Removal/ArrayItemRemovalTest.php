@@ -40,9 +40,7 @@ use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('integration')]
 #[CoversClass(ArrayItemRemoval::class)]
 final class ArrayItemRemovalTest extends BaseMutatorTestCase
 {

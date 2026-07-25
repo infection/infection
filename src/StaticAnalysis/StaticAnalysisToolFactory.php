@@ -38,6 +38,7 @@ namespace Infection\StaticAnalysis;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
@@ -53,6 +54,7 @@ final readonly class StaticAnalysisToolFactory
         private Configuration $infectionConfig,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -70,6 +72,7 @@ final readonly class StaticAnalysisToolFactory
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
+                $this->shellCommandLineExecutor,
             );
         }
 
@@ -85,6 +88,7 @@ final readonly class StaticAnalysisToolFactory
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
+                $this->shellCommandLineExecutor,
             );
         }
 

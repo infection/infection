@@ -139,7 +139,8 @@ final class ConfigureCommand extends BaseCommand
             $this->abort();
         }
 
-        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
+        $container = $this->getApplication()->getContainer();
+        $fileSystem = $container->getFileSystem();
 
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
@@ -156,7 +157,10 @@ final class ConfigureCommand extends BaseCommand
             $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
 
-        $phpUnitExecutableFinder = new TestFrameworkFinder($this->getApplication()->getContainer()->getComposerExecutableFinder());
+        $phpUnitExecutableFinder = new TestFrameworkFinder(
+            $container->getComposerExecutableFinder(),
+            $container->getShellCommandLineExecutor(),
+        );
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 

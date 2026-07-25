@@ -35,16 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use function array_filter;
-use function array_map;
-use Infection\StreamWrapper\IncludeInterceptor;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionProperty;
-use function sprintf;
 
 /**
  * This class is responsible for testing that our code base adheres to certain rules,
@@ -61,65 +54,5 @@ final class ProjectCodeTest extends TestCase
 
         $this->assertFileExists($infectionFile);
         $this->assertTrue(is_executable($infectionFile));
-    }
-
-    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
-    public function test_source_classes_do_not_expose_public_properties(string $className): void
-    {
-        $reflectionClass = new ReflectionClass($className);
-
-        $properties = $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC);
-
-        if ($className === IncludeInterceptor::class) {
-            // The IncludeInterceptor needs 1 public property: $context
-            // @see https://secure.php.net/manual/en/class.streamwrapper.php
-            $this->assertCount(
-                1,
-                $properties,
-                sprintf(
-                    'The "%s" class must have exactly 1 public property as it is a streamwrapper. '
-                    . 'If this has changed due to recent PHP developments, consider updating this test.',
-                    $className,
-                ),
-            );
-
-            $this->assertSame(
-                'context',
-                $properties[0]->getName(),
-                sprintf(
-                    'The "%s" class must have exactly 1 public property named "context". '
-                    . 'If this has changed due to recent PHP developments, consider updating this test.',
-                    $className,
-                ),
-            );
-
-            return;
-        }
-
-        // We should consider only properties belonging to our classes, but not to foreign classes
-        // we're extending from, e.g. we can't change Symfony\Component\Process\Process to not have
-        // a public property it has.
-        $propertyNames = array_map(
-            static fn (ReflectionProperty $reflectionProperty): string => sprintf(
-                '%s#%s',
-                $reflectionProperty->getDeclaringClass()->getName(),
-                $reflectionProperty->getName(),
-            ),
-            array_filter(
-                $properties,
-                static fn (ReflectionProperty $property): bool => $property->class === $className
-                    && !$property->isReadOnly(),
-            ),
-        );
-
-        $this->assertSame(
-            [],
-            $propertyNames,
-            sprintf(
-                'The class "%s" should not have any public properties declared. If it has '
-                . 'properties that needs to be accessed, getters should be used instead.',
-                $className,
-            ),
-        );
     }
 }

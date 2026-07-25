@@ -38,13 +38,18 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\Command\ConfigureCommand;
 use Infection\Engine;
 use Infection\Tests\Architecture\PHPat\Selector\HasDocBlock\ClassWithDocBlock;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\AnalysisResult;
+use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\DetectConcreteClassMeaningfulImplementationVisitor;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario;
 use Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
+use Infection\Tests\Process\Exception\GenericProcessException;
 use Infection\Tests\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider\PhpUnit09Provider;
+use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
 use Infection\Tests\TestFramework\Tracing\Tracer\CodeceptionProvider;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
@@ -53,6 +58,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(PHPUnitTestSupportConcreteClassWithoutCanonicalTest::class)]
+#[CoversClass(HasTrivialImplementation::class)]
+#[CoversClass(AnalysisResult::class)]
+#[CoversClass(Support\ClassReflectionPredicates::class)]
+#[CoversClass(Analyser::class)]
+#[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends SelectorTestCase
 {
     public function test_it_does_not_match_anonymous_classes(): void
@@ -86,6 +96,16 @@ final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends Sele
         yield 'testing utility without canonical test' => [
             FS::class,
             true,
+        ];
+
+        yield 'test support class with empty implementation' => [
+            GenericProcessException::class,
+            false,
+        ];
+
+        yield 'test support fake with unsupported method implementations' => [
+            FakeTrace::class,
+            false,
         ];
 
         yield 'testing utility with canonical test' => [
