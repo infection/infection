@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandLineExecutor;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -56,7 +56,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/project',
             [],
             true,
-            shellCommandLineExecutor: new ShellCommandLineExecutor(),
+            shellCommandLineExecutor: new SymfonyProcessShellCommandLineExecutor(),
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

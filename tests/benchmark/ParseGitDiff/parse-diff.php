@@ -33,31 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Benchmark\ParseGitDiff;
 
 use Closure;
 use function count;
 use Infection\Git\CommandLineGit;
-use Infection\Process\ShellCommandLineExecutor;
 use function Safe\file_get_contents;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $diff = file_get_contents(__DIR__ . '/diff');
 
-// @phpstan-ignore class.extendsFinalByPhpDoc
-$executorMock = new class($diff) extends ShellCommandLineExecutor {
-    public function __construct(private readonly string $diff)
-    {
-    }
-
-    public function execute(array $command): string
-    {
-        return $this->diff;
-    }
-};
-
-$git = new CommandLineGit($executorMock);
+$git = new CommandLineGit(
+    new DummyShellCommandLineExecutor($diff),
+);
 
 // The values used for this method do not matter: we return the diff content.
 /**

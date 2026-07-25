@@ -33,32 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
-use Infection\Tests\Configuration\ConfigurationBuilder;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\RuntimeException;
 
-#[CoversClass(StaticAnalysisToolFactory::class)]
-final class StaticAnalysisToolFactoryTest extends TestCase
+/**
+ * @internal
+ *
+ * Provides test framework adapters with a testable boundary for running blocking shell commands.
+ */
+interface ShellCommandLineExecutor
 {
-    public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
-    {
-        $factory = new StaticAnalysisToolFactory(
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(StaticAnalysisToolExecutableFinder::class),
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(ShellCommandLineExecutor::class),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
-
-        $factory->create('Fake SA Tool', 30);
-    }
+    /**
+     * @param string[] $command
+     *
+     * @throws ProcessFailedException When process didn't terminate successfully.
+     * @throws RuntimeException When process can't be launched.
+     * @throws ProcessTimedOutException When process timed out.
+     * @throws ProcessSignaledException When process stopped after receiving signal.
+     */
+    public function execute(array $command): string;
 }

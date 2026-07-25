@@ -643,22 +643,10 @@ parameters:
 			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
 
 		-
 			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
@@ -733,22 +721,10 @@ parameters:
 			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
 			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
 
 		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
@@ -895,12 +871,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\AbstractTestFrameworkAdapter
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 6
@@ -938,12 +908,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -1798,10 +1762,10 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
-			rawMessage: Infection\Tests\Process\ShellCommandLineExecutorTest should not exist
+			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
-			path: ../tests/phpunit/Process/ShellCommandLineExecutorTest.php
+			path: ../tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php
 
 		-
 			rawMessage: 'Parameter #1 $className of static method Infection\Reflection\AnonymousClassReflection::fromClassName() expects class-string, string given.'

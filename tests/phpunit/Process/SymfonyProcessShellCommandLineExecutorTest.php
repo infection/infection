@@ -35,22 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandLineExecutor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-#[CoversClass(ShellCommandLineExecutor::class)]
+#[CoversClass(SymfonyProcessShellCommandLineExecutor::class)]
 #[Group('integration')]
-final class ShellCommandLineExecutorTest extends TestCase
+final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
 {
-    private ShellCommandLineExecutor $executor;
+    private SymfonyProcessShellCommandLineExecutor $executor;
 
     protected function setUp(): void
     {
-        $this->executor = new ShellCommandLineExecutor();
+        $this->executor = new SymfonyProcessShellCommandLineExecutor();
     }
 
     /**

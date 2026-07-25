@@ -42,7 +42,8 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
@@ -104,7 +105,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->composerFinder->method('find')
             ->willReturn(['/usr/bin/composer']);
 
-        $this->shellCommandLineExecutor = new ShellCommandLineExecutor();
+        $this->shellCommandLineExecutor = new SymfonyProcessShellCommandLineExecutor();
     }
 
     protected function tearDown(): void

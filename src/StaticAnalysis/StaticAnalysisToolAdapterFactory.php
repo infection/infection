@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 
 /**
  * @internal

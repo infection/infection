@@ -33,32 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
-use Infection\Tests\Configuration\ConfigurationBuilder;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use DomainException;
 
-#[CoversClass(StaticAnalysisToolFactory::class)]
-final class StaticAnalysisToolFactoryTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class FakeShellCommandLineExecutor implements ShellCommandLineExecutor
 {
-    public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
+    public function execute(array $command): string
     {
-        $factory = new StaticAnalysisToolFactory(
-            ConfigurationBuilder::withMinimalTestData()->build(),
-            $this->createStub(StaticAnalysisToolExecutableFinder::class),
-            $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(ShellCommandLineExecutor::class),
-        );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
-
-        $factory->create('Fake SA Tool', 30);
+        throw new DomainException('Unexpected call.');
     }
 }
