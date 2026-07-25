@@ -148,7 +148,7 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         ];
 
         yield 'limit without unit' => [
-            '268435456',    // 256M
+            '1073741824',   // 1G
             true,
         ];
     }
