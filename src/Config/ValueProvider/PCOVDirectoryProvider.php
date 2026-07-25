@@ -39,14 +39,27 @@ use Safe\Exceptions\InfoException;
 use function Safe\ini_get;
 
 /**
- * Provides value for pcov.directory configuration option. Can be injected with a configuration object to provide a better, precise, value.
+ * When used as the coverage driver, PCOV selects the first existing directory
+ * from `src`, `lib`, `app`, and the current working directory by default. This
+ * may exclude source code located outside the selected directory.
+ *
+ * The `pcov.directory` setting overrides this behaviour.
+ *
+ * Infection knows which source code it targets and can therefore refine this
+ * setting to provide a safer default.
+ *
+ * @see https://github.com/krakjoe/pcov
+ * @see https://github.com/krakjoe/pcov/blob/57e143363aa6ba3c4d1e1b0a2e68556e28f38950/pcov.c#L357-L387
  *
  * @internal
  * @final
  */
-class PCOVDirectoryProvider
+readonly class PCOVDirectoryProvider
 {
-    private ?string $phpConfiguredPcovDirectory = null;
+    // https://github.com/krakjoe/pcov/blob/57e143363aa6ba3c4d1e1b0a2e68556e28f38950/pcov.c#L80-L83
+    private const string DEFAULT_DIRECTORY = '';
+
+    private ?string $phpConfiguredPcovDirectory;
 
     public function __construct(?string $iniValue = null)
     {
@@ -58,11 +71,9 @@ class PCOVDirectoryProvider
         }
     }
 
-    public function shallProvide(): bool
+    public function shouldProvide(): bool
     {
-        // That's the default value as per:
-        // https://github.com/krakjoe/pcov/blob/57e143363aa6ba3c4d1e1b0a2e68556e28f38950/pcov.c#L80-L83
-        return $this->phpConfiguredPcovDirectory === '';
+        return $this->phpConfiguredPcovDirectory === self::DEFAULT_DIRECTORY;
     }
 
     public function getDirectory(): string
