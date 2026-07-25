@@ -100,7 +100,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $this->assertSame('PHPUnit', $this->adapter->getName());
     }
@@ -112,7 +112,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $this->assertTrue($this->adapter->hasJUnitReport());
     }
@@ -152,7 +152,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $actual = $this->adapter->testsPass($output);
 
@@ -169,7 +169,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $actual = $this->adapter->isSyntaxError($output);
 
@@ -186,7 +186,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $result = $this->adapter->getMemoryUsed($output);
 
@@ -200,7 +200,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $options = $this->adapter->getInitialRunOnlyOptions();
 
@@ -222,7 +222,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->pcovDirectoryProvider
             ->expects($scenario->skipCoverage ? $this->never() : $this->once())
-            ->method('shallProvide')
+            ->method('shouldProvide')
             ->willReturn($scenario->pcovDirectory !== '');
         $this->pcovDirectoryProvider
             ->expects($this->atMost(1))
@@ -260,7 +260,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,

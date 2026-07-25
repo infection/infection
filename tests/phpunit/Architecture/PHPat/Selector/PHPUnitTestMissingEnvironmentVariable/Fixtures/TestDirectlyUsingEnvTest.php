@@ -33,43 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestMissingEnvironmentVariable\Fixtures;
 
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
-#[CoversClass(PhpUnitAdapterFactory::class)]
-final class PhpUnitAdapterFactoryTest extends TestCase
+#[CoversNothing]
+final class TestDirectlyUsingEnvTest extends TestCase
 {
-    public function test_it_can_create_an_adapter(): void
+    public function test_it_reads_the_environment(): void
     {
-        $adapter = PhpUnitAdapterFactory::create(
-            '/path/to/phpunit',
-            '/tmp',
-            __FILE__,   // the FS is not mocked so it needs a real file; the content doesn't matter for this test though.
-            '/path/to/config-dir',
-            '/path/to/junit.xml',
-            '/path/to/project',
-            [],
-            true,
-            shellCommandLineExecutor: new ShellCommandLineExecutor(),
-            sourceDirectoryBasePath: '/path/to/project',
-        );
-
-        $this->assertSame('PHPUnit', $adapter->getName());
-    }
-
-    public function test_it_has_a_name(): void
-    {
-        $this->assertSame('phpunit', PhpUnitAdapterFactory::getAdapterName());
-    }
-
-    public function test_it_has_an_executable(): void
-    {
-        $this->assertSame('phpunit', PhpUnitAdapterFactory::getExecutableName());
+        $this->assertNull($_ENV['DIRECT_NAME'] ?? null);
     }
 }

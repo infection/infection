@@ -174,15 +174,6 @@ If no test mocks the class, use the keyword. Do not expect `BypassFinals`. Do no
 just to mock a single class. Reviewers ask "is there a reason this is `@final` rather
 than `final`?" Have the answer ("it is mocked in X").
 
-### `@internal` everywhere; the public API is a whitelist
-
-Every class gets `@internal` (PHPat-enforced). Users may depend only on extension points that
-are listed in `tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php::EXTENSION_POINTS`:
-`Mutator`, `Definition`, `MutatorCategory`, `BaseMutatorTestCase`, `MutationAnalysisLogger`,
-`SchemaConfigurationFactory`, `SchemaConfigurationFileLoader`, `SchemaValidator`. Extension
-points must have documented doc-blocks (another PHPat rule). Everything else may break at any
-release. Conversely, changing anything on that list is a BC event.
-
 ### Imports: everything, including functions and constants
 
 Every native call is imported (`use function sprintf;`, `use const DIRECTORY_SEPARATOR;`) -
@@ -522,8 +513,8 @@ Notes for review:
 - Complex setup gets hand-rolled immutable builders/fakes next to the test
   (`tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php`,
   a fake `Git` implementation) rather than deep mock graphs.
-- Env vars: any test calling `putenv` must `use BacksUpEnvironmentVariables;`
-  (AutoReview-checked).
+- Env vars: tests exercising code that uses a statically identifiable environment variable
+  must declare it with `#[WithEnvironmentVariable]` (PHPat-enforced).
 - Visitors have a dedicated harness - read `tests/phpunit/PhpParser/Visitor/README.md`:
   extend `VisitorTestCase`, `addIdsToNodes()`, traverse with your visitor +
   `MarkTraversedNodesAsVisitedVisitor`, dump with the configured `NodeDumper`, `assertSame`

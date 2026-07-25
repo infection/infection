@@ -33,95 +33,137 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 
+use Infection\Testing\SingletonContainer;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(EnvManipulatorCodeDetector::class)]
-final class EnvManipulatorCodeDetectorTest extends TestCase
+#[CoversClass(EnvironmentVariableUsageVisitor::class)]
+final class EnvironmentVariableUsageVisitorTest extends TestCase
 {
+    /**
+     * @param list<string> $expected
+     */
     #[DataProvider('codeProvider')]
-    public function test_it_can_detect_environment_variable_manipulations(string $code, bool $expected): void
-    {
-        $actual = EnvManipulatorCodeDetector::codeManipulatesEnvVariables($code);
+    public function test_it_finds_statically_identifiable_environment_variables(
+        string $code,
+        array $expected,
+    ): void {
+        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        Assert::notNull($nodes);
+
+        $visitor = new EnvironmentVariableUsageVisitor();
+        (new NodeTraverser($visitor))->traverse($nodes);
+
+        $actual = $visitor->getEnvironmentVariables();
 
         $this->assertSame($expected, $actual);
     }
 
     public static function codeProvider(): iterable
     {
-        yield 'empty' => [
-            '',
-            false,
-        ];
-
-        yield 'putenv core function' => [
+        yield 'putenv assignment' => [
             <<<'PHP'
                 <?php
-                putenv("FOO=BAR");
+
+                putenv('FOO=bar');
                 PHP,
-            false,   // Cannot detect this case since this is not a FQ call
+            ['FOO'],
         ];
 
-        yield 'putenv core function FQ call' => [
+        yield 'putenv removal' => [
             <<<'PHP'
                 <?php
-                \putenv("FOO=BAR");
+
+                putenv('FOO');
                 PHP,
-            true,
+            ['FOO'],
         ];
 
-        yield 'putenv core function imported' => [
+        yield 'Safe putenv' => [
             <<<'PHP'
                 <?php
-                use function putenv;
+
+                \Safe\putenv('FOO=bar');
                 PHP,
-            true,
+            ['FOO'],
         ];
 
-        yield 'putenv Safe function' => [
+        yield 'putenv with a dynamic value' => [
             <<<'PHP'
                 <?php
-                Safe\putenv('FOO=BAR');
+
+                putenv('FOO=' . $value);
                 PHP,
-            true,
+            ['FOO'],
         ];
 
-        yield 'putenv Safe function FQ call' => [
+        yield 'putenv with a dynamic name' => [
             <<<'PHP'
                 <?php
-                \Safe\putenv('FOO=BAR');
+
+                putenv($name . '=bar');
                 PHP,
-            true,
+            [],
         ];
 
-        yield 'putenv Safe function imported' => [
+        yield '_ENV access' => [
             <<<'PHP'
                 <?php
-                use function Safe\putenv;
+
+                $value = $_ENV['FOO'];
                 PHP,
-            true,
+            ['FOO'],
         ];
 
-        yield 'readonly env function' => [
+        yield '_ENV access with a dynamic name' => [
             <<<'PHP'
                 <?php
+
+                $value = $_ENV[$name];
+                PHP,
+            [],
+        ];
+
+        yield '_SERVER access' => [
+            <<<'PHP'
+                <?php
+
+                $value = $_SERVER['FOO'];
+                PHP,
+            [],
+        ];
+
+        yield '_SERVER access with a dynamic name' => [
+            <<<'PHP'
+                <?php
+
+                $value = $_SERVER[$name];
+                PHP,
+            [],
+        ];
+
+        yield 'getenv call' => [
+            <<<'PHP'
+                <?php
+
                 getenv('FOO');
                 PHP,
-            false,
+            [],
         ];
 
-        yield 'Statement containing a word match of a FS function' => [
+        yield 'duplicates' => [
             <<<'PHP'
                 <?php
 
-                /**
-                 * putenv
-                 */
+                putenv('FOO=bar');
+                $_ENV['FOO'] = 'bar';
                 PHP,
-            false,
+            ['FOO'],
         ];
     }
 }
