@@ -81,7 +81,6 @@ $input = new ArgvInput(
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
-/** @var positive-int $maxNodeCount */
 $maxNodeCount = (static function (InputInterface $input, string $optionName): int {
     $option = $input->getOption($optionName);
 
@@ -112,7 +111,6 @@ $maxNodeCount = (static function (InputInterface $input, string $optionName): in
     return $intValue;
 })($input, MAX_NODE_COUNT_OPT);
 
-/** @var float $percentage */
 $percentage = (static function (InputInterface $input, string $optionName): float {
     $option = $input->getOption($optionName);
 

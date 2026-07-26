@@ -4905,7 +4905,7 @@ count = 1
 [[issues]]
 file = "tests/benchmark/AstProcessing/AstProcessingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(): int(0)|positive-int))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(): int(0)|positive-int))."
 count = 1
 
 [[issues]]
@@ -4913,6 +4913,12 @@ file = "tests/benchmark/AstProcessing/create-main.php"
 code = "possibly-invalid-argument"
 message = "Possible argument type mismatch for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but possibly received `array<array-key, mixed>|array<array-key, string>|string`."
 count = 2
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `{closure:tests/benchmark/AstProcessing/create-main.php:226:12}`.'
+count = 1
 
 [[issues]]
 file = "tests/benchmark/AstProcessing/create-main.php"
@@ -4973,18 +4979,6 @@ file = "tests/benchmark/AstProcessing/profile.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
 count = 3
-
-[[issues]]
-file = "tests/benchmark/AstProcessing/profile.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$maxNodeCount`."
-count = 1
-
-[[issues]]
-file = "tests/benchmark/AstProcessing/profile.php"
-code = "redundant-docblock-type"
-message = "Redundant docblock type for variable `$percentage`."
-count = 1
 
 [[issues]]
 file = "tests/benchmark/BlackfireInstrumentor.php"
