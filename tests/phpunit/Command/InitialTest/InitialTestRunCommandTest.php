@@ -43,6 +43,7 @@ use Infection\Framework\Str;
 use Infection\Git\Git;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -53,6 +54,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Process\Process;
 
+#[AllowMockObjectsWithoutExpectations]
 #[Group('integration')]
 #[CoversClass(InitialTestRunCommand::class)]
 final class InitialTestRunCommandTest extends TestCase
@@ -235,11 +237,10 @@ final class InitialTestRunCommandTest extends TestCase
             )
             ->willReturn($initialTestsProcessMock);
 
-        $container = Container::create();
-        // Cannot use cloneWithService here: https://github.com/sanmai/di-container/issues/53
-        $container->set(Git::class, static fn () => $gitMock);
-        $container->set(TestFrameworkAdapter::class, static fn () => $testFrameworkAdapterMock);
-        $container->set(InitialTestsRunner::class, static fn () => $initialTestsRunnerMock);
+        $container = Container::create()
+            ->cloneWithService(Git::class, $gitMock)
+            ->cloneWithService(TestFrameworkAdapter::class, $testFrameworkAdapterMock)
+            ->cloneWithService(InitialTestsRunner::class, $initialTestsRunnerMock);
 
         $application = new Application($container);
 

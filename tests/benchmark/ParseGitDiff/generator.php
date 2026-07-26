@@ -464,7 +464,7 @@ final readonly class Generator
             // New file
             $output .= "new file mode 100644\n";
             $output .= 'index 0000000..';
-            $hash = md5($filePath . (string) time());
+            $hash = md5($filePath . time());
             $output .= substr($hash, 0, 7) . "\n";
             $output .= "--- /dev/null\n";
             $output .= "+++ b/$filePath\n";

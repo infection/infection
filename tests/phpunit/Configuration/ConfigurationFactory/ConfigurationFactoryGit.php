@@ -58,7 +58,7 @@ final readonly class ConfigurationFactoryGit implements Git
         string $diffFilter,
         string $base,
         array $sourceDirectories,
-    ): string {
+    ): array {
         throw new DomainException('Not implemented.');
     }
 
@@ -73,5 +73,10 @@ final readonly class ConfigurationFactoryGit implements Git
     public function getBaseReference(string $base): string
     {
         return sprintf('reference(%s)', $base);
+    }
+
+    public function getProjectDirectory(): string
+    {
+        throw new DomainException('Not implemented.');
     }
 }

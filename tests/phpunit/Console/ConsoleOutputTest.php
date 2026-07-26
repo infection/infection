@@ -99,6 +99,32 @@ final class ConsoleOutputTest extends TestCase
         );
     }
 
+    public function test_log_running_with_thread_count_plural(): void
+    {
+        $this->consoleOutput->logRunningWithThreadCount(7);
+
+        $this->assertSame(
+            <<<'TXT'
+                [notice] Running Infection with 7 threads.
+
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
+        );
+    }
+
+    public function test_log_running_with_thread_count_singular(): void
+    {
+        $this->consoleOutput->logRunningWithThreadCount(1);
+
+        $this->assertSame(
+            <<<'TXT'
+                [notice] Running Infection with 1 thread.
+
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
+        );
+    }
+
     public function test_log_running_with_debugger(): void
     {
         $this->consoleOutput->logRunningWithDebugger('foo');

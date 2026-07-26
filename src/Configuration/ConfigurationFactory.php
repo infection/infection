@@ -37,19 +37,24 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function explode;
 use function file_exists;
+use function implode;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Mago;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
@@ -63,7 +68,9 @@ use Infection\Reporter\FileReporter;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
 use function is_numeric;
+use function ltrim;
 use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -85,6 +92,8 @@ class ConfigurationFactory
      */
     private const int DEFAULT_TIMEOUT = 10;
 
+    private const int DEFAULT_DOTS_PER_ROW = 50;
+
     public function __construct(
         private readonly TmpDirProvider $tmpDirProvider,
         private readonly MutatorResolver $mutatorResolver,
@@ -92,10 +101,16 @@ class ConfigurationFactory
         private readonly MutatorParser $mutatorParser,
         private readonly CiDetectorInterface $ciDetector,
         private readonly Git $git,
+        private readonly ProjectDirectoryProvider $projectDirectoryProvider,
+        private readonly CpuCoresCountProvider $cpuCoresCountProvider,
+        private readonly PositionalPathsClassifier $positionalPathsClassifier,
     ) {
     }
 
     /**
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
+     *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
      */
@@ -118,9 +133,11 @@ class ConfigurationFactory
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
+        ?string $testFrameworkExtraArgs,
         ?string $staticAnalysisToolOptions,
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
         ?int $threadCount,
+        string|int|null $dotsPerRow,
         bool $dryRun,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
@@ -130,7 +147,7 @@ class ConfigurationFactory
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
-        ?string $loggerProjectRootDirectory,
+        ?string $projectDirectory,
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
@@ -156,7 +173,11 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
+        [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
+            $sourceFilter,
+            $schema,
+            $testFrameworkExtraArgs,
+        );
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
@@ -172,7 +193,12 @@ class ConfigurationFactory
             testFramework: $testFramework,
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
-            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
+                $testFrameworkExtraOptions,
+                $testFrameworkExtraArgs,
+                $schema,
+                $testFramework,
+            ),
             staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
             coveragePath: $coverageBasePath,
             skipCoverage: $skipCoverage,
@@ -188,11 +214,12 @@ class ConfigurationFactory
             maxTimeouts: self::retrieveMaxTimeouts($maxTimeouts, $schema),
             msiPrecision: $msiPrecision,
             threadCount: $this->retrieveThreadCount($threadCount, $schema),
+            dotsPerRow: self::retrieveDotsPerRow($dotsPerRow, $schema),
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $loggerProjectRootDirectory,
+            projectDirectory: $this->retrieveProjectDirectory($projectDirectory),
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
             configurationPathname: $schema->pathname,
@@ -289,11 +316,34 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $existingCoveragePath);
     }
 
-    private static function retrieveTestFrameworkExtraOptions(
+    private static function retrieveTestFrameworkExtraArgs(
         ?string $testFrameworkExtraOptions,
+        ?string $testFrameworkExtraArgs,
         SchemaConfiguration $schema,
+        string $testFramework,
     ): string {
-        return $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
+        $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
+
+        if ($extraArgs !== '') {
+            return $extraArgs;
+        }
+
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
+
+        return $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT
+            ? $extraOptions
+            : self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraOptions);
+    }
+
+    private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
+    {
+        return implode(
+            ' ',
+            array_map(
+                static fn ($option): string => '--' . $option,
+                explode(' --', ltrim($extraOptions, '-')),
+            ),
+        );
     }
 
     private static function retrieveStaticAnalysisToolOptions(
@@ -357,17 +407,60 @@ class ConfigurationFactory
         return $map;
     }
 
+    /**
+     * @return array{0: PlainFilter|null, 1: string|null}
+     */
+    private function resolvePositionalPathsFilter(
+        PositionalPathsFilter $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        $classified = $this->positionalPathsClassifier->classify(
+            $sourceFilter->paths,
+            $schema,
+        );
+
+        $resolvedFilter = $classified->sourcePaths !== []
+            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
+            : null;
+
+        if ($classified->testPaths !== []) {
+            if ($testFrameworkExtraArgs !== null) {
+                throw new InvalidArgumentException(
+                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                );
+            }
+
+            $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
+        }
+
+        return [$resolvedFilter, $testFrameworkExtraArgs];
+    }
+
+    /**
+     * @return array{0: SourceFilter|null, 1: string|null}
+     */
     private function refineFilterIfNecessary(
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
-    ): ?SourceFilter {
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        if ($sourceFilter instanceof PositionalPathsFilter) {
+            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+                $sourceFilter,
+                $schema,
+                $testFrameworkExtraArgs,
+            );
+        }
+
         if ($sourceFilter instanceof IncompleteGitDiffFilter) {
-            return new GitDiffFilter(
+            $sourceFilter = new GitDiffFilter(
                 $sourceFilter->value,
                 self::refineGitBase($sourceFilter->base),
             );
         }
 
-        return $sourceFilter;
+        return [$sourceFilter, $testFrameworkExtraArgs];
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
@@ -449,8 +542,11 @@ class ConfigurationFactory
 
         $threadsFromSchema = $schema->threads;
 
+        // we subtract 1 here to not use all the available cores by Infection
+        $maxThreads = max(1, $this->cpuCoresCountProvider->provide() - 1);
+
         if ($threadsFromSchema === null) {
-            return 1;
+            return $maxThreads;
         }
 
         // config has numeric string or integer value
@@ -461,8 +557,17 @@ class ConfigurationFactory
         // config has `max` thread count
         Assert::same($threadsFromSchema, 'max', sprintf('The value of key `threads` in configuration file must be of type integer or string "max". String "%s" provided.', $threadsFromSchema));
 
-        // we subtract 1 here to not use all the available cores by Infection
-        return max(1, CpuCoresCountProvider::provide() - 1);
+        return $maxThreads;
+    }
+
+    /**
+     * @param positive-int|'max'|null $dotsPerRow
+     *
+     * @return positive-int|'max'
+     */
+    private static function retrieveDotsPerRow(string|int|null $dotsPerRow, SchemaConfiguration $schema): int|string
+    {
+        return $dotsPerRow ?? $schema->dotsPerRow ?? self::DEFAULT_DOTS_PER_ROW;
     }
 
     /**
@@ -491,5 +596,22 @@ class ConfigurationFactory
         // To prevent this, we try to find the best common ancestor, here C.
         // As a result, we would do `git diff C HEAD` which would give (D,E).
         return $this->git->getBaseReference($base ?? $this->git->getDefaultBase());
+    }
+
+    /**
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     *
+     * @return non-empty-string Absolute path.
+     */
+    private function retrieveProjectDirectory(?string $projectDirectory): string
+    {
+        $resolvedProjectDirectory = $projectDirectory ?? $this->projectDirectoryProvider->provide();
+
+        Assert::notNull(
+            $resolvedProjectDirectory,
+            'Could not resolve the project directory.',
+        );
+
+        return $resolvedProjectDirectory;
     }
 }

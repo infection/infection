@@ -46,7 +46,7 @@ final class MemoizedComposerExecutableFinderTest extends TestCase
 {
     public function test_it(): void
     {
-        $pathToComposer = '/path/to/composer';
+        $pathToComposer = ['/path/to/composer'];
 
         $mockFinder = $this->createMock(ComposerExecutableFinder::class);
         $mockFinder->expects($this->once())

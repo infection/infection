@@ -38,7 +38,6 @@ namespace Infection\FileSystem\Finder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function Safe\getcwd;
 use function Safe\realpath;
-use function sprintf;
 use function str_contains;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -48,7 +47,10 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 final readonly class ConcreteComposerExecutableFinder implements ComposerExecutableFinder
 {
-    public function find(): string
+    /**
+     * @return list<string>
+     */
+    public function find(): array
     {
         $probable = ['composer', 'composer.phar'];
         $finder = new ExecutableFinder();
@@ -59,7 +61,7 @@ final readonly class ConcreteComposerExecutableFinder implements ComposerExecuta
 
             if ($path !== null) {
                 if (!str_contains($path, '.phar')) {
-                    return $path;
+                    return [$path];
                 }
 
                 return $this->makeExecutable($path);
@@ -80,12 +82,16 @@ final readonly class ConcreteComposerExecutableFinder implements ComposerExecuta
         throw FinderException::composerNotFound();
     }
 
-    private function makeExecutable(string $path): string
+    /**
+     * @return list<string>
+     */
+    private function makeExecutable(string $path): array
     {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find() ?: 'php',
+        $phpExecutable = (new PhpExecutableFinder())->find();
+
+        return [
+            $phpExecutable === false ? 'php' : $phpExecutable,
             $path,
-        );
+        ];
     }
 }

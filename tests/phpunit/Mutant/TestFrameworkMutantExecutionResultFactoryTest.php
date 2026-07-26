@@ -46,11 +46,13 @@ use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Testing\MutatorName;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(TestFrameworkMutantExecutionResultFactory::class)]
 final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 {

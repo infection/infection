@@ -37,31 +37,19 @@ namespace Infection\Tests\Reporter;
 
 use Infection\Metrics\ResultsCollector;
 use Infection\Reporter\GitHubAnnotationsReporter;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
 #[CoversClass(GitHubAnnotationsReporter::class)]
 final class GitHubAnnotationsReporterTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
     use CreateMetricsCalculator;
-
-    protected function setUp(): void
-    {
-        $this->backupEnvironmentVariables();
-
-        parent::setUp();
-    }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        $this->restoreEnvironmentVariables();
         self::resetOriginalFilePrefix();
     }
 
@@ -73,7 +61,10 @@ final class GitHubAnnotationsReporterTest extends TestCase
         ResultsCollector $resultsCollector,
         array $expectedLines,
     ): void {
-        $reporter = new GitHubAnnotationsReporter($resultsCollector, null);
+        $reporter = new GitHubAnnotationsReporter(
+            $resultsCollector,
+            '/path/to/project',
+        );
 
         $this->assertSame($expectedLines, $reporter->getLines());
     }
@@ -94,21 +85,8 @@ final class GitHubAnnotationsReporterTest extends TestCase
         ];
     }
 
-    public function test_it_reports_correctly_with_ci_github_workspace(): void
-    {
-        \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
-        self::setOriginalFilePrefix('/my/project/dir/');
-
-        $resultsCollector = self::createCompleteResultsCollector();
-
-        $reporter = new GitHubAnnotationsReporter($resultsCollector, null);
-
-        $this->assertStringContainsString('warning file=foo/bar', $reporter->getLines()[0]);
-    }
-
     public function test_it_reports_correctly_with_custom_github_workspace(): void
     {
-        \Safe\putenv('GITHUB_WORKSPACE=/my/project/dir');
         self::setOriginalFilePrefix('/custom/project/dir/');
 
         $resultsCollector = self::createCompleteResultsCollector();

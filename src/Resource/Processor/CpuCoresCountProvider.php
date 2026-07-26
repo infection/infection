@@ -41,13 +41,14 @@ use Infection\Framework\OperatingSystem;
 
 /**
  * @internal
+ * @final
  */
-final class CpuCoresCountProvider
+class CpuCoresCountProvider
 {
     /**
      * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
      */
-    public static function provide(): int
+    public function provide(): int
     {
         if (OperatingSystem::isWindows()) {
             return 1;

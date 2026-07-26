@@ -50,7 +50,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final readonly class FileReporter implements Reporter
 {
-    public const array ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr'];
+    public const array ALLOWED_PHP_STREAMS = ['php://stdout', 'php://stderr', 'php://output'];
 
     public function __construct(
         private string $filePath,
@@ -72,8 +72,8 @@ final readonly class FileReporter implements Reporter
                 // The Symfony filesystem component doesn't support using streams so provide a
                 // sensible error message
                 $this->logger->error(sprintf(
-                    '<error>The only streams supported are "php://stdout" and "php://stderr"'
-                    . '. Got "%s"</error>',
+                    '<error>The only streams supported are "%s". Got "%s"</error>',
+                    implode('", "', self::ALLOWED_PHP_STREAMS),
                     $this->filePath,
                 ));
             }

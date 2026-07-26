@@ -52,6 +52,7 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
         'yml.dist',
         'dist.xml',
         'dist.yml',
+        'php',
     ];
 
     public function __construct(

@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function ctype_digit;
 use function getenv;
 use Infection\Container\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use InvalidArgumentException;
 use function is_numeric;
+use function is_string;
 use function max;
 use function sprintf;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +55,7 @@ final readonly class RunCommandHelper
 {
     public function __construct(
         private InputInterface $input,
+        private CpuCoresCountProvider $cpuCoresCountProvider,
     ) {
     }
 
@@ -123,7 +126,33 @@ final readonly class RunCommandHelper
         Assert::same($threads, 'max', sprintf('The value of option `--threads` must be of type integer or string "max". String "%s" provided.', $threads));
 
         // we subtract 1 here to not use all the available cores by Infection
-        return max(1, CpuCoresCountProvider::provide() - 1);
+        return max(1, $this->cpuCoresCountProvider->provide() - 1);
+    }
+
+    /**
+     * @return positive-int|'max'|null
+     */
+    public function getDotsPerRow(): string|int|null
+    {
+        $dotsPerRow = $this->input->getOption(RunCommand::OPTION_DOTS_PER_ROW);
+
+        if ($dotsPerRow === null) {
+            return null;
+        }
+
+        $error = sprintf('The value of option `--dots-per-row` must be a positive integer or string "max". "%s" provided.', $dotsPerRow);
+
+        if (is_string($dotsPerRow) && ctype_digit($dotsPerRow)) {
+            $value = (int) $dotsPerRow;
+
+            Assert::positiveInteger($value, $error);
+
+            return $value;
+        }
+
+        Assert::same($dotsPerRow, 'max', $error);
+
+        return 'max';
     }
 
     public function getNumberOfShownMutations(): ?int

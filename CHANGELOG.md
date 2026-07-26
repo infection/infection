@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.33.0]
+
+**Added:**
+
+* feat: New testing framework `Testo` support by @roxblnfk in https://github.com/infection/infection/pull/3107
+* feat(logger): Make dots-per-row configurable in the dot progress formatter by @paulbalandan in https://github.com/infection/infection/pull/3129
+
+**Changed:**
+
+* feat!: BC break: Improve the project directory resolution to the ConfigurationFactory by @theofidry in https://github.com/infection/infection/pull/3009
+
+**Fixed:**
+
+* fix(git): Fix the project directory resolution when git is not available by @theofidry in https://github.com/infection/infection/pull/3113
+
+**Internal:**
+
+* feat(reporter): Introduce the Reporter framework by @theofidry in https://github.com/infection/infection/pull/3095
+
+**Full Changelog**: https://github.com/infection/infection/compare/0.32.7...0.33.0
+
 ## [0.32.0]
 
 **Fixed:**

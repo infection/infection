@@ -48,6 +48,7 @@ final readonly class AdapterInstaller
     public const array OFFICIAL_ADAPTERS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
         TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
+        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
     ];
 
     // 2 minutes
@@ -63,7 +64,7 @@ final readonly class AdapterInstaller
         Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
 
         $process = new Process([
-            $this->composerExecutableFinder->find(),
+            ...$this->composerExecutableFinder->find(),
             'require',
             '--dev',
             self::OFFICIAL_ADAPTERS_MAP[$adapterName],

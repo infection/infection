@@ -1,6 +1,10 @@
 !/.tools/.gitkeep
 !/dist/.gitkeep
 !/var/cache/.gitkeep
+.DS_Store
+.claude/
+.codex/
+.idea/
 .phpunit.*
 /*.phar
 /.box_dump/
@@ -8,11 +12,12 @@
 /.composer/
 /.direnv/
 /.envrc.local
-/.idea
 /.php_cs.cache
+/.sbx/
 /.tools/
 /build/
 /devTools/Docker*.json
+/devTools/sbx/kits/project-local/spec.yaml
 /dist/
 /infection-cache
 /infection.log
@@ -35,3 +40,6 @@
 /tests/phpunit/**/*/generated_index.xml
 /var/
 /vendor/
+Desktop.ini
+Thumbs.db
+ehthumbs.db

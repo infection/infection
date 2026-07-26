@@ -38,6 +38,7 @@ namespace Infection\Command\Option;
 use Infection\CannotBeInstantiated;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\IO;
 use Infection\Container\Container;
 use Infection\Git\Git;
@@ -106,21 +107,34 @@ final class SourceFilterOptions
             );
     }
 
-    public static function get(IO $io): PlainFilter|IncompleteGitDiffFilter|null
+    /**
+     * @param list<non-empty-string> $positionalPaths
+     */
+    public static function get(IO $io, array $positionalPaths = []): PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null
     {
         $input = $io->getInput();
 
-        $filter = self::getPlainFilter($input);
+        $filter = self::getPlainFilter($io);
         $gitFilter = self::getGitFilter($input);
 
-        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter);
+        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter, $positionalPaths);
+
+        if ($positionalPaths !== []) {
+            return new PositionalPathsFilter($positionalPaths);
+        }
 
         return $filter ?? $gitFilter;
     }
 
-    private static function getPlainFilter(InputInterface $input): ?PlainFilter
+    private static function getPlainFilter(IO $io): ?PlainFilter
     {
-        $value = trim((string) $input->getOption(self::PLAIN_FILTER_NAME));
+        $value = trim((string) $io->getInput()->getOption(self::PLAIN_FILTER_NAME));
+
+        if ($value !== '') {
+            $io->warning(
+                'The "--filter" option is deprecated since 0.34.0 and will be removed in future versions. Use positional arguments instead: infection <filter>',
+            );
+        }
 
         return PlainFilter::tryToCreate($value);
     }
@@ -232,9 +246,13 @@ final class SourceFilterOptions
         }
     }
 
+    /**
+     * @param list<non-empty-string> $positionalPaths
+     */
     private static function assertOnlyOneTypeOfFiltering(
         ?PlainFilter $plainFilter,
         ?IncompleteGitDiffFilter $gitFilter,
+        array $positionalPaths,
     ): void {
         if ($plainFilter !== null && $gitFilter !== null) {
             throw new InvalidArgumentException(
@@ -244,6 +262,25 @@ final class SourceFilterOptions
                     self::GIT_DIFF_FILTER_NAME,
                     self::PLAIN_FILTER_NAME,
                     self::GIT_DIFF_FILTER_NAME,
+                ),
+            );
+        }
+
+        if ($positionalPaths !== [] && $plainFilter !== null) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass source paths as positional arguments together with the "--%s" option. Use either form, not both.',
+                    self::PLAIN_FILTER_NAME,
+                ),
+            );
+        }
+
+        if ($positionalPaths !== [] && $gitFilter !== null) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass positional paths together with "--%s" / "--%s". Use either form, not both.',
+                    self::GIT_DIFF_FILTER_NAME,
+                    self::GIT_DIFF_LINES_NAME,
                 ),
             );
         }

@@ -40,5 +40,8 @@ namespace Infection\FileSystem\Finder;
  */
 interface ComposerExecutableFinder
 {
-    public function find(): string;
+    /**
+     * @return list<string>
+     */
+    public function find(): array;
 }

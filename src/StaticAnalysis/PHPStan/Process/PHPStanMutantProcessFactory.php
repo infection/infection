@@ -37,10 +37,10 @@ namespace Infection\StaticAnalysis\PHPStan\Process;
 
 use function array_merge;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -50,12 +50,14 @@ use Symfony\Component\Process\Process;
  */
 final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
+    private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
+
     /**
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
         private Filesystem $fileSystem,
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private MutantExecutionResultFactory $mutantExecutionResultFactory,
         private string $staticAnalysisConfigPath,
         private string $staticAnalysisToolExecutable,
         private CommandLineBuilder $commandLineBuilder,
@@ -105,7 +107,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            self::PHP_EXTRA_ARGS,
             $options,
         );
     }

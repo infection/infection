@@ -48,7 +48,7 @@ final class NameResolverFactory
     public static function create(): NameResolver
     {
         return new NameResolver(
-            errorHandler: null, // Ensure we throw.
+            // Ensure we throw.
             options: [
                 'preserveOriginalNames' => true,
                 // must be `false` for pretty-printing to work properly

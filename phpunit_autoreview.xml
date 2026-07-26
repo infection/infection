@@ -22,13 +22,26 @@
 
     <testsuites>
         <testsuite name="Auto-Review Test Suite">
+            <directory>tests/phpunit/Architecture</directory>
             <directory>tests/phpunit/AutoReview</directory>
+
+            <exclude>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures</exclude>
+            <exclude>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures</exclude>
+            <exclude>tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures</exclude>
         </testsuite>
     </testsuites>
 
     <source>
         <include>
+            <directory>tests/Architecture</directory>
+            <directory>tests/phpunit/Architecture</directory>
             <directory>tests/phpunit/AutoReview</directory>
         </include>
+
+        <exclude>
+            <directory>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures</directory>
+            <directory>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures</directory>
+            <directory>tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures</directory>
+        </exclude>
     </source>
 </phpunit>

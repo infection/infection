@@ -51,7 +51,6 @@ use Symfony\Component\Finder\Finder;
 
 #[Group('integration')]
 #[CoversClass(BaseReportLocator::class)]
-#[CoversClass(DemoReportLocator::class)]
 final class BaseReportLocatorTest extends FileSystemTestCase
 {
     private FileSystem $fileSystem;

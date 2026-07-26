@@ -35,15 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Git;
 
-use function explode;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Git\NoGitProjectFound;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use function Safe\chdir;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
@@ -52,7 +53,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 #[Group('integration')]
 #[CoversClass(CommandLineGit::class)]
-final class CommandLineGitIntegrationTest extends TestCase
+final class CommandLineGitIntegrationTest extends FileSystemTestCase
 {
     // https://github.com/infection/infection/commit/40d08afda22d5fe6d0d87ffb95fd609dcb01992a
     // At minimum we will have the following files in the entire output:
@@ -81,12 +82,15 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+        chdir($this->cwd);
+
         $this->git = new CommandLineGit(
             new ShellCommandLineExecutor(),
         );
     }
 
-    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
+    public function test_it_gets_the_relative_paths_of_the_changed_files(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
@@ -95,7 +99,6 @@ final class CommandLineGitIntegrationTest extends TestCase
             self::COMMIT_REFERENCE,
             ['src/Git'],
         );
-        $paths = explode(',', $output);
 
         $expectedFiles = [
             'src/Git/CommandLineGit.php',
@@ -105,8 +108,8 @@ final class CommandLineGitIntegrationTest extends TestCase
         foreach ($expectedFiles as $expectedFile) {
             $this->assertContains(
                 $expectedFile,
-                $paths,
-                implode("\n", $paths),
+                $output,
+                implode("\n", $output),
             );
         }
     }
@@ -213,6 +216,22 @@ final class CommandLineGitIntegrationTest extends TestCase
         $refinedBase = $this->git->getBaseReference($originalBase);
 
         $this->assertNotSame($originalBase, $refinedBase);
+    }
+
+    public function test_it_gets_the_project_directory(): void
+    {
+        $projectDirectory = $this->git->getProjectDirectory();
+
+        $this->assertNotSame('', $projectDirectory);
+    }
+
+    public function test_it_cannot_the_project_directory_when_there_is_not_git_project(): void
+    {
+        chdir($this->tmp);
+
+        $this->expectException(NoGitProjectFound::class);
+
+        $this->git->getProjectDirectory();
     }
 
     private function skipIfCommitReferenceIsNotAvailable(): void

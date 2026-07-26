@@ -50,12 +50,14 @@ use Infection\Tests\PhpParser\FakeToken;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\Parser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
 {

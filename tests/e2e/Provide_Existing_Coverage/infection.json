@@ -1,5 +1,6 @@
 {
     "timeout": 25,
+    "threads": 1,
     "tmpDir": ".",
     "source": {
         "directories": [

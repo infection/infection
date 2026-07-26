@@ -38,7 +38,7 @@ namespace Infection\Process\Factory;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
@@ -58,7 +58,7 @@ class MutantProcessContainerFactory
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
-        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         /**
          * @var list<LazyMutantProcessFactory>
          */

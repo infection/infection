@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PHPUnit;
 
+use function array_slice;
+use function array_values;
 use Infection\CannotBeInstantiated;
 
 final class DataProviderFactory
@@ -68,6 +70,24 @@ final class DataProviderFactory
     {
         foreach ($dataProvider as $title => $scenario) {
             yield $prefix . $title => $scenario;
+        }
+    }
+
+    /**
+     * @param iterable<array-key, array<array-key, mixed>> $dataProvider
+     *
+     * @return iterable<array-key, list<mixed>>
+     */
+    public static function takeArguments(int $count, iterable $dataProvider): iterable
+    {
+        foreach ($dataProvider as $title => $scenario) {
+            yield $title => array_values(
+                array_slice(
+                    array: $scenario,
+                    offset: 0,
+                    length: $count,
+                ),
+            );
         }
     }
 }

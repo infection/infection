@@ -44,9 +44,8 @@ use SplFileInfo;
  * lazily.
  *
  * @internal
- * @final
  */
-class ProxyTrace implements Trace
+final class ProxyTrace implements Trace
 {
     private ?TestLocator $tests = null;
 

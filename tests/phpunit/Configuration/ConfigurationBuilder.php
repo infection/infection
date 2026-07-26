@@ -61,7 +61,9 @@ final class ConfigurationBuilder
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param positive-int|'max' $dotsPerRow
      * @param non-empty-string $configPathname
+     * @param non-empty-string $projectDirectory
      */
     private function __construct(
         private float $timeout,
@@ -93,11 +95,12 @@ final class ConfigurationBuilder
         private ?int $maxTimeouts,
         private int $msiPrecision,
         private int $threadCount,
+        private int|string $dotsPerRow,
         private bool $dryRun,
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
-        private ?string $loggerProjectRootDirectory,
+        private string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
@@ -138,11 +141,12 @@ final class ConfigurationBuilder
             maxTimeouts: $configuration->maxTimeouts,
             msiPrecision: $configuration->msiPrecision,
             threadCount: $configuration->threadCount,
+            dotsPerRow: $configuration->dotsPerRow,
             dryRun: $configuration->isDryRun,
             ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $configuration->loggerProjectRootDirectory,
+            projectDirectory: $configuration->projectDirectory,
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
             configPathname: $configuration->configurationPathname,
@@ -181,11 +185,12 @@ final class ConfigurationBuilder
             maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
+            dotsPerRow: 50,
             dryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
             mapSourceClassToTestStrategy: null,
-            loggerProjectRootDirectory: null,
+            projectDirectory: '/var/www/project',
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
@@ -246,13 +251,14 @@ final class ConfigurationBuilder
             maxTimeouts: 5,
             msiPrecision: 2,
             threadCount: 4,
+            dotsPerRow: 80,
             dryRun: true,
             ignoreSourceCodeMutatorsMap: [
                 'Foo\\Bar' => ['.*test.*'],
             ],
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: '/var/www/project',
+            projectDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
             configPathname: '/path/to/project/infection.json5',
@@ -522,6 +528,17 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param positive-int|'max' $dotsPerRow
+     */
+    public function withDotsPerRow(int|string $dotsPerRow): self
+    {
+        $clone = clone $this;
+        $clone->dotsPerRow = $dotsPerRow;
+
+        return $clone;
+    }
+
     public function withDryRun(bool $dryRun): self
     {
         $clone = clone $this;
@@ -557,10 +574,13 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    /**
+     * @param non-empty-string $projectDirectory
+     */
+    public function withProjectDirectory(string $projectDirectory): self
     {
         $clone = clone $this;
-        $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;
+        $clone->projectDirectory = $projectDirectory;
 
         return $clone;
     }
@@ -624,11 +644,12 @@ final class ConfigurationBuilder
             maxTimeouts: $this->maxTimeouts,
             msiPrecision: $this->msiPrecision,
             threadCount: $this->threadCount,
+            dotsPerRow: $this->dotsPerRow,
             isDryRun: $this->dryRun,
             ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
-            loggerProjectRootDirectory: $this->loggerProjectRootDirectory,
+            projectDirectory: $this->projectDirectory,
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
             configurationPathname: $this->configPathname,

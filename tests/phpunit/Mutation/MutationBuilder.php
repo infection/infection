@@ -220,6 +220,14 @@ final class MutationBuilder
         return $clone;
     }
 
+    public function withAttribute(string $key, string|int|float $attribute): self
+    {
+        $clone = clone $this;
+        $clone->attributes[$key] = $attribute;
+
+        return $clone;
+    }
+
     public function withMutatedNodeClass(string $mutatedNodeClass): self
     {
         $clone = clone $this;

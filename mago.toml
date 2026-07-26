@@ -8,6 +8,7 @@ workspace = "."
 paths = [
     "src",
     "tests/autoloaded",
+    "tests/Architecture",
     "tests/benchmark",
     "tests/phpunit"
 ]
@@ -19,6 +20,8 @@ excludes = [
     "tests/benchmark/Tracing/benchmark-source",
     "tests/benchmark/Tracing/coverage",
     "tests/benchmark/Tracing/sources",
+    "tests/Architecture",
+    "tests/phpunit/Architecture",
     "tests/phpunit/Fixtures",
     "tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php",
     "tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php",

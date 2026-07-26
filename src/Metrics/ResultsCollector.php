@@ -43,9 +43,8 @@ use function sprintf;
 
 /**
  * @internal
- * @final
  */
-class ResultsCollector implements Collector
+final class ResultsCollector implements Collector
 {
     /**
      * @var array<string, SortableMutantExecutionResults>

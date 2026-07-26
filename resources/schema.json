@@ -26,6 +26,19 @@
                 }
             ]
         },
+        "dotsPerRow": {
+            "description": "Number of dots per row in the dot progress formatter. Use \"max\" to fit the terminal width.",
+            "oneOf": [
+                {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                {
+                    "type": "string",
+                    "enum": ["max"]
+                }
+            ]
+        },
         "source": {
             "type": "object",
             "required": [
@@ -641,7 +654,8 @@
             "anyOf": [
                 "phpunit",
                 "phpspec",
-                "codeception"
+                "codeception",
+                "testo"
             ]
         },
         "staticAnalysisTool": {
@@ -665,7 +679,12 @@
         },
         "testFrameworkOptions": {
             "type": "string",
-            "description": "Specify an additional options to pass to the test framework (e.g. enabling Verbose Mode). --test-framework-options will override this option."
+            "deprecated": true,
+            "description": "Deprecated. Use testFrameworkExtraArgs instead."
+        },
+        "testFrameworkExtraArgs": {
+            "type": "string",
+            "description": "Specify raw additional arguments to pass to Test Framework."
         }
     },
     "definitions": {

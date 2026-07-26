@@ -39,7 +39,6 @@ use Infection\Command\ListSourcesCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
@@ -65,42 +64,43 @@ final class ListSourcesCommandTest extends TestCase
         chdir($this->cwd);
     }
 
-    /**
-     * @param array<string, string> $input
-     */
-    #[DataProvider('inputProvider')]
-    public function test_it_lists_source_files(
-        array $input,
-        string $expected,
-    ): void {
-        $application = new Application(Container::create());
-        $tester = new CommandTester($application->find('config:list-sources'));
-
-        $tester->execute($input);
-
-        $actual = $tester->getDisplay();
-
-        $this->assertSame($expected, $actual);
-        $tester->assertCommandIsSuccessful();
-    }
-
-    public static function inputProvider(): iterable
+    public function test_it_lists_all_source_files(): void
     {
-        yield 'no filter' => [
-            [],
+        $tester = $this->runCommand([]);
+
+        $this->assertSame(
             <<<'STDOUT'
                 File1.php
                 File2.php
 
                 STDOUT,
-        ];
+            $tester->getDisplay(),
+        );
+        $tester->assertCommandIsSuccessful();
+    }
 
-        yield 'with plain filter' => [
-            ['--filter' => 'File1'],
-            <<<'STDOUT'
-                File1.php
+    public function test_it_lists_filtered_source_files_and_warns_about_the_deprecated_filter_option(): void
+    {
+        $tester = $this->runCommand(['--filter' => 'File1']);
 
-                STDOUT,
-        ];
+        $actual = $tester->getDisplay();
+
+        $this->assertStringContainsString('File1.php', $actual);
+        $this->assertStringNotContainsString('File2.php', $actual);
+        $this->assertStringContainsString('The "--filter" option is deprecated', $actual);
+        $tester->assertCommandIsSuccessful();
+    }
+
+    /**
+     * @param array<string, string> $input
+     */
+    private function runCommand(array $input): CommandTester
+    {
+        $application = new Application(Container::create());
+        $tester = new CommandTester($application->find('config:list-sources'));
+
+        $tester->execute($input);
+
+        return $tester;
     }
 }

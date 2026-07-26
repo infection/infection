@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
-use function class_exists;
-use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Debug\DumpAstCommand;
 use Infection\Command\Debug\MockTeamCityCommand;
@@ -51,13 +49,14 @@ use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container\Container;
+use Infection\Framework\InfectionVersion;
 use OutOfBoundsException;
 use Override;
-use function preg_quote;
-use function Safe\preg_match;
 use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use function trim;
 
@@ -66,8 +65,6 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    public const string PACKAGE_NAME = 'infection/infection';
-
     private const string NAME = 'Infection - PHP Mutation Testing Framework';
 
     private const string LOGO = '
@@ -81,11 +78,28 @@ final class Application extends BaseApplication
 
 ';
 
+    /**
+     * @throws OutOfBoundsException
+     */
     public function __construct(
         private readonly Container $container,
+        InfectionVersion $infectionVersion = new InfectionVersion(),
     ) {
-        parent::__construct(self::NAME, self::getPrettyVersion());
+        parent::__construct(self::NAME, $infectionVersion->prettyVersion());
         $this->setDefaultCommand('run');
+    }
+
+    #[Override]
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
+    {
+        $input ??= new ArgvInput();
+
+        // This allows to run `infection tests/` instead of `infection run tests/`.
+        if ($this->isUnknownCommand($input)) {
+            $input = $this->defaultToRunCommand($input);
+        }
+
+        return parent::run($input, $output);
     }
 
     public function getContainer(): Container
@@ -145,26 +159,24 @@ final class Application extends BaseApplication
         OutputFormatterStyleConfigurator::configure($output);
     }
 
-    private static function getPrettyVersion(): string
+    private function isUnknownCommand(InputInterface $input): bool
     {
-        // Pre 2.0 Composer runtime didn't have this class.
-        // @codeCoverageIgnoreStart
-        if (!class_exists(InstalledVersions::class)) {
-            return 'unknown';
-        }
-        // @codeCoverageIgnoreEnd
+        $firstArgument = $input->getFirstArgument();
 
-        try {
-            return (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
-            // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $e) {
-            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {
-                throw $e;
-            }
+        return $firstArgument !== null && !$this->has($firstArgument);
+    }
 
-            // We have a bogus exception: how can Infection be not installed if we're here?
-            return 'not-installed';
+    private function defaultToRunCommand(InputInterface $input): InputInterface
+    {
+        $newInput = new StringInput('run ' . $input);
+
+        // preserve interactivity that was set programmatically on the input
+        // rather than through a flag (e.g. when the input is built by tests).
+        // Flag- and CI-based interactivity is handled by `configureIO()`.
+        if (!$input->isInteractive()) {
+            $newInput->setInteractive(false);
         }
-        // @codeCoverageIgnoreEnd
+
+        return $newInput;
     }
 }

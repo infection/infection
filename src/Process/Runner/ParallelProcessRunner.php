@@ -48,9 +48,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  *
  * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
- * @final
  */
 class ParallelProcessRunner implements ProcessRunner
 {

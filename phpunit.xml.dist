@@ -8,11 +8,7 @@
          failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
-         displayDetailsOnIncompleteTests="true"
-         displayDetailsOnPhpunitDeprecations="true"
-         displayDetailsOnSkippedTests="true"
-         displayDetailsOnTestsThatTriggerDeprecations="true"
-         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnAllIssues="true"
          cacheDirectory="./var/cache/phpunit"
 >
 
@@ -28,6 +24,7 @@
         <testsuite name="Infection Test Suite">
             <directory>tests/phpunit</directory>
 
+            <exclude>tests/phpunit/Architecture</exclude>
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>
             <exclude>tests/phpunit/TestFramework/Coverage/Fixtures</exclude>
@@ -37,6 +34,7 @@
     <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
+            <directory>tests/phpunit</directory>
         </include>
     </source>
 

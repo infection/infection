@@ -36,19 +36,19 @@ declare(strict_types=1);
 namespace Infection\StaticAnalysis\Mago\Adapter;
 
 use function array_merge;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use RuntimeException;
 use Safe\Exceptions\PcreException;
 use function sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
 use function version_compare;
 
 /**
@@ -60,13 +60,14 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly MagoMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
         private ?string $version = null,
     ) {
     }
@@ -140,9 +141,8 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
             ['--version'],
         );
 
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        return $this->versionParser->parse($process->getOutput());
+        return $this->versionParser->parse(
+            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+        );
     }
 }

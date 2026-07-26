@@ -48,11 +48,11 @@ final class DryProcessRunnerTest extends TestCase
         $called = false;
 
         $processes = (function () use (&$called): iterable {
-            yield $this->createMock(MutantProcessContainer::class);
+            yield $this->createStub(MutantProcessContainer::class);
 
             $called = true;
 
-            yield $this->createMock(MutantProcessContainer::class);
+            yield $this->createStub(MutantProcessContainer::class);
         })();
 
         foreach ((new DryProcessRunner())->run($processes) as $item) {

@@ -43,18 +43,25 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ProjectDirectoryProvider\ChainProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\GitProjectDirectoryProvider;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
+use Infection\Differ\UnifiedDiffOutputBuilder;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -136,8 +143,8 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
-use Infection\Source\Collector\CachedSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
+use Infection\Source\Collector\MemoizedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
@@ -175,7 +182,6 @@ use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
@@ -247,13 +253,13 @@ final class Container extends DIContainer
 
     public const null DEFAULT_STATIC_ANALYSIS_TOOL = null;
 
-    public const null DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
-
     public const null DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
     public const null DEFAULT_FILTER = null;
 
     public const null DEFAULT_THREAD_COUNT = null;
+
+    public const null DEFAULT_DOTS_PER_ROW = null;
 
     public const bool DEFAULT_DRY_RUN = false;
 
@@ -295,6 +301,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
+                    $container->getShellCommandLineExecutor(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -304,6 +311,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
+                    $container->getShellCommandLineExecutor(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -317,7 +325,7 @@ final class Container extends DIContainer
             MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
                 $container->getPrinter(),
             ),
-            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
+            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,
@@ -474,7 +482,7 @@ final class Container extends DIContainer
                     $config->mutateOnlyCoveredCode(),
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
-                    $config->loggerProjectRootDirectory,
+                    $config->projectDirectory,
                     $config->processTimeout,
                 );
             },
@@ -622,7 +630,7 @@ final class Container extends DIContainer
                 static function () use ($container): SourceCollector {
                     $configuration = $container->getConfiguration();
 
-                    return new CachedSourceCollector(
+                    return new MemoizedSourceCollector(
                         $container->get(SourceCollectorFactory::class)->create(
                             $configuration->configurationPathname,
                             $configuration->source,
@@ -641,6 +649,23 @@ final class Container extends DIContainer
                 $container->getConfiguration()->configurationPathname,
             ),
             NodeDumper::class => static fn (self $container): NodeDumper => new NodeDumper(),
+            ProjectDirectoryProvider::class => static fn (self $container): ProjectDirectoryProvider => new ChainProjectDirectoryProvider(
+                new EnvironmentVariableBasedProjectDirectoryProvider(
+                    $container->getFileSystem(),
+                    // See https://docs.github.com/en/actions/reference/workflows-and-actions/variables
+                    'GITHUB_WORKSPACE',
+                ),
+                new EnvironmentVariableBasedProjectDirectoryProvider(
+                    $container->getFileSystem(),
+                    // See https://docs.gitlab.com/ci/variables/predefined_variables/#predefined-variables
+                    'CI_PROJECT_DIR',
+                ),
+                new GitProjectDirectoryProvider(
+                    $container->getGit(),
+                    $container->getLogger(),
+                ),
+                new CurrentWorkingDirectoryProvider(),
+            ),
         ]);
 
         return $container->withValues(
@@ -651,6 +676,8 @@ final class Container extends DIContainer
 
     /**
      * @param non-empty-string|null $configFile
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
      */
     public function withValues(
         LoggerInterface $logger,
@@ -674,10 +701,12 @@ final class Container extends DIContainer
         ?int $maxTimeouts = self::DEFAULT_MAX_TIMEOUTS,
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
-        ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        ?string $testFrameworkExtraOptions = null,
+        ?string $testFrameworkExtraArgs = null,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        string|int|null $dotsPerRow = self::DEFAULT_DOTS_PER_ROW,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
@@ -687,7 +716,7 @@ final class Container extends DIContainer
         bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
         bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-        ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
+        ?string $projectDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
         ?string $mutantId = self::DEFAULT_MUTANT_ID,
     ): self {
@@ -726,7 +755,10 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             MutationAnalysisLogger::class,
-            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($loggerName),
+            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create(
+                $loggerName,
+                $container->getConfiguration()->dotsPerRow,
+            ),
         );
 
         $clone->offsetSet(
@@ -754,9 +786,11 @@ final class Container extends DIContainer
                 mutatorsInput: $mutatorsInput,
                 testFramework: $testFramework,
                 testFrameworkExtraOptions: $testFrameworkExtraOptions,
+                testFrameworkExtraArgs: $testFrameworkExtraArgs,
                 staticAnalysisToolOptions: $staticAnalysisToolOptions,
                 sourceFilter: $sourceFilter,
                 threadCount: $threadCount,
+                dotsPerRow: $dotsPerRow,
                 dryRun: $dryRun,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,
@@ -766,7 +800,7 @@ final class Container extends DIContainer
                 useNoopMutators: $useNoopMutators,
                 executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
                 mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
-                loggerProjectRootDirectory: $loggerProjectRootDirectory,
+                projectDirectory: $projectDirectory,
                 staticAnalysisTool: $staticAnalysisTool,
                 mutantId: $mutantId,
             ),

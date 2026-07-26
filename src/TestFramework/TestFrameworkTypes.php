@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use function is_a;
 use Webmozart\Assert\Assert;
@@ -45,11 +46,15 @@ use Webmozart\Assert\Assert;
  */
 final class TestFrameworkTypes
 {
+    use CannotBeInstantiated;
+
     public const string PHPUNIT = 'phpunit';
 
     public const string PHPSPEC = 'phpspec';
 
     public const string CODECEPTION = 'codeception';
+
+    public const string TESTO = 'testo';
 
     /**
      * @var string[]
@@ -58,6 +63,7 @@ final class TestFrameworkTypes
         self::PHPUNIT,
         self::PHPSPEC,
         self::CODECEPTION,
+        self::TESTO,
     ];
 
     /**

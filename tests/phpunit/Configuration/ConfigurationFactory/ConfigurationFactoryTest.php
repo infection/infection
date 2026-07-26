@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use Exception;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -43,11 +44,15 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\PositionalPathsClassifier;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
@@ -59,6 +64,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -68,10 +74,13 @@ use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
+use Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function str_contains;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -79,6 +88,8 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     private const string GIT_DEFAULT_BASE = 'test/default';
+
+    private const string DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
 
     /**
      * @var array<string, Mutator>|null
@@ -95,19 +106,25 @@ final class ConfigurationFactoryTest extends TestCase
         ConfigurationFactoryScenario $scenario,
     ): void {
         $schema = $scenario->schemaBuilder->build();
-
-        $actual = $this
-            ->createConfigurationFactory(
-                $scenario->ciDetected,
-                $scenario->githubActionsDetected,
-            )
-            ->create(...$scenario->inputBuilder->build($schema))
-        ;
-
-        $this->assertEquals(
-            $scenario->expected,
-            $actual,
+        $factory = $this->createConfigurationFactory(
+            $scenario->ciDetected,
+            $scenario->githubActionsDetected,
+            $scenario->resolvedProjectDirectory,
+            $scenario->cpuCoresCountProvider,
         );
+
+        if ($scenario->expected instanceof Exception) {
+            $this->expectExceptionObject($scenario->expected);
+        }
+
+        $actual = $factory->create(...$scenario->inputBuilder->build($schema));
+
+        if (!$scenario->expected instanceof Exception) {
+            $this->assertEquals(
+                $scenario->expected,
+                $actual,
+            );
+        }
     }
 
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
@@ -131,8 +148,10 @@ final class ConfigurationFactoryTest extends TestCase
             bootstrap: null,
             initialTestsPhpOptions: null,
             testFrameworkExtraOptions: null,
+            testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
 
@@ -142,6 +161,8 @@ final class ConfigurationFactoryTest extends TestCase
             ->createConfigurationFactory(
                 ciDetected: false,
                 githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                cpuCoresCountProvider: new CpuCoresCountProvider(),
             )
             ->create(
                 schema: $schema,
@@ -162,9 +183,11 @@ final class ConfigurationFactoryTest extends TestCase
                 mutatorsInput: '',
                 testFramework: TestFrameworkTypes::PHPUNIT,
                 testFrameworkExtraOptions: null,
+                testFrameworkExtraArgs: null,
                 staticAnalysisToolOptions: null,
                 sourceFilter: null,
                 threadCount: 0,
+                dotsPerRow: null,
                 dryRun: false,
                 useGitHubLogger: false,
                 gitlabLogFilePath: null,
@@ -174,7 +197,7 @@ final class ConfigurationFactoryTest extends TestCase
                 useNoopMutators: false,
                 executeOnlyCoveringTestCases: false,
                 mapSourceClassToTestStrategy: null,
-                loggerProjectRootDirectory: null,
+                projectDirectory: null,
                 staticAnalysisTool: 'non-supported-static-analysis-tool',
                 mutantId: null,
             )
@@ -206,8 +229,10 @@ final class ConfigurationFactoryTest extends TestCase
             bootstrap: null,
             initialTestsPhpOptions: null,
             testFrameworkExtraOptions: null,
+            testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: null,
         );
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
@@ -230,9 +255,11 @@ final class ConfigurationFactoryTest extends TestCase
             mutatorsInput: '',
             testFramework: null,
             testFrameworkExtraOptions: null,
+            testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             sourceFilter: new IncompleteGitDiffFilter('AM', 'master'),
             threadCount: 1,
+            dotsPerRow: null,
             dryRun: false,
             useGitHubLogger: true,
             gitlabLogFilePath: null,
@@ -242,7 +269,7 @@ final class ConfigurationFactoryTest extends TestCase
             useNoopMutators: false,
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: null,
+            projectDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
         );
@@ -277,11 +304,12 @@ final class ConfigurationFactoryTest extends TestCase
             maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
+            dotsPerRow: 50,
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-            loggerProjectRootDirectory: null,
+            projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
@@ -291,6 +319,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultScenario = ConfigurationFactoryScenario::create(
             ciDetected: false,
             githubActionsDetected: false,
+            projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
             schemaBuilder: $defaultSchemaBuilder,
             inputBuilder: $defaultInputBuilder,
             expected: $defaultConfiguration,
@@ -370,6 +399,15 @@ final class ConfigurationFactoryTest extends TestCase
                     'relative/path/to/from-config.text',
                     null,
                     '/path/to/relative/path/to/from-config.text',
+                ),
+        ];
+
+        yield 'PHP output stream text file log path' => [
+            $defaultScenario
+                ->forValueForTextLogFilePath(
+                    'php://output',
+                    null,
+                    'php://output',
                 ),
         ];
 
@@ -695,6 +733,100 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'dotsPerRow not specified in schema and not specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                null,
+                null,
+                50,
+            ),
+        ];
+
+        yield 'dotsPerRow specified in schema and not specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                80,
+                null,
+                80,
+            ),
+        ];
+
+        yield 'dotsPerRow not specified in schema and specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                null,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'dotsPerRow specified in schema and specified in input' => [
+            $defaultScenario->forValueForDotsPerRow(
+                80,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'dotsPerRow set to max in schema' => [
+            $defaultScenario->forValueForDotsPerRow(
+                'max',
+                null,
+                'max',
+            ),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, auto-detected from 1 CPU core stays at minimum of 1' => [
+            $defaultScenario
+                ->forValueForThreadCount(
+                    schemaThreads: null,
+                    inputThreadCount: null,
+                    expectedThreadCount: 1,
+                )
+                ->withCpuCoresCountProvider(new DummyCpuCoresCountProvider(1)),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, auto-detected from 2 CPU cores is 1' => [
+            $defaultScenario
+                ->forValueForThreadCount(
+                    schemaThreads: null,
+                    inputThreadCount: null,
+                    expectedThreadCount: 1,
+                )
+                ->withCpuCoresCountProvider(new DummyCpuCoresCountProvider(2)),
+        ];
+
+        yield 'thread count not specified in schema and not specified in input, auto-detected from 8 CPU cores is 7' => [
+            $defaultScenario
+                ->forValueForThreadCount(
+                    schemaThreads: null,
+                    inputThreadCount: null,
+                    expectedThreadCount: 7,
+                )
+                ->withCpuCoresCountProvider(new DummyCpuCoresCountProvider(8)),
+        ];
+
+        yield 'thread count specified in schema and not specified in input' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 4,
+                inputThreadCount: null,
+                expectedThreadCount: 4,
+            ),
+        ];
+
+        yield 'thread count not specified in schema and specified in input' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: null,
+                inputThreadCount: 4,
+                expectedThreadCount: 4,
+            ),
+        ];
+
+        yield 'thread count specified in schema and specified in input (CLI takes priority)' => [
+            $defaultScenario->forValueForThreadCount(
+                schemaThreads: 2,
+                inputThreadCount: 4,
+                expectedThreadCount: 4,
+            ),
+        ];
+
         yield 'minCoveredMsi not specified in schema and not specified in input' => [
             $defaultScenario->forValueForMinCoveredMsi(
                 null,
@@ -925,12 +1057,58 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'test framework PHP options from config are normalized for PHPUnit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                'debug --stop-on-failure',
+                null,
+                '--debug --stop-on-failure',
+            ),
+        ];
+
         yield 'test framework PHP options from input' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 null,
                 '--debug',
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for PHPUnit' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '--debug --stop-on-failure',
+                '--debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for PHPUnit (missing leading dashes)' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                'debug stop-on-failure',
+                '--debug stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for PHPUnit with short option' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+                // Incorrect current behaviour: the splitter normalises all options to long options.
+                '--v debug --stop-on-failure -c phpunit_autoreview',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for PHPUnit with spaces' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpunit',
+                null,
+                '--filter "a test with spaces"',
+                '--filter "a test with spaces"',
             ),
         ];
 
@@ -943,12 +1121,57 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'test framework PHP options from config with phpspec framework' => [
+        yield 'test framework PHP options from config with another test framework' => [
             $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpspec',
                 '--debug',
                 null,
                 '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from config are not normalized for another test framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                'debug --stop-on-failure',
+                null,
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are not normalized for another test framework' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug --stop-on-failure',
+                'debug --stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input are normalized for another test framework (missing leading dashes)' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                'debug stop-on-failure',
+                'debug stop-on-failure',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for another test framework with short option' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+                '-v debug --stop-on-failure -c phpunit_autoreview',
+            ),
+        ];
+
+        yield 'test framework PHP options from input for another test framework with spaces' => [
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
+                'phpspec',
+                null,
+                '--filter "a test with spaces"',
+                '--filter "a test with spaces"',
             ),
         ];
 
@@ -1146,6 +1369,64 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'positional source paths become a PlainFilter (with deduplication)' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'Bar.php', 'Foo.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php', 'Bar.php']))
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths become testFrameworkExtraOptions' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['tests/FooTest.php', 'tests/BarTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(null)
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php tests/BarTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional paths with both source and test paths' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder->withSourceFilter(
+                        new PositionalPathsFilter(['Foo.php', 'tests/FooTest.php']),
+                    ),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceFilter(new PlainFilter(['Foo.php']))
+                        ->withTestFrameworkExtraOptions('tests/FooTest.php')
+                        ->build(),
+                ),
+        ];
+
+        yield 'positional test paths with existing testFrameworkExtraArgs throws' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInputBuilder
+                        ->withSourceFilter(new PositionalPathsFilter(['tests/FooTest.php']))
+                        ->withTestFrameworkExtraArgs('--stop-on-failure'),
+                )
+                ->withExpected(
+                    new InvalidArgumentException(
+                        'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                    ),
+                ),
+        ];
+
         yield 'with git filters and base branch' => [
             $defaultScenario
                 ->forSourceFilter(
@@ -1154,10 +1435,53 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'with project directory input' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: '/path/to/project',
+                resolvedProjectDirectory: null,
+                expected: '/path/to/project',
+            ),
+        ];
+
+        yield 'with relative project directory input' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: 'relative-path/to/project',
+                resolvedProjectDirectory: null,
+                expected: 'relative-path/to/project',
+            ),
+        ];
+
+        yield 'without project directory input and with a resolved project directory' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: null,
+                resolvedProjectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                expected: self::DEFAULT_PROJECT_DIRECTORY,
+            ),
+        ];
+
+        yield 'without project directory input nor resolved project directory' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: null,
+                resolvedProjectDirectory: null,
+                expected: new InvalidArgumentException(
+                    'Could not resolve the project directory.',
+                ),
+            ),
+        ];
+
+        yield 'with project directory input & resolved project directory' => [
+            $defaultScenario->forProjectDirectory(
+                projectDirectoryInput: '/path/to/project',
+                resolvedProjectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
+                expected: '/path/to/project',
+            ),
+        ];
+
         yield 'complete' => [
             ConfigurationFactoryScenario::create(
                 ciDetected: false,
                 githubActionsDetected: false,
+                projectDirectory: self::DEFAULT_PROJECT_DIRECTORY,
                 schemaBuilder: SchemaConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10.0)
                     ->withSource(new Source(['src/'], ['vendor/']))
@@ -1205,12 +1529,14 @@ final class ConfigurationFactoryTest extends TestCase
                     mutatorsInput: 'TrueValue',
                     testFramework: 'phpspec',
                     testFrameworkExtraOptions: '--stop-on-failure',
+                    testFrameworkExtraArgs: null,
                     staticAnalysisToolOptions: null,
                     sourceFilter: new PlainFilter([
                         'src/Foo.php',
                         'src/Bar.php',
                     ]),
                     threadCount: 4,
+                    dotsPerRow: null,
                     dryRun: true,
                     useGitHubLogger: false,
                     gitlabLogFilePath: null,
@@ -1220,7 +1546,7 @@ final class ConfigurationFactoryTest extends TestCase
                     useNoopMutators: false,
                     executeOnlyCoveringTestCases: false,
                     mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
-                    loggerProjectRootDirectory: null,
+                    projectDirectory: '/path/to/project',
                     staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
                     mutantId: 'h4sh',
                 ),
@@ -1277,7 +1603,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withIgnoreSourceCodeMutatorsMap([])
                     ->withExecuteOnlyCoveringTestCases(false)
                     ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
-                    ->withLoggerProjectRootDirectory(null)
+                    ->withProjectDirectory('/path/to/project')
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
                     ->withConfigPathname('/path/to/infection.json')
@@ -1330,10 +1656,28 @@ final class ConfigurationFactoryTest extends TestCase
         return self::$mutators;
     }
 
+    /**
+     * @param non-empty-string|null $projectDirectory
+     */
     private function createConfigurationFactory(
         bool $ciDetected,
         bool $githubActionsDetected,
+        ?string $projectDirectory,
+        CpuCoresCountProvider $cpuCoresCountProvider,
     ): ConfigurationFactory {
+        $projectDirectoryProviderStub = $this->createStub(ProjectDirectoryProvider::class);
+        $projectDirectoryProviderStub
+            ->method('provide')
+            ->willReturn($projectDirectory);
+
+        // Report paths living under a "tests" directory as existing on disk so that the
+        // positional-paths scenarios can classify them as test paths, while bare values
+        // such as "Foo.php" stay unreadable and fall back to the source-filter heuristic.
+        $isTestPath = static fn (string $filename): bool => str_contains($filename, '/tests/');
+        $fileSystem = $this->createStub(FileSystem::class);
+        $fileSystem->method('isReadableFile')->willReturnCallback($isTestPath);
+        $fileSystem->method('isReadableDirectory')->willReturnCallback($isTestPath);
+
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
@@ -1343,6 +1687,9 @@ final class ConfigurationFactoryTest extends TestCase
             new ConfigurationFactoryGit(
                 self::GIT_DEFAULT_BASE,
             ),
+            $projectDirectoryProviderStub,
+            $cpuCoresCountProvider,
+            new PositionalPathsClassifier($fileSystem),
         );
     }
 }

@@ -51,6 +51,7 @@ final class SchemaConfigurationBuilder
      * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
+     * @param positive-int|'max'|null $dotsPerRow
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     private function __construct(
@@ -72,8 +73,10 @@ final class SchemaConfigurationBuilder
         private ?string $bootstrap,
         private ?string $initialTestsPhpOptions,
         private ?string $testFrameworkExtraOptions,
+        private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
         private string|int|null $threads,
+        private string|int|null $dotsPerRow,
         private ?string $staticAnalysisTool,
     ) {
     }
@@ -99,8 +102,10 @@ final class SchemaConfigurationBuilder
             bootstrap: $schema->bootstrap,
             initialTestsPhpOptions: $schema->initialTestsPhpOptions,
             testFrameworkExtraOptions: $schema->testFrameworkExtraOptions,
+            testFrameworkExtraArgs: $schema->testFrameworkExtraArgs,
             staticAnalysisToolOptions: $schema->staticAnalysisToolOptions,
             threads: $schema->threads,
+            dotsPerRow: $schema->dotsPerRow,
             staticAnalysisTool: $schema->staticAnalysisTool,
         );
     }
@@ -126,8 +131,10 @@ final class SchemaConfigurationBuilder
             bootstrap: null,
             initialTestsPhpOptions: null,
             testFrameworkExtraOptions: null,
+            testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: null,
             threads: null,
+            dotsPerRow: null,
             staticAnalysisTool: null,
         );
     }
@@ -164,8 +171,10 @@ final class SchemaConfigurationBuilder
             bootstrap: 'bootstrap.php',
             initialTestsPhpOptions: '-d memory_limit=1G',
             testFrameworkExtraOptions: '--verbose',
+            testFrameworkExtraArgs: null,
             staticAnalysisToolOptions: '--level=max',
             threads: 4,
+            dotsPerRow: 80,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
     }
@@ -340,6 +349,17 @@ final class SchemaConfigurationBuilder
     }
 
     /**
+     * @param positive-int|'max'|null $dotsPerRow
+     */
+    public function withDotsPerRow(string|int|null $dotsPerRow): self
+    {
+        $clone = clone $this;
+        $clone->dotsPerRow = $dotsPerRow;
+
+        return $clone;
+    }
+
+    /**
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function withStaticAnalysisTool(?string $staticAnalysisTool): self
@@ -371,8 +391,10 @@ final class SchemaConfigurationBuilder
             bootstrap: $this->bootstrap,
             initialTestsPhpOptions: $this->initialTestsPhpOptions,
             testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
+            testFrameworkExtraArgs: $this->testFrameworkExtraArgs,
             staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
             threads: $this->threads,
+            dotsPerRow: $this->dotsPerRow,
             staticAnalysisTool: $this->staticAnalysisTool,
         );
     }

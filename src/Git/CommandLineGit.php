@@ -83,7 +83,7 @@ final readonly class CommandLineGit implements Git
         return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
-    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
+    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): array
     {
         $lines = $this->diff(
             $diffFilter,
@@ -96,7 +96,9 @@ final readonly class CommandLineGit implements Git
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
-        return implode(',', $lines);
+        Assert::allStringNotEmpty($lines);
+
+        return $lines;
     }
 
     public function getChangedLinesRangesByFileRelativePaths(
@@ -147,6 +149,26 @@ final readonly class CommandLineGit implements Git
         }
 
         return $base;
+    }
+
+    public function getProjectDirectory(): string
+    {
+        // An error here should really not happen, so we are fine to let it
+        // bubble up instead of throwing a dedicated exception or providing a
+        // fallback.
+        try {
+            $directory = $this->shellCommandLineExecutor->execute([
+                'git',
+                'rev-parse',
+                '--show-toplevel',
+            ]);
+        } catch (ProcessException $exception) {
+            throw NoGitProjectFound::create($exception);
+        }
+
+        Assert::stringNotEmpty($directory);
+
+        return $directory;
     }
 
     /**
@@ -241,7 +263,7 @@ final readonly class CommandLineGit implements Git
     /**
      * @param string[] $sourceDirectories
      *
-     * @return string[]
+     * @return list<string>
      */
     private function diff(
         string $diffFilter,

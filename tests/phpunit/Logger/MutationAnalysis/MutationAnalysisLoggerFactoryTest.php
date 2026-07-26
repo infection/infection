@@ -58,14 +58,14 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
         MutationAnalysisLoggerName $name,
         string $expectedFormatterClassName,
     ): void {
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
+        $outputStub = $this->createStub(OutputInterface::class);
+        $outputStub
             ->method('isDecorated')
             ->willReturn(false)
         ;
 
         $factory = new MutationAnalysisLoggerFactory(
-            $outputMock,
+            $outputStub,
             new TeamCity(
                 timeoutsAsEscaped: false,
                 differ: SingletonContainer::getContainer()->getDiffer(),
@@ -73,7 +73,7 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
             '/path/to/project/infection.json5',
         );
 
-        $logger = $factory->create($name);
+        $logger = $factory->create($name, 50);
 
         $this->assertInstanceOf($expectedFormatterClassName, $logger);
     }

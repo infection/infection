@@ -40,9 +40,11 @@ use Infection\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNod
 use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(VisitorTestCase::class)]
+#[Group('integration')]
 final class VisitorTestCaseTest extends TestCase
 {
     private ConcreteVisitorTestCase $testCase;

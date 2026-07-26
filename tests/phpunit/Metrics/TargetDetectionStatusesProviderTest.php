@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
+use function array_values;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
@@ -312,7 +313,10 @@ final class TargetDetectionStatusesProviderTest extends TestCase
      */
     private function assertProvides(array $expected, array $actual): void
     {
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEqualsCanonicalizing(
+            array_values($expected),
+            array_values($actual),
+        );
     }
 
     /**
@@ -323,6 +327,9 @@ final class TargetDetectionStatusesProviderTest extends TestCase
     {
         $expected = DetectionStatus::getCasesExcluding(...$excluding);
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEqualsCanonicalizing(
+            $expected,
+            array_values($actual),
+        );
     }
 }

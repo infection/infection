@@ -38,12 +38,10 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 use function array_map;
 use function array_merge;
 use function count;
-use function explode;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use function ltrim;
 use SplFileInfo;
 use function sprintf;
 
@@ -128,10 +126,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         if ($extraOptions !== '') {
             $options = array_merge(
                 $options,
-                array_map(
-                    static fn ($option): string => '--' . $option,
-                    explode(' --', ltrim($extraOptions, '-')),
-                ),
+                TestFrameworkExtraArgs::parseRawTokens($extraOptions),
             );
         }
 

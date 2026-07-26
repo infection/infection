@@ -94,6 +94,7 @@ set -x
 "${DOCKER_BUILD_COMMAND[@]}" \
     "${DOCKER_BUILD_CACHE_OPTIONS[@]}" \
     --build-arg="PHP_VERSION=${PHP_VERSION}" \
+    --build-arg="CONTAINER_STRUCTURE_TEST_VERSION=${CONTAINER_STRUCTURE_TEST_VERSION}" \
     --file="${DOCKERFILE}" \
     --label="org.infection.sbx.cache-key=${CACHE_KEY}" \
     --tag="${IMAGE_REF}" \

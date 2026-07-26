@@ -38,9 +38,14 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 
 final class ConfigurationFactoryInputBuilder
 {
+    /**
+     * @param non-empty-string|null $projectDirectory
+     * @param positive-int|'max'|null $dotsPerRow
+     */
     public function __construct(
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
@@ -59,9 +64,11 @@ final class ConfigurationFactoryInputBuilder
         private string $mutatorsInput,
         private ?string $testFramework,
         private ?string $testFrameworkExtraOptions,
+        private ?string $testFrameworkExtraArgs,
         private ?string $staticAnalysisToolOptions,
-        private PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        private PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
         private ?int $threadCount,
+        private string|int|null $dotsPerRow,
         private bool $dryRun,
         private ?bool $useGitHubLogger,
         private ?string $gitlabLogFilePath,
@@ -71,7 +78,7 @@ final class ConfigurationFactoryInputBuilder
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
-        private ?string $loggerProjectRootDirectory,
+        private ?string $projectDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
     ) {
@@ -213,6 +220,14 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    public function withTestFrameworkExtraArgs(?string $testFrameworkExtraArgs): self
+    {
+        $clone = clone $this;
+        $clone->testFrameworkExtraArgs = $testFrameworkExtraArgs;
+
+        return $clone;
+    }
+
     public function withStaticAnalysisToolOptions(?string $staticAnalysisToolOptions): self
     {
         $clone = clone $this;
@@ -221,7 +236,7 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|null $sourceFilter): self
+    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilter = $sourceFilter;
@@ -233,6 +248,17 @@ final class ConfigurationFactoryInputBuilder
     {
         $clone = clone $this;
         $clone->threadCount = $threadCount;
+
+        return $clone;
+    }
+
+    /**
+     * @param positive-int|'max'|null $dotsPerRow
+     */
+    public function withDotsPerRow(string|int|null $dotsPerRow): self
+    {
+        $clone = clone $this;
+        $clone->dotsPerRow = $dotsPerRow;
 
         return $clone;
     }
@@ -309,10 +335,13 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    /**
+     * @param non-empty-string|null $projectDirectory
+     */
+    public function withProjectDirectory(?string $projectDirectory): self
     {
         $clone = clone $this;
-        $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;
+        $clone->projectDirectory = $projectDirectory;
 
         return $clone;
     }
@@ -354,20 +383,22 @@ final class ConfigurationFactoryInputBuilder
      *     16: string|null,
      *     17: string|null,
      *     18: string|null,
-     *     19: PlainFilter|IncompleteGitDiffFilter|null,
-     *     20: int|null,
-     *     21: bool,
-     *     22: bool|null,
-     *     23: string|null,
-     *     24: string|null,
+     *     19: string|null,
+     *     20: PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null,
+     *     21: int|null,
+     *     22: positive-int|'max'|null,
+     *     23: bool,
+     *     24: bool|null,
      *     25: string|null,
      *     26: string|null,
-     *     27: bool,
-     *     28: bool,
-     *     29: string|null,
-     *     30: string|null,
+     *     27: string|null,
+     *     28: string|null,
+     *     29: bool,
+     *     30: bool,
      *     31: string|null,
-     *     32: string|null
+     *     32: non-empty-string|null,
+     *     33: string|null,
+     *     34: string|null,
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -391,9 +422,11 @@ final class ConfigurationFactoryInputBuilder
             $this->mutatorsInput,
             $this->testFramework,
             $this->testFrameworkExtraOptions,
+            $this->testFrameworkExtraArgs,
             $this->staticAnalysisToolOptions,
             $this->sourceFilter,
             $this->threadCount,
+            $this->dotsPerRow,
             $this->dryRun,
             $this->useGitHubLogger,
             $this->gitlabLogFilePath,
@@ -403,7 +436,7 @@ final class ConfigurationFactoryInputBuilder
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,
-            $this->loggerProjectRootDirectory,
+            $this->projectDirectory,
             $this->staticAnalysisTool,
             $this->mutantId,
         ];

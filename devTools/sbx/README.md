@@ -6,9 +6,44 @@ It extends [`docker/sandbox-templates:codex-docker`][docker-sandbox-templates-co
 
 It uses [container-structure-test][container-structure-test] for testing the image.
 
+## Telemetry
+
+Codex telemetry is optional. The OpenTelemetry settings live in
+`devTools/sbx/codex-otel.toml` and are merged into the Codex user-level config
+by the `devTools/sbx/kits/codex-otel` kit when the sandbox starts.
+
+The provided template assumes the OTLP HTTP collector is reachable from
+the sandbox at `http://host.docker.internal:4318`. If it runs elsewhere,
+update `devTools/sbx/codex-otel.toml`.
+
+Note that depending on the port used or your network policies, the connection
+to the host may be denied. For example, with the value above, you will need to
+execute:
+
+```shell
+sbx policy allow network localhost:4318
+```
+
 ## Usage
 
-Build the image:
+```shell
+make sbx-create
+```
+
+This will create the Docker Sandbox image with the template and OTEL kit for the current
+branch and will make it available with:
+
+```shell
+sbx run codex-infection
+```
+
+Be aware that this command will drop the existing `codex-infection` sandbox.
+
+The command also creates `devTools/sbx/kits/project-local/spec.yaml` from
+`devTools/sbx/project-local-kit.yaml` when the local file is missing. The
+generated file is ignored by Git and is always included as a kit.
+
+If you wish to only build the image:
 
 ```shell
 make sbx-image-build
@@ -17,11 +52,25 @@ make sbx-image-build
 make _sbx-image-build
 ```
 
-Run a sandbox with the loaded template:
+To run a sandbox manually with the loaded template from the repository root:
 
 ```shell
-sbx run --template=infection-sbx-php-8.4:latest codex
+sbx run codex \
+  --template=infection-sbx-php-8.4:latest \
+  --kit=./devTools/sbx/kits/codex-otel \
+  --kit=./devTools/sbx/kits/project-local
 ```
+
+The `--kit` flag only applies when the sandbox is created. For an existing
+sandbox, recreate it or apply the kit explicitly with `sbx kit add`.
+
+To add user-specific sandbox customisation, edit:
+
+```text
+devTools/sbx/kits/project-local/spec.yaml
+```
+
+You can use the `--clone` or `--name` option to further adjust your setup.
 
 [docker sandbox]: https://www.docker.com/products/docker-sandboxes/
 [docker-sandbox-templates-codex]: https://hub.docker.com/layers/docker/sandbox-templates/codex-docker/images

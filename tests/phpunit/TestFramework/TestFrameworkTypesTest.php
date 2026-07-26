@@ -52,6 +52,7 @@ final class TestFrameworkTypesTest extends TestCase
                 TestFrameworkTypes::PHPUNIT,
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
+                TestFrameworkTypes::TESTO,
             ],
             $types,
         );
@@ -74,6 +75,7 @@ final class TestFrameworkTypesTest extends TestCase
                 TestFrameworkTypes::PHPUNIT,
                 TestFrameworkTypes::PHPSPEC,
                 TestFrameworkTypes::CODECEPTION,
+                TestFrameworkTypes::TESTO,
                 'dummy',
             ],
             $types,

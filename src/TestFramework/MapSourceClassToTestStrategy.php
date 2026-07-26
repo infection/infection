@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\CannotBeInstantiated;
+
 /**
  * @internal
  */
 final class MapSourceClassToTestStrategy
 {
+    use CannotBeInstantiated;
+
     public const string SIMPLE = 'simple';
 
     /**

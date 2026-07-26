@@ -47,11 +47,13 @@ use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultAssertions;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(PHPStanMutantExecutionResultFactory::class)]
 final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 {

@@ -46,9 +46,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
+final class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
     private const int PROCESS_MIN_ERROR_CODE = 100;
 

@@ -34,6 +34,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\BooleanNot\NegatedAndsToPositiveOrsRector;
 use Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector;
 use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetchRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
@@ -82,14 +83,26 @@ use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForCommo
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForJsonArrayRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\DocblockGetterReturnArrayFromPropertyDocblockVarRector;
 
-return RectorConfig::configure()
+$skippedPaths = [
+    __DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php',
+    __DIR__ . '/tests/benchmark/MutationGenerator/sources',
+    __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
+    __DIR__ . '/tests/benchmark/Tracing/coverage',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/ClassWithNoArgumentPrivateConstructor/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/HasInheritDoc/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/StaticOrConstOnlyClass/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/CoveredClassWithoutIo.php',
+];
+
+$config = RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/src',
+        __DIR__ . '/tests/Architecture',
+        __DIR__ . '/tests/benchmark',
         __DIR__ . '/tests/phpunit',
     ])
-    ->withSkipPath(
-        __DIR__ . '/src/PhpParser/NodeDumper/NodeDumper.php',
-    )
     ->withCache(
         cacheClass: FileCacheStorage::class,
         cacheDirectory: __DIR__ . '/var/cache/rector',
@@ -153,6 +166,7 @@ return RectorConfig::configure()
         MergeWithCallableAndWillReturnRector::class => [
             __DIR__ . '/tests/phpunit/Mutation/FileMutationGeneratorTest.php',
         ],
+        NegatedAndsToPositiveOrsRector::class => null,
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Tracing/Trace/TestLocations.php',
@@ -191,3 +205,11 @@ return RectorConfig::configure()
         ],
         VariableConstFetchToClassConstFetchRector::class,
     ]);
+
+foreach ($skippedPaths as $skippedPath) {
+    if (\file_exists($skippedPath)) {
+        $config = $config->withSkipPath($skippedPath);
+    }
+}
+
+return $config;

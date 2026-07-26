@@ -39,6 +39,7 @@ use function array_key_exists;
 use function count;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\CannotBeInstantiated;
 use Infection\Framework\ClassName;
 use function is_numeric;
 use function preg_quote;
@@ -51,6 +52,8 @@ use function version_compare;
  */
 final class FilterBuilder
 {
+    use CannotBeInstantiated;
+
     private const int MAX_EXPLODE_PARTS = 2;
 
     // The real limit is likely higher, but it is better to be safe than sorry.

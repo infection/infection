@@ -79,7 +79,7 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
         $traverserFactory
             ->createEnrichmentTraverser(
                 new MockSplFileInfo(realPath: '/path/to/source.php'),
-                $this->createTraceMock(),
+                $this->createTraceStub(),
             )
             ->traverse($nodes);
         $traversedNodes = $traverserFactory
@@ -2187,10 +2187,10 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
             );
     }
 
-    private function createTraceMock(): Trace
+    private function createTraceStub(): Trace
     {
-        $traceMock = $this->createMock(Trace::class);
-        $traceMock
+        $traceStub = $this->createStub(Trace::class);
+        $traceStub
             ->method('getAllTestsForMutation')
             ->willReturn([
                 new TestLocation(
@@ -2200,6 +2200,6 @@ final class EnrichmentTraverseIntegrationTest extends VisitorTestCase
                 ),
             ]);
 
-        return $traceMock;
+        return $traceStub;
     }
 }

@@ -44,6 +44,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\Process\Exception\GenericProcessException;
 use function is_string;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -51,6 +52,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
 
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
 {
@@ -147,7 +149,7 @@ final class CommandLineGitTest extends TestCase
                 ),
             );
 
-        $expected = 'app/A.php,my lib/B.php';
+        $expected = ['app/A.php', 'my lib/B.php'];
 
         $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/']);
 
@@ -665,5 +667,19 @@ final class CommandLineGitTest extends TestCase
             ),
             Git::FALLBACK_BASE,
         ];
+    }
+
+    public function test_it_gets_the_project_directory(): void
+    {
+        $expected = '/path/to/project';
+
+        $this->commandLineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($expected);
+
+        $actual = $this->git->getProjectDirectory();
+
+        $this->assertSame($expected, $actual);
     }
 }

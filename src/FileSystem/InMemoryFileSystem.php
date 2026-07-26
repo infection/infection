@@ -36,10 +36,15 @@ declare(strict_types=1);
 namespace Infection\FileSystem;
 
 use function array_key_exists;
+use function array_keys;
+use function dirname;
 use DomainException;
+use function is_string;
 use Override;
 use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Traversable;
 use Webmozart\Assert\Assert;
@@ -54,11 +59,24 @@ final class InMemoryFileSystem extends FileSystem
      */
     private array $files = [];
 
+    /**
+     * @var array<string, string>
+     */
+    private array $canonicalFileNames = [];
+
+    /**
+     * @var array<string, true>
+     */
+    private array $directories = [];
+
     #[Override]
     public function dumpFile(string $filename, $content = ''): void
     {
         Assert::stringNotEmpty($content);
+        $this->assertDirectoryDoesNotExist($filename);
+
         $this->files[$filename] = $content;
+        $this->canonicalFileNames[$filename] = Path::canonicalize($filename);
     }
 
     public function isReadable(string $filename): bool
@@ -81,7 +99,19 @@ final class InMemoryFileSystem extends FileSystem
     #[Override]
     public function isReadableDirectory(string $filename): bool
     {
-        throw new DomainException('Unexpected call.');
+        $canonicalDirectory = Path::canonicalize($filename);
+
+        if (array_key_exists($canonicalDirectory, $this->directories)) {
+            return true;
+        }
+
+        foreach ($this->canonicalFileNames as $file) {
+            if (self::isParentDirectory($canonicalDirectory, $file)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     #[Override]
@@ -97,9 +127,17 @@ final class InMemoryFileSystem extends FileSystem
     }
 
     #[Override]
-    public function mkdir(iterable|string $dirs, int $mode = 0o777): never
+    public function mkdir(iterable|string $dirs, int $mode = 0o777): void
     {
-        throw new DomainException('Unexpected call.');
+        $dirs = is_string($dirs) ? [$dirs] : $dirs;
+
+        foreach ($dirs as $dir) {
+            $canonicalDirectory = Path::canonicalize($dir);
+
+            $this->assertFileDoesNotExist($dir);
+
+            $this->directories[$canonicalDirectory] = true;
+        }
     }
 
     #[Override]
@@ -213,5 +251,41 @@ final class InMemoryFileSystem extends FileSystem
         }
 
         return $this->files[$filename];
+    }
+
+    private function assertDirectoryDoesNotExist(string $filename): void
+    {
+        $canonicalFilename = Path::canonicalize($filename);
+
+        if (array_key_exists($canonicalFilename, $this->directories)) {
+            throw new DomainException(
+                sprintf(
+                    'Cannot dump file "%s": a directory exists at the same path.',
+                    $filename,
+                ),
+            );
+        }
+    }
+
+    private function assertFileDoesNotExist(string $canonicalDirName): void
+    {
+        foreach (array_keys($this->files) as $filename) {
+            if ($filename === $canonicalDirName) {
+                throw new DomainException(
+                    sprintf(
+                        'Cannot create directory "%s": a file exists at the same path.',
+                        $canonicalDirName,
+                    ),
+                );
+            }
+        }
+    }
+
+    private static function isParentDirectory(string $directory, string $file): bool
+    {
+        $fileDirectory = dirname($file);
+
+        return $directory === $fileDirectory
+            || str_starts_with($fileDirectory, $directory . '/');
     }
 }

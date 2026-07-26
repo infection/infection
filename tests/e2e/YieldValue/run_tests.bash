@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 
 readonly INFECTION="../../../${1} --with-uncovered"
 
-set -e pipefail
+set -eo pipefail
 
 if [ "$DRIVER" = "phpdbg" ]
 then

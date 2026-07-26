@@ -14,17 +14,23 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     name: 'Tests'
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.4'
           tools: composer
@@ -42,12 +48,16 @@ jobs:
       runs-on: ubuntu-latest
       timeout-minutes: 30
       name: 'Benchmarks'
+      permissions:
+          contents: read
       steps:
           - name: Checkout code
-            uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            with:
+                persist-credentials: false
 
           - name: Setup PHP
-            uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+            uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
             with:
                 php-version: '8.4'
                 tools: composer

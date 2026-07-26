@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -52,6 +53,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
             32.3,
             '/tmp',
             [],
+            new ShellCommandLineExecutor(),
         );
 
         $this->assertSame('PHPStan', $adapter->getName());

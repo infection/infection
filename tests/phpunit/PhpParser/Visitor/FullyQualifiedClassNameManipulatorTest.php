@@ -46,7 +46,6 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(FullyQualifiedClassNameManipulator::class)]
@@ -57,7 +56,6 @@ final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
      *
      * @param array<int, Name|FullyQualified|null> $partialExpectedFqcns
      */
-    #[CoversNothing]
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_resolved_node_names(
         string $code,

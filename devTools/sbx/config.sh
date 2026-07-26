@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd -P)"
 DOCKERFILE="${SCRIPT_DIR}/Dockerfile"
 TEST_CONFIG="${SCRIPT_DIR}/test.yaml"
 PHP_VERSION="${PHP_VERSION:-8.4}"
+CONTAINER_STRUCTURE_TEST_VERSION="${CONTAINER_STRUCTURE_TEST_VERSION:-1.22.1}"
 IMAGE_NAME="${IMAGE_NAME:-infection-sbx-php-${PHP_VERSION}}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 IMAGE_REF="${IMAGE_REF:-${IMAGE_NAME}:${IMAGE_TAG}}"
@@ -34,6 +35,7 @@ EOF
     {
         printf 'image-ref=%s\n' "${IMAGE_REF}"
         printf 'php-version=%s\n' "${PHP_VERSION}"
+        printf 'container-structure-test-version=%s\n' "${CONTAINER_STRUCTURE_TEST_VERSION}"
         printf 'platform=%s\n' "${IMAGE_PLATFORM:-}"
         printf 'dockerfile:\n'
         cat "${DOCKERFILE}"

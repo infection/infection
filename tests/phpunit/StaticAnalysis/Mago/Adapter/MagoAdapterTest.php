@@ -35,20 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
-use Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
 
-#[Group('integration')]
+#[AllowMockObjectsWithoutExpectations]
 #[CoversClass(MagoAdapter::class)]
 final class MagoAdapterTest extends TestCase
 {
@@ -56,18 +57,22 @@ final class MagoAdapterTest extends TestCase
 
     private CommandLineBuilder&MockObject $commandLineBuilder;
 
+    private ShellCommandLineExecutor $shellCommandLineExecutor;
+
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
+        $this->shellCommandLineExecutor = $this->createStub(ShellCommandLineExecutor::class);
 
         $this->adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
             [],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
     }
@@ -96,13 +101,14 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_single_option(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
             ['--sort'],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
 
@@ -127,13 +133,14 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_multiple_options(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
             ['--no-progress'],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
 
@@ -159,13 +166,14 @@ final class MagoAdapterTest extends TestCase
     public function test_it_builds_initial_run_command_line_with_complex_options(): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
             ['--no-stubs', '--baseline /path/to/baseline.toml'],
+            $this->shellCommandLineExecutor,
             '9.0',
         );
 
@@ -195,6 +203,38 @@ final class MagoAdapterTest extends TestCase
         $this->assertSame('9.0', $this->adapter->getVersion());
     }
 
+    public function test_it_retrieves_version_with_the_shell_command_line_executor(): void
+    {
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/mago', [], ['--version'])
+            ->willReturn(['/path/to/mago', '--version'])
+        ;
+
+        $shellCommandLineExecutor
+            ->expects($this->once())
+            ->method('execute')
+            ->with(['/path/to/mago', '--version'])
+            ->willReturn('mago 1.23.0')
+        ;
+
+        $adapter = new MagoAdapter(
+            $this->createStub(MutantExecutionResultFactory::class),
+            '/path/to/mago-config-path',
+            '/path/to/mago',
+            $this->commandLineBuilder,
+            new VersionParser(),
+            31.0,
+            [],
+            $shellCommandLineExecutor,
+        );
+
+        $this->assertSame('1.23.0', $adapter->getVersion());
+    }
+
     public function test_it_creates_mutant_process_creator(): void
     {
         $this->assertInstanceOf(
@@ -209,13 +249,14 @@ final class MagoAdapterTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
             [],
+            $this->shellCommandLineExecutor,
             $version,
         );
 
@@ -227,13 +268,14 @@ final class MagoAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new MagoAdapter(
-            $this->createStub(MagoMutantExecutionResultFactory::class),
+            $this->createStub(MutantExecutionResultFactory::class),
             '/path/to/mago-config-path',
             '/path/to/mago',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
             [],
+            $this->shellCommandLineExecutor,
             $version,
         );
 

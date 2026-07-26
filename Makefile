@@ -18,7 +18,7 @@ BOX=./.tools/box
 BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
-PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.89.2/php-cs-fixer.phar"
+PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.92.5/php-cs-fixer.phar"
 
 PHPSTAN=./vendor/bin/phpstan
 MAGO=./vendor/bin/mago
@@ -29,6 +29,7 @@ PHPUNIT_BIN=vendor/phpunit/phpunit/phpunit
 CI ?=
 PHPUNIT=$(PHPUNIT_BIN)$(if $(CI), --no-progress,)
 PARATEST=vendor/bin/paratest
+AGENTS_MD=AGENTS.md
 
 PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 
@@ -49,6 +50,9 @@ BENCHMARK_TRACING_COVERAGE_SOURCE_DIR=$(BENCHMARK_TRACING_SUBMODULE)/dist/covera
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
+SBX_PROJECT_LOCAL_KIT=./devTools/sbx/kits/project-local
+SBX_PROJECT_LOCAL_KIT_SPEC=$(SBX_PROJECT_LOCAL_KIT)/spec.yaml
+SBX_PROJECT_LOCAL_KIT_TEMPLATE=./devTools/sbx/project-local-kit.yaml
 
 #
 # Commands (phony targets)
@@ -64,6 +68,27 @@ compile:
 compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
 	$(DOCKER_RUN_82) make compile
+
+.PHONY: sbx-create
+sbx-create:	## Drops the existing PHP sbx image and create it anew
+sbx-create: sbx-image-build sbx-project-local-kit sbx-kit-validate
+	sbx rm codex-infection || true
+	sbx run codex \
+		--template=infection-sbx-php-8.4:latest \
+		--kit=./devTools/sbx/kits/codex-otel \
+		--kit "git+https://github.com/docker/sbx-kits-contrib#ref=v0.9.0&dir=git-ssh-sign" . \
+		--kit=$(SBX_PROJECT_LOCAL_KIT)
+
+.PHONY: sbx-project-local-kit
+sbx-project-local-kit: $(SBX_PROJECT_LOCAL_KIT_TEMPLATE)
+	mkdir -p "$(SBX_PROJECT_LOCAL_KIT)"
+	test -f "$(SBX_PROJECT_LOCAL_KIT_SPEC)" || cp "$(SBX_PROJECT_LOCAL_KIT_TEMPLATE)" "$(SBX_PROJECT_LOCAL_KIT_SPEC)"
+
+.PHONY: sbx-kit-validate
+sbx-kit-validate:	## Validates the sbx kit specs
+sbx-kit-validate: sbx-project-local-kit
+	sbx kit validate ./devTools/sbx/kits/codex-otel
+	sbx kit validate $(SBX_PROJECT_LOCAL_KIT)
 
 .PHONY: sbx-image-build
 sbx-image-build:	## Builds the PHP sbx image
@@ -85,6 +110,16 @@ sbx-image-test:
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
 
+.PHONY: update-agents-adr-list
+update-agents-adr-list:	## Updates the generated ADR list in AGENTS.md
+update-agents-adr-list:
+	./devTools/update-agents-adr-list.sh "$(AGENTS_MD)"
+
+.PHONY: check-agents-adr-list
+check-agents-adr-list:	## Checks the generated ADR list in AGENTS.md
+check-agents-adr-list: update-agents-adr-list
+	git diff --exit-code -- "$(AGENTS_MD)"
+
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
@@ -102,7 +137,7 @@ cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
 cs-check: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --diff --dry-run
+	$(PHP_CS_FIXER) check -v --diff
 	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
@@ -111,6 +146,7 @@ phpstan: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress
 
 .PHONY: phpstan-baseline
+phpstan-baseline:	## Regenerates the PHPStan baseline
 phpstan-baseline: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
 
@@ -119,6 +155,7 @@ mago: vendor $(MAGO)
 	$(MAGO) analyze
 
 .PHONY: mago-baseline
+mago-baseline:		## Regenerates the Mago baseline
 mago-baseline: vendor $(MAGO)
 	$(MAGO) analyze --generate-baseline || true
 
@@ -137,6 +174,11 @@ rector-check: vendor $(RECTOR)
 .PHONY: validate
 validate:
 	composer validate --strict
+
+.PHONY: zizmor
+zizmor:			## Runs zizmor
+zizmor:
+	$(DOCKER_RUN) zizmor
 
 .PHONY: profile
 profile: 	 	## Runs Blackfire
@@ -219,7 +261,7 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions
+autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list $(if $(CI),,zizmor)
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -322,14 +364,18 @@ $(MAGO): vendor
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
-	composer require infection/codeception-adapter infection/phpspec-adapter
+	composer require --no-interaction \
+		infection/codeception-adapter \
+		infection/phpspec-adapter \
+		testo/bridge-infection
+
 	# Workaround for https://github.com/box-project/box/issues/580
-	composer install --no-dev
+	composer install --no-interaction --no-dev
 	$(BOX) --version
-	$(BOX) validate
-	$(BOX) compile
-	composer remove infection/codeception-adapter infection/phpspec-adapter
-	composer install
+	$(BOX) validate --no-interaction
+	$(BOX) compile --no-interaction
+	composer remove infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
+	composer install --no-interaction
 	touch -c $@
 
 vendor: composer.lock

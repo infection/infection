@@ -37,17 +37,17 @@ namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
 use function array_merge;
 use function explode;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 use function version_compare;
 
 /**
@@ -55,6 +55,18 @@ use function version_compare;
  */
 final class PHPStanAdapter implements StaticAnalysisToolAdapter
 {
+    /**
+     * At the time of writing, `-d memory_limit`, which sets the main process's memory limit, is
+     * inherited by its sub-processes. When `--memory-limit` is passed, PHPStan attempts to set the
+     * memory limit only after starting a sub-process. If the inherited limit is too low, the
+     * sub-process may crash before PHPStan can apply the requested limit.
+     *
+     * For now, remove the memory limit from the main PHPStan process and its sub-processes.
+     *
+     * @see https://github.com/phpstan/phpstan-src/blob/3f716d44cde31076dc33a2f835872d7e2d26f0e7/src/Process/ProcessHelper.php#L41-L44
+     */
+    private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
+
     private const int VERSION_1 = 1;
 
     private const int VERSION_2 = 2;
@@ -64,7 +76,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
      */
     public function __construct(
         private readonly Filesystem $fileSystem,
-        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
@@ -72,6 +84,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly float $timeout,
         private readonly string $tmpDir,
         private readonly array $staticAnalysisToolOptions,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
         private ?string $version = null,
     ) {
     }
@@ -96,7 +109,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            self::PHP_EXTRA_ARGS,
             $options,
         );
     }
@@ -166,13 +179,12 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     {
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            self::PHP_EXTRA_ARGS,
             ['--version'],
         );
 
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        return $this->versionParser->parse($process->getOutput());
+        return $this->versionParser->parse(
+            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+        );
     }
 }

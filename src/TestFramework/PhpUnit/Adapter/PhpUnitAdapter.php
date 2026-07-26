@@ -36,16 +36,18 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
+use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\VersionParser;
 use Override;
 use function Safe\preg_match;
 use function sprintf;
@@ -54,9 +56,8 @@ use function version_compare;
 
 /**
  * @internal
- * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
     final public const string COVERAGE_DIR = 'coverage-xml';
 
@@ -68,11 +69,21 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
     ) {
-        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
+        parent::__construct(
+            $testFrameworkExecutable,
+            $initialConfigBuilder,
+            $mutationConfigBuilder,
+            $argumentsAndOptionsBuilder,
+            $shellCommandLineExecutor,
+            $versionParser,
+            $commandLineBuilder,
+            $version,
+        );
     }
 
     public function hasJUnitReport(): bool
@@ -94,23 +105,26 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
+            $generatedOptions = [];
+
             if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
-                $extraOptions = trim(sprintf(
-                    '%s --exclude-source-from-xml-coverage --coverage-xml=%s --log-junit=%s',
-                    $extraOptions,
-                    $this->tmpDir . '/' . self::COVERAGE_DIR,
-                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-                ));
-            } else {
-                $extraOptions = trim(sprintf(
-                    '%s --coverage-xml=%s --log-junit=%s',
-                    $extraOptions,
-                    $this->tmpDir . '/' . self::COVERAGE_DIR,
-                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-                ));
+                $generatedOptions[] = '--exclude-source-from-xml-coverage';
             }
 
-            if ($this->pcovDirectoryProvider->shallProvide()) {
+            $generatedOptions[] = '--coverage-xml=' . $this->tmpDir . '/' . self::COVERAGE_DIR;
+            $generatedOptions[] = '--log-junit=' . $this->jUnitFilePath; // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+
+            $extraOptions = trim(
+                sprintf(
+                    '%s %s',
+                    $extraOptions,
+                    implode(' ', $generatedOptions),
+                ),
+            );
+
+            // PCOV may require an adjusted `pcov.directory` setting to include
+            // all target source code in the coverage report.
+            if ($this->pcovDirectoryProvider->shouldProvide()) {
                 $phpExtraArgs[] = '-d';
                 $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
             }

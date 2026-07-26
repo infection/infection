@@ -52,6 +52,7 @@ $finder = Finder::create()
         '.ci',
         '.composer',
         '.github',
+        '.sbx',
         '.tools',
         'build',
         'devTools',
@@ -62,11 +63,13 @@ $finder = Finder::create()
         'tests/benchmark/Tracing/sources',
         'tests/benchmark/Tracing/benchmark-source',
         'tests/e2e',
+        'tests/phpunit/Architecture/PHPat/Selector/HasInheritDoc/Fixtures',
         'tests/phpunit/Fixtures',
         'var',
     ])
     ->ignoreDotFiles(false)
     ->name('*php')
+    ->notPath('src/Differ/UnifiedDiffOutputBuilder.php')
     ->append([
         __DIR__ . '/bin/infection',
         __DIR__ . '/bin/infection-debug',
@@ -80,7 +83,6 @@ return (new Config())
     ->setRules([
         '@PHP7x1Migration' => true,
         '@PHP7x1Migration:risky' => true,
-        '@PHPUnit6x0Migration:risky' => true,
         '@PHPUnit7x5Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,

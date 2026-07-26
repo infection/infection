@@ -41,14 +41,12 @@ use Infection\TestFramework\Coverage\CoverageNotFound;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -60,7 +58,6 @@ use Symfony\Component\Filesystem\Path;
  * Requires some I/O operations
  */
 #[PreserveGlobalState(false)]
-#[Group('integration')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
@@ -172,7 +169,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             new FixedLocator(self::JUNIT_PATH),
             'unknown',
-            $this->createInvalidIndexLocatorMock(),
+            $this->createInvalidIndexLocatorStub(),
         );
 
         try {
@@ -200,7 +197,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             new FixedLocator(self::JUNIT_PATH),
             'phpunit',
-            $this->createInvalidIndexLocatorMock(),
+            $this->createInvalidIndexLocatorStub(),
         );
 
         try {
@@ -229,7 +226,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             new FixedLocator(self::JUNIT_PATH),
             'codeception',
-            $this->createInvalidIndexLocatorMock(),
+            $this->createInvalidIndexLocatorStub(),
         );
 
         try {
@@ -274,7 +271,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::COVERAGE_DIR_PATH,
             true,
-            $this->createInvalidJUnitReportLocatorMock(),
+            $this->createInvalidJUnitReportLocatorStub(),
             'unknown',
             new FixedLocator(self::COVERAGE_DIR_PATH . '/index.xml'),
         );
@@ -296,16 +293,13 @@ final class CoverageCheckerTest extends TestCase
 
     public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_phpunit_test_framework_adapter(): void
     {
-        $phpUnitAdapterMock = $this->createMock(PhpUnitAdapter::class);
-        $phpUnitAdapterMock->method('hasJUnitReport')->willReturn(true);
-
         $checker = new CoverageChecker(
             false,
             false,
             '',
             self::COVERAGE_DIR_PATH,
             true,
-            $this->createInvalidJUnitReportLocatorMock(),
+            $this->createInvalidJUnitReportLocatorStub(),
             'phpunit',
             new FixedLocator(self::COVERAGE_DIR_PATH . '/index.xml'),
         );
@@ -337,7 +331,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::COVERAGE_DIR_PATH,
             true,
-            $this->createInvalidJUnitReportLocatorMock(),
+            $this->createInvalidJUnitReportLocatorStub(),
             'codeception',
             new FixedLocator(self::COVERAGE_DIR_PATH . '/index.xml'),
         );
@@ -410,7 +404,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             new FixedLocator(self::JUNIT_PATH),
             'unknown',
-            $this->createInvalidIndexLocatorMock(),
+            $this->createInvalidIndexLocatorStub(),
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -444,7 +438,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             $coveragePath,
             true,
-            $this->createInvalidJUnitReportLocatorMock(),
+            $this->createInvalidJUnitReportLocatorStub(),
             'unknown',
             new FixedLocator(self::COVERAGE_DIR_PATH . '/index.xml'),
         );
@@ -512,25 +506,25 @@ final class CoverageCheckerTest extends TestCase
         }
     }
 
-    private function createInvalidIndexLocatorMock(): ReportLocator&MockObject
+    private function createInvalidIndexLocatorStub(): ReportLocator&Stub
     {
-        $indexLocatorMock = $this->createMock(ReportLocator::class);
-        $indexLocatorMock
+        $indexLocatorStub = $this->createStub(ReportLocator::class);
+        $indexLocatorStub
             ->method('locate')
             ->willThrowException(UnknownReportLocatorException::create('index.xml'))
         ;
 
-        return $indexLocatorMock;
+        return $indexLocatorStub;
     }
 
-    private function createInvalidJUnitReportLocatorMock(): ReportLocator&MockObject
+    private function createInvalidJUnitReportLocatorStub(): ReportLocator&Stub
     {
-        $jUnitLocatorMock = $this->createMock(ReportLocator::class);
-        $jUnitLocatorMock
+        $jUnitLocatorStub = $this->createStub(ReportLocator::class);
+        $jUnitLocatorStub
             ->method('locate')
             ->willThrowException(UnknownReportLocatorException::create('JUnit'))
         ;
 
-        return $jUnitLocatorMock;
+        return $jUnitLocatorStub;
     }
 }

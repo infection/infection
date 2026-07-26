@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG_FILE="${CODEX_CONFIG_FILE:-/home/agent/.codex/config.toml}"
+WORKDIR_FILE="/home/agent/.config/infection-sbx/workdir"
+
+if [[ -f "${WORKDIR_FILE}" ]]; then
+    WORKDIR="$(tr -d '\n' < "${WORKDIR_FILE}")"
+else
+    WORKDIR="${WORKDIR:-${PWD}}"
+fi
+
+OTEL_CONFIG="${CODEX_OTEL_CONFIG_FILE:-${WORKDIR}/devTools/sbx/codex-otel.toml}"
+
+if [[ ! -f "${OTEL_CONFIG}" ]]; then
+    printf 'Codex OTEL config not found: %s\n' "${OTEL_CONFIG}" >&2
+    exit 1
+fi
+
+mkdir -p "$(dirname "${CONFIG_FILE}")"
+touch "${CONFIG_FILE}"
+
+TMP_CONFIG="$(mktemp)"
+trap 'rm -f "${TMP_CONFIG}"' EXIT
+
+awk '
+    /^\[otel(\]|\.)/ {
+        skip = 1
+        next
+    }
+
+    /^\[[^]]+\]/ {
+        skip = 0
+    }
+
+    skip != 1 {
+        print
+    }
+' "${CONFIG_FILE}" > "${TMP_CONFIG}"
+
+{
+    sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' "${TMP_CONFIG}"
+    printf '\n\n'
+    cat "${OTEL_CONFIG}"
+} > "${CONFIG_FILE}"

@@ -241,7 +241,7 @@ final class E2ETest extends TestCase
 
             try {
                 $process = new Process([
-                    (new ConcreteComposerExecutableFinder())->find(),
+                    ...(new ConcreteComposerExecutableFinder())->find(),
                     'install',
                 ]);
                 $process->setTimeout(300);

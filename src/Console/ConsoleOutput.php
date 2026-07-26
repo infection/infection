@@ -105,6 +105,17 @@ class ConsoleOutput
         );
     }
 
+    public function logRunningWithThreadCount(int $threadCount): void
+    {
+        $this->logger->notice(
+            sprintf(
+                'Running Infection with %d %s.',
+                $threadCount,
+                $threadCount > 1 ? 'threads' : 'thread',
+            ),
+        );
+    }
+
     public function logRunningWithDebugger(string $debugger): void
     {
         $this->logger->notice(sprintf(self::RUNNING_WITH_DEBUGGER_NOTE, $debugger));

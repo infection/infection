@@ -41,7 +41,9 @@ use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\DebugOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
+use Infection\Command\Option\PathsArgument;
 use Infection\Command\Option\SourceFilterOptions;
+use Infection\Command\Option\TestFrameworkExtraArgsOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -61,8 +63,10 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -70,6 +74,9 @@ use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Filesystem\Path;
+use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -77,6 +84,8 @@ use Symfony\Component\Console\Input\InputOption;
 final class RunCommand extends BaseCommand
 {
     public const string OPTION_THREADS = 'threads';
+
+    public const string OPTION_DOTS_PER_ROW = 'dots-per-row';
 
     public const string OPTION_LOGGER_GITHUB = 'logger-github';
 
@@ -114,6 +123,7 @@ final class RunCommand extends BaseCommand
 
     private const string OPTION_LOGGER_GITLAB = 'logger-gitlab';
 
+    // TODO: to rename to projectDirectory?
     private const string OPTION_LOGGER_PROJECT_ROOT_DIRECTORY = 'logger-project-root-directory';
 
     private const string OPTION_LOGGER_HTML = 'logger-html';
@@ -144,6 +154,8 @@ final class RunCommand extends BaseCommand
             ->setName('run')
             ->setDescription('Runs the mutation testing.');
 
+        PathsArgument::addArgument($this);
+
         TestFrameworkOption::addOption($this)
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL,
@@ -156,7 +168,10 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
             );
 
-        TestFrameworkOptionsOption::addOption($this)
+        TestFrameworkExtraArgsOption::addOption($this);
+        TestFrameworkOptionsOption::addOption($this);
+
+        $this
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS,
                 null,
@@ -170,6 +185,13 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Number of threads to use by the runner when executing the mutations. Use "max" to auto calculate it.',
                 Container::DEFAULT_THREAD_COUNT,
+            )
+            ->addOption(
+                self::OPTION_DOTS_PER_ROW,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Number of dots per row in the dot progress formatter. Use "max" to fit the terminal width.',
+                Container::DEFAULT_DOTS_PER_ROW,
             )
             ->addOption(
                 self::OPTION_WITH_UNCOVERED,
@@ -415,7 +437,7 @@ final class RunCommand extends BaseCommand
         LoggerInterface $logger,
     ): Container {
         $input = $io->getInput();
-        $commandHelper = new RunCommandHelper($input);
+        $commandHelper = new RunCommandHelper($input, new CpuCoresCountProvider());
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -435,6 +457,8 @@ final class RunCommand extends BaseCommand
                     self::OPTION_FORCE_PROGRESS),
             );
         }
+
+        self::assertTestFrameworkOptionsAreNotBothProvided($io);
 
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
@@ -466,9 +490,11 @@ final class RunCommand extends BaseCommand
             msiPrecision: $msiPrecision,
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
+            testFrameworkExtraArgs: TestFrameworkExtraArgsOption::get($io),
             staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
-            sourceFilter: SourceFilterOptions::get($io),
+            sourceFilter: SourceFilterOptions::get($io, PathsArgument::get($io)),
             threadCount: $commandHelper->getThreadCount(),
+            dotsPerRow: $commandHelper->getDotsPerRow(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),
@@ -479,10 +505,26 @@ final class RunCommand extends BaseCommand
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
-            loggerProjectRootDirectory: $commandHelper->getStringOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY),
+            projectDirectory: $this->getProjectDirectory($io),
             staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
-            mutantId: $input->getOption(self::OPTION_MUTANT_ID),
+            mutantId: $commandHelper->getStringOption(self::OPTION_MUTANT_ID, Container::DEFAULT_MUTANT_ID),
         );
+    }
+
+    private static function assertTestFrameworkOptionsAreNotBothProvided(IO $io): void
+    {
+        if (
+            TestFrameworkOptionsOption::isProvided($io)
+            && TestFrameworkExtraArgsOption::isProvided($io)
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass both the legacy option "--%s" and "--%s".',
+                    TestFrameworkOptionsOption::NAME,
+                    TestFrameworkExtraArgsOption::NAME,
+                ),
+            );
+        }
     }
 
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
@@ -500,8 +542,8 @@ final class RunCommand extends BaseCommand
 
         $io->newLine();
         $io->writeln(sprintf(
-            'Installing <comment>infection/%s-adapter</comment>...',
-            $adapterName,
+            'Installing <comment>%s</comment>...',
+            AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName],
         ));
 
         $container->getAdapterInstaller()->install($adapterName);
@@ -549,6 +591,8 @@ final class RunCommand extends BaseCommand
         $container->getCoverageChecker()->checkCoverageRequirements();
 
         $config = $container->getConfiguration();
+
+        $consoleOutput->logRunningWithThreadCount($config->threadCount);
 
         if ($config->isStaticAnalysisEnabled()) {
             $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
@@ -603,5 +647,38 @@ final class RunCommand extends BaseCommand
                     Container::DEFAULT_FORMATTER_NAME->value,
                 ),
             );
+    }
+
+    /**
+     * @return non-empty-string|null Absolute path.
+     */
+    private function getProjectDirectory(IO $io): ?string
+    {
+        $directory = trim((string) $io->getInput()->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY));
+
+        if ($directory === '') {
+            return null;
+        }
+
+        $fileSystem = $this->getApplication()->getContainer()->getFileSystem();
+        $canonicalDirectory = Path::canonicalize($directory);
+
+        Assert::true(
+            $fileSystem->isAbsolutePath($canonicalDirectory),
+            sprintf(
+                'Expected the path "%s" to be an absolute path.',
+                $canonicalDirectory,
+            ),
+        );
+        Assert::true(
+            $fileSystem->isReadableDirectory($canonicalDirectory),
+            sprintf(
+                'Expected the path "%s" to point to a readable directory.',
+                $canonicalDirectory,
+            ),
+        );
+        Assert::stringNotEmpty($canonicalDirectory);
+
+        return $canonicalDirectory;
     }
 }
