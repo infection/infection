@@ -57,6 +57,6 @@ final class OperatingSystem
 
     public static function isCaseSensitive(): bool
     {
-        return !self::isMacOs() && !self::isWindows();
+        return !(self::isMacOs() || self::isWindows());
     }
 }
