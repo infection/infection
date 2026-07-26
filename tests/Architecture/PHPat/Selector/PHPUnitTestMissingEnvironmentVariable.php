@@ -33,56 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use function array_key_exists;
-use function getenv;
-use function Safe\putenv;
-use function sprintf;
-use Webmozart\Assert\Assert;
+use function array_diff;
+use function count;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-final readonly class EnvBackup
+final readonly class PHPUnitTestMissingEnvironmentVariable implements SelectorInterface
 {
-    /**
-     * @param array<string, string> $environmentVariables
-     */
-    private function __construct(
-        private array $environmentVariables,
+    public function __construct(
+        private EnvironmentVariableUsageDetector $environmentVariableUsageDetector,
     ) {
     }
 
-    public static function createSnapshot(): self
+    public function getName(): string
     {
-        $environmentVariables = getenv();
-
-        Assert::allString($environmentVariables);
-
-        return new self($environmentVariables);
+        return 'PHPUnit test missing a `WithEnvironmentVariable` attribute';
     }
 
-    public function restore(): void
+    public function matches(ClassReflection $classReflection): bool
     {
-        $snapshot = $this->environmentVariables;
-
-        foreach (getenv() as $name => $value) {
-            if (!array_key_exists($name, $snapshot)) {
-                putenv($name);
-
-                continue;
-            }
-
-            $snapshotValue = $snapshot[$name];
-            unset($snapshot[$name]);
-
-            if ($snapshotValue === $value) {
-                continue;
-            }
-
-            putenv(sprintf('%s=%s', $name, $snapshotValue));
+        if (!PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection)) {
+            return false;
         }
 
-        foreach ($snapshot as $name => $value) {
-            putenv(sprintf('%s=%s', $name, $value));
-        }
+        $usedEnvironmentVariables = $this->environmentVariableUsageDetector->getEnvironmentVariables($classReflection);
+        $declaredEnvironmentVariables = PHPUnitTestClassAnalysis::getEnvironmentVariables($classReflection);
+
+        $nonDeclaredUsedEnvironmentVariables = array_diff($usedEnvironmentVariables, $declaredEnvironmentVariables);
+
+        return count($nonDeclaredUsedEnvironmentVariables) > 0;
     }
 }
