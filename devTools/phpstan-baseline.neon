@@ -1291,46 +1291,10 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
 
 		-
-			rawMessage: 'Only booleans are allowed in a ternary operator condition, string|false given.'
-			identifier: ternary.condNotBoolean
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
-
-		-
-			rawMessage: 'Parameter #1 $string of function strlen expects string, string|false given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
-
-		-
-			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
-
-		-
 			rawMessage: Variable method call on Infection\Tests\FileSystem\Finder\MockVendor.
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
-
-		-
-			rawMessage: 'Only booleans are allowed in a ternary operator condition, string|false given.'
-			identifier: ternary.condNotBoolean
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			rawMessage: 'Parameter #1 $string of function strlen expects string, string|false given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
 			rawMessage: Variable method call on Infection\Tests\FileSystem\Finder\MockVendor.

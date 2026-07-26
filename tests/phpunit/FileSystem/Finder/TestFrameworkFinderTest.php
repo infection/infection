@@ -72,21 +72,13 @@ use Symfony\Component\Filesystem\Path;
 #[WithEnvironmentVariable('PATHEXT')]
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
-    private static string $pathName;
+    private const string PATH_NAME = 'PATH';
 
     private Filesystem $fileSystem;
 
     private ComposerExecutableFinder&Stub $composerFinder;
 
     private ShellCommandLineExecutor $shellCommandLineExecutor;
-
-    /**
-     * Saves the current environment
-     */
-    public static function setUpBeforeClass(): void
-    {
-        self::$pathName = getenv('PATH') ? 'PATH' : 'Path';
-    }
 
     protected function setUp(): void
     {
@@ -130,7 +122,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_it_adds_vendor_bin_to_path_if_needed(): void
     {
-        $path = getenv(self::$pathName);
+        $path = self::getPath();
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
 
@@ -142,7 +134,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             'Should return the phpunit path',
         );
 
-        $pathAfterTest = getenv(self::$pathName);
+        $pathAfterTest = self::getPath();
 
         // Vendor bin should be the first item
         $pathList = explode(PATH_SEPARATOR, $pathAfterTest);
@@ -164,7 +156,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $mock = new MockVendor($this->tmp, $this->fileSystem);
         $mock->setUpPlatformTest();
 
-        putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
+        putenv(sprintf('%s=%s', self::PATH_NAME, $this->tmp));
         putenv('PATHEXT=');
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
@@ -191,7 +183,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
             Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
         );
 
-        $pathAfterTest = getenv(self::$pathName);
+        $pathAfterTest = self::getPath();
         $pathList = explode(PATH_SEPARATOR, $pathAfterTest);
 
         $this->assertSame(
@@ -208,7 +200,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $phpUnitPath = $this->createPhpUnitExecutableFixture($composerBinDir);
 
-        putenv(sprintf('%s=%s', self::$pathName, $this->tmp));
+        putenv(sprintf('%s=%s', self::PATH_NAME, $this->tmp));
         putenv('PATHEXT=');
 
         $frameworkFinder = new TestFrameworkFinder(
@@ -230,7 +222,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $mock->setUpPlatformTest();
 
         // Set the path to a single directory (vendor/bin)
-        putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
+        putenv(sprintf('%s=%s', self::PATH_NAME, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
@@ -256,7 +248,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $mock->{$methodName}();
 
         // Set the path to a single directory (vendor/bin)
-        putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
+        putenv(sprintf('%s=%s', self::PATH_NAME, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
@@ -273,6 +265,13 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         yield 'composer-bat' => ['setUpComposerBatchTest'];
 
         yield 'project-bat' => ['setUpProjectBatchTest'];
+    }
+
+    private static function getPath(): string
+    {
+        $path = getenv(self::PATH_NAME);
+
+        return $path === false ? '' : $path;
     }
 
     private function createComposerExecutableFixture(): string
