@@ -175,7 +175,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_report_with_the_wrong_case_on_a_case_insensitive_system(): void
     {
-        if (!OperatingSystem::isMacOs()) {
+        if (!OperatingSystem::isMacOs() && !OperatingSystem::isWindows()) {
             $this->markTestSkipped('Requires a case-insensitive system.');
         }
 
@@ -192,7 +192,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system(): void
     {
-        if (OperatingSystem::isMacOs()) {
+        if (OperatingSystem::isMacOs() || OperatingSystem::isWindows()) {
             $this->markTestSkipped('Requires a case-sensitive system.');
         }
 

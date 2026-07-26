@@ -134,12 +134,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
 
-        if (OperatingSystem::isWindows()) {
-            // The main script must be found from the .bat file
-            $expected = realpath('vendor/phpunit/phpunit/phpunit');
-        } else {
-            $expected = realpath('vendor/bin/phpunit');
-        }
+        $expected = realpath('vendor/bin/phpunit');
 
         $this->assertSame(
             Path::normalize($expected),

@@ -81,6 +81,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function str_contains;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -280,7 +281,7 @@ final class ConfigurationFactoryTest extends TestCase
             sourceFilter: new GitDiffFilter('AM', 'reference(master)'),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
-            tmpDir: sys_get_temp_dir() . '/infection',
+            tmpDir: Path::normalize(sys_get_temp_dir() . '/infection'),
             phpUnit: new PhpUnit('/path/to', null),
             phpStan: new PhpStan('/path/to', null),
             mago: new Mago('/path/to', null),
@@ -290,7 +291,7 @@ final class ConfigurationFactoryTest extends TestCase
             initialTestsPhpOptions: null,
             testFrameworkExtraOptions: '',
             staticAnalysisToolOptions: null,
-            coveragePath: sys_get_temp_dir() . '/infection',
+            coveragePath: Path::normalize(sys_get_temp_dir() . '/infection'),
             skipCoverage: false,
             skipInitialTests: false,
             isDebugEnabled: false,
