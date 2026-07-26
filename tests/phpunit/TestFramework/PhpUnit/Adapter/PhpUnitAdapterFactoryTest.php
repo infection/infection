@@ -57,6 +57,7 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             [],
             true,
             shellCommandLineExecutor: new ShellCommandLineExecutor(),
+            sourceDirectoryBasePath: '/path/to/project',
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

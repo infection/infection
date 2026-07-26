@@ -855,7 +855,7 @@ count = 1
 [[issues]]
 file = "src/Configuration/Schema/SchemaConfigurationFile.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$decodedContents` (null|stdClass)."
+message = "A value with a less specific type `mixed` is being assigned to property `$decodedContents` (null|stdClass)."
 count = 1
 
 [[issues]]
@@ -1485,7 +1485,7 @@ count = 2
 [[issues]]
 file = "src/Event/EventDispatcher/SyncEventDispatcher.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
+message = "A value with a less specific type `array<array-key, array<array-key, mixed>>` is being assigned to property `$listeners` (array<array-key, array<array-key, (callable(...mixed): mixed)>>)."
 count = 1
 
 [[issues]]
@@ -1767,19 +1767,13 @@ count = 1
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Git\CommandLineGit::getChangedFileRelativePaths`: expected `non-empty-string`, but found `string`.'
-count = 1
-
-[[issues]]
-file = "src/Git/CommandLineGit.php"
-code = "invalid-return-statement"
 message = 'Invalid return type for function `Infection\Git\CommandLineGit::parseFilePathFromLine`: expected `string`, but found `null|string`.'
 count = 1
 
 [[issues]]
 file = "src/Git/CommandLineGit.php"
 code = "less-specific-nested-return-statement"
-message = '''Returned type `list<mixed>` is less specific than the declared return type `array<array-key, string>` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
+message = '''Returned type `list<mixed>` is less specific than the declared return type `list<string>` for function `Infection\Git\CommandLineGit::diff` due to nested 'mixed'.'''
 count = 1
 
 [[issues]]
@@ -2091,7 +2085,7 @@ count = 3
 [[issues]]
 file = "src/Mutator/Boolean/TrueValue.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array<string, array-key>` is being assigned to property `$$allowedFunctions` (array<string, int>)."
+message = "A value of a less specific type `array<string, array-key>` is being assigned to property `$allowedFunctions` (array<string, int>)."
 count = 1
 
 [[issues]]
@@ -2163,7 +2157,7 @@ count = 1
 [[issues]]
 file = "src/Mutator/Extensions/MBString.php"
 code = "mixed-property-type-coercion"
-message = 'A value with a less specific type `array<string, (closure(...mixed): mixed)>` is being assigned to property `$$converters` (array<string, (closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)>).'
+message = 'A value with a less specific type `array<string, (closure(...mixed): mixed)>` is being assigned to property `$converters` (array<string, (closure(PhpParser\Node\Expr\FuncCall): iterable<mixed, PhpParser\Node\Expr\FuncCall>)>).'
 count = 1
 
 [[issues]]
@@ -2181,7 +2175,7 @@ count = 1
 [[issues]]
 file = "src/Mutator/IgnoreConfig.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$$hashtable` (array<string, int>)."
+message = "A value of a less specific type `non-empty-array<string, array-key>` is being assigned to property `$hashtable` (array<string, int>)."
 count = 1
 
 [[issues]]
@@ -2631,31 +2625,31 @@ count = 1
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$decorateNodes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$decorateNodes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$dumpOtherAttributes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$dumpOtherAttributes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$dumpPositions` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$dumpPositions` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$onlyVisitedNodes` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$onlyVisitedNodes` (bool)."
 count = 1
 
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$showLineNumbers` (bool)."
+message = "A value with a less specific type `mixed` is being assigned to property `$showLineNumbers` (bool)."
 count = 1
 
 [[issues]]
@@ -2691,7 +2685,7 @@ count = 1
 [[issues]]
 file = "src/PhpParser/NodeDumper/NodeDumper.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array{'comments': true, 'endFilePos': true, 'endLine': true, 'endTokenPos': true, 'startFilePos': true, 'startLine': true, 'startTokenPos': true, ...<array-key, true>}` is being assigned to property `$$ignoredAttributesByKey` (array<string, true>)."
+message = "A value of a less specific type `array{'comments': true, 'endFilePos': true, 'endLine': true, 'endTokenPos': true, 'startFilePos': true, 'startLine': true, 'startTokenPos': true, ...<array-key, true>}` is being assigned to property `$ignoredAttributesByKey` (array<string, true>)."
 count = 1
 
 [[issues]]
@@ -3489,7 +3483,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "falsable-return-statement"
-message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:110:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
+message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:119:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
 count = 1
 
 [[issues]]
@@ -3501,7 +3495,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:110:21}`: expected `string`, but found `false|string`."
+message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:119:21}`: expected `string`, but found `false|string`."
 count = 1
 
 [[issues]]
@@ -3645,7 +3639,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Config/Path/PathReplacer.php"
 code = "invalid-property-write"
-message = "Cannot modify a readonly property after initialization."
+message = "Cannot write to private property `$nodeValue` on class `DOMNameSpaceNode`."
 count = 1
 
 [[issues]]
@@ -4935,13 +4929,13 @@ count = 1
 [[issues]]
 file = "tests/benchmark/MutationGenerator/MutationGeneratorBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/MutationGenerator/MutationGeneratorBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
@@ -4995,20 +4989,26 @@ count = 2
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/GitParseDiffBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
 code = "impossible-condition"
 message = "This condition (type `false`) will always evaluate to false."
-count = 3
+count = 11
+
+[[issues]]
+file = "tests/benchmark/ParseGitDiff/generator.php"
+code = "redundant-comparison"
+message = "Redundant `<=` comparison: left-hand side is never less than or equal to right-hand side."
+count = 8
 
 [[issues]]
 file = "tests/benchmark/ParseGitDiff/generator.php"
@@ -5067,13 +5067,13 @@ count = 1
 [[issues]]
 file = "tests/benchmark/Tracing/TracingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$count` (int)."
+message = "A value with a less specific type `mixed` is being assigned to property `$count` (int)."
 count = 1
 
 [[issues]]
 file = "tests/benchmark/Tracing/TracingBench.php"
 code = "mixed-property-type-coercion"
-message = "A value with a less specific type `mixed` is being assigned to property `$$main` ((closure(...mixed=): mixed))."
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(...mixed=): mixed))."
 count = 1
 
 [[issues]]
@@ -5164,78 +5164,6 @@ count = 1
 file = "tests/phpunit/AutoReview/ConcreteClassReflector.php"
 code = "unhandled-thrown-type"
 message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ConcreteClassReflector.php:55:13}`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulatorCodeDetectorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `codeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `envTestCaseTupleProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `provideEnvTestCaseTuple` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations`: expected `null|string`, but found `false|string`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations`: expected `null|string`, but found `false|string`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of function `Safe\file_get_contents` is possibly `false`, but parameter type `string` does not accept it.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProviderTest::test_env_test_case_classes_provider_is_valid`.'
 count = 1
 
 [[issues]]
@@ -5962,6 +5890,12 @@ count = 1
 file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::tearDown`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Config/ValueProvider/PCOVDirectoryProviderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `sourceDirectoryPathsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -7701,7 +7635,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_relative_paths_of_the_changed_files_as_a_string`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Tests\Git\CommandLineGitIntegrationTest::test_it_gets_the_relative_paths_of_the_changed_files`.'
 count = 1
 
 [[issues]]
@@ -13938,20 +13872,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
-code = "docblock-type-mismatch"
-message = 'Docblock return type `PhpParser\Node|array<array-key, PhpParser\Node>|int` is incompatible with native return type `void`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
-code = "missing-return-statement"
-message = "Missing return statement in function `enternode`"
-count = 1
-
-[[issues]]
-file = "tests/phpunit/TestingUtility/PhpParser/Visitor/KeepOnlyDesiredAttributesVisitor/KeepOnlyDesiredAttributesVisitor.php"
 code = "property-type-coercion"
-message = "A value of a less specific type `array<array-key, mixed>` is being assigned to property `$$desiredAttributeKeys` (array<string, mixed>)."
+message = "A value of a less specific type `array<array-key, mixed>` is being assigned to property `$desiredAttributeKeys` (array<string, mixed>)."
 count = 1
 
 [[issues]]

@@ -29,6 +29,7 @@ PHPUNIT_BIN=vendor/phpunit/phpunit/phpunit
 CI ?=
 PHPUNIT=$(PHPUNIT_BIN)$(if $(CI), --no-progress,)
 PARATEST=vendor/bin/paratest
+AGENTS_MD=AGENTS.md
 
 PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 
@@ -108,6 +109,16 @@ sbx-image-test:
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
+
+.PHONY: update-agents-adr-list
+update-agents-adr-list:	## Updates the generated ADR list in AGENTS.md
+update-agents-adr-list:
+	./devTools/update-agents-adr-list.sh "$(AGENTS_MD)"
+
+.PHONY: check-agents-adr-list
+check-agents-adr-list:	## Checks the generated ADR list in AGENTS.md
+check-agents-adr-list: update-agents-adr-list
+	git diff --exit-code -- "$(AGENTS_MD)"
 
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
@@ -234,7 +245,7 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions $(if $(CI),,zizmor)
+autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list $(if $(CI),,zizmor)
 
 .PHONY: test
 test:		 	## Runs all the tests

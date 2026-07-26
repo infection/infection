@@ -173,9 +173,9 @@ Agents often mark everything `final`. Here, hard `final` is only for classes nev
 (mutators, visitors, value objects, leaf utilities); services that tests mock get `/** @internal
 @final */` with NO keyword. The PHPat finality rule accepts either form; adding the keyword
 to a mocked class breaks the suite. Mockability is the only accepted reason for `@final`.
-If no test mocks the class, use the keyword. Do not add interfaces just to mock a single class.
-Reviewers ask "is there a reason this is `@final` rather than `final`?" Have the answer ("it
-is mocked in X").
+If no test mocks the class, use the keyword. Do not expect `BypassFinals`. Do not add interfaces
+just to mock a single class. Reviewers ask "is there a reason this is `@final` rather
+than `final`?" Have the answer ("it is mocked in X").
 
 ### Imports: everything, including functions and constants
 

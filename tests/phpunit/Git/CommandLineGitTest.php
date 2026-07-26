@@ -149,7 +149,7 @@ final class CommandLineGitTest extends TestCase
                 ),
             );
 
-        $expected = 'app/A.php,my lib/B.php';
+        $expected = ['app/A.php', 'my lib/B.php'];
 
         $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/']);
 

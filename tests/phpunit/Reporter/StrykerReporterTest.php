@@ -44,11 +44,11 @@ use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\Http\StrykerDashboardClient;
 use Infection\Reporter\StrykerReporter;
 use Infection\Tests\CI\ConfigurableEnv;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\Logger\DummyLogger;
 use OndraM\CiDetector\CiDetector;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -56,10 +56,10 @@ use function Safe\putenv;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(StrykerReporter::class)]
+#[WithEnvironmentVariable('INFECTION_DASHBOARD_API_KEY')]
+#[WithEnvironmentVariable('STRYKER_DASHBOARD_API_KEY')]
 final class StrykerReporterTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
-
     private MockObject&StrykerDashboardClient $strykerDashboardClient;
 
     private MockObject&MetricsCalculator $metricsCalculatorMock;
@@ -72,8 +72,6 @@ final class StrykerReporterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->backupEnvironmentVariables();
-
         $this->strykerDashboardClient = $this->createMock(StrykerDashboardClient::class);
         $this->metricsCalculatorMock = $this->createMock(MetricsCalculator::class);
         $this->ciDetectorEnv = new ConfigurableEnv();
@@ -88,11 +86,6 @@ final class StrykerReporterTest extends TestCase
             StrykerConfig::forBadge('master'),
             $this->logger,
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
     }
 
     public function test_it_skips_logging_when_it_is_not_travis(): void

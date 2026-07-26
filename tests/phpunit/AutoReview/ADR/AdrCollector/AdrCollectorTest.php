@@ -33,40 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\AutoReview\ADR\AdrCollector;
 
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function sprintf;
 
-#[CoversNothing]
-final class EnvManipulationTest extends TestCase
+#[Group('integration')]
+#[CoversClass(AdrCollector::class)]
+final class AdrCollectorTest extends TestCase
 {
-    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
-    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
-        string $testCaseClassName,
-        string $fileWithEnvManipulations,
-    ): void {
-        $import = sprintf(
-            'use %s;',
-            BacksUpEnvironmentVariables::class,
-        );
+    public function test_it_collects_adr_base_names(): void
+    {
+        $expected = [
+            '0001-first-decision',
+            '0012-another-decision',
+        ];
+        $actual = AdrCollector::collect(__DIR__ . '/Fixtures');
 
-        $this->assertStringContainsString(
-            $import,
-            file_get_contents($fileWithEnvManipulations),
-            sprintf(
-                <<<'TXT'
-                        Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
-                        been found in the file "%s".
-                    TXT,
-                $testCaseClassName,
-                BacksUpEnvironmentVariables::class,
-                $fileWithEnvManipulations,
-            ),
-        );
+        $this->assertSame($expected, $actual);
     }
 }

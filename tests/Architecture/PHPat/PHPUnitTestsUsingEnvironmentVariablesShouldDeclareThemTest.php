@@ -33,37 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat;
 
-use function getenv;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use function Safe\putenv;
+use Infection\Tests\Architecture\PHPat\Selector\InfectionSelector;
+use PHPat\Test\Builder\Rule;
+use PHPat\Test\PHPat;
+use PHPStan\Reflection\ReflectionProvider;
 
-#[CoversClass(EnvBackup::class)]
-final class EnvBackupTest extends TestCase
+final readonly class PHPUnitTestsUsingEnvironmentVariablesShouldDeclareThemTest
 {
-    public function test_it_can_backup_and_restore_environment_variables(): void
+    public function __construct(
+        private ReflectionProvider $reflectionProvider,
+    ) {
+    }
+
+    public function testPHPUnitTestsUsingEnvironmentVariablesDeclareThem(): Rule
     {
-        putenv('BEFORE_SNAPSHOT_0=initialValue0');
-        putenv('BEFORE_SNAPSHOT_1=initialValue1');
-        putenv('BEFORE_SNAPSHOT_2=initialValue2');
-
-        $initialEnvironmentVariables = getenv();
-
-        $snapshot = EnvBackup::createSnapshot();
-
-        putenv('BEFORE_SNAPSHOT_0=newValue0');
-        putenv('BEFORE_SNAPSHOT_1=');
-        putenv('BEFORE_SNAPSHOT_2');
-        putenv('AFTER_SNAPSHOT=value');
-
-        $snapshot->restore();
-
-        $this->assertSame('initialValue0', getenv('BEFORE_SNAPSHOT_0'));
-        $this->assertSame('initialValue1', getenv('BEFORE_SNAPSHOT_1'));
-        $this->assertSame('initialValue2', getenv('BEFORE_SNAPSHOT_2'));
-        $this->assertFalse(getenv('AFTER_SNAPSHOT'));
-        $this->assertSame($initialEnvironmentVariables, getenv());
+        return PHPat::rule()
+            ->classes(
+                InfectionSelector::phpunitTestMissingEnvironmentVariable($this->reflectionProvider),
+            )
+            ->excluding(InfectionSelector::selectorFixtures())
+            ->shouldNot()
+            ->exist()
+            ->because('PHPUnit tests exercising code that uses environment variables should declare them with WithEnvironmentVariable.');
     }
 }

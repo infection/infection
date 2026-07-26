@@ -38,7 +38,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector\Support\Analyser;
 use function array_filter;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\ClassName;
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
@@ -77,7 +77,7 @@ final class Analyser
             return $this->analysisResultCache[$cacheKey];
         }
 
-        $isConcreteClass = ConcreteClassReflection::isConcreteClass($classReflection);
+        $isConcreteClass = ClassReflectionPredicates::isConcreteClass($classReflection);
 
         if (
             !$isConcreteClass
@@ -90,6 +90,7 @@ final class Analyser
                 hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
                 belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
                 declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
+                environmentVariables: [],
             );
         }
 
@@ -131,17 +132,19 @@ final class Analyser
         ClassReflection $classReflection,
         array $nodes,
     ): AnalysisResult {
-        $meaningfulImplementationVisitor = ConcreteClassReflection::isConcreteClass($classReflection)
+        $meaningfulImplementationVisitor = ClassReflectionPredicates::isConcreteClass($classReflection)
             ? new DetectConcreteClassMeaningfulImplementationVisitor(
                 ClassName::getShortClassName($classReflection->getName()),
             )
             : null;
         $ioCodeDetectorVisitor = IoCodeDetectorVisitor::create();
+        $environmentVariableUsageVisitor = new EnvironmentVariableUsageVisitor();
 
         $this
             ->createTraverser(
                 $meaningfulImplementationVisitor,
                 $ioCodeDetectorVisitor,
+                $environmentVariableUsageVisitor,
             )
             ->traverse($nodes);
 
@@ -152,6 +155,7 @@ final class Analyser
             hasCoversNothing: PHPUnitTestClassAnalysis::hasCoversNothing($classReflection),
             belongsToIntegrationGroup: PHPUnitTestClassAnalysis::belongsToIntegrationGroup($classReflection),
             declaresPublicNonReadonlyProperty: PublicPropertyAnalysis::hasDeclaredPublicNonReadonlyProperty($classReflection),
+            environmentVariables: $environmentVariableUsageVisitor->getEnvironmentVariables(),
         );
     }
 

@@ -33,41 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\AutoReview\ADR\AdrCollector;
 
-use function class_exists;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use function sprintf;
+use function array_filter;
+use function array_map;
+use function array_values;
+use function basename;
+use Infection\CannotBeInstantiated;
+use function Safe\glob;
+use function str_starts_with;
 
-#[CoversClass(EnvTestCasesProvider::class)]
-final class EnvTestCasesProviderTest extends TestCase
+final class AdrCollector
 {
-    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
-    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
+    use CannotBeInstantiated;
+
+    private const string ADR_NAME_GLOB_PATTERN = '[0-9][0-9][0-9][0-9]-*.md';
+
+    /**
+     * @return list<string>
+     */
+    public static function collect(string $adrDirectory): array
     {
-        $this->assertTrue(
-            class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName),
-        );
+        $paths = glob($adrDirectory . '/' . self::ADR_NAME_GLOB_PATTERN);
 
-        $testCaseReflection = new ReflectionClass($testCaseClassName);
-
-        $this->assertInstanceOf(
-            TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor(),
-        );
-
-        $this->assertFalse(
-            $testCaseReflection->isAbstract(),
-            sprintf(
-                'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName,
+        return array_values(
+            array_filter(
+                array_map(
+                    static fn (string $path): string => basename($path, '.md'),
+                    $paths,
+                ),
+                static fn (string $path): bool => !str_starts_with($path, '0000-'),
             ),
         );
-
-        $this->assertFileExists($fileWithIoOperations);
     }
 }
