@@ -77,6 +77,12 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Collect tool versions
+        id: tool-versions
+        # PHPUnit is most of what a mutant process runs; its version explains
+        # workload shifts that php_version alone cannot (e.g. the PHPUnit 12 upgrade)
+        run: echo "phpunit_version=$(composer show phpunit/phpunit --format=json | jq -r '.versions[0]')" >> $GITHUB_OUTPUT
+
       - name: Collect coverage report
         run: |
           php vendor/phpunit/phpunit/phpunit --stop-on-failure \
@@ -113,6 +119,7 @@ jobs:
           fi
 
       - name: Run Infection with timing
+        id: run-infection
         env:
           HAS_SUMMARY_LOGGER: ${{ steps.feature-check.outputs.has_summary_logger }}
         run: |
@@ -120,6 +127,8 @@ jobs:
           if [[ "${HAS_SUMMARY_LOGGER}" == "true" ]]; then
             SUMMARY_OPT="--logger-summary-json=infection-summary.json"
           fi
+
+          grep '^cpu ' /proc/stat > stat-before.txt
 
           /usr/bin/time -f '{"user_time_sec":%U,"system_time_sec":%S,"wall_clock_sec":%e,"max_rss_kb":%M,"cpu_percent":"%P","voluntary_ctx_switches":%w,"involuntary_ctx_switches":%c,"exit_status":%x}' \
             -o timing.json \
@@ -131,7 +140,17 @@ jobs:
               --no-interaction \
               $SUMMARY_OPT \
             || true
+
+          grep '^cpu ' /proc/stat > stat-after.txt
           cat timing.json
+
+          # CPU steal over the run: jiffies the hypervisor gave to other tenants.
+          # paste joins the snapshots, so fields 2-11 are before, 13-22 after; steal is field 9.
+          steal_percent=$(paste stat-before.txt stat-after.txt | awk '{
+            for (i = 2; i <= 11; i++) total += $(i + 11) - $i
+            printf "%.2f", (total > 0 ? 100 * ($20 - $9) / total : 0)
+          }')
+          echo "steal_percent=$steal_percent" >> $GITHUB_OUTPUT
 
       - name: Checkout metrics repository
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -152,6 +171,8 @@ jobs:
           CPU_ARCH: ${{ steps.runner-specs.outputs.cpu_arch }}
           REF_INPUT: ${{ github.event.inputs.ref }}
           TOTAL_MEM: ${{ steps.runner-specs.outputs.total_memory_kb }}
+          PHPUNIT_VERSION: ${{ steps.tool-versions.outputs.phpunit_version }}
+          STEAL_PERCENT: ${{ steps.run-infection.outputs.steal_percent }}
         run: |
           export COMMIT_DATE=$(git log -1 --format='%cI')
           export GIT_SHA=$(git rev-parse HEAD)
