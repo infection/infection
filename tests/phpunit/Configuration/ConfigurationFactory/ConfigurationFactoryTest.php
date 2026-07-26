@@ -456,14 +456,14 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'null tmp dir' => [
             $defaultScenario->forValueForTmpDir(
                 null,
-                sys_get_temp_dir() . '/infection',
+                Path::normalize(sys_get_temp_dir() . '/infection'),
             ),
         ];
 
         yield 'empty tmp dir' => [
             $defaultScenario->forValueForTmpDir(
                 '',
-                sys_get_temp_dir() . '/infection',
+                Path::normalize(sys_get_temp_dir() . '/infection'),
             ),
         ];
 
@@ -485,7 +485,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario->forValueForCoveragePath(
                 null,
                 false,
-                sys_get_temp_dir() . '/infection',
+                Path::normalize(sys_get_temp_dir() . '/infection'),
             ),
         ];
 

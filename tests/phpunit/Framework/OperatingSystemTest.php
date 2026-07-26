@@ -33,30 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Tests\Framework;
 
-use Infection\CannotBeInstantiated;
-use const PHP_OS_FAMILY;
+use Infection\Framework\OperatingSystem;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class OperatingSystem
+#[CoversClass(OperatingSystem::class)]
+final class OperatingSystemTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    public static function isMacOs(): bool
+    public function test_it_detects_whether_the_operating_system_is_case_sensitive(): void
     {
-        return PHP_OS_FAMILY === 'Darwin';
-    }
-
-    public static function isWindows(): bool
-    {
-        return PHP_OS_FAMILY === 'Windows';
-    }
-
-    public static function isCaseSensitive(): bool
-    {
-        return !self::isMacOs() && !self::isWindows();
+        $this->assertSame(
+            !OperatingSystem::isMacOs() && !OperatingSystem::isWindows(),
+            OperatingSystem::isCaseSensitive(),
+        );
     }
 }
