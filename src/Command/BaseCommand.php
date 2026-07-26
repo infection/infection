@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use Infection\Console\Application;
 use Infection\Console\IO;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,8 +48,9 @@ use Webmozart\Assert\Assert;
  */
 abstract class BaseCommand extends Command
 {
-    private ?IO $io = null;
+    protected ?IO $io = null;
 
+    #[Override]
     final public function getApplication(): Application
     {
         $application = parent::getApplication();
@@ -57,7 +59,7 @@ abstract class BaseCommand extends Command
             $application,
             Application::class,
             'Cannot access to the command application if the command has not been '
-            . 'registered to the application yet'
+            . 'registered to the application yet',
         );
 
         return $application;
@@ -72,7 +74,9 @@ abstract class BaseCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        return $this->executeCommand($this->getIO()) ? 0 : 1;
+        return $this->executeCommand($this->getIO())
+            ? self::SUCCESS
+            : self::FAILURE;
     }
 
     abstract protected function executeCommand(IO $io): bool;
@@ -81,7 +85,7 @@ abstract class BaseCommand extends Command
     {
         Assert::notNull(
             $this->io,
-            'Cannot retrieve the IO object before the command was initialized'
+            'Cannot retrieve the IO object before the command was initialized',
         );
 
         return $this->io;

@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions: {}
+
+jobs:
+  release:
+    name: Upload PHAR and signature
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      -
+        name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: 8.3
+          coverage: none
+          ini-values: memory_limit=512M, opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
+          tools: 'composer'
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      -
+        name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      -
+        name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      -
+        name: Build PHAR
+        run: make compile
+
+      -
+        name: Sign the PHAR
+        run: |
+          gpg --local-user maks.rafalko@gmail.com \
+              --yes \
+              --passphrase="${{ secrets.GPG_PASSPHRASE }}" \
+              --detach-sign \
+              --output dist/infection.phar.asc \
+              dist/infection.phar
+
+      - name: Upload PHAR to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1 \
+            || gh release create "${GITHUB_REF_NAME}" --verify-tag --title "${GITHUB_REF_NAME}"
+
+          gh release upload "${GITHUB_REF_NAME}" dist/infection.phar*

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")"
+
+readonly INFECTION=../../../${1}
+
+set -eo pipefail
+
+composer install --no-interaction --working-dir=tools
+
+php $INFECTION --static-analysis-tool=phpstan --no-progress --threads=2
+
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+fi
+
+diff -u --ignore-all-space expected-output.txt infection.log

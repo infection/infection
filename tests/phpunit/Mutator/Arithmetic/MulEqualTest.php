@@ -35,46 +35,82 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\MulEqual;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(MulEqual::class)]
 final class MulEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates multiply equal' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a *= 2;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a /= 2;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a *= 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a /= 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate normal multiply' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 10 * 3;
+                    PHP,
+            ),
+        ];
 
-$a = 10 * 3;
-PHP
-            ,
+        yield 'It does not mutate multiply by 1 to avoid an equivalent mutation' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a *= 1;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate multiply by -1 to avoid an equivalent mutation' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a *= -1;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate multiply by 1.0 to avoid an equivalent mutation' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a *= 1.0;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate multiply by -1.0 to avoid an equivalent mutation' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a *= -1.0;
+                    PHP,
+            ),
         ];
     }
 }

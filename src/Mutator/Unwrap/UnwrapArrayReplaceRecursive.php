@@ -38,6 +38,7 @@ namespace Infection\Mutator\Unwrap;
 use function array_keys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 
 /**
@@ -45,29 +46,28 @@ use PhpParser\Node;
  */
 final class UnwrapArrayReplaceRecursive extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_replace_recursive` function call with its first operand. For example:
+                Replaces an `array_replace_recursive` function call with its first operand. For example:
 
-```php
-$x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-```
+                ```php
+                $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
-            ,
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-+ $x = ['foo', 'bar', 'baz'];
-DIFF
+                - $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 
@@ -79,6 +79,7 @@ DIFF
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_keys($node->args);

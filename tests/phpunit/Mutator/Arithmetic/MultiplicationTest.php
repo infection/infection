@@ -35,149 +35,152 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\Multiplication;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Multiplication::class)]
 final class MultiplicationTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal multiplication' => [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-<?php
-
-$a = 10 * 3;
-PHP
-                ,
+                    $a = 10 * 3;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
                 <<<'PHP'
-<?php
-
-$a = 10 / 3;
-PHP
+                    $a = 10 / 3;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate multiplication equals' => [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-<?php
-
-$a = 1;
-$a *= 2;
-PHP
+                    $a = 1;
+                    $a *= 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is 1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = 1 * $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1 * $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is 1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = $b * 1;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b * 1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is -1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = -1 * $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = -1 * $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is -1 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = $b * -1;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b * -1;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is 1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = 1.0 * $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1.0 * $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is 1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = $b * 1.0;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b * 1.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the left side is -1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = -1.0 * $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = -1.0 * $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when the right side is -1.0 to avoid an equivalent mutation' => [
-            <<<'PHP'
-<?php
-
-$a = $b * -1.0;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b * -1.0;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when class method returns type is integer' => [
-            <<<'PHP'
-<?php
-
-new class
-{
-    public function mul(int $a, int $b): int
-    {
-        return $a * $b;
-    }
-};
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    new class
+                    {
+                        public function mul(int $a, int $b): int
+                        {
+                            return $a * $b;
+                        }
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It mutates when class method returns type is integer' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    new class
+                    {
+                        public function mul(int $a, int $b): int
+                        {
+                            $c = $a * $b;
 
-new class
-{
-    public function mul(int $a, int $b): int
-    {
-        $c = $a * $b;
+                            return 1;
+                        }
+                    };
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    new class
+                    {
+                        public function mul(int $a, int $b): int
+                        {
+                            $c = $a / $b;
 
-        return 1;
-    }
-};
-PHP,
-            <<<'PHP'
-<?php
-
-new class
-{
-    public function mul(int $a, int $b) : int
-    {
-        $c = $a / $b;
-        return 1;
-    }
-};
-PHP
+                            return 1;
+                        }
+                    };
+                    PHP,
+            ),
         ];
     }
 }

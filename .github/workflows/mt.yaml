@@ -13,31 +13,45 @@
 name: Mutation Testing
 
 on:
-  pull_request:
   push:
     branches:
       - main
       - master
+  pull_request:
+    paths:
+      - '.github/workflows/mt.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
 
 env:
-  MIN_MSI: 70.17
-  MIN_COVERED_MSI: 86.48
+  PHP_VERSION: '8.3'
+  MIN_MSI: 77.0
+  MIN_COVERED_MSI: 86.00
 
 jobs:
-  tests:
+  mutation-testing:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
 
     name: Infection complete run on Infection
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup PHP for coverage
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           # Any supported PHP version is fine
-          php-version: '8.2'
+          php-version: ${{ env.PHP_VERSION }}
           coverage: pcov
           tools: composer
         env:
@@ -46,15 +60,15 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
             composer-${{ runner.os }}-
             composer-
 
@@ -65,19 +79,48 @@ jobs:
 
       - name: Collect coverage report
         run: |
-          SYMFONY_DEPRECATIONS_HELPER=disabled php vendor/phpunit/phpunit/phpunit --stop-on-failure \
-            --coverage-xml=build/logs/coverage-xml \
-            --log-junit=build/logs/junit.xml
+          php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            --coverage-xml=var/coverage/coverage-xml \
+            --log-junit=var/coverage/junit.xml
 
-      - name: Run Infection
+      - name: Setup PHP for mutation testing
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create opcache directory
+        run: mkdir -p /tmp/opcache
+
+      - name: Run Infection on the full codebase
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
         run: |
-          php bin/infection --threads=max \
+          php bin/infection \
             --skip-initial-tests \
             --min-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
-            --coverage=build/logs \
+            --coverage=var/coverage \
             --log-verbosity=none \
             --no-interaction \
             --no-progress
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+      name: Mutation Testing Status
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
+      needs: mutation-testing
+      if: always()
+      steps:
+          - name: Successful run
+            if: ${{ !(contains(needs.*.result, 'failure')) }}
+            run: exit 0
+
+          - name: Failing run
+            if: ${{ contains(needs.*.result, 'failure') }}
+            run: exit 1

@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder\Exception;
 
 use Infection\FileSystem\Finder\Exception\FinderException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FinderException::class)]
 final class FinderExceptionTest extends TestCase
 {
     public function test_composer_not_found_exception(): void
@@ -47,7 +49,7 @@ final class FinderExceptionTest extends TestCase
         $this->assertInstanceOf(FinderException::class, $exception);
         $this->assertStringContainsString(
             'Unable to locate a Composer executable on local system',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -58,7 +60,7 @@ final class FinderExceptionTest extends TestCase
         $this->assertInstanceOf(FinderException::class, $exception);
         $this->assertStringContainsString(
             'Unable to locate the PHP executable on the local system',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -69,11 +71,11 @@ final class FinderExceptionTest extends TestCase
         $this->assertInstanceOf(FinderException::class, $exception);
         $this->assertStringContainsString(
             'Unable to locate a framework executable on local system.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertStringContainsString(
             'Ensure that framework is installed and available.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -84,7 +86,7 @@ final class FinderExceptionTest extends TestCase
         $this->assertInstanceOf(FinderException::class, $exception);
         $this->assertStringContainsString(
             'The custom path to framework was set as "foo/bar/abc"',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 }

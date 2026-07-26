@@ -38,8 +38,10 @@ namespace Infection\Tests\CI;
 use Infection\CI\NullCiDetector;
 use OndraM\CiDetector\Env;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(NullCiDetector::class)]
 final class NullCiDetectorTest extends TestCase
 {
     public function test_it_can_be_instantiated_from_environment(): void

@@ -1,0 +1,91 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Benchmarks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    name: 'Tests'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.4'
+          tools: composer
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+
+      - name: Run tests
+        shell: bash
+        run: make test-benchmark
+
+  benchmarks:
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
+      name: 'Benchmarks'
+      permissions:
+          contents: read
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            with:
+                persist-credentials: false
+
+          - name: Setup PHP
+            uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+            with:
+                php-version: '8.4'
+                tools: composer
+                coverage: none
+                ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
+
+          - name: Install dependencies
+            uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+
+          - name: Run benchmarks
+            shell: bash
+            run: make benchmark
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+    name: Benchmarks Status
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs:
+      - tests
+      - benchmarks
+    if: always()
+    steps:
+      - name: Successful run
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+
+      - name: Failing run
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

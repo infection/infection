@@ -35,197 +35,187 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\Assignment;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Assignment::class)]
 final class AssignmentTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield [
-            <<<'PHP'
-<?php
-
-$a += $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a += $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a -= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a -= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a *= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a *= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a **= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a **= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a /= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a /= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a %= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a %= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a .= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a .= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a &= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a &= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a |= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a |= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a ^= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a ^= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a <<= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a <<= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield [
-            <<<'PHP'
-<?php
-
-$a >>= $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $b;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a >>= $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $b;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate Coalesce operator' => [
-            <<<'PHP'
-<?php
-
-$a ??= $b;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a ??= $b;
+                    PHP,
+            ),
         ];
     }
 }

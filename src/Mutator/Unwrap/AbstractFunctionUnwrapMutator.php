@@ -53,7 +53,7 @@ abstract class AbstractFunctionUnwrapMutator implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Arg>
+     * @return iterable<Node\Expr>
      */
     final public function mutate(Node $node): iterable
     {
@@ -66,7 +66,7 @@ abstract class AbstractFunctionUnwrapMutator implements Mutator
                 continue;
             }
 
-            yield $node->args[$index];
+            yield $node->args[$index]->value;
         }
     }
 

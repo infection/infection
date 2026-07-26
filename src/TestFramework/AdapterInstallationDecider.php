@@ -38,22 +38,24 @@ namespace Infection\TestFramework;
 use function array_key_exists;
 use function class_exists;
 use Infection\Console\IO;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * @internal
  */
-final class AdapterInstallationDecider
+final readonly class AdapterInstallationDecider
 {
-    private const ADAPTER_NAME_TO_CLASS_MAP = [
+    private const array ADAPTER_NAME_TO_CLASS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'Infection\TestFramework\Codeception\CodeceptionAdapter',
         TestFrameworkTypes::PHPSPEC => 'Infection\TestFramework\PhpSpec\PhpSpecAdapter',
+        TestFrameworkTypes::TESTO => 'Testo\Bridge\Infection\TestoAdapter',
     ];
 
-    public function __construct(private QuestionHelper $questionHelper)
-    {
+    public function __construct(
+        private QuestionHelper $questionHelper,
+    ) {
     }
 
     public function shouldBeInstalled(string $adapterName, IO $io): bool
@@ -69,19 +71,18 @@ final class AdapterInstallationDecider
         $question = new ConfirmationQuestion(
             sprintf(
                 <<<TEXT
-We noticed you are using a test framework supported by an external Infection plugin.
-Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
-TEXT
-                ,
-                AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName]
+                    We noticed you are using a test framework supported by an external Infection plugin.
+                    Would you like to install <comment>%s</comment>? [<comment>yes</comment>]:
+                    TEXT,
+                AdapterInstaller::OFFICIAL_ADAPTERS_MAP[$adapterName],
             ),
-            true
+            true,
         );
 
         return $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
-            $question
+            $question,
         );
     }
 }

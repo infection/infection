@@ -35,25 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
+use Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter;
+use Infection\Tests\Fixtures\Resource\Time\FakeTimeFormatter;
 use function is_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function strpos;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(PerformanceLoggerSubscriber::class)]
 final class PerformanceLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
     protected function setUp(): void
     {
@@ -64,16 +62,19 @@ final class PerformanceLoggerSubscriberTest extends TestCase
     {
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($this->callback(static function ($parameter): bool {
-                return is_array($parameter) && $parameter[0] === '' && strpos($parameter[1], 'Time:') === 0;
+            ->with($this->callback(static function (string|iterable $parameter): bool {
+                $expectedOutput = 'Time: 5s. Memory: 2.00KB. Threads: 1';
+
+                return is_array($parameter) && $parameter[0] === '' && $parameter[1] === $expectedOutput;
             }));
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new PerformanceLoggerSubscriber(
             new Stopwatch(),
-            new TimeFormatter(),
-            new MemoryFormatter(),
-            $this->output
+            new FakeTimeFormatter(5),
+            new FakeMemoryFormatter(2048),
+            1,
+            $this->output,
         ));
 
         $dispatcher->dispatch(new ApplicationExecutionWasStarted());

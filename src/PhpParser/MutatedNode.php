@@ -42,36 +42,30 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class MutatedNode
+final readonly class MutatedNode
 {
-    private $value;
-
     /**
-     * @param Node|Node[] $value
+     * @param int|Node|Node[] $value
      */
-    private function __construct($value)
+    private function __construct(private int|Node|array $value)
     {
         if (is_array($value)) {
             Assert::allIsInstanceOf($value, Node::class);
-        } else {
-            Assert::isInstanceOf($value, Node::class);
         }
-
-        $this->value = $value;
     }
 
     /**
-     * @param Node|Node[] $value
+     * @param int|Node|Node[] $value
      */
-    public static function wrap($value): self
+    public static function wrap(int|Node|array $value): self
     {
         return new self($value);
     }
 
     /**
-     * @return Node|Node[]
+     * @return int|Node|Node[]
      */
-    public function unwrap()
+    public function unwrap(): int|Node|array
     {
         return $this->value;
     }

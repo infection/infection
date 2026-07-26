@@ -35,27 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Processor;
 
-use function defined;
 use Fidry\CpuCoreCounter\CpuCoreCounter;
 use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
+use Infection\Framework\OperatingSystem;
 
 /**
  * @internal
+ * @final
  */
-final class CpuCoresCountProvider
+class CpuCoresCountProvider
 {
     /**
      * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
      */
-    public static function provide(): int
+    public function provide(): int
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (OperatingSystem::isWindows()) {
             return 1;
         }
 
         try {
             return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound $exception) {
+        } catch (NumberOfCpuCoreNotFound) {
             return 1;
         }
     }

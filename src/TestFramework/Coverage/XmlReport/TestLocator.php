@@ -37,9 +37,9 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_values;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,8 +48,9 @@ use Webmozart\Assert\Assert;
  */
 class TestLocator
 {
-    public function __construct(private TestLocations $testLocations)
-    {
+    public function __construct(
+        private readonly TestLocations $testLocations,
+    ) {
     }
 
     public function hasTests(): bool
@@ -68,7 +69,7 @@ class TestLocator
      */
     public function getAllTestsForMutation(
         NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature
+        bool $isOnFunctionSignature,
     ): iterable {
         // TODO: would any of those operations benefit from being cached? To be checked with a profile
         if ($isOnFunctionSignature) {
@@ -119,7 +120,7 @@ class TestLocator
             ) {
                 return $this->getTestsForLineRange(new NodeLineRangeData(
                     $methodRange->getStartLine(),
-                    $methodRange->getEndLine()
+                    $methodRange->getEndLine(),
                 ));
             }
         }

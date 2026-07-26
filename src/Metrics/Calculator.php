@@ -49,19 +49,27 @@ final class Calculator
 
     private ?float $coveredMutationScoreIndicator = null;
 
-    public function __construct(private int $roundingPrecision, private int $killedCount, private int $errorCount, private int $timedOutCount, private int $notTestedCount, private int $totalCount)
-    {
+    public function __construct(
+        private readonly int $roundingPrecision,
+        private readonly int $killedCount,
+        private readonly int $errorCount,
+        private readonly int $timedOutCount,
+        private readonly int $notTestedCount,
+        private readonly int $totalCount,
+        private readonly bool $timeoutsAsEscaped = false,
+    ) {
     }
 
-    public static function fromMetrics(MetricsCalculator $calculator): self
+    public static function fromMetrics(MetricsCalculator $calculator, bool $timeoutsAsEscaped = false): self
     {
         return new self(
             $calculator->getRoundingPrecision(),
-            $calculator->getKilledCount(),
+            $calculator->getKilledByTestsCount() + $calculator->getKilledByStaticAnalysisCount(),
             $calculator->getErrorCount() + $calculator->getSyntaxErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),
-            $calculator->getTestedMutantsCount()
+            $calculator->getTestedMutantsCount(),
+            $timeoutsAsEscaped,
         );
     }
 
@@ -75,7 +83,12 @@ final class Calculator
         }
 
         $score = 0.;
-        $coveredTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
+        $coveredTotal = $this->killedCount + $this->errorCount;
+
+        if (!$this->timeoutsAsEscaped) {
+            $coveredTotal += $this->timedOutCount;
+        }
+
         $totalCount = $this->totalCount;
 
         if ($totalCount !== 0) {
@@ -116,7 +129,11 @@ final class Calculator
 
         $score = 0.;
         $testedTotal = $this->totalCount - $this->notTestedCount;
-        $coveredTotal = $this->killedCount + $this->timedOutCount + $this->errorCount;
+        $coveredTotal = $this->killedCount + $this->errorCount;
+
+        if (!$this->timeoutsAsEscaped) {
+            $coveredTotal += $this->timedOutCount;
+        }
 
         if ($testedTotal !== 0) {
             $score = 100 * $coveredTotal / $testedTotal;

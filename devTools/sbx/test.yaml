@@ -1,0 +1,70 @@
+schemaVersion: 2.0.0
+
+commandTests:
+    -   name: "php 8.4 is installed"
+        command: "php"
+        args: ["--version"]
+        expectedOutput: ['^PHP 8\.4\.\d+ \(cli\) ']
+        exitCode: 0
+
+    -   name: "Xdebug coverage mode is enabled"
+        command: "bash"
+        # The pipe needs a shell; "-c" asks bash to execute this string.
+        args: ["-c", "php -i | grep 'xdebug.mode'"]
+        expectedOutput: ['(?m)^xdebug\.mode => coverage => coverage$']
+        exitCode: 0
+
+    -   name: "PHP memory limit is disabled"
+        command: "php"
+        args: ["-r", "echo ini_get('memory_limit'), PHP_EOL;"]
+        expectedOutput: ['(?m)^-1$']
+        exitCode: 0
+
+    -   name: "curl PHP extension is loaded"
+        command: "php"
+        args: ["-r", "exit(extension_loaded('curl') ? 0 : 1);"]
+        exitCode: 0
+
+    -   name: "composer is executable"
+        command: "composer"
+        args: ["--version"]
+        exitCode: 0
+
+    -   name: "PIE is executable"
+        command: "pie"
+        args: ["--version"]
+        exitCode: 0
+
+    # https://github.com/php/pie/issues/604
+    -   name: "PIE extension build tools are installed"
+        command: "bash"
+        args: ["-c", "command -v gcc && command -v make && command -v autoconf && command -v bison && command -v re2c && command -v pkg-config && command -v libtoolize && command -v phpize"]
+        expectedOutput:
+            - "/usr/bin/gcc"
+            - "/usr/bin/make"
+            - "/usr/bin/autoconf"
+            - "/usr/bin/bison"
+            - "/usr/bin/re2c"
+            - "/usr/bin/pkg-config"
+            - "/usr/bin/libtoolize"
+            - "/usr/bin/phpize"
+        exitCode: 0
+
+    -   name: "container-structure-test is executable"
+        command: "container-structure-test"
+        args: ["version"]
+        exitCode: 0
+
+    -   name: "wget is executable"
+        command: "wget"
+        args: ["--version"]
+        expectedOutput: ["(?m)^GNU Wget "]
+        exitCode: 0
+
+    -   name: "Container runs as agent user"
+        command: "whoami"
+        expectedOutput: ["(?m)^agent$"]
+
+globalEnvVars:
+    -   key: "SHELL"
+        value: "/bin/bash"

@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.6.20"
+    },
+    "autoload": {
+        "psr-4": {
+            "Exclude_By_Folder\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Exclude_By_Folder\\Test\\": "tests/"
+        }
+    }
+}

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Config;
 
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -44,11 +44,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleHelper
 {
-    private FormatterHelper $formatterHelper;
-
-    public function __construct(FormatterHelper $formatterHelper)
-    {
-        $this->formatterHelper = $formatterHelper;
+    public function __construct(
+        private readonly FormatterHelper $formatterHelper,
+    ) {
     }
 
     public function writeSection(OutputInterface $output, string $text, string $style = 'bg=blue;fg=white'): void

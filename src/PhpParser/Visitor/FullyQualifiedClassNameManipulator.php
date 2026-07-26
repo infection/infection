@@ -37,8 +37,6 @@ namespace Infection\PhpParser\Visitor;
 
 use Infection\CannotBeInstantiated;
 use PhpParser\Node;
-use PhpParser\Node\Name\FullyQualified;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -47,22 +45,14 @@ final class FullyQualifiedClassNameManipulator
 {
     use CannotBeInstantiated;
 
-    private const FQN_ATTRIBUTE = 'fullyQualifiedClassName';
+    public const string RESOLVED_NAME = 'resolvedName';
 
-    public static function setFqcn(Node $node, ?FullyQualified $fqcn): void
+    public const string RESOLVED_NAMESPACE_NAME = 'namespacedName';
+
+    public static function getFqcn(Node $node): ?Node\Name
     {
-        $node->setAttribute(self::FQN_ATTRIBUTE, $fqcn);
-    }
-
-    public static function hasFqcn(Node $node): bool
-    {
-        return $node->hasAttribute(self::FQN_ATTRIBUTE);
-    }
-
-    public static function getFqcn(Node $node): ?FullyQualified
-    {
-        Assert::true(self::hasFqcn($node));
-
-        return $node->getAttribute(self::FQN_ATTRIBUTE);
+        return $node->namespacedName
+            ?? $node->getAttribute('resolvedName')
+            ?? $node->getAttribute('namespacedName');
     }
 }

@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Config;
 
 use Infection\Config\ConsoleHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(ConsoleHelper::class)]
 final class ConsoleHelperTest extends TestCase
 {
     public function test_it_writes_to_section(): void
@@ -50,7 +52,7 @@ final class ConsoleHelperTest extends TestCase
             ->with(
                 'foo',
                 'bg=blue;fg=white',
-                true
+                true,
             )
             ->willReturn('Formatted Foo');
 
@@ -61,7 +63,7 @@ final class ConsoleHelperTest extends TestCase
                     '',
                     'Formatted Foo',
                     '',
-                ]
+                ],
             );
         $console = new ConsoleHelper($formatHelper);
 
@@ -74,7 +76,7 @@ final class ConsoleHelperTest extends TestCase
 
         $this->assertSame(
             '<info>Would you like a cup of tea?</info>: ',
-            $consoleHelper->getQuestion('Would you like a cup of tea?')
+            $consoleHelper->getQuestion('Would you like a cup of tea?'),
         );
     }
 
@@ -84,7 +86,7 @@ final class ConsoleHelperTest extends TestCase
 
         $this->assertSame(
             '<info>Would you like a cup of tea?</info> [<comment>yes</comment>]: ',
-            $consoleHelper->getQuestion('Would you like a cup of tea?', 'yes')
+            $consoleHelper->getQuestion('Would you like a cup of tea?', 'yes'),
         );
     }
 }

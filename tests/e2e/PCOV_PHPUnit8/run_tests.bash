@@ -42,9 +42,13 @@ then
     exit 0
 fi
 
-set -e pipefail
+set -eo pipefail
 
 run "../../../bin/infection"
 
-diff -w expected-output.txt infection.log
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+fi
+
+diff -u --ignore-all-space expected-output.txt infection.log
 

@@ -40,6 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -51,27 +52,29 @@ final class CatchBlockRemoval implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    private const int MIN_CATCH_COUNT_TO_MUTATE = 2;
+
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes `catch` block when more than one defined in `try-catch`.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-try {
-    $callback();
-- } catch (\DomainException $ex) {
--     $logger->log($ex);
-} catch (\LogicException $e) {
-    throw $e;
-}
-DIFF
+                try {
+                    $callback();
+                - } catch (\DomainException $ex) {
+                -     $logger->log($ex);
+                } catch (\LogicException $e) {
+                    throw $e;
+                }
+                DIFF,
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\TryCatch || count($node->catches) < 2) {
+        if (!$node instanceof Node\Stmt\TryCatch || count($node->catches) < self::MIN_CATCH_COUNT_TO_MUTATE) {
             return false;
         }
 
@@ -100,7 +103,7 @@ DIFF
 
             unset($catches[$i]);
 
-            yield new Node\Stmt\TryCatch($node->stmts, $catches, $node->finally, $node->getAttributes());
+            yield new Node\Stmt\TryCatch($node->stmts, $catches, $node->finally, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 

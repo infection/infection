@@ -40,6 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -51,20 +52,20 @@ final class Catch_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes exception types in `catch` block.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-try {
-    $fn();
-- } catch (\Exception | \DomainException $e) {
-+ } catch (\Exception $e) {
-    throw $e;
-}
-DIFF
+                try {
+                    $fn();
+                - } catch (\Exception | \DomainException $e) {
+                + } catch (\Exception $e) {
+                    throw $e;
+                }
+                DIFF,
         );
     }
 
@@ -86,7 +87,7 @@ DIFF
 
             unset($types[$i]);
 
-            yield new Node\Stmt\Catch_($types, $node->var, $node->stmts, $node->getAttributes());
+            yield new Node\Stmt\Catch_($types, $node->var, $node->stmts, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 }

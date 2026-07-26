@@ -35,139 +35,132 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\Ternary;
+use Infection\Testing\BaseMutatorTestCase;
 use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Ternary::class)]
 final class TernaryTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutates ternary and flip conditions' => [
-            <<<'PHP'
-<?php
-
-isset($b) ? 'B' : 'C';
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-isset($b) ? 'C' : 'B';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    isset($b) ? 'B' : 'C';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    isset($b) ? 'C' : 'B';
+                    PHP,
+            ),
         ];
 
         yield 'Mutates ternary expression without values in the if condition' => [
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$foo ?: 'bar';
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$foo ? 'bar' : $foo;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $foo ?: 'bar';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $foo ? 'bar' : $foo;
+                    PHP,
+            ),
         ];
 
         if (PHP_VERSION_ID < 80000) {
             yield 'Mutates nested ternary expression with values in the if condition' => [
-                <<<'PHP'
-<?php
-
-true ? 'true' : false ? 't' : 'f';
-PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        true ? 'true' : false ? 't' : 'f';
+                        PHP,
+                ),
                 [
-                    <<<'PHP'
-<?php
-
-(true ? false : 'true') ? 't' : 'f';
-PHP
-                    ,
-                    <<<'PHP'
-<?php
-
-(true ? 'true' : false) ? 'f' : 't';
-PHP
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ? false : 'true') ? 't' : 'f';
+                            PHP,
+                    ),
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ? 'true' : false) ? 'f' : 't';
+                            PHP,
+                    ),
                 ],
             ];
 
             yield 'Mutates nested ternary expression without values in the if condition' => [
-                <<<'PHP'
-<?php
-
-true ?: false ?: 'f';
-PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        true ?: false ?: 'f';
+                        PHP,
+                ),
                 [
-                    <<<'PHP'
-<?php
-
-(true ? false : true) ?: 'f';
-PHP
-                    ,
-                    <<<'PHP'
-<?php
-
-(true ?: false) ? 'f' : (true ?: false);
-PHP
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ? false : true) ?: 'f';
+                            PHP,
+                    ),
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ?: false) ? 'f' : (true ?: false);
+                            PHP,
+                    ),
                 ],
             ];
 
             yield 'Mutates wrapped in braces ternary expressions with values in the if condition' => [
-                <<<'PHP'
-<?php
-
-(true ? 'true' : false) ? 't' : 'f';
-PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        (true ? 'true' : false) ? 't' : 'f';
+                        PHP,
+                ),
                 [
-                    <<<'PHP'
-<?php
-
-(true ? false : 'true') ? 't' : 'f';
-PHP
-                    ,
-                    <<<'PHP'
-<?php
-
-(true ? 'true' : false) ? 'f' : 't';
-PHP
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ? false : 'true') ? 't' : 'f';
+                            PHP,
+                    ),
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ? 'true' : false) ? 'f' : 't';
+                            PHP,
+                    ),
                 ],
             ];
 
             yield 'Mutates wrapped in braces ternary expressions without values in the if condition' => [
-                <<<'PHP'
-<?php
-
-((true ?: false) ? 't' : 'f');
-PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        ((true ?: false) ? 't' : 'f');
+                        PHP,
+                ),
                 [
-                    <<<'PHP'
-<?php
-
-(true ? false : true) ? 't' : 'f';
-PHP
-                    ,
-                    <<<'PHP'
-<?php
-
-(true ?: false) ? 'f' : 't';
-PHP
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ? false : true) ? 't' : 'f';
+                            PHP,
+                    ),
+                    self::wrapCodeInMethod(
+                        <<<'PHP'
+                            (true ?: false) ? 'f' : 't';
+                            PHP,
+                    ),
                 ],
             ];
         }

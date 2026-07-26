@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
          stopOnFailure="true"
          failOnWarning="true"
          failOnRisky="true"
-         verbose="true"
+         requireCoverageMetadata="true"
+         displayDetailsOnIncompleteTests="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnSkippedTests="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         cacheDirectory="./var/cache/phpunit-autoreview"
 >
 
-    <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
-    </php>
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
 
     <testsuites>
         <testsuite name="Auto-Review Test Suite">
+            <directory>tests/phpunit/Architecture</directory>
             <directory>tests/phpunit/AutoReview</directory>
+
+            <exclude>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures</exclude>
+            <exclude>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures</exclude>
+            <exclude>tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures</exclude>
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
+    <source>
+        <include>
+            <directory>tests/Architecture</directory>
+            <directory>tests/phpunit/Architecture</directory>
             <directory>tests/phpunit/AutoReview</directory>
-        </whitelist>
-    </filter>
+        </include>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
-    </listeners>
-
+        <exclude>
+            <directory>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestNotRequiringIoWithIntegrationGroup/Fixtures</directory>
+            <directory>tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures</directory>
+            <directory>tests/phpunit/Architecture/PHPat/Selector/Support/EventArchitectureTest/Fixtures</directory>
+        </exclude>
+    </source>
 </phpunit>

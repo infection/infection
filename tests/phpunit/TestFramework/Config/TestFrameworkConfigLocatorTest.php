@@ -37,16 +37,17 @@ namespace Infection\Tests\TestFramework\Config;
 
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use function Infection\Tests\normalizePath as p;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(TestFrameworkConfigLocator::class)]
 final class TestFrameworkConfigLocatorTest extends TestCase
 {
-    private $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
+    private string $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
 
     public function test_it_throws_an_error_if_no_config_file_found(): void
     {
@@ -57,8 +58,8 @@ final class TestFrameworkConfigLocatorTest extends TestCase
         $this->expectExceptionMessage(
             sprintf(
                 'The path "%s" does not contain any of the requested files: "phpunit.xml", "phpunit.yml", "phpunit.xml.dist", "phpunit.yml.dist", "phpunit.dist.xml", "phpunit.dist.yml"',
-                $dir
-            )
+                $dir,
+            ),
         );
 
         $locator->locate('phpunit');
@@ -73,8 +74,8 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            p($output),
-            'Did not find the correct phpunit.xml.dist file.'
+            Path::normalize($output),
+            'Did not find the correct phpunit.xml.dist file.',
         );
     }
 
@@ -87,8 +88,8 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/AltDistFile/phpunit.dist.xml',
-            p($output),
-            'Did not find the correct phpunit.xml.dist file.'
+            Path::normalize($output),
+            'Did not find the correct phpunit.xml.dist file.',
         );
     }
 
@@ -101,8 +102,8 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/XmlFile/phpunit.xml',
-            p($output),
-            'Did not find the correct phpunit.xml file.'
+            Path::normalize($output),
+            'Did not find the correct phpunit.xml file.',
         );
     }
 
@@ -115,8 +116,8 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/BothXmlAndDist/phpunit.xml',
-            p($output),
-            'Did not find the correct phpunit.xml file.'
+            Path::normalize($output),
+            'Did not find the correct phpunit.xml file.',
         );
     }
 
@@ -129,8 +130,8 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            p($output),
-            'Did not find the correct phpunit.xml.dist file.'
+            Path::normalize($output),
+            'Did not find the correct phpunit.xml.dist file.',
         );
 
         $this->expectException(FileOrDirectoryNotFound::class);

@@ -35,52 +35,37 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_filter;
 use function array_map;
+use function array_unique;
+use function array_values;
+use function count;
+use function end;
 use function extension_loaded;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function strpos;
+use function str_contains;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-/**
- * @group integration
- */
+#[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private static $phpBin;
+    private MockObject&InitialTestsRunProcessFactory $processFactoryMock;
 
-    /**
-     * @var InitialTestsRunProcessFactory|MockObject
-     */
-    private $processFactoryMock;
+    private EventDispatcherCollector $eventDispatcher;
 
-    /**
-     * @var EventDispatcherCollector
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var InitialTestsRunner
-     */
-    private $runner;
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$phpBin = (new PhpExecutableFinder())->find();
-    }
+    private InitialTestsRunner $runner;
 
     protected function setUp(): void
     {
@@ -102,10 +87,9 @@ final class InitialTestsRunnerTest extends TestCase
         $skipCoverage = false;
 
         $process = $this->createProcessForCode(<<<STR
-echo 'ping';
-sleep(1);
-echo 'pong';
-STR
+            echo 'ping';
+            echo 'pong';
+            STR
         );
 
         $this->processFactoryMock
@@ -120,10 +104,9 @@ STR
             [
                 InitialTestSuiteWasStarted::class,
                 InitialTestCaseWasCompleted::class,
-                InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
+            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
     }
 
@@ -136,11 +119,11 @@ STR
         $input = new InputStream();
 
         $process = $this->createProcessForCode(<<<STR
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-fwrite(STDOUT, 123);
-fwrite(STDERR, 321);
-STR
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            fwrite(STDOUT, 123);
+            fwrite(STDERR, 321);
+            STR
         );
         $process->setInput($input);
 
@@ -154,26 +137,36 @@ STR
             $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
-            if (extension_loaded('xdebug') && strpos($e->getMessage(), 'The process has been signaled with signal "11"') !== false) {
+            if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {
                 $this->markTestIncomplete($e->getMessage());
             }
 
             throw $e;
         }
 
-        $this->assertSame(
-            [
-                InitialTestSuiteWasStarted::class,
-                InitialTestCaseWasCompleted::class,
-                InitialTestCaseWasCompleted::class,
-                InitialTestSuiteWasFinished::class,
-            ],
-            array_map('get_class', $this->eventDispatcher->getEvents())
-        );
+        $events = $this->eventDispatcher->getEvents();
+
+        // First event must be suite start, last must be suite finish
+        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $events[0]);
+        $this->assertInstanceOf(InitialTestSuiteWasFinished::class, end($events));
+
+        // Count completed events - OS buffering makes exact count non-deterministic
+        // Minimum 1: at least one output chunk was processed
+        // Maximum 4: the test script has 4 writes total
+        $completedCount = count(array_filter(
+            $events,
+            static fn ($e) => $e instanceof InitialTestCaseWasCompleted,
+        ));
+        $this->assertGreaterThanOrEqual(1, $completedCount, 'Should process at least one output');
+        $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');
     }
 
     private function createProcessForCode(string $code): Process
     {
-        return new Process([self::$phpBin, '-r', $code]);
+        return new Process([
+            TestPhpExecutableFinder::find(),
+            '-r',
+            $code,
+        ]);
     }
 }

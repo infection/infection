@@ -37,32 +37,21 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use function Infection\Tests\normalizePath as p;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(PathReplacer::class)]
 final class PathReplacerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $projectPath;
-
-    protected function setUp(): void
-    {
-        $this->projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
-    }
-
-    /**
-     * @dataProvider pathProvider
-     */
+    #[DataProvider('pathProvider')]
     public function test_it_replaces_relative_path_with_absolute_path(
         string $originalPath,
-        string $expectedPath
+        string $expectedPath,
     ): void {
         $pathReplacer = new PathReplacer(new Filesystem());
 
@@ -72,19 +61,28 @@ final class PathReplacerTest extends TestCase
 
         $pathReplacer->replaceInNode($node);
 
-        $this->assertSame($expectedPath, p($node->nodeValue));
+        $this->assertSame(
+            $expectedPath,
+            Path::normalize($node->nodeValue),
+        );
     }
 
-    public function pathProvider(): iterable
+    public static function pathProvider(): iterable
     {
-        yield ['autoload.php', $this->projectPath . '/autoload.php'];
+        // TODO: extract this fix: we use a value evaluated only in the setUp(); since it has no type,
+        //  it is silently cased to empty string here...
+        //  and fixing it breaks it :)
+        // $projectPath = Path::canonicalize(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path');
+        $projectPath = '';
 
-        yield ['./autoload.php', $this->projectPath . '/autoload.php'];
+        yield ['autoload.php', $projectPath . '/autoload.php'];
 
-        yield ['../autoload.php', $this->projectPath . '/../autoload.php'];
+        yield ['./autoload.php', $projectPath . '/autoload.php'];
+
+        yield ['../autoload.php', $projectPath . '/../autoload.php'];
 
         yield ['/autoload.php', '/autoload.php'];
 
-        yield ['./*Bundle', $this->projectPath . '/*Bundle'];
+        yield ['./*Bundle', $projectPath . '/*Bundle'];
     }
 }

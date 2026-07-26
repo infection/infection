@@ -46,7 +46,7 @@ final class ParentConnector
 {
     use CannotBeInstantiated;
 
-    private const PARENT_ATTRIBUTE = 'parent';
+    private const string PARENT_ATTRIBUTE = 'parent';
 
     public static function setParent(Node $node, ?Node $parent): void
     {
@@ -65,6 +65,6 @@ final class ParentConnector
 
     public static function findParent(Node $node): ?Node
     {
-        return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
+        return $node->getAttribute(self::PARENT_ATTRIBUTE);
     }
 }

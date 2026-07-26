@@ -35,92 +35,306 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function array_fill_keys;
+use function array_keys;
+use function array_replace;
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use InvalidArgumentException;
+use Infection\PhpParser\Visitor\NameResolverFactory;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase\VisitorTestCase;
 use PhpParser\Node;
+use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
-use PhpParser\Node\Stmt\Nop;
-use PHPUnit\Framework\TestCase;
+use PhpParser\NodeTraverser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-final class FullyQualifiedClassNameManipulatorTest extends TestCase
+#[CoversClass(FullyQualifiedClassNameManipulator::class)]
+final class FullyQualifiedClassNameManipulatorTest extends VisitorTestCase
 {
     /**
-     * @dataProvider hasFqcnProvider
+     * This test is to ensure the integration of NameResolver works as expected.
+     *
+     * @param array<int, Name|FullyQualified|null> $partialExpectedFqcns
      */
-    public function test_it_can_determine_if_the_given_node_has_a_fqcn_attribute(
-        Node $node,
-        bool $expected
+    #[DataProvider('nodeProvider')]
+    public function test_it_annotates_the_resolved_node_names(
+        string $code,
+        string $expectedDump,
+        array $partialExpectedFqcns,
     ): void {
-        $this->assertSame($expected, FullyQualifiedClassNameManipulator::hasFqcn($node));
+        $nodes = $this->parse($code);
+
+        $nodesById = $this->addIdsToNodes($nodes);
+        (new NodeTraverser(
+            NameResolverFactory::create(),
+        ))->traverse($nodes);
+
+        $actual = $this->dumper->dump($nodes, onlyVisitedNodes: false);
+
+        $this->assertSame($expectedDump, $actual);
+
+        $expected = self::completeExpectedFqcns($nodesById, $partialExpectedFqcns);
+        $actualFqcns = $this->getFqcns($nodesById);
+
+        $this->assertEquals($expected, $actualFqcns);
     }
 
-    public function test_it_can_provide_the_node_fqcn(): void
+    public static function nodeProvider(): iterable
     {
-        $fqcn = new FullyQualified('Acme\Foo');
-        $node = new Nop(['fullyQualifiedClassName' => $fqcn]);
+        yield 'function declaration and call' => [
+            <<<'PHP'
+                <?php
 
-        $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
+                function calculate() {}
+                calculate();
 
-    public function test_it_can_provide_the_node_fqcn_for_an_anonymous_class(): void
-    {
-        $node = new Nop(['fullyQualifiedClassName' => null]);
-
-        $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public function test_it_cannot_provide_the_node_fqcn_if_has_not_be_set_yet(): void
-    {
-        $node = new Nop();
-
-        $this->expectException(InvalidArgumentException::class);
-
-        // We are not interested in a more helpful message here since it would be the result of
-        // a misconfiguration on our part rather than a user one. Plus this would require some
-        // extra processing on a part which is quite a hot path.
-
-        FullyQualifiedClassNameManipulator::getFqcn($node);
-    }
-
-    public function test_it_can_set_a_node_fqcn(): void
-    {
-        $fqcn = new FullyQualified('Acme\Foo');
-        $node = new Nop();
-
-        FullyQualifiedClassNameManipulator::setFqcn($node, $fqcn);
-
-        $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public function test_it_can_set_a_node_fqcn_for_an_anonymous_class(): void
-    {
-        $node = new Nop();
-
-        FullyQualifiedClassNameManipulator::setFqcn($node, null);
-
-        $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public static function hasFqcnProvider(): iterable
-    {
-        yield 'no FQCN' => [
-            new Nop(),
-            false,
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Function(
+                        name: Identifier(
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Name(
+                                nodeId: 4
+                                resolvedName: FullyQualified(calculate)
+                            )
+                            nodeId: 3
+                        )
+                        nodeId: 2
+                    )
+                )
+                AST,
+            [
+                0 => new Name('calculate'),
+                4 => new FullyQualified('calculate'),
+            ],
         ];
 
-        yield 'empty string FQCN' => [
-            new Nop(['fullyQualifiedClassName' => '']),
-            true,
+        yield 'namespaced function declaration and call' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                function calculate() {}
+                calculate();
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_Function(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_FuncCall(
+                                    name: Name(
+                                        namespacedName: FullyQualified(Infection\Tests\Virtual\calculate)
+                                        nodeId: 6
+                                    )
+                                    nodeId: 5
+                                )
+                                nodeId: 4
+                            )
+                        )
+                        kind: 1
+                        nodeId: 0
+                    )
+                )
+                AST,
+            [
+                2 => new Name('Infection\Tests\Virtual\calculate'),
+                6 => new FullyQualified('Infection\Tests\Virtual\calculate'),
+            ],
         ];
 
-        yield 'null FQCN' => [
-            new Nop(['fullyQualifiedClassName' => null]),
-            true,
+        yield 'class declaration and call' => [
+            <<<'PHP'
+                <?php
+
+                class Calculator {
+                    static function calculate() {}
+                }
+                Calculator::calculate();
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Class(
+                        name: Identifier(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                            )
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_StaticCall(
+                            class: Name(
+                                nodeId: 6
+                                resolvedName: FullyQualified(Calculator)
+                            )
+                            name: Identifier(
+                                nodeId: 7
+                            )
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                    )
+                )
+                AST,
+            [
+                0 => new Name('Calculator'),
+                6 => new FullyQualified('Calculator'),
+            ],
         ];
 
-        yield 'has FQCN' => [
-            new Nop(['fullyQualifiedClassName' => 'Acme\Foo']),
-            true,
+        yield 'namespaced class declaration and call' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                class Calculator {
+                    static function calculate() {}
+                }
+                Calculator::calculate();
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            nodeId: 5
+                                        )
+                                        nodeId: 4
+                                    )
+                                )
+                                nodeId: 2
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_StaticCall(
+                                    class: Name(
+                                        nodeId: 8
+                                        resolvedName: FullyQualified(Infection\Tests\Virtual\Calculator)
+                                    )
+                                    name: Identifier(
+                                        nodeId: 9
+                                    )
+                                    nodeId: 7
+                                )
+                                nodeId: 6
+                            )
+                        )
+                        kind: 1
+                        nodeId: 0
+                    )
+                )
+                AST,
+            [
+                2 => new Name('Infection\Tests\Virtual\Calculator'),
+                8 => new FullyQualified('Infection\Tests\Virtual\Calculator'),
+            ],
         ];
+
+        yield 'code without names' => [
+            <<<'PHP'
+                <?php
+
+                $x = 'Hello World!';
+
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_String(
+                                kind: KIND_SINGLE_QUOTED (1)
+                                nodeId: 3
+                                rawValue: 'Hello World!'
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                    )
+                )
+                AST,
+            [],
+        ];
+    }
+
+    /**
+     * @param array<int, Node> $nodesById
+     * @param array<int, Name|FullyQualified|null> $partialExpectedFqcns
+     *
+     * @return array<int, Name|FullyQualified|null>
+     */
+    private static function completeExpectedFqcns(
+        array $nodesById,
+        array $partialExpectedFqcns,
+    ): array {
+        return array_replace(
+            array_fill_keys(
+                array_keys($nodesById),
+                null,
+            ),
+            $partialExpectedFqcns,
+        );
+    }
+
+    /**
+     * @param array<int, Node> $nodesById
+     *
+     * @return array<int, Name|FullyQualified|null>
+     */
+    private function getFqcns(array $nodesById): array
+    {
+        $fqcns = [];
+
+        foreach ($nodesById as $nodeId => $node) {
+            $this->assertArrayHasKey(
+                $nodeId,
+                $nodesById,
+                'No node with the node ID %s was found.',
+            );
+
+            $actual = FullyQualifiedClassNameManipulator::getFqcn($node);
+            $actual?->setAttributes([]);
+
+            $fqcns[$nodeId] = $actual;
+        }
+
+        return $fqcns;
     }
 }

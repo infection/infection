@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="LoggerTrait.php" path="/Uncovered">
+    <totals>
+      <lines total="29" comments="0" code="29" executable="4" executed="0" percent="0.00"/>
+      <methods count="4" tested="0" percent="0.00"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="1" tested="0" percent="0.00"/>
+    </totals>
+    <trait name="Infection\E2ETests\PHPUnit_11\Uncovered\LoggerTrait" start="5" executable="4" executed="0" crap="20">
+      <namespace name="Infection\E2ETests\PHPUnit_11\Uncovered"/>
+      <method name="log" signature="log(string $message): void" start="9" end="12" crap="2" executable="1" executed="0" coverage="0"/>
+      <method name="getLogs" signature="getLogs(): array" start="14" end="17" crap="2" executable="1" executed="0" coverage="0"/>
+      <method name="clearLogs" signature="clearLogs(): void" start="19" end="22" crap="2" executable="1" executed="0" coverage="0"/>
+      <method name="hasLogs" signature="hasLogs(): bool" start="24" end="27" crap="2" executable="1" executed="0" coverage="0"/>
+    </trait>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_NAMESPACE">namespace</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NAME_QUALIFIED">Infection\E2ETests\PHPUnit_11\Uncovered</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="4"/>
+      <line no="5">
+        <token name="T_TRAIT">trait</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">LoggerTrait</token>
+      </line>
+      <line no="6">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="7">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ARRAY">array</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$logs</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="8"/>
+      <line no="9">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">log</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">string</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$message</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">void</token>
+      </line>
+      <line no="10">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="11">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">logs</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$message</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="12">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="13"/>
+      <line no="14">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getLogs</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ARRAY">array</token>
+      </line>
+      <line no="15">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="16">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">logs</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="17">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="18"/>
+      <line no="19">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">clearLogs</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">void</token>
+      </line>
+      <line no="20">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="21">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">logs</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="22">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="23"/>
+      <line no="24">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">hasLogs</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">bool</token>
+      </line>
+      <line no="25">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="26">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">count</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">logs</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_GT">&gt;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">0</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="27">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="28">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="29"/>
+    </source>
+  </file>
+</phpunit>

@@ -43,10 +43,13 @@ use Infection\Console\ConsoleOutput;
  */
 class MinMsiChecker
 {
-    private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
+    private const int VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
-    public function __construct(private bool $ignoreMsiWithNoMutations, private float $minMsi, private float $minCoveredCodeMsi)
-    {
+    public function __construct(
+        private readonly bool $ignoreMsiWithNoMutations,
+        private readonly float $minMsi,
+        private readonly float $minCoveredCodeMsi,
+    ) {
     }
 
     /**
@@ -56,7 +59,7 @@ class MinMsiChecker
         int $totalMutantCount,
         float $msi,
         float $coveredCodeMsi,
-        ConsoleOutput $consoleOutput
+        ConsoleOutput $consoleOutput,
     ): void {
         $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
         $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
@@ -73,14 +76,14 @@ class MinMsiChecker
         if ($this->isMsiInsufficient($msi)) {
             throw MinMsiCheckFailed::createForMsi(
                 $this->minMsi,
-                $msi
+                $msi,
             );
         }
 
         if ($this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
             throw MinMsiCheckFailed::createCoveredMsi(
                 $this->minCoveredCodeMsi,
-                $coveredCodeMsi
+                $coveredCodeMsi,
             );
         }
     }
@@ -90,14 +93,14 @@ class MinMsiChecker
         if ($this->canIncreaseMsi($msi)) {
             $output->logMinMsiCanGetIncreasedNotice(
                 $this->minMsi,
-                $msi
+                $msi,
             );
         }
 
         if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {
             $output->logMinCoveredCodeMsiCanGetIncreasedNotice(
                 $this->minCoveredCodeMsi,
-                $coveredCodeMsi
+                $coveredCodeMsi,
             );
         }
     }

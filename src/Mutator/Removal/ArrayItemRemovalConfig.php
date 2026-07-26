@@ -42,19 +42,20 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class ArrayItemRemovalConfig implements MutatorConfig
+final readonly class ArrayItemRemovalConfig implements MutatorConfig
 {
-    private const REMOVE_VALUES = [
+    private const array REMOVE_VALUES = [
         'first',
         'last',
         'all',
     ];
 
     private string $remove;
+
     private int $limit;
 
     /**
-     * @param array{remove: string|null, limit: int|null} $settings
+     * @param array{remove?: string|null, limit?: int|null} $settings
      */
     public function __construct(array $settings)
     {
@@ -64,12 +65,12 @@ final class ArrayItemRemovalConfig implements MutatorConfig
         Assert::oneOf($this->remove, self::REMOVE_VALUES);
         Assert::integer(
             $this->limit,
-            'Expected the limit to be an integer. Got "%s" instead'
+            'Expected the limit to be an integer. Got "%s" instead',
         );
         Assert::greaterThanEq(
             $this->limit,
             1,
-            'Expected the limit to be greater or equal than 1. Got "%s" instead'
+            'Expected the limit to be greater or equal than 1. Got "%s" instead',
         );
     }
 

@@ -38,6 +38,7 @@ namespace Infection\Mutator\Unwrap;
 use function array_keys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 
 /**
@@ -45,39 +46,38 @@ use PhpParser\Node;
  */
 final class UnwrapArrayMergeRecursive extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_merge_recursive` function call with each of its operands. For example:
+                Replaces an `array_merge_recursive` function call with each of its operands. For example:
 
-```php
-$x = array_merge_recursive(['foo', 'bar', 'baz'], ['oof']);
-```
+                ```php
+                $x = array_merge_recursive(['foo', 'bar', 'baz'], ['oof']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
 
-And into:
+                And into:
 
-```php
-$x = ['oof'];
-```
+                ```php
+                $x = ['oof'];
+                ```
 
-TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_merge_recursive(['foo', 'bar', 'baz'], ['oof']);
-# Mutation 1
-+ $x = ['foo', 'bar', 'baz'];
-# Mutation 2
-+ $x = ['oof'];
-DIFF
+                - $x = array_merge_recursive(['foo', 'bar', 'baz'], ['oof']);
+                # Mutation 1
+                + $x = ['foo', 'bar', 'baz'];
+                # Mutation 2
+                + $x = ['oof'];
+                DIFF,
         );
     }
 
@@ -89,6 +89,7 @@ DIFF
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_keys($node->args);

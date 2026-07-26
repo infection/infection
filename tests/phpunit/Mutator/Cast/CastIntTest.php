@@ -35,50 +35,174 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Cast\CastInt;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastInt::class)]
 final class CastIntTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to int' => [
-            <<<'PHP'
-<?php
-
-(int) 1.0;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-1.0;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) 1.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1.0;
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to integer' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (integer) 1.0;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1.0;
+                    PHP,
+            ),
+        ];
 
-(integer) 1.0;
-PHP
-            ,
-            <<<'PHP'
-<?php
+        yield 'It removes casting to integer in conditions' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ((int) round()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (round()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
+        ];
 
-1.0;
-PHP
-            ,
+        yield 'It removes casting to integer in global return' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return (int) round();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return round();
+                    PHP,
+            ),
+        ];
+
+        yield 'It removes casting to integer in return of untyped-function' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return (int) round();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return round();
+                    }
+                    PHP,
+            ),
+        ];
+
+        yield 'It removes casting to integer in return of int-function when strict-types=0' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsInt(): int
+                    {
+                        return (int) round();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsInt(): int
+                    {
+                        return round();
+                    }
+                    PHP,
+            ),
+        ];
+
+        yield 'It not removes casting to integer in return of int-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsInt(): int {
+                    return (int) round();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to integer in nested return of int-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsInt(): int {
+                    if (true) {
+                        return (int) round();
+                    }
+                    return 0;
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to int in function parameters when strict-types=0' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        range((int) $s);
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        range($s);
+                    }
+                    PHP,
+            ),
+        ];
+
+        yield 'It not removes casting to int in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    range((int) $s);
+                }
+                PHP,
         ];
     }
 }

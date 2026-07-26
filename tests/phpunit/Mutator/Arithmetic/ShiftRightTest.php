@@ -35,62 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\ShiftRight;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(ShiftRight::class)]
 final class ShiftRightTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates shift right' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a >> 2;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a << 2;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a >> 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a << 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate shift left' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a << 2;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a << 2;
+                    PHP,
+            ),
         ];
-    }
-
-    public function test_replaces_post_decrement(): void
-    {
-        $code = '<?php $a = 1; $a >> 2;';
-        $mutations = $this->mutate($code);
-
-        $expectedMutatedCode = <<<'PHP'
-<?php
-
-$a = 1;
-$a << 2;
-PHP;
-
-        $this->assertSame($expectedMutatedCode, $mutations[0]);
     }
 }

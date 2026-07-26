@@ -36,116 +36,35 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function class_exists;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function interface_exists;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use function trait_exists;
 
-/**
- * @covers \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider
- */
+#[CoversClass(ProjectCodeProvider::class)]
 final class ProjectCodeProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
-    public function test_source_class_provider_is_valid(string $className): void
+    #[DataProvider('sourceClassProvider')]
+    public function test_source_classes_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className, true)
-            || interface_exists($className, true)
-            || trait_exists($className, true),
+                || interface_exists($className, true)
+                || trait_exists($className, true),
             sprintf(
-                'The "%s" class was picked up by the source files finder, but it is not a '
-                . 'class, interface or trait. Please check for typos in the class name. If the '
-                . ' problematic file is not a class file declaration, add it to the list of '
-                . 'excluded files in %s::provideSourceClasses().',
+                'Expected "%s" to be a class, an interface, or a trait.',
                 $className,
-                ProjectCodeProvider::class
-            )
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
-     */
-    public function test_concrete_class_provider_is_valid(string $className): void
+    public static function sourceClassProvider(): iterable
     {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'Expected "%s" to be a class.',
-                $className
-            )
-        );
-    }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonTestedConcreteClassesProvider
-     */
-    public function test_non_tested_concrete_class_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true),
-            sprintf(
-                'The class "%s" no longer exists. Please remove it from the list of non tested '
-                . 'classes in %s::NON_TESTED_CONCRETE_CLASSES.',
-                $className,
-                ProjectCodeProvider::class
-            )
-        );
-    }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
-     */
-    public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true) || trait_exists($className, true),
-            sprintf(
-                'Expected "%s" to be either a class or a trait.',
-                $className
-            )
-        );
-    }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
-     */
-    public function test_test_classes_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true)
-            || interface_exists($className, true)
-            || trait_exists($className, true),
-            sprintf(
-                'The "%s" class was picked up by the test files finder, but it is not a class,'
-                . ' interface or trait. Please check for typos in the class name. If the '
-                . ' problematic file is not a class file declaration, add it to the list of '
-                . 'excluded files in %s::provideTestClasses().',
-                $className,
-                ProjectCodeProvider::class
-            )
-        );
-    }
-
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonFinalExtensionClasses
-     */
-    public function test_non_final_extension_classes_provider_is_valid(string $className): void
-    {
-        $this->assertTrue(
-            class_exists($className, true)
-            || interface_exists($className, true)
-            || trait_exists($className, true),
-            sprintf(
-                'The "%s" class was picked up by the test files finder, but it is not a class,'
-                . ' interface or trait. Please check for typos in the class name. If the '
-                . ' class no longer exists, remove it from %s::NON_FINAL_EXTENSION_CLASSES.',
-                $className,
-                ProjectCodeProvider::class
-            )
+        yield from DataProviderFactory::fromIterable(
+            ProjectCodeProvider::provideSourceClasses(),
         );
     }
 }

@@ -36,19 +36,21 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Locator;
 
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FileOrDirectoryNotFound::class)]
 final class FileOrDirectoryNotFoundTest extends TestCase
 {
     /**
-     * @dataProvider nonExistentPathsProvider
-     *
      * @param string[] $roots
      */
+    #[DataProvider('nonExistentPathsProvider')]
     public function test_file_or_directory_does_not_exist(
         string $file,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileOrDirectoryNotFound::fromFileName($file, $roots);
 
@@ -58,15 +60,14 @@ final class FileOrDirectoryNotFoundTest extends TestCase
     }
 
     /**
-     * @dataProvider multipleNonExistentPathsProvider
-     *
      * @param string[] $files
      * @param string[] $roots
      */
+    #[DataProvider('multipleNonExistentPathsProvider')]
     public function test_files_or_directories_does_not_exist(
         array $files,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileOrDirectoryNotFound::fromFiles($files, $roots);
 
@@ -81,13 +82,13 @@ final class FileOrDirectoryNotFoundTest extends TestCase
 
         $this->assertSame(
             'The path "foo/bar/" does not contain any of the requested files: "file1", "file2"',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
     }
 
-    public function nonExistentPathsProvider(): iterable
+    public static function nonExistentPathsProvider(): iterable
     {
         yield [
             'unknown',
@@ -114,7 +115,7 @@ final class FileOrDirectoryNotFoundTest extends TestCase
         ];
     }
 
-    public function multipleNonExistentPathsProvider(): iterable
+    public static function multipleNonExistentPathsProvider(): iterable
     {
         yield [
             [],

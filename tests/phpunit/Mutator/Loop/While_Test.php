@@ -35,68 +35,72 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Loop;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Loop\While_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(While_::class)]
 final class While_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates expression part from variable to false' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $condition = true;
 
-$condition = true;
+                    while ($condition) {
+                    }
 
-while ($condition) {
-}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $condition = true;
 
-PHP
-            ,
-            <<<'PHP'
-<?php
+                    while (false) {
+                    }
 
-$condition = true;
-while (false) {
-}
-PHP
+                    PHP,
+            ),
         ];
 
         yield 'It mutates expression part from boolean true to false' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                    }
 
-while (true) {
-}
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (false) {
+                    }
 
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-while (false) {
-}
-PHP
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate expression part in do-while loop to false' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    do {
 
-do {
+                    } while (true);
 
-} while (true);
-
-PHP
+                    PHP,
+            ),
         ];
     }
 }

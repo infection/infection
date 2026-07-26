@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 if [ "$DRIVER" = "phpdbg" ]
 then
     # Memory limit cannot be enforced from our custom php.ini
@@ -20,7 +22,11 @@ run () {
         php $PHPARGS $INFECTION
     fi
 
-    diff -u -w expected-output.txt infection.log
+    if [ -n "$GOLDEN" ]; then
+        cp -v infection.log expected-output.txt
+    fi
+
+    diff -u --ignore-all-space expected-output.txt infection.log
 }
 
 

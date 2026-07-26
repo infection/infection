@@ -46,21 +46,21 @@ final class SyntaxError implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a `$this` with `false` to produce a syntax error. Internal usage only.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo()
-    {
--        $this->method();
-+        $->method();
-    }
-}
-DIFF
+                class X {
+                    function foo()
+                    {
+                -        $this->method();
+                +        $->method();
+                    }
+                }
+                DIFF,
         );
     }
 

@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function array_keys;
+use function array_values;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -51,52 +54,52 @@ final class MatchArmRemoval implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes `match arm`s from `match`.
+                Removes `match arm`s from `match`.
 
-```php
-match ($x) {
-    'cond1', 'cond2' => true,
-    default => throw new \Exception(),
-};
-```
+                ```php
+                match ($x) {
+                    'cond1', 'cond2' => true,
+                    default => throw new \Exception(),
+                };
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-match ($x) {
-    'cond1' => true,
-    default => throw new \Exception(),
-};
-```
+                ```php
+                match ($x) {
+                    'cond1' => true,
+                    default => throw new \Exception(),
+                };
+                ```
 
-```php
-match ($x) {
-    'cond2' => true,
-    default => throw new \Exception(),
-};
-```
+                ```php
+                match ($x) {
+                    'cond2' => true,
+                    default => throw new \Exception(),
+                };
+                ```
 
-And:
-```php
-match ($x) {
-    default => throw new \Exception(),
-};
-```
-TXT,
+                And:
+                ```php
+                match ($x) {
+                    default => throw new \Exception(),
+                };
+                ```
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-match ($x) {
--   0 => false,
-    1 => true,
-    2 => null,
-    default => throw new \Exception(),
-};
-DIFF
+                match ($x) {
+                -   0 => false,
+                    1 => true,
+                    2 => null,
+                    default => throw new \Exception(),
+                };
+                DIFF,
         );
     }
 
@@ -116,15 +119,17 @@ DIFF
         foreach ($node->arms as $i => $arm) {
             $arms = $node->arms;
 
-            if ($arm->conds !== null && count($arm->conds) > 1) {
-                foreach ($arm->conds as $j => $cond) {
-                    $conds = $arm->conds;
+            $armConds = $arm->conds ?? [];
+
+            if (count($armConds) > 1) {
+                foreach (array_keys($armConds) as $j) {
+                    $conds = $armConds;
 
                     unset($conds[$j]);
 
-                    $arms[$i] = new Node\MatchArm($conds, $arm->body, $node->getAttributes());
+                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, NodeAttributes::getAllExceptOriginalNode($node));
 
-                    yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
+                    yield new Node\Expr\Match_($node->cond, $arms, NodeAttributes::getAllExceptOriginalNode($node));
                 }
 
                 continue;
@@ -132,7 +137,7 @@ DIFF
 
             unset($arms[$i]);
 
-            yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
+            yield new Node\Expr\Match_($node->cond, $arms, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 }

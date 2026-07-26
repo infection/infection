@@ -53,8 +53,7 @@ abstract class AbstractValueToNullReturnValue implements Mutator
 
     protected function isNullReturnValueAllowed(Node $node): bool
     {
-        /** @var Node\Stmt\Function_|null $functionScope */
-        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
+        $functionScope = ReflectionVisitor::findFunctionScope($node);
 
         if ($functionScope === null) {
             return true;
@@ -63,7 +62,7 @@ abstract class AbstractValueToNullReturnValue implements Mutator
         $returnType = $functionScope->getReturnType();
 
         if ($returnType instanceof Node\Identifier) {
-            $returnType = $returnType->name;
+            $returnType = $returnType->toString();
         }
 
         // no return value specified

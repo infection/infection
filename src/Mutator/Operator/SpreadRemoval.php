@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,29 +51,28 @@ final class SpreadRemoval implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes a spread operator in an array expression. For example:
+                Removes a spread operator in an array expression. For example:
 
-```php
-$x = [...$collection, 4, 5];
-```
+                ```php
+                $x = [...$collection, 4, 5];
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = [$collection, 4, 5];
-```
-TXT
-            ,
+                ```php
+                $x = [$collection, 4, 5];
+                ```
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [...$collection, 4, 5];
-+ $x = [$collection, 4, 5];
-DIFF
+                - $x = [...$collection, 4, 5];
+                + $x = [$collection, 4, 5];
+                DIFF,
         );
     }
 
@@ -87,8 +87,8 @@ DIFF
             $node->value,
             null,
             false,
-            $node->getAttributes(),
-            false
+            NodeAttributes::getAllExceptOriginalNode($node),
+            false,
         );
     }
 

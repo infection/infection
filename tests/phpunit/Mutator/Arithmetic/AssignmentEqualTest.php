@@ -35,77 +35,74 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\AssignmentEqual;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(AssignmentEqual::class)]
 final class AssignmentEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates a comparison to an assignment' => [
-            <<<'PHP'
-<?php
-
-if ($a == $b) {
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-if ($a = $b) {
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($a == $b) {
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($a = $b) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate comparsion to an impossible assignment' => [
-            <<<'PHP'
-<?php
-
-if (1 == $a) {
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (1 == $a) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not try to assign a variable to a class constant' => [
-            <<<'PHP'
-<?php
-
-if (BaseClass::CLASS_CONST == $a) {
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (BaseClass::CLASS_CONST == $a) {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not try to assign a variable to a built in constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-if (PHP_EOL == $a) {
-}
-PHP
-            ,
+                if (PHP_EOL == $a) {
+                }
+                PHP,
         ];
 
         yield 'It does not try to assign a scalar to a result of a function call' => [
-            <<<'PHP'
-<?php
-
-if ($x->getFoo() == 1) {
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ($x->getFoo() == 1) {
+                    }
+                    PHP,
+            ),
         ];
     }
 }

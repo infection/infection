@@ -47,16 +47,17 @@ final class MemoizedTestFileDataProvider implements TestFileDataProvider
      */
     private array $cache = [];
 
-    public function __construct(private TestFileDataProvider $provider)
-    {
+    public function __construct(
+        private readonly TestFileDataProvider $provider,
+    ) {
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function getTestFileInfo(string $testId): TestFileTimeData
     {
-        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
-            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
+        if (!array_key_exists($testId, $this->cache)) {
+            $this->cache[$testId] = $this->provider->getTestFileInfo($testId);
         }
 
-        return $this->cache[$fullyQualifiedClassName];
+        return $this->cache[$testId];
     }
 }

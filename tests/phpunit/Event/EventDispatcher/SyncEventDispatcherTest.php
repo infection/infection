@@ -40,8 +40,10 @@ use Infection\Tests\Fixtures\Event\UnknownEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserEventSubscriber;
 use Infection\Tests\Fixtures\Event\UserWasCreated;
 use Infection\Tests\Fixtures\Event\UserWasCreatedCounterSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SyncEventDispatcher::class)]
 final class SyncEventDispatcherTest extends TestCase
 {
     public function test_it_triggers_the_subscribers_registered_to_the_event_when_dispatcher_an_event(): void

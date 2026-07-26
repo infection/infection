@@ -1,5 +1,6 @@
 {
     "timeout": 25,
+    "threads": 1,
     "source": {
         "directories": [
             "src"
@@ -9,5 +10,8 @@
         "summary": "infection.log"
     },
     "bootstrap": "src/bootstrap.php",
+    "mutators": {
+        "PublicVisibility": true
+    },
     "tmpDir": "."
 }

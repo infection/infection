@@ -42,34 +42,26 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[AllowMockObjectsWithoutExpectations]
+#[Group('integration')]
+#[CoversClass(MemoryLimiter::class)]
 final class MemoryLimiterTest extends FileSystemTestCase
 {
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $adapterMock;
-
-    /**
-     * @var MemoryLimiterEnvironment|MockObject
-     */
-    private $environmentMock;
+    private MockObject&MemoryLimiterEnvironment $environmentMock;
 
     protected function setUp(): void
     {
         $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->adapterMock = $this->createMock(AbstractTestFrameworkAdapter::class);
         $this->environmentMock = $this->createMock(MemoryLimiterEnvironment::class);
 
         parent::setUp();
@@ -89,7 +81,10 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory('', $this->adapterMock);
+        $memoryLimiter->limitMemory(
+            '',
+            $this->createStub(AbstractTestFrameworkAdapter::class),
+        );
     }
 
     public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void
@@ -100,16 +95,14 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter->limitMemory(
             '',
-            new FakeAwareAdapter(10)
+            new FakeAwareAdapter(10),
         );
     }
 
-    /**
-     * @dataProvider memoryLimitProvider
-     */
+    #[DataProvider('memoryLimitProvider')]
     public function test_it_applies_memory_limit_if_possible(
         float $memoryLimit,
-        float $expectedLimit
+        float $expectedLimit,
     ): void {
         $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
 
@@ -124,7 +117,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->method('appendToFile')
             ->with(
                 $filename,
-                PHP_EOL . sprintf('memory_limit = %dM', $expectedLimit)
+                PHP_EOL . sprintf('memory_limit = %dM', (int) $expectedLimit),
             );
 
         $this->configureEnvironmentToBeCalledOnce();

@@ -35,16 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function array_intersect_key;
-use function array_keys;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutator\ProfileList;
+use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\MutatedNode;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
+use Infection\TestFramework\Tracing\TestTotalTimeCalculator;
 use function md5;
 use PhpParser\Node;
-use function Safe\array_flip;
+use PhpParser\Token;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,36 +52,40 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private string $mutatorName;
-    /** @var array<string|int|float> */
-    private array $attributes;
-    private bool $coveredByTests;
+    private readonly string $mutatorClass;
+
+    /** @var array<value-of<MutationAttributeKeys>, string|int|float> */
+    private readonly array $attributes;
+
+    private readonly bool $coveredByTests;
+
     private ?float $nominalTimeToTest = null;
 
     private ?string $hash = null;
 
     /**
      * @param Node[] $originalFileAst
-     * @param array<string|int|float> $attributes
+     * @param array<string, string|int|float> $attributes
      * @param TestLocation[] $tests
+     * @param Token[] $originalFileTokens
      */
     public function __construct(
-        private string $originalFilePath,
-        private array $originalFileAst,
-        string $mutatorName,
+        private readonly string $originalFilePath,
+        private readonly array $originalFileAst,
+        string $mutatorClass,
+        private readonly string $mutatorName,
         array $attributes,
-        private string $mutatedNodeClass,
-        private MutatedNode $mutatedNode,
-        private int $mutationByMutatorIndex,
-        private array $tests
+        private readonly string $mutatedNodeClass,
+        private readonly MutatedNode $mutatedNode,
+        private readonly int $mutationByMutatorIndex,
+        private readonly array $tests,
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
-        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+        Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
-        foreach (MutationAttributeKeys::ALL as $key) {
-            Assert::keyExists($attributes, $key);
-        }
-        $this->mutatorName = $mutatorName;
-        $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
+        $this->mutatorClass = $mutatorClass;
+        $this->attributes = MutationAttributeKeys::pluck($attributes);
         $this->coveredByTests = $tests !== [];
     }
 
@@ -105,6 +108,19 @@ class Mutation
     }
 
     /**
+     * @return Token[]
+     */
+    public function getOriginalFileTokens(): array
+    {
+        return $this->originalFileTokens;
+    }
+
+    public function getMutatorClass(): string
+    {
+        return $this->mutatorClass;
+    }
+
+    /**
      * @return (string|int|float)[]
      */
     public function getAttributes(): array
@@ -114,22 +130,22 @@ class Mutation
 
     public function getOriginalStartingLine(): int
     {
-        return (int) $this->attributes['startLine'];
+        return (int) $this->attributes[MutationAttributeKeys::START_LINE->value];
     }
 
     public function getOriginalEndingLine(): int
     {
-        return (int) $this->attributes['endLine'];
+        return (int) $this->attributes[MutationAttributeKeys::END_LINE->value];
     }
 
     public function getOriginalStartFilePosition(): int
     {
-        return (int) $this->attributes['startFilePos'];
+        return (int) $this->attributes[MutationAttributeKeys::START_FILE_POSITION->value];
     }
 
     public function getOriginalEndFilePosition(): int
     {
-        return (int) $this->attributes['endFilePos'];
+        return (int) $this->attributes[MutationAttributeKeys::END_FILE_POSITION->value];
     }
 
     public function getMutatedNodeClass(): string
@@ -162,12 +178,17 @@ class Mutation
     public function getNominalTestExecutionTime(): float
     {
         // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
-        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
+        return $this->nominalTimeToTest ??= (new TestTotalTimeCalculator($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string
     {
-        return $this->hash ?? $this->hash = $this->createHash();
+        return $this->hash ??= $this->createHash();
+    }
+
+    public function getOriginalFileContent(): string
+    {
+        return $this->originalFileContent;
     }
 
     private function createHash(): string

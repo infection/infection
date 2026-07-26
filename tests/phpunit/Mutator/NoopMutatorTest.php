@@ -39,27 +39,27 @@ use DomainException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
+use Infection\Testing\MutatorName;
 use function iterator_to_array;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(NoopMutator::class)]
 final class NoopMutatorTest extends TestCase
 {
-    /**
-     * @var MockObject&Mutator
-     */
-    private $mutatorMock;
+    private MockObject&Mutator $mutatorMock;
 
-    /**
-     * @var MockObject&Node
-     */
-    private $nodeMock;
+    private Stub&Node $nodeStub;
 
     protected function setUp(): void
     {
         $this->mutatorMock = $this->createMock(Mutator::class);
-        $this->nodeMock = $this->createMock(Node::class);
+        $this->nodeStub = $this->createStub(Node::class);
     }
 
     public function test_it_cannot_give_a_definition(): void
@@ -71,7 +71,7 @@ final class NoopMutatorTest extends TestCase
         } catch (DomainException $exception) {
             $this->assertSame(
                 'The class "Infection\Mutator\NoopMutator" does not have a definition',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -83,11 +83,11 @@ final class NoopMutatorTest extends TestCase
         $this->mutatorMock
             ->expects($this->once())
             ->method('canMutate')
-            ->with($this->nodeMock)
+            ->with($this->nodeStub)
             ->willReturn(false)
         ;
 
-        $mutate = $ignoreMutator->canMutate($this->nodeMock);
+        $mutate = $ignoreMutator->canMutate($this->nodeStub);
 
         $this->assertFalse($mutate);
     }
@@ -99,11 +99,11 @@ final class NoopMutatorTest extends TestCase
         $this->mutatorMock
             ->expects($this->once())
             ->method('canMutate')
-            ->with($this->nodeMock)
+            ->with($this->nodeStub)
             ->willReturn(true)
         ;
 
-        $mutate = $ignoreMutator->canMutate($this->nodeMock);
+        $mutate = $ignoreMutator->canMutate($this->nodeStub);
 
         $this->assertTrue($mutate);
     }
@@ -112,9 +112,9 @@ final class NoopMutatorTest extends TestCase
     {
         $ignoreMutator = new NoopMutator($this->mutatorMock);
 
-        $mutatedNode = $ignoreMutator->mutate($this->nodeMock);
+        $mutatedNode = $ignoreMutator->mutate($this->nodeStub);
 
-        $this->assertSame([$this->nodeMock], iterator_to_array($mutatedNode));
+        $this->assertSame([$this->nodeStub], iterator_to_array($mutatedNode));
     }
 
     public function test_it_exposes_its_decorated_mutator_name(): void
@@ -123,7 +123,7 @@ final class NoopMutatorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $ignoreMutator->getName()
+            $ignoreMutator->getName(),
         );
     }
 }

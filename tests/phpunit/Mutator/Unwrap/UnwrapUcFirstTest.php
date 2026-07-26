@@ -35,157 +35,152 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapUcFirst;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapUcFirst::class)]
 final class UnwrapUcFirstTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-<?php
-
-$a = ucfirst('good Afternoon!');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'good Afternoon!';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ucfirst('good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-<?php
-
-$a = ucfirst(\Class_With_Const::Const);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = \Class_With_Const::Const;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ucfirst(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of ucfirst' => [
-            <<<'PHP'
-<?php
-
-$a = \ucfirst('good Afternoon!');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'good Afternoon!';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \ucfirst('good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-<?php
-
-$a = 'good Afternoon!';
-if (ucfirst($a) === $a) {
-    return true;
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'good Afternoon!';
-if ($a === $a) {
-    return true;
-}
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'good Afternoon!';
+                    if (ucfirst($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'good Afternoon!';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when ucfirst is wrongly capitalized' => [
-            <<<'PHP'
-<?php
-
-$a = uCfIrSt('good Afternoon!');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'good Afternoon!';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = uCfIrSt('good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when ucfirst uses another function as input' => [
-            <<<'PHP'
-<?php
-
-$a = ucfirst($foo->bar());
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $foo->bar();
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ucfirst($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-<?php
-
-$a = ucfirst(array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ucfirst(array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    }));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    });
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other calls' => [
-            <<<'PHP'
-<?php
-
-$a = strtolower('Good Afternoon!');
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower('Good Afternoon!');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named ucfirst' => [
-            <<<'PHP'
-<?php
-
-function ucfirst($string)
-{
-}
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function ucfirst($string)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'ucfirst';
 
-$a = 'ucfirst';
-
-$b = $a('FooBar');
-PHP
-            ,
+                    $b = $a('FooBar');
+                    PHP,
+            ),
         ];
     }
 }

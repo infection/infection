@@ -1,18 +1,38 @@
-version: '3'
 services:
-  php80:
+  # May require you to login to ghcr.io first:
+  # $ docker login ghcr.io --username=<username>
+  # If you need a token, a short-lived classic token with read:packages is enough.
+  zizmor:
+    image: ghcr.io/zizmorcore/zizmor:1.27.0
+    command: --quiet --quiet --min-severity=low .github
+    working_dir: /opt/infection
+    volumes:
+      - .:/opt/infection
+
+  php83:
     build:
       context: devTools
       args:
-        PHP_VERSION: '8.0'
-        XDEBUG_VERSION: '3.0.4'
+        PHP_VERSION: '8.3'
+        XDEBUG_VERSION: '3.4.1'
     volumes:
       - .:/opt/infection
-  php81:
+
+  php84:
     build:
       context: devTools
       args:
-        PHP_VERSION: '8.1'
-        XDEBUG_VERSION: '3.1.5'
+        PHP_VERSION: '8.4'
+        XDEBUG_VERSION: '3.4.0'
     volumes:
       - .:/opt/infection
+
+  php85:
+    build:
+      context: devTools
+      args:
+        PHP_VERSION: '8.5'
+        XDEBUG_VERSION: '3.5.1'
+    volumes:
+      - .:/opt/infection
+

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-set -e pipefail
+cd "$(dirname "$0")"
+
+set -eo pipefail
 
 readonly INFECTION="./bootstrap"
 
@@ -11,4 +13,8 @@ else
     $(which php) $INFECTION
 fi
 
-diff expected-output.txt infection.log
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+fi
+
+diff -u expected-output.txt infection.log

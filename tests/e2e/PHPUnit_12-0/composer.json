@@ -1,0 +1,30 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12"
+    },
+    "conflict": {
+        "phpunit/phpunit": ">=12.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnit_12_0\\": "src/"
+        },
+        "files": [
+            "src/Covered/functions.php",
+            "src/Uncovered/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnit_12_0\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "audit": {
+            "ignore": {
+                "CVE-2026-24765": "Testing PHPUnit 12.0 compatibility"
+            }
+        }
+    }
+}

@@ -40,22 +40,24 @@ use Infection\Tests\Fixtures\Console\FakeOutput;
 use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
 use Infection\Tests\Fixtures\Event\IONullSubscriber;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
+#[CoversClass(ChainSubscriberFactory::class)]
 final class ChainSubscriberFactoryTest extends TestCase
 {
     public function test_it_does_not_create_any_subscriber_if_no_factory_was_given(): void
     {
         $factory = new ChainSubscriberFactory();
 
-        $subscribers = $factory->create(new FakeOutput());
+        $subscribers = $factory->create();
 
         $this->assertCount(
             0,
             $subscribers instanceof Traversable
                 ? iterator_to_array($subscribers, false)
-                : $subscribers
+                : $subscribers,
         );
     }
 
@@ -69,11 +71,11 @@ final class ChainSubscriberFactoryTest extends TestCase
 
         $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber1),
-            new DummySubscriberFactory($subscriber2),
-            new DummySubscriberFactory($subscriber3)
+            $subscriber2,
+            new DummySubscriberFactory($subscriber3),
         );
 
-        $subscribers = $factory->create($output);
+        $subscribers = $factory->create();
 
         if ($subscribers instanceof Traversable) {
             $subscribers = iterator_to_array($subscribers, false);
@@ -85,7 +87,7 @@ final class ChainSubscriberFactoryTest extends TestCase
                 $subscriber2,
                 $subscriber3,
             ],
-            $subscribers
+            $subscribers,
         );
     }
 }

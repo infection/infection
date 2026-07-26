@@ -35,80 +35,75 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Boolean\NotIdenticalNotEqual;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(NotIdenticalNotEqual::class)]
 final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates not identical operator into not equal operator with two variables' => [
-            <<<'PHP'
-<?php
-
-$a !== $b;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a != $b;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a !== $b;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a != $b;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates not identical operator into not equal operator with type casting' => [
-            <<<'PHP'
-<?php
-
-(int) $c !== 2;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-(int) $c != 2;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $c !== 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $c != 2;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates not identical operator into not equal operator with variable and null' => [
-            <<<'PHP'
-<?php
-
-$d !== null;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$d != null;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $d !== null;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $d != null;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates not identical operator into not equal operator with boolean and function call' => [
-            <<<'PHP'
-<?php
-
-false !== strpos();
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-false != strpos();
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    false !== strpos();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    false != strpos();
+                    PHP,
+            ),
         ];
     }
 }

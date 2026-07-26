@@ -39,15 +39,14 @@ use InvalidArgumentException;
 use function preg_quote;
 use Safe\Exceptions\PcreException;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
  */
-final class StrykerConfig
+final readonly class StrykerConfig
 {
     private string $branchMatch;
-    private bool $isForFullReport;
 
     /**
      * Stryker has 2 ways for integration (https://stryker-mutator.io/docs/General/dashboard):
@@ -56,10 +55,10 @@ final class StrykerConfig
      *
      * @throws InvalidArgumentException when the provided $branch looks like a regular expression, but is not a valid one
      */
-    private function __construct(string $branch, bool $isForFullReport)
-    {
-        $this->isForFullReport = $isForFullReport;
-
+    private function __construct(
+        string $branch,
+        private bool $isForFullReport,
+    ) {
         if (preg_match('#^/.+/$#', $branch) === 0) {
             $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';
 
@@ -73,7 +72,7 @@ final class StrykerConfig
             throw new InvalidArgumentException(
                 sprintf('Provided branchMatchRegex "%s" is not a valid regex', $branch),
                 0,
-                $invalidRegex
+                $invalidRegex,
             );
         }
 

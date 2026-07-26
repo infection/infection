@@ -39,42 +39,41 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @group integration
- */
-final class MutationCollectorVisitorTest extends BaseVisitorTest
+#[CoversClass(MutationCollectorVisitor::class)]
+final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
-    private const CODE = <<<'PHP'
-<?php
+    private const string CODE = <<<'PHP'
+        <?php
 
-class Foo {}
+        class Foo {}
 
-PHP;
+        PHP;
 
     public function test_it_collects_the_generated_mutations(): void
     {
-        $mutation0 = $this->createMock(Mutation::class);
-        $mutation1 = $this->createMock(Mutation::class);
-        $mutation2 = $this->createMock(Mutation::class);
-        $mutation3 = $this->createMock(Mutation::class);
-        $mutation4 = $this->createMock(Mutation::class);
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation2 = $this->createStub(Mutation::class);
+        $mutation3 = $this->createStub(Mutation::class);
+        $mutation4 = $this->createStub(Mutation::class);
 
-        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
-        $nodeMutationGeneratorMock
+        $nodeMutationGeneratorStub = $this->createStub(NodeMutationGenerator::class);
+        $nodeMutationGeneratorStub
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation2],
-                [$mutation3, $mutation4]
+                [$mutation3, $mutation4],
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
         $this->traverse(
-            $this->parseCode(self::CODE),
-            [$visitor]
+            self::parseCode(self::CODE)[0],
+            [$visitor],
         );
 
         $this->assertSame(
@@ -86,34 +85,34 @@ PHP;
                 // generator can produce _more_ mutations, we only call it as many times as we need
                 // it, not as many times it can create mutations
             ],
-            iterator_to_array($visitor->getMutations(), false)
+            iterator_to_array($visitor->getMutations(), false),
         );
     }
 
     public function test_it_resets_its_state_between_two_traverse(): void
     {
-        $mutation0 = $this->createMock(Mutation::class);
-        $mutation1 = $this->createMock(Mutation::class);
-        $mutation2 = $this->createMock(Mutation::class);
-        $mutation3 = $this->createMock(Mutation::class);
-        $mutation4 = $this->createMock(Mutation::class);
+        $mutation0 = $this->createStub(Mutation::class);
+        $mutation1 = $this->createStub(Mutation::class);
+        $mutation2 = $this->createStub(Mutation::class);
+        $mutation3 = $this->createStub(Mutation::class);
+        $mutation4 = $this->createStub(Mutation::class);
 
-        $nodeMutationGeneratorMock = $this->createMock(NodeMutationGenerator::class);
-        $nodeMutationGeneratorMock
+        $nodeMutationGeneratorStub = $this->createStub(NodeMutationGenerator::class);
+        $nodeMutationGeneratorStub
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation2],
                 [$mutation3, $mutation4],
-                []
+                [],
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorStub);
 
         $this->traverse(
-            $this->parseCode(self::CODE),
-            [$visitor]
+            self::parseCode(self::CODE)[0],
+            [$visitor],
         );
 
         // Sanity check
@@ -123,12 +122,12 @@ PHP;
                 $mutation1,
                 $mutation2,
             ],
-            iterator_to_array($visitor->getMutations(), false)
+            iterator_to_array($visitor->getMutations(), false),
         );
 
         $this->traverse(
-            $this->parseCode(self::CODE),
-            [$visitor]
+            self::parseCode(self::CODE)[0],
+            [$visitor],
         );
 
         $this->assertSame(
@@ -136,7 +135,7 @@ PHP;
                 $mutation3,
                 $mutation4,
             ],
-            iterator_to_array($visitor->getMutations(), false)
+            iterator_to_array($visitor->getMutations(), false),
         );
     }
 }

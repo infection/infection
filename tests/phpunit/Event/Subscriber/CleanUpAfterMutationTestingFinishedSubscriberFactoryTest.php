@@ -38,20 +38,15 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[CoversClass(CleanUpAfterMutationTestingFinishedSubscriberFactory::class)]
 final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
     protected function setUp(): void
     {
@@ -67,10 +62,10 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             false,
             $this->fileSystemMock,
-            '/path/to/tmp'
+            '/path/to/tmp',
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(CleanUpAfterMutationTestingFinishedSubscriber::class, $subscriber);
     }
@@ -80,10 +75,10 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             true,
             $this->fileSystemMock,
-            '/path/to/tmp'
+            '/path/to/tmp',
         );
 
-        $subscriber = $factory->create(new FakeOutput());
+        $subscriber = $factory->create();
 
         $this->assertInstanceOf(NullSubscriber::class, $subscriber);
     }

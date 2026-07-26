@@ -40,20 +40,19 @@ use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
-use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use function Safe\class_implements;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.
  * 'Mutators shouldn't declare any public methods'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class MutatorProvider
 {
     use CannotBeInstantiated;
@@ -61,12 +60,12 @@ final class MutatorProvider
     /**
      * @var string[]|null
      */
-    private static $mutatorClasses;
+    private static ?array $mutatorClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $concreteMutatorClasses;
+    private static ?array $concreteMutatorClasses = null;
 
     /**
      * @var string[]|null
@@ -78,7 +77,7 @@ final class MutatorProvider
         if (self::$mutatorClasses === null) {
             self::$mutatorClasses = array_column(
                 iterator_to_array(ProfileListProvider::mutatorNameAndClassProvider(), true),
-                1
+                1,
             );
         }
 
@@ -89,7 +88,7 @@ final class MutatorProvider
     {
         if (self::$concreteMutatorClasses === null) {
             self::$concreteMutatorClasses = ConcreteClassReflector::filterByConcreteClasses(
-                iterator_to_array(self::provideMutatorClasses(), false)
+                iterator_to_array(self::provideMutatorClasses(), false),
             );
         }
 
@@ -113,16 +112,16 @@ final class MutatorProvider
 
     public static function mutatorClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideMutatorClasses());
+        yield from DataProviderFactory::fromIterable(self::provideMutatorClasses());
     }
 
     public static function concreteMutatorClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideConcreteMutatorClasses());
+        yield from DataProviderFactory::fromIterable(self::provideConcreteMutatorClasses());
     }
 
     public static function configurableMutatorClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideConfigurableMutatorClasses());
+        yield from DataProviderFactory::fromIterable(self::provideConfigurableMutatorClasses());
     }
 }

@@ -36,19 +36,21 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Locator;
 
 use Infection\FileSystem\Locator\FileNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FileNotFound::class)]
 final class FileNotFoundTest extends TestCase
 {
     /**
-     * @dataProvider nonExistentPathsProvider
-     *
      * @param string[] $roots
      */
+    #[DataProvider('nonExistentPathsProvider')]
     public function test_file_or_directory_does_not_exist(
         string $file,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileNotFound::fromFileName($file, $roots);
 
@@ -58,15 +60,14 @@ final class FileNotFoundTest extends TestCase
     }
 
     /**
-     * @dataProvider multipleNonExistentPathsProvider
-     *
      * @param string[] $files
      * @param string[] $roots
      */
+    #[DataProvider('multipleNonExistentPathsProvider')]
     public function test_files_or_directories_does_not_exist(
         array $files,
         array $roots,
-        string $expectedErrorMessage
+        string $expectedErrorMessage,
     ): void {
         $exception = FileNotFound::fromFiles($files, $roots);
 
@@ -75,7 +76,7 @@ final class FileNotFoundTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function nonExistentPathsProvider(): iterable
+    public static function nonExistentPathsProvider(): iterable
     {
         yield [
             'unknown',
@@ -102,7 +103,7 @@ final class FileNotFoundTest extends TestCase
         ];
     }
 
-    public function multipleNonExistentPathsProvider(): iterable
+    public static function multipleNonExistentPathsProvider(): iterable
     {
         yield [
             [],

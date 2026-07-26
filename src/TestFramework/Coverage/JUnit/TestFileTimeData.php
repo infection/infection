@@ -40,7 +40,13 @@ namespace Infection\TestFramework\Coverage\JUnit;
  */
 final class TestFileTimeData
 {
-    public function __construct(public string $path, public float $time)
-    {
+    /**
+     * @param string $path Absolute path to the test file.
+     * @param float $time Test execution time in seconds.
+     */
+    public function __construct(
+        public string $path,
+        public float $time,
+    ) {
     }
 }

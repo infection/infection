@@ -35,63 +35,76 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\Catch_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Catch_::class)]
 final class Catch_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, array|string $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes multiple exceptions using pipe (|) character used' => [
-            '<?php
-
-try {
-    $fn();
-} catch (\Throwable | \Exception | \DomainException $e) {
-    throw $e;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $fn();
+                    } catch (\Throwable | \Exception | \DomainException $e) {
+                        throw $e;
+                    }
+                    PHP,
+            ),
             [
-                '<?php
-
-try {
-    $fn();
-} catch (\Exception|\DomainException $e) {
-    throw $e;
-}',
-                '<?php
-
-try {
-    $fn();
-} catch (\Throwable|\DomainException $e) {
-    throw $e;
-}',
-                '<?php
-
-try {
-    $fn();
-} catch (\Throwable|\Exception $e) {
-    throw $e;
-}',
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        try {
+                            $fn();
+                        } catch (\Exception|\DomainException $e) {
+                            throw $e;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        try {
+                            $fn();
+                        } catch (\Throwable|\DomainException $e) {
+                            throw $e;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        try {
+                            $fn();
+                        } catch (\Throwable|\Exception $e) {
+                            throw $e;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate when pipe (|) character is not used' => [
-            '<?php
-
-try {
-    $fn();
-} catch (\Throwable $e) {
-    throw $e;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $fn();
+                    } catch (\Throwable $e) {
+                        throw $e;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

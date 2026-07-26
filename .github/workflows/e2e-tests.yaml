@@ -1,0 +1,243 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: E2E Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.operating-system }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        operating-system: [ ubuntu-latest ]
+        php-version: [ '8.3' ]
+        dependencies: [ locked ]
+        composer: [ 'composer' ]
+        coverage-driver: [ pcov, xdebug ]
+        e2e-runner: [ 'bin/infection' ]
+        include:
+          - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'dist/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'dist/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+
+    name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.coverage-driver }}
+          ini-values: memory_limit=512M, xdebug.mode=off
+          tools: ${{ matrix.composer }}
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove the configured PHP platform
+        if: matrix.dependencies != 'locked'
+        run: composer config --unset platform.php
+
+      - name: Configure for PHP >= 8.4
+        if: "matrix.php-version >= '8.4'"
+        run: |
+          composer config platform.php 8.4.99
+
+      - name: Get composer cache directory
+        id: composer-cache
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }}-${{ hashFiles('tests/e2e/*/composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }}-
+            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        if: ${{ matrix.dependencies == 'locked' }}
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
+
+      - name: Try to install paratest for parallel test execution
+        run: composer require --dev brianium/paratest:^7.8.4 --with-all-dependencies --minimal-changes --no-interaction --no-progress || true
+
+      - name: Cache E2E tests dependencies
+        if: runner.os == 'Windows'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: tests/e2e/*/vendor
+          key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}
+          restore-keys: |
+            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-
+            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-
+            e2e-vendor-${{ runner.os }}-
+            composer-
+
+      - name: Install Linux dependencies for E2E tests
+        if: runner.os != 'Windows'
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: expect moreutils
+
+      - name: Install Composer dependencies for E2E tests
+        shell: bash
+        run: |
+          CHRONIC=$(command -v chronic || true)
+          ls tests/e2e/*/composer.json | xargs dirname |
+             xargs -I{} -P 4 $CHRONIC composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
+
+      - name: Download mago used in some E2E tests
+        run: vendor/bin/mago --version
+        working-directory: tests/e2e/Mago_Integration
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run the Windows compatible subset of E2E tests
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
+
+      - name: Run the whole set of E2E tests
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
+        env:
+          TERM: xterm-256color
+        run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
+
+      - name: Compile the prefixed PHAR
+        if: &prefixed-phar-condition runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.3'
+        run: make compile
+
+      - name: Check the prefixed PHAR works from a subfolder
+        if: *prefixed-phar-condition
+        run: cd dist && ./infection.phar -V
+
+      - name: Run the whole set of E2E tests with prefixed PHAR
+        if: *prefixed-phar-condition
+        env:
+          TERM: xterm-256color
+        run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
+
+  phpstan-build-infection:
+    name: PHPStan's infection build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Infection
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout phpstan/build-infection
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: phpstan/build-infection
+          path: build-infection
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get composer cache directory
+        id: composer-cache
+        working-directory: build-infection
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-phpstan-build-infection-${{ hashFiles('build-infection/composer.*', 'composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-phpstan-build-infection-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Configure local Infection dependency
+        working-directory: build-infection
+        run: |
+          composer config repositories.local-infection '{"type":"path","url":"..","options":{"symlink":true,"versions":{"infection/infection":"dev-master"}}}'
+          composer require --dev infection/infection:dev-master --no-update
+
+      - name: Install dependencies
+        working-directory: build-infection
+        run: composer update infection/infection --with-all-dependencies --no-interaction --prefer-dist --no-progress
+
+      - name: Run lint
+        working-directory: build-infection
+        run: make lint
+
+      - name: Run tests
+        working-directory: build-infection
+        run: make tests
+
+      - name: Run PHPStan
+        working-directory: build-infection
+        run: make phpstan
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+      name: E2E Tests Status
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
+      needs:
+          - tests
+          - phpstan-build-infection
+      if: always()
+      steps:
+          - name: Successful run
+            if: ${{ !(contains(needs.*.result, 'failure')) }}
+            run: exit 0
+
+          - name: Failing run
+            if: ${{ contains(needs.*.result, 'failure') }}
+            run: exit 1

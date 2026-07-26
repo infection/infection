@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-set -e pipefail
+cd "$(dirname "$0")"
 
-readonly INFECTION="../../../bin/infection --coverage=infection-coverage --skip-initial-tests"
+set -eo pipefail
+
+readonly INFECTION="../../../bin/infection --coverage=infection-coverage --skip-initial-tests --with-uncovered"
 readonly PHPUNIT="vendor/bin/phpunit  --coverage-xml=infection-coverage/coverage-xml --log-junit=infection-coverage/junit.xml"
 
 if [ "$DRIVER" = "phpdbg" ]
@@ -22,8 +24,8 @@ else
     php $INFECTION
 fi
 
-if [[ -v GOLDEN ]]; then
-   cp -v infection.log expected-output_phpunit.txt
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output_phpunit.txt
 fi
 
 diff -u expected-output_phpunit.txt infection.log

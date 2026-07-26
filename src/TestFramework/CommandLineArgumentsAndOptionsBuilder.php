@@ -52,5 +52,5 @@ interface CommandLineArgumentsAndOptionsBuilder
      *
      * @return string[]
      */
-    public function buildForMutant(string $configPath, string $extraOptions, array $tests): array;
+    public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array;
 }

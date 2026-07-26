@@ -35,65 +35,103 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Boolean\InstanceOf_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(InstanceOf_::class)]
 final class InstanceOf_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates an instanceof comparison with a class literal to true and false' => [
-            <<<'PHP'
-<?php
-
-return $example instanceof Example;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return $example instanceof Example;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
-
-return true;
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-return false;
-PHP
-                ,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return !$example instanceof Example;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates an instanceof comparison with a variable to true and false' => [
-            <<<'PHP'
-<?php
-
-return $example instanceof $foo;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return $example instanceof $foo;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return !$example instanceof $foo;
+                        PHP,
+                ),
+            ],
+        ];
 
-return true;
-PHP
-                ,
+        yield 'It mutates an instanceof comparison without double negation' => [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-<?php
+                    return !$example instanceof Example;
+                    PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return $example instanceof Example;
+                        PHP,
+                ),
+            ],
+        ];
 
-return false;
-PHP
-                ,
+        yield 'It does not mutate an instanceof comparison inside `assert()` function call with a class literal' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return assert($example instanceof Example);
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate an instanceof comparison inside `assert()` function call with variable' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return assert($example instanceof $foo);
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates an instanceof comparison inside other than `assert()` functions' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return someFunc($example instanceof $foo);
+                    PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return someFunc(true);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        return someFunc(false);
+                        PHP,
+                ),
             ],
         ];
     }

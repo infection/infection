@@ -35,19 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function count;
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Differ\FilesDiffChangedLines;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
+use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use PhpParser\Node;
+use PhpParser\Token;
 use Throwable;
-use Traversable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -57,28 +52,19 @@ use Webmozart\Assert\Assert;
 class NodeMutationGenerator
 {
     /** @var Mutator<Node>[] */
-    private array $mutators;
-
-    private Node $currentNode;
-    /** @var TestLocation[]|null */
-    private ?array $testsMemoized = null;
-    private ?bool $isOnFunctionSignatureMemoized = null;
-    private ?bool $isInsideFunctionMemoized = null;
+    private readonly array $mutators;
 
     /**
      * @param Mutator<Node>[] $mutators
      * @param Node[] $fileNodes
+     * @param Token[] $originalFileTokens
      */
     public function __construct(
         array $mutators,
-        private string $filePath,
-        private array $fileNodes,
-        private Trace $trace,
-        private bool $onlyCovered,
-        private bool $isForGitDiffLines,
-        private ?string $gitDiffBase,
-        private LineRangeCalculator $lineRangeCalculator,
-        private FilesDiffChangedLines $filesDiffChangedLines
+        private readonly string $filePath,
+        private readonly array $fileNodes,
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -86,22 +72,13 @@ class NodeMutationGenerator
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return iterable<Mutation>
      */
     public function generate(Node $node): iterable
     {
-        $this->currentNode = $node;
-        $this->testsMemoized = null;
-        $this->isOnFunctionSignatureMemoized = null;
-        $this->isInsideFunctionMemoized = null;
-
-        if (!$this->isOnFunctionSignature()
-            && !$this->isInsideFunction()
-        ) {
-            return;
-        }
-
-        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine(), $this->gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE)) {
+        if (!LabelNodesAsEligibleVisitor::isEligible($node)) {
             return;
         }
 
@@ -125,14 +102,8 @@ class NodeMutationGenerator
             throw InvalidMutator::create(
                 $this->filePath,
                 $mutator->getName(),
-                $throwable
+                $throwable,
             );
-        }
-
-        $tests = $this->getAllTestsForCurrentNode();
-
-        if ($this->onlyCovered && count($tests) === 0) {
-            return;
         }
 
         $mutationByMutatorIndex = 0;
@@ -141,48 +112,18 @@ class NodeMutationGenerator
             yield new Mutation(
                 $this->filePath,
                 $this->fileNodes,
+                $mutator::class,
                 $mutator->getName(),
                 $node->getAttributes(),
                 $node::class,
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
-                $tests
+                AddTestsVisitor::getTests($node),
+                $this->originalFileTokens,
+                $this->originalFileContent,
             );
 
             ++$mutationByMutatorIndex;
         }
-    }
-
-    private function isOnFunctionSignature(): bool
-    {
-        return $this->isOnFunctionSignatureMemoized ??
-            $this->isOnFunctionSignatureMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-    }
-
-    private function isInsideFunction(): bool
-    {
-        return $this->isInsideFunctionMemoized ??
-            $this->isInsideFunctionMemoized = $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
-    }
-
-    /**
-     * @return TestLocation[]
-     */
-    private function getAllTestsForCurrentNode(): array
-    {
-        if ($this->testsMemoized !== null) {
-            return $this->testsMemoized;
-        }
-
-        $testsMemoized = $this->trace->getAllTestsForMutation(
-            $this->lineRangeCalculator->calculateRange($this->currentNode),
-            $this->isOnFunctionSignature()
-        );
-
-        if ($testsMemoized instanceof Traversable) {
-            $testsMemoized = iterator_to_array($testsMemoized, false);
-        }
-
-        return $this->testsMemoized = $testsMemoized;
     }
 }

@@ -40,30 +40,23 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Console\IO;
 use function microtime;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function random_int;
 use function Safe\mkdir;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
-/**
- * @group integration
- */
-final class ExcludeDirsProviderTest extends BaseProviderTest
+#[Group('integration')]
+#[CoversClass(ExcludeDirsProvider::class)]
+final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var string
-     */
-    private $workspace;
+    private string $workspace;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private Filesystem $fileSystem;
 
-    /**
-     * @var ExcludeDirsProvider
-     */
-    private $provider;
+    private ExcludeDirsProvider $provider;
 
     protected function setUp(): void
     {
@@ -73,9 +66,9 @@ final class ExcludeDirsProviderTest extends BaseProviderTest
         $this->fileSystem = new Filesystem();
 
         $this->provider = new ExcludeDirsProvider(
-            $this->createMock(ConsoleHelper::class),
+            $this->createStub(ConsoleHelper::class),
             $this->getQuestionHelper(),
-            $this->fileSystem
+            $this->fileSystem,
         );
     }
 
@@ -85,17 +78,18 @@ final class ExcludeDirsProviderTest extends BaseProviderTest
     }
 
     /**
-     * @dataProvider excludeDirsProvider
+     * @param string[] $dirsInCurrentFolder
      */
+    #[DataProvider('excludeDirsProvider')]
     public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {
         $excludedDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             $dirsInCurrentFolder,
-            ['.']
+            ['.'],
         );
 
         $this->assertContains($excludedRootDir, $excludedDirs);
@@ -110,10 +104,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTest
         $excludeDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("abc\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             ['src'],
-            ['src']
+            ['src'],
         );
 
         $this->assertCount(0, $excludeDirs);
@@ -134,10 +128,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTest
         $excludeDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("foo\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             ['src'],
-            [$this->workspace]
+            [$this->workspace],
         );
 
         $this->assertContains('foo', $excludeDirs);
@@ -160,10 +154,10 @@ final class ExcludeDirsProviderTest extends BaseProviderTest
         $excludeDirs = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("$dirA\n$dirA\n$dirC\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             [$dirA, $dirB, $dirC],
-            ['.']
+            ['.'],
         );
 
         $this->assertSame([0 => $dirA, 1 => $dirC], $excludeDirs);

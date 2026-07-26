@@ -43,29 +43,28 @@ use Infection\Mutator\MutatorCategory;
  */
 final class UnwrapStrRepeat extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_repeat` function call with its first operand. For example:
+                Replaces a `str_repeat` function call with its first operand. For example:
 
-```php
-$x = str_repeat('Hello!');
-```
+                ```php
+                $x = str_repeat('Hello!');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'Hello!';
-```
-TXT
-            ,
+                ```php
+                $x = 'Hello!';
+                ```
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = str_repeat('Hello!');
-+ $x = 'Hello!';
-DIFF
+                - $x = str_repeat('Hello!');
+                + $x = 'Hello!';
+                DIFF,
         );
     }
 

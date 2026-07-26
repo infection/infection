@@ -37,25 +37,46 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
+use function explode;
+use function file_exists;
+use function implode;
+use function in_array;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\ProjectDirectoryProvider\ProjectDirectoryProvider;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\FileSystem\SourceFileCollector;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Git\Git;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
+use Infection\Reporter\FileReporter;
+use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
+use InvalidArgumentException;
+use function is_numeric;
+use function ltrim;
+use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
-use function Safe\sprintf;
+use PhpParser\Node;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
@@ -69,34 +90,30 @@ class ConfigurationFactory
     /**
      * Default allowed timeout (on a test basis) in seconds
      */
-    private const DEFAULT_TIMEOUT = 10;
+    private const int DEFAULT_TIMEOUT = 10;
 
-    private TmpDirProvider $tmpDirProvider;
-    private MutatorResolver $mutatorResolver;
-    private MutatorFactory $mutatorFactory;
-    private MutatorParser $mutatorParser;
-    private SourceFileCollector $sourceFileCollector;
-    private CiDetectorInterface $ciDetector;
-    private GitDiffFileProvider $gitDiffFileProvider;
+    private const int DEFAULT_DOTS_PER_ROW = 50;
 
     public function __construct(
-        TmpDirProvider $tmpDirProvider,
-        MutatorResolver $mutatorResolver,
-        MutatorFactory $mutatorFactory,
-        MutatorParser $mutatorParser,
-        SourceFileCollector $sourceFileCollector,
-        CiDetectorInterface $ciDetector,
-        GitDiffFileProvider $gitDiffFileProvider
+        private readonly TmpDirProvider $tmpDirProvider,
+        private readonly MutatorResolver $mutatorResolver,
+        private readonly MutatorFactory $mutatorFactory,
+        private readonly MutatorParser $mutatorParser,
+        private readonly CiDetectorInterface $ciDetector,
+        private readonly Git $git,
+        private readonly ProjectDirectoryProvider $projectDirectoryProvider,
+        private readonly CpuCoresCountProvider $cpuCoresCountProvider,
+        private readonly PositionalPathsClassifier $positionalPathsClassifier,
     ) {
-        $this->tmpDirProvider = $tmpDirProvider;
-        $this->mutatorResolver = $mutatorResolver;
-        $this->mutatorFactory = $mutatorFactory;
-        $this->mutatorParser = $mutatorParser;
-        $this->sourceFileCollector = $sourceFileCollector;
-        $this->ciDetector = $ciDetector;
-        $this->gitDiffFileProvider = $gitDiffFileProvider;
     }
 
+    /**
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     * @param positive-int|'max'|null $dotsPerRow
+     *
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -104,88 +121,133 @@ class ConfigurationFactory
         bool $skipInitialTests,
         string $logVerbosity,
         bool $debug,
-        bool $onlyCovered,
+        bool $withUncovered,
         bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        bool $showMutations,
+        ?int $numberOfShownMutations,
         ?float $minCoveredMsi,
+        bool $timeoutsAsEscaped,
+        ?int $maxTimeouts,
         int $msiPrecision,
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
-        string $filter,
-        int $threadCount,
+        ?string $testFrameworkExtraArgs,
+        ?string $staticAnalysisToolOptions,
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        ?int $threadCount,
+        string|int|null $dotsPerRow,
         bool $dryRun,
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
         ?bool $useGitHubLogger,
+        ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
+        ?string $textLogFilePath,
+        ?string $summaryJsonLogFilePath,
         bool $useNoopMutators,
-        bool $executeOnlyCoveringTestCases
+        bool $executeOnlyCoveringTestCases,
+        ?string $mapSourceClassToTestStrategy,
+        ?string $projectDirectory,
+        ?string $staticAnalysisTool,
+        ?string $mutantId,
     ): Configuration {
-        $configDir = dirname($schema->getFile());
+        $configDir = dirname($schema->pathname);
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework = $testFramework ?? $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+        $testFramework ??= $schema->testFramework ?? TestFrameworkTypes::PHPUNIT;
+        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->staticAnalysisTool;
 
         $skipCoverage = $existingCoveragePath !== null;
 
         $coverageBasePath = self::retrieveCoverageBasePath(
             $existingCoveragePath,
             $configDir,
-            $namespacedTmpDir
+            $namespacedTmpDir,
         );
 
-        $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
+        $this->includeUserBootstrap($schema->bootstrap);
+
+        $resolvedMutatorsArray = $this->resolveMutators($schema->mutators, $mutatorsInput);
 
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        return new Configuration(
-            $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
-            $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collectFiles(
-                $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes()
-            ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
-            $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $useGitHubLogger, $htmlLogFilePath),
-            $logVerbosity,
-            $namespacedTmpDir,
-            $this->retrievePhpUnit($schema, $configDir),
-            $mutators,
-            $testFramework,
-            $schema->getBootstrap(),
-            $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
-            $coverageBasePath,
-            $skipCoverage,
-            $skipInitialTests,
-            $debug,
-            $onlyCovered,
-            $this->retrieveNoProgress($noProgress),
-            self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
-            self::retrieveMinMsi($minMsi, $schema),
-            $showMutations,
-            self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
-            $msiPrecision,
-            $threadCount,
-            $dryRun,
-            $ignoreSourceCodeMutatorsMap,
-            $executeOnlyCoveringTestCases,
-            $isForGitDiffLines,
-            $gitDiffBase
+        [$sourceFilter, $testFrameworkExtraArgs] = $this->refineFilterIfNecessary(
+            $sourceFilter,
+            $schema,
+            $testFrameworkExtraArgs,
         );
+
+        return new Configuration(
+            processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
+            source: $schema->source,
+            sourceFilter: $sourceFilter,
+            logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath, $summaryJsonLogFilePath),
+            logVerbosity: $logVerbosity,
+            tmpDir: $namespacedTmpDir,
+            phpUnit: $this->retrievePhpUnit($schema, $configDir),
+            phpStan: $this->retrievePhpStan($schema, $configDir),
+            mago: $this->retrieveMago($schema, $configDir),
+            mutators: $mutators,
+            testFramework: $testFramework,
+            bootstrap: $schema->bootstrap,
+            initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraArgs(
+                $testFrameworkExtraOptions,
+                $testFrameworkExtraArgs,
+                $schema,
+                $testFramework,
+            ),
+            staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
+            coveragePath: $coverageBasePath,
+            skipCoverage: $skipCoverage,
+            skipInitialTests: $skipInitialTests,
+            isDebugEnabled: $debug,
+            withUncovered: $withUncovered,
+            noProgress: $this->retrieveNoProgress($noProgress),
+            ignoreMsiWithNoMutations: self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
+            minMsi: self::retrieveMinMsi($minMsi, $schema),
+            numberOfShownMutations: $numberOfShownMutations,
+            minCoveredMsi: self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
+            timeoutsAsEscaped: self::retrieveTimeoutsAsEscaped($timeoutsAsEscaped, $schema),
+            maxTimeouts: self::retrieveMaxTimeouts($maxTimeouts, $schema),
+            msiPrecision: $msiPrecision,
+            threadCount: $this->retrieveThreadCount($threadCount, $schema),
+            dotsPerRow: self::retrieveDotsPerRow($dotsPerRow, $schema),
+            isDryRun: $dryRun,
+            ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
+            executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
+            mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
+            projectDirectory: $this->retrieveProjectDirectory($projectDirectory),
+            staticAnalysisTool: $resultStaticAnalysisTool,
+            mutantId: $mutantId,
+            configurationPathname: $schema->pathname,
+        );
+    }
+
+    /**
+     * @throws FileOrDirectoryNotFound
+     */
+    private function includeUserBootstrap(?string $bootstrap): void
+    {
+        if ($bootstrap === null) {
+            return;
+        }
+
+        if (!file_exists($bootstrap)) {
+            throw FileOrDirectoryNotFound::fromFileName($bootstrap, [__DIR__]);
+        }
+
+        (static function (string $infectionBootstrapFile): void {
+            require_once $infectionBootstrapFile;
+        })($bootstrap);
     }
 
     /**
      * @param array<string, mixed> $schemaMutators
      *
-     * @return array<class-string<Mutator<\PhpParser\Node>&ConfigurableMutator<\PhpParser\Node>>, mixed[]>
+     * @return array<class-string<Mutator<Node>&ConfigurableMutator<Node>>, mixed[]>
      */
     private function resolveMutators(array $schemaMutators, string $mutatorsInput): array
     {
@@ -199,6 +261,10 @@ class ConfigurationFactory
             $mutatorsList = $schemaMutators;
         } else {
             $mutatorsList = array_fill_keys($parsedMutatorsInput, true);
+
+            if (array_key_exists('global-ignoreSourceCodeByRegex', $schemaMutators)) {
+                $mutatorsList['global-ignoreSourceCodeByRegex'] = $schemaMutators['global-ignoreSourceCodeByRegex'];
+            }
         }
 
         return $this->mutatorResolver->resolve($mutatorsList);
@@ -206,9 +272,9 @@ class ConfigurationFactory
 
     private function retrieveTmpDir(
         SchemaConfiguration $schema,
-        string $configDir
+        string $configDir,
     ): string {
-        $tmpDir = (string) $schema->getTmpDir();
+        $tmpDir = (string) $schema->tmpDir;
 
         if ($tmpDir === '') {
             $tmpDir = sys_get_temp_dir();
@@ -221,25 +287,23 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->getPhpUnit();
+        return $schema->phpUnit->withAbsolutePaths($configDir);
+    }
 
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
+    private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
+    {
+        return $schema->phpStan->withAbsolutePaths($configDir);
+    }
 
-        if ($phpUnitConfigDir === null) {
-            $phpUnit->setConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->setConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir
-            ));
-        }
-
-        return $phpUnit;
+    private function retrieveMago(SchemaConfiguration $schema, string $configDir): Mago
+    {
+        return $schema->mago->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(
         ?string $existingCoveragePath,
         string $configDir,
-        string $tmpDir
+        string $tmpDir,
     ): string {
         if ($existingCoveragePath === null) {
             return $tmpDir;
@@ -252,11 +316,41 @@ class ConfigurationFactory
         return sprintf('%s/%s', $configDir, $existingCoveragePath);
     }
 
-    private static function retrieveTestFrameworkExtraOptions(
+    private static function retrieveTestFrameworkExtraArgs(
         ?string $testFrameworkExtraOptions,
-        SchemaConfiguration $schema
+        ?string $testFrameworkExtraArgs,
+        SchemaConfiguration $schema,
+        string $testFramework,
     ): string {
-        return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+        $extraArgs = $testFrameworkExtraArgs ?? $schema->testFrameworkExtraArgs ?? '';
+
+        if ($extraArgs !== '') {
+            return $extraArgs;
+        }
+
+        $extraOptions = $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
+
+        return $extraOptions === '' || $testFramework !== TestFrameworkTypes::PHPUNIT
+            ? $extraOptions
+            : self::retrieveLegacyPhpUnitTestFrameworkExtraOptions($extraOptions);
+    }
+
+    private static function retrieveLegacyPhpUnitTestFrameworkExtraOptions(string $extraOptions): string
+    {
+        return implode(
+            ' ',
+            array_map(
+                static fn ($option): string => '--' . $option,
+                explode(' --', ltrim($extraOptions, '-')),
+            ),
+        );
+    }
+
+    private static function retrieveStaticAnalysisToolOptions(
+        ?string $staticAnalysisToolOptions,
+        SchemaConfiguration $schema,
+    ): ?string {
+        return $staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions;
     }
 
     private function retrieveNoProgress(bool $noProgress): bool
@@ -266,23 +360,33 @@ class ConfigurationFactory
 
     private static function retrieveIgnoreMsiWithNoMutations(
         ?bool $ignoreMsiWithNoMutations,
-        SchemaConfiguration $schema
+        SchemaConfiguration $schema,
     ): bool {
-        return $ignoreMsiWithNoMutations ?? $schema->getIgnoreMsiWithNoMutations() ?? false;
+        return $ignoreMsiWithNoMutations ?? $schema->ignoreMsiWithNoMutations ?? false;
     }
 
     private static function retrieveMinMsi(?float $minMsi, SchemaConfiguration $schema): ?float
     {
-        return $minMsi ?? $schema->getMinMsi();
+        return $minMsi ?? $schema->minMsi;
     }
 
     private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float
     {
-        return $minCoveredMsi ?? $schema->getMinCoveredMsi();
+        return $minCoveredMsi ?? $schema->minCoveredMsi;
+    }
+
+    private static function retrieveTimeoutsAsEscaped(bool $timeoutsAsEscaped, SchemaConfiguration $schema): bool
+    {
+        return $timeoutsAsEscaped || ($schema->timeoutsAsEscaped ?? false);
+    }
+
+    private static function retrieveMaxTimeouts(?int $maxTimeouts, SchemaConfiguration $schema): ?int
+    {
+        return $maxTimeouts ?? $schema->maxTimeouts;
     }
 
     /**
-     * @param array<string, mixed[]> $resolvedMutatorsMap
+     * @param array<class-string, mixed[]> $resolvedMutatorsMap
      *
      * @return array<string, array<int, string>>
      */
@@ -304,24 +408,62 @@ class ConfigurationFactory
     }
 
     /**
-     * @param string[] $sourceDirectories
+     * @return array{0: PlainFilter|null, 1: string|null}
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
-    {
-        if ($gitDiffFilter === null && !$isForGitDiffLines) {
-            return $filter;
+    private function resolvePositionalPathsFilter(
+        PositionalPathsFilter $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        $classified = $this->positionalPathsClassifier->classify(
+            $sourceFilter->paths,
+            $schema,
+        );
+
+        $resolvedFilter = $classified->sourcePaths !== []
+            ? new PlainFilter(array_values(array_unique($classified->sourcePaths)))
+            : null;
+
+        if ($classified->testPaths !== []) {
+            if ($testFrameworkExtraArgs !== null) {
+                throw new InvalidArgumentException(
+                    'Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option. Use either form, not both.',
+                );
+            }
+
+            $testFrameworkExtraArgs = implode(' ', $classified->testPaths);
         }
 
-        $baseBranch = $gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE;
-
-        if ($isForGitDiffLines) {
-            return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);
-        }
-
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
+        return [$resolvedFilter, $testFrameworkExtraArgs];
     }
 
-    private function retrieveLogs(Logs $logs, ?bool $useGitHubLogger, ?string $htmlLogFilePath): Logs
+    /**
+     * @return array{0: SourceFilter|null, 1: string|null}
+     */
+    private function refineFilterIfNecessary(
+        PlainFilter|IncompleteGitDiffFilter|PositionalPathsFilter|null $sourceFilter,
+        SchemaConfiguration $schema,
+        ?string $testFrameworkExtraArgs,
+    ): array {
+        if ($sourceFilter instanceof PositionalPathsFilter) {
+            [$sourceFilter, $testFrameworkExtraArgs] = $this->resolvePositionalPathsFilter(
+                $sourceFilter,
+                $schema,
+                $testFrameworkExtraArgs,
+            );
+        }
+
+        if ($sourceFilter instanceof IncompleteGitDiffFilter) {
+            $sourceFilter = new GitDiffFilter(
+                $sourceFilter->value,
+                self::refineGitBase($sourceFilter->base),
+            );
+        }
+
+        return [$sourceFilter, $testFrameworkExtraArgs];
+    }
+
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -331,21 +473,145 @@ class ConfigurationFactory
             $logs->setUseGitHubAnnotationsLogger($useGitHubLogger);
         }
 
+        if ($gitlabLogFilePath !== null) {
+            $logs->setGitlabLogFilePath($gitlabLogFilePath);
+        }
+
         if ($htmlLogFilePath !== null) {
             $logs->setHtmlLogFilePath($htmlLogFilePath);
         }
 
-        return $logs;
+        if ($textLogFilePath !== null) {
+            $logs->setTextLogFilePath($textLogFilePath);
+        }
+
+        if ($summaryJsonLogFilePath !== null) {
+            $logs->setSummaryJsonLogFilePath($summaryJsonLogFilePath);
+        }
+
+        return new Logs(
+            self::pathToAbsolute($logs->getTextLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getHtmlLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getSummaryLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getJsonLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getGitlabLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getDebugLogFilePath(), $configDir),
+            self::pathToAbsolute($logs->getPerMutatorFilePath(), $configDir),
+            $logs->getUseGitHubAnnotationsLogger(),
+            $logs->getStrykerConfig(),
+            self::pathToAbsolute($logs->getSummaryJsonLogFilePath(), $configDir),
+        );
     }
 
     private function detectCiGithubActions(): bool
     {
         try {
             $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $e) {
+        } catch (CiNotDetectedException) {
             return false;
         }
 
         return $ci->getCiName() === CiDetector::CI_GITHUB_ACTIONS;
+    }
+
+    private static function pathToAbsolute(
+        ?string $path,
+        string $configDir,
+    ): ?string {
+        if ($path === null) {
+            return null;
+        }
+
+        if (in_array($path, FileReporter::ALLOWED_PHP_STREAMS, true)) {
+            return $path;
+        }
+
+        if (Path::isAbsolute($path)) {
+            return $path;
+        }
+
+        return sprintf('%s/%s', $configDir, $path);
+    }
+
+    private function retrieveThreadCount(?int $threadCount, SchemaConfiguration $schema): int
+    {
+        // user passed `--threads` option, already validated
+        if ($threadCount !== null) {
+            return $threadCount;
+        }
+
+        $threadsFromSchema = $schema->threads;
+
+        // we subtract 1 here to not use all the available cores by Infection
+        $maxThreads = max(1, $this->cpuCoresCountProvider->provide() - 1);
+
+        if ($threadsFromSchema === null) {
+            return $maxThreads;
+        }
+
+        // config has numeric string or integer value
+        if (is_numeric($threadsFromSchema)) {
+            return (int) $threadsFromSchema;
+        }
+
+        // config has `max` thread count
+        Assert::same($threadsFromSchema, 'max', sprintf('The value of key `threads` in configuration file must be of type integer or string "max". String "%s" provided.', $threadsFromSchema));
+
+        return $maxThreads;
+    }
+
+    /**
+     * @param positive-int|'max'|null $dotsPerRow
+     *
+     * @return positive-int|'max'
+     */
+    private static function retrieveDotsPerRow(string|int|null $dotsPerRow, SchemaConfiguration $schema): int|string
+    {
+        return $dotsPerRow ?? $schema->dotsPerRow ?? self::DEFAULT_DOTS_PER_ROW;
+    }
+
+    /**
+     * @param non-empty-string|null $base
+     *
+     * @return non-empty-string
+     */
+    private function refineGitBase(?string $base): string
+    {
+        // When the user gives a base, we need to try to refine it.
+        // For example, if the user created their feature branch:
+        //
+        //  main:     A --- B --- C
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Later, after others push to main
+        //
+        //  main:     A --- B --- C --- F --- G --- H
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
+        // touch code the user did not touch.
+        //
+        // To prevent this, we try to find the best common ancestor, here C.
+        // As a result, we would do `git diff C HEAD` which would give (D,E).
+        return $this->git->getBaseReference($base ?? $this->git->getDefaultBase());
+    }
+
+    /**
+     * @param non-empty-string|null $projectDirectory Absolute path.
+     *
+     * @return non-empty-string Absolute path.
+     */
+    private function retrieveProjectDirectory(?string $projectDirectory): string
+    {
+        $resolvedProjectDirectory = $projectDirectory ?? $this->projectDirectoryProvider->provide();
+
+        Assert::notNull(
+            $resolvedProjectDirectory,
+            'Could not resolve the project directory.',
+        );
+
+        return $resolvedProjectDirectory;
     }
 }

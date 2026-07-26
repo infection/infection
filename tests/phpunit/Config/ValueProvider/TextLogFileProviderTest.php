@@ -38,22 +38,20 @@ namespace Infection\Tests\Config\ValueProvider;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Console\IO;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
-final class TextLogFileProviderTest extends BaseProviderTest
+#[Group('integration')]
+#[CoversClass(TextLogFileProvider::class)]
+final class TextLogFileProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var TextLogFileProvider
-     */
-    private $provider;
+    private TextLogFileProvider $provider;
 
     protected function setUp(): void
     {
         $this->provider = new TextLogFileProvider(
-            $this->createMock(ConsoleHelper::class),
-            $this->getQuestionHelper()
+            $this->createStub(ConsoleHelper::class),
+            $this->getQuestionHelper(),
         );
     }
 
@@ -62,9 +60,9 @@ final class TextLogFileProviderTest extends BaseProviderTest
         $textLogFilePath = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            []
+            [],
         );
 
         $this->assertNull($textLogFilePath);
@@ -77,9 +75,9 @@ final class TextLogFileProviderTest extends BaseProviderTest
         $textLogFilePath = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("{$inputValue}\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
-            []
+            [],
         );
 
         $this->assertSame($inputValue, $textLogFilePath);

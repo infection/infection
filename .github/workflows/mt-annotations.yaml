@@ -6,23 +6,33 @@ name: Annotations
 on:
     pull_request:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
+permissions: {}
+
 jobs:
     tests:
         runs-on: ubuntu-latest
+        timeout-minutes: 30
+        permissions:
+            contents: read
 
         strategy:
             matrix:
-                php-version: ['8.0']
+                php-version: ['8.3']
 
         name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 0
+                  persist-credentials: false
             - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
               with:
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2.1
@@ -33,10 +43,10 @@ jobs:
 
             - name: Get composer cache directory
               id: composer-cache
-              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
             - name: Cache dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
                   key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
@@ -47,9 +57,32 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  composer update --no-interaction --prefer-dist --no-progress
+                  composer install --no-interaction --prefer-dist --no-progress
 
-            - name: Run Infection for added files only
+            - name: Run Infection for changed lines only
               run: |
                   git fetch origin $GITHUB_BASE_REF
-                  php bin/infection --threads=max --git-diff-lines --git-diff-base=origin/$GITHUB_BASE_REF --ignore-msi-with-no-mutations --only-covered
+                  php bin/infection \
+                    --git-diff-lines \
+                    --git-diff-base=origin/$GITHUB_BASE_REF \
+                    --ignore-msi-with-no-mutations \
+                    --max-timeouts=0 \
+                    --min-msi=100 \
+                    --min-covered-msi=100
+
+    # This is a meta job to avoid to have to constantly change the protection rules
+    # whenever we touch the matrix.
+    tests-status:
+        name: Annotations Status
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        needs: tests
+        if: always()
+        steps:
+            - name: Successful run
+              if: ${{ !(contains(needs.*.result, 'failure')) }}
+              run: exit 0
+
+            - name: Failing run
+              if: ${{ contains(needs.*.result, 'failure') }}
+              run: exit 1

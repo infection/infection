@@ -35,50 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Boolean\Yield_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Yield_::class)]
 final class Yield_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with a double arrow to a yield with a greater than comparison' => [
-            <<<'PHP'
-<?php
-
-$a = function () {
-    (yield $a => $b);
-};
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = function () {
-    (yield $a > $b);
-};
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a => $b);
+                    };
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a > $b);
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [
-            <<<'PHP'
-<?php
-
-$a = function () {
-    (yield $b);
-};
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $b);
+                    };
+                    PHP,
+            ),
         ];
     }
 }

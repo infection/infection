@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infection\Tests\Fixtures\TestFramework;
 
 use ErrorException;
@@ -9,11 +11,8 @@ use Infection\Tests\UnsupportedMethod;
 
 class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware
 {
-    private $memoryLimit;
-
-    public function __construct(float $memoryLimit)
+    public function __construct(private readonly float $memoryLimit)
     {
-        $this->memoryLimit = $memoryLimit;
     }
 
     public function hasJUnitReport(): bool
@@ -23,20 +22,17 @@ class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsa
 
     public function testsPass(string $output): bool
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function getName(): string
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     /**
      * Reports memory used by a test suite.
      *
-     * @param string $output
-     *
-     * @return float
      */
     public function getMemoryUsed(string $output): float
     {

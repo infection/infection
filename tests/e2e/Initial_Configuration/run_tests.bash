@@ -6,7 +6,7 @@ if test ! -f "$(which expect)"; then
     exit 1;
 fi
 
-cd $(dirname $0)
+cd "$(dirname "$0")"
 rm -v -f infection.json5 infection.log
 
 set -e

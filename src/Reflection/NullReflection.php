@@ -49,4 +49,9 @@ final class NullReflection implements ClassReflection
     {
         return '';
     }
+
+    public function isFinal(): bool
+    {
+        return false;
+    }
 }

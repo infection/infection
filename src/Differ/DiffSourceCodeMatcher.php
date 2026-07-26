@@ -40,11 +40,12 @@ use function str_contains;
 
 /**
  * @internal
+ * @final
  */
-final class DiffSourceCodeMatcher
+class DiffSourceCodeMatcher
 {
-    private const POSSIBLE_DELIMITERS = [
-            '#', '%', ':', ';', '=', '?', '@', '^', '~',
+    private const array POSSIBLE_DELIMITERS = [
+        '#', '%', ':', ';', '=', '?', '@', '^', '~',
     ];
 
     public function matches(string $diff, string $sourceCodeRegex): bool

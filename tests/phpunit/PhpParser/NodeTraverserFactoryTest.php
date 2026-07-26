@@ -37,108 +37,142 @@ namespace Infection\Tests\PhpParser;
 
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\Testing\FileSystem\MockSplFileInfo;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 
+#[CoversClass(NodeTraverserFactory::class)]
 final class NodeTraverserFactoryTest extends TestCase
 {
+    private static ?ReflectionProperty $visitorsReflection = null;
+
     /**
-     * @var ReflectionProperty|null
+     * @param list<class-string<NodeVisitor>> $expected
      */
-    private static $visitorsReflection;
+    #[DataProvider('visitorProvider')]
+    public function test_it_can_create_a_traverser_for_enriching_the_ast(
+        bool $onlyCovered,
+        array $expected,
+    ): void {
+        $sourceFile = new MockSplFileInfo(realPath: '/path/to/virtual-test-file.php');
 
-    public function test_it_can_create_a_traverser(): void
-    {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
+        $factory = self::createTraverserFactory($onlyCovered);
 
-        $visitors = array_map(
-            'get_class',
-            self::getVisitorReflection()->getValue($traverser)
+        $traverser = $factory->createEnrichmentTraverser(
+            $sourceFile,
+            new EmptyTrace($sourceFile),
         );
 
-        $this->assertSame(
+        $this->assertTraverserVisitorsAre($traverser, $expected);
+    }
+
+    public static function visitorProvider(): iterable
+    {
+        $baseVisitors = [
+            NextConnectingVisitor::class,
+            LabelNodesAsEligibleVisitor::class,
+            ExcludeIgnoredNodesVisitor::class,
+            SkipIgnoredNodesVisitor::class,
+            NameResolver::class,
+            ParentConnectingVisitor::class,
+            ReflectionVisitor::class,
+            ExcludeNonMutableCodeVisitor::class,
+            ExcludeUnchangedLinesVisitor::class,
+            AddTestsVisitor::class,
+        ];
+
+        yield 'without only covered' => [
+            false,
+            $baseVisitors,
+        ];
+
+        yield 'with only covered' => [
+            true,
             [
-                IgnoreAllMutationsAnnotationReaderVisitor::class,
-                NonMutableNodesIgnorerVisitor::class,
-                NameResolver::class,
-                ParentConnectorVisitor::class,
-                FullyQualifiedClassNameVisitor::class,
-                ReflectionVisitor::class,
+                ...$baseVisitors,
+                ExcludeUntestedNodesVisitor::class,
+            ],
+        ];
+    }
+
+    public function test_it_can_create_a_traverser_for_generating_mutations(): void
+    {
+        $traverser = self::createTraverserFactory(true)->createMutationTraverser(
+            new FakeVisitor(),
+        );
+
+        $this->assertTraverserVisitorsAre(
+            $traverser,
+            [
+                CloningVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitors
         );
     }
 
-    public function test_it_can_create_a_traverser_with_node_ignorers(): void
-    {
-        $traverser = (new NodeTraverserFactory())->create(
-            new FakeVisitor(),
-            [
-                new FakeIgnorer(),
-                new FakeIgnorer(),
-            ]
-        );
+    /**
+     * @param list<class-string<NodeVisitor>> $expected
+     */
+    private function assertTraverserVisitorsAre(
+        NodeTraverserInterface $traverser,
+        array $expected,
+    ): void {
+        // Sanity check. This is not a hard constraint, but if that changes in the future, then we need
+        // to adapt the code here to retrieve the visitors a different way.
+        $this->assertInstanceOf(NodeTraverser::class, $traverser);
 
+        $actual = self::getVisitorClassNames($traverser);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return list<class-string<NodeVisitor>>
+     */
+    private static function getVisitorClassNames(NodeTraverser $traverser): array
+    {
+        /** @var list<NodeVisitor> $visitors */
         $visitors = self::getVisitorReflection()->getValue($traverser);
 
-        $visitorClasses = array_map('get_class', $visitors);
-
-        $this->assertSame(
-            [
-                IgnoreAllMutationsAnnotationReaderVisitor::class,
-                NonMutableNodesIgnorerVisitor::class,
-                NameResolver::class,
-                ParentConnectorVisitor::class,
-                FullyQualifiedClassNameVisitor::class,
-                ReflectionVisitor::class,
-                FakeVisitor::class,
-            ],
-            $visitorClasses
-        );
-
-        $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('nodeIgnorers');
-        $nodeIgnorersReflection->setAccessible(true);
-
-        $actualNodeIgnorers = array_map(
-            'get_class',
-            $nodeIgnorersReflection->getValue($visitors[1])
-        );
-
-        $this->assertSame(
-            [
-                FakeIgnorer::class,
-                FakeIgnorer::class,
-                ChangingIgnorer::class,
-                InterfaceIgnorer::class,
-                AbstractMethodIgnorer::class,
-            ],
-            $actualNodeIgnorers
+        return array_map(
+            get_class(...),
+            $visitors,
         );
     }
 
     private static function getVisitorReflection(): ReflectionProperty
     {
-        if (self::$visitorsReflection !== null) {
-            return self::$visitorsReflection;
-        }
+        return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
+    }
 
-        self::$visitorsReflection = (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
-        self::$visitorsReflection->setAccessible(true);
-
-        return self::$visitorsReflection;
+    private static function createTraverserFactory(bool $onlyCovered): NodeTraverserFactory
+    {
+        return new NodeTraverserFactory(
+            sourceLineMatcher: new NullSourceLineMatcher(),
+            lineRangeCalculator: new LineRangeCalculator(),
+            onlyCovered: $onlyCovered,
+        );
     }
 }

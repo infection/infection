@@ -35,140 +35,154 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Generator;
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Regex\PregMatchRemoveFlags;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
  */
+#[CoversClass(PregMatchRemoveFlags::class)]
 final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider provideMutationCases
+     * @param string|string[]|null $expected
      */
-    public function test_mutator($input, $expected = null): void
+    #[DataProvider('provideMutationCases')]
+    public function test_mutator(string $input, string|array|null $expected = null): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function provideMutationCases(): Generator
+    public static function provideMutationCases(): iterable
     {
         yield 'It removes flags one by one' => [
-            <<<'PHP'
-<?php
-
-preg_match('~some-regexp$~igu', 'irrelevant');
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp$~igu', 'irrelevant');
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
-
-preg_match('~some-regexp$~gu', 'irrelevant');
-PHP
-            ,
-                <<<'PHP'
-<?php
-
-preg_match('~some-regexp$~iu', 'irrelevant');
-PHP
-            ,
-                <<<'PHP'
-<?php
-
-preg_match('~some-regexp$~ig', 'irrelevant');
-PHP
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('~some-regexp$~gu', 'irrelevant');
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('~some-regexp$~iu', 'irrelevant');
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('~some-regexp$~ig', 'irrelevant');
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate when no flags are used' => [
-            <<<'PHP'
-<?php
-
-preg_match('~some-regexp$~', 'irrelevant');
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('~some-regexp$~', 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly preg_match function is wrongly capitalized' => [
-            <<<'PHP'
-<?php
-
-pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
-
-pReG_MaTcH('~some-regexp$~g', 'irrelevant');
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-pReG_MaTcH('~some-regexp$~i', 'irrelevant');
-PHP
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        pReG_MaTcH('~some-regexp$~g', 'irrelevant');
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        pReG_MaTcH('~some-regexp$~i', 'irrelevant');
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when delimeter is not standard' => [
-            <<<'PHP'
-<?php
-
-pReG_MaTcH('^some-regexp$^ig', 'irrelevant');
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    pReG_MaTcH('^some-regexp$^ig', 'irrelevant');
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        pReG_MaTcH('^some-regexp$^g', 'irrelevant');
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        pReG_MaTcH('^some-regexp$^i', 'irrelevant');
+                        PHP,
+                ),
+            ],
+        ];
 
-pReG_MaTcH('^some-regexp$^g', 'irrelevant');
-PHP
-                ,
+        // https://github.com/infection/infection/issues/2977
+        yield 'It preserves non-canonical backslash encoding in the regex body when only flags change' => [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-<?php
-
-pReG_MaTcH('^some-regexp$^i', 'irrelevant');
-PHP
+                    preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/iU', '', $m);
+                    PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/U', '', $m);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        preg_match('/(?:.*controller\\\|.*controllers\\\)([\w\\\]+)controller$/i', '', $m);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate regular expression with an encapsed variable' => [
-            <<<'PHP'
-<?php
-
-preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression when provided with an unpacked array' => [
-            <<<'PHP'
-<?php
-
-preg_match(...foo());
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match(...foo());
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate regular expression when provided with a variable' => [
-            <<<'PHP'
-<?php
-
-preg_match($regex, 'irrelevant');
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match($regex, 'irrelevant');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when provided with a variable function name' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $f = 'preg_match';
 
-$f = 'preg_match';
-
-$f('~some-regexp$~ig', 'irrelevant');
-PHP
-            ,
+                    $f('~some-regexp$~ig', 'irrelevant');
+                    PHP,
+            ),
         ];
     }
 }

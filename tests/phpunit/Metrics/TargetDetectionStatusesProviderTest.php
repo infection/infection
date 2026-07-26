@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_keys;
+use function array_values;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function Safe\array_flip;
-use function Safe\ksort;
 
+#[CoversClass(TargetDetectionStatusesProvider::class)]
 final class TargetDetectionStatusesProviderTest extends TestCase
 {
     public function test_it_provides_all_statuses_when_debugging_log_is_enabled(): void
@@ -56,7 +56,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('debug.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -70,7 +70,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('per_mutator.md')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -84,7 +84,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -98,13 +98,15 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
-        $this->assertProvidesExcluding([
-                DetectionStatus::KILLED,
+        $this->assertProvidesExcluding(
+            [
+                DetectionStatus::KILLED_BY_TESTS,
+                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
                 DetectionStatus::ERROR,
             ],
-            $provider->get()
+            $provider->get(),
         );
     }
 
@@ -117,22 +119,43 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
-        $this->assertProvidesExcluding([
-                DetectionStatus::KILLED,
+        $this->assertProvidesExcluding(
+            [
+                DetectionStatus::KILLED_BY_TESTS,
+                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
                 DetectionStatus::ERROR,
                 DetectionStatus::NOT_COVERED,
             ],
-            $provider->get()
+            $provider->get(),
+        );
+    }
+
+    public function test_it_provides_not_covered_when_with_uncovered_option_is_used(): void
+    {
+        $logs = $this->createStub(Logs::class);
+
+        $provider = new TargetDetectionStatusesProvider(
+            $logs,
+            logVerbosity: LogVerbosity::NORMAL,
+            onlyCoveredMode: false,
+            numberOfShownMutations: 0,
+        );
+
+        $this->assertProvides(
+            [
+                DetectionStatus::NOT_COVERED,
+            ],
+            $provider->get(),
         );
     }
 
     public function test_it_includes_escaped_when_requested(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, true);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 20);
 
         $this->assertProvides([
             DetectionStatus::ESCAPED,
@@ -141,9 +164,9 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
     public function test_it_provides_nothing_when_logging_verbosity_is_none(): void
     {
-        $logs = $this->createMock(Logs::class);
+        $logs = $this->createStub(Logs::class);
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 
         $this->assertSame([], $provider->get());
     }
@@ -157,7 +180,23 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(true)
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
+
+        $this->assertProvides([
+            DetectionStatus::ESCAPED,
+        ], $provider->get());
+    }
+
+    public function test_it_provides_escaped_when_using_gitlab_logger(): void
+    {
+        $logs = $this->createMock(Logs::class);
+        $logs
+            ->expects($this->once())
+            ->method('getGitlabLogFilePath')
+            ->willReturn('gitlab.json')
+        ;
+
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvides([
             DetectionStatus::ESCAPED,
@@ -173,7 +212,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.json')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding([
             DetectionStatus::NOT_COVERED,
@@ -190,7 +229,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.json')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding([
             DetectionStatus::SKIPPED,
@@ -206,7 +245,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.html')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -225,7 +264,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(StrykerConfig::forFullReport('master'))
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -244,7 +283,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(StrykerConfig::forFullReport('master'))
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -263,39 +302,34 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(StrykerConfig::forBadge('master'))
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertSame([], $provider->get());
     }
 
+    /**
+     * @param DetectionStatus[] $expected
+     * @param DetectionStatus[] $actual
+     */
     private function assertProvides(array $expected, array $actual): void
     {
-        $expected = array_flip($expected);
-        ksort($expected);
-
-        ksort($actual);
-
-        $this->assertSame(array_keys($expected), array_keys($actual));
+        $this->assertEqualsCanonicalizing(
+            array_values($expected),
+            array_values($actual),
+        );
     }
 
+    /**
+     * @param DetectionStatus[] $excluding
+     * @param DetectionStatus[] $actual
+     */
     private function assertProvidesExcluding(array $excluding, array $actual): void
     {
-        $expected = $this->getDetectionStatusesIndexExcluding($excluding);
-        ksort($expected);
+        $expected = DetectionStatus::getCasesExcluding(...$excluding);
 
-        ksort($actual);
-
-        $this->assertSame(array_keys($expected), array_keys($actual));
-    }
-
-    private function getDetectionStatusesIndexExcluding(array $excludeList): array
-    {
-        $detectionStatuses = array_flip(DetectionStatus::ALL);
-
-        foreach ($excludeList as $exclude) {
-            unset($detectionStatuses[$exclude]);
-        }
-
-        return $detectionStatuses;
+        $this->assertEqualsCanonicalizing(
+            $expected,
+            array_values($actual),
+        );
     }
 }

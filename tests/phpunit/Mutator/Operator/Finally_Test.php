@@ -35,58 +35,58 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\Finally_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Finally_::class)]
 final class Finally_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes the finally statement' => [
-            <<<'PHP'
-<?php
-
-try {
-    $a = 1;
-} catch (\Exception $e) {
-    $a = 2;
-} finally {
-    $a = 3;
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-try {
-    $a = 1;
-} catch (\Exception $e) {
-    $a = 2;
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $a = 1;
+                    } catch (\Exception $e) {
+                        $a = 2;
+                    } finally {
+                        $a = 3;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $a = 1;
+                    } catch (\Exception $e) {
+                        $a = 2;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when no catch() blocks are present' => [
-            <<<'PHP'
-<?php
-
-try {
-    $a = 1;
-} finally {
-    $a = 2;
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    try {
+                        $a = 1;
+                    } finally {
+                        $a = 2;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

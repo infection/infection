@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command;
 
+use Infection\Command\RunCommand;
 use Infection\Console\Application;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * @group integration
- */
+#[CoversClass(RunCommand::class)]
 final class RunCommandTest extends TestCase
 {
     public function test_it_fails_when_threads_value_is_string_but_not_max(): void
@@ -57,5 +57,106 @@ final class RunCommandTest extends TestCase
 
         $result = $tester->execute(['--threads' => 'abc']);
         $this->assertSame(1, $result);
+    }
+
+    public function test_it_fails_when_show_mutations_value_is_string_but_not_max(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of option `--show-mutations` must be of type integer or string "max". String "abc" provided.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $result = $tester->execute(['--show-mutations' => 'abc']);
+        $this->assertSame(1, $result);
+    }
+
+    public function test_it_fails_when_both_test_framework_option_names_are_passed(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass both the legacy option "--test-framework-options" and "--test-framework-extra-args".');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            '--test-framework-options' => '',
+            '--test-framework-extra-args' => '',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_source_path_and_filter_option_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass source paths as positional arguments together with the "--filter" option. Use either form, not both.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['src/Engine.php'],
+            '--filter' => 'src/Engine.php',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_test_path_and_test_framework_extra_args_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass test paths as positional arguments together with the "--test-framework-extra-args" option.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['tests/phpunit/EngineTest.php'],
+            '--test-framework-extra-args' => 'tests/phpunit/EngineTest.php',
+        ]);
+    }
+
+    public function test_it_fails_when_positional_source_path_and_git_diff_filter_are_both_provided(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot pass positional paths together with "--git-diff-filter" / "--git-diff-lines". Use either form, not both.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['src/Engine.php'],
+            '--git-diff-filter' => 'AM',
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_path_does_not_exist_on_disk(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid path argument "src/DefinitelyDoesNotExist.php": multiple paths must be passed as separate arguments.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['src/DefinitelyDoesNotExist.php'],
+        ]);
+    }
+
+    public function test_it_fails_when_a_positional_argument_is_an_fqcn(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('FQCN-style arguments like "\App\Foo" are not yet supported.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $tester->execute([
+            'paths' => ['\App\Foo'],
+        ]);
     }
 }

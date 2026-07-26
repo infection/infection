@@ -35,20 +35,59 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
+use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
+use function is_a;
+use Webmozart\Assert\Assert;
+
 /**
  * @internal
  */
 final class TestFrameworkTypes
 {
-    public const PHPUNIT = 'phpunit';
-    public const PEST = 'pest';
-    public const PHPSPEC = 'phpspec';
-    public const CODECEPTION = 'codeception';
+    use CannotBeInstantiated;
 
-    public const TYPES = [
-        self::PEST,
+    public const string PHPUNIT = 'phpunit';
+
+    public const string PHPSPEC = 'phpspec';
+
+    public const string CODECEPTION = 'codeception';
+
+    public const string TESTO = 'testo';
+
+    /**
+     * @var string[]
+     */
+    private static array $defaultTypes = [
         self::PHPUNIT,
         self::PHPSPEC,
         self::CODECEPTION,
+        self::TESTO,
     ];
+
+    /**
+     * @param mixed[] $installedExtensions
+     *
+     * @return string[]
+     */
+    public static function getTypes(
+        array $installedExtensions = GeneratedExtensionsConfig::EXTENSIONS,
+    ): array {
+        $types = self::$defaultTypes;
+
+        foreach ($installedExtensions as $installedExtension) {
+            $factory = $installedExtension['extra']['class'];
+
+            Assert::classExists($factory);
+
+            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
+                continue;
+            }
+
+            $types[] = $factory::getAdapterName();
+        }
+
+        return $types;
+    }
 }

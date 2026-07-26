@@ -1,0 +1,21 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Mutator/CustomMutator.php"
+        ]
+    },
+    "mutators": {
+        "@default": false,
+        "Custom_Mutator\\Mutator\\CustomMutator": true
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "tmpDir": "."
+}

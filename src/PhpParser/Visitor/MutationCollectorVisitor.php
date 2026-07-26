@@ -37,6 +37,7 @@ namespace Infection\PhpParser\Visitor;
 
 use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\Source\Exception\NoSourceFound;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -50,8 +51,9 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
      */
     private array $mutationChunks = [];
 
-    public function __construct(private NodeMutationGenerator $mutationGenerator)
-    {
+    public function __construct(
+        private readonly NodeMutationGenerator $mutationGenerator,
+    ) {
     }
 
     public function beforeTraverse(array $nodes): ?array
@@ -69,6 +71,8 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return iterable<Mutation>
      */
     public function getMutations(): iterable

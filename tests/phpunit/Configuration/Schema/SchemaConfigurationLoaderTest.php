@@ -39,26 +39,20 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\FileSystem\Locator\Locator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+#[CoversClass(SchemaConfigurationLoader::class)]
 final class SchemaConfigurationLoaderTest extends TestCase
 {
-    /**
-     * @var Locator|MockObject
-     */
-    private $locatorStub;
+    private MockObject&Locator $locatorStub;
 
-    /**
-     * @var SchemaConfigurationFileLoader|MockObject
-     */
-    private $configFileLoaderStub;
+    private MockObject&SchemaConfigurationFileLoader $configFileLoaderStub;
 
-    /**
-     * @var SchemaConfigurationLoader
-     */
-    private $loader;
+    private SchemaConfigurationLoader $loader;
 
     protected function setUp(): void
     {
@@ -67,40 +61,40 @@ final class SchemaConfigurationLoaderTest extends TestCase
 
         $this->loader = new SchemaConfigurationLoader(
             $this->locatorStub,
-            $this->configFileLoaderStub
+            $this->configFileLoaderStub,
         );
     }
 
     /**
-     * @dataProvider configurationPathsProvider
-     *
-     * @param string[] $potentialPaths
+     * @param non-empty-string[] $potentialFileNames
+     * @param non-empty-string $expectedPathname
      */
+    #[DataProvider('configurationPathsProvider')]
     public function test_it_loads_the_located_file(
-        array $potentialPaths,
-        string $expectedPath,
-        SchemaConfiguration $expectedConfig
+        array $potentialFileNames,
+        string $expectedPathname,
+        SchemaConfiguration $expectedConfig,
     ): void {
         $this->locatorStub
             ->expects($this->once())
             ->method('locateOneOf')
-            ->with($potentialPaths)
-            ->willReturn($expectedPath)
+            ->with($potentialFileNames)
+            ->willReturn($expectedPathname)
         ;
 
         $this->configFileLoaderStub
             ->expects($this->once())
             ->method('loadFile')
-            ->with($expectedPath)
+            ->with($expectedPathname)
             ->willReturn($expectedConfig)
         ;
 
-        $actualConfig = $this->loader->loadConfiguration($potentialPaths);
+        $actualConfig = $this->loader->loadConfiguration($potentialFileNames);
 
         $this->assertSame($expectedConfig, $actualConfig);
     }
 
-    public function configurationPathsProvider(): iterable
+    public static function configurationPathsProvider(): iterable
     {
         $config = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
@@ -121,12 +115,6 @@ final class SchemaConfigurationLoaderTest extends TestCase
                 '/path/to/configC',
             ],
             '/path/to/configB',
-            $config,
-        ];
-
-        yield 'empty values' => [
-            [],
-            '',
             $config,
         ];
     }

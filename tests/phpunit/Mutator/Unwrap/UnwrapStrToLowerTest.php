@@ -35,157 +35,152 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapStrToLower;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapStrToLower::class)]
 final class UnwrapStrToLowerTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
-            <<<'PHP'
-<?php
-
-$a = strtolower('Good Afternoon!');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'Good Afternoon!';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-<?php
-
-$a = strtolower(\Class_With_Const::Const);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = \Class_With_Const::Const;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower(\Class_With_Const::Const);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of strtolower' => [
-            <<<'PHP'
-<?php
-
-$a = \strtolower('Good Afternoon!');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'Good Afternoon!';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \strtolower('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-<?php
-
-$a = 'Good Afternoon!';
-if (strtolower($a) === $a) {
-    return true;
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'Good Afternoon!';
-if ($a === $a) {
-    return true;
-}
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if (strtolower($a) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when strtolower is wrongly capitalized' => [
-            <<<'PHP'
-<?php
-
-$a = sTrToLoWeR('Good Afternoon!');
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 'Good Afternoon!';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = sTrToLoWeR('Good Afternoon!');
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'Good Afternoon!';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when strtolower uses another function as input' => [
-            <<<'PHP'
-<?php
-
-$a = strtolower($foo->bar());
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $foo->bar();
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower($foo->bar());
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-<?php
-
-$a = strtolower(array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtolower(array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    }));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_reduce($words, function (string $carry, string $item) {
+                        return $carry . substr($item, 0, 1);
+                    });
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other str* calls' => [
-            <<<'PHP'
-<?php
-
-$a = strtoupper('Good Afternoon!');
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = strtoupper('Good Afternoon!');
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named strtolower' => [
-            <<<'PHP'
-<?php
-
-function strtolower($string)
-{
-}
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function strtolower($string)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'strtolower';
 
-$a = 'strtolower';
-
-$b = $a('FooBar');
-PHP
-            ,
+                    $b = $a('FooBar');
+                    PHP,
+            ),
         ];
     }
 }

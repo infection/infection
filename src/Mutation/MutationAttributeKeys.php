@@ -35,28 +35,80 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\CannotBeInstantiated;
+use function array_diff_key;
+use function array_flip;
+use function array_intersect_key;
+use function array_keys;
+use function array_map;
+use function count;
+use function implode;
+use function sprintf;
+use UnexpectedValueException;
 
 /**
  * @internal
  */
-final class MutationAttributeKeys
+enum MutationAttributeKeys: string
 {
-    use CannotBeInstantiated;
+    case START_LINE = 'startLine';
+    case END_LINE = 'endLine';
+    case START_TOKEN_POSITION = 'startTokenPos';
+    case END_TOKEN_POSITION = 'endTokenPos';
+    case START_FILE_POSITION = 'startFilePos';
+    case END_FILE_POSITION = 'endFilePos';
 
-    public const START_LINE = 'startLine';
-    public const END_LINE = 'endLine';
-    public const START_TOKEN_POS = 'startTokenPos';
-    public const END_TOKEN_POS = 'endTokenPos';
-    public const START_FILE_POS = 'startFilePos';
-    public const END_FILE_POS = 'endFilePos';
+    /**
+     * @param array<string|int|float> $attributes
+     *
+     * @return array<value-of<self>, string|int|float>
+     */
+    public static function pluck(array $attributes): array
+    {
+        $keysAsIndex = self::getKeysAsIndex();
 
-    public const ALL = [
-        self::START_LINE,
-        self::END_LINE,
-        self::START_TOKEN_POS,
-        self::END_TOKEN_POS,
-        self::START_FILE_POS,
-        self::END_FILE_POS,
-    ];
+        $values = array_intersect_key($attributes, $keysAsIndex);
+
+        self::assertAllAttributesExist($values, $keysAsIndex);
+
+        return $values;
+    }
+
+    /**
+     * @return array<value-of<self>, mixed>
+     */
+    private static function getKeysAsIndex(): array
+    {
+        return array_flip(
+            array_map(
+                static fn (self $case) => $case->value,
+                self::cases(),
+            ),
+        );
+    }
+
+    /**
+     * @param array<value-of<self>, mixed> $values
+     * @param array<value-of<self>, mixed> $keysAsIndex
+     */
+    private static function assertAllAttributesExist(array $values, array $keysAsIndex): void
+    {
+        if (count($values) === count($keysAsIndex)) {
+            return;
+        }
+
+        throw new UnexpectedValueException(
+            sprintf(
+                'Expected all the mutation attributes to be found. Missing the following attribute(s): "%s".',
+                implode(
+                    '", "',
+                    array_keys(
+                        array_diff_key(
+                            $keysAsIndex,
+                            $values,
+                        ),
+                    ),
+                ),
+            ),
+        );
+    }
 }

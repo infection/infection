@@ -14,6 +14,31 @@
             "description": "The allowed timeout in seconds.",
             "minimum": "0"
         },
+        "threads": {
+            "oneOf": [
+                {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                {
+                    "type": "string",
+                    "enum": ["max"]
+                }
+            ]
+        },
+        "dotsPerRow": {
+            "description": "Number of dots per row in the dot progress formatter. Use \"max\" to fit the terminal width.",
+            "oneOf": [
+                {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                {
+                    "type": "string",
+                    "enum": ["max"]
+                }
+            ]
+        },
         "source": {
             "type": "object",
             "required": [
@@ -95,6 +120,14 @@
                 "github": {
                     "type": "boolean",
                     "description": "GitHub Annotations for escaped Mutants in the added/modifies files"
+                },
+                "gitlab": {
+                    "type": "string",
+                    "definition": "GitLab (Code Climate) code quality json file."
+                },
+                "summaryJson": {
+                    "type": "string",
+                    "definition": "Summary JSON log file, which contains only the statistics from the complete JSON file."
                 }
             }
         },
@@ -117,6 +150,36 @@
                 }
             }
         },
+        "phpStan": {
+            "type": "object",
+            "description": "PHPStan additional settings.",
+            "additionalProperties": false,
+            "properties": {
+                "configDir": {
+                    "type": "string",
+                    "description": "Path to directory containing PHPStan configuration file."
+                },
+                "customPath": {
+                    "type": "string",
+                    "description": "Custom path to PHPStan executable."
+                }
+            }
+        },
+        "mago": {
+            "type": "object",
+            "description": "Mago additional settings.",
+            "additionalProperties": false,
+            "properties": {
+                "configDir": {
+                    "type": "string",
+                    "description": "Path to directory containing mago configuration file."
+                },
+                "customPath": {
+                    "type": "string",
+                    "description": "Custom path to mago executable."
+                }
+            }
+        },
         "ignoreMsiWithNoMutations": {
             "type": "boolean",
             "description": "Ignore MSI violations with zero mutations."
@@ -133,9 +196,22 @@
             "maximum": 100,
             "description": "Minimum Covered Code Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
         },
+        "timeoutsAsEscaped": {
+            "type": "boolean",
+            "default": false,
+            "description": "Treat timed-out mutants as escaped (affects MSI calculation)."
+        },
+        "maxTimeouts": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Maximum allowed number of timed-out mutants. Build fails if exceeded."
+        },
         "mutators": {
             "type": "object",
             "additionalProperties": false,
+            "patternProperties": {
+                "^[\\w]+(?:\\\\[\\w]+){1,}$": { "$ref": "#/definitions/default-mutator-config" }
+            },
             "description": "Contains the settings for different mutations and profiles",
             "properties": {
                 "global-ignore": {
@@ -197,16 +273,27 @@
                 "ShiftLeft": { "$ref": "#/definitions/default-mutator-config" },
                 "ShiftRight": { "$ref": "#/definitions/default-mutator-config" },
                 "RoundingFamily": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayAll": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayAny": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayFind": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayFindKey": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayLast": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
-                "IdenticalEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "InstanceOf_": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalAnd": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAndAllSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAndNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalAndSingleSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalLowerAnd": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalLowerOr": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalNot": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalOr": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrAllSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrNegation": { "$ref": "#/definitions/default-mutator-config" },
+                "LogicalOrSingleSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "NotEqualNotIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "NotIdenticalNotEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "TrueValue": {
@@ -272,9 +359,11 @@
                 "Break_": { "$ref": "#/definitions/default-mutator-config" },
                 "Catch_": { "$ref": "#/definitions/default-mutator-config" },
                 "Continue_": { "$ref": "#/definitions/default-mutator-config" },
+                "ElseIfNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "Ternary": { "$ref": "#/definitions/default-mutator-config" },
                 "Throw_": { "$ref": "#/definitions/default-mutator-config" },
                 "Finally_": { "$ref": "#/definitions/default-mutator-config" },
+                "IfNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "Coalesce": { "$ref": "#/definitions/default-mutator-config" },
                 "Concat": { "$ref": "#/definitions/default-mutator-config" },
                 "PregQuote": { "$ref": "#/definitions/default-mutator-config" },
@@ -337,6 +426,7 @@
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "ReturnRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
                 "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "FunctionCall": { "$ref": "#/definitions/default-mutator-config" },
@@ -564,8 +654,20 @@
             "anyOf": [
                 "phpunit",
                 "phpspec",
-                "codeception"
+                "codeception",
+                "testo"
             ]
+        },
+        "staticAnalysisTool": {
+            "type": "string",
+            "description": "Sets the Static Analysis tool to use to catch escaped Mutants.",
+            "anyOf": [
+                "phpstan"
+            ]
+        },
+        "staticAnalysisToolOptions": {
+            "type": "string",
+            "description": "Specify additional options to pass to the static analysis tool (e.g. memory limit). --static-analysis-tool-options will override this option."
         },
         "bootstrap": {
             "type": "string",
@@ -577,7 +679,12 @@
         },
         "testFrameworkOptions": {
             "type": "string",
-            "description": "Specify an additional options to pass to the test framework (e.g. enabling Verbose Mode). --test-framework-options will override this option."
+            "deprecated": true,
+            "description": "Deprecated. Use testFrameworkExtraArgs instead."
+        },
+        "testFrameworkExtraArgs": {
+            "type": "string",
+            "description": "Specify raw additional arguments to pass to Test Framework."
         }
     },
     "definitions": {

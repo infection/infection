@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpstan/phpstan": "^2.1.17"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPStan_Custom_Executable_Path\\": "../src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPStan_Custom_Executable_Path\\Test\\": "../tests/"
+        }
+    }
+}

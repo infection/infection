@@ -3,41 +3,46 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
-         executionOrder="random"
+         executionOrder="defects,random"
          failOnWarning="true"
+         failOnDeprecation="true"
          failOnRisky="true"
-         verbose="true"
+         requireCoverageMetadata="true"
+         displayDetailsOnAllIssues="true"
+         cacheDirectory="./var/cache/phpunit"
 >
 
     <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
         <env name="COLUMNS" value="100" force="true" />
     </php>
+
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
 
     <testsuites>
         <testsuite name="Infection Test Suite">
             <directory>tests/phpunit</directory>
 
+            <exclude>tests/phpunit/Architecture</exclude>
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>
+            <exclude>tests/phpunit/TestFramework/Coverage/Fixtures</exclude>
         </testsuite>
     </testsuites>
 
-    <coverage cacheDirectory="./reports/.coverage-cache">
+    <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
+            <directory>tests/phpunit</directory>
         </include>
-    </coverage>
+    </source>
 
     <groups>
         <exclude>
+            <group>benchmark</group>
             <group>e2e</group>
         </exclude>
     </groups>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
-    </listeners>
 
 </phpunit>

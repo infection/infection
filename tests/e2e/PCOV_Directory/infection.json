@@ -1,5 +1,6 @@
 {
     "timeout": 25,
+    "threads": 1,
     "source": {
         "directories": [
             "example"
@@ -7,6 +8,9 @@
     },
     "logs": {
         "summary": "infection.log"
+    },
+    "mutators": {
+        "PublicVisibility": true
     },
     "tmpDir": "."
 }

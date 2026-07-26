@@ -1,0 +1,2038 @@
+parameters:
+	ignoreErrors:
+		-
+			rawMessage: Infection\Command\ConfigureCommand should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Command/ConfigureCommand.php
+
+		-
+			rawMessage: Infection\Command\Git\LoggerFactory should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Command/Git/LoggerFactory.php
+
+		-
+			rawMessage: Infection\Command\Git\Option\BaseOption should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Command/Git/Option/BaseOption.php
+
+		-
+			rawMessage: Infection\Command\Git\Option\FilterOption should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Command/Git/Option/FilterOption.php
+
+		-
+			rawMessage: Anonymous function should return string but returns string|null.
+			identifier: return.type
+			count: 1
+			path: ../src/Command/MakeCustomMutatorCommand.php
+
+		-
+			rawMessage: 'Cannot call method askQuestion() on Infection\Console\IO|null.'
+			identifier: method.nonObject
+			count: 1
+			path: ../src/Command/MakeCustomMutatorCommand.php
+
+		-
+			rawMessage: Infection\Command\Option\ConfigurationOption should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Command/Option/ConfigurationOption.php
+
+		-
+			rawMessage: Infection\Command\Option\SourceFilterOptions should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Command/Option/SourceFilterOptions.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../src/Command/RunCommand.php
+
+		-
+			rawMessage: Infection\Config\ConsoleHelper should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Config/ConsoleHelper.php
+
+		-
+			rawMessage: Infection\Config\Guesser\SourceDirGuesser should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Config/Guesser/SourceDirGuesser.php
+
+		-
+			rawMessage: Variable property access on mixed.
+			identifier: property.dynamicName
+			count: 1
+			path: ../src/Config/Guesser/SourceDirGuesser.php
+
+		-
+			rawMessage: Infection\Configuration\Entry\Logs should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Configuration/Entry/Logs.php
+
+		-
+			rawMessage: Infection\Configuration\ProjectDirectoryProvider\CurrentWorkingDirectoryProvider should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Configuration/ProjectDirectoryProvider/CurrentWorkingDirectoryProvider.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Configuration/Schema/InvalidSchema.php
+
+		-
+			rawMessage: Infection\Configuration\Schema\SchemaConfiguration should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Configuration/Schema/SchemaConfiguration.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Configuration/Schema/SchemaConfigurationFactory.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Configuration/SourceFilter/PlainFilter.php
+
+		-
+			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Console/LogVerbosity.php
+
+		-
+			rawMessage: Fetching deprecated class constant NONE_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Console/LogVerbosity.php
+
+		-
+			rawMessage: Fetching deprecated class constant NORMAL_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Console/LogVerbosity.php
+
+		-
+			rawMessage: Infection\Console\XdebugHandler should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Console/XdebugHandler.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Container/Container.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 2
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			rawMessage: Variable $end might not be defined.
+			identifier: variable.undefined
+			count: 1
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			rawMessage: Variable $start might not be defined.
+			identifier: variable.undefined
+			count: 3
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			rawMessage: Infection\Differ\Tokens should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Differ/Tokens.php
+
+		-
+			rawMessage: 'Call to method maybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
+			identifier: method.internalClass
+			count: 1
+			path: ../src/Environment/BuildContextResolver.php
+
+		-
+			rawMessage: 'Call to method yes() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
+			identifier: method.internalClass
+			count: 1
+			path: ../src/Environment/BuildContextResolver.php
+
+		-
+			rawMessage: Infection\Event\Subscriber\DispatchPcntlSignalSubscriber should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Event/Subscriber/DispatchPcntlSignalSubscriber.php
+
+		-
+			rawMessage: Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Event/Subscriber/StopInfectionOnSigintSignalSubscriber.php
+
+		-
+			rawMessage: Infection\FileSystem\FileSystem should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/FileSystem/FileSystem.php
+
+		-
+			rawMessage: Infection\FileSystem\FileSystem should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/FileSystem/FileSystem.php
+
+		-
+			rawMessage: Infection\FileSystem\Finder\ConcreteComposerExecutableFinder should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/FileSystem/Finder/ConcreteComposerExecutableFinder.php
+
+		-
+			rawMessage: Infection\FileSystem\Finder\NonExecutableFinder should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/FileSystem/Finder/NonExecutableFinder.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../src/FileSystem/Finder/NonExecutableFinder.php
+
+		-
+			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
+
+		-
+			rawMessage: Infection\FileSystem\Finder\TestFrameworkFinder should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
+
+		-
+			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
+
+		-
+			rawMessage: Infection\Framework\OperatingSystem should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Framework/OperatingSystem.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Git/CommandLineGit.php
+
+		-
+			rawMessage: Infection\Git\NoGitProjectFound should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Git/NoGitProjectFound.php
+
+		-
+			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
+			identifier: catch.neverThrown
+			count: 1
+			path: ../src/Logger/ArtefactCollection/ConsoleNoProgressLogger.php
+
+		-
+			rawMessage: Dead catch - InvalidArgumentException is never thrown in the try block.
+			identifier: catch.neverThrown
+			count: 1
+			path: ../src/Logger/ArtefactCollection/ConsoleProgressBarLogger.php
+
+		-
+			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\AbstractLogger::log()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\LoggerInterface::log()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: 'Parameter #1 $level (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $level (mixed) of method Psr\Log\LoggerTrait::log()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: 'Parameter #2 $message (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $message (string|Stringable) of method Psr\Log\AbstractLogger::log()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: 'Parameter #2 $message (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $message (string|Stringable) of method Psr\Log\LoggerInterface::log()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: 'Parameter #2 $message (string) of method Infection\Logger\Console\ConsoleLogger::log() should be contravariant with parameter $message (string|Stringable) of method Psr\Log\LoggerTrait::log()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: Variable method call on Infection\Console\IO.
+			identifier: method.dynamicName
+			count: 1
+			path: ../src/Logger/Console/ConsoleLogger.php
+
+		-
+			rawMessage: Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Logger/MutationAnalysis/ConsoleProgressBarLogger.php
+
+		-
+			rawMessage: Infection\Metrics\MetricsCalculator should be final
+			identifier: phpat.testInterfaceImplementationsAreFinal
+			count: 1
+			path: ../src/Metrics/MetricsCalculator.php
+
+		-
+			rawMessage: Infection\Metrics\MetricsCalculator should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Metrics/MetricsCalculator.php
+
+		-
+			rawMessage: 'Call to deprecated method findRequired() of class Infection\Metrics\TargetDetectionStatusesProvider.'
+			identifier: method.deprecated
+			count: 1
+			path: ../src/Metrics/TargetDetectionStatusesProvider.php
+
+		-
+			rawMessage: Infection\Mutant\MutantExecutionResult should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Mutant/MutantExecutionResult.php
+
+		-
+			rawMessage: 'Parameter #1 $array of function array_intersect expects an array of values castable to string, list<PhpParser\Node\Expr|string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalOr.php
+
+		-
+			rawMessage: 'Parameter #2 $arrays of function array_intersect expects an array of values castable to string, list<PhpParser\Node\Expr|string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Mutator/Boolean/LogicalOr.php
+
+		-
+			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
+			count: 8
+			path: ../src/Mutator/Extensions/BCMath.php
+
+		-
+			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
+			count: 11
+			path: ../src/Mutator/Extensions/MBString.php
+
+		-
+			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
+			count: 1
+			path: ../src/Mutator/Extensions/MBString.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PRIVATE of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PRIVATE instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PROTECTED of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PROTECTED instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/ProtectedVisibility.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PROTECTED of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PROTECTED instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
+
+		-
+			rawMessage: '''
+				Fetching deprecated class constant MODIFIER_PUBLIC of class PhpParser\Node\Stmt\Class_:
+				Use Modifiers::PUBLIC instead
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Mutator/FunctionSignature/PublicVisibility.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/Mutator/MutatorParser.php
+
+		-
+			rawMessage: 'Method Infection\Mutator\MutatorResolver::resolve() should return array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>> but returns array<string, array<string>>.'
+			identifier: return.type
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			rawMessage: 'Method Infection\Mutator\MutatorResolver::resolveSettings() has parameter $settings with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			rawMessage: PHPDoc tag @var with type array<string> is not subtype of type bool|stdClass.
+			identifier: varTag.type
+			count: 2
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			rawMessage: 'Parameter &$mutators by-ref type of method Infection\Mutator\MutatorResolver::registerFromClass() expects array<string, array<string, string>>, array<string, array<string, array<string>|string>> given.'
+			identifier: parameterByRef.type
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			rawMessage: 'Parameter &$mutators by-ref type of method Infection\Mutator\MutatorResolver::registerFromClass() expects array<string, array<string, string>>, array<string, array> given.'
+			identifier: parameterByRef.type
+			count: 1
+			path: ../src/Mutator/MutatorResolver.php
+
+		-
+			rawMessage: Infection\Mutator\NodeMutationGenerator should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Mutator/NodeMutationGenerator.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				This mutator is a semantic addition
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: ../src/Mutator/ProfileList.php
+
+		-
+			rawMessage: 'Impure yield in pure method Infection\Mutator\Unwrap\UnwrapArrayCombine::getParameterIndexes().'
+			identifier: impure.yield
+			count: 2
+			path: ../src/Mutator/Unwrap/UnwrapArrayCombine.php
+
+		-
+			rawMessage: 'Generator expects value type list<PhpParser\Node\Stmt>, array<PhpParser\Node\Stmt> given.'
+			identifier: generator.valueType
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapFinally.php
+
+		-
+			rawMessage: 'Generator expects value type list<PhpParser\Node\Stmt>, non-empty-array<PhpParser\Node\Stmt> given.'
+			identifier: generator.valueType
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapFinally.php
+
+		-
+			rawMessage: 'Impure yield in pure method Infection\Mutator\Unwrap\UnwrapStrIreplace::getParameterIndexes().'
+			identifier: impure.yield
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrIreplace.php
+
+		-
+			rawMessage: 'Impure yield in pure method Infection\Mutator\Unwrap\UnwrapStrReplace::getParameterIndexes().'
+			identifier: impure.yield
+			count: 1
+			path: ../src/Mutator/Unwrap/UnwrapStrReplace.php
+
+		-
+			rawMessage: 'Parameter #1 $node (PhpParser\Node\Expr) of method Infection\Mutator\Util\AbstractAllSubExprNegation::mutate() should be contravariant with parameter $node (PhpParser\Node) of method Infection\Mutator\Mutator<TNode of PhpParser\Node>::mutate()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Mutator/Util/AbstractAllSubExprNegation.php
+
+		-
+			rawMessage: 'Parameter #1 $node (PhpParser\Node\Expr) of method Infection\Mutator\Util\AbstractSingleSubExprNegation::mutate() should be contravariant with parameter $node (PhpParser\Node) of method Infection\Mutator\Mutator<TNode of PhpParser\Node>::mutate()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Mutator/Util/AbstractSingleSubExprNegation.php
+
+		-
+			rawMessage: Infection\PhpParser\InfectionPrettyPrinter should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/PhpParser/InfectionPrettyPrinter.php
+
+		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\AddTestsVisitor::createAllTestsForNodeLocator() should return Closure(): list<Infection\AbstractTestFramework\Coverage\TestLocation> but returns Closure(): array.'
+			identifier: return.type
+			count: 1
+			path: ../src/PhpParser/Visitor/AddTestsVisitor.php
+
+		-
+			rawMessage: Access to an undefined property PhpParser\Node::$namespacedName.
+			identifier: property.notFound
+			count: 1
+			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
+
+		-
+			rawMessage: Infection\PhpParser\Visitor\NameResolverFactory should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/PhpParser/Visitor/NameResolverFactory.php
+
+		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\ReflectionVisitor::enterNode() never returns PhpParser\Node so it can be removed from the return type.'
+			identifier: return.unusedType
+			count: 1
+			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
+
+		-
+			rawMessage: 'Method Infection\PhpParser\Visitor\ReflectionVisitor::enterNode() never returns array<PhpParser\Node> so it can be removed from the return type.'
+			identifier: return.unusedType
+			count: 1
+			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
+
+		-
+			rawMessage: 'Parameter #2 $env (array<bool|string>|null) of method Infection\Process\OriginalPhpProcess::start() should be contravariant with parameter $env (array) of method Symfony\Component\Process\Process::start()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/Process/OriginalPhpProcess.php
+
+		-
+			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reflection/AnonymousClassReflection.php
+
+		-
+			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::hasMethod() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reflection/AnonymousClassReflection.php
+
+		-
+			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::hasMethodRecursively() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reflection/AnonymousClassReflection.php
+
+		-
+			rawMessage: 'Method Infection\Reflection\CoreClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reflection/CoreClassReflection.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::build() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::getFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::getTestFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::retrieveMutants() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: 'Offset ''name'' might not exist on array{}|array{0: non-falsy-string, name: non-falsy-string, 1: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
+
+		-
+			rawMessage: Infection\Reporter\Http\StrykerCurlClient should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Reporter/Http/StrykerCurlClient.php
+
+		-
+			rawMessage: Infection\Reporter\Http\StrykerDashboardClient should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/Reporter/Http/StrykerDashboardClient.php
+
+		-
+			rawMessage: Infection\Resource\Processor\CpuCoresCountProvider should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Resource/Processor/CpuCoresCountProvider.php
+
+		-
+			rawMessage: Infection\Source\Collector\FixedSourceCollector should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Source/Collector/FixedSourceCollector.php
+
+		-
+			rawMessage: Infection\Source\Collector\GitDiffSourceCollector should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Source/Collector/GitDiffSourceCollector.php
+
+		-
+			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Process\ShellCommandLineExecutor
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 5
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Mutant\MagoMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/Mago/Process/MagoMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Process\ShellCommandLineExecutor
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\DetectionStatus
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 5
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResult
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Mutant\Mutant
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Mutant\MutantExecutionResultFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Process\Factory\LazyMutantProcessFactory
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory should not depend on Infection\Process\MutantProcess
+			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactory.php
+
+		-
+			rawMessage: Unused Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory::create
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\AdapterInstaller should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/AdapterInstaller.php
+
+		-
+			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/AdapterInstaller.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 2
+			path: ../src/TestFramework/Common/CommandLineBuilder.php
+
+		-
+			rawMessage: Function shell_exec is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\shell_exec;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: ../src/TestFramework/Common/CommandLineBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\Common\CommandLineBuilder should not depend on Infection\FileSystem\Finder\Exception\FinderException
+			identifier: phpat.testTestFrameworkCommonUtilitiesStayWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/Common/CommandLineBuilder.php
+
+		-
+			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../src/TestFramework/Config/TestFrameworkConfigLocator.php
+
+		-
+			rawMessage: Function ini_get is unsafe to use. It can return FALSE instead of throwing an exception. Please add 'use function Safe\ini_get;' at the beginning of the file to use the variant provided by the 'thecodingmachine/safe' library.
+			identifier: theCodingMachineSafe.function
+			count: 1
+			path: ../src/TestFramework/Coverage/CoverageChecker.php
+
+		-
+			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/Coverage/Locator/Throwable/InvalidReportSource.php
+
+		-
+			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/Coverage/Locator/Throwable/NoReportFound.php
+
+		-
+			rawMessage: Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/Coverage/Locator/Throwable/TooManyReportsFound.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\ShellCommandLineExecutor
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\AbstractTestFrameworkAdapter
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 6
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\InitialConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\Config\MutationConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\ProvidesInitialRunOnlyOptions
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-falsy-string}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: 'Parameter #7 $sourceDirectories (array<string>) of method Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create() should be contravariant with parameter $sourceDirectories (array) of method Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder should not depend on Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder should not depend on Infection\Framework\ClassName
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			rawMessage: 'Parameter #1 $className of static method Infection\Framework\ClassName::getShortClassName() expects class-string, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\Config\InitialConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 4
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\Config\MutationConfigBuilder
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\Tracing\TestRunOrderResolver
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 8
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not exist
+			identifier: phpat.testSourceConcreteClassesAreFinals
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 21
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+
+		-
+			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider should not depend on Infection\TestFramework\XML\SafeDOMXPath
+			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
+			count: 2
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+
+		-
+			rawMessage: 'Offset 1 might not exist on array{}|array{0: non-falsy-string, 1: non-falsy-string, 2?: ''/phpunit''}.'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
+
+		-
+			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
+			count: 1
+			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
+
+		-
+			rawMessage: Do not use magic number in bitwise operations. Move to constant with a suitable name.
+			count: 3
+			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
+
+		-
+			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
+			count: 1
+			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
+
+		-
+			rawMessage: 'Generator expects value type string, string|null given.'
+			identifier: generator.valueType
+			count: 1
+			path: ../src/TestFramework/Tracing/TestRunOrderResolver.php
+
+		-
+			rawMessage: Infection\TestFramework\Tracing\Trace\EmptyTrace should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/TestFramework/Tracing/Trace/EmptyTrace.php
+
+		-
+			rawMessage: Infection\Testing\BaseMutatorTestCase should not exist
+			identifier: phpat.testExtensionPointsHaveDocBlock
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::createMutator() has parameter $settings with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::createMutator() return type with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::getMutationsFromCode() has parameter $settings with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::mutate() has parameter $settings with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, non-empty-array<string, array{settings: array}> given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: 'Property Infection\Testing\BaseMutatorTestCase::$mutator with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../src/Testing/BaseMutatorTestCase.php
+
+		-
+			rawMessage: Infection\Testing\MutatorName should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Testing/MutatorName.php
+
+		-
+			rawMessage: Infection\Testing\SingletonContainer should not exist
+			identifier: phpat.testConcreteSourceClassesHaveTests
+			count: 1
+			path: ../src/Testing/SingletonContainer.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method isSubclassOf() of class PHPStan\Reflection\ClassReflection:
+				Use isSubclassOfClass instead.
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: ../tests/Architecture/PHPat/Selector/Support/PHPUnitTestClassAnalysis.php
+
+		-
+			rawMessage: Infection\Tests\AutoReview\ConcreteClassReflector should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/AutoReview/ConcreteClassReflector.php
+
+		-
+			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/ConcreteClassReflector.php
+
+		-
+			rawMessage: 'Cannot call method getPrerequisites() on Fidry\Makefile\Rule|null.'
+			identifier: method.nonObject
+			count: 2
+			path: ../tests/phpunit/AutoReview/Makefile/MakefileTest.php
+
+		-
+			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorProviderTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\AutoReview\Mutator\MutatorTest::getPublicMethods() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
+
+		-
+			rawMessage: 'PHPDoc tag @var for variable $mutator contains generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
+
+		-
+			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
+			identifier: argument.type
+			count: 3
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
+
+		-
+			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
+			identifier: arrayFilter.strict
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/DocBlockParser.php
+
+		-
+			rawMessage: Infection\Tests\BenchmarkSmokeTest should not exist
+			identifier: phpat.testPHPUnitTestsWithCoversNothingBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/BenchmarkSmokeTest.php
+
+		-
+			rawMessage: Infection\Tests\CI\ConfigurableEnv should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/CI/ConfigurableEnv.php
+
+		-
+			rawMessage: 'Parameter #1 $variables of method Infection\Tests\CI\ConfigurableEnv::setVariables() expects array<string, string|false>, array{TRAVIS: true} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationBuilder::withMutators() has parameter $mutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryScenario.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::getDefaultMutators() return type with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
+
+		-
+			rawMessage: 'Property Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::$mutators with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
+
+		-
+			rawMessage: Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/Configuration/ProjectDirectoryProvider/FixedProjectDirectoryProvider.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../tests/phpunit/Console/E2ETest.php
+
+		-
+			rawMessage: Fetching deprecated class constant DEBUG_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 2
+			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
+			rawMessage: Fetching deprecated class constant NONE_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
+			rawMessage: Fetching deprecated class constant NORMAL_INTEGER of class Infection\Console\LogVerbosity.
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../tests/phpunit/Console/LogVerbosityTest.php
+
+		-
+			rawMessage: Variable method call on Infection\Container\Container.
+			identifier: method.dynamicName
+			count: 1
+			path: ../tests/phpunit/Container/ContainerTest.php
+
+		-
+			rawMessage: 'Call to static method createFromBoolean() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
+			identifier: staticMethod.internalClass
+			count: 4
+			path: ../tests/phpunit/Environment/BuildContextResolverTest.php
+
+		-
+			rawMessage: 'Call to static method createMaybe() of internal class OndraM\CiDetector\TrinaryLogic from outside its root namespace OndraM.'
+			identifier: staticMethod.internalClass
+			count: 1
+			path: ../tests/phpunit/Environment/BuildContextResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $environment of method Infection\Environment\StrykerApiKeyResolver::resolve() expects array<string, string>, array<string, int|stdClass|string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Environment/StrykerApiKeyResolverTest.php
+
+		-
+			rawMessage: 'Call to an undefined method object::setFilter().'
+			identifier: method.notFound
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
+
+		-
+			rawMessage: 'Only booleans are allowed in a ternary operator condition, string|false given.'
+			identifier: ternary.condNotBoolean
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
+
+		-
+			rawMessage: 'Parameter #1 $string of function strlen expects string, string|false given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
+
+		-
+			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
+
+		-
+			rawMessage: Variable method call on Infection\Tests\FileSystem\Finder\MockVendor.
+			identifier: method.dynamicName
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
+
+		-
+			rawMessage: 'Only booleans are allowed in a ternary operator condition, string|false given.'
+			identifier: ternary.condNotBoolean
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			rawMessage: 'Parameter #1 $string of function strlen expects string, string|false given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			rawMessage: 'Parameter #2 $string of function explode expects string, string|false given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			rawMessage: Variable method call on Infection\Tests\FileSystem\Finder\MockVendor.
+			identifier: method.dynamicName
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			rawMessage: 'Call to deprecated method multipleFilesDoNotExist() of class Infection\FileSystem\Locator\FileOrDirectoryNotFound.'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../tests/phpunit/FileSystem/Locator/FileOrDirectoryNotFoundTest.php
+
+		-
+			rawMessage: Infection\Tests\Logger\Console\BufferedOutputWithStdErrOutput should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/Logger/Console/BufferedOutputWithStdErrOutput.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Logger\Console\ConsoleLoggerTest::test_it_casts_the_context_values_into_strings() has parameter $value with no type specified.'
+			identifier: missingType.parameter
+			count: 1
+			path: ../tests/phpunit/Logger/Console/ConsoleLoggerTest.php
+
+		-
+			rawMessage: Infection\Tests\Logger\DummyLogger should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/Logger/DummyLogger.php
+
+		-
+			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Metrics/FilteringResultsCollectorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Metrics/FilteringResultsCollectorTest.php
+
+		-
+			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Metrics/MetricsCalculatorTest.php
+
+		-
+			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<non-falsy-string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Metrics/ResultsCollectorTest.php
+
+		-
+			rawMessage: 'Parameter #4 $mutantDiff of class Infection\Mutant\MutantExecutionResult constructor expects Later\Interfaces\Deferred<string>, Later\Interfaces\Deferred<lowercase-string&non-falsy-string&uppercase-string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Metrics/SortableMutantExecutionResultsTest.php
+
+		-
+			rawMessage: Infection\Tests\MockedContainer should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/MockedContainer.php
+
+		-
+			rawMessage: 'Method Infection\Tests\MockedContainer::createWithServices() has parameter $values with no value type specified in iterable type array<class-string<object>, mixed>.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/MockedContainer.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 6
+			path: ../tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php
+
+		-
+			rawMessage: 'Parameter #2 $stmts of class PhpParser\Node\Stmt\Namespace_ constructor expects array<PhpParser\Node\Stmt>|null, array<int, PhpParser\Node\Scalar\Int_> given.'
+			identifier: argument.type
+			count: 5
+			path: ../tests/phpunit/Mutation/MutationTest.php
+
+		-
+			rawMessage: 'Parameter #1 $items of class PhpParser\Node\Expr\Array_ constructor expects array<PhpParser\Node\ArrayItem>, array<int, PhpParser\Node\Scalar\Int_> given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/Mutator/Arithmetic/PlusTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				This mutator is a semantic addition
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: ../tests/phpunit/Mutator/Boolean/NotIdenticalNotEqualTest.php
+
+		-
+			rawMessage: 'Parameter #1 $settings of class Infection\Mutator\Boolean\TrueValueConfig constructor expects array<string, bool>, array<string, string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/Boolean/TrueValueConfigTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\DefinitionTest::test_it_must_define_remedies() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/DefinitionTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Assignment: array{}, Infection\Mutator\Arithmetic\AssignmentEqual: array{}, Infection\Mutator\Arithmetic\BitwiseAnd: array{}, Infection\Mutator\Arithmetic\BitwiseNot: array{}, Infection\Mutator\Arithmetic\BitwiseOr: array{}, Infection\Mutator\Arithmetic\BitwiseXor: array{}, Infection\Mutator\Arithmetic\Decrement: array{}, Infection\Mutator\Arithmetic\DivEqual: array{}, ...} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/DefinitionTest.php
+
+		-
+			rawMessage: 'Parameter #4 $diff of class Infection\Mutator\Definition constructor expects string, string|null given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/DefinitionTest.php
+
+		-
+			rawMessage: 'Parameter #1 $settings of class Infection\Mutator\Extensions\BCMathConfig constructor expects array<string, bool>, array<string, string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/Extensions/BCMathConfigTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\Extensions\BCMathTest::test_it_can_mutate() has parameter $settings with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/Extensions/BCMathTest.php
+
+		-
+			rawMessage: 'Parameter #1 $callback of function array_map expects (callable(int<1, max>): mixed)|null, Closure(string): non-falsy-string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/Extensions/BCMathTest.php
+
+		-
+			rawMessage: 'Parameter #1 $settings of class Infection\Mutator\Extensions\MBStringConfig constructor expects array<string, bool>, array<string, string> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
+
+		-
+			rawMessage: 'Property Infection\Tests\Mutator\IgnoreMutatorTest::$mutatorMock with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/IgnoreMutatorTest.php
+
+		-
+			rawMessage: 'Cannot call method isPublic() on ReflectionClassConstant|false.'
+			identifier: method.nonObject
+			count: 2
+			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\MutatorCategoryTest::assertAllIsPublic() has parameter $classReflection with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\MutatorCategoryTest::assertExposedConstantsArePublic() has parameter $classReflection with generic class ReflectionClass but does not specify its types: T'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\MutatorFactoryTest::assertSameMutatorsByClass() has parameter $actualMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Assignment: array{}, Infection\Mutator\Arithmetic\AssignmentEqual: array{}, Infection\Mutator\Arithmetic\BitwiseAnd: array{}, Infection\Mutator\Arithmetic\BitwiseNot: array{}, Infection\Mutator\Arithmetic\BitwiseOr: array{}, Infection\Mutator\Arithmetic\BitwiseXor: array{}, Infection\Mutator\Arithmetic\Decrement: array{}, Infection\Mutator\Arithmetic\DivEqual: array{}, ...} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Plus: array{unknown: ''dunno''}} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Plus: false} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Boolean\TrueValue: array{ignore: array{''A::B''}}} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Boolean\TrueValue: array{settings: stdClass}} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Unknown\Mutator: array{}} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
+
+		-
+			rawMessage: '''
+				Access to constant on deprecated class Infection\Mutator\Boolean\NotIdenticalNotEqual:
+				This mutator is a semantic addition
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 3
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<int|string, array<int|string, bool|string>|string>|bool> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<int|string, array<string, bool>|string>|bool> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<int|string, list<string>|string>> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<int|string, list<string>|string>|bool> given.'
+			identifier: argument.type
+			count: 3
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<string, list<string>>> given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array<string, list<string>>|true> given.'
+			identifier: argument.type
+			count: 4
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Parameter #1 $mutatorSettings of method Infection\Mutator\MutatorResolver::resolve() expects array<string, bool|stdClass>, array<string, array> given.'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/Mutator/MutatorResolverTest.php
+
+		-
+			rawMessage: 'Call to method __construct() of internal class PHPUnit\Framework\Exception from outside its root namespace PHPUnit.'
+			identifier: method.internalClass
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Class PHPUnit\Framework\AssertionFailedError constructor invoked with named argument $code, but it''s not allowed because of @no-named-arguments.'
+			identifier: argument.named
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Class PHPUnit\Framework\AssertionFailedError constructor invoked with named argument $previous, but it''s not allowed because of @no-named-arguments.'
+			identifier: argument.named
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: Instantiation of internal class PHPUnit\Framework\AssertionFailedError.
+			identifier: new.internalClass
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\MutatorRobustnessTest::mutatesCode() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\MutatorRobustnessTest::test_the_mutator_does_not_crash() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, non-empty-array{Infection\Mutator\Arithmetic\Assignment?: array{}, Infection\Mutator\Arithmetic\AssignmentEqual?: array{}, Infection\Mutator\Arithmetic\BitwiseAnd?: array{}, Infection\Mutator\Arithmetic\BitwiseNot?: array{}, Infection\Mutator\Arithmetic\BitwiseOr?: array{}, Infection\Mutator\Arithmetic\BitwiseXor?: array{}, Infection\Mutator\Arithmetic\Decrement?: array{}, Infection\Mutator\Arithmetic\DivEqual?: array{}, ...} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
+
+		-
+			rawMessage: 'Property Infection\Tests\Mutator\NoopMutatorTest::$mutatorMock with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/NoopMutatorTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\ProfileListProvider::getProfiles() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListProvider.php
+
+		-
+			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListProvider.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\ProfileListTest::test_all_mutator_profiles_are_sorted_lexicographically() has parameter $profileOrMutators with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListTest.php
+
+		-
+			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubjectStub with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
+
+		-
+			rawMessage: 'Parameter #1 $kind (array<int|string>|int|string) of method Infection\Tests\PhpParser\FakeToken::is() should be contravariant with parameter $kind (array|int|string) of method PhpToken::is()'
+			identifier: method.childParameterType
+			count: 1
+			path: ../tests/phpunit/PhpParser/FakeToken.php
+
+		-
+			rawMessage: Variable method call on Infection\Tests\PhpParser\FakeToken.
+			identifier: method.dynamicName
+			count: 1
+			path: ../tests/phpunit/PhpParser/FakeTokenTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\PhpParser\MutatedNodeTest::test_it_can_be_instantiated() has parameter $node with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
+
+		-
+			rawMessage: PHPDoc tag @param for parameter $node with type array<PhpParser\Node>|PhpParser\Node is not subtype of native type array|PhpParser\Node\Scalar\Int_.
+			identifier: parameter.phpDocType
+			count: 1
+			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
+
+		-
+			rawMessage: Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\StopAtSkippedArgVisitor should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/MarkTraversedNodesAsVisitedVisitor/StopAtSkippedArgVisitor.php
+
+		-
+			rawMessage: Infection\Tests\PhpParser\Visitor\SkipIgnoredNodesVisitor\IdNodeIgnorer should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/SkipIgnoredNodesVisitor/IdNodeIgnorer.php
+
+		-
+			rawMessage: Infection\Tests\PhpParser\Visitor\VisitorTestCase\ConcreteVisitorTestCase should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 11
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::iterableContaining() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::someIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
+
+		-
+			rawMessage: Infection\Tests\Process\ShellCommandLineExecutorTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Process/ShellCommandLineExecutorTest.php
+
+		-
+			rawMessage: 'Parameter #1 $className of static method Infection\Reflection\AnonymousClassReflection::fromClassName() expects class-string, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Reflection/AnonymousClassReflectionTest.php
+
+		-
+			rawMessage: Infection\Tests\Reflection\ProtChild should be final
+			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			rawMessage: Infection\Tests\Reflection\ProtParent should be final
+			identifier: phpat.testPHPUnitTestClassesAreTraitAbstractOrFinal
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			rawMessage: Unused Infection\Tests\Reflection\ProtChild::foo
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			rawMessage: Unused Infection\Tests\Reflection\ProtParent::foo
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../tests/phpunit/Reflection/ClassReflectionTestCase.php
+
+		-
+			rawMessage: Infection\Tests\Reflection\ContainerReflection should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/Reflection/ContainerReflection.php
+
+		-
+			rawMessage: 'Parameter #1 $className of static method Infection\Reflection\CoreClassReflection::fromClassName() expects class-string, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
+
+		-
+			rawMessage: Infection\Tests\Reporter\FileLocationReporter\InvokableReporter should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::assertRegisteredReportersAre() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::test_it_creates_a_reporter_for_log_type_on_normal_verbosity() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
+
+		-
+			rawMessage: Infection\Tests\Reporter\GitLabCodeQualityReporterTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Reporter/GitLabCodeQualityReporterTest.php
+
+		-
+			rawMessage: 'Parameter #2 $processOutput of class Infection\Mutant\MutantExecutionResult constructor expects string, string|null given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Reporter/Html/StrykerHtmlReportBuilderTest.php
+
+		-
+			rawMessage: Infection\Tests\Reporter\JsonReporterTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/Reporter/JsonReporterTest.php
+
+		-
+			rawMessage: 'Parameter #1 $expected of method PHPUnit\Framework\Assert::assertInstanceOf() expects class-string<object>, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Reporter/StrykerReporterFactoryTest.php
+
+		-
+			rawMessage: 'Parameter $sourceDirectories of static method Infection\Source\Collector\BasicSourceCollector::create() expects array<non-empty-string>, array{string} given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			rawMessage: 'Unable to resolve the template type TMapKey in call to method Pipeline\Standard<(int|string),Symfony\Component\Finder\SplFileInfo>::map()'
+			identifier: argument.templateType
+			count: 1
+			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 5
+			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: ../tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 4
+			path: ../tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php
+
+		-
+			rawMessage: '''
+				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
+				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: ../tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
+
+		-
+			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
+
+		-
+			rawMessage: Anonymous function should return string but returns string|null.
+			identifier: return.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			rawMessage: 'Parameter #1 $path of static method Symfony\Component\Filesystem\Path::normalize() expects string, string|null given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
+
+		-
+			rawMessage: 'Call to method PHPUnit\Framework\Assert::assertTrue() with true will always evaluate to true.'
+			identifier: method.alreadyNarrowedType
+			count: 3
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
+
+		-
+			rawMessage: 'Parameter #1 $callback of function set_error_handler expects (callable(int, string, string, int): bool)|null, Closure(int, string, string, string): void given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\Tracing\DummyTracer should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/DummyTracer.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\Tracing\TestLocationBucketSorterTest should not exist
+			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
+
+		-
+			rawMessage: 'Only numeric types are allowed in /, float|null given on the right side.'
+			identifier: div.rightNonNumeric
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
+
+		-
+			rawMessage: Access to an undefined property PhpParser\NodeVisitor::$range.
+			identifier: property.notFound
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
+
+		-
+			rawMessage: 'Parameter #1 $nodes of method PhpParser\NodeTraverser::traverse() expects array<PhpParser\Node>, array<PhpParser\Node\Stmt>|null given.'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/SyntheticTrace.php
+
+		-
+			rawMessage: 'Method Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::serializeValue() has no return type specified.'
+			identifier: missingType.return
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
+
+		-
+			rawMessage: 'Method Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::serializeValue() has parameter $mixed with no type specified.'
+			identifier: missingType.parameter
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
+
+		-
+			rawMessage: Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TraceAssertion.php
+
+		-
+			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
+
+		-
+			rawMessage: Infection\Tests\TestingUtility\Console\Command\TestOptionCommand should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestingUtility/Console/Command/TestOptionCommand.php
+
+		-
+			rawMessage: Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder should not exist
+			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
+			count: 1
+			path: ../tests/phpunit/TestingUtility/Process/TestPhpExecutableFinder.php

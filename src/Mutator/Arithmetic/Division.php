@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,16 +51,16 @@ final class Division implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a division operator (`/`) with a multiplication operator (`*`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b / $c;
-+ $a = $b * $c;
-DIFF
+                - $a = $b / $c;
+                + $a = $b * $c;
+                DIFF,
         );
     }
 
@@ -70,7 +71,7 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Mul($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Mul($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
@@ -87,11 +88,7 @@ DIFF
             return false;
         }
 
-        if ($node->right instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->right->expr)) {
-            return false;
-        }
-
-        return true;
+        return !($node->right instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->right->expr));
     }
 
     private function isNumericOne(Node $node): bool

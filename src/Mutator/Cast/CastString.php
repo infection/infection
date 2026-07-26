@@ -44,21 +44,25 @@ use PhpParser\Node;
  */
 final class CastString extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes a string cast operator (`(string)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a = (string) $value;
-+ $a = $value;
-DIFF
+                - $a = (string) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\String_;
+        if (!$node instanceof Node\Expr\Cast\String_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'string');
     }
 }

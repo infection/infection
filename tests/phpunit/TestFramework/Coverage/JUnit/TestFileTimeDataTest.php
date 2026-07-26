@@ -36,15 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TestFileTimeData::class)]
 final class TestFileTimeDataTest extends TestCase
 {
     public function test_it_creates_self_object_with_named_constructor(): void
     {
         $testFileTimeData = new TestFileTimeData(
             '/path/to/Test.php',
-            2.345
+            2.345,
         );
 
         $this->assertSame('/path/to/Test.php', $testFileTimeData->path);

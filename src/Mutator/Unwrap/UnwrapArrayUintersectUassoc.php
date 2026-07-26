@@ -40,6 +40,7 @@ use function array_slice;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 
 /**
@@ -47,49 +48,50 @@ use PhpParser\Node;
  */
 final class UnwrapArrayUintersectUassoc extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    private const int NON_MUTABLE_ARGS_COUNT = 2;
+
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_uintersect_uassoc` function call with each of its operands. For example:
+                Replaces an `array_uintersect_uassoc` function call with each of its operands. For example:
 
-```php
-$x = array_uintersect_uassoc(
-    ['foo' => 'bar'],
-    ['baz' => 'bar'],
-    $value_compare_func,
-    $key_compare_func
-);
-```
+                ```php
+                $x = array_uintersect_uassoc(
+                    ['foo' => 'bar'],
+                    ['baz' => 'bar'],
+                    $value_compare_func,
+                    $key_compare_func
+                );
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo' => 'bar'];
-```
+                ```php
+                $x = ['foo' => 'bar'];
+                ```
 
-And into:
+                And into:
 
-```php
-$x = ['baz' => 'bar'];
-```
+                ```php
+                $x = ['baz' => 'bar'];
+                ```
 
-TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_uintersect_uassoc(
--     ['foo' => 'bar'],
--     ['baz' => 'bar'],
--     $value_compare_func,
--     $key_compare_func
-- );
-# Mutation 1
-+ $x = ['foo' => 'bar'];
-# Mutation 2
-+ $x = ['baz' => 'bar'];
-DIFF
+                - $x = array_uintersect_uassoc(
+                -     ['foo' => 'bar'],
+                -     ['baz' => 'bar'],
+                -     $value_compare_func,
+                -     $key_compare_func
+                - );
+                # Mutation 1
+                + $x = ['foo' => 'bar'];
+                # Mutation 2
+                + $x = ['baz' => 'bar'];
+                DIFF,
         );
     }
 
@@ -101,12 +103,13 @@ DIFF
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from array_slice(
             array_keys($node->args),
             0,
-            count($node->args) - 2
+            count($node->args) - self::NON_MUTABLE_ARGS_COUNT,
         );
     }
 }

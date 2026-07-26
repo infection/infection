@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\CoverageNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(CoverageNotFound::class)]
 final class CoverageNotFoundTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void

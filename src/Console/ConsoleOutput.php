@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function implode;
-use Infection\Logger\ConsoleLogger;
 use const PHP_EOL;
-use function Safe\sprintf;
+use Psr\Log\LoggerInterface;
+use function sprintf;
 
 /**
  * @internal
@@ -46,18 +46,20 @@ use function Safe\sprintf;
  */
 class ConsoleOutput
 {
-    private const RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
-    private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percentage points over the required %s. Consider increasing the required %s percentage the next time you run Infection.';
+    private const string RUNNING_WITH_DEBUGGER_NOTE = 'You are running Infection with %s enabled.';
 
-    public function __construct(private ConsoleLogger $logger)
-    {
+    private const string MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percentage points over the required %s. Consider increasing the required %s percentage the next time you run Infection.';
+
+    public function __construct(
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     public function logVerbosityDeprecationNotice(string $valueToUse): void
     {
         $this->logger->notice(
             'Numeric versions of log-verbosity have been deprecated, please use, ' . $valueToUse . ' to keep the same result',
-            ['block' => true]
+            ['block' => true],
         );
     }
 
@@ -65,7 +67,7 @@ class ConsoleOutput
     {
         $this->logger->notice(
             'Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option',
-            ['block' => true]
+            ['block' => true],
         );
     }
 
@@ -80,9 +82,9 @@ class ConsoleOutput
                 $typeString,
                 $msiDifference,
                 $typeString,
-                $typeString
+                $typeString,
             ),
-            ['block' => true]
+            ['block' => true],
         );
     }
 
@@ -97,9 +99,20 @@ class ConsoleOutput
                 $typeString,
                 $msiDifference,
                 $typeString,
-                $typeString
+                $typeString,
             ),
-            ['block' => true]
+            ['block' => true],
+        );
+    }
+
+    public function logRunningWithThreadCount(int $threadCount): void
+    {
+        $this->logger->notice(
+            sprintf(
+                'Running Infection with %d %s.',
+                $threadCount,
+                $threadCount > 1 ? 'threads' : 'thread',
+            ),
         );
     }
 
@@ -111,9 +124,9 @@ class ConsoleOutput
     public function logNotInControlOfExitCodes(): void
     {
         $this->logger->warning(
-            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-            'It is your responsibility to disable xdebug/phpdbg unless needed.',
-            ['block' => true]
+            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL
+            . 'It is your responsibility to disable xdebug/phpdbg unless needed.',
+            ['block' => true],
         );
     }
 
@@ -125,7 +138,7 @@ class ConsoleOutput
                 'Skipping the initial test run can be very dangerous.',
                 'It is your responsibility to ensure the tests are in a passing state to begin.',
                 'If this is not done then mutations may report as caught when they are not.',
-            ]
+            ],
         ));
     }
 }

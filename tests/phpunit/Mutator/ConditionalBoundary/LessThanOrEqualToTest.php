@@ -35,53 +35,52 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalBoundary;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\ConditionalBoundary\LessThanOrEqualTo;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(LessThanOrEqualTo::class)]
 final class LessThanOrEqualToTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates less than or equal to' => [
-            <<<'PHP'
-<?php
-
-1 <= 2;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-1 < 2;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 <= 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 < 2;
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate an arrow' => [
-            <<<'PHP'
-    <?php
-
-    [1 => 2];
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    [1 => 2];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate a spaceship' => [
-            <<<'PHP'
-    <?php
-
-    1 <=> 2;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    1 <=> 2;
+                    PHP,
+            ),
         ];
     }
 }

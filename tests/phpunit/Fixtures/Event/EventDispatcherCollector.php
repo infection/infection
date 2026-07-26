@@ -10,7 +10,7 @@ use Infection\Event\Subscriber\EventSubscriber;
 
 final class EventDispatcherCollector implements EventDispatcher
 {
-    private $events = [];
+    private array $events = [];
 
     public function dispatch(object $event): void
     {

@@ -35,81 +35,69 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function array_filter;
-use function array_map;
+use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\PhpUnit\Adapter\PestAdapterFactory;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
-use function iterator_to_array;
-use function Safe\sprintf;
 use SplFileInfo;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class Factory
+final readonly class Factory
 {
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
-    public function __construct(private string $tmpDir, private string $projectDir, private TestFrameworkConfigLocatorInterface $configLocator, private TestFrameworkFinder $testFrameworkFinder, private string $jUnitFilePath, private Configuration $infectionConfig, private SourceFileFilter $sourceFileFilter, private array $installedExtensions)
-    {
+    public function __construct(
+        private string $tmpDir,
+        private string $projectDir,
+        private TestFrameworkConfigLocatorInterface $configLocator,
+        private TestFrameworkFinder $testFrameworkFinder,
+        private string $jUnitFilePath,
+        private Configuration $infectionConfig,
+        private SourceCollector $sourceCollector,
+        private array $installedExtensions,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
+    ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
+                    (string) $this->infectionConfig->phpUnit->customPath,
                 ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
-                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
+                $this->infectionConfig->source->directories,
                 $skipCoverage,
-                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate
+                $this->infectionConfig->executeOnlyCoveringTestCases,
+                $this->getFilteredSourceFilesToMutate(),
+                $this->infectionConfig->mapSourceClassToTestStrategy,
+                $this->shellCommandLineExecutor,
+                sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
             );
         }
 
-        if ($adapterName === TestFrameworkTypes::PEST) {
-            $pestConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
-
-            return PestAdapterFactory::create(
-                $this->testFrameworkFinder->find(
-                    TestFrameworkTypes::PEST,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath()
-                ),
-                $this->tmpDir,
-                $pestConfigPath,
-                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
-                $this->jUnitFilePath,
-                $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
-                $skipCoverage,
-                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate
-            );
-        }
-
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::PEST];
+        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
 
         foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];
@@ -123,6 +111,8 @@ final class Factory
             $availableTestFrameworks[] = $factory::getAdapterName();
 
             if ($adapterName === $factory::getAdapterName()) {
+                $configuration = $this->infectionConfig;
+
                 return $factory::create(
                     $this->testFrameworkFinder->find($factory::getExecutableName()),
                     $this->tmpDir,
@@ -130,8 +120,8 @@ final class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $this->infectionConfig->getSourceDirectories(),
-                    $skipCoverage
+                    $configuration->source->directories,
+                    $skipCoverage,
                 );
             }
         }
@@ -139,27 +129,21 @@ final class Factory
         throw new InvalidArgumentException(sprintf(
             'Invalid name of test framework "%s". Available names are: %s',
             $adapterName,
-            implode(', ', $availableTestFrameworks)
+            implode(', ', $availableTestFrameworks),
         ));
     }
 
     /**
-     * Get only those source files that will be mutated to use them in coverage whitelist
+     * Get only those source files that will be mutated. If the source is filtered by the user,
+     * we do not need to execute the initial test run against all the sources, only the necessary
+     * subset.
      *
-     * @return list<string>
+     * @return SplFileInfo[]
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        if ($this->sourceFileFilter->getFilters() === []) {
-            return [];
-        }
-
-        /** @var list<string> $filteredPaths */
-        $filteredPaths = array_filter(array_map(
-            static fn (SplFileInfo $file) => $file->getRealPath(),
-            iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()))
-        ));
-
-        return $filteredPaths;
+        return $this->infectionConfig->sourceFilter === null
+            ? []
+            : $this->sourceCollector->collect();
     }
 }

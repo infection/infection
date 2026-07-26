@@ -36,43 +36,44 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
-use PHPUnit\Framework\MockObject\MockObject;
+use Infection\Process\MutantProcessContainer;
+use Infection\Tests\Mutant\MutantBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    /**
-     * @var MockObject|Process
-     */
-    private $processMock;
+    private Stub&Process $processStub;
 
-    /**
-     * @var MockObject|Mutant
-     */
-    private $mutantMock;
+    private Mutant $mutant;
 
-    /**
-     * @var MutantProcess
-     */
-    private $mutantProcess;
+    private MutantProcess $mutantProcess;
 
     protected function setUp(): void
     {
-        $this->processMock = $this->createMock(Process::class);
-        $this->mutantMock = $this->createMock(Mutant::class);
+        $this->processStub = $this->createStub(Process::class);
+        $this->mutant = MutantBuilder::withMinimalTestData()->build();
+        $mutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
 
-        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutantMock);
+        $this->mutantProcess = new MutantProcess(
+            $this->processStub,
+            $this->mutant,
+            $mutantExecutionResultFactory,
+        );
     }
 
     public function test_it_exposes_its_state(): void
     {
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
-            $this->processMock,
-            $this->mutantMock,
-            false
+            $this->processStub,
+            $this->mutant,
+            false,
         );
     }
 
@@ -82,34 +83,17 @@ final class MutantProcessTest extends TestCase
 
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
-            $this->processMock,
-            $this->mutantMock,
-            true
+            $this->processStub,
+            $this->mutant,
+            true,
         );
-    }
-
-    public function test_it_can_have_a_callback_registered_and_executed(): void
-    {
-        $called = false;
-
-        $this->mutantProcess->registerTerminateProcessClosure(
-            static function () use (&$called): void {
-                $called = true;
-            }
-        );
-
-        $this->assertFalse($called);
-
-        $this->mutantProcess->terminateProcess();
-
-        $this->assertTrue($called);
     }
 
     private function assertMutantProcessStateIs(
         MutantProcess $mutantProcess,
         Process $expectedProcess,
         Mutant $expectedMutant,
-        bool $expectedTimedOut
+        bool $expectedTimedOut,
     ): void {
         $this->assertSame($expectedProcess, $mutantProcess->getProcess());
         $this->assertSame($expectedMutant, $mutantProcess->getMutant());

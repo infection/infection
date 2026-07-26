@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.6.20"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPStan_Custom_Executable_Path\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPStan_Custom_Executable_Path\\Test\\": "tests/"
+        }
+    }
+}

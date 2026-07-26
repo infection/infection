@@ -41,6 +41,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -52,28 +53,27 @@ final class RoundingFamily implements Mutator
 {
     use GetMutatorName;
 
-    private const MUTATORS_MAP = [
+    private const array MUTATORS_MAP = [
         'floor',
         'ceil',
         'round',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
-TXT
-            ,
+                Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = floor($b);
-# Mutation 1
-+ $a = ceil($b);
-# Mutation 2
-+ $a = round($b);
-DIFF
+                - $a = floor($b);
+                # Mutation 1
+                + $a = ceil($b);
+                # Mutation 2
+                + $a = round($b);
+                DIFF,
         );
     }
 
@@ -86,7 +86,6 @@ DIFF
     {
         /** @var Node\Name $name */
         $name = $node->name;
-        /** @psalm-suppress ImpureMethodCall */
         $currentFunctionName = $name->toLowerString();
 
         $mutateToFunctions = array_diff(self::MUTATORS_MAP, [$currentFunctionName]);
@@ -95,7 +94,7 @@ DIFF
             yield new Node\Expr\FuncCall(
                 new Node\Name($functionName),
                 [$node->args[0]],
-                $node->getAttributes()
+                NodeAttributes::getAllExceptOriginalNode($node),
             );
         }
     }
@@ -106,12 +105,7 @@ DIFF
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
-            !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
-        ) {
-            return false;
-        }
-
-        return true;
+        return $node->name instanceof Node\Name
+            && in_array($node->name->toLowerString(), self::MUTATORS_MAP, true);
     }
 }

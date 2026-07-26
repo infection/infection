@@ -37,21 +37,18 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\LogVerbosity;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
+#[CoversClass(LogVerbosity::class)]
 final class LogVerbosityTest extends TestCase
 {
-    /**
-     * @var InputInterface|MockObject
-     */
-    private $inputMock;
+    private MockObject&InputInterface $inputMock;
 
-    /**
-     * @var ConsoleOutput|MockObject
-     */
-    private $consoleOutputMock;
+    private MockObject&ConsoleOutput $consoleOutputMock;
 
     protected function setUp(): void
     {
@@ -71,12 +68,10 @@ final class LogVerbosityTest extends TestCase
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
 
-    /**
-     * @dataProvider convertedLogVerbosityProvider
-     */
+    #[DataProvider('convertedLogVerbosityProvider')]
     public function test_it_converts_int_version_to_string_version_of_verbosity(
-        $inputVerbosity,
-        string $output
+        int|string $inputVerbosity,
+        string $output,
     ): void {
         $this->setInputExpectationsWhenItDoesChange($inputVerbosity, $output);
 
@@ -125,10 +120,7 @@ final class LogVerbosityTest extends TestCase
         ];
     }
 
-    /**
-     * @param string|int $inputVerbosity
-     */
-    private function setInputExpectationsWhenItDoesNotChange($inputVerbosity): void
+    private function setInputExpectationsWhenItDoesNotChange(string|int $inputVerbosity): void
     {
         $this->inputMock
             ->expects($this->once())
@@ -138,10 +130,7 @@ final class LogVerbosityTest extends TestCase
         ;
     }
 
-    /**
-     * @param string|int $inputVerbosity
-     */
-    private function setInputExpectationsWhenItDoesChange($inputVerbosity, string $output): void
+    private function setInputExpectationsWhenItDoesChange(int|string $inputVerbosity, string $output): void
     {
         $this->setInputExpectationsWhenItDoesNotChange($inputVerbosity);
 

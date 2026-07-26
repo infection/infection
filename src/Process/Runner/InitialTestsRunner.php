@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Symfony\Component\Process\Process;
 
@@ -48,8 +48,10 @@ use Symfony\Component\Process\Process;
  */
 class InitialTestsRunner
 {
-    public function __construct(private InitialTestsRunProcessFactory $processBuilder, private EventDispatcher $eventDispatcher)
-    {
+    public function __construct(
+        private readonly InitialTestsRunProcessFactory $processBuilder,
+        private readonly EventDispatcher $eventDispatcher,
+    ) {
     }
 
     /**
@@ -58,18 +60,18 @@ class InitialTestsRunner
     public function run(
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): Process {
         $process = $this->processBuilder->createProcess(
             $testFrameworkExtraOptions,
             $phpExtraOptions,
-            $skipCoverage
+            $skipCoverage,
         );
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
         $process->run(function (string $type) use ($process): void {
-            if ($process::ERR === $type) {
+            if ($type === Process::ERR) {
                 // Stop on the first error encountered
                 $process->stop();
             }

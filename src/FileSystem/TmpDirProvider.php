@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\FileSystem;
 
 use const DIRECTORY_SEPARATOR;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  */
 final class TmpDirProvider
 {
-    private const BASE_DIR_NAME = 'infection';
+    private const string BASE_DIR_NAME = 'infection';
 
     /**
      * Provides a Infection namespaced temporary directory path.
@@ -57,14 +57,14 @@ final class TmpDirProvider
             Path::isAbsolute($baseTmpDir),
             sprintf(
                 'Expected the temporary directory passed to be an absolute path. Got "%s"',
-                $baseTmpDir
-            )
+                $baseTmpDir,
+            ),
         );
 
         return str_replace(
             [DIRECTORY_SEPARATOR, '//'],
             ['/', '/'],
-            sprintf('%s/%s', $baseTmpDir, self::BASE_DIR_NAME)
+            sprintf('%s/%s', $baseTmpDir, self::BASE_DIR_NAME),
         );
     }
 }

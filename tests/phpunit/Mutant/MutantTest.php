@@ -38,32 +38,32 @@ namespace Infection\Tests\Mutant;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Tests\Mutation\MutationBuilder;
 use function Later\now;
-use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Mutant::class)]
 final class MutantTest extends TestCase
 {
     use MutantAssertions;
 
-    /**
-     * @dataProvider valuesProvider
-     *
-     * @param TestLocation[] $expectedTests
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $filePath,
         Mutation $mutation,
         string $mutatedCode,
         string $diff,
-        bool $expectedCoveredByTests,
-        array $expectedTests,
-        string $originalCode
+        string $originalCode,
     ): void {
-        $mutant = new Mutant($filePath, $mutation, now($mutatedCode), now($diff), now($originalCode));
+        $mutant = new Mutant(
+            mutantFilePath: $filePath,
+            mutation: $mutation,
+            mutatedCode: now($mutatedCode),
+            diff: now($diff),
+            prettyPrintedOriginalCode: now($originalCode),
+        );
 
         $this->assertMutantStateIs(
             $mutant,
@@ -71,13 +71,11 @@ final class MutantTest extends TestCase
             $mutation,
             $mutatedCode,
             $diff,
-            $expectedCoveredByTests,
-            $expectedTests,
-            $originalCode
+            $originalCode,
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => 3,
@@ -92,53 +90,31 @@ final class MutantTest extends TestCase
             new TestLocation(
                 'FooTest::test_it_can_instantiate',
                 '/path/to/acme/FooTest.php',
-                0.01
+                0.01,
             ),
         ];
 
         $originalCode = '<?php $a = 1';
 
-        yield 'nominal with tests' => [
+        yield 'with tests' => [
             '/path/to/tmp/mutant.Foo.infection.php',
-            new Mutation(
-                '/path/to/acme/Foo.php',
-                [new Node\Stmt\Namespace_(
-                    new Node\Name('Acme'),
-                    [new Node\Scalar\LNumber(0)]
-                )],
-                MutatorName::getName(Plus::class),
-                $nominalAttributes,
-                Node\Scalar\LNumber::class,
-                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-                0,
-                $tests
-            ),
+            MutationBuilder::withMinimalTestData()
+                ->withAttributes($nominalAttributes)
+                ->withTests($tests)
+                ->build(),
             'mutated code',
             'diff value',
-            true,
-            $tests,
             $originalCode,
         ];
 
         yield 'nominal without tests' => [
             '/path/to/tmp/mutant.Foo.infection.php',
-            new Mutation(
-                '/path/to/acme/Foo.php',
-                [new Node\Stmt\Namespace_(
-                    new Node\Name('Acme'),
-                    [new Node\Scalar\LNumber(0)]
-                )],
-                MutatorName::getName(Plus::class),
-                $nominalAttributes,
-                Node\Scalar\LNumber::class,
-                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-                0,
-                []
-            ),
+            MutationBuilder::withMinimalTestData()
+                ->withAttributes($nominalAttributes)
+                ->withTests([])
+                ->build(),
             'mutated code',
             'diff value',
-            false,
-            [],
             $originalCode,
         ];
     }

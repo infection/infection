@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\MutatorConfig;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -44,7 +44,7 @@ use Webmozart\Assert\Assert;
  */
 final class TrueValueConfig implements MutatorConfig
 {
-    private const KNOWN_FUNCTIONS = [
+    private const array KNOWN_FUNCTIONS = [
         'array_search',
         'in_array',
     ];
@@ -64,8 +64,8 @@ final class TrueValueConfig implements MutatorConfig
                 $enabled,
                 sprintf(
                     'Expected the value for "%s" to be a boolean. Got "%%s" instead',
-                    $functionName
-                )
+                    $functionName,
+                ),
             );
             Assert::oneOf($functionName, self::KNOWN_FUNCTIONS);
 

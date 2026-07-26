@@ -1,5 +1,6 @@
 {
     "timeout": 10,
+    "threads": 1,
     "source": {
         "directories": [
             "src"

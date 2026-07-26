@@ -35,51 +35,51 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\Break_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Break_::class)]
 final class Break_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It replaces break with continue in while' => [
-            <<<'PHP'
-<?php
-
-while (true) {
-    break;
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-while (true) {
-    continue;
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                        break;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    while (true) {
+                        continue;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not replaces break with continue in switch' => [
-            <<<'PHP'
-<?php
-
-switch (1) {
-    case 1:
-        break;
-}
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    switch (1) {
+                        case 1:
+                            break;
+                    }
+                    PHP,
+            ),
         ];
     }
 }

@@ -36,42 +36,54 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
+use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\VersionParser;
+use Override;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
 use function trim;
 use function version_compare;
 
 /**
  * @internal
- * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
+final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
-    public const COVERAGE_DIR = 'coverage-xml';
+    final public const string COVERAGE_DIR = 'coverage-xml';
 
     public function __construct(
         string $testFrameworkExecutable,
-        private string $tmpDir,
-        private string $jUnitFilePath,
-        private PCOVDirectoryProvider $pcovDirectoryProvider,
+        private readonly string $tmpDir,
+        private readonly string $jUnitFilePath,
+        private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        ShellCommandLineExecutor $shellCommandLineExecutor,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
-        ?string $version = null
+        ?string $version = null,
     ) {
-        parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
+        parent::__construct(
+            $testFrameworkExecutable,
+            $initialConfigBuilder,
+            $mutationConfigBuilder,
+            $argumentsAndOptionsBuilder,
+            $shellCommandLineExecutor,
+            $versionParser,
+            $commandLineBuilder,
+            $version,
+        );
     }
 
     public function hasJUnitReport(): bool
@@ -86,20 +98,33 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
      *
      * @return string[]
      */
+    #[Override]
     public function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
-            $extraOptions = trim(sprintf(
-                '%s --coverage-xml=%s --log-junit=%s',
-                $extraOptions,
-                $this->tmpDir . '/' . self::COVERAGE_DIR,
-                $this->jUnitFilePath // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-            ));
+            $generatedOptions = [];
 
-            if ($this->pcovDirectoryProvider->shallProvide()) {
+            if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
+                $generatedOptions[] = '--exclude-source-from-xml-coverage';
+            }
+
+            $generatedOptions[] = '--coverage-xml=' . $this->tmpDir . '/' . self::COVERAGE_DIR;
+            $generatedOptions[] = '--log-junit=' . $this->jUnitFilePath; // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+
+            $extraOptions = trim(
+                sprintf(
+                    '%s %s',
+                    $extraOptions,
+                    implode(' ', $generatedOptions),
+                ),
+            );
+
+            // PCOV may require an adjusted `pcov.directory` setting to include
+            // all target source code in the coverage report.
+            if ($this->pcovDirectoryProvider->shouldProvide()) {
                 $phpExtraArgs[] = '-d';
                 $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
             }
@@ -152,21 +177,47 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         return 'PHPUnit';
     }
 
+    #[Override]
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
         $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
 
-        if (version_compare($this->getVersion(), '7.2', '>=')) {
+        if (self::supportsExecutionOrderDefectsRandom($this->getVersion())) {
             $recommendations = sprintf(
                 "%s\n\n%s\n\n%s",
-                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n" .
-                'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
+                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine)
+                parent::getInitialTestsFailRecommendations($commandLine),
+            );
+        } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
+            $recommendations = sprintf(
+                "%s\n\n%s\n\n%s",
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
+                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
+                'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
+                parent::getInitialTestsFailRecommendations($commandLine),
             );
         }
 
         return $recommendations;
+    }
+
+    /**
+     * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element from the XML report which contained the list of tokens of the source code file.
+     */
+    public static function supportsExcludingSourceFromCoverage(string $version): bool
+    {
+        return version_compare($version, '12.5', '>=');
+    }
+
+    public static function supportsExecutionOrderDefectsRandom(string $version): bool
+    {
+        return
+            version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
+            || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
+            || version_compare($version, '12.2.7', '>=')
+        ;
     }
 
     /**

@@ -39,9 +39,12 @@ use function extension_loaded;
 use Infection\Process\OriginalPhpProcess;
 use function ini_get as ini_get_unsafe;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(OriginalPhpProcess::class)]
 final class OriginalPhpProcessTest extends TestCase
 {
     public function test_it_extends_symfony_process(): void
@@ -57,20 +60,18 @@ final class OriginalPhpProcessTest extends TestCase
         $this->assertStringContainsString('foo', $process->getCommandLine());
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_injects_xdebug_env_vars(): void
     {
         $process = new OriginalPhpProcess(['env']);
         $process->run(null, ['TESTING' => 'test']);
 
         if (
-            !extension_loaded('pcov') &&
-            PHP_SAPI !== 'phpdbg' &&
-            (
-                ini_get_unsafe('xdebug.mode') === false ||
-                ini_get_unsafe('xdebug.mode') !== 'coverage'
+            !extension_loaded('pcov')
+            && PHP_SAPI !== 'phpdbg'
+            && (
+                ini_get_unsafe('xdebug.mode') === false
+                || ini_get_unsafe('xdebug.mode') !== 'coverage'
             )
         ) {
             $this->assertStringContainsString('XDEBUG_MODE=coverage', $process->getOutput());

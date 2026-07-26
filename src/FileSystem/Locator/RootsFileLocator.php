@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Locator;
 
-use function array_shift;
-use function current;
 use const DIRECTORY_SEPARATOR;
 use function is_file;
 use function Safe\realpath;
@@ -47,19 +45,16 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class RootsFileLocator implements Locator
+final readonly class RootsFileLocator implements Locator
 {
-    /** @var string[] */
-    private array $roots;
-
     /**
      * @param string[] $roots
      */
-    public function __construct(array $roots, private Filesystem $filesystem)
-    {
+    public function __construct(
+        private array $roots,
+        private Filesystem $filesystem,
+    ) {
         Assert::allString($roots);
-
-        $this->roots = $roots;
     }
 
     public function locate(string $fileName): string
@@ -99,20 +94,20 @@ final class RootsFileLocator implements Locator
     }
 
     /**
-     * @param string[] $fileNames
+     * @param non-empty-string[] $fileNames
+     *
+     * @return non-empty-string|null
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {
-        if ($fileNames === []) {
-            return null;
+        foreach ($fileNames as $fileName) {
+            try {
+                return $this->locate($fileName);
+            } catch (FileNotFound) {
+                // keep trying
+            }
         }
 
-        try {
-            return $this->locate(current($fileNames));
-        } catch (FileNotFound) {
-            array_shift($fileNames);
-
-            return $this->innerLocateOneOf($fileNames);
-        }
+        return null;
     }
 }

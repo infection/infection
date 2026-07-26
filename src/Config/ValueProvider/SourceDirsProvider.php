@@ -51,20 +51,13 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 /**
  * @internal
  */
-final class SourceDirsProvider
+final readonly class SourceDirsProvider
 {
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-    private SourceDirGuesser $sourceDirGuesser;
-
     public function __construct(
-        ConsoleHelper $consoleHelper,
-        QuestionHelper $questionHelper,
-        SourceDirGuesser $sourceDirGuesser
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+        private SourceDirGuesser $sourceDirGuesser,
     ) {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
-        $this->sourceDirGuesser = $sourceDirGuesser;
     }
 
     /**
@@ -84,7 +77,7 @@ final class SourceDirsProvider
 
         $questionText = $this->consoleHelper->getQuestion(
             'Which source directories do you want to include (comma separated)?',
-            $defaultValues
+            $defaultValues,
         );
 
         $question = new ChoiceQuestion($questionText, $choices, $defaultValues);

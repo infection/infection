@@ -38,13 +38,15 @@ namespace Infection\Reflection;
 /**
  * @internal
  */
-final class Visibility
+final readonly class Visibility
 {
-    public const PUBLIC = 'public';
-    public const PROTECTED = 'protected';
+    public const string PUBLIC = 'public';
 
-    private function __construct(private string $variant)
-    {
+    public const string PROTECTED = 'protected';
+
+    private function __construct(
+        private string $variant,
+    ) {
     }
 
     public static function asPublic(): self

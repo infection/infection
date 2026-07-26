@@ -38,12 +38,11 @@ namespace Infection\Tests\Mutator;
 use function array_key_exists;
 use function end;
 use function explode;
-use function get_class;
 use Infection\CannotBeInstantiated;
-use PHPUnit\Framework\TestCase;
+use Infection\Testing\BaseMutatorTestCase;
 use function Safe\file_get_contents;
-use function Safe\sprintf;
-use function Safe\substr;
+use function sprintf;
+use function substr;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -51,21 +50,24 @@ final class MutatorFixturesProvider
 {
     use CannotBeInstantiated;
 
-    private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
+    private const string MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
 
     /**
      * @var array<string, string>
      */
-    private static $testCaseFixtureDirMapping = [];
+    private static array $testCaseFixtureDirMapping = [];
 
-    public static function getFixtureFileContent(TestCase $testCase, string $file): string
+    /**
+     * @param class-string $class
+     */
+    public static function getFixtureFileContent(string $class, string $file): string
     {
-        Assert::isInstanceOf($testCase, BaseMutatorTestCase::class);
+        Assert::isAOf($class, BaseMutatorTestCase::class);
 
         return file_get_contents(sprintf(
             '%s/%s',
-            self::getTestCaseFixtureDir(get_class($testCase)),
-            $file
+            self::getTestCaseFixtureDir($class),
+            $file,
         ));
     }
 
@@ -83,7 +85,7 @@ final class MutatorFixturesProvider
         return self::$testCaseFixtureDirMapping[$testCaseClass] = Path::canonicalize(sprintf(
             '%s/%s',
             self::MUTATOR_FIXTURES_DIR,
-            substr(end($testCaseClassParts), 0, -4)
+            substr(end($testCaseClassParts), 0, -4),
         ));
     }
 }

@@ -35,181 +35,174 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapArraySplice;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArraySplice::class)]
 final class UnwrapArraySpliceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-<?php
-
-$a = array_splice(['foo', 'bar', 'baz'], 1);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_splice(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-<?php
-
-$a = array_splice(\Class_With_Const::Const, 1);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = \Class_With_Const::Const;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_splice(\Class_With_Const::Const, 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \Class_With_Const::Const;
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_splice' => [
-            <<<'PHP'
-<?php
-
-$a = \array_splice(['foo', 'bar', 'baz'], 1);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_splice(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-<?php
-
-$a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_splice' => [
-            <<<'PHP'
-<?php
-
-function array_splice($array, $offset, $length = null, $preserveKeys = null)
-{
-}
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_splice($array, $offset, $length = null, $preserveKeys = null)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-if (array_splice($a, 1) === $a) {
-    return true;
-}
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-if ($a === $a) {
-    return true;
-}
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    if (array_splice($a, 1) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_splice is wrongly capitalized' => [
-            <<<'PHP'
-<?php
-
-$a = aRrAy_SpLiCe(['foo', 'bar', 'baz'], 1);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_SpLiCe(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when array_splice uses another function as input' => [
-            <<<'PHP'
-<?php
-
-$a = array_splice($foo->bar(), 1);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = $foo->bar();
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_splice($foo->bar(), 1);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = $foo->bar();
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-<?php
-
-$a = array_map('strtolower', array_splice(['foo', 'bar', 'baz'], 1));
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = array_map('strtolower', ['foo', 'bar', 'baz']);
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_splice(['foo', 'bar', 'baz'], 1));
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $length parameter is present' => [
-            <<<'PHP'
-<?php
-
-$a = array_splice(['foo', 'bar', 'baz'], 1, $length);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_splice(['foo', 'bar', 'baz'], 1, $length);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when the $replacement parameter is present' => [
-            <<<'PHP'
-<?php
-
-$a = array_splice(['foo', 'bar', 'baz'], 1, $length, $replacement);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = ['foo', 'bar', 'baz'];
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_splice(['foo', 'bar', 'baz'], 1, $length, $replacement);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['foo', 'bar', 'baz'];
+                    PHP,
+            ),
         ];
 
         yield 'It does not break when provided with a variable function name' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_splice';
 
-$a = 'array_splice';
-
-$b = $a(['foo', 'bar', 'baz'], 1);
-PHP
-            ,
+                    $b = $a(['foo', 'bar', 'baz'], 1);
+                    PHP,
+            ),
         ];
     }
 }

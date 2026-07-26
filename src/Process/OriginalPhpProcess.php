@@ -39,6 +39,7 @@ use function array_merge;
 use Composer\XdebugHandler\PhpConfig;
 use Composer\XdebugHandler\XdebugHandler;
 use function extension_loaded;
+use Override;
 use const PHP_SAPI;
 use Symfony\Component\Process\Process;
 
@@ -56,6 +57,7 @@ final class OriginalPhpProcess extends Process
     /**
      * @param array<string|bool>|null $env
      */
+    #[Override]
     public function start(?callable $callback = null, ?array $env = null): void
     {
         $phpConfig = new PhpConfig();

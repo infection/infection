@@ -35,54 +35,83 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
+use Infection\PhpParser\Visitor\AddTestsVisitor;
+use Infection\PhpParser\Visitor\ExcludeIgnoredNodesVisitor;
+use Infection\PhpParser\Visitor\ExcludeNonMutableCodeVisitor;
+use Infection\PhpParser\Visitor\ExcludeUnchangedLinesVisitor;
+use Infection\PhpParser\Visitor\ExcludeUntestedNodesVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
+use Infection\PhpParser\Visitor\NameResolverFactory;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\SkipIgnoredNodesVisitor;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
-use SplObjectStorage;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use SplFileInfo;
 
 /**
  * @internal
  * @final
  */
-class NodeTraverserFactory
+readonly class NodeTraverserFactory
 {
+    public function __construct(
+        private SourceLineMatcher $sourceLineMatcher,
+        private LineRangeCalculator $lineRangeCalculator,
+        private bool $onlyCovered,
+    ) {
+    }
+
     /**
-     * @param NodeIgnorer[] $nodeIgnorers
+     * @see /doc/nomenclature.md#ast-enrichment
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function createEnrichmentTraverser(
+        SplFileInfo $sourceFile,
+        Trace $trace,
+    ): NodeTraverserInterface {
+        $nodeIgnorers = [
+            new InterfaceIgnorer(),
+            new AbstractMethodIgnorer(),
+        ];
+
+        $visitors = [
+            new NextConnectingVisitor(),
+            new LabelNodesAsEligibleVisitor(),
+            new ExcludeIgnoredNodesVisitor(),
+            new SkipIgnoredNodesVisitor($nodeIgnorers),
+            NameResolverFactory::create(),
+            new ParentConnectingVisitor(),
+            new ReflectionVisitor(),
+            new ExcludeNonMutableCodeVisitor(),
+            new ExcludeUnchangedLinesVisitor(
+                $this->sourceLineMatcher,
+                $sourceFile->getRealPath(),
+            ),
+            new AddTestsVisitor(
+                $trace,
+                $this->lineRangeCalculator,
+            ),
+        ];
+
+        if ($this->onlyCovered) {
+            $visitors[] = new ExcludeUntestedNodesVisitor();
+        }
+
+        return new NodeTraverser(...$visitors);
+    }
+
+    public function createMutationTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
     {
-        $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
-
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
-
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ])
+        return new NodeTraverser(
+            new NodeVisitor\CloningVisitor(),
+            $mutationVisitor,
         );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
     }
 }

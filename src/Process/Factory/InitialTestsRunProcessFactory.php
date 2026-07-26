@@ -35,12 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Process\Factory;
 
-use Composer\InstalledVersions;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\OriginalPhpProcess;
-use function method_exists;
 use Symfony\Component\Process\Process;
-use function version_compare;
 
 /**
  * @internal
@@ -48,8 +45,9 @@ use function version_compare;
  */
 class InitialTestsRunProcessFactory
 {
-    public function __construct(private TestFrameworkAdapter $testFrameworkAdapter)
-    {
+    public function __construct(
+        private readonly TestFrameworkAdapter $testFrameworkAdapter,
+    ) {
     }
 
     /**
@@ -60,27 +58,18 @@ class InitialTestsRunProcessFactory
     public function createProcess(
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): Process {
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
-        /** @var Process $process */
-        $process = new $processClass(
-            $this->testFrameworkAdapter->getInitialTestRunCommandLine(
+        return new $processClass(
+            command: $this->testFrameworkAdapter->getInitialTestRunCommandLine(
                 $testFrameworkExtraOptions,
                 $phpExtraOptions,
-                $skipCoverage
-            )
+                $skipCoverage,
+            ),
+            timeout: null, // Ignore the default timeout of 60 seconds
         );
-
-        $process->setTimeout(null); // Ignore the default timeout of 60 seconds
-
-        if (method_exists($process, 'inheritEnvironmentVariables') && version_compare((string) InstalledVersions::getPrettyVersion('symfony/console'), 'v4.4', '<')) {
-            // In version 4.4.0 this method is deprecated and removed in 5.0.0
-            $process->inheritEnvironmentVariables();
-        }
-
-        return $process;
     }
 }

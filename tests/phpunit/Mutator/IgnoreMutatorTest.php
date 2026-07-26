@@ -42,22 +42,22 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\CoreClassReflection;
+use Infection\Testing\MutatorName;
+use Infection\Tests\WithConsecutive;
 use function iterator_to_array;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
+#[CoversClass(IgnoreMutator::class)]
 final class IgnoreMutatorTest extends TestCase
 {
-    /**
-     * @var MockObject&Mutator
-     */
-    private $mutatorMock;
+    private MockObject&Mutator $mutatorMock;
 
-    /**
-     * @var MockObject&Node
-     */
-    private $nodeMock;
+    private MockObject&Node $nodeMock;
 
     protected function setUp(): void
     {
@@ -74,7 +74,7 @@ final class IgnoreMutatorTest extends TestCase
         } catch (DomainException $exception) {
             $this->assertSame(
                 'The class "Infection\Mutator\IgnoreMutator" does not have a definition',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -130,19 +130,21 @@ final class IgnoreMutatorTest extends TestCase
         $this->nodeMock
             ->expects($this->exactly(2))
             ->method('getAttribute')
-            ->withConsecutive(
-                [ReflectionVisitor::REFLECTION_CLASS_KEY, false],
-                [ReflectionVisitor::FUNCTION_NAME, '']
+            ->with(
+                ...WithConsecutive::create(
+                    [ReflectionVisitor::REFLECTION_CLASS_KEY, null],
+                    [ReflectionVisitor::FUNCTION_NAME, ''],
+                ),
             )
             ->willReturnOnConsecutiveCalls(
                 CoreClassReflection::fromClassName(self::class),
-                'foo'
+                'foo',
             )
         ;
 
         $this->nodeMock
             ->expects($this->once())
-            ->method('getLine')
+            ->method('getStartLine')
             ->willReturn(10)
         ;
 
@@ -166,7 +168,7 @@ final class IgnoreMutatorTest extends TestCase
     {
         $ignoreMutator = new IgnoreMutator(new IgnoreConfig([]), $this->mutatorMock);
 
-        $mutatedNodeMock = $this->createMock(Node::class);
+        $mutatedNodeMock = $this->createStub(Node::class);
 
         $this->mutatorMock
             ->expects($this->once())
@@ -188,7 +190,7 @@ final class IgnoreMutatorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $ignoreMutator->getName()
+            $ignoreMutator->getName(),
         );
     }
 }

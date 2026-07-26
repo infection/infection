@@ -1,0 +1,32 @@
+# See the Conductor setup guide at https://packagist.com/docs/conductor/getting-started
+
+on:
+  repository_dispatch:
+    types:
+      - dependency_update
+
+name: Private Packagist Conductor
+
+permissions:
+  contents: write
+
+jobs:
+  conductor:
+    name: Private Packagist Conductor
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    env:
+      COMPOSER_AUTH: ${{ secrets.CONDUCTOR_COMPOSER_AUTH }}
+
+    steps:
+      - name: Checkout
+        # zizmor: ignore[artipacked] Conductor updates dependencies and needs the checkout token persisted for repository writes.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Install PHP
+        uses: "shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240" # master
+        with:
+          php-version: "8.3"
+
+      - name: "Running Conductor"
+        uses: packagist/conductor-github-action@3513567296cf906ee3c97ba63df6f6d7ddcc55a5 # 1.6.1

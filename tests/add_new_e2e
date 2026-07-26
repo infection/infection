@@ -17,7 +17,7 @@ cp -r Example_Test/src "$dirname"/src
 cp -r Example_Test/tests $dirname/tests
 cp  Example_Test/composer.json $dirname/composer.json
 cp  Example_Test/expected-output.txt $dirname/expected-output.txt
-cp  Example_Test/infection.json $dirname/infection.json
+cp  Example_Test/infection.json5 $dirname/infection.json5
 cp  Example_Test/phpunit.xml $dirname/phpunit.xml
 cp  Example_Test/README.md $dirname/README.md
 

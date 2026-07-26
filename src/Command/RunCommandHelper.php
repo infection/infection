@@ -1,0 +1,202 @@
+<?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+declare(strict_types=1);
+
+namespace Infection\Command;
+
+use function ctype_digit;
+use function getenv;
+use Infection\Container\Container;
+use Infection\Resource\Processor\CpuCoresCountProvider;
+use InvalidArgumentException;
+use function is_numeric;
+use function is_string;
+use function max;
+use function sprintf;
+use Symfony\Component\Console\Input\InputInterface;
+use function trim;
+use Webmozart\Assert\Assert;
+
+/**
+ * @internal
+ */
+final readonly class RunCommandHelper
+{
+    public function __construct(
+        private InputInterface $input,
+        private CpuCoresCountProvider $cpuCoresCountProvider,
+    ) {
+    }
+
+    /**
+     * @template T of string|null
+     * @param T $default
+     * @return (T is null ? string|null : string)
+     */
+    public function getStringOption(string $name, ?string $default = null): ?string
+    {
+        $optionValue = trim((string) $this->input->getOption($name));
+
+        return $optionValue === ''
+            ? $default
+            : $optionValue;
+    }
+
+    public function getUseGitHubLogger(): ?bool
+    {
+        // on e2e environment, we don't need github logger
+        if (getenv('INFECTION_E2E_TESTS_ENV') !== false) {
+            return false;
+        }
+
+        $useGitHubLogger = $this->input->getOption(RunCommand::OPTION_LOGGER_GITHUB);
+
+        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
+        // `null` means the option was provided without any argument -> user wants to enable it
+        // any string: the argument provided, but only `'true'` and `'false` are supported
+        if ($useGitHubLogger === false) {
+            return null;
+        }
+
+        if ($useGitHubLogger === null) {
+            return true;
+        }
+
+        if ($useGitHubLogger === 'true') {
+            return true;
+        }
+
+        if ($useGitHubLogger === 'false') {
+            return false;
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
+            $useGitHubLogger,
+            RunCommand::OPTION_LOGGER_GITHUB,
+        ));
+    }
+
+    public function getThreadCount(): ?int
+    {
+        $threads = $this->input->getOption(RunCommand::OPTION_THREADS);
+
+        // user didn't pass `--threads` option
+        if ($threads === null) {
+            return null;
+        }
+
+        // user passed `--threads=<int>` option
+        if (is_numeric($threads)) {
+            return (int) $threads;
+        }
+
+        // user passed `--threads=max` option
+        Assert::same($threads, 'max', sprintf('The value of option `--threads` must be of type integer or string "max". String "%s" provided.', $threads));
+
+        // we subtract 1 here to not use all the available cores by Infection
+        return max(1, $this->cpuCoresCountProvider->provide() - 1);
+    }
+
+    /**
+     * @return positive-int|'max'|null
+     */
+    public function getDotsPerRow(): string|int|null
+    {
+        $dotsPerRow = $this->input->getOption(RunCommand::OPTION_DOTS_PER_ROW);
+
+        if ($dotsPerRow === null) {
+            return null;
+        }
+
+        $error = sprintf('The value of option `--dots-per-row` must be a positive integer or string "max". "%s" provided.', $dotsPerRow);
+
+        if (is_string($dotsPerRow) && ctype_digit($dotsPerRow)) {
+            $value = (int) $dotsPerRow;
+
+            Assert::positiveInteger($value, $error);
+
+            return $value;
+        }
+
+        Assert::same($dotsPerRow, 'max', $error);
+
+        return 'max';
+    }
+
+    public function getNumberOfShownMutations(): ?int
+    {
+        $shownMutations = $this->input->getOption(RunCommand::OPTION_SHOW_MUTATIONS);
+
+        // user didn't pass `--show-mutations` option
+        if ($shownMutations === null) {
+            return Container::DEFAULT_SHOW_MUTATIONS;
+        }
+
+        // user passed `--show-mutations=<int>` option
+        if (is_numeric($shownMutations)) {
+            return (int) $shownMutations;
+        }
+
+        // user passed `--show-mutations=max` option
+        Assert::same($shownMutations, 'max', sprintf('The value of option `--show-mutations` must be of type integer or string "max". String "%s" provided.', $shownMutations));
+
+        return null; // unlimited mutations
+    }
+
+    public function getIgnoreMsiWithNoMutations(): ?bool
+    {
+        $ignoreMsiWithNoMutations = $this->input->getOption(RunCommand::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS);
+
+        // OPTION_VALUE_NOT_PROVIDED means the option was not provided at all -> return null to preserve config value
+        // `null` or any other value means the option was provided -> return true to enable it
+        return match ($ignoreMsiWithNoMutations) {
+            RunCommand::OPTION_VALUE_NOT_PROVIDED => null,
+            default => true,
+        };
+    }
+
+    public function getTimeoutsAsEscaped(): bool
+    {
+        return (bool) $this->input->getOption(RunCommand::OPTION_WITH_TIMEOUTS);
+    }
+
+    public function getMaxTimeouts(): ?int
+    {
+        /** @var string|null $maxTimeoutsInput */
+        $maxTimeoutsInput = $this->input->getOption(RunCommand::OPTION_MAX_TIMEOUTS);
+
+        return $maxTimeoutsInput !== null ? (int) $maxTimeoutsInput : null;
+    }
+}

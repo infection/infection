@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,23 +51,23 @@ final class UnwrapFinally implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces `try-catch-finally` block with try-catch or try-finally with simple statements.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-$check = true;
-- try {
--     $callback();
-- }
-- } finally {
--     $check = false;
-- }
-+ $callback();
-+ $check = false
-DIFF
+                $check = true;
+                - try {
+                -     $callback();
+                - }
+                - } finally {
+                -     $check = false;
+                - }
+                + $callback();
+                + $check = false
+                DIFF,
         );
     }
 
@@ -93,7 +94,7 @@ DIFF
         }
 
         yield [
-            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, $node->getAttributes()),
+            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, NodeAttributes::getAllExceptOriginalNode($node)),
             ...($node->finally->stmts ?? []),
         ];
     }

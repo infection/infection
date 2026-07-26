@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Fixtures\Process;
+
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Process\MutantProcess;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\Process\Process;
+
+final class DummyMutantProcess extends MutantProcess
+{
+    public function __construct(
+        private readonly Process $process,
+        Mutant $mutant,
+        MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly bool $expectTimeOut
+    ) {
+        parent::__construct($process, $mutant, $mutantExecutionResultFactory);
+    }
+
+    #[\Override]
+    public function getProcess(): Process
+    {
+        return $this->process;
+    }
+
+    #[\Override]
+    public function markAsTimedOut(): void
+    {
+        if (!$this->expectTimeOut) {
+            Assert::fail(sprintf(
+                'Did not expect "%s()" to be called',
+                __FUNCTION__
+            ));
+        }
+    }
+}

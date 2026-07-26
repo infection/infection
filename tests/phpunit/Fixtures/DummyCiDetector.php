@@ -11,20 +11,15 @@ use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Env;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 
-final class DummyCiDetector implements CiDetectorInterface
+final readonly class DummyCiDetector implements CiDetectorInterface
 {
-    private bool $ciDetected;
-    private bool $githubActionsDetected;
-
-    public function __construct(bool $ciDetected, bool $githubActionsDetected = false)
+    public function __construct(private bool $ciDetected, private bool $githubActionsDetected = false)
     {
-        $this->ciDetected = $ciDetected;
-        $this->githubActionsDetected = $githubActionsDetected;
     }
 
     public static function fromEnvironment(Env $environment): CiDetectorInterface
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function isCiDetected(): bool

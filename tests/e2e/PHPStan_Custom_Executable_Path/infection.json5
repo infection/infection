@@ -1,0 +1,17 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 25,
+    "threads": 1,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "phpStan": {
+        "customPath": "tools/vendor/bin/phpstan"
+    },
+    "tmpDir": "."
+}

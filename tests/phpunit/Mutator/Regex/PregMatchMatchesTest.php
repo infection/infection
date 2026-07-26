@@ -35,107 +35,105 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Regex\PregMatchMatches;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(PregMatchMatches::class)]
 final class PregMatchMatchesTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $output
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $output = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $output);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
-        yield 'It mutates ' => [
-            <<<'PHP'
-<?php
-
-preg_match('/a/', 'b', $foo);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-(int) ($foo = array());
-PHP
+        yield 'It mutates' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $foo);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if the function is a variable' => [
-            <<<'PHP'
-<?php
-
-$foo = 'preg_match';
-$foo('/a/', 'b', $bar);
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'preg_match';
+                    $foo('/a/', 'b', $bar);
+                    PHP,
+            ),
         ];
 
         yield 'It mutates if preg_match is incorrectly cased' => [
-          <<<'PHP'
-<?php
-
-PreG_maTch('/a/', 'b', $foo);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-(int) ($foo = array());
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PreG_maTch('/a/', 'b', $foo);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate if there are less than 3 arguments' => [
-            <<<'PHP'
-<?php
-
-preg_match('/asdfa/', 'foo');
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/asdfa/', 'foo');
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly if the 3rd variable is a property' => [
-            <<<'PHP'
-<?php
-
-preg_match('/a/', 'b', $a->b);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-(int) ($a->b = array());
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $a->b);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $a->b = [];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly even with four arguments' => [
-            <<<'PHP'
-<?php
-
-preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-(int) ($foo = array());
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly even with five arguments' => [
-            <<<'PHP'
-<?php
-
-preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-(int) ($foo = array());
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (int) $foo = [];
+                    PHP,
+            ),
         ];
     }
 }

@@ -35,71 +35,70 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\AssignCoalesce;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(AssignCoalesce::class)]
 final class AssignCoalesceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
-            <<<'PHP'
-<?php
-
-$a['value'] ??= 'otherValue';
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a['value'] = 'otherValue';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] ??= 'otherValue';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = 'otherValue';
+                    PHP,
+            ),
         ];
 
         yield 'Mutate coalesce when right part is an expression' => [
-            <<<'PHP'
-<?php
-
-$a['value'] ??= 'other' . ' Value';
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a['value'] = 'other' . ' Value';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] ??= 'other' . ' Value';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = 'other' . ' Value';
+                    PHP,
+            ),
         ];
 
         yield 'Mutate coalesce when right part is a variable' => [
-            <<<'PHP'
-<?php
-
-$a['value'] ??= $var;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a['value'] = $var;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] ??= $var;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = $var;
+                    PHP,
+            ),
         ];
 
         yield 'Does not mutate coalesce binary operator' => [
-            <<<'PHP'
-<?php
-
-$a['value'] = $foo ?? $bar;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = $foo ?? $bar;
+                    PHP,
+            ),
         ];
     }
 }

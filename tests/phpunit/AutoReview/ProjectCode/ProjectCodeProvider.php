@@ -35,53 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use function array_filter;
-use function array_map;
 use const DIRECTORY_SEPARATOR;
-use function in_array;
 use Infection\CannotBeInstantiated;
-use Infection\Command\ConfigureCommand;
-use Infection\Config\ConsoleHelper;
-use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
-use Infection\Console\Application;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\Console\XdebugHandler;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\NullSubscriber;
-use Infection\FileSystem\DummyFileSystem;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Infection\FileSystem\Finder\NonExecutableFinder;
-use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Logger\Http\StrykerCurlClient;
-use Infection\Logger\Http\StrykerDashboardClient;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutation\MutationAttributeKeys;
-use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\Runner\IndexedProcessBearer;
-use Infection\Process\ShellCommandLineExecutor;
-use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
-use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\AutoReview\ConcreteClassReflector;
-use function Infection\Tests\generator_to_phpunit_data_provider;
-use function iterator_to_array;
-use function ltrim;
-use ReflectionClass;
-use function Safe\sort;
-use function Safe\sprintf;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
+use Infection\Testing\BaseMutatorTestCase;
+use function Pipeline\take;
+use function sort;
 use const SORT_STRING;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -91,49 +58,14 @@ final class ProjectCodeProvider
     use CannotBeInstantiated;
 
     /**
-     * This array contains all classes that don't have tests yet, due to legacy
-     * reasons. This list should never be added to, only removed from.
-     */
-    public const NON_TESTED_CONCRETE_CLASSES = [
-        ConfigureCommand::class,
-        Application::class,
-        ProgressFormatter::class,
-        ComposerExecutableFinder::class,
-        StrykerCurlClient::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
-        TestFrameworkTypes::class,
-        NodeMutationGenerator::class,
-        NonExecutableFinder::class,
-        AdapterInstaller::class,
-        DetectionStatus::class,
-        DummyFileSystem::class,
-        MutationAttributeKeys::class,
-        XdebugHandler::class,
-        NullSubscriber::class,
-        FormatterName::class,
-        ShellCommandLineExecutor::class,
-        CpuCoresCountProvider::class,
-    ];
-
-    /**
-     * This array contains all classes that are not extension points, but not final due to legacy
-     * reasons. This list should never be added to, only removed from.
-     */
-    public const NON_FINAL_EXTENSION_CLASSES = [
-        ConsoleHelper::class,
-        SourceDirGuesser::class,
-        TestFrameworkFinder::class,
-        StrykerDashboardClient::class,
-        MetricsCalculator::class,
-        PhpUnitInitalConfigBuilder::class,
-        PhpUnitMutationConfigBuilder::class,
-    ];
-
-    /**
      * This array contains all classes that can be extended by our users.
      */
-    public const EXTENSION_POINTS = [
-        OutputFormatter::class,
+    public const array EXTENSION_POINTS = [
+        BaseMutatorTestCase::class,
+        Definition::class,
+        Mutator::class,
+        MutationAnalysisLogger::class,
+        MutatorCategory::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
@@ -142,17 +74,7 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
-    private static $sourceClasses;
-
-    /**
-     * @var string[]|null
-     */
-    private static $sourceClassesToCheckForPublicProperties;
-
-    /**
-     * @var string[]|null
-     */
-    private static $testClasses;
+    private static ?array $sourceClasses = null;
 
     public static function provideSourceClasses(): iterable
     {
@@ -165,154 +87,30 @@ final class ProjectCodeProvider
         $finder = Finder::create()
             ->files()
             ->name('*.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
+            ->notName('__Name__.php')
+            ->notName('__Name__Test.php')
             ->in(__DIR__ . '/../../../../src')
         ;
 
-        $classes = array_map(
-            static function (SplFileInfo $file): string {
-                return sprintf(
-                    '%s\\%s%s%s',
-                    'Infection',
-                    str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                    $file->getRelativePath() !== '' ? '\\' : '',
-                    $file->getBasename('.' . $file->getExtension())
-                );
-            },
-            iterator_to_array($finder, false)
-        );
-        sort($classes, SORT_STRING);
+        self::$sourceClasses = take($finder)
+            ->cast(self::castSplFileInfoToFQCN(...))
+            ->toList();
 
-        self::$sourceClasses = $classes;
+        sort(self::$sourceClasses, SORT_STRING);
 
         yield from self::$sourceClasses;
     }
 
-    public static function sourceClassesProvider(): iterable
+    private static function castSplFileInfoToFQCN(SplFileInfo $file): string
     {
-        yield from generator_to_phpunit_data_provider(
-            self::provideSourceClasses()
-        );
-    }
-
-    public static function provideConcreteSourceClasses(): iterable
-    {
-        yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
-            self::provideSourceClasses(),
-            true
-        ));
-    }
-
-    public static function concreteSourceClassesProvider(): iterable
-    {
-        yield from generator_to_phpunit_data_provider(
-            self::provideConcreteSourceClasses()
-        );
-    }
-
-    public static function provideSourceClassesToCheckForPublicProperties(): iterable
-    {
-        if (self::$sourceClassesToCheckForPublicProperties !== null) {
-            yield from self::$sourceClassesToCheckForPublicProperties;
-
-            return;
-        }
-
-        self::$sourceClassesToCheckForPublicProperties = array_filter(
-            iterator_to_array(self::provideSourceClasses(), true),
-            static function (string $className): bool {
-                $reflectionClass = new ReflectionClass($className);
-
-                return !$reflectionClass->isInterface()
-                    && !in_array(
-                        $className,
-                        [
-                            // having public properties on DTO is for performance reasons
-                            TestLocations::class,
-                            SourceMethodLineRange::class,
-                            NodeLineRangeData::class,
-                            TestFileTimeData::class,
-                            IndexedProcessBearer::class,
-                        ],
-                        true
-                    )
-                ;
-            }
-        );
-
-        yield from self::$sourceClassesToCheckForPublicProperties;
-    }
-
-    public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
-    {
-        yield from generator_to_phpunit_data_provider(
-            self::provideSourceClassesToCheckForPublicProperties()
-        );
-    }
-
-    public static function provideTestClasses(): iterable
-    {
-        if (self::$testClasses !== null) {
-            yield from self::$testClasses;
-
-            return;
-        }
-
-        $finder = Finder::create()
-            ->files()
-            ->name('*.php')
-            ->in(__DIR__ . '/../../../../tests')
-            ->notName('Helpers.php')
-            ->notPath('xdebug-filter.php')
-            ->exclude([
-                'autoloaded',
-                'benchmark',
-                'e2e',
-                'Fixtures',
-            ])
-        ;
-
-        $classes = array_map(
-            static function (SplFileInfo $file): string {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
-                $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
-
-                return sprintf(
-                    'Infection\\Tests\\%s%s%s',
-                    $fqcnPart,
-                    $file->getRelativePath() === 'phpunit' ? '' : '\\',
-                    $file->getBasename('.' . $file->getExtension())
-                );
-            },
-            iterator_to_array($finder, false)
-        );
-
-        sort($classes, SORT_STRING);
-
-        self::$testClasses = $classes;
-
-        yield from self::$testClasses;
-    }
-
-    // "testClassesProvider" would be more correct but PHPUnit will then detect this method as a
-    // test instead of a test provider.
-    public static function classesTestProvider(): iterable
-    {
-        yield from generator_to_phpunit_data_provider(
-            self::provideTestClasses()
-        );
-    }
-
-    public static function nonTestedConcreteClassesProvider(): iterable
-    {
-        yield from generator_to_phpunit_data_provider(
-            self::NON_TESTED_CONCRETE_CLASSES
-        );
-    }
-
-    public static function nonFinalExtensionClasses(): iterable
-    {
-        yield from generator_to_phpunit_data_provider(
-            self::NON_FINAL_EXTENSION_CLASSES
+        return sprintf(
+            '%s\\%s%s%s',
+            'Infection',
+            str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
+            $file->getRelativePath() !== '' ? '\\' : '',
+            $file->getBasename('.' . $file->getExtension()),
         );
     }
 }

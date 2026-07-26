@@ -1,3 +1,32 @@
+## Description
+
+<!-- Explain what this PR does and why. Link to relevant context. -->
+
+## Changes
+
+- Adds/Fixes/Updates ...
+
+## Checklist
+
+- [ ] Tests added/updated
+- [ ] Documentation updated (provide link to PR: https://github.com/infection/site/pull/XXX)
+- [ ] CHANGELOG.md updated (if deprecations/breaking changes)
+- [ ] Appropriate labels applied (e.g. `performance`, `feature`).
+
+
+## Breaking Changes
+
+<!-- Remove if not applicable -->
+
+
+## Reviewer Notes
+
+<!-- What should reviewers focus on? Any areas of concern? -->
+
+## Related issues
+
+Fixes https://github.com/infection/infection/issues/XXX.
+
 This PR:
 
 - [ ] Adds new feature ...
@@ -9,11 +38,3 @@ Remove if not relevant
 -->
 
 Fixes https://github.com/infection/infection/issues/XXX
-
-<!--
-- Replace this comment by a detailed description of what your PR is solving.
-- Use labels for different kinds of PR like `performance`, `feature`, etc.
-- Use Milestone to show when this code is going to be released.
-
-Deprecations? don't forget to update UPGRADE-*.md files
--->

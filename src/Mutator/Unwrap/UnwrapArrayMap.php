@@ -38,6 +38,7 @@ namespace Infection\Mutator\Unwrap;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Override;
 use PhpParser\Node;
 use function range;
 
@@ -46,29 +47,34 @@ use function range;
  */
 final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_map` function call with its array operand. For example:
+                Replaces an `array_map` function call with its array operand. For example:
 
-```php
-$x = array_map($callback, ['foo', 'bar', 'baz']);
-```
+                ```php
+                $x = array_map($callback, ['foo', 'bar', 'baz']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
-            ,
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null,
+            <<<'TXT'
+                    This mutation escaping suggests that the `$callback` transformation passed to
+                    `array_map()` does no effect to the passed elements.
+
+                    Either this transformation is needed in which case additional tests capturing
+                    this need are required, or it is not and should be removed.
+                TXT,
             <<<'DIFF'
-- $x = array_map($callback, ['foo', 'bar', 'baz']);
-+ $x = ['foo', 'bar', 'baz'];
-DIFF
+                - $x = array_map($callback, ['foo', 'bar', 'baz']);
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 
@@ -80,6 +86,7 @@ DIFF
     /**
      * @psalm-mutation-free
      */
+    #[Override]
     protected function getParameterIndexes(Node\Expr\FuncCall $node): iterable
     {
         yield from range(1, count($node->args) - 1);

@@ -40,36 +40,36 @@ use Infection\FileSystem\Locator\Locator;
 /**
  * @internal
  */
-final class SchemaConfigurationLoader
+final readonly class SchemaConfigurationLoader
 {
-    public const POSSIBLE_DEFAULT_CONFIG_FILES = [
+    public const array POSSIBLE_DEFAULT_CONFIG_FILE_NAMES = [
         self::DEFAULT_JSON5_CONFIG_FILE,
         self::DEFAULT_JSON_CONFIG_FILE,
         self::DEFAULT_DIST_JSON5_CONFIG_FILE,
         self::DEFAULT_DIST_JSON_CONFIG_FILE,
     ];
-    public const DEFAULT_JSON5_CONFIG_FILE = 'infection.json5';
 
-    private const DEFAULT_DIST_JSON5_CONFIG_FILE = 'infection.json5.dist';
-    private const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
-    private const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
+    public const string DEFAULT_JSON5_CONFIG_FILE = 'infection.json5';
 
-    private Locator $locator;
-    private SchemaConfigurationFileLoader $fileLoader;
+    private const string DEFAULT_DIST_JSON5_CONFIG_FILE = 'infection.json5.dist';
 
-    public function __construct(Locator $locator, SchemaConfigurationFileLoader $fileLoader)
-    {
-        $this->locator = $locator;
-        $this->fileLoader = $fileLoader;
+    private const string DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
+
+    private const string DEFAULT_JSON_CONFIG_FILE = 'infection.json';
+
+    public function __construct(
+        private Locator $locator,
+        private SchemaConfigurationFileLoader $fileLoader,
+    ) {
     }
 
     /**
-     * @param string[] $potentialPaths
+     * @param non-empty-string[] $potentialFileNames
      */
-    public function loadConfiguration(array $potentialPaths): SchemaConfiguration
+    public function loadConfiguration(array $potentialFileNames): SchemaConfiguration
     {
         return $this->fileLoader->loadFile(
-            $this->locator->locateOneOf($potentialPaths)
+            $this->locator->locateOneOf($potentialFileNames),
         );
     }
 }

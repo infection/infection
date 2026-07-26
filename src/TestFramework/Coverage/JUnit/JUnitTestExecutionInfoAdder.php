@@ -38,7 +38,10 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use function Later\lazy;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -48,12 +51,18 @@ use Infection\TestFramework\Coverage\Trace;
  */
 class JUnitTestExecutionInfoAdder
 {
-    public function __construct(private TestFrameworkAdapter $adapter, private TestFileDataProvider $testFileDataProvider)
-    {
+    private const int MAX_EXPLODE_PARTS = 2;
+
+    public function __construct(
+        private readonly TestFrameworkAdapter $adapter,
+        private readonly TestFileDataProvider $testFileDataProvider,
+    ) {
     }
 
     /**
      * @param iterable<Trace> $traces
+     *
+     * @throws TestNotFound
      *
      * @return iterable<Trace>
      */
@@ -69,39 +78,52 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<Trace> $traces
      *
+     * @throws TestNotFound
+     *
      * @return iterable<Trace>
      */
     private function testExecutionInfoAdder(iterable $traces): iterable
     {
         /** @var Trace $trace */
         foreach ($traces as $trace) {
-            $tests = $trace->getTests();
-
-            if ($tests === null) {
-                continue;
-            }
-
-            foreach ($tests->getTestsLocationsBySourceLine() as &$testsLocations) {
-                foreach ($testsLocations as $line => $test) {
-                    $testsLocations[$line] = $this->createCompleteTestLocation($test);
-                }
-            }
-            unset($testsLocations);
-
-            yield $trace;
+            yield new ProxyTrace(
+                $trace->getSourceFileInfo(),
+                $trace->getRealPath(),
+                lazy(self::createCompleteTestLocationsGenerator($trace)),
+            );
         }
     }
 
+    /**
+     * @return iterable<TestLocations>
+     */
+    private function createCompleteTestLocationsGenerator(Trace $trace): iterable
+    {
+        $incompleteTestLocations = $trace->getTests();
+
+        foreach ($incompleteTestLocations->getTestsLocationsBySourceLine() as &$testsLocations) {
+            foreach ($testsLocations as $line => $test) {
+                $testsLocations[$line] = $this->createCompleteTestLocation($test);
+            }
+        }
+        unset($testsLocations);
+
+        yield $incompleteTestLocations;
+    }
+
+    /**
+     * @throws TestNotFound
+     */
     private function createCompleteTestLocation(TestLocation $test): TestLocation
     {
-        $class = explode(':', $test->getMethod(), 2)[0];
+        $class = explode(':', $test->getMethod(), self::MAX_EXPLODE_PARTS)[0];
 
         $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
 
         return new TestLocation(
             $test->getMethod(),
             $testFileData->path,
-            $testFileData->time
+            $testFileData->time,
         );
     }
 }

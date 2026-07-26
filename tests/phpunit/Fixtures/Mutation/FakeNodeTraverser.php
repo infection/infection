@@ -10,18 +10,18 @@ use PhpParser\NodeVisitor;
 
 final class FakeNodeTraverser implements NodeTraverserInterface
 {
-    public function addVisitor(NodeVisitor $visitor)
+    public function addVisitor(NodeVisitor $visitor): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function removeVisitor(NodeVisitor $visitor)
+    public function removeVisitor(NodeVisitor $visitor): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function traverse(array $nodes): array
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

@@ -40,8 +40,10 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use function is_string;
 use const PHP_INT_MAX;
 use PhpParser\Node;
+use function stripos;
 
 /**
  * @internal
@@ -52,25 +54,34 @@ final class DecrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    private const COUNT_NAMES = [
+    public const array NON_NEGATIVE_INT_RETURNING_FUNCTIONS = [
         'count',
+        'iterator_count',
         'grapheme_strlen',
         'iconv_strlen',
         'mb_strlen',
         'sizeof',
         'strlen',
+        'strpos',
+        'stripos',
+        'strrpos',
+        'mb_strpos',
+        'mb_stripos',
+        'mb_strrpos',
+        'preg_match',
+        'preg_match_all',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = 20;
-+ $a = 19;
-DIFF
+                - $a = 20;
+                + $a = 19;
+                DIFF,
         );
     }
 
@@ -120,6 +131,10 @@ DIFF
             return false;
         }
 
+        if ($parentNode instanceof Node\Expr\Assign && $this->isCountOrLengthExpression($parentNode->var)) {
+            return false;
+        }
+
         if ($this->isArrayZeroIndexAccess($node)) {
             return false;
         }
@@ -151,8 +166,8 @@ DIFF
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
                 $parentNode->left->name->toLowerString(),
-                self::COUNT_NAMES,
-                true
+                self::NON_NEGATIVE_INT_RETURNING_FUNCTIONS,
+                true,
             )
         ) {
             return false;
@@ -161,14 +176,48 @@ DIFF
         if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
             && in_array(
                 $parentNode->right->name->toLowerString(),
-                self::COUNT_NAMES,
-                true
+                self::NON_NEGATIVE_INT_RETURNING_FUNCTIONS,
+                true,
             )
         ) {
             return false;
         }
 
-        return true;
+        if ($this->isCountOrLengthExpression($parentNode->left)) {
+            return false;
+        }
+
+        return !$this->isCountOrLengthExpression($parentNode->right);
+    }
+
+    private function isCountOrLengthExpression(Node\Expr $expr): bool
+    {
+        foreach (['count', 'length', 'numberof'] as $magicNeedle) {
+            if (
+                $expr instanceof Node\Expr\Variable && is_string($expr->name)
+                && stripos($expr->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\PropertyFetch || $expr instanceof Node\Expr\NullsafePropertyFetch)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\MethodCall || $expr instanceof Node\Expr\NullsafeMethodCall)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function isArrayZeroIndexAccess(Node\Scalar\LNumber $node): bool
@@ -177,11 +226,7 @@ DIFF
             return false;
         }
 
-        if (ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch) {
-            return true;
-        }
-
-        return false;
+        return ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch;
     }
 
     private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool

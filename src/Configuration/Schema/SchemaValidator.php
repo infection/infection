@@ -38,15 +38,15 @@ namespace Infection\Configuration\Schema;
 use function array_map;
 use JsonSchema\Validator;
 use const PHP_EOL;
-use function Safe\sprintf;
-use function strpos;
+use function sprintf;
+use function str_contains;
 
 /**
  * @final
  */
 class SchemaValidator
 {
-    private const SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
+    private const string SCHEMA_FILE = __DIR__ . '/../../../resources/schema.json';
 
     /**
      * @throws InvalidSchema
@@ -58,7 +58,7 @@ class SchemaValidator
         $schemaFile = self::SCHEMA_FILE;
 
         // Prepend with file:// only when not using a special schema already (e.g. in the PHAR)
-        if (strpos($schemaFile, '://') === false) {
+        if (!str_contains($schemaFile, '://')) {
             $schemaFile = 'file://' . $schemaFile;
         }
 
@@ -71,10 +71,8 @@ class SchemaValidator
         }
 
         $errors = array_map(
-            static function (array $error): string {
-                return sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL);
-            },
-            $validator->getErrors()
+            static fn (array $error): string => sprintf('[%s] %s%s', $error['property'], $error['message'], PHP_EOL),
+            $validator->getErrors(),
         );
 
         throw InvalidSchema::create($rawConfig, $errors);

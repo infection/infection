@@ -42,10 +42,11 @@ use function trim;
 /**
  * @internal
  */
-final class BuildContextResolver
+final readonly class BuildContextResolver
 {
-    public function __construct(private CiDetector $ciDetector)
-    {
+    public function __construct(
+        private CiDetector $ciDetector,
+    ) {
     }
 
     public function resolve(): BuildContext
@@ -74,7 +75,7 @@ final class BuildContextResolver
 
         return new BuildContext(
             $ci->getRepositoryName(),
-            $ci->getBranch()
+            $ci->getBranch(),
         );
     }
 }

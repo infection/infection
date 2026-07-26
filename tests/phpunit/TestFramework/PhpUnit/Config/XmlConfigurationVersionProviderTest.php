@@ -36,26 +36,26 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function version_compare;
 
+#[CoversClass(XmlConfigurationVersionProvider::class)]
 final class XmlConfigurationVersionProviderTest extends TestCase
 {
-    /**
-     * @var XmlConfigurationVersionProvider
-     */
-    private $versionProvider;
+    private XmlConfigurationVersionProvider $versionProvider;
 
     protected function setUp(): void
     {
         $this->versionProvider = new XmlConfigurationVersionProvider();
     }
 
-    public function configurationsProvider()
+    public static function configurationsProvider(): iterable
     {
-        yield from take($this->legacyConfigurationsProvider())
+        yield from take(self::legacyConfigurationsProvider())
             ->map(static function (string $xml): iterable {
                 yield $xml => [
                     SafeDOMXPath::fromString($xml),
@@ -63,7 +63,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
                 ];
             });
 
-        yield from take($this->mainlineConfigurationsProvider())
+        yield from take(self::mainlineConfigurationsProvider())
             ->map(static function (string $xml): iterable {
                 yield $xml => [
                     SafeDOMXPath::fromString($xml),
@@ -72,9 +72,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
             });
     }
 
-    /**
-     * @dataProvider configurationsProvider
-     */
+    #[DataProvider('configurationsProvider')]
     public function test_it_finds_correct_version(SafeDOMXPath $xPath, bool $mainline): void
     {
         $version = $this->versionProvider->provide($xPath);
@@ -82,128 +80,128 @@ final class XmlConfigurationVersionProviderTest extends TestCase
         $this->assertSame($mainline, version_compare($version, '9.3', '>='));
     }
 
-    protected function legacyConfigurationsProvider()
+    private static function legacyConfigurationsProvider(): iterable
     {
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-    backupGlobals="false"
-    backupStaticAttributes="false"
-    bootstrap="/app/autoload2.php"
-    colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    printerClass="Fake\Printer\Class"
-    processIsolation="false"
-    syntaxCheck="false"
->
-    <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory>/*Bundle</directory>
-            <exclude>/*Bundle/Fixtures</exclude>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory>/src/</directory>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-html" target="/path/to/tmp"/>
-    </logging>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                backupGlobals="false"
+                backupStaticAttributes="false"
+                bootstrap="/app/autoload2.php"
+                colors="true"
+                convertErrorsToExceptions="true"
+                convertNoticesToExceptions="true"
+                convertWarningsToExceptions="true"
+                printerClass="Fake\Printer\Class"
+                processIsolation="false"
+                syntaxCheck="false"
+            >
+                <testsuites>
+                    <testsuite name="Application Test Suite">
+                        <directory>/*Bundle</directory>
+                        <exclude>/*Bundle/Fixtures</exclude>
+                    </testsuite>
+                </testsuites>
+                <filter>
+                    <whitelist>
+                        <directory>/src/</directory>
+                    </whitelist>
+                </filter>
+                <logging>
+                    <log type="coverage-html" target="/path/to/tmp"/>
+                </logging>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <logging>
-        <log type="coverage-html" target="/path/to/tmp"/>
-    </logging>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <logging>
+                    <log type="coverage-html" target="/path/to/tmp"/>
+                </logging>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <filter>
-        <whitelist>
-            <directory>/src/</directory>
-        </whitelist>
-    </filter>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <filter>
+                    <whitelist>
+                        <directory>/src/</directory>
+                    </whitelist>
+                </filter>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit disableCodeCoverageIgnore="true"></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit disableCodeCoverageIgnore="true"></phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit ignoreDeprecatedCodeUnitsFromCodeCoverage="true"></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit ignoreDeprecatedCodeUnitsFromCodeCoverage="true"></phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit></phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit></phpunit>
+            XML;
 
-        yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></phpunit>
-XML;
+        yield <<<'XML_WRAP'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></phpunit>
+            XML_WRAP;
 
-        yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd">
-</phpunit>
-XML;
+        yield <<<'XML_WRAP'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd">
+            </phpunit>
+            XML_WRAP;
 
-        yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd">
-</phpunit>
-XML;
+        yield <<<'XML_WRAP'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/9.2.xsd">
+            </phpunit>
+            XML_WRAP;
 
-        yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./phpunit.xsd">
-</phpunit>
-XML;
+        yield <<<'XML_WRAP'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="./phpunit.xsd">
+            </phpunit>
+            XML_WRAP;
     }
 
-    protected function mainlineConfigurationsProvider()
+    private static function mainlineConfigurationsProvider(): iterable
     {
-        yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-</phpunit>
-XML;
+        yield <<<'XML_WRAP'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+            </phpunit>
+            XML_WRAP;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <coverage>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-    </coverage>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <coverage>
+                    <include>
+                        <directory suffix=".php">src</directory>
+                    </include>
+                </coverage>
+            </phpunit>
+            XML;
 
         yield <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-    <logging>
-        <text outputFile="logfile.txt"/>
-    </logging>
-</phpunit>
-XML;
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit>
+                <logging>
+                    <text outputFile="logfile.txt"/>
+                </logging>
+            </phpunit>
+            XML;
     }
 }

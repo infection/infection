@@ -41,13 +41,16 @@ use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use OndraM\CiDetector\TrinaryLogic;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(BuildContextResolver::class)]
 final class BuildContextResolverTest extends TestCase
 {
     public function test_resolve_throws_when_ci_could_not_be_detected(): void
     {
-        $ciDetector = $this->createMock(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
@@ -63,13 +66,13 @@ final class BuildContextResolverTest extends TestCase
 
     public function test_resolve_throws_when_ci_is_in_pull_request_context(): void
     {
-        $ci = $this->createMock(CiInterface::class);
+        $ci = $this->createStub(CiInterface::class);
 
         $ci
             ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createFromBoolean(true));
 
-        $ciDetector = $this->createMock(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
@@ -85,13 +88,13 @@ final class BuildContextResolverTest extends TestCase
 
     public function test_resolve_throws_when_ci_is_maybe_in_pull_request_context(): void
     {
-        $ci = $this->createMock(CiInterface::class);
+        $ci = $this->createStub(CiInterface::class);
 
         $ci
             ->method('isPullRequest')
             ->willReturn(TrinaryLogic::createMaybe());
 
-        $ciDetector = $this->createMock(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
@@ -105,14 +108,12 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    /**
-     * @dataProvider provideBlankOrEmptyString
-     */
+    #[DataProvider('provideBlankOrEmptyString')]
     public function test_resolve_throws_when_repository_name_is_empty(string $repositoryName): void
     {
         $gitBranch = 'fix/this';
 
-        $ci = $this->createMock(CiInterface::class);
+        $ci = $this->createStub(CiInterface::class);
 
         $ci
             ->method('isPullRequest')
@@ -126,7 +127,7 @@ final class BuildContextResolverTest extends TestCase
             ->method('getBranch')
             ->willReturn($gitBranch);
 
-        $ciDetector = $this->createMock(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
@@ -140,14 +141,12 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    /**
-     * @dataProvider provideBlankOrEmptyString
-     */
+    #[DataProvider('provideBlankOrEmptyString')]
     public function test_resolve_throws_when_branch_name_is_empty(string $gitBranch): void
     {
         $repositoryName = 'foo/bar';
 
-        $ci = $this->createMock(CiInterface::class);
+        $ci = $this->createStub(CiInterface::class);
 
         $ci
             ->method('isPullRequest')
@@ -161,7 +160,7 @@ final class BuildContextResolverTest extends TestCase
             ->method('getBranch')
             ->willReturn($gitBranch);
 
-        $ciDetector = $this->createMock(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')
@@ -175,7 +174,7 @@ final class BuildContextResolverTest extends TestCase
         $buildContextResolver->resolve();
     }
 
-    public function provideBlankOrEmptyString(): iterable
+    public static function provideBlankOrEmptyString(): iterable
     {
         yield 'string-blank' => [' '];
 
@@ -187,7 +186,7 @@ final class BuildContextResolverTest extends TestCase
         $repositoryName = 'foo/bar';
         $gitBranch = 'fix/this';
 
-        $ci = $this->createMock(CiInterface::class);
+        $ci = $this->createStub(CiInterface::class);
 
         $ci
             ->method('isPullRequest')
@@ -201,7 +200,7 @@ final class BuildContextResolverTest extends TestCase
             ->method('getBranch')
             ->willReturn($gitBranch);
 
-        $ciDetector = $this->createMock(CiDetector::class);
+        $ciDetector = $this->createStub(CiDetector::class);
 
         $ciDetector
             ->method('detect')

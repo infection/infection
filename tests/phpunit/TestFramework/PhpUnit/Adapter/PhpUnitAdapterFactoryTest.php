@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(PhpUnitAdapterFactory::class)]
 final class PhpUnitAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void
@@ -48,12 +50,14 @@ final class PhpUnitAdapterFactoryTest extends TestCase
         $adapter = PhpUnitAdapterFactory::create(
             '/path/to/phpunit',
             '/tmp',
-            __DIR__ . '/../../../Fixtures/Files/phpunit/phpunit.xml',
+            __FILE__,   // the FS is not mocked so it needs a real file; the content doesn't matter for this test though.
             '/path/to/config-dir',
             '/path/to/junit.xml',
             '/path/to/project',
             [],
-            true
+            true,
+            shellCommandLineExecutor: new ShellCommandLineExecutor(),
+            sourceDirectoryBasePath: '/path/to/project',
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

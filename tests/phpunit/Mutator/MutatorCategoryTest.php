@@ -40,13 +40,17 @@ use function array_unique;
 use function array_values;
 use function in_array;
 use Infection\Mutator\MutatorCategory;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 
+#[Group('integration')]
+#[CoversNothing]
 final class MutatorCategoryTest extends TestCase
 {
-    private const ALL_CONSTANT_KEY = 'ALL';
+    private const string ALL_CONSTANT_KEY = 'ALL';
 
     public function test_it_cannot_be_instantiated(): void
     {
@@ -54,7 +58,7 @@ final class MutatorCategoryTest extends TestCase
 
         $this->assertFalse(
             $classReflection->isInstantiable(),
-            sprintf('Did not expect "%s" to be instantiable', MutatorCategory::class)
+            sprintf('Did not expect "%s" to be instantiable', MutatorCategory::class),
         );
     }
 
@@ -88,11 +92,14 @@ final class MutatorCategoryTest extends TestCase
             sprintf(
                 'Expected enum "%s#%s" constant to be public',
                 $enumClass,
-                self::ALL_CONSTANT_KEY
-            )
+                self::ALL_CONSTANT_KEY,
+            ),
         );
     }
 
+    /**
+     * @param array<string, mixed> $constants
+     */
     private function assertAllDoesNotHaveDuplicatedValues(string $enumClass, array $constants): void
     {
         $all = $constants[self::ALL_CONSTANT_KEY];
@@ -104,11 +111,14 @@ final class MutatorCategoryTest extends TestCase
             sprintf(
                 'Did not expect the constant "%s#%s" to have duplicated values',
                 $enumClass,
-                self::ALL_CONSTANT_KEY
-            )
+                self::ALL_CONSTANT_KEY,
+            ),
         );
     }
 
+    /**
+     * @param array<string, mixed> $constants
+     */
     private function assertAllListTheExposedConstants(string $enumClass, array $constants): void
     {
         $all = $constants[self::ALL_CONSTANT_KEY];
@@ -120,15 +130,18 @@ final class MutatorCategoryTest extends TestCase
             sprintf(
                 'Expected the constant "%s#%s" to list all of the enums constants',
                 $enumClass,
-                self::ALL_CONSTANT_KEY
-            )
+                self::ALL_CONSTANT_KEY,
+            ),
         );
     }
 
+    /**
+     * @param array<string, mixed> $constants
+     */
     private function assertExposedConstantsArePublic(
         string $enumClass,
         ReflectionClass $classReflection,
-        array $constants
+        array $constants,
     ): void {
         foreach (array_keys($constants) as $constantName) {
             if ($constantName !== self::ALL_CONSTANT_KEY
@@ -144,8 +157,8 @@ final class MutatorCategoryTest extends TestCase
                 sprintf(
                     'Expected the constant "%s#%s" exposed by the enum to be public',
                     $enumClass,
-                    $constantName
-                )
+                    $constantName,
+                ),
             );
         }
     }

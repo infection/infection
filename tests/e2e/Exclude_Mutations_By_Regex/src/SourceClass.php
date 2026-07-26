@@ -6,6 +6,10 @@ use Webmozart\Assert\Assert;
 
 class SourceClass
 {
+    public function __construct(
+        private readonly Logger $logger
+    ) {}
+
     public function hello(): string
     {
         Assert::numeric('1');
@@ -19,6 +23,8 @@ class SourceClass
 
     public function getString()
     {
+        $this->logger->info('string', ['message' => 'foo', 'err' => 'bar']);
+
         return 'string';
     }
 }

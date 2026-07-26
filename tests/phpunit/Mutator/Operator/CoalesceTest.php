@@ -35,161 +35,156 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\Coalesce;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Coalesce::class)]
 final class CoalesceTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce and flip operands' => [
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$foo ?? $bar;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$bar ?? $foo;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $foo ?? $bar;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $bar ?? $foo;
+                    PHP,
+            ),
         ];
 
         yield 'Mutate more than one coalesce operators and flip operands' => [
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $bar ?? $baz;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $foo ?? $bar ?? $baz;
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $baz ?? $bar;
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$bar ?? $foo ?? $baz;
-PHP
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $foo = 'foo';
+                        $bar = 'bar';
+                        $baz = 'baz';
+                        $foo ?? $baz ?? $bar;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $foo = 'foo';
+                        $bar = 'bar';
+                        $baz = 'baz';
+                        $bar ?? $foo ?? $baz;
+                        PHP,
+                ),
             ],
         ];
 
         yield 'Mutate more than two coalesce operators and flip operands' => [
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $bar ?? $baz ?? 'oof';
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $baz = 'baz';
+                    $foo ?? $bar ?? $baz ?? 'oof';
+                    PHP,
+            ),
             [
-                <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $bar ?? 'oof' ?? $baz;
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$foo ?? $baz ?? $bar ?? 'oof';
-PHP
-                ,
-                <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$baz = 'baz';
-$bar ?? $foo ?? $baz ?? 'oof';
-PHP
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $foo = 'foo';
+                        $bar = 'bar';
+                        $baz = 'baz';
+                        $foo ?? $bar ?? 'oof' ?? $baz;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $foo = 'foo';
+                        $bar = 'bar';
+                        $baz = 'baz';
+                        $foo ?? $baz ?? $bar ?? 'oof';
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $foo = 'foo';
+                        $bar = 'bar';
+                        $baz = 'baz';
+                        $bar ?? $foo ?? $baz ?? 'oof';
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate when left operator is constant defined through `define` function' => [
-            <<<'PHP'
-<?php
-
-define('FOO', 'foo');
-FOO ?? 'bar';
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    define('FOO', 'foo');
+                    FOO ?? 'bar';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when left operator is constant defined in class' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    new class {
+                        private const FOO = 'foo';
 
-new class {
-    private const FOO = 'foo';
-
-    public function getFoo(): string
-    {
-        return self::FOO ?? 'bar';
-    }
-};
-PHP
+                        public function getFoo(): string
+                        {
+                            return self::FOO ?? 'bar';
+                        }
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when null is used with one coalesce' => [
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$foo ?? null;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $foo ?? null;
+                    PHP,
+            ),
         ];
 
         yield 'It does not move null from the last position with 2 coalesce' => [
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$foo ?? $bar ?? null;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$foo = 'foo';
-$bar = 'bar';
-$bar ?? $foo ?? null;
-PHP
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $foo ?? $bar ?? null;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $foo = 'foo';
+                    $bar = 'bar';
+                    $bar ?? $foo ?? null;
+                    PHP,
+            ),
         ];
     }
 }

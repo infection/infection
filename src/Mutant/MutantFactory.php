@@ -38,10 +38,9 @@ namespace Infection\Mutant;
 use Infection\Differ\Differ;
 use Infection\Mutation\Mutation;
 use Later\Interfaces\Deferred;
+use function Later\later;
 use function Later\lazy;
-use PhpParser\Node;
-use PhpParser\PrettyPrinterAbstract;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -49,13 +48,11 @@ use function Safe\sprintf;
  */
 class MutantFactory
 {
-    /**
-     * @var string[]
-     */
-    private array $printedFileCache = [];
-
-    public function __construct(private string $tmpDir, private Differ $differ, private PrettyPrinterAbstract $printer, private MutantCodeFactory $mutantCodeFactory)
-    {
+    public function __construct(
+        private readonly string $tmpDir,
+        private readonly Differ $differ,
+        private readonly MutantCodeFactory $mutantCodeFactory,
+    ) {
     }
 
     public function create(Mutation $mutation): Mutant
@@ -63,18 +60,18 @@ class MutantFactory
         $mutantFilePath = sprintf(
             '%s/mutant.%s.infection.php',
             $this->tmpDir,
-            $mutation->getHash()
+            $mutation->getHash(),
         );
 
         $mutatedCode = lazy($this->createMutatedCode($mutation));
-        $originalPrettyPrintedFile = lazy($this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst()));
+        $originalPrettyPrintedFile = later(static fn () => yield $mutation->getOriginalFileContent());
 
         return new Mutant(
             $mutantFilePath,
             $mutation,
             $mutatedCode,
-            lazy($this->createMutantDiff($originalPrettyPrintedFile, $mutation, $mutatedCode)),
-            $originalPrettyPrintedFile
+            lazy($this->createMutantDiff($originalPrettyPrintedFile, $mutatedCode)),
+            $originalPrettyPrintedFile,
         );
     }
 
@@ -90,20 +87,8 @@ class MutantFactory
      *
      * @return iterable<string>
      */
-    private function createMutantDiff(Deferred $originalPrettyPrintedFile, Mutation $mutation, Deferred $mutantCode): iterable
+    private function createMutantDiff(Deferred $originalPrettyPrintedFile, Deferred $mutantCode): iterable
     {
         yield $this->differ->diff($originalPrettyPrintedFile->get(), $mutantCode->get());
-    }
-
-    /**
-     * @param Node[] $originalStatements
-     *
-     * @return iterable<string>
-     */
-    private function getOriginalPrettyPrintedFile(string $originalFilePath, array $originalStatements): iterable
-    {
-        // The same file may be mutated multiple times hence we can memoize that call
-        yield $this->printedFileCache[$originalFilePath]
-            ?? $this->printedFileCache[$originalFilePath] = $this->printer->prettyPrintFile($originalStatements);
     }
 }

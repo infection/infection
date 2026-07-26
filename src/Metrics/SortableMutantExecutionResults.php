@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
+use function array_is_list;
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\usort;
+use LogicException;
+use function usort;
 
 /**
  * @internal
@@ -57,7 +59,7 @@ final class SortableMutantExecutionResults
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getSortedExecutionResults(): array
     {
@@ -66,11 +68,16 @@ final class SortableMutantExecutionResults
             $this->sorted = true;
         }
 
+        if (!array_is_list($this->executionResults)) {
+            throw new LogicException('Execution results are not sorted');
+        }
+
         return $this->executionResults;
     }
 
     /**
      * @param MutantExecutionResult[] $executionResults
+     * @param-out list<MutantExecutionResult> $executionResults
      */
     private static function sortResults(array &$executionResults): void
     {
@@ -82,7 +89,7 @@ final class SortableMutantExecutionResults
                 }
 
                 return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
+            },
         );
     }
 }

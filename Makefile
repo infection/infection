@@ -15,36 +15,44 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.16.0/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
-PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.9.5/php-cs-fixer.phar"
-PHP_CS_FIXER_CACHE=.php_cs.cache
+PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.92.5/php-cs-fixer.phar"
 
 PHPSTAN=./vendor/bin/phpstan
+MAGO=./vendor/bin/mago
+RECTOR=./vendor/bin/rector
+COLLISION_DETECTOR=./vendor/bin/detect-collisions
 
-PSALM=./.tools/psalm
-PSALM_URL="https://github.com/vimeo/psalm/releases/download/v4.15.0/psalm.phar"
-
-PHPUNIT=vendor/phpunit/phpunit/phpunit
+PHPUNIT_BIN=vendor/phpunit/phpunit/phpunit
+CI ?=
+PHPUNIT=$(PHPUNIT_BIN)$(if $(CI), --no-progress,)
 PARATEST=vendor/bin/paratest
+AGENTS_MD=AGENTS.md
 
-INFECTION=./build/infection.phar
+PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 
-DOCKER_RUN=docker-compose run
-DOCKER_RUN_80=$(DOCKER_RUN) php80 $(FLOCK) Makefile
-DOCKER_RUN_81=$(DOCKER_RUN) php81 $(FLOCK) Makefile
+INFECTION=./dist/infection.phar
+
+DOCKER_RUN=docker compose run --rm
+DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
 DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
-BENCHMARK_SOURCES=tests/benchmark/MutationGenerator/sources \
-				  tests/benchmark/Tracing/coverage \
-				  tests/benchmark/Tracing/sources
+BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
+BENCHMARK_PARSE_GIT_DIFF_SOURCE=tests/benchmark/ParseGitDiff/diff
+BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
+BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/benchmark-source
+BENCHMARK_TRACING_COVERAGE_SOURCE_DIR=$(BENCHMARK_TRACING_SUBMODULE)/dist/coverage
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
+SBX_PROJECT_LOCAL_KIT=./devTools/sbx/kits/project-local
+SBX_PROJECT_LOCAL_KIT_SPEC=$(SBX_PROJECT_LOCAL_KIT)/spec.yaml
+SBX_PROJECT_LOCAL_KIT_TEMPLATE=./devTools/sbx/project-local-kit.yaml
 
 #
 # Commands (phony targets)
@@ -59,84 +67,217 @@ compile:
 .PHONY: compile-docker
 compile-docker:	 	## Bundles Infection into a PHAR using docker
 compile-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_81) make compile
+	$(DOCKER_RUN_82) make compile
+
+.PHONY: sbx-create
+sbx-create:	## Drops the existing PHP sbx image and create it anew
+sbx-create: sbx-image-build sbx-project-local-kit sbx-kit-validate
+	sbx rm codex-infection || true
+	sbx run codex \
+		--template=infection-sbx-php-8.4:latest \
+		--kit=./devTools/sbx/kits/codex-otel \
+		--kit "git+https://github.com/docker/sbx-kits-contrib#ref=v0.9.0&dir=git-ssh-sign" . \
+		--kit=$(SBX_PROJECT_LOCAL_KIT)
+
+.PHONY: sbx-project-local-kit
+sbx-project-local-kit: $(SBX_PROJECT_LOCAL_KIT_TEMPLATE)
+	mkdir -p "$(SBX_PROJECT_LOCAL_KIT)"
+	test -f "$(SBX_PROJECT_LOCAL_KIT_SPEC)" || cp "$(SBX_PROJECT_LOCAL_KIT_TEMPLATE)" "$(SBX_PROJECT_LOCAL_KIT_SPEC)"
+
+.PHONY: sbx-kit-validate
+sbx-kit-validate:	## Validates the sbx kit specs
+sbx-kit-validate: sbx-project-local-kit
+	sbx kit validate ./devTools/sbx/kits/codex-otel
+	sbx kit validate $(SBX_PROJECT_LOCAL_KIT)
+
+.PHONY: sbx-image-build
+sbx-image-build:	## Builds the PHP sbx image
+sbx-image-build:
+	./devTools/sbx/build-image.sh
+	./devTools/sbx/load-template.sh
+
+.PHONY: _sbx-image-build
+_sbx-image-build:
+	FORCE_REBUILD=1 ./devTools/sbx/build-image.sh
+	./devTools/sbx/load-template.sh
+
+.PHONY: sbx-image-test
+sbx-image-test:	## Verifies the PHP sbx image contains the expected tooling
+sbx-image-test:
+	container-structure-test test --image=infection-sbx-php-8.4:latest --config=./devTools/sbx/test.yaml
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
 
+.PHONY: update-agents-adr-list
+update-agents-adr-list:	## Updates the generated ADR list in AGENTS.md
+update-agents-adr-list:
+	./devTools/update-agents-adr-list.sh "$(AGENTS_MD)"
+
+.PHONY: check-agents-adr-list
+check-agents-adr-list:	## Checks the generated ADR list in AGENTS.md
+check-agents-adr-list: update-agents-adr-list
+	git diff --exit-code -- "$(AGENTS_MD)"
+
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff
+	$(PHP_CS_FIXER) fix -v --diff
+	LC_ALL=C sort -u .gitignore -o .gitignore
+	$(MAKE) check_trailing_whitespaces
+
+.PHONY: cs-docker
+cs-docker:		## Runs PHP-CS-Fixer in docker
+cs-docker: $(DOCKER_FILE_IMAGE) $(PHP_CS_FIXER)
+	$(DOCKER_RUN_82) $(PHP_CS_FIXER) fix -v --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
 cs-check: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --dry-run
+	$(PHP_CS_FIXER) check -v --diff
 	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress
 
 .PHONY: phpstan-baseline
+phpstan-baseline:	## Regenerates the PHPStan baseline
 phpstan-baseline: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-src-baseline.neon || true
-	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-tests-baseline.neon || true
+	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
 
-.PHONY: psalm-baseline
-psalm-baseline: vendor
-	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
+.PHONY: mago
+mago: vendor $(MAGO)
+	$(MAGO) analyze
 
-.PHONY: psalm
-psalm: vendor $(PSALM)
-	$(PSALM) --threads=max
+.PHONY: mago-baseline
+mago-baseline:		## Regenerates the Mago baseline
+mago-baseline: vendor $(MAGO)
+	$(MAGO) analyze --generate-baseline || true
+
+.PHONY: detect-collisions
+detect-collisions: vendor $(PHPSTAN)
+	$(COLLISION_DETECTOR) --configuration devTools/collision-detector.json
+
+.PHONY: rector
+rector: vendor $(RECTOR)
+	$(RECTOR) process
+
+.PHONY: rector-check
+rector-check: vendor $(RECTOR)
+	$(RECTOR) process --dry-run
 
 .PHONY: validate
 validate:
 	composer validate --strict
 
+.PHONY: zizmor
+zizmor:			## Runs zizmor
+zizmor:
+	$(DOCKER_RUN) zizmor
+
 .PHONY: profile
 profile: 	 	## Runs Blackfire
-profile: vendor $(BENCHMARK_SOURCES)
-	composer dump --classmap-authoritative
+profile:
+	$(MAKE) profile_mutation_generator
+	$(MAKE) profile_ast_processing
+	$(MAKE) profile_parse_git_diff
+	$(MAKE) profile_tracing
+
+.PHONY: benchmark
+benchmark: vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_PARSE_GIT_DIFF_SOURCE) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: profile_mutation_generator
+profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
+	composer dump --classmap-authoritative --quiet
 	blackfire run \
-		--samples=5 \
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
+	composer dump
+
+.PHONY: profile_ast_processing
+profile_ast_processing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
 	blackfire run \
-		--samples=5 \
+		--title="AstProcessing" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/AstProcessing/profile.php
+	composer dump
+
+.PHONY: benchmark_mutation_generator
+benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: benchmark_ast_processing
+benchmark_ast_processing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/AstProcessing $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: profile_parse_git_diff
+profile_parse_git_diff: vendor $(BENCHMARK_PARSE_GIT_DIFF_SOURCE)
+	composer dump --classmap-authoritative --quiet
+	blackfire run \
+		--title="ParseGitDiff" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/ParseGitDiff/profile.php
+	composer dump
+
+.PHONY: benchmark_parse_git_diff
+benchmark_parse_git_diff: vendor $(BENCHMARK_PARSE_GIT_DIFF_SOURCE)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/ParseGitDiff $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: profile_tracing
+profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	blackfire run \
 		--title="Tracing" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/Tracing/profile.php
 	composer dump
 
+.PHONY: benchmark_tracing
+benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/Tracing $(PHPBENCH_REPORTS)
+	composer dump
+
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: phpstan psalm validate test-autoreview
+autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list $(if $(CI),,zizmor)
 
 .PHONY: test
 test:		 	## Runs all the tests
-test: autoreview test-unit test-e2e test-infection
+test: autoreview test-unit test-benchmark test-e2e test-infection
 
 .PHONY: test-docker
 test-docker:		## Runs all the tests on the different Docker platforms
 test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
-test-autoreview: $(PHPUNIT) vendor
+test-autoreview: $(PHPUNIT_BIN) vendor
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
-test-unit: $(PHPUNIT) vendor
+test-unit: $(PHPUNIT_BIN) vendor
 	$(PHPUNIT) --group $(PHPUNIT_GROUP) --exclude-group e2e
 
 .PHONY: test-unit-parallel
@@ -146,11 +287,19 @@ test-unit-parallel: $(PARATEST) vendor
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-80-docker
+test-unit-docker: test-unit-82-docker
 
-.PHONY: test-unit-80-docker
-test-unit-80-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT_BIN)
+	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+
+.PHONY: test-benchmark
+test-benchmark:	 	## Runs the benchmark tests
+test-benchmark: $(PHPUNIT_BIN) \
+		vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	$(PHPUNIT) --group=benchmark
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -159,28 +308,24 @@ test-e2e: test-e2e-phpunit
 
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
-test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
-	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+test-e2e-phpunit: $(PHPUNIT_BIN) vendor
+	@if [ -x $(PARATEST) ]; then \
+		$(PARATEST) --group $(E2E_PHPUNIT_GROUP); \
+	else \
+		$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP); \
+	fi
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
-test-e2e-docker: test-e2e-phpdbg-docker test-e2e-xdebug-docker
-
-.PHONY: test-e2e-phpdbg-docker
-test-e2e-phpdbg-docker: test-e2e-phpdbg-80-docker
-
-.PHONY: test-e2e-phpdbg-80-docker
-test-e2e-phpdbg-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_80) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+test-e2e-docker: test-e2e-xdebug-docker
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-80-docker
+test-e2e-xdebug-docker: test-e2e-xdebug-82-docker
 
-.PHONY: test-e2e-xdebug-80-docker
-test-e2e-xdebug-80-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
+.PHONY: test-e2e-xdebug-82-docker
+test-e2e-xdebug-82-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_82) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	$(DOCKER_RUN_82) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
 test-infection:		## Runs Infection against itself
@@ -189,21 +334,14 @@ test-infection: $(INFECTION) vendor
 
 .PHONY: test-infection-docker
 test-infection-docker:	## Runs Infection against itself on the different Docker platforms
-test-infection-docker: test-infection-phpdbg-docker test-infection-xdebug-docker
-
-.PHONY: test-infection-phpdbg-docker
-test-infection-phpdbg-docker: test-infection-phpdbg-80-docker
-
-.PHONY: test-infection-phpdbg-80-docker
-test-infection-phpdbg-80-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=max
+test-infection-docker: test-infection-xdebug-docker
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-80-docker
+test-infection-xdebug-docker: test-infection-xdebug-82-docker
 
-.PHONY: test-infection-xdebug-80-docker
-test-infection-xdebug-80-docker: $(DOCKER_FILE_IMAGE)
-	$(DOCKER_RUN_80) ./bin/infection --threads=max
+.PHONY: test-infection-xdebug-82-docker
+test-infection-xdebug-82-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
@@ -222,17 +360,22 @@ $(PHP_CS_FIXER): Makefile
 $(PHPSTAN): vendor
 	touch -c $@
 
-$(PSALM): Makefile
-	wget -q $(PSALM_URL) --output-document=$(PSALM)
-	chmod a+x $(PSALM)
+$(MAGO): vendor
 	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
-	composer require infection/codeception-adapter infection/phpspec-adapter
+	composer require --no-interaction \
+		infection/codeception-adapter \
+		infection/phpspec-adapter \
+		testo/bridge-infection
+
+	# Workaround for https://github.com/box-project/box/issues/580
+	composer install --no-interaction --no-dev
 	$(BOX) --version
-	$(BOX) validate
-	$(BOX) compile
-	composer remove infection/codeception-adapter infection/phpspec-adapter
+	$(BOX) validate --no-interaction
+	$(BOX) compile --no-interaction
+	composer remove infection/codeception-adapter infection/phpspec-adapter testo/bridge-infection
+	composer install --no-interaction
 	touch -c $@
 
 vendor: composer.lock
@@ -243,7 +386,7 @@ composer.lock: composer.json
 	composer install --prefer-dist
 	touch -c $@
 
-$(PHPUNIT): vendor phpunit.xml.dist
+$(PHPUNIT_BIN): vendor phpunit.xml.dist
 	touch -c $@
 
 phpunit.xml.dist:
@@ -252,25 +395,39 @@ phpunit.xml.dist:
 	touch -c $@
 
 $(DOCKER_FILE_IMAGE): devTools/Dockerfile
-	docker-compose build
+	docker compose build php82
+	docker image inspect infection-php82 >> $(DOCKER_FILE_IMAGE)
 	touch -c $@
 
-tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
+$(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-tests/benchmark/Tracing/coverage: tests/benchmark/Tracing/coverage.tar.gz
-	@echo "Untarring the coverage, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
+$(BENCHMARK_PARSE_GIT_DIFF_SOURCE):
+	php tests/benchmark/ParseGitDiff/generate-diff.php
 	touch -c $@
 
-tests/benchmark/Tracing/sources: tests/benchmark/Tracing/sources.tar.gz
-	@echo "Untarring the sources, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
+$(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR)
+	@echo "Generating coverage"
+	@rm -rf $(BENCHMARK_TRACING_COVERAGE_DIR) || true
+	cp -R $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	@# Correct the absolute paths found
+	PROJECT_ROOT=$$(pwd)/$(BENCHMARK_TRACING_SUBMODULE) \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-type f \
+			-exec sed -i.bak "s|/path/to/project|$${PROJECT_ROOT}|g" {} \; \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-name "*.bak" \
+			-type f \
+			-delete
 	touch -c $@
+
+$(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR):
+	git submodule update --init $(BENCHMARK_TRACING_SUBMODULE)
 
 clean:
 	rm -fr tests/benchmark/MutationGenerator/sources
-	rm -fr tests/benchmark/Tracing/coverage
-	rm -fr tests/benchmark/Tracing/sources
+	@rm -fr tests/benchmark/Tracing/sources
+	rm -fr $(BENCHMARK_TRACING_COVERAGE_DIR)
+	rm -fr $(BENCHMARK_TRACING_VENDOR)
 	git clean -f -X tests/e2e/

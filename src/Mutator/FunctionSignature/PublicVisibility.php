@@ -40,9 +40,9 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
 use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,16 +53,16 @@ final class PublicVisibility implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces the `public` method visibility keyword with `protected`.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- public function foo() {
-+ protected function foo() {
-DIFF
+                - public function foo() {
+                + protected function foo() {
+                DIFF,
         );
     }
 
@@ -81,8 +81,9 @@ DIFF
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
                 'stmts' => $node->getStmts(),
+                'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 
@@ -105,8 +106,8 @@ DIFF
 
     private function hasSamePublicParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        /** @var ClassReflection $reflection */
-        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+        $reflection = ReflectionVisitor::findReflectionClass($node);
+        Assert::notNull($reflection);
 
         return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asPublic());
     }

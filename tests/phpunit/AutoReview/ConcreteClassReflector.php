@@ -59,7 +59,7 @@ final class ConcreteClassReflector
                     && !$reflectionClass->isAbstract()
                     && !$reflectionClass->isTrait()
                 ;
-            }
+            },
         );
     }
 }

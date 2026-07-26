@@ -1,4 +1,4 @@
-Total: 8
+Total: 10
 
 Killed mutants:
 ===============
@@ -9,14 +9,14 @@ Line 7
 Mutator: Plus
 Line 9
 
+Mutator: ReturnRemoval
+Line 9
+
 Mutator: TrueValue
 Line 12
 
 Mutator: PublicVisibility
 Line 12
-
-Mutator: FalseValue
-Line 14
 
 Mutator: NotIdentical
 Line 14
@@ -24,6 +24,12 @@ Line 14
 Mutator: TrueValue
 Line 15
 
+Mutator: ReturnRemoval
+Line 15
+
+
+Killed by Static Analysis mutants:
+==================================
 
 Errors mutants:
 ===============
@@ -47,4 +53,7 @@ Not Covered mutants:
 ====================
 
 Mutator: FalseValue
+Line 17
+
+Mutator: ReturnRemoval
 Line 17

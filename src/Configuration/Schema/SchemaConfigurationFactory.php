@@ -39,42 +39,117 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Mago;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\TestFrameworkTypes;
+use function property_exists;
 use stdClass;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @final
  */
 class SchemaConfigurationFactory
 {
-    public function create(string $path, stdClass $rawConfig): SchemaConfiguration
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function create(string $pathname, stdClass $rawConfig): SchemaConfiguration
     {
+        /** @var stdClass $mago */
+        $mago = $rawConfig->mago ?? new stdClass();
+
+        self::assertTestFrameworkOptionsAreNotBothConfigured($rawConfig);
+
         return new SchemaConfiguration(
-            $path,
-            $rawConfig->timeout ?? null,
-            self::createSource($rawConfig->source),
-            self::createLogs($rawConfig->logs ?? new stdClass()),
-            self::normalizeString($rawConfig->tmpDir ?? null),
-            self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
-            $rawConfig->ignoreMsiWithNoMutations ?? null,
-            $rawConfig->minMsi ?? null,
-            $rawConfig->minCoveredMsi ?? null,
-            (array) ($rawConfig->mutators ?? []),
-            $rawConfig->testFramework ?? null,
-            self::normalizeString($rawConfig->bootstrap ?? null),
-            self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
-            self::normalizeString($rawConfig->testFrameworkOptions ?? null)
+            pathname: $pathname,
+            timeout: self::getTimeout($rawConfig),
+            source: self::createSource($rawConfig->source),
+            logs: self::createLogs($rawConfig->logs ?? new stdClass()),
+            tmpDir: self::normalizeString($rawConfig->tmpDir ?? null),
+            phpUnit: self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
+            phpStan: self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
+            mago: self::createMago($mago),
+            ignoreMsiWithNoMutations: $rawConfig->ignoreMsiWithNoMutations ?? null,
+            minMsi: $rawConfig->minMsi ?? null,
+            minCoveredMsi: $rawConfig->minCoveredMsi ?? null,
+            timeoutsAsEscaped: $rawConfig->timeoutsAsEscaped ?? null,
+            maxTimeouts: $rawConfig->maxTimeouts ?? null,
+            mutators: (array) ($rawConfig->mutators ?? []),
+            testFramework: self::getTestFramework($rawConfig),
+            bootstrap: self::normalizeString($rawConfig->bootstrap ?? null),
+            initialTestsPhpOptions: self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
+            testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
+            testFrameworkExtraArgs: self::normalizeString($rawConfig->testFrameworkExtraArgs ?? null),
+            staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
+            threads: $rawConfig->threads ?? null,
+            dotsPerRow: $rawConfig->dotsPerRow ?? null,
+            staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
         );
+    }
+
+    private static function getTimeout(stdClass $rawConfig): ?float
+    {
+        $timeout = $rawConfig->timeout ?? null;
+
+        Assert::nullOrGreaterThanEq($timeout, 0);
+
+        return $timeout;
+    }
+
+    private static function assertTestFrameworkOptionsAreNotBothConfigured(stdClass $rawConfig): void
+    {
+        Assert::false(
+            property_exists($rawConfig, 'testFrameworkOptions')
+            && property_exists($rawConfig, 'testFrameworkExtraArgs'),
+            'Cannot configure both the deprecated "testFrameworkOptions" and "testFrameworkExtraArgs".',
+        );
+    }
+
+    /**
+     * @return TestFrameworkTypes::*|null
+     */
+    private static function getTestFramework(stdClass $rawConfig): ?string
+    {
+        $testFramework = $rawConfig->testFramework ?? null;
+
+        // This value is already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
+
+        // @phpstan-ignore return.type
+        return $testFramework;
+    }
+
+    /**
+     * @return StaticAnalysisToolTypes::*|null
+     */
+    private static function getStaticAnalysisTool(stdClass $rawConfig): ?string
+    {
+        $staticAnalysisTool = $rawConfig->staticAnalysisTool ?? null;
+
+        // This value is already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+
+        // @phpstan-ignore return.type
+        return $staticAnalysisTool;
     }
 
     private static function createSource(stdClass $source): Source
     {
         return new Source(
             self::normalizeStringArray($source->directories ?? []),
-            self::normalizeStringArray($source->excludes ?? [])
+            self::normalizeStringArray($source->excludes ?? []),
         );
     }
 
@@ -85,10 +160,12 @@ class SchemaConfigurationFactory
             self::normalizeString($logs->html ?? null),
             self::normalizeString($logs->summary ?? null),
             self::normalizeString($logs->json ?? null),
+            self::normalizeString($logs->gitlab ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
             $logs->github ?? false,
-            self::createStrykerConfig($logs->stryker ?? null)
+            self::createStrykerConfig($logs->stryker ?? null),
+            self::normalizeString($logs->summaryJson ?? null),
         );
     }
 
@@ -115,18 +192,45 @@ class SchemaConfigurationFactory
     {
         return new PhpUnit(
             self::normalizeString($phpUnit->configDir ?? null),
-            self::normalizeString($phpUnit->customPath ?? null)
+            self::normalizeString($phpUnit->customPath ?? null),
+        );
+    }
+
+    private static function createPhpStan(stdClass $phpStan): PhpStan
+    {
+        return new PhpStan(
+            self::normalizeString($phpStan->configDir ?? null),
+            self::normalizeString($phpStan->customPath ?? null),
+        );
+    }
+
+    private static function createMago(stdClass $mago): Mago
+    {
+        /**
+         * Based on the schema validation this is guaranteed to be a string if it exists
+         * @var string|null $customPath
+         */
+        $customPath = $mago->customPath ?? null;
+        /**
+         * Based on the schema validation this is guaranteed to be a string if it exists
+         * @var string|null $configDir
+         */
+        $configDir = $mago->configDir ?? null;
+
+        return new Mago(
+            self::normalizeString($configDir),
+            self::normalizeString($customPath),
         );
     }
 
     /**
      * @param string[] $values
      *
-     * @return string[]
+     * @return list<non-empty-string>
      */
     private static function normalizeStringArray(array $values): array
     {
-        $normalizedValue = array_filter(array_map('trim', $values));
+        $normalizedValue = array_filter(array_map(trim(...), $values));
 
         return array_values($normalizedValue);
     }

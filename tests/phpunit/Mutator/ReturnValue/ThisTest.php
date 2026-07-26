@@ -35,45 +35,45 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\ReturnValue\This;
+use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @group integration
- */
+#[CoversClass(This::class)]
 final class ThisTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does mutate with no typehint' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'this_return-this.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'this_return-this.php'),
             <<<'PHP'
-<?php
+                <?php
 
-namespace ThisReturnThis;
+                namespace ThisReturnThis;
 
-class Test
-{
-    function test()
-    {
-        return null;
-    }
-}
-PHP
+                class Test
+                {
+                    function test()
+                    {
+                        return null;
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate non \'this\' return statements' => [
-            MutatorFixturesProvider::getFixtureFileContent($this, 'this-return-types.php'),
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'this-return-types.php'),
         ];
     }
 }

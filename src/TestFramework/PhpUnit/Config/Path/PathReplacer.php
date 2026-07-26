@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Path;
 
-use DOMElement;
+use DOMNameSpaceNode;
 use DOMNode;
 use function ltrim;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 use function trim;
@@ -46,21 +46,23 @@ use function trim;
 /**
  * @internal
  */
-final class PathReplacer
+final readonly class PathReplacer
 {
-    public function __construct(private Filesystem $filesystem, private ?string $phpUnitConfigDir = null)
-    {
+    public function __construct(
+        private Filesystem $filesystem,
+        private string $phpUnitConfigDir = '',
+    ) {
     }
 
-    public function replaceInNode(DOMElement|DOMNode $domElement): void
+    public function replaceInNode(DOMNameSpaceNode|DOMNode $domElement): void
     {
-        $path = trim($domElement->nodeValue);
+        $path = trim((string) $domElement->nodeValue);
 
         if (!$this->filesystem->isAbsolutePath($path)) {
             $newPath = sprintf(
                 '%s/%s',
                 $this->phpUnitConfigDir,
-                ltrim($path, '\/')
+                ltrim($path, '\/'),
             );
 
             // remove all occurrences of "/./". realpath can't be used because of glob patterns

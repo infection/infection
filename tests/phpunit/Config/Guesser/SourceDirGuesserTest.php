@@ -37,23 +37,25 @@ namespace Infection\Tests\Config\Guesser;
 
 use Infection\Config\Guesser\SourceDirGuesser;
 use LogicException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 
+#[CoversClass(SourceDirGuesser::class)]
 final class SourceDirGuesserTest extends TestCase
 {
     public function test_it_parser_psr4(): void
     {
         $composerJson = <<<'JSON'
-{
-    "autoload": {
-        "psr-4": {
-            "Infection\\": "abc",
-            "Namespace\\": "namespace"
-        }
-    }
-}
-JSON;
+            {
+                "autoload": {
+                    "psr-4": {
+                        "Infection\\": "abc",
+                        "Namespace\\": "namespace"
+                    }
+                }
+            }
+            JSON;
         $guesser = new SourceDirGuesser(json_decode($composerJson));
 
         $this->assertSame(['abc', 'namespace'], $guesser->guess());
@@ -62,15 +64,15 @@ JSON;
     public function test_it_returns_only_src_if_several_are_in_psr_config(): void
     {
         $composerJson = <<<'JSON'
-{
-    "autoload": {
-        "psr-4": {
-            "Infection\\": "src",
-            "Namespace\\": "namespace"
-        }
-    }
-}
-JSON;
+            {
+                "autoload": {
+                    "psr-4": {
+                        "Infection\\": "src",
+                        "Namespace\\": "namespace"
+                    }
+                }
+            }
+            JSON;
         $guesser = new SourceDirGuesser(json_decode($composerJson));
 
         $this->assertSame(['src'], $guesser->guess());
@@ -79,14 +81,14 @@ JSON;
     public function test_it_parser_psr0(): void
     {
         $composerJson = <<<'JSON'
-{
-    "autoload": {
-        "psr-0": {
-            "": "src"
-        }
-    }
-}
-JSON;
+            {
+                "autoload": {
+                    "psr-0": {
+                        "": "src"
+                    }
+                }
+            }
+            JSON;
         $guesser = new SourceDirGuesser(json_decode($composerJson));
 
         $this->assertSame(['src'], $guesser->guess());
@@ -109,7 +111,7 @@ JSON;
     public function test_it_returns_only_src_if_contains_array_of_paths(): void
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-0": {"": ["src", "libs"]}}}')
+            json_decode('{"autoload":{"psr-0": {"": ["src", "libs"]}}}'),
         );
 
         $this->assertSame(['src'], $guesser->guess());
@@ -118,7 +120,7 @@ JSON;
     public function test_it_returns_list_if_contains_array_of_paths_without_src(): void
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources", "libs"]}}}')
+            json_decode('{"autoload":{"psr-4": {"NameSpace\\//": ["sources", "libs"]}}}'),
         );
 
         $this->assertSame(['sources', 'libs'], $guesser->guess());
@@ -127,7 +129,7 @@ JSON;
     public function test_it_throw_invalid_autoload_exception(): void
     {
         $guesser = new SourceDirGuesser(
-            json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}')
+            json_decode('{"autoload":{"psr-4": [{"NameSpace\\//": ["sources", "libs"]}]}}'),
         );
 
         $this->expectException(LogicException::class);

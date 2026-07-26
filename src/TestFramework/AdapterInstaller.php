@@ -43,18 +43,20 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class AdapterInstaller
+final readonly class AdapterInstaller
 {
-    public const OFFICIAL_ADAPTERS_MAP = [
+    public const array OFFICIAL_ADAPTERS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
         TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
+        TestFrameworkTypes::TESTO => 'testo/bridge-infection',
     ];
 
     // 2 minutes
-    private const TIMEOUT = 120.0;
+    private const float TIMEOUT = 120.0;
 
-    public function __construct(private ComposerExecutableFinder $composerExecutableFinder)
-    {
+    public function __construct(
+        private ComposerExecutableFinder $composerExecutableFinder,
+    ) {
     }
 
     public function install(string $adapterName): void
@@ -62,7 +64,7 @@ final class AdapterInstaller
         Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
 
         $process = new Process([
-            $this->composerExecutableFinder->find(),
+            ...$this->composerExecutableFinder->find(),
             'require',
             '--dev',
             self::OFFICIAL_ADAPTERS_MAP[$adapterName],

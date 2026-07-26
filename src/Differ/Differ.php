@@ -36,19 +36,20 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  * @final
  *
- * Tiny adapter for Sebastian's differ. It is technically no longer necessary as of now, but there
- * has been several changes with Sebastian's differ hence having an adapter against which we test
- * the behaviour is always a nice to have.
+ * Builds mutation diffs through Sebastian's differ while keeping Infection's expected output shape under test.
  */
 class Differ
 {
-    public function __construct(private BaseDiffer $differ)
-    {
+    public function __construct(
+        private readonly BaseDiffer $differ,
+    ) {
     }
 
     /**
@@ -60,5 +61,63 @@ class Differ
     public function diff(string $from, string $to): string
     {
         return $this->differ->diff($from, $to);
+    }
+
+    /**
+     * Returns the diff between two pieces of code, but instead of a unified diff,
+     * it provides the relevant sections of the original and modified code.
+     * As with a unified diff, only changed lines and their surrounding context
+     * are included.
+     *
+     * @return array{string, string}
+     */
+    public function diffToArray(string $from, string $to): array
+    {
+        $tokens = $this->differ->diffToArray($from, $to);
+
+        $from = new Tokens();
+        $to = new Tokens();
+
+        foreach ($tokens as $tokenPair) {
+            self::processTokens($tokenPair, $from, $to);
+        }
+
+        return [
+            $from->getLines(),
+            $to->getLines(),
+        ];
+    }
+
+    /**
+     * @param array{string, BaseDiffer::*} $tokenPair
+     */
+    private static function processTokens(
+        array $tokenPair,
+        Tokens $from,
+        Tokens $to,
+    ): void {
+        [$token, $type] = $tokenPair;
+
+        if ($type === BaseDiffer::OLD) {
+            $from->addUnchangedToken($token);
+            $to->addUnchangedToken($token);
+        } elseif ($type === BaseDiffer::ADDED) {
+            $to->addChangedToken($token);
+        } elseif ($type === BaseDiffer::REMOVED) {
+            $from->addChangedToken($token);
+        } else {
+            Assert::oneOf(
+                $type,
+                [
+                    BaseDiffer::DIFF_LINE_END_WARNING,
+                    BaseDiffer::NO_LINE_END_EOF_WARNING,
+                ],
+                sprintf(
+                    'Unknown token type "%s" for the token "%s".',
+                    $type,
+                    $token,
+                ),
+            );
+        }
     }
 }

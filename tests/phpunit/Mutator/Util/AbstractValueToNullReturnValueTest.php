@@ -37,42 +37,40 @@ namespace Infection\Tests\Mutator\Util;
 
 use Infection\Mutator\Util\AbstractValueToNullReturnValue;
 use PhpParser\Node;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Function_;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use stdClass;
 
+#[CoversClass(AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    /**
-     * @var AbstractValueToNullReturnValue|MockObject
-     */
-    private $testSubject;
+    private Stub&AbstractValueToNullReturnValue $testSubjectStub;
 
     protected function setUp(): void
     {
-        $this->testSubject = $this->getMockBuilder(AbstractValueToNullReturnValue::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->testSubjectStub = $this->createStub(AbstractValueToNullReturnValue::class);
     }
 
     public function test_attribute_not_found(): void
     {
-        $this->assertTrue($this->invokeMethod($this->mockNode(null)));
+        $this->assertTrue($this->invokeMethod($this->createNodeStub(null)));
     }
 
     public function test_return_type_is_node_identifier(): void
     {
-        /** @var Node\Identifier $mockNode */
-        $mockNode = $this->createMock(Node\Identifier::class);
+        $node = new Identifier('int');
 
-        $this->assertTrue(
+        $this->assertFalse(
             $this->invokeMethod(
-                $this->mockNode(
-                    $this->mockFunction($mockNode)
-                )
-            )
+                $this->createNodeStub(
+                    $this->createFunctionStub($node),
+                ),
+            ),
         );
     }
 
@@ -80,10 +78,10 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $this->assertFalse(
             $this->invokeMethod(
-                $this->mockNode(
-                    $this->mockFunction('int')
-                )
-            )
+                $this->createNodeStub(
+                    $this->createFunctionStub('int'),
+                ),
+            ),
         );
     }
 
@@ -91,12 +89,12 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $this->assertTrue(
             $this->invokeMethod(
-                $this->mockNode(
-                    $this->mockFunction(
-                        $this->createMock(Node\NullableType::class)
-                    )
-                )
-            )
+                $this->createNodeStub(
+                    $this->createFunctionStub(
+                        $this->createStub(Node\NullableType::class),
+                    ),
+                ),
+            ),
         );
     }
 
@@ -104,12 +102,12 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $this->assertTrue(
             $this->invokeMethod(
-                $this->mockNode(
-                    $this->mockFunction(
-                        new stdClass()
-                    )
-                )
-            )
+                $this->createNodeStub(
+                    $this->createFunctionStub(
+                        new stdClass(),
+                    ),
+                ),
+            ),
         );
     }
 
@@ -117,22 +115,18 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     {
         $this->assertFalse(
             $this->invokeMethod(
-                $this->mockNode(
-                    $this->mockFunction(
-                        $this->createMock(Node\Name::class)
-                    )
-                )
-            )
+                $this->createNodeStub(
+                    $this->createFunctionStub(
+                        $this->createStub(Name::class),
+                    ),
+                ),
+            ),
         );
     }
 
-    private function mockNode($returnValue): Node
+    private function createNodeStub(mixed $returnValue): Node&Stub
     {
-        /** @var Node|MockObject $mockNode */
-        $mockNode = $this->getMockBuilder(Node::class)
-                         ->disableOriginalConstructor()
-                         ->setMethods(['getAttribute'])
-                         ->getMockForAbstractClass();
+        $mockNode = $this->createStub(Node::class);
 
         $mockNode->method('getAttribute')
                  ->willReturn($returnValue);
@@ -140,13 +134,9 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         return $mockNode;
     }
 
-    private function mockFunction($returnValue): Function_
+    private function createFunctionStub(mixed $returnValue): Function_&Stub
     {
-        /** @var Function_|MockObject $mockFunction */
-        $mockFunction = $this->getMockBuilder(Function_::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getReturnType'])
-            ->getMock();
+        $mockFunction = $this->createStub(Function_::class);
 
         $mockFunction->method('getReturnType')
             ->willReturn($returnValue);
@@ -154,11 +144,10 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         return $mockFunction;
     }
 
-    private function invokeMethod(Node $mockNode)
+    private function invokeMethod(Node $mockNode): mixed
     {
         $reflectionMethod = new ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
-        $reflectionMethod->setAccessible(true);
 
-        return $reflectionMethod->invoke($this->testSubject, $mockNode);
+        return $reflectionMethod->invoke($this->testSubjectStub, $mockNode);
     }
 }

@@ -41,33 +41,18 @@ namespace Infection\Configuration\Entry;
  */
 class Logs
 {
-    private ?string $textLogFilePath;
-    private ?string $htmlLogFilePath;
-    private ?string $summaryLogFilePath;
-    private ?string $jsonLogFilePath;
-    private ?string $debugLogFilePath;
-    private ?string $perMutatorFilePath;
-    private bool $useGitHubAnnotationsLogger;
-    private ?StrykerConfig $strykerConfig;
-
     public function __construct(
-        ?string $textLogFilePath,
-        ?string $htmlLogFilePath,
-        ?string $summaryLogFilePath,
-        ?string $jsonLogFilePath,
-        ?string $debugLogFilePath,
-        ?string $perMutatorFilePath,
-        bool $useGitHubAnnotationsLogger,
-        ?StrykerConfig $strykerConfig
+        private ?string $textLogFilePath,
+        private ?string $htmlLogFilePath,
+        private readonly ?string $summaryLogFilePath,
+        private readonly ?string $jsonLogFilePath,
+        private ?string $gitlabLogFilePath,
+        private readonly ?string $debugLogFilePath,
+        private readonly ?string $perMutatorFilePath,
+        private bool $useGitHubAnnotationsLogger,
+        private readonly ?StrykerConfig $strykerConfig,
+        private ?string $summaryJsonLogFilePath,
     ) {
-        $this->textLogFilePath = $textLogFilePath;
-        $this->htmlLogFilePath = $htmlLogFilePath;
-        $this->summaryLogFilePath = $summaryLogFilePath;
-        $this->jsonLogFilePath = $jsonLogFilePath;
-        $this->debugLogFilePath = $debugLogFilePath;
-        $this->perMutatorFilePath = $perMutatorFilePath;
-        $this->useGitHubAnnotationsLogger = $useGitHubAnnotationsLogger;
-        $this->strykerConfig = $strykerConfig;
     }
 
     public static function createEmpty(): self
@@ -79,8 +64,10 @@ class Logs
             null,
             null,
             null,
+            null,
             false,
-            null
+            null,
+            null,
         );
     }
 
@@ -94,9 +81,19 @@ class Logs
         return $this->htmlLogFilePath;
     }
 
+    public function setGitlabLogFilePath(string $gitlabLogFilePath): void
+    {
+        $this->gitlabLogFilePath = $gitlabLogFilePath;
+    }
+
     public function setHtmlLogFilePath(string $htmlLogFilePath): void
     {
         $this->htmlLogFilePath = $htmlLogFilePath;
+    }
+
+    public function setTextLogFilePath(string $textLogFilePath): void
+    {
+        $this->textLogFilePath = $textLogFilePath;
     }
 
     public function getSummaryLogFilePath(): ?string
@@ -107,6 +104,11 @@ class Logs
     public function getJsonLogFilePath(): ?string
     {
         return $this->jsonLogFilePath;
+    }
+
+    public function getGitlabLogFilePath(): ?string
+    {
+        return $this->gitlabLogFilePath;
     }
 
     public function getDebugLogFilePath(): ?string
@@ -132,5 +134,15 @@ class Logs
     public function getStrykerConfig(): ?StrykerConfig
     {
         return $this->strykerConfig;
+    }
+
+    public function getSummaryJsonLogFilePath(): ?string
+    {
+        return $this->summaryJsonLogFilePath;
+    }
+
+    public function setSummaryJsonLogFilePath(string $summaryJsonLogFilePath): void
+    {
+        $this->summaryJsonLogFilePath = $summaryJsonLogFilePath;
     }
 }

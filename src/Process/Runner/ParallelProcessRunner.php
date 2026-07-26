@@ -37,146 +37,193 @@ namespace Infection\Process\Runner;
 
 use function array_shift;
 use function count;
+use DuoClock\DuoClock;
 use Generator;
+use Infection\Process\MutantProcessContainer;
+use Iterator;
 use function max;
-use function microtime;
 use function range;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use function usleep;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  *
  * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
  */
-final class ParallelProcessRunner implements ProcessRunner
+class ParallelProcessRunner implements ProcessRunner
 {
+    private const int POLL_WAIT_IN_MS = 1000;
+
     /**
-     * @var array<int, IndexedProcessBearer>
+     * @var array<int, IndexedMutantProcessContainer>
      */
-    private array $runningProcesses = [];
+    private array $runningProcessContainers = [];
+
     /**
      * @var array<int, int>
      */
     private array $availableThreadIndexes = [];
 
+    private bool $shouldStop = false;
+
     /**
-     * @param int $poll Delay (in milliseconds) to wait in-between two polls
+     * @param non-negative-int $poll Delay (in milliseconds) to wait in-between two polls
      */
-    public function __construct(private int $threadCount, private int $poll = 1000)
-    {
+    public function __construct(
+        private readonly int $threadCount,
+        private readonly int $poll = self::POLL_WAIT_IN_MS,
+        private readonly DuoClock $clock = new DuoClock(),
+        private readonly ProcessQueue $queue = new ProcessQueue(),
+    ) {
     }
 
-    public function run(iterable $processes): void
+    public function stop(): void
+    {
+        $this->shouldStop = true;
+    }
+
+    /**
+     * @param iterable<MutantProcessContainer> $processContainers
+     * @return iterable<MutantProcessContainer>
+     */
+    public function run(iterable $processContainers): iterable
     {
         /*
-         * It takes about 100000 ms for a mutated process to finish, where it takes
-         * about 5000 ms to make it. Therefore instead of just waiting we can produce
+         * It takes about 100,000 ms for a mutated process to finish, where it takes
+         * about 5,000 ms to make it. Therefore, instead of just waiting, we can produce
          * new processes so that when a process or several finish, we would have
          * additional jobs on hand, without a need to wait for them to be created.
          *
          * For our purposes we need to make sure we only see one process only once. Thus,
          * we use a generator here which is both non-rewindable, and will fail loudly if tried.
+         * That said, we permit iterators for testing purposes, as they can be mocked.
          */
-        $generator = self::toGenerator($processes);
+        $generator = $processContainers instanceof Iterator
+            ? $processContainers
+            : self::toGenerator($processContainers);
 
-        // Bucket for processes to be executed
-        $bucket = [];
-
-        // Load the first process from the queue to buy us some time.
-        self::fillBucketOnce($bucket, $generator, 1);
+        // To get going, try to load at least one process to the bucket
+        $this->queue->enqueueFrom($generator);
 
         $threadCount = max(1, $this->threadCount);
         $this->availableThreadIndexes = range(1, $threadCount);
 
         // start the initial batch of processes
-        while ($process = array_shift($bucket)) {
-            $threadIndex = array_shift($this->availableThreadIndexes);
-
-            Assert::integer($threadIndex, 'Thread index can not be null.');
-
-            $this->startProcess($process, $threadIndex);
-
-            if (count($this->runningProcesses) >= $threadCount) {
-                do {
-                    // While we wait, try fetch a good amount of next processes from the queue,
-                    // reducing the poll delay with each loaded process
-                    usleep(max(0, $this->poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
-                } while (!$this->freeTerminatedProcesses());
+        do {
+            if ($this->shouldStop) {
+                break;
             }
 
-            // In any case try to load at least one process to the bucket
-            self::fillBucketOnce($bucket, $generator, 1);
-        }
+            if (!$this->queue->isEmpty()) {
+                $mutantProcessContainer = $this->queue->dequeue();
+                $threadIndex = array_shift($this->availableThreadIndexes);
 
-        do {
-            usleep($this->poll);
-            $this->freeTerminatedProcesses();
-            // continue loop while there are processes being executed or waiting for execution
-        } while ($this->runningProcesses);
+                Assert::integer($threadIndex, 'Thread index cannot be null. This indicates a bug - verify the isEmpty() check is present before dequeue().');
+
+                $this->startProcess($mutantProcessContainer, $threadIndex);
+            }
+
+            while ($this->hasProcessesThatCouldBeFreed($threadCount)) {
+                // While we wait, try to fetch a good number of next processes from the queue,
+                // reducing the poll delay with each loaded process
+                $this->sleepRemaining(
+                    timeSpentDoingWork: $this->queue->enqueueFrom($generator, maxQueueDepth: $threadCount),
+                );
+
+                // yield back so that we can work on a process result
+                yield from $this->tryToFreeNotRunningProcess();
+
+                // Continue if we still have too many running processes and no processes were terminated
+            }
+
+            // this termination is added for the case when there are few processes than threads, and we don't fill/free processes above
+            // yield back so that we can work on a process result
+            yield from $this->tryToFreeNotRunningProcess();
+
+            // Keep the queue populated for the next iteration. This ensures we always have
+            // work ready when threads become available. Without this, the loop would exit
+            // prematurely when the queue empties (we check for isEmpty() below), even
+            // if the generator has more processes.
+            $this->queue->enqueueFrom($generator);
+        } while (!$this->queue->isEmpty() || $this->runningProcessContainers !== []);
     }
 
-    private function freeTerminatedProcesses(): bool
+    /**
+     * This method checks if we have enough processes running that could be freed.
+     * Left as protected to allow spying off a mock in tests.
+     */
+    protected function hasProcessesThatCouldBeFreed(int $threadCount): bool
+    {
+        return count($this->runningProcessContainers) >= $threadCount;
+    }
+
+    /**
+     * Adaptive polling: sleep for the remaining poll interval after accounting for work done.
+     * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
+     */
+    protected function sleepRemaining(int $timeSpentDoingWork): void
+    {
+        $this->clock->usleep(max(0, $this->poll - $timeSpentDoingWork));
+    }
+
+    /**
+     * @return iterable<MutantProcessContainer>
+     */
+    private function tryToFreeNotRunningProcess(): iterable
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcesses as $index => $indexedProcessBearer) {
-            $processBearer = $indexedProcessBearer->processBearer;
-            $process = $processBearer->getProcess();
+        foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
+            $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
+            $mutantProcess = $mutantProcessContainer->getCurrent();
+            $process = $mutantProcess->getProcess();
 
             try {
                 $process->checkTimeout();
             } catch (ProcessTimedOutException) {
-                $processBearer->markAsTimedOut();
+                $mutantProcess->markAsTimedOut();
             }
 
-            if (!$process->isRunning()) {
-                $processBearer->terminateProcess();
-
-                $this->availableThreadIndexes[] = $indexedProcessBearer->threadIndex;
-
-                unset($this->runningProcesses[$index]->processBearer);
-                unset($this->runningProcesses[$index]);
-
-                return true;
+            if ($process->isRunning()) {
+                continue;
             }
+
+            $mutantProcess->markAsFinished();
+
+            $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
+
+            unset($this->runningProcessContainers[$index]->mutantProcessContainer);
+            unset($this->runningProcessContainers[$index]);
+
+            if ($mutantProcessContainer->hasNext()) {
+                $mutantProcessContainer->createNext();
+
+                // Enqueue the needed static analysis run
+                $this->queue->enqueue($mutantProcessContainer);
+
+                return;
+            }
+
+            // Only pass along processes that are completely done
+            yield $mutantProcessContainer;
         }
-
-        return false;
     }
 
-    private function startProcess(ProcessBearer $processBearer, int $threadIndex): void
+    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
-        $processBearer->getProcess()->start(null, [
+        $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,
         ]);
 
-        $this->runningProcesses[] = new IndexedProcessBearer($threadIndex, $processBearer);
+        $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
     }
 
     /**
-     * @param ProcessBearer[] $bucket
-     * @param Generator<ProcessBearer> $input
-     */
-    private static function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
-    {
-        if (count($bucket) >= $threadCount || !$input->valid()) {
-            return 0;
-        }
-
-        $start = microtime(true);
-
-        $bucket[] = $input->current();
-        $input->next();
-
-        return (int) (microtime(true) - $start) * 1_000_000; // ns to ms
-    }
-
-    /**
-     * @param iterable<ProcessBearer> $input
+     * @param iterable<MutantProcessContainer> $input
      *
-     * @return Generator<ProcessBearer>
+     * @return Generator<MutantProcessContainer>
      */
     private static function toGenerator(iterable &$input): Generator
     {

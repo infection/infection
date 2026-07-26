@@ -36,18 +36,27 @@ declare(strict_types=1);
 namespace Infection\Console;
 
 use function array_merge;
-use function class_exists;
-use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Debug\DumpAstCommand;
+use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
+use Infection\Command\Git\GitBaseReferenceCommand;
+use Infection\Command\Git\GitChangedFilesCommand;
+use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\InitialTest\InitialTestRunCommand;
+use Infection\Command\ListSourcesCommand;
+use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
-use Infection\Container;
+use Infection\Container\Container;
+use Infection\Framework\InfectionVersion;
 use OutOfBoundsException;
-use function preg_quote;
-use function Safe\preg_match;
-use function Safe\sprintf;
+use Override;
+use function sprintf;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use function trim;
 
@@ -56,11 +65,9 @@ use function trim;
  */
 final class Application extends BaseApplication
 {
-    public const PACKAGE_NAME = 'infection/infection';
+    private const string NAME = 'Infection - PHP Mutation Testing Framework';
 
-    private const NAME = 'Infection - PHP Mutation Testing Framework';
-
-    private const LOGO = '
+    private const string LOGO = '
     ____      ____          __  _
    /  _/___  / __/__  _____/ /_(_)___  ____
    / // __ \/ /_/ _ \/ ___/ __/ / __ \/ __ \
@@ -71,14 +78,28 @@ final class Application extends BaseApplication
 
 ';
 
-    private Container $container;
-
-    public function __construct(Container $container)
-    {
-        parent::__construct(self::NAME, self::getPrettyVersion());
-
-        $this->container = $container;
+    /**
+     * @throws OutOfBoundsException
+     */
+    public function __construct(
+        private readonly Container $container,
+        InfectionVersion $infectionVersion = new InfectionVersion(),
+    ) {
+        parent::__construct(self::NAME, $infectionVersion->prettyVersion());
         $this->setDefaultCommand('run');
+    }
+
+    #[Override]
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
+    {
+        $input ??= new ArgvInput();
+
+        // This allows to run `infection tests/` instead of `infection run tests/`.
+        if ($this->isUnknownCommand($input)) {
+            $input = $this->defaultToRunCommand($input);
+        }
+
+        return parent::run($input, $output);
     }
 
     public function getContainer(): Container
@@ -86,34 +107,47 @@ final class Application extends BaseApplication
         return $this->container;
     }
 
+    #[Override]
     public function getLongVersion(): string
     {
         return trim(sprintf(
             '<info>%s</info> version <comment>%s</comment>',
             $this->getName(),
-            $this->getVersion()
+            $this->getVersion(),
         ));
     }
 
+    #[Override]
     public function getHelp(): string
     {
         return self::LOGO . parent::getHelp();
     }
 
+    #[Override]
     protected function getDefaultCommands(): array
     {
-        $commands = array_merge(
+        $fileSystem = Container::create()->getFileSystem();
+
+        return array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
+                new MockTeamCityCommand($fileSystem),
+                new DumpAstCommand($fileSystem),
+                new GitBaseReferenceCommand(),
+                new GitChangedFilesCommand(),
+                new GitChangedLinesCommand(),
+                new GitDefaultBaseCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
-            ]
+                new ListSourcesCommand(),
+                new MakeCustomMutatorCommand(),
+                new InitialTestRunCommand(),
+            ],
         );
-
-        return $commands;
     }
 
+    #[Override]
     protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
@@ -125,26 +159,24 @@ final class Application extends BaseApplication
         OutputFormatterStyleConfigurator::configure($output);
     }
 
-    private static function getPrettyVersion(): string
+    private function isUnknownCommand(InputInterface $input): bool
     {
-        // Pre 2.0 Composer runtime didn't have this class.
-        // @codeCoverageIgnoreStart
-        if (!class_exists(InstalledVersions::class)) {
-            return 'unknown';
-        }
-        // @codeCoverageIgnoreEnd
+        $firstArgument = $input->getFirstArgument();
 
-        try {
-            return (string) InstalledVersions::getPrettyVersion(self::PACKAGE_NAME);
-            // @codeCoverageIgnoreStart
-        } catch (OutOfBoundsException $e) {
-            if (preg_match('#package .*' . preg_quote(self::PACKAGE_NAME, '#') . '.* not installed#i', $e->getMessage()) === 0) {
-                throw $e;
-            }
+        return $firstArgument !== null && !$this->has($firstArgument);
+    }
 
-            // We have a bogus exception: how can Infection be not installed if we're here?
-            return 'not-installed';
+    private function defaultToRunCommand(InputInterface $input): InputInterface
+    {
+        $newInput = new StringInput('run ' . $input);
+
+        // preserve interactivity that was set programmatically on the input
+        // rather than through a flag (e.g. when the input is built by tests).
+        // Flag- and CI-based interactivity is handled by `configureIO()`.
+        if (!$input->isInteractive()) {
+            $newInput->setInteractive(false);
         }
-        // @codeCoverageIgnoreEnd
+
+        return $newInput;
     }
 }

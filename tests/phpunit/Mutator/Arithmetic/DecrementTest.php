@@ -35,63 +35,87 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\Decrement;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Decrement::class)]
 final class DecrementTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
-    public function test_it_can_mutate(string $input, $expected = []): void
+    #[DataProvider('mutationsProvider')]
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It replaces post decrement' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a--;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-$a++;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a--;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a++;
+                    PHP,
+            ),
         ];
 
         yield 'It replaces pre decrement' => [
-            <<<'PHP'
-<?php
-
-$a = 1;
---$a;
-PHP
-            ,
-            <<<'PHP'
-<?php
-
-$a = 1;
-++$a;
-PHP
-            ,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    --$a;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    ++$a;
+                    PHP,
+            ),
         ];
 
         yield 'It does not change when its not a real decrement' => [
-            <<<'PHP'
-<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $b - -$a;
+                    PHP,
+            ),
+        ];
 
-$b - -$a;
-PHP
-            ,
+        yield 'It does not mutate pre increment' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    ++$a;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not mutate post increment' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1;
+                    $a++;
+                    PHP,
+            ),
+        ];
+
+        yield 'It does not decrement in for-loops to prevent endless loops' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    for ($i = strlen($string) - 1; $i > 10; $i--) {}
+                    PHP,
+            ),
         ];
     }
 }

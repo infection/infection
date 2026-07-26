@@ -41,10 +41,11 @@ use ReflectionException;
 /**
  * @internal
  */
-final class CoreClassReflection implements ClassReflection
+final readonly class CoreClassReflection implements ClassReflection
 {
-    private function __construct(private ReflectionClass $reflectionClass)
-    {
+    private function __construct(
+        private ReflectionClass $reflectionClass,
+    ) {
     }
 
     /**
@@ -73,5 +74,10 @@ final class CoreClassReflection implements ClassReflection
     public function getName(): string
     {
         return $this->reflectionClass->getName();
+    }
+
+    public function isFinal(): bool
+    {
+        return $this->reflectionClass->isFinal();
     }
 }

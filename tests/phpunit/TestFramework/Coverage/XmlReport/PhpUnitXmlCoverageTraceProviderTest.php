@@ -35,19 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_put_contents;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(PhpUnitXmlCoverageTraceProvider::class)]
 final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
 {
     public function test_it_can_parse_coverage_data(): void
@@ -57,18 +58,12 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
 
         file_put_contents($indexPath, $indexContents);
 
-        $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
-        $indexLocatorMock
-            ->method('locate')
-            ->willReturn($indexPath)
-        ;
-
-        $sourceFileInfoProviderMock = $this->createMock(SourceFileInfoProvider::class);
+        $sourceFileInfoProviderMock = $this->createStub(SourceFileInfoProvider::class);
 
         $indexXmlParserMock = $this->createMock(IndexXmlCoverageParser::class);
         $indexXmlParserMock
             ->method('parse')
-            ->with($indexPath, $indexContents, $this->tmp)
+            ->with($indexPath, $this->tmp)
             ->willReturn([$sourceFileInfoProviderMock])
         ;
 
@@ -86,9 +81,9 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
         ;
 
         $provider = new PhpUnitXmlCoverageTraceProvider(
-            $indexLocatorMock,
+            new FixedLocator($indexPath),
             $indexXmlParserMock,
-            $coverageXmlParserMock
+            $coverageXmlParserMock,
         );
 
         $traces = $provider->provideTraces();

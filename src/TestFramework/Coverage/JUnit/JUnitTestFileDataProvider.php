@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use DOMDocument;
-use DOMElement;
-use DOMNodeList;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\preg_replace;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -50,77 +48,63 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(private JUnitReportLocator $jUnitLocator)
-    {
+    public function __construct(
+        private readonly ReportLocator $jUnitLocator,
+    ) {
     }
 
-    /**
-     * @throws TestFileNameNotFoundException
-     */
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    public function getTestFileInfo(string $testId): TestFileTimeData
     {
         $xPath = $this->getXPath();
 
-        /** @var DOMNodeList<DOMElement> $nodes */
-        $nodes = null;
+        $node = null;
+        $testFound = false;
 
-        foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
-            $nodes = $xPath->query(sprintf($queryString, $placeholder));
+        foreach (self::testCaseMapGenerator($testId) as $queryString => $placeholder) {
+            $node = $xPath->queryElement(sprintf($queryString, $placeholder));
 
-            if ($nodes->length !== 0) {
+            if ($node !== null) {
+                $testFound = true;
+
                 break;
             }
         }
 
-        Assert::notNull($nodes);
-
-        if ($nodes->length === 0) {
-            throw TestFileNameNotFoundException::notFoundFromFQN(
-                $fullyQualifiedClassName,
-                $this->jUnitLocator->locate()
+        if (!$testFound) {
+            throw TestNotFound::forTestId(
+                $testId,
+                $this->jUnitLocator->locate(),
             );
         }
 
-        Assert::same($nodes->length, 1);
+        Assert::notNull($node);
 
         return new TestFileTimeData(
-            $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
+            $node->getAttribute('file'),
+            (float) $node->getAttribute('time'),
         );
     }
 
     /**
      * @return iterable<string, string>
      */
-    private static function testCaseMapGenerator(string $fullyQualifiedClassName): iterable
+    private static function testCaseMapGenerator(string $testId): iterable
     {
         // A default format for <testsuite>
-        yield '//testsuite[@name="%s"][1]' => $fullyQualifiedClassName;
+        yield '//testsuite[@name="%s"][1]' => $testId;
 
         // A format where the class name is inside `class` attribute of `testcase` tag
-        yield '//testcase[@class="%s"][1]' => $fullyQualifiedClassName;
+        yield '//testcase[@class="%s"][1]' => $testId;
 
         // A format where the class name is inside `file` attribute of `testcase` tag
-        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $fullyQualifiedClassName);
+        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $testId);
 
         // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
-        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $fullyQualifiedClassName);
+        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $testId);
     }
 
     private function getXPath(): SafeDOMXPath
     {
-        return $this->xPath ?? $this->xPath = self::createXPath($this->jUnitLocator->locate());
-    }
-
-    private static function createXPath(string $jUnitPath): SafeDOMXPath
-    {
-        Assert::fileExists($jUnitPath);
-
-        $dom = new DOMDocument();
-        $success = @$dom->load($jUnitPath);
-
-        Assert::true($success);
-
-        return new SafeDOMXPath($dom);
+        return $this->xPath ??= SafeDOMXPath::fromFile($this->jUnitLocator->locate());
     }
 }

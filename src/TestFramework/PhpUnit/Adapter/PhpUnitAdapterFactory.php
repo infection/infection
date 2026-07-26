@@ -35,20 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function array_map;
+use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
+use Infection\Process\ShellCommandLineExecutor;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Tracing\TestRunOrderResolver;
 use function Safe\file_get_contents;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -56,9 +63,11 @@ use Webmozart\Assert\Assert;
  */
 final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
+    use CannotBeInstantiated;
+
     /**
      * @param string[] $sourceDirectories
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public static function create(
         string $testFrameworkExecutable,
@@ -70,43 +79,65 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $sourceDirectories,
         bool $skipCoverage,
         bool $executeOnlyCoveringTestCases = false,
-        array $filteredSourceFilesToMutate = []
+        array $filteredSourceFilesToMutate = [],
+        ?string $mapSourceClassToTestStrategy = null,
+        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?string $sourceDirectoryBasePath = null,
     ): TestFrameworkAdapter {
-        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
+        Assert::notNull($shellCommandLineExecutor);
+        Assert::notNull($sourceDirectoryBasePath);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
                 new Filesystem(),
-                $testFrameworkConfigDir
+                $testFrameworkConfigDir,
             ),
-            $testFrameworkConfigDir
+            $testFrameworkConfigDir,
         );
 
         return new PhpUnitAdapter(
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider(),
+            new PCOVDirectoryProvider(
+                self::makeSourcePathsAbsolute(
+                    $sourceDirectoryBasePath,
+                    $sourceDirectories,
+                ),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 new XmlConfigurationVersionProvider(),
+                new Filesystem(),
                 $sourceDirectories,
-                $filteredSourceFilesToMutate
+                array_map(
+                    static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
+                    $filteredSourceFilesToMutate,
+                ),
             ),
             new MutationConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
                 $configManipulator,
                 $projectDir,
-                new JUnitTestCaseSorter()
+                new TestRunOrderResolver(),
+                new Filesystem(),
             ),
-            new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases),
+            new ArgumentsAndOptionsBuilder(
+                $executeOnlyCoveringTestCases,
+                $filteredSourceFilesToMutate,
+                $mapSourceClassToTestStrategy,
+            ),
+            $shellCommandLineExecutor,
             new VersionParser(),
-            new CommandLineBuilder()
+            new CommandLineBuilder(
+                new PhpExecutableFinder(),
+            ),
         );
     }
 
@@ -118,5 +149,25 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     *
+     * @return list<string>
+     */
+    private static function makeSourcePathsAbsolute(
+        string $sourceDirectoryBasePath,
+        array $sourceDirectories,
+    ): array {
+        return array_values(
+            array_map(
+                static fn (string $sourceDirectory): string => Path::makeAbsolute(
+                    $sourceDirectory,
+                    $sourceDirectoryBasePath,
+                ),
+                $sourceDirectories,
+            ),
+        );
     }
 }

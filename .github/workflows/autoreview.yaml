@@ -10,36 +10,70 @@ on:
       - main
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
 
     strategy:
       matrix:
-        # Should use the latest supported PHP version
-        php-version: ['8.2']
+        # Should use the oldest supported PHP version
+        php-version: ['8.3']
 
     name: Autoreview on PHP ${{ matrix.php-version }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
         env:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure PHP-CS-Fixer GitHub Actions cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ./var/cache/php-cs-fixer
+          key: "${{ matrix.php-version }}-php-cs-fixer-${{ github.run_id }}"
+          restore-keys: "${{ matrix.php-version }}-php-cs-fixer"
+
+      - name: Configure Rector GitHub Actions cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ./var/cache/rector
+          key: "${{ matrix.php-version }}-rector-${{ github.run_id }}"
+          restore-keys: "${{ matrix.php-version }}-rector"
+
+      - name: Configure PHPStan GitHub Actions cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ./var/cache/phpstan
+          key: "${{ matrix.php-version }}-phpstan-${{ github.run_id }}"
+          restore-keys: "${{ matrix.php-version }}-phpstan"
+
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
@@ -52,7 +86,28 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Download Mago
+        run: vendor/bin/mago --version
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run auto-review tests
         # Ensures we see all the errors
         run: make autoreview --keep-going
 
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+    name: Autoreview Status
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: tests
+    if: always()
+    steps:
+      - name: Successful run
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+
+      - name: Failing run
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

@@ -35,71 +35,71 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapFinally;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapFinally::class)]
 final class UnwrapFinallyTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      * @param mixed[] $settings
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, array|string $expected = [], array $settings = []): void
     {
-        $this->doTest($input, $expected, $settings);
+        $this->assertMutatesInput($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Can unwrap try-finally block without catches' => [
-            '<?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
 
-function withoutChecks(callable $fn): void
-{
-    $this->useChecks = false;
-    try {
-        $fn();
-    } finally {
-        $this->useChecks = true;
-    }
-}',
-            '<?php
-
-function withoutChecks(callable $fn) : void
-{
-    $this->useChecks = false;
-    $fn();
-    $this->useChecks = true;
-}',
+                    try {
+                        $fn();
+                    } finally {
+                        $this->useChecks = true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
+                    $fn();
+                    $this->useChecks = true;
+                    PHP,
+            ),
         ];
 
         yield 'Can unwrap finally statements and leave try-catch' => [
-            '<?php
-
-function withoutChecks(callable $fn): void
-{
-    $this->useChecks = false;
-    try {
-        $fn();
-    } catch (\Throwable $e) {
-        throw $e;
-    } finally {
-        $this->useChecks = true;
-    }
-}',
-            '<?php
-
-function withoutChecks(callable $fn) : void
-{
-    $this->useChecks = false;
-    try {
-        $fn();
-    } catch (\Throwable $e) {
-        throw $e;
-    }
-    $this->useChecks = true;
-}',
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
+                    try {
+                        $fn();
+                    } catch (\Throwable $e) {
+                        throw $e;
+                    } finally {
+                        $this->useChecks = true;
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $this->useChecks = false;
+                    try {
+                        $fn();
+                    } catch (\Throwable $e) {
+                        throw $e;
+                    }
+                    $this->useChecks = true;
+                    PHP,
+            ),
         ];
     }
 }

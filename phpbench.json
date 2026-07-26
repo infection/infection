@@ -1,0 +1,40 @@
+{
+    "$schema": "./vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.file_pattern": "*Bench.php",
+    "report.generators": {
+        "bar_chart_iteration": {
+            "title": null,
+            "description": null,
+            "partition": [
+                "subject_name",
+                "variant_name"
+            ],
+            "filter": null,
+            "components": [
+                {
+                    "extends": "bar_chart_iteration"
+                }
+            ],
+            "tabbed": false,
+            "tab_labels": [],
+            "generator": "component"
+        }
+    },
+    "report.components": {
+        "bar_chart_iteration": {
+            "title": "Average iteration times",
+            "x_partition": [
+                "iteration_index"
+            ],
+            "bar_partition": [
+                "suite_tag"
+            ],
+            "y_axes_label": "yValue as time precision 1",
+            "x_axes_label": null,
+            "y_error_margin": "stdev(partition['result_time_avg'])",
+            "component": "bar_chart_aggregate",
+            "y_expr": "mode(partition['result_time_avg'])"
+        }
+    }
+}

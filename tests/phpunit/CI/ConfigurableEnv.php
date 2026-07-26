@@ -37,10 +37,14 @@ namespace Infection\Tests\CI;
 
 use function array_key_exists;
 use OndraM\CiDetector\Env;
+use Override;
 
 final class ConfigurableEnv extends Env
 {
-    private $variables = [];
+    /**
+     * @var array<string, string|false>
+     */
+    private array $variables = [];
 
     /**
      * @param array<string, string|false> $variables
@@ -50,6 +54,7 @@ final class ConfigurableEnv extends Env
         $this->variables = $variables;
     }
 
+    #[Override]
     public function get(string $name)
     {
         if (!array_key_exists($name, $this->variables)) {

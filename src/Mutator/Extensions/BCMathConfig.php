@@ -43,7 +43,7 @@ use Infection\Mutator\MutatorConfig;
  */
 final class BCMathConfig extends AllowedFunctionsConfig implements MutatorConfig
 {
-    private const KNOWN_FUNCTIONS = [
+    private const array KNOWN_FUNCTIONS = [
         'bcadd',
         'bccomp',
         'bcdiv',

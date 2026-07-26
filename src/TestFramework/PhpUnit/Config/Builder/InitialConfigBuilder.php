@@ -35,38 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use DOMDocument;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\file_put_contents;
-use function Safe\sprintf;
+use Infection\TestFramework\XML\SafeDOMXPath;
+use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-class InitialConfigBuilder implements ConfigBuilder
+final readonly class InitialConfigBuilder implements ConfigBuilder
 {
     private string $originalXmlConfigContent;
 
     /**
      * @param string[] $srcDirs
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param string[] $filteredSourceFilesToMutate
      */
     public function __construct(
         private string $tmpDir,
         string $originalXmlConfigContent,
         private XmlConfigurationManipulator $configManipulator,
         private XmlConfigurationVersionProvider $versionProvider,
+        private Filesystem $filesystem,
         private array $srcDirs,
-        private array $filteredSourceFilesToMutate
+        private array $filteredSourceFilesToMutate,
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
-            'The original XML config content cannot be an empty string'
+            'The original XML config content cannot be an empty string',
         );
         $this->originalXmlConfigContent = $originalXmlConfigContent;
     }
@@ -75,14 +76,11 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $path = $this->buildPath();
 
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $success = @$dom->loadXML($this->originalXmlConfigContent);
-
-        Assert::true($success);
-
-        $xPath = new SafeDOMXPath($dom);
+        $xPath = SafeDOMXPath::fromString(
+            $this->originalXmlConfigContent,
+            preserveWhiteSpace: false,
+            formatOutput: true,
+        );
 
         $this->configManipulator->validate($path, $xPath);
 
@@ -90,14 +88,17 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
         $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
-        $this->configManipulator->setStopOnFailure($xPath);
+        $this->configManipulator->setStopOnFailureOrDefect($version, $xPath);
         $this->configManipulator->deactivateColours($xPath);
         $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        file_put_contents($path, $dom->saveXML());
+        $this->filesystem->dumpFile(
+            $path,
+            $xPath->document->saveXML(),
+        );
 
         return $path;
     }
@@ -109,6 +110,28 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
+        if (version_compare($version, '12.0', '>=')) {
+            // For PHPUnit 12.0+, preserve the original coverage configuration as-is.
+            // Otherwise, if the initial tests executed cover code that is outside
+            // configured sources, PHPUnit will fail with a warning.
+            // Historically, this was done for performance reasons, but since then
+            // PHPUnit coverage was reworked and optimised, and there are no more
+            // benefits to doing this.
+            $this->configManipulator->addOrUpdateSourceIncludeNodes(
+                xPath: $xPath,
+                srcDirs: $this->srcDirs,
+                filteredSourceFilesToMutate: [],
+            );
+
+            return;
+        }
+
+        if (version_compare($version, '10.1', '>=')) {
+            $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
+
+            return;
+        }
+
         if (version_compare($version, '10', '>=')) {
             $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
@@ -133,22 +156,25 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        if (version_compare($version, '7.2', '<')) {
-            return;
-        }
-
-        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
-            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+        if (PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version)) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
+        } elseif (version_compare($version, '7.2', '>=')) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
         }
     }
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+        $count = $xPath->queryCount(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length === 0) {
-            $node = $xPath->query('/phpunit')[0];
-            $node->setAttribute($attribute, $value);
+        if ($count === 0) {
+            $xPath
+                ->getElement('/phpunit')
+                ->setAttribute($attribute, $value);
 
             return true;
         }
