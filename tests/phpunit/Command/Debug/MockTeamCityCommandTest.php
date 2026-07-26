@@ -42,6 +42,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
 use Infection\Container\Container;
 use Infection\FileSystem\FileSystem;
+use Infection\Framework\Str;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
@@ -79,7 +80,7 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
 
         $tester->assertCommandIsSuccessful();
 
-        $this->assertSame(self::LOG_EXAMPLE . "\n", $tester->getDisplay());
+        $this->assertSame(self::LOG_EXAMPLE . "\n", Str::toUnixLineEndings($tester->getDisplay()));
         $this->assertSame([100_000, 100_000, 100_000, 100_000], $recordedSleepCalls);
     }
 
@@ -96,7 +97,7 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
 
         $tester->assertCommandIsSuccessful();
 
-        $this->assertSame(self::LOG_EXAMPLE . "\n\n", $tester->getDisplay());
+        $this->assertSame(self::LOG_EXAMPLE . "\n\n", Str::toUnixLineEndings($tester->getDisplay()));
         $this->assertSame([50_000, 50_000, 50_000, 50_000, 50_000], $recordedSleepCalls);
     }
 
@@ -134,7 +135,7 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
         ]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertSame("\n", $tester->getDisplay());
+        $this->assertSame("\n", Str::toUnixLineEndings($tester->getDisplay()));
         $this->assertCount(1, $recordedSleepCalls); // One sleep for the empty line
     }
 
@@ -214,7 +215,7 @@ final class MockTeamCityCommandTest extends FileSystemTestCase
     private function createTeamCityLog(string $content = self::LOG_EXAMPLE): string
     {
         $teamCityLog = $this->tmp . '/teamcity.log';
-        file_put_contents($teamCityLog, $content);
+        file_put_contents($teamCityLog, Str::toSystemLineEndings($content));
 
         return $teamCityLog;
     }

@@ -7256,18 +7256,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #1 of function `strlen` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #2 of function `explode` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
 code = "string-member-selector"
 message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
 count = 1
@@ -7283,18 +7271,6 @@ file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesMockSetup` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #1 of function `strlen` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #2 of function `explode` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
