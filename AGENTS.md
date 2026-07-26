@@ -90,8 +90,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
-- `adr/` - Architecture Decision Records; short rationale for standing conventions. Read
-  before challenging one. New ADRs must follow the template `adr/0000-template.md`. Keep jargon to a minimum (ASD-STE100) when writing.
+- `adr/` - Architecture Decision Records; short rationale for standing conventions. See
+  `## Suggest Architecture Decision Records` for when to read, update, or create one.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
@@ -101,6 +101,41 @@ The human contributor guide - e2e scenario anatomy, the e2e runner, the pre-push
 transcluded here:
 
 @.github/CONTRIBUTING.md
+
+## Suggest Architecture Decision Records (ADRs)
+
+`AGENTS.md` reflects the current outcomes agents usually need, so ADRs are mainly for
+durable rationale. Read an ADR when changing, challenging, or extending one of its decisions.
+
+When a task exposes an undocumented, durable choice about architecture, public API,
+dependencies, testing strategy, or a project-wide convention, tell the contributor that it
+is a candidate for an ADR. Suggest an ADR especially when credible alternatives exist or the
+same decision is likely to recur in reviews. First search `adr/`: update or supersede an
+existing decision instead of creating a competing record. Follow the criteria and workflow
+in `adr/README.md` and the template in `adr/0000-template.md`. Keep jargon to a minimum
+(follow ASD-STE100) when writing.
+
+Suggest the ADR; do not expand the task by writing one unless the contributor asks for it.
+Do not suggest ADRs for implementation descriptions, subsystem invariants, contribution
+workflows, command lists, or one-off details. Put those in architecture documentation,
+contributor documentation, or code comments as appropriate.
+
+Current ADRs:
+
+<!-- adr-list:start -->
+- [`adr/0001-inheritdoc.md`](adr/0001-inheritdoc.md) - Inheritdoc usage
+- [`adr/0002-@covers-annotations.md`](adr/0002-@covers-annotations.md) - `@covers` annotations usage
+- [`adr/0003-PHPUnit-this-over-self.md`](adr/0003-PHPUnit-this-over-self.md) - Use `$this` instead of `self` for PHPUnit assertions
+- [`adr/0004-PHPUnit-expect-exception-over-try-catch.md`](adr/0004-PHPUnit-expect-exception-over-try-catch.md) - Use PHPUnit `expectException*()` API over `try-catch`
+- [`adr/0005-Bump-PHP-versions.md`](adr/0005-Bump-PHP-versions.md) - Bumping PHP version requirements
+- [`adr/0006-memoized-over-cached-nomenclature.md`](adr/0006-memoized-over-cached-nomenclature.md) - Use `Memoized` over `Cached` for object-local result reuse
+- [`adr/0007-declare-phpunit-coverage-metadata.md`](adr/0007-declare-phpunit-coverage-metadata.md) - Declare PHPUnit coverage metadata explicitly
+- [`adr/0008-PHP-version-support-policy.md`](adr/0008-PHP-version-support-policy.md) - PHP version support policy
+- [`adr/0009-event-and-subscriber-naming.md`](adr/0009-event-and-subscriber-naming.md) - Event and subscriber naming conventions
+- [`adr/0010-compare-objects-with-assert-equals.md`](adr/0010-compare-objects-with-assert-equals.md) - Compare objects with PHPUnit `assertEquals()`
+- [`adr/0011-use-phpunit-environment-variable-attribute.md`](adr/0011-use-phpunit-environment-variable-attribute.md) - Use PHPUnit attributes for test environment variables
+- [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
+<!-- adr-list:end -->
 
 ## Commands
 
@@ -132,14 +167,15 @@ analysers are PHPStan and Mago.
 Each entry gives three things: what agents often write, what this codebase does instead, and
 why. These rules come from comparing agent designs with the real subsystems.
 
-### `@internal` everywhere; the public API is a whitelist
+### Finality: `final` keyword vs `@final` docblock
 
-Every class gets `@internal` (PHPat-enforced). Users may depend only on extension points that
-are listed in `tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php::EXTENSION_POINTS`:
-`Mutator`, `Definition`, `MutatorCategory`, `BaseMutatorTestCase`, `MutationAnalysisLogger`,
-`SchemaConfigurationFactory`, `SchemaConfigurationFileLoader`, `SchemaValidator`. Extension
-points must have documented doc-blocks (another PHPat rule). Everything else may break at any
-release. Conversely, changing anything on that list is a BC event.
+Agents often mark everything `final`. Here, hard `final` is only for classes never mocked
+(mutators, visitors, value objects, leaf utilities); services that tests mock get `/** @internal
+@final */` with NO keyword. The PHPat finality rule accepts either form; adding the keyword
+to a mocked class breaks the suite. Mockability is the only accepted reason for `@final`.
+If no test mocks the class, use the keyword. Do not add interfaces just to mock a single class.
+Reviewers ask "is there a reason this is `@final` rather than `final`?" Have the answer ("it
+is mocked in X").
 
 ### Imports: everything, including functions and constants
 
@@ -480,8 +516,8 @@ Notes for review:
 - Complex setup gets hand-rolled immutable builders/fakes next to the test
   (`tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryInputBuilder.php`,
   a fake `Git` implementation) rather than deep mock graphs.
-- Env vars: any test calling `putenv` must `use BacksUpEnvironmentVariables;`
-  (AutoReview-checked).
+- Env vars: tests exercising code that uses a statically identifiable environment variable
+  must declare it with `#[WithEnvironmentVariable]` (PHPat-enforced).
 - Visitors have a dedicated harness - read `tests/phpunit/PhpParser/Visitor/README.md`:
   extend `VisitorTestCase`, `addIdsToNodes()`, traverse with your visitor +
   `MarkTraversedNodesAsVisitedVisitor`, dump with the configured `NodeDumper`, `assertSame`
