@@ -37,7 +37,7 @@ namespace Infection\TestFramework;
 
 use Composer\Autoload\ClassLoader;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
-use Symfony\Component\Process\Process;
+use Infection\Process\ShellCommandLineExecutor;
 use Webmozart\Assert\Assert;
 
 /**
@@ -56,6 +56,7 @@ final readonly class AdapterInstaller
 
     public function __construct(
         private ComposerExecutableFinder $composerExecutableFinder,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -63,16 +64,19 @@ final readonly class AdapterInstaller
     {
         Assert::keyExists(self::OFFICIAL_ADAPTERS_MAP, $adapterName);
 
-        $process = new Process([
-            ...$this->composerExecutableFinder->find(),
-            'require',
-            '--dev',
-            self::OFFICIAL_ADAPTERS_MAP[$adapterName],
-        ]);
-
-        $process->setTimeout(self::TIMEOUT);
-
-        $process->run();
+        $this->shellCommandLineExecutor->run(
+            [
+                ...$this->composerExecutableFinder->find(),
+                'require',
+                '--dev',
+                self::OFFICIAL_ADAPTERS_MAP[$adapterName],
+            ],
+            null,
+            null,
+            [],
+            null,
+            self::TIMEOUT,
+        );
 
         $loader = new ClassLoader();
 

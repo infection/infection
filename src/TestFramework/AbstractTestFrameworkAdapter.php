@@ -174,7 +174,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         );
 
         return $this->versionParser->parse(
-            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable)->stdout,
         );
     }
 }

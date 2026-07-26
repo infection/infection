@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -49,11 +48,11 @@ readonly class InitialStaticAnalysisProcessFactory
     ) {
     }
 
-    public function createProcess(): Process
+    /**
+     * @return list<string>
+     */
+    public function createCommandLine(): array
     {
-        return new Process(
-            command: $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
-            timeout: null, // Ignore the default timeout of 60 seconds
-        );
+        return $this->staticAnalysisToolAdapter->getInitialRunCommandLine();
     }
 }

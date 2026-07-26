@@ -115,7 +115,7 @@ class TestFrameworkFinder
                 ...$this->findComposer(),
                 'config',
                 'bin-dir',
-            ]);
+            ])->stdout;
         } catch (RuntimeException) {
             $candidate = getcwd() . '/vendor/bin';
 

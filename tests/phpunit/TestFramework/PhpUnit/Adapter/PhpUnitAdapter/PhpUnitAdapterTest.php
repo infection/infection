@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
+use Infection\Process\CompletedProcess;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
@@ -124,7 +125,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->expects($this->once())
             ->method('execute')
             ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
-            ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
+            ->willReturn(new CompletedProcess([], 0, 'PHPUnit 10.5.1 by Sebastian Bergmann and contributors.', ''));
 
         $expected = '10.5.1';
 

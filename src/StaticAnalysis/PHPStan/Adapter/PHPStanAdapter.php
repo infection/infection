@@ -184,7 +184,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         );
 
         return $this->versionParser->parse(
-            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable)->stdout,
         );
     }
 }

@@ -43,14 +43,17 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InitialStaticAnalysisProcessFactory::class)]
 final class InitialStaticAnalysisProcessFactoryTest extends TestCase
 {
-    public function test_it_creates_initial_process_without_timeout(): void
+    public function test_it_creates_initial_command_line(): void
     {
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+        $staticAnalysisToolAdapter
+            ->method('getInitialRunCommandLine')
+            ->willReturn(['/path/to/phpstan', 'analyse']);
+
         $factory = new InitialStaticAnalysisProcessFactory(
-            $this->createStub(StaticAnalysisToolAdapter::class),
+            $staticAnalysisToolAdapter,
         );
 
-        $process = $factory->createProcess();
-
-        $this->assertNull($process->getTimeout());
+        $this->assertSame(['/path/to/phpstan', 'analyse'], $factory->createCommandLine());
     }
 }

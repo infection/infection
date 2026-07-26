@@ -38,23 +38,26 @@ namespace Infection\Tests\Process\Runner;
 use function array_map;
 use function array_unique;
 use function array_values;
+use Closure;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Process\CompletedProcess;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
-use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
-use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
     private InitialStaticAnalysisProcessFactory&Stub $processFactoryStub;
+
+    private ShellCommandLineExecutor&MockObject $shellCommandLineExecutor;
 
     private EventDispatcherCollector $eventDispatcher;
 
@@ -62,28 +65,41 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     protected function setUp(): void
     {
-        if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('The processes do not work the same way in PGPDBG');
-        }
-
         $this->processFactoryStub = $this->createStub(InitialStaticAnalysisProcessFactory::class);
+        $this->shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
 
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->runner = new InitialStaticAnalysisRunner($this->processFactoryStub, $this->eventDispatcher);
+        $this->runner = new InitialStaticAnalysisRunner(
+            $this->processFactoryStub,
+            $this->shellCommandLineExecutor,
+            $this->eventDispatcher,
+        );
     }
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
-        $process = $this->createProcessForCode(<<<STR
-            echo 'ping';
-            echo 'pong';
-            STR
-        );
-
         $this->processFactoryStub
-            ->method('createProcess')
-            ->willReturn($process)
+            ->method('createCommandLine')
+            ->willReturn(['/path/to/phpstan', 'analyse'])
+        ;
+
+        $this->shellCommandLineExecutor
+            ->expects($this->once())
+            ->method('run')
+            ->with(
+                ['/path/to/phpstan', 'analyse'],
+                $this->isInstanceOf(Closure::class),
+                null,
+                [],
+                null,
+                null,
+            )
+            ->willReturnCallback(static function (array $command, Closure $callback): CompletedProcess {
+                $callback('out', 'ping');
+
+                return new CompletedProcess($command, 0, 'ping', '');
+            })
         ;
 
         $this->runner->run();
@@ -96,14 +112,5 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
-    }
-
-    private function createProcessForCode(string $code): Process
-    {
-        return new Process([
-            TestPhpExecutableFinder::find(),
-            '-r',
-            $code,
-        ]);
     }
 }

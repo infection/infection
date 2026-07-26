@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\CompletedProcess;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -229,7 +230,7 @@ final class PHPStanAdapterTest extends TestCase
             ->expects($this->once())
             ->method('execute')
             ->with(['/usr/bin/php', '/path/to/phpstan', '--version'])
-            ->willReturn('PHPStan 2.1.17')
+            ->willReturn(new CompletedProcess([], 0, 'PHPStan 2.1.17', ''))
         ;
 
         $adapter = new PHPStanAdapter(

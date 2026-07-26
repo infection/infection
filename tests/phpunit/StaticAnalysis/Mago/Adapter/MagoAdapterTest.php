@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\Mago\Adapter;
 
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\CompletedProcess;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
@@ -218,7 +219,7 @@ final class MagoAdapterTest extends TestCase
             ->expects($this->once())
             ->method('execute')
             ->with(['/path/to/mago', '--version'])
-            ->willReturn('mago 1.23.0')
+            ->willReturn(new CompletedProcess([], 0, 'mago 1.23.0', ''))
         ;
 
         $adapter = new MagoAdapter(
