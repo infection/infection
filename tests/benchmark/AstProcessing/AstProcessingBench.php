@@ -33,30 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Benchmark\AstProcessing;
 
-use Infection\CannotBeInstantiated;
-use const PHP_OS_FAMILY;
+use Closure;
+use const PHP_INT_MAX;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Iterations;
+use Webmozart\Assert\Assert;
 
 /**
- * @internal
+ * To execute this test run `make benchmark_ast_processing`
  */
-final class OperatingSystem
+final class AstProcessingBench
 {
-    use CannotBeInstantiated;
+    /**
+     * @var Closure():(positive-int|0)
+     */
+    private Closure $main;
 
-    public static function isMacOs(): bool
+    /**
+     * @var positive-int|0
+     */
+    private int $count;
+
+    public function setUp(): void
     {
-        return PHP_OS_FAMILY === 'Darwin';
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX, .25);
     }
 
-    public static function isWindows(): bool
+    public function tearDown(): void
     {
-        return PHP_OS_FAMILY === 'Windows';
+        Assert::greaterThan(
+            $this->count,
+            0,
+            'No node was entered.',
+        );
     }
 
-    public static function isCaseSensitive(): bool
+    #[BeforeMethods('setUp')]
+    #[AfterMethods('tearDown')]
+    #[Iterations(5)]
+    public function bench(): void
     {
-        return !(self::isMacOs() || self::isWindows());
+        $this->count = ($this->main)();
     }
 }

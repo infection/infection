@@ -33,30 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Tests\AutoReview\ADR\AdrCollector;
 
-use Infection\CannotBeInstantiated;
-use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class OperatingSystem
+#[Group('integration')]
+#[CoversClass(AdrCollector::class)]
+final class AdrCollectorTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    public static function isMacOs(): bool
+    public function test_it_collects_adr_base_names(): void
     {
-        return PHP_OS_FAMILY === 'Darwin';
-    }
+        $expected = [
+            '0001-first-decision',
+            '0012-another-decision',
+        ];
+        $actual = AdrCollector::collect(__DIR__ . '/Fixtures');
 
-    public static function isWindows(): bool
-    {
-        return PHP_OS_FAMILY === 'Windows';
-    }
-
-    public static function isCaseSensitive(): bool
-    {
-        return !(self::isMacOs() || self::isWindows());
+        $this->assertSame($expected, $actual);
     }
 }

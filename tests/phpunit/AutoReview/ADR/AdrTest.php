@@ -33,30 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Tests\AutoReview\ADR;
 
-use Infection\CannotBeInstantiated;
-use const PHP_OS_FAMILY;
+use function array_map;
+use function array_unique;
+use Infection\Tests\AutoReview\ADR\AdrCollector\AdrCollector;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
+use function substr;
 
-/**
- * @internal
- */
-final class OperatingSystem
+#[Group('integration')]
+#[CoversNothing]
+final class AdrTest extends TestCase
 {
-    use CannotBeInstantiated;
+    private const string ADR_DIRECTORY = __DIR__ . '/../../../../adr';
 
-    public static function isMacOs(): bool
+    public function test_adr_numbers_are_unique(): void
     {
-        return PHP_OS_FAMILY === 'Darwin';
-    }
+        $adrNumbers = array_map(
+            static fn (string $adrBaseName): string => substr($adrBaseName, 0, 4),
+            AdrCollector::collect(self::ADR_DIRECTORY),
+        );
 
-    public static function isWindows(): bool
-    {
-        return PHP_OS_FAMILY === 'Windows';
-    }
-
-    public static function isCaseSensitive(): bool
-    {
-        return !(self::isMacOs() || self::isWindows());
+        $this->assertSame(
+            array_unique($adrNumbers),
+            $adrNumbers,
+            'Each Architecture Decision Record must have a unique number.',
+        );
     }
 }

@@ -33,30 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Tests\AutoReview\ADR\AdrCollector;
 
+use function array_filter;
+use function array_map;
+use function array_values;
+use function basename;
 use Infection\CannotBeInstantiated;
-use const PHP_OS_FAMILY;
+use function Safe\glob;
+use function str_starts_with;
 
-/**
- * @internal
- */
-final class OperatingSystem
+final class AdrCollector
 {
     use CannotBeInstantiated;
 
-    public static function isMacOs(): bool
-    {
-        return PHP_OS_FAMILY === 'Darwin';
-    }
+    private const string ADR_NAME_GLOB_PATTERN = '[0-9][0-9][0-9][0-9]-*.md';
 
-    public static function isWindows(): bool
+    /**
+     * @return list<string>
+     */
+    public static function collect(string $adrDirectory): array
     {
-        return PHP_OS_FAMILY === 'Windows';
-    }
+        $paths = glob($adrDirectory . '/' . self::ADR_NAME_GLOB_PATTERN);
 
-    public static function isCaseSensitive(): bool
-    {
-        return !(self::isMacOs() || self::isWindows());
+        return array_values(
+            array_filter(
+                array_map(
+                    static fn (string $path): string => basename($path, '.md'),
+                    $paths,
+                ),
+                static fn (string $path): bool => !str_starts_with($path, '0000-'),
+            ),
+        );
     }
 }
