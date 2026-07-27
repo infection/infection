@@ -78,23 +78,6 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->exactly(2))
             ->method('execute')
-            ->with($this->logicalOr(
-                ['git', '-C', '/project', 'rev-parse', '--show-toplevel'],
-                [
-                    'git',
-                    '-C',
-                    '/project',
-                    '--no-pager',
-                    'diff',
-                    'master',
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--name-only',
-                    '--diff-filter=AM',
-                    '--',
-                    'src/',
-                ],
-            ))
             ->willReturnOnConsecutiveCalls('/repository', '');
 
         $this->expectException(NoSourceFound::class);
@@ -197,24 +180,26 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->exactly(2))
             ->method('execute')
-            ->with($this->logicalOr(
-                ['git', '-C', '/project', 'rev-parse', '--show-toplevel'],
-                [
-                    'git',
-                    '-C',
-                    '/project',
-                    '--no-pager',
-                    'diff',
-                    'main',
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--unified=0',
-                    '--diff-filter=AM',
-                    '--',
-                    'src',
-                    'lib',
-                ],
-            ))
+            ->with(
+                $this->logicalOr(
+                    ['git', '-C', '/project', 'rev-parse', '--show-toplevel'],
+                    [
+                        'git',
+                        '-C',
+                        '/project',
+                        '--no-pager',
+                        'diff',
+                        'main',
+                        '--no-ext-diff',
+                        '--no-color',
+                        '--unified=0',
+                        '--diff-filter=AM',
+                        '--',
+                        'src',
+                        'lib',
+                    ],
+                ),
+            )
             ->willReturnOnConsecutiveCalls('/', $diff);
 
         $actual = $this->git->getChangedLinesRangesByFilePaths(
