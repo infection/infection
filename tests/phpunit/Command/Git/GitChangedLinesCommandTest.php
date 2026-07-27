@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Git;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\Command\Git\GitChangedLinesCommand;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -61,7 +62,7 @@ final class GitChangedLinesCommandTest extends TestCase
 
     private const string CONFIGURATION_PATHNAME = '/configuration/infection.json5';
 
-    private const string FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const string FIXTURES_DIR = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures';
 
     private const array SOURCE_DIRECTORIES = ['src', 'lib'];
 
