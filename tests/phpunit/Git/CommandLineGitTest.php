@@ -76,8 +76,26 @@ final class CommandLineGitTest extends TestCase
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
         $this->commandLineMock
+            ->expects($this->exactly(2))
             ->method('execute')
-            ->willReturn('');
+            ->with($this->logicalOr(
+                ['git', '-C', '/project', 'rev-parse', '--show-toplevel'],
+                [
+                    'git',
+                    '-C',
+                    '/project',
+                    '--no-pager',
+                    'diff',
+                    'master',
+                    '--no-ext-diff',
+                    '--no-color',
+                    '--name-only',
+                    '--diff-filter=AM',
+                    '--',
+                    'src/',
+                ],
+            ))
+            ->willReturnOnConsecutiveCalls('/repository', '');
 
         $this->expectException(NoSourceFound::class);
 
@@ -126,6 +144,24 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->exactly(2))
             ->method('execute')
+            ->with($this->logicalOr(
+                ['git', '-C', '/project', 'rev-parse', '--show-toplevel'],
+                [
+                    'git',
+                    '-C',
+                    '/project',
+                    '--no-pager',
+                    'diff',
+                    'main',
+                    '--no-ext-diff',
+                    '--no-color',
+                    '--name-only',
+                    '--diff-filter=AM',
+                    '--',
+                    'app/',
+                    'my lib/',
+                ],
+            ))
             ->willReturnOnConsecutiveCalls(
                 '/repository',
                 Str::toSystemLineEndings(
@@ -161,6 +197,24 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->expects($this->exactly(2))
             ->method('execute')
+            ->with($this->logicalOr(
+                ['git', '-C', '/project', 'rev-parse', '--show-toplevel'],
+                [
+                    'git',
+                    '-C',
+                    '/project',
+                    '--no-pager',
+                    'diff',
+                    'main',
+                    '--no-ext-diff',
+                    '--no-color',
+                    '--unified=0',
+                    '--diff-filter=AM',
+                    '--',
+                    'src',
+                    'lib',
+                ],
+            ))
             ->willReturnOnConsecutiveCalls('/', $diff);
 
         $actual = $this->git->getChangedLinesRangesByFilePaths(
