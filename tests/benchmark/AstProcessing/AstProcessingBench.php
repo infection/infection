@@ -33,56 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\EnvVariableManipulation;
+namespace Infection\Benchmark\AstProcessing;
 
-use function array_key_exists;
-use function getenv;
-use function Safe\putenv;
-use function sprintf;
+use Closure;
+use const PHP_INT_MAX;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Iterations;
 use Webmozart\Assert\Assert;
 
-final readonly class EnvBackup
+/**
+ * To execute this test run `make benchmark_ast_processing`
+ */
+final class AstProcessingBench
 {
     /**
-     * @param array<string, string> $environmentVariables
+     * @var Closure():(positive-int|0)
      */
-    private function __construct(
-        private array $environmentVariables,
-    ) {
+    private Closure $main;
+
+    /**
+     * @var positive-int|0
+     */
+    private int $count;
+
+    public function setUp(): void
+    {
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX, .25);
     }
 
-    public static function createSnapshot(): self
+    public function tearDown(): void
     {
-        $environmentVariables = getenv();
-
-        Assert::allString($environmentVariables);
-
-        return new self($environmentVariables);
+        Assert::greaterThan(
+            $this->count,
+            0,
+            'No node was entered.',
+        );
     }
 
-    public function restore(): void
+    #[BeforeMethods('setUp')]
+    #[AfterMethods('tearDown')]
+    #[Iterations(5)]
+    public function bench(): void
     {
-        $snapshot = $this->environmentVariables;
-
-        foreach (getenv() as $name => $value) {
-            if (!array_key_exists($name, $snapshot)) {
-                putenv($name);
-
-                continue;
-            }
-
-            $snapshotValue = $snapshot[$name];
-            unset($snapshot[$name]);
-
-            if ($snapshotValue === $value) {
-                continue;
-            }
-
-            putenv(sprintf('%s=%s', $name, $snapshotValue));
-        }
-
-        foreach ($snapshot as $name => $value) {
-            putenv(sprintf('%s=%s', $name, $value));
-        }
+        $this->count = ($this->main)();
     }
 }

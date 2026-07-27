@@ -33,40 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function sprintf;
+use function array_diff;
+use function count;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
+use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis;
+use PHPat\Selector\SelectorInterface;
+use PHPStan\Reflection\ClassReflection;
 
-#[CoversNothing]
-final class EnvManipulationTest extends TestCase
+final readonly class PHPUnitTestMissingEnvironmentVariable implements SelectorInterface
 {
-    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
-    public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
-        string $testCaseClassName,
-        string $fileWithEnvManipulations,
-    ): void {
-        $import = sprintf(
-            'use %s;',
-            BacksUpEnvironmentVariables::class,
-        );
+    public function __construct(
+        private EnvironmentVariableUsageDetector $environmentVariableUsageDetector,
+    ) {
+    }
 
-        $this->assertStringContainsString(
-            $import,
-            file_get_contents($fileWithEnvManipulations),
-            sprintf(
-                <<<'TXT'
-                        Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
-                        been found in the file "%s".
-                    TXT,
-                $testCaseClassName,
-                BacksUpEnvironmentVariables::class,
-                $fileWithEnvManipulations,
-            ),
-        );
+    public function getName(): string
+    {
+        return 'PHPUnit test missing a `WithEnvironmentVariable` attribute';
+    }
+
+    public function matches(ClassReflection $classReflection): bool
+    {
+        if (!PHPUnitTestClassAnalysis::isPHPUnitTestCase($classReflection)) {
+            return false;
+        }
+
+        $usedEnvironmentVariables = $this->environmentVariableUsageDetector->getEnvironmentVariables($classReflection);
+        $declaredEnvironmentVariables = PHPUnitTestClassAnalysis::getEnvironmentVariables($classReflection);
+
+        $nonDeclaredUsedEnvironmentVariables = array_diff($usedEnvironmentVariables, $declaredEnvironmentVariables);
+
+        return count($nonDeclaredUsedEnvironmentVariables) > 0;
     }
 }

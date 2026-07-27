@@ -33,51 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\AutoReview\ADR\AdrCollector;
 
-use Infection\CannotBeInstantiated;
-use function sprintf;
-use function str_contains;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-final class EnvManipulatorCodeDetector
+#[Group('integration')]
+#[CoversClass(AdrCollector::class)]
+final class AdrCollectorTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    private const array FUNCTIONS = [
-        'putenv',
-        'Safe\putenv',
-    ];
-
-    /**
-     * @var string[]|null
-     */
-    private static ?array $statements = null;
-
-    public static function codeManipulatesEnvVariables(string $code): bool
+    public function test_it_collects_adr_base_names(): void
     {
-        foreach (self::getStatements() as $statement) {
-            if (str_contains($code, $statement)) {
-                return true;
-            }
-        }
+        $expected = [
+            '0001-first-decision',
+            '0012-another-decision',
+        ];
+        $actual = AdrCollector::collect(__DIR__ . '/Fixtures');
 
-        return false;
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function getStatements(): array
-    {
-        if (self::$statements !== null) {
-            return self::$statements;
-        }
-
-        foreach (self::FUNCTIONS as $safeFunctionName) {
-            self::$statements[] = sprintf('use function %s', $safeFunctionName);
-            self::$statements[] = sprintf('\\%s(', $safeFunctionName);
-        }
-
-        return self::$statements;
+        $this->assertSame($expected, $actual);
     }
 }

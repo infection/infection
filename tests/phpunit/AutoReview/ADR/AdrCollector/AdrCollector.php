@@ -33,37 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\EnvVariableManipulation;
+namespace Infection\Tests\AutoReview\ADR\AdrCollector;
 
-use function getenv;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use function Safe\putenv;
+use function array_filter;
+use function array_map;
+use function array_values;
+use function basename;
+use Infection\CannotBeInstantiated;
+use function Safe\glob;
+use function str_starts_with;
 
-#[CoversClass(EnvBackup::class)]
-final class EnvBackupTest extends TestCase
+final class AdrCollector
 {
-    public function test_it_can_backup_and_restore_environment_variables(): void
+    use CannotBeInstantiated;
+
+    private const string ADR_NAME_GLOB_PATTERN = '[0-9][0-9][0-9][0-9]-*.md';
+
+    /**
+     * @return list<string>
+     */
+    public static function collect(string $adrDirectory): array
     {
-        putenv('BEFORE_SNAPSHOT_0=initialValue0');
-        putenv('BEFORE_SNAPSHOT_1=initialValue1');
-        putenv('BEFORE_SNAPSHOT_2=initialValue2');
+        $paths = glob($adrDirectory . '/' . self::ADR_NAME_GLOB_PATTERN);
 
-        $initialEnvironmentVariables = getenv();
-
-        $snapshot = EnvBackup::createSnapshot();
-
-        putenv('BEFORE_SNAPSHOT_0=newValue0');
-        putenv('BEFORE_SNAPSHOT_1=');
-        putenv('BEFORE_SNAPSHOT_2');
-        putenv('AFTER_SNAPSHOT=value');
-
-        $snapshot->restore();
-
-        $this->assertSame('initialValue0', getenv('BEFORE_SNAPSHOT_0'));
-        $this->assertSame('initialValue1', getenv('BEFORE_SNAPSHOT_1'));
-        $this->assertSame('initialValue2', getenv('BEFORE_SNAPSHOT_2'));
-        $this->assertFalse(getenv('AFTER_SNAPSHOT'));
-        $this->assertSame($initialEnvironmentVariables, getenv());
+        return array_values(
+            array_filter(
+                array_map(
+                    static fn (string $path): string => basename($path, '.md'),
+                    $paths,
+                ),
+                static fn (string $path): bool => !str_starts_with($path, '0000-'),
+            ),
+        );
     }
 }

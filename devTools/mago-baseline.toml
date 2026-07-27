@@ -3483,7 +3483,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "falsable-return-statement"
-message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:110:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
+message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:119:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
 count = 1
 
 [[issues]]
@@ -3495,7 +3495,7 @@ count = 1
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:110:21}`: expected `string`, but found `false|string`."
+message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:119:21}`: expected `string`, but found `false|string`."
 count = 1
 
 [[issues]]
@@ -4897,6 +4897,90 @@ message = "Function `test` is missing a return type hint."
 count = 1
 
 [[issues]]
+file = "tests/benchmark/AstProcessing/AstProcessingBench.php"
+code = "invalid-callable"
+message = "Expression of type `mixed` cannot be called as a function or method."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/AstProcessingBench.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$main` ((closure(): int(0)|positive-int))."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but possibly received `array<array-key, mixed>|array<array-key, string>|string`."
+count = 2
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `{closure:tests/benchmark/AstProcessing/create-main.php:226:12}`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\JUnit\TestNotFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/create-main.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound` in `Infection\Benchmark\AstProcessing\collectTraces`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "invalid-callable"
+message = "Expression of type `mixed` cannot be called as a function or method."
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #1 of `Infection\Benchmark\Instrumentor::profile`: expected `(closure(): (closure(): int(0)|positive-int))`, but provided type `(closure(): mixed)` is less specific.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Infection\Benchmark\InstrumentorFactory::create`: expected `bool`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #3 of `sprintf`: expected `Stringable|null|scalar`, but found `mixed`."
+count = 2
+
+[[issues]]
+file = "tests/benchmark/AstProcessing/profile.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
 file = "tests/benchmark/BlackfireInstrumentor.php"
 code = "invalid-callable"
 message = "Expression of type `mixed` cannot be called as a function or method."
@@ -5164,78 +5248,6 @@ count = 1
 file = "tests/phpunit/AutoReview/ConcreteClassReflector.php"
 code = "unhandled-thrown-type"
 message = "Potentially unhandled exception `ReflectionException` in `{closure:tests/phpunit/AutoReview/ConcreteClassReflector.php:55:13}`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvManipulatorCodeDetectorTest.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `codeProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "falsable-return-statement"
-message = '''Function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations` is declared to return `null|string` but possibly returns 'false' (inferred as `false|string`).'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `envTestCaseTupleProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "imprecise-type"
-message = "Type `iterable` in return type of `provideEnvTestCaseTuple` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations`: expected `null|string`, but found `false|string`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "invalid-return-statement"
-message = 'Invalid return type for function `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations`: expected `null|string`, but found `false|string`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "possibly-false-argument"
-message = 'Argument #1 of function `Safe\file_get_contents` is possibly `false`, but parameter type `string` does not accept it.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #1 of `ReflectionClass::__construct`: expected `('T.reflectionclass extends object)|class-string<'T.reflectionclass extends object>`, but possibly received `string`."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestCaseForEnvManipulations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::checkTestedClassForEnvManipulations`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProviderTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `ReflectionException` in `Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProviderTest::test_env_test_case_classes_provider_is_valid`.'
 count = 1
 
 [[issues]]
@@ -5968,6 +5980,12 @@ count = 1
 file = "tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::tearDown`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Config/ValueProvider/PCOVDirectoryProviderTest.php"
+code = "imprecise-type"
+message = "Type `iterable` in return type of `sourceDirectoryPathsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
 [[issues]]
@@ -7244,18 +7262,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #1 of function `strlen` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #2 of function `explode` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php"
 code = "string-member-selector"
 message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
 count = 1
@@ -7271,18 +7277,6 @@ file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `providesMockSetup` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #1 of function `strlen` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"
-code = "possibly-false-argument"
-message = "Argument #2 of function `explode` is possibly `false`, but parameter type `string` does not accept it."
-count = 2
 
 [[issues]]
 file = "tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php"

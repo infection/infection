@@ -33,41 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\EnvVariableManipulation;
+namespace Infection\Tests\Architecture\PHPat\Selector\PHPUnitTestMissingEnvironmentVariable\Fixtures;
 
-use function class_exists;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use function sprintf;
+use function Safe\putenv;
 
-#[CoversClass(EnvTestCasesProvider::class)]
-final class EnvTestCasesProviderTest extends TestCase
+final readonly class CoveredCodeUsingDynamicEnvironmentVariable
 {
-    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
-    public function test_env_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
+    public function __construct(string $name)
     {
-        $this->assertTrue(
-            class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName),
-        );
-
-        $testCaseReflection = new ReflectionClass($testCaseClassName);
-
-        $this->assertInstanceOf(
-            TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor(),
-        );
-
-        $this->assertFalse(
-            $testCaseReflection->isAbstract(),
-            sprintf(
-                'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName,
-            ),
-        );
-
-        $this->assertFileExists($fileWithIoOperations);
+        putenv($name . '=value');
     }
 }
