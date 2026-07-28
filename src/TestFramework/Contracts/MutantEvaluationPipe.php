@@ -33,21 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Process\MutantProcess;
 
 /**
+ * Represents a mutant evaluation as a chain of processes that may require follow-up stages.
+ * It exposes the current process and controls whether the evaluation advances to the next one.
+ *
  * @internal
  */
-interface ProcessRunner
+interface MutantEvaluationPipe
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
+    public function getCurrent(): MutantProcess;
 
-    public function stop(): void;
+    public function hasNext(): bool;
+
+    public function createNext(): MutantProcess;
 }

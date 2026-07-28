@@ -37,7 +37,7 @@ namespace Infection\Process\Runner;
 
 use function count;
 use DuoClock\DuoClock;
-use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Iterator;
 use SplQueue;
 use Webmozart\Assert\Assert;
@@ -53,7 +53,7 @@ class ProcessQueue
     private const int NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
     /**
-     * @var SplQueue<MutantProcessContainer>
+     * @var SplQueue<MutantEvaluationPipe>
      */
     private readonly SplQueue $bucket;
 
@@ -66,7 +66,7 @@ class ProcessQueue
     /**
      * This fills the bucket from the input stream of processes containers (original mutant processes)
      *
-     * @param Iterator<MutantProcessContainer> $input
+     * @param Iterator<MutantEvaluationPipe> $input
      * @param positive-int $maxQueueDepth
      * @return int Microseconds spent doing work to enqueue a process
      */
@@ -89,12 +89,12 @@ class ProcessQueue
         return self::ns2ms($this->clock->microtime() - $start);
     }
 
-    public function enqueue(MutantProcessContainer $container): void
+    public function enqueue(MutantEvaluationPipe $container): void
     {
         $this->bucket->enqueue($container);
     }
 
-    public function dequeue(): MutantProcessContainer
+    public function dequeue(): MutantEvaluationPipe
     {
         return $this->bucket->dequeue();
     }
