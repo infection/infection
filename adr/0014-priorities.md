@@ -102,30 +102,6 @@ visible instead of remembered, and so that the queue can be read in one place. T
 issues as well as pull requests, because a proposal that waits for a decision, an RFC for
 example, spends the same review capacity as a diff.
 
-### Mapping onto GitHub
-
-This subsection describes the current mechanism only. It can change without a new ADR, provided
-that the two axes stay recorded and readable.
-
-A pull request states its type in the `Type of change` section of the pull request template.
-GitHub cannot validate a template, which is why enforcement is review only.
-
-An issue carries the organisation `Type` field: `Bug`, `Feature`, `Enabling Refactoring` or
-`Other`. Organisation members see it in the issue sidebar.
-
-GitHub gives a pull request no issue field, and a project board cannot use an issue field as a
-column. The `Development Board`, which already receives every pull request, therefore carries two
-single-select fields of its own: `Review type`, with the four type names, and `Review priority`,
-with the four urgency names. They are named for the review because that is what they order, and
-they apply to pull requests and to the issues that wait for review.
-
-A board view whose columns are `Review type`, sorted by `Review priority`, shows what to review
-first. Moving a card between columns sets its type. The `Status` field keeps its existing meaning,
-so a card also records how far it is through review.
-
-The board is private, so it serves maintainers only. This ADR and the pull request template
-remain the statement of priorities that contributors can read.
-
 ## Alternatives considered
 
 Reviewing every well-written pull request on its merits alone was rejected. It ignores the
