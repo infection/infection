@@ -7,11 +7,10 @@ much the project can absorb, and every pull request spends part of that capacity
 
 A large number of pull requests neither fix a reported bug nor add a requested feature. They
 often restructure code, or add tooling that no current task needs.
-Such a change is harder to review than a bug fix. A bug fix carries its own purpose: the
-linked issue says what was wrong. A restructuring usually does not, so the reviewer has to work
+Such a change is harder to review than a bug fix. A bug fix has a purpose: the
+linked issue identifies a problem. A restructuring usually does not, so the reviewer has to work
 out why it is proposed at all, and whether it brings any bug fix or feature closer. That answer
-is frequently missing from the pull request, and asking for it costs more time than reading the
-diff.
+is frequently missing from the pull request, and the answer to this question is more important than the diff.
 The result is that reported bugs and accepted features wait behind changes that no user asked
 for.
 
