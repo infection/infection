@@ -6,7 +6,7 @@ Maintainers review Infection in their own time. Review capacity, not the number 
 much the project can absorb, and every pull request spends part of that capacity.
 
 A large number of pull requests neither fix a reported bug nor add a requested feature. They
-often restructure code that already works, or add tooling that no current task needs.
+often restructure code, or add tooling that no current task needs.
 Such a change is harder to review than a bug fix. A bug fix carries its own purpose: the
 linked issue says what was wrong. A restructuring usually does not, so the reviewer has to work
 out why it is proposed at all, and whether it brings any bug fix or feature closer. That answer
@@ -62,8 +62,8 @@ reorders work but does not make a type 4 change into work that the project needs
 
 Every pull request states its type, and the author is the one who states it. Type 3 also names
 and links the issue that the refactoring unblocks, because the type alone does not tell the
-reviewer what the change buys. A refactoring that cannot name that issue is type 4, and we
-normally decline or postpone it - it is not a priority for maintainers' review. Urgency is for
+reviewer what the change brings. A refactoring that cannot name that issue is type 4, and we
+normally decline or postpone it because it is not a priority for maintainers' review. Urgency is for
 maintainers to judge, not for the author to declare.
 
 A rationale must be verifiable by the reviewer: a reproduced defect, a named capability, a
