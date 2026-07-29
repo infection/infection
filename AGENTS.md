@@ -290,6 +290,29 @@ This style rule often surprises agents. Code is structured for killability:
 An escaping mutant means either a missing test or code that should be reshaped; "only
 performance" escapes can be accepted, but say so explicitly in the PR.
 
+### Propose the smallest change that does the job
+
+Agents default to a complete, defensible artifact: a class where a function works, a test
+suite where a CI check already fails, a generator script where `git diff` answers the
+question. Every line is individually justifiable and the total is still wrong - reviewers
+here read totals, not lines. Removing or reducing code outranks adding it. Where CI already
+fails on the condition your change prevents, that failure is the test; do not restate it as
+unit tests. In tests, one data provider with named cases beats a row of near-identical test
+methods. Tooling gets the same size bar as `src/`: every contributor reads it and no user
+exercises it, so "it is only tooling" makes it cheaper to write and not cheaper to keep.
+
+Work in two passes:
+
+1. **Write** the change as you planned it.
+2. **Re-read it as a reviewer, then cut.** Delete what nothing needs, merge what repeats,
+   shorten what stands. Count the files and the lines you added, and drop the ones you
+   cannot defend one by one.
+
+The second pass is not polish, and it is where most of the value is. It does not override
+the killability rules above: keep separate `return` statements and early returns even when
+one expression would be shorter. Do the task asked; when you see adjacent work, name it and
+stop.
+
 ## Subsystem invariants
 
 These are the ten places where a confident rewrite can break an invariant. Read the target
@@ -584,6 +607,8 @@ The costliest traps:
     "optimizing" (`make benchmark`), and re-validate old perf hacks before extending them.
 12. Escaped mutant on a literal? Extract a named constant. Escaped mutant on a loose mock?
     Tighten `->with(...)`. Truly unkillable? Discuss a bypass - do not fake a test.
+13. Volume is not rigor. Fewer files is the default; adding one means saying why the
+    smaller shape fails.
 
 ## Maintaining this file
 
