@@ -196,6 +196,8 @@ class ParallelProcessRunner implements ProcessRunner
             unset($this->runningProcessContainers[$index]->mutantProcessContainer);
             unset($this->runningProcessContainers[$index]);
 
+            // TODO: could be simplified with ::next(). Would avoid having a guard
+            //   in ::createNext() for when called without ::hasNext() = true
             if ($mutantProcessContainer->hasNext()) {
                 $mutantProcessContainer->createNext();
 

@@ -97,6 +97,7 @@ final readonly class Engine
         $initialRunResults = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
 
+        // TODO: actually this should be done by the adapter itself?
         /*
          * Limit the memory used for the mutation processes based on the memory
          * used for the initial test run.

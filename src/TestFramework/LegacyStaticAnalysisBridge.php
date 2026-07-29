@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use DomainException;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Mutant\Mutant;
@@ -43,6 +42,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -114,9 +114,10 @@ final readonly class LegacyStaticAnalysisBridge implements TestFramework
 
     public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
     {
-        // TODO: Implement test() method.
-        //  at this point this is implemented directory via MutantProcessContainerFactory which
-        //  uses the SA adapter to create the other factories.
-        throw new DomainException('Not needed yet');
+        Assert::notNull($this->adapter);
+
+        return new LazyMutantEvaluationPipe(
+            fn () => $this->adapter->createMutantProcessFactory()->create($mutant),
+        );
     }
 }

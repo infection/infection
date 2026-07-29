@@ -35,6 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
+use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
+use Infection\TestFramework\Common\LazyMutantEvaluationPipe;
+use Symfony\Component\Process\Process;
 use function explode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -48,6 +55,7 @@ use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\MutantEvaluationPipe;
 use Infection\TestFramework\Contracts\TestFramework;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use function min;
 
 /**
  * @deprecated This is for the compatibility layer with the old AbstractTestFramework contract. To be removed.
@@ -56,6 +64,10 @@ use Infection\TestFramework\Coverage\CoverageChecker;
  */
 final readonly class LegacyTestFrameworkBridge implements TestFramework
 {
+    private const int TIMEOUT_FACTOR = 5;
+
+    private const int TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+
     public function __construct(
         private TestFrameworkAdapter $adapter,
         private ConsoleOutput $consoleOutput,
@@ -64,6 +76,7 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         private Configuration $config,
         private MutantProcessContainerFactory $processFactory,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
     ) {
     }
 
@@ -117,11 +130,41 @@ final readonly class LegacyTestFrameworkBridge implements TestFramework
         );
     }
 
-    public function test(Mutant $mutant): MutantEvaluationPipe
+    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe
     {
-        return $this->processFactory->create(
+        return new LazyMutantEvaluationPipe(
+            static fn () => $this->createTestProcess($mutant),
+        );
+    }
+
+    private function createTestProcess(Mutant $mutant): MutantProcess
+    {
+        // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
+        $timeout = min(
+            self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()),
+            $this->config->processTimeout,
+        );
+
+        // TODO: we should strive to remove this Process instantiation.
+        $process = new Process(
+            command: $this->adapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $this->getFilteredExtraOptionsForMutant(),
+            ),
+            timeout: $timeout,
+        );
+
+        if ($this->config->isDryRun) {
+            $process = DryRunProcess::fromProcess($process);
+        }
+
+        return new MutantProcess(
+            $process,
             $mutant,
-            $this->getFilteredExtraOptionsForMutant(),
+            $this->mutantExecutionResultFactory,
         );
     }
 

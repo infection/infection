@@ -35,50 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Contracts;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\TestFramework\Contracts\Throwable\InitialTestsFailed;
-use Infection\TestFramework\Contracts\Throwable\RequirementChecksFailed;
+use Webmozart\Assert\Assert;
 
 /**
- * A test framework is the tool that will be used to evaluate mutations to check if they are
- * covered or escaped.
- *
- * It can be a standard test framework such as PHPUnit, PhpSpec, a static analyser like PHPStan
- * or Psalm or something else entirely!
- *
  * @internal
  */
-interface TestFramework
+final readonly class CompositeInitialRunResults
 {
-    public function getName(): string;
-
-    public function getVersion(): string;
-
     /**
-     * Checks that the version of the tool used is compatible with the adapter.
-     *
-     * Additionally, Some test frameworks may require artefacts to work with. For example, PHPUnit
-     * requires a code coverage report. PHPStan will require an up-to-date cache.
-     *
-     * @throws RequirementChecksFailed
+     * @param list<array{TestFramework, InitialRunResults}> $results
      */
-    public function checkRequirements(): void;
-
-    /**
-     * Initial test run. This allows tools like PHPUnit to ensure the tests are valid
-     * in the first place and generate the required code coverage or PHPStan to generate
-     * an up-to-date cache.
-     *
-     * @throws InitialTestsFailed
-     */
-    public function executeInitialRun(): InitialRunResults|CompositeInitialRunResults;
-
-    /**
-     * Evaluates the Mutant. Some test frameworks may be able to do this in-memory, e.g.
-     * Psalm, or it requires to launch a process in which case the process execution is
-     * delegated to an orchestrator. How the result of the process is interpreted is
-     * encapsulated by a process.
-     */
-    public function test(Mutant $mutant): MutantExecutionResult|MutantEvaluationPipe;
+    public function __construct(
+        public array $results,
+    ) {
+    }
 }
