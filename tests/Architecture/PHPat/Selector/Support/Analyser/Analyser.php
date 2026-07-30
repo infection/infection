@@ -43,6 +43,7 @@ use Infection\Tests\Architecture\PHPat\Selector\Support\PHPUnitTestClassAnalysis
 use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
@@ -158,7 +159,7 @@ final class Analyser
         );
     }
 
-    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverser
+    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
             new ParentConnectingVisitor(),
