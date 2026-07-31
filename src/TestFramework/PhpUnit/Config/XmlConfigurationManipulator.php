@@ -59,6 +59,8 @@ use Webmozart\Assert\Assert;
  */
 final readonly class XmlConfigurationManipulator
 {
+    private const string INVALID_SCHEMA_PATH_MESSAGE = 'Invalid schema path found %s';
+
     public function __construct(
         private PathReplacer $pathReplacer,
         private string $phpUnitConfigDir,
@@ -312,8 +314,13 @@ final readonly class XmlConfigurationManipulator
         return $errorsString;
     }
 
+    /**
+     * @return non-empty-string
+     */
     private function buildSchemaPath(string $nodeValue): string
     {
+        Assert::stringNotEmpty($nodeValue, self::INVALID_SCHEMA_PATH_MESSAGE);
+
         if (filter_var($nodeValue, FILTER_VALIDATE_URL) !== false) {
             return $nodeValue;
         }
@@ -324,7 +331,7 @@ final readonly class XmlConfigurationManipulator
             $schemaPath = sprintf('%s/%s', $this->phpUnitConfigDir, $nodeValue);
         }
 
-        Assert::fileExists($schemaPath, 'Invalid schema path found %s');
+        Assert::fileExists($schemaPath, self::INVALID_SCHEMA_PATH_MESSAGE);
 
         return $schemaPath;
     }
