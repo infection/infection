@@ -1,0 +1,12 @@
+# The analysis configuration without the baseline: it reports the errors that the
+# baseline currently hides. Used by `make phpstan-debt` to list the remaining
+# static analysis debt.
+#
+# It keeps its own result cache because PHPStan invalidates the cache when the
+# configuration changes, and this configuration alternates with phpstan.neon.
+
+includes:
+    - phpstan-analysis.neon
+
+parameters:
+    tmpDir: ../var/cache/phpstan-debt

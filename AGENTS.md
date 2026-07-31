@@ -87,7 +87,9 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Performance PRs cite before/after numbers from these.
 - `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
   are for pre-existing debt only; never baseline a finding your new code introduced.
-  Regenerate with `make phpstan-baseline` or `make mago-baseline`.
+  Regenerate with `make phpstan-baseline` or `make mago-baseline`. The PHPStan rules live
+  in `phpstan-analysis.neon`; `phpstan.neon` adds the baseline on top, and
+  `phpstan-debt.neon` omits it so `make phpstan-debt` can list what the baseline hides.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. See
