@@ -46,6 +46,7 @@ use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultAssertions;
+use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -86,9 +87,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -107,9 +108,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     [],
                     [],
                     '',
-                ),
-                'notCovered#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('notCovered#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -117,9 +118,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'notCovered#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -162,9 +163,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -189,9 +190,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'errored#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('errored#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -199,9 +200,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'errored#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -242,9 +243,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -269,9 +270,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'escaped#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('escaped#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -279,9 +280,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'escaped#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -323,9 +324,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -350,9 +351,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'killed#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('killed#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -360,9 +361,9 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'killed#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 

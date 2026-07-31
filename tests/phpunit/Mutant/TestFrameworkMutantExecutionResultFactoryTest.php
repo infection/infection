@@ -45,6 +45,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Testing\MutatorName;
+use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -94,9 +95,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -115,9 +116,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     [],
                     [],
                     '',
-                ),
-                'notCovered#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('notCovered#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -125,9 +126,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'notCovered#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -168,9 +169,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -195,9 +196,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'timedOut#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('timedOut#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -205,9 +206,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'timedOut#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
         $mutantProcess->markAsTimedOut();
@@ -254,9 +255,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -281,9 +282,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'errored#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('errored#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -291,9 +292,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'errored#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -341,9 +342,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -368,9 +369,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'escaped#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('escaped#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -378,9 +379,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'escaped#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -428,9 +429,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -455,9 +456,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'killed#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('killed#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -465,9 +466,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'killed#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
@@ -524,9 +525,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::materialize(
-                '/path/to/mutant',
-                new Mutation(
+            MutantBuilder::withMinimalTestData()
+                ->withMutantFilePath('/path/to/mutant')
+                ->withMutation(new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
                     [],
                     For_::class,
@@ -551,9 +552,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     ],
                     [],
                     '',
-                ),
-                'killed#0',
-                $mutantDiff = <<<'DIFF'
+                ))
+                ->withMutatedCode(now('killed#0'))
+                ->withDiff(now($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -561,9 +562,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'killed#0';
 
-                    DIFF,
-                '<?php $a = 1;',
-            ),
+                    DIFF))
+                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                ->build(),
             $this->resultFactory,
         );
 
