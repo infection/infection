@@ -33,21 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
-
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+namespace Infection\TestFramework\Contracts;
 
 /**
+ * Temporary interface for the Container.
+ *
  * @internal
  */
-interface ProcessRunner
+interface StaticAnalysisTestFramework extends TestFramework
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
-
-    public function stop(): void;
 }

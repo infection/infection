@@ -37,14 +37,12 @@ namespace Infection\Tests\Resource\Memory;
 
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
-use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function sprintf;
@@ -81,10 +79,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory(
-            '',
-            $this->createStub(AbstractTestFrameworkAdapter::class),
-        );
+        $memoryLimiter->limitMemory(null);
     }
 
     public function test_it_does_not_apply_a_limit_if_no_ini_file_loaded(): void
@@ -93,17 +88,11 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, 'foo/bar', $this->environmentMock);
 
-        $memoryLimiter->limitMemory(
-            '',
-            new FakeAwareAdapter(10),
-        );
+        $memoryLimiter->limitMemory(new InitialRunResults('', 10.));
     }
 
-    #[DataProvider('memoryLimitProvider')]
-    public function test_it_applies_memory_limit_if_possible(
-        float $memoryLimit,
-        float $expectedLimit,
-    ): void {
+    public function test_it_applies_memory_limit_if_possible(): void
+    {
         $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
 
         $this->fileSystemMock
@@ -117,49 +106,33 @@ final class MemoryLimiterTest extends FileSystemTestCase
             ->method('appendToFile')
             ->with(
                 $filename,
-                PHP_EOL . sprintf('memory_limit = %dM', (int) $expectedLimit),
+                PHP_EOL . sprintf('memory_limit = %dM', 40),
             );
 
         $this->configureEnvironmentToBeCalledOnce();
 
-        $adapter = new FakeAwareAdapter($memoryLimit);
-
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
 
-        $memoryLimiter->limitMemory('foo', $adapter);
+        $memoryLimiter->limitMemory(new InitialRunResults('foo', 20.));
     }
 
     public function test_it_does_nothing_when_the_adapter_cannot_detect_the_memory_used(): void
     {
         $filename = $this->tmp . '/fake-ini' . microtime() . '.ini';
 
-        $this->configureEnvironmentToBeCalledOnce();
+        $this->environmentMock
+            ->expects($this->never())
+            ->method('hasMemoryLimitSet')
+        ;
 
-        $adapter = new FakeAwareAdapter(-1);
+        $this->environmentMock
+            ->expects($this->never())
+            ->method('isUsingSystemIni')
+        ;
 
         $memoryLimiter = new MemoryLimiter($this->fileSystemMock, $filename, $this->environmentMock);
 
-        $memoryLimiter->limitMemory('', $adapter);
-    }
-
-    public static function memoryLimitProvider(): iterable
-    {
-        yield 'nominal' => [
-            20.,
-            40.,
-        ];
-
-        // This is a silly case. We do not care about it, it just to capture the current behaviour
-        yield 'negative' => [
-            -1.2,
-            -2.4,
-        ];
-
-        // This is a silly case. We do not care about it, it just to capture the current behaviour
-        yield 'no memory allowed' => [
-            0.,
-            0.,
-        ];
+        $memoryLimiter->limitMemory(new InitialRunResults('', null));
     }
 
     private function configureEnvironmentToBeCalledOnce(): void

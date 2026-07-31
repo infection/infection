@@ -33,21 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\MutantEvaluationPipe;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
+use Symfony\Component\Process\Process;
 
 /**
+ * Represents a single process that evaluates a mutant and records its execution state.
+ * It allows process runners to track completion and obtain the resulting mutation evaluation.
+ *
  * @internal
  */
-interface ProcessRunner
+interface MutantProcess
 {
-    /**
-     * @param iterable<MutantEvaluationPipe> $processContainers
-     *
-     * @return iterable<MutantEvaluationPipe>
-     */
-    public function run(iterable $processContainers): iterable;
+    public function getMutant(): Mutant;
 
-    public function stop(): void;
+    public function getProcess(): Process;
+
+    public function markAsTimedOut(): void;
+
+    public function isTimedOut(): bool;
+
+    public function markAsFinished(): void;
+
+    public function getFinishedAt(): float;
+
+    public function getResult(): MutantExecutionResult;
 }
