@@ -47,6 +47,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
+use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -60,9 +61,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
     #[DataProvider('timeoutDataProvider')]
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -87,9 +88,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            $mutantDiff = <<<'DIFF'
+            ))
+            ->withMutatedCode(now('killed#0'))
+            ->withDiff(now($mutantDiff = <<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -97,9 +98,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF))
+            ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+            ->build();
 
         $testFrameworkExtraOptions = '--verbose';
 
