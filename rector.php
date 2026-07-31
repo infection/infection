@@ -76,7 +76,6 @@ use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromPropertyDe
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarFromParamDocblockInConstructorRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockBasedOnArrayMapRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromAssignsParamToParamReferenceRector;
-use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDataProviderRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDimFetchAccessRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForArrayDimAssignedObjectRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForCommonObjectDenominatorRector;
@@ -116,7 +115,6 @@ $config = RectorConfig::configure()
     )
     ->withRules([
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
-        AddParamArrayDocblockFromDataProviderRector::class,
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
         AddReturnDocblockForCommonObjectDenominatorRector::class,
         AddReturnDocblockForJsonArrayRector::class,
@@ -150,9 +148,6 @@ $config = RectorConfig::configure()
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
         AddInstanceofAssertForNullableInstanceRector::class,
-        AddParamArrayDocblockFromDataProviderRector::class => [
-            __DIR__ . '/tests/phpunit/Framework/Iterable/GeneratorFactory/GeneratorFactoryTest.php',
-        ],
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
         ],
