@@ -45,7 +45,6 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Testing\MutatorName;
-use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
