@@ -25,18 +25,6 @@ parameters:
 			path: ../src/Command/Git/Option/FilterOption.php
 
 		-
-			rawMessage: Anonymous function should return string but returns string|null.
-			identifier: return.type
-			count: 1
-			path: ../src/Command/MakeCustomMutatorCommand.php
-
-		-
-			rawMessage: 'Cannot call method askQuestion() on Infection\Console\IO|null.'
-			identifier: method.nonObject
-			count: 1
-			path: ../src/Command/MakeCustomMutatorCommand.php
-
-		-
 			rawMessage: Infection\Command\Option\ConfigurationOption should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -127,18 +115,6 @@ parameters:
 			path: ../src/Differ/DiffColorizer.php
 
 		-
-			rawMessage: Variable $end might not be defined.
-			identifier: variable.undefined
-			count: 1
-			path: ../src/Differ/DiffColorizer.php
-
-		-
-			rawMessage: Variable $start might not be defined.
-			identifier: variable.undefined
-			count: 3
-			path: ../src/Differ/DiffColorizer.php
-
-		-
 			rawMessage: Infection\Differ\Tokens should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -199,20 +175,8 @@ parameters:
 			path: ../src/FileSystem/Finder/NonExecutableFinder.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
-
-		-
 			rawMessage: Infection\FileSystem\Finder\TestFrameworkFinder should not exist
 			identifier: phpat.testSourceConcreteClassesAreFinals
-			count: 1
-			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
-
-		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-empty-string}.'
-			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
@@ -422,12 +386,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/AddTestsVisitor.php
 
 		-
-			rawMessage: Access to an undefined property PhpParser\Node::$namespacedName.
-			identifier: property.notFound
-			count: 1
-			path: ../src/PhpParser/Visitor/FullyQualifiedClassNameManipulator.php
-
-		-
 			rawMessage: Infection\PhpParser\Visitor\NameResolverFactory should not exist
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
@@ -450,12 +408,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
-
-		-
-			rawMessage: 'Offset ''name'' might not exist on array{}|array{0: non-falsy-string, name: non-falsy-string, 1: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
 
 		-
 			rawMessage: Infection\Reporter\Http\StrykerCurlClient should not exist
@@ -782,12 +734,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{non-falsy-string, non-falsy-string}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -878,12 +824,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
 
 		-
-			rawMessage: 'Offset 1 might not exist on array{}|array{0: non-falsy-string, 1: non-falsy-string, 2?: ''/phpunit''}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
-
-		-
 			rawMessage: 'Generator expects value type string, string|null given.'
 			identifier: generator.valueType
 			count: 1
@@ -930,12 +870,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/ConcreteClassReflector.php
-
-		-
-			rawMessage: 'Cannot call method getPrerequisites() on Fidry\Makefile\Rule|null.'
-			identifier: method.nonObject
-			count: 2
-			path: ../tests/phpunit/AutoReview/Makefile/MakefileTest.php
 
 		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
@@ -1149,12 +1083,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
-
-		-
-			rawMessage: 'Cannot call method isPublic() on ReflectionClassConstant|false.'
-			identifier: method.nonObject
-			count: 2
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
 
 		-
 			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Assignment: array{}, Infection\Mutator\Arithmetic\AssignmentEqual: array{}, Infection\Mutator\Arithmetic\BitwiseAnd: array{}, Infection\Mutator\Arithmetic\BitwiseNot: array{}, Infection\Mutator\Arithmetic\BitwiseOr: array{}, Infection\Mutator\Arithmetic\BitwiseXor: array{}, Infection\Mutator\Arithmetic\Decrement: array{}, Infection\Mutator\Arithmetic\DivEqual: array{}, ...} given.'
@@ -1460,12 +1388,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Tracing/TestLocationBucketSorterTest.php
 
 		-
-			rawMessage: Access to an undefined property PhpParser\NodeVisitor::$range.
-			identifier: property.notFound
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
-
-		-
 			rawMessage: 'Parameter #1 $nodes of method PhpParser\NodeTraverser::traverse() expects array<PhpParser\Node>, array<PhpParser\Node\Stmt>|null given.'
 			identifier: argument.type
 			count: 1
@@ -1482,12 +1404,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/TraceAssertion.php
-
-		-
-			rawMessage: Access to an undefined property DOMNameSpaceNode|DOMNode::$attributes.
-			identifier: property.notFound
-			count: 2
-			path: ../tests/phpunit/TestFramework/XML/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Console\Command\TestOptionCommand should not exist

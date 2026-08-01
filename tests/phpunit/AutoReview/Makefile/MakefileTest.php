@@ -53,6 +53,7 @@ use function str_ends_with;
 use function str_starts_with;
 use function substr;
 use function substr_count;
+use Webmozart\Assert\Assert;
 
 #[Group('integration')]
 #[CoversNothing]
@@ -223,7 +224,9 @@ final class MakefileTest extends BaseMakefileTestCase
         $testRules = self::getTestRules(false);
 
         // Exclude itself
-        $testPrerequisites = array_shift($testRules)->getPrerequisites();
+        $testRule = array_shift($testRules);
+        Assert::notNull($testRule, 'Expected the Makefile to declare a "test" rule.');
+        $testPrerequisites = $testRule->getPrerequisites();
 
         $rootTestTargets = self::getRootTestTargets($testRules, 1);
         $rootTestTargets = array_replace($rootTestTargets, ['test-autoreview'], ['autoreview']);
@@ -236,7 +239,9 @@ final class MakefileTest extends BaseMakefileTestCase
         $testRules = self::getTestRules(true);
 
         // Exclude itself
-        $testPrerequisites = array_shift($testRules)->getPrerequisites();
+        $testRule = array_shift($testRules);
+        Assert::notNull($testRule, 'Expected the Makefile to declare a "test-docker" rule.');
+        $testPrerequisites = $testRule->getPrerequisites();
 
         $rootTestTargets = self::getRootTestTargets($testRules, 2);
         array_unshift($rootTestTargets, 'autoreview');

@@ -33,36 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\CannotBeInstantiated;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Override;
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
+ * Records the line range calculated for the last visited node of interest. Exposing
+ * `$range` as a declared property (rather than an anonymous class) lets
+ * LineRangeCalculatorTest read it back without going through the NodeVisitor
+ * interface, which does not declare it.
+ *
  * @internal
  */
-final class FullyQualifiedClassNameManipulator
+final class RangeSpyVisitor extends NodeVisitorAbstract
 {
-    use CannotBeInstantiated;
+    /**
+     * @var int[]
+     */
+    public array $range = [];
 
-    public const string RESOLVED_NAME = 'resolvedName';
-
-    public const string RESOLVED_NAMESPACE_NAME = 'namespacedName';
-
-    public static function getFqcn(Node $node): ?Node\Name
+    #[Override]
+    public function leaveNode(Node $node)
     {
-        // NameResolver sets `namespacedName` as a declared property only on these
-        // node types (see NameResolver::addNamespacedName()); every other node
-        // exposes it, if at all, as an attribute instead.
-        $namespacedName = match (true) {
-            $node instanceof Node\Stmt\ClassLike,
-            $node instanceof Node\Stmt\Function_,
-            $node instanceof Node\Const_ => $node->namespacedName,
-            default => null,
-        };
+        if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === 'findMe') {
+            $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, true);
 
-        return $namespacedName
-            ?? $node->getAttribute('resolvedName')
-            ?? $node->getAttribute('namespacedName');
+            $this->range = (new LineRangeCalculator())->calculateRange($node)->range;
+        }
+
+        if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
+            $this->range = (new LineRangeCalculator())->calculateRange($node)->range;
+        }
+
+        return null;
     }
 }

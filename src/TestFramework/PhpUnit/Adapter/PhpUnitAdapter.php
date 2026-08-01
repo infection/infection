@@ -53,6 +53,7 @@ use function Safe\preg_match;
 use function sprintf;
 use function trim;
 use function version_compare;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -166,6 +167,8 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
     public function getMemoryUsed(string $output): float
     {
         if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
+            Assert::keyExists($match, 1, 'The regex has a mandatory capture group; its absence indicates the pattern above was changed without updating this code.');
+
             return (float) $match[1];
         }
 
