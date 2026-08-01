@@ -95,10 +95,11 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        $this->filesystem->dumpFile(
-            $path,
-            $xPath->document->saveXML(),
-        );
+        $xml = $xPath->document->saveXML();
+
+        Assert::notFalse($xml, 'Failed to serialize the initial PHPUnit XML configuration. This indicates a bug - the DOM document built from the original config is malformed.');
+
+        $this->filesystem->dumpFile($path, $xml);
 
         return $path;
     }

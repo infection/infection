@@ -313,18 +313,6 @@ parameters:
 			path: ../src/Mutant/MutantExecutionResult.php
 
 		-
-			rawMessage: 'Parameter #1 $array of function array_intersect expects an array of values castable to string, list<PhpParser\Node\Expr|string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Mutator/Boolean/LogicalOr.php
-
-		-
-			rawMessage: 'Parameter #2 $arrays of function array_intersect expects an array of values castable to string, list<PhpParser\Node\Expr|string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/Mutator/Boolean/LogicalOr.php
-
-		-
 			rawMessage: Do not use magic number as a function argument. Move to constant with a suitable name.
 			count: 8
 			path: ../src/Mutator/Extensions/BCMath.php
@@ -698,12 +686,6 @@ parameters:
 			path: ../src/TestFramework/AdapterInstaller.php
 
 		-
-			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/TestFramework/AdapterInstaller.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 2
@@ -848,12 +830,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
 
 		-
-			rawMessage: 'Parameter #1 $className of static method Infection\Framework\ClassName::getShortClassName() expects class-string, string given.'
-			identifier: argument.type
-			count: 1
-			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\Config\InitialConfigBuilder
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
@@ -863,12 +839,6 @@ parameters:
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 4
-			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
-
-		-
-			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
-			identifier: argument.type
-			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php
 
 		-
@@ -892,12 +862,6 @@ parameters:
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder should not exist
 			identifier: phpat.testSourceConcreteClassesAreFinals
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
-
-		-
-			rawMessage: 'Parameter #2 $content of method Symfony\Component\Filesystem\Filesystem::dumpFile() expects resource|string, string|false given.'
-			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php
 
