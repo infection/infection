@@ -82,8 +82,7 @@ final class MutatorRobustnessTest extends TestCase
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
      * whether the code is actually mutated, only if it does not error.
-     */
-    /**
+     *
      * @param Mutator<Node> $mutator
      */
     #[DataProvider('mutatorWithCodeCaseProvider')]

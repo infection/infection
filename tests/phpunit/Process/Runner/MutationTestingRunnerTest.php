@@ -780,7 +780,7 @@ final class MutationTestingRunnerTest extends TestCase
         }
 
         /** @var Callback<iterable<MutantProcessContainer>> $result */
-        $result = $this->callback(static fn ($_subject): bool => true);
+        $result = $this->callback(static fn (iterable $_subject): bool => true);
 
         return $result;
     }

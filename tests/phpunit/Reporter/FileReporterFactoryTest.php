@@ -51,6 +51,7 @@ use Infection\Reporter\GitLabCodeQualityReporter;
 use Infection\Reporter\Html\HtmlFileReporter;
 use Infection\Reporter\Html\StrykerHtmlReportBuilder;
 use Infection\Reporter\JsonReporter;
+use Infection\Reporter\LineMutationTestingResultsReporter;
 use Infection\Reporter\PerMutatorReporter;
 use Infection\Reporter\Reporter;
 use Infection\Reporter\SummaryFileReporter;
@@ -369,8 +370,7 @@ final class FileReporterFactoryTest extends TestCase
         $actualReporterClassNames = array_map(
             static function (Reporter $reporter) use ($fileReporterDecoratedReporter): string {
                 if ($reporter instanceof FileReporter) {
-                    // FileReporter::$lineReporter always holds a Reporter instance.
-                    /** @var object $reporter */
+                    /** @var LineMutationTestingResultsReporter $reporter */
                     $reporter = $fileReporterDecoratedReporter->getValue($reporter);
                 }
 

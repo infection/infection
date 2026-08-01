@@ -141,7 +141,7 @@ final class MutatorResolver
     }
 
     /**
-     * @param array<string, mixed[]>|bool|stdClass $settings
+     * @param array<string, mixed>|bool|stdClass $settings
      * @param array<string, string[]> $globalSettings
      *
      * @return array<string, mixed[]>|bool
@@ -157,16 +157,9 @@ final class MutatorResolver
         }
 
         if ($globalSettings === []) {
-            // A stdClass cast loses its property value types (per the "ignore",
-            // "ignoreSourceCodeByRegex" and "settings" keys of the schema's
-            // default-mutator-config, they are always arrays).
-            /** @var array<string, mixed[]> $castSettings */
-            $castSettings = (array) $settings;
-
-            return $castSettings;
+            return (array) $settings;
         }
 
-        /** @var array<string, mixed[]> $resultSettings */
         $resultSettings = array_merge_recursive($globalSettings, (array) $settings);
 
         foreach ($resultSettings as $key => &$settingValues) {

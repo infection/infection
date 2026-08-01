@@ -146,8 +146,6 @@ final class ProfileListProvider
 
         $profileListReflection = new ReflectionClass(ProfileList::class);
 
-        // Every ProfileList::*_PROFILE constant is a string[] of mutator/profile
-        // names; ReflectionClass::getConstants() itself cannot express that.
         /** @var array<string, string[]> $profileConstants */
         $profileConstants = array_filter(
             $profileListReflection->getConstants(),

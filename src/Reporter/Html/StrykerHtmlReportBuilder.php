@@ -106,7 +106,7 @@ final readonly class StrykerHtmlReportBuilder
      *     schemaVersion: string,
      *     thresholds: array{high: int, low: int},
      *     files: ArrayObject<string, array<mixed>|string>,
-     *     testFiles: ArrayObject<string, array{tests: list<array{id: string, name: string}>}>,
+     *     testFiles: ArrayObject<array-key, array{tests: non-empty-list<array{id: string, name: string}>}>,
      *     framework: array{name: string, branding: array{homepageUrl: string, imageUrl: string}},
      * }
      */
@@ -131,14 +131,11 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @return ArrayObject<string, array{tests: list<array{id: string, name: string}>}>
+     * @return ArrayObject<array-key, array{tests: non-empty-list<array{id: string, name: string}>}>
      */
     private function getTestFiles(): ArrayObject
     {
-        /**
-         * @var ArrayObject<string, array{tests: list<array{id: string, name: string}>}>
-         */
-        $testFiles = new ArrayObject();
+        $testFiles = [];
         $allTests = [];
 
         foreach ($this->resultsCollector->getAllExecutionResults() as $result) {
@@ -162,25 +159,17 @@ final readonly class StrykerHtmlReportBuilder
         }, []);
 
         foreach ($uniqueTests as $testLocation) {
-            /*
-             * TestLocation gets its file path and timings from TestFileTimeData.
-             * Path for TestFileTimeData is not optional. It is never a null.
-             * Therefore we don't need to make any type checks here.
-             */
-
-            /** @var string $filePath */
-            $filePath = $testLocation->getFilePath();
-
-            if (!$testFiles->offsetExists($filePath)) {
-                $testFiles[$filePath] = [
+            if (!array_key_exists($testLocation->getFilePath(), $testFiles)) {
+                $testFiles[$testLocation->getFilePath()] = [
                     'tests' => [$this->buildTest($testLocation)],
                 ];
             } else {
-                $testFiles[$filePath]['tests'][] = $this->buildTest($testLocation);
+                $testFiles[$testLocation->getFilePath()]['tests'][] = $this->buildTest($testLocation);
             }
         }
 
-        return $testFiles;
+        /** @var array<array-key, array{tests: non-empty-list<array{id: string, name: string}>}> $testFiles */
+        return new ArrayObject($testFiles);
     }
 
     /**

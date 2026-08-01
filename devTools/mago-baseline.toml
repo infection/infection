@@ -2270,6 +2270,12 @@ count = 2
 
 [[issues]]
 file = "src/Mutator/MutatorResolver.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `array<string, mixed>` is less specific than the declared return type `array<string, array<array-key, mixed>>|bool` for function `Infection\Mutator\MutatorResolver::resolveSettings` due to nested 'mixed'.'''
+count = 2
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #1 of `array_unique`: expected `array<('K.array_unique() extends array-key), ('V.array_unique() extends mixed)>`, but found `mixed`."
 count = 1
