@@ -364,7 +364,7 @@ $(PHP_CS_FIXER): Makefile
 	touch -c $@
 
 $(PHPSTAN): vendor
-	touch -c $@
+	@touch -c $@
 
 $(MAGO): vendor
 	touch -c $@
@@ -385,12 +385,12 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	touch -c $@
 
 vendor: composer.lock
-	composer install --prefer-dist
-	touch -c $@
+	@chronic composer install --prefer-dist
+	@chronic touch -c $@
 
 composer.lock: composer.json
-	composer install --prefer-dist
-	touch -c $@
+	@chronic composer install --prefer-dist
+	@chronic touch -c $@
 
 $(PHPUNIT_BIN): vendor phpunit.xml.dist
 	touch -c $@
