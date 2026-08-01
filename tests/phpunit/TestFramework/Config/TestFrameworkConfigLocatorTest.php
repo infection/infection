@@ -57,7 +57,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
         $this->expectException(FileOrDirectoryNotFound::class);
         $this->expectExceptionMessage(
             sprintf(
-                'The path "%s" does not contain any of the requested files: "phpunit.xml", "phpunit.yml", "phpunit.xml.dist", "phpunit.yml.dist", "phpunit.dist.xml", "phpunit.dist.yml"',
+                'Could not locate the files "phpunit.xml", "phpunit.yml", "phpunit.xml.dist", "phpunit.yml.dist", "phpunit.dist.xml", "phpunit.dist.yml", "phpunit.php" in "%s"',
                 $dir,
             ),
         );

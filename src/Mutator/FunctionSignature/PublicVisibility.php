@@ -41,6 +41,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\Visibility;
+use PhpParser\Modifiers;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
@@ -76,7 +77,7 @@ final class PublicVisibility implements Mutator
         yield new Node\Stmt\ClassMethod(
             $node->name,
             [
-                'flags' => ($node->flags & ~Node\Stmt\Class_::MODIFIER_PUBLIC) | Node\Stmt\Class_::MODIFIER_PROTECTED,
+                'flags' => ($node->flags & ~Modifiers::PUBLIC) | Modifiers::PROTECTED,
                 'byRef' => $node->returnsByRef(),
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),

@@ -57,7 +57,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
         $this->expectException(FileOrDirectoryNotFound::class);
         $this->expectExceptionMessage(
             sprintf(
-                'The path "%s" does not contain any of the requested files: "phpstan.neon", "phpstan.neon.dist", "phpstan.dist.neon"',
+                'Could not locate the files "phpstan.neon", "phpstan.neon.dist", "phpstan.dist.neon", "phpstan.toml", "phpstan.json", "phpstan.yaml" in "%s"',
                 $dir,
             ),
         );

@@ -69,12 +69,17 @@ final class LogVerbosity
     public const int NONE_INTEGER = 3;
 
     /**
+     * The keys are the legacy numeric values of DEBUG_INTEGER, NORMAL_INTEGER and
+     * NONE_INTEGER above, spelled out as literals because those constants are marked
+     * deprecated, and PHPStan forbids fetching a deprecated constant even from its
+     * own declaring class.
+     *
      * @var array<int, string>
      */
     public const array ALLOWED_OPTIONS = [
-        self::DEBUG_INTEGER => self::DEBUG,
-        self::NORMAL_INTEGER => self::NORMAL,
-        self::NONE_INTEGER => self::NONE,
+        1 => self::DEBUG,
+        2 => self::NORMAL,
+        3 => self::NONE,
     ];
 
     public static function convertVerbosityLevel(InputInterface $input, ConsoleOutput $io): void
