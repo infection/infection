@@ -45,6 +45,7 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;
 use function ksort;
+use PhpParser\Node;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -81,6 +82,9 @@ final class MutatorRobustnessTest extends TestCase
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
      * whether the code is actually mutated, only if it does not error.
+     */
+    /**
+     * @param Mutator<Node> $mutator
      */
     #[DataProvider('mutatorWithCodeCaseProvider')]
     public function test_the_mutator_does_not_crash(
@@ -145,6 +149,9 @@ final class MutatorRobustnessTest extends TestCase
         yield from self::$files;
     }
 
+    /**
+     * @param Mutator<Node> $mutator
+     */
     private function mutatesCode(SplFileInfo $fileInfo, Mutator $mutator): void
     {
         $mutations = $this->fileMutationGenerator->generate(

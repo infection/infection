@@ -347,12 +347,6 @@ parameters:
 			path: ../src/Mutator/MutatorResolver.php
 
 		-
-			rawMessage: 'Method Infection\Mutator\MutatorResolver::resolveSettings() has parameter $settings with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Mutator/MutatorResolver.php
-
-		-
 			rawMessage: PHPDoc tag @var with type array<string> is not subtype of type bool|stdClass.
 			identifier: varTag.type
 			count: 2
@@ -468,54 +462,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: ../src/Process/OriginalPhpProcess.php
-
-		-
-			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Reflection/AnonymousClassReflection.php
-
-		-
-			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::hasMethod() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Reflection/AnonymousClassReflection.php
-
-		-
-			rawMessage: 'Method Infection\Reflection\AnonymousClassReflection::hasMethodRecursively() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Reflection/AnonymousClassReflection.php
-
-		-
-			rawMessage: 'Method Infection\Reflection\CoreClassReflection::__construct() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Reflection/CoreClassReflection.php
-
-		-
-			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::build() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::getFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::getTestFiles() return type with generic class ArrayObject does not specify its types: TKey, TValue'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Reporter\Html\StrykerHtmlReportBuilder::retrieveMutants() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Reporter/Html/StrykerHtmlReportBuilder.php
 
 		-
 			rawMessage: 'Offset ''name'' might not exist on array{}|array{0: non-falsy-string, name: non-falsy-string, 1: non-falsy-string, dataname?: non-falsy-string, 2?: non-falsy-string}.'
@@ -992,38 +938,8 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::createMutator() has parameter $settings with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::createMutator() return type with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::getMutationsFromCode() has parameter $settings with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			rawMessage: 'Method Infection\Testing\BaseMutatorTestCase::mutate() has parameter $settings with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, non-empty-array<string, array{settings: array}> given.'
+			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, non-empty-array<string, array{settings: array<mixed>}> given.'
 			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			rawMessage: 'Property Infection\Testing\BaseMutatorTestCase::$mutator with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
-			identifier: missingType.generics
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
 
@@ -1064,18 +980,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/Mutator/MutatorProviderTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\AutoReview\Mutator\MutatorTest::getPublicMethods() has parameter $reflectionClass with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
-
-		-
-			rawMessage: 'PHPDoc tag @var for variable $mutator contains generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
-
-		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
 			count: 3
@@ -1110,30 +1014,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationBuilder::withMutators() has parameter $mutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryScenario.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::getDefaultMutators() return type with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
-
-		-
-			rawMessage: 'Property Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryTest::$mutators with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\Configuration\ProjectDirectoryProvider\FixedProjectDirectoryProvider should not exist
@@ -1196,12 +1076,6 @@ parameters:
 			path: ../tests/phpunit/Logger/Console/BufferedOutputWithStdErrOutput.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Logger\Console\ConsoleLoggerTest::test_it_casts_the_context_values_into_strings() has parameter $value with no type specified.'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Logger/Console/ConsoleLoggerTest.php
-
-		-
 			rawMessage: Infection\Tests\Logger\DummyLogger should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1250,12 +1124,6 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			rawMessage: 'Method Infection\Tests\MockedContainer::createWithServices() has parameter $values with no value type specified in iterable type array<class-string<object>, mixed>.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/MockedContainer.php
-
-		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
 			identifier: argument.type
 			count: 1
@@ -1289,12 +1157,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Boolean/TrueValueConfigTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Mutator\DefinitionTest::test_it_must_define_remedies() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/DefinitionTest.php
-
-		-
 			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Assignment: array{}, Infection\Mutator\Arithmetic\AssignmentEqual: array{}, Infection\Mutator\Arithmetic\BitwiseAnd: array{}, Infection\Mutator\Arithmetic\BitwiseNot: array{}, Infection\Mutator\Arithmetic\BitwiseOr: array{}, Infection\Mutator\Arithmetic\BitwiseXor: array{}, Infection\Mutator\Arithmetic\Decrement: array{}, Infection\Mutator\Arithmetic\DivEqual: array{}, ...} given.'
 			identifier: argument.type
 			count: 1
@@ -1313,12 +1175,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Extensions/BCMathConfigTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Mutator\Extensions\BCMathTest::test_it_can_mutate() has parameter $settings with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/BCMathTest.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of function array_map expects (callable(int<1, max>): mixed)|null, Closure(string): non-falsy-string given.'
 			identifier: argument.type
 			count: 1
@@ -1331,34 +1187,10 @@ parameters:
 			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
 
 		-
-			rawMessage: 'Property Infection\Tests\Mutator\IgnoreMutatorTest::$mutatorMock with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/IgnoreMutatorTest.php
-
-		-
 			rawMessage: 'Cannot call method isPublic() on ReflectionClassConstant|false.'
 			identifier: method.nonObject
 			count: 2
 			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Mutator\MutatorCategoryTest::assertAllIsPublic() has parameter $classReflection with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Mutator\MutatorCategoryTest::assertExposedConstantsArePublic() has parameter $classReflection with generic class ReflectionClass but does not specify its types: T'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Mutator\MutatorFactoryTest::assertSameMutatorsByClass() has parameter $actualMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorFactoryTest.php
 
 		-
 			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Assignment: array{}, Infection\Mutator\Arithmetic\AssignmentEqual: array{}, Infection\Mutator\Arithmetic\BitwiseAnd: array{}, Infection\Mutator\Arithmetic\BitwiseNot: array{}, Infection\Mutator\Arithmetic\BitwiseOr: array{}, Infection\Mutator\Arithmetic\BitwiseXor: array{}, Infection\Mutator\Arithmetic\Decrement: array{}, Infection\Mutator\Arithmetic\DivEqual: array{}, ...} given.'
@@ -1472,52 +1304,16 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Mutator\MutatorRobustnessTest::mutatesCode() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Mutator\MutatorRobustnessTest::test_the_mutator_does_not_crash() has parameter $mutator with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
-
-		-
 			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, non-empty-array{Infection\Mutator\Arithmetic\Assignment?: array{}, Infection\Mutator\Arithmetic\AssignmentEqual?: array{}, Infection\Mutator\Arithmetic\BitwiseAnd?: array{}, Infection\Mutator\Arithmetic\BitwiseNot?: array{}, Infection\Mutator\Arithmetic\BitwiseOr?: array{}, Infection\Mutator\Arithmetic\BitwiseXor?: array{}, Infection\Mutator\Arithmetic\Decrement?: array{}, Infection\Mutator\Arithmetic\DivEqual?: array{}, ...} given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
-			rawMessage: 'Property Infection\Tests\Mutator\NoopMutatorTest::$mutatorMock with generic interface Infection\Mutator\Mutator does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/NoopMutatorTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Mutator\ProfileListProvider::getProfiles() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/ProfileListProvider.php
-
-		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/ProfileListProvider.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Mutator\ProfileListTest::test_all_mutator_profiles_are_sorted_lexicographically() has parameter $profileOrMutators with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/ProfileListTest.php
-
-		-
-			rawMessage: 'Property Infection\Tests\Mutator\Util\AbstractValueToNullReturnValueTest::$testSubjectStub with generic class Infection\Mutator\Util\AbstractValueToNullReturnValue does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
 
 		-
 			rawMessage: 'Parameter #1 $kind (array<int|string>|int|string) of method Infection\Tests\PhpParser\FakeToken::is() should be contravariant with parameter $kind (array|int|string) of method PhpToken::is()'
@@ -1530,18 +1326,6 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: ../tests/phpunit/PhpParser/FakeTokenTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\PhpParser\MutatedNodeTest::test_it_can_be_instantiated() has parameter $node with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $node with type array<PhpParser\Node>|PhpParser\Node is not subtype of native type array|PhpParser\Node\Scalar\Int_.
-			identifier: parameter.phpDocType
-			count: 1
-			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
 
 		-
 			rawMessage: Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\StopAtSkippedArgVisitor should not exist
@@ -1560,24 +1344,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::iterableContaining() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::someIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
 			rawMessage: Infection\Tests\Process\ShellCommandLineExecutorTest should not exist
@@ -1634,18 +1400,6 @@ parameters:
 			path: ../tests/phpunit/Reporter/FileLocationReporter/InvokableReporter.php
 
 		-
-			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::assertRegisteredReportersAre() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\Reporter\FileReporterFactoryTest::test_it_creates_a_reporter_for_log_type_on_normal_verbosity() has parameter $expectedReporterClassNames with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Reporter/FileReporterFactoryTest.php
-
-		-
 			rawMessage: Infection\Tests\Reporter\GitLabCodeQualityReporterTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
@@ -1688,18 +1442,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
 
 		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
-
-		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.
 			identifier: ternary.shortNotAllowed
 			count: 1
@@ -1708,12 +1450,6 @@ parameters:
 		-
 			rawMessage: Anonymous function should return string but returns string|null.
 			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilderTest::queryXpath() return type with generic class DOMNodeList does not specify its types: TNode'
-			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
@@ -1776,18 +1512,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Tracing/Trace/SyntheticTrace.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::serializeValue() has no return type specified.'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
-
-		-
-			rawMessage: 'Method Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer::serializeValue() has parameter $mixed with no type specified.'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion should not exist

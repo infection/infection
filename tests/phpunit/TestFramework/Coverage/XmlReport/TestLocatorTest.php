@@ -174,6 +174,9 @@ final class TestLocatorTest extends TestCase
         return new TestLocator($testsLocations[$filePath]);
     }
 
+    /**
+     * @return array<string, TestLocations>
+     */
     private function getTestsLocations(): array
     {
         return self::$testsLocations ??= [

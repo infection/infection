@@ -55,6 +55,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(IgnoreMutator::class)]
 final class IgnoreMutatorTest extends TestCase
 {
+    /** @var Mutator<Node>&MockObject */
     private MockObject&Mutator $mutatorMock;
 
     private MockObject&Node $nodeMock;

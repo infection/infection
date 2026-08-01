@@ -50,6 +50,7 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +67,7 @@ abstract class BaseMutatorTestCase extends TestCase
 {
     private const string WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
 
+    /** @var Mutator<Node> */
     protected Mutator $mutator;
 
     protected function setUp(): void
@@ -144,6 +146,11 @@ abstract class BaseMutatorTestCase extends TestCase
         }
     }
 
+    /**
+     * @param mixed[] $settings
+     *
+     * @return Mutator<Node>
+     */
     final protected function createMutator(array $settings = []): Mutator
     {
         $mutatorClassName = $this->getTestedMutatorClassName();
@@ -180,6 +187,8 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
+     * @param mixed[] $settings
+     *
      * @return string[]
      */
     final protected function mutate(string $code, array $settings = []): array
@@ -221,6 +230,8 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
+     * @param mixed[] $settings
+     *
      * @return Mutation[]
      */
     private function getMutationsFromCode(string $code, array $settings): array

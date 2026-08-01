@@ -44,6 +44,7 @@ use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
+use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
@@ -104,7 +105,7 @@ final class MutatorTest extends TestCase
     #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_mutators_have_a_definition(string $className): void
     {
-        /** @var Mutator $mutator */
+        /** @var Mutator<Node> $mutator */
         $mutator = (new ReflectionClass($className))->newInstanceWithoutConstructor();
 
         $definition = $mutator::getDefinition();
@@ -202,6 +203,8 @@ final class MutatorTest extends TestCase
     }
 
     /**
+     * @param ReflectionClass<object> $reflectionClass
+     *
      * @return string[]
      */
     private function getPublicMethods(ReflectionClass $reflectionClass): array

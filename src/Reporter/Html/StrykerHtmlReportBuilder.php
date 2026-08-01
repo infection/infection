@@ -101,6 +101,15 @@ final readonly class StrykerHtmlReportBuilder
     ) {
     }
 
+    /**
+     * @return array{
+     *     schemaVersion: string,
+     *     thresholds: array{high: int, low: int},
+     *     files: ArrayObject<string, array<mixed>|string>,
+     *     testFiles: ArrayObject<string, array{tests: list<array{id: string, name: string}>}>,
+     *     framework: array{name: string, branding: array{homepageUrl: string, imageUrl: string}},
+     * }
+     */
     public function build(): array
     {
         return [
@@ -121,9 +130,15 @@ final readonly class StrykerHtmlReportBuilder
         ];
     }
 
+    /**
+     * @return ArrayObject<string, array{tests: list<array{id: string, name: string}>}>
+     */
     private function getTestFiles(): ArrayObject
     {
-        $testFiles = [];
+        /**
+         * @var ArrayObject<string, array{tests: list<array{id: string, name: string}>}>
+         */
+        $testFiles = new ArrayObject();
         $allTests = [];
 
         foreach ($this->resultsCollector->getAllExecutionResults() as $result) {
@@ -147,18 +162,30 @@ final readonly class StrykerHtmlReportBuilder
         }, []);
 
         foreach ($uniqueTests as $testLocation) {
-            if (!array_key_exists($testLocation->getFilePath(), $testFiles)) {
-                $testFiles[$testLocation->getFilePath()] = [
+            /*
+             * TestLocation gets its file path and timings from TestFileTimeData.
+             * Path for TestFileTimeData is not optional. It is never a null.
+             * Therefore we don't need to make any type checks here.
+             */
+
+            /** @var string $filePath */
+            $filePath = $testLocation->getFilePath();
+
+            if (!$testFiles->offsetExists($filePath)) {
+                $testFiles[$filePath] = [
                     'tests' => [$this->buildTest($testLocation)],
                 ];
             } else {
-                $testFiles[$testLocation->getFilePath()]['tests'][] = $this->buildTest($testLocation);
+                $testFiles[$filePath]['tests'][] = $this->buildTest($testLocation);
             }
         }
 
-        return new ArrayObject($testFiles);
+        return $testFiles;
     }
 
+    /**
+     * @return ArrayObject<string, array<mixed>|string>
+     */
     private function getFiles(): ArrayObject
     {
         $files = new ArrayObject();
@@ -179,7 +206,7 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @param array<string, MutantExecutionResult[]> $resultsByPath
+     * @param array<string, list<MutantExecutionResult>> $resultsByPath
      *
      * @return ArrayObject<string, array<mixed>|string>
      */
@@ -211,7 +238,7 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @return array<string, MutantExecutionResult[]>
+     * @return array<string, list<MutantExecutionResult>>
      */
     private function retrieveResultsByPath(): array
     {
@@ -225,7 +252,20 @@ final readonly class StrykerHtmlReportBuilder
     }
 
     /**
-     * @param MutantExecutionResult[] $results
+     * @param list<MutantExecutionResult> $results
+     *
+     * @return list<array{
+     *     id: string,
+     *     mutatorName: string,
+     *     replacement: string,
+     *     description: string,
+     *     location: array{start: array{line: int, column: int}, end: array{line: int, column: int}},
+     *     status: string,
+     *     statusReason: string,
+     *     coveredBy: array<array-key, string>,
+     *     killedBy: array<int, string>,
+     *     testsCompleted: int,
+     * }>
      */
     private function retrieveMutants(array $results, string $originalCode): array
     {

@@ -76,6 +76,7 @@ use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
 use Infection\Tests\Fixtures\Resource\Processor\DummyCpuCoresCountProvider;
 use InvalidArgumentException;
+use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -93,7 +94,7 @@ final class ConfigurationFactoryTest extends TestCase
     private const string DEFAULT_PROJECT_DIRECTORY = '/ci/path/to/project';
 
     /**
-     * @var array<string, Mutator>|null
+     * @var array<string, Mutator<Node>>|null
      */
     private static ?array $mutators = null;
 
@@ -1241,6 +1242,20 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        // Widens IgnoreMutator<Node\Stmt\Expression> to the generic Mutator<Node> contract
+        // expected by ConfigurationFactoryScenario::forValueForMutators(): the Mutator
+        // interface's TNode is not declared covariant (see MutatorFactory::create() for
+        // the same widening done in production code).
+        /** @var array<string, Mutator<Node>> $mutatorsFromConfig */
+        $mutatorsFromConfig = [
+            'MethodCallRemoval' => new IgnoreMutator(
+                new IgnoreConfig([
+                    'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                ]),
+                new MethodCallRemoval(),
+            ),
+        ];
+
         yield 'mutators from config' => [
             $defaultScenario->forValueForMutators(
                 [
@@ -1253,15 +1268,18 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
                 '',
                 false,
-                [
-                    'MethodCallRemoval' => new IgnoreMutator(
-                        new IgnoreConfig([
-                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                        ]),
-                        new MethodCallRemoval(),
-                    ),
-                ],
+                $mutatorsFromConfig,
             ),
+        ];
+
+        /** @var array<string, Mutator<Node>> $noopMutatorsFromConfig */
+        $noopMutatorsFromConfig = [
+            'MethodCallRemoval' => new NoopMutator(new IgnoreMutator(
+                new IgnoreConfig([
+                    'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                ]),
+                new MethodCallRemoval(),
+            )),
         ];
 
         yield 'noop mutators from config' => [
@@ -1276,14 +1294,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
                 '',
                 true,
-                [
-                    'MethodCallRemoval' => new NoopMutator(new IgnoreMutator(
-                        new IgnoreConfig([
-                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                        ]),
-                        new MethodCallRemoval(),
-                    )),
-                ],
+                $noopMutatorsFromConfig,
             ),
         ];
 
@@ -1316,6 +1327,12 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        /** @var array<string, Mutator<Node>> $mutatorsFromConfigAndInput */
+        $mutatorsFromConfigAndInput = [
+            'AssignmentEqual' => new AssignmentEqual(),
+            'EqualIdentical' => new EqualIdentical(),
+        ];
+
         yield 'mutators from config & input' => [
             $defaultScenario->forValueForMutators(
                 [
@@ -1329,10 +1346,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ],
                 'AssignmentEqual,EqualIdentical',
                 false,
-                [
-                    'AssignmentEqual' => new AssignmentEqual(),
-                    'EqualIdentical' => new EqualIdentical(),
-                ],
+                $mutatorsFromConfigAndInput,
                 [
                     'AssignmentEqual' => ['Assert::.*'],
                     'EqualIdentical' => ['Assert::.*'],
@@ -1478,6 +1492,11 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        /** @var array<string, Mutator<Node>> $completeExpectedMutators */
+        $completeExpectedMutators = [
+            'TrueValue' => new TrueValue(new TrueValueConfig([])),
+        ];
+
         yield 'complete' => [
             ConfigurationFactoryScenario::create(
                 ciDetected: false,
@@ -1580,9 +1599,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', '/path/to/config/phpunit'))
                     ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'))
                     ->withMago(new Mago('/path/to/config/mago-dir', '/path/to/bin/mago'))
-                    ->withMutators([
-                        'TrueValue' => new TrueValue(new TrueValueConfig([])),
-                    ])
+                    ->withMutators($completeExpectedMutators)
                     ->withTestFramework('phpspec')
                     ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
                     ->withInitialTestsPhpOptions('-d zend_extension=xdebug.so')
@@ -1638,7 +1655,7 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @return array<string, Mutator>
+     * @return array<string, Mutator<Node>>
      */
     private static function getDefaultMutators(): array
     {

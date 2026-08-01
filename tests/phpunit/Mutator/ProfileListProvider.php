@@ -135,6 +135,9 @@ final class ProfileListProvider
         yield from self::$mutators;
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function getProfiles(): array
     {
         if (self::$profileConstants !== null) {
@@ -143,13 +146,18 @@ final class ProfileListProvider
 
         $profileListReflection = new ReflectionClass(ProfileList::class);
 
-        self::$profileConstants = array_filter(
+        // Every ProfileList::*_PROFILE constant is a string[] of mutator/profile
+        // names; ReflectionClass::getConstants() itself cannot express that.
+        /** @var array<string, string[]> $profileConstants */
+        $profileConstants = array_filter(
             $profileListReflection->getConstants(),
             static fn (string $constantName): bool => str_ends_with($constantName, '_PROFILE'),
             ARRAY_FILTER_USE_KEY,
         );
 
-        return self::$profileConstants;
+        self::$profileConstants = $profileConstants;
+
+        return $profileConstants;
     }
 
     public static function profileProvider(): iterable

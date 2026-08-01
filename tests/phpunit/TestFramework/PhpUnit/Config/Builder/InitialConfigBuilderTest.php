@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNodeList;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\InMemoryFileSystem;
@@ -601,6 +603,9 @@ final class InitialConfigBuilderTest extends TestCase
         ];
     }
 
+    /**
+     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
+     */
     private function queryXpath(string $xml, string $query): DOMNodeList
     {
         return SafeDOMXPath::fromString($xml)->queryList($query);

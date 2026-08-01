@@ -52,6 +52,7 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 final class ConfigurationFactoryScenario
@@ -651,7 +652,7 @@ final class ConfigurationFactoryScenario
 
     /**
      * @param array<string, mixed> $configMutators
-     * @param array<string, Mutator> $expectedMutators
+     * @param array<string, Mutator<Node>> $expectedMutators
      * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     public function forValueForMutators(
@@ -693,6 +694,15 @@ final class ConfigurationFactoryScenario
         $previousExpected = $this->expected;
         Assert::isInstanceOf($previousExpected, Configuration::class);
 
+        // Widens MethodCallRemoval (a Mutator<Node\Expr\MethodCall>) to the generic
+        // Mutator<Node> contract expected by ConfigurationBuilder::withMutators(): the
+        // Mutator interface's TNode is not declared covariant (see MutatorFactory::create()
+        // for the same widening done in production code).
+        /** @var array<string, Mutator<Node>> $expectedMutators */
+        $expectedMutators = [
+            'MethodCallRemoval' => new MethodCallRemoval(),
+        ];
+
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -700,9 +710,7 @@ final class ConfigurationFactoryScenario
             )
             ->withExpected(
                 ConfigurationBuilder::from($previousExpected)
-                    ->withMutators([
-                        'MethodCallRemoval' => new MethodCallRemoval(),
-                    ])
+                    ->withMutators($expectedMutators)
                     ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
                     ->build(),
             );
