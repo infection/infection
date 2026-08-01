@@ -76,22 +76,6 @@ final class FileOrDirectoryNotFoundTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    /**
-     * @deprecated Covers the deprecated FileOrDirectoryNotFound::multipleFilesDoNotExist(),
-     * kept here on purpose so the shim stays under test while it is still shipped.
-     */
-    public function test_multiple_files_do_not_exist(): void
-    {
-        $exception = FileOrDirectoryNotFound::multipleFilesDoNotExist('foo/bar/', ['file1', 'file2']);
-
-        $this->assertSame(
-            'The path "foo/bar/" does not contain any of the requested files: "file1", "file2"',
-            $exception->getMessage(),
-        );
-        $this->assertSame(0, $exception->getCode());
-        $this->assertNull($exception->getPrevious());
-    }
-
     public static function nonExistentPathsProvider(): iterable
     {
         yield [

@@ -97,10 +97,6 @@ final class LogVerbosityTest extends TestCase
         LogVerbosity::convertVerbosityLevel($this->inputMock, $this->consoleOutputMock);
     }
 
-    /**
-     * @deprecated Exercises the deprecated LogVerbosity::NONE_INTEGER, NORMAL_INTEGER
-     * and DEBUG_INTEGER, kept here on purpose so they stay under test while still shipped.
-     */
     public static function convertedLogVerbosityProvider(): iterable
     {
         yield 'none integer to none' => [
