@@ -5,7 +5,6 @@
     "timeout": 20,
     "threads": 1,
     "tmpDir": "var",
-    "debug": { "logFile": "var/debug.jsonl" },
     "source": { "directories": ["src"] },
     "mutators": { "Plus": true }
 }

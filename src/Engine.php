@@ -203,6 +203,7 @@ final readonly class Engine
      */
     private function getInitialTestsPhpOptionsArray(): array
     {
+        // TODO: explode(' ', '') becomes ['']... This may cause undesired behaviour downstream.
         return explode(' ', (string) $this->config->initialTestsPhpOptions);
     }
 

@@ -1,33 +1,91 @@
 <?php
 
-declare(strict_types=1);
+const STAGES = [
+    'test-framework-initial',
+    'static-analysis-initial',
+    'test-framework-mutant',
+    'static-analysis-mutant',
+];
 
-$records = array_map(
-    static fn (string $line): array => json_decode($line, true, flags: JSON_THROW_ON_ERROR),
-    file($argv[1], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES),
-);
+/**
+ * @phpstan-type Record = array{
+ *     stage: string,
+ *     mutationHash: ?string,
+ *     command: list<string>,
+ *     php: array{memoryLimit: string, extensions: array{pcov: bool, xdebug: bool}},
+ * }
+ */
+final class DebugRecords
+{
+    /**
+     * @throws JsonException
+     *
+     * @return list<Record>
+     */
+    public static function load(string $filename): array
+    {
+        return array_map(
+            static fn(string $line): array => json_decode($line, true, flags: JSON_THROW_ON_ERROR),
+            file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES),
+        );
+    }
 
-$byStage = [];
+    /**
+     * @param list<Record> $records
+     * @return array<string, Record>
+     */
+    public static function indexByStage(array $records): array
+    {
+        $recordsByStage = [];
 
-foreach ($records as $record) {
-    $byStage[$record['stage']][] = $record;
-}
+        foreach ($records as $record) {
+            $stage = $record['stage'];
 
-foreach (['test-framework-initial', 'static-analysis-initial', 'test-framework-mutant', 'static-analysis-mutant'] as $stage) {
-    if (!isset($byStage[$stage]) || count($byStage[$stage]) !== 1) {
-        throw new RuntimeException(sprintf('Expected one "%s" record. Got: %s', $stage, json_encode($records)));
+            if (isset($recordsByStage[$stage])) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Expected one "%s" record. Got: %s',
+                        $stage,
+                        json_encode($records),
+                    ),
+                );
+            }
+
+            $recordsByStage[$stage] = $record;
+        }
+
+        foreach (STAGES as $stage) {
+            if (!isset($recordsByStage[$stage])) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Expected one "%s" record. Got: %s',
+                        $stage,
+                        json_encode($records),
+                    ),
+                );
+            }
+        }
+
+        return $recordsByStage;
     }
 }
 
-$testMutant = $byStage['test-framework-mutant'][0];
-$staticAnalysisMutant = $byStage['static-analysis-mutant'][0];
+$records = DebugRecords::load($argv[1]);
+$recordsByStage = DebugRecords::indexByStage($records);
+
+$testMutant = $recordsByStage['test-framework-mutant'];
+$staticAnalysisMutant = $recordsByStage['static-analysis-mutant'];
 
 if ($testMutant['mutationHash'] !== $staticAnalysisMutant['mutationHash']) {
-    throw new RuntimeException('The test framework and static analysis did not evaluate the same mutant.');
+    throw new RuntimeException(
+        'The test framework and static analysis did not evaluate the same mutant.',
+    );
 }
 
 if ($staticAnalysisMutant['php']['memoryLimit'] !== '-1') {
-    throw new RuntimeException('The static analysis mutant process must have an unlimited memory limit.');
+    throw new RuntimeException(
+        'The static analysis mutant process must have an unlimited memory limit.',
+    );
 }
 
 if (!in_array('memory_limit=-1', $staticAnalysisMutant['command'], true)) {

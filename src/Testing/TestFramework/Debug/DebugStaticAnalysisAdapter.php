@@ -47,7 +47,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
     private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../../../resources/debug-runtime.php';
 
     public function __construct(
-        private string $log,
+        private string $logFile,
         private float $timeout,
         private DebugCommandLine $commandLine,
     ) {
@@ -62,11 +62,11 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
     public function getInitialRunCommandLine(): array
     {
         return $this->commandLine->create(
-            self::DEBUG_RUNTIME_SCRIPT,
-            ['-d', 'memory_limit=-1'],
-            [
+            runtime: self::DEBUG_RUNTIME_SCRIPT,
+            phpArguments: ['-d', 'memory_limit=-1'],
+            options: [
                 'stage' => 'static-analysis-initial',
-                'log' => $this->log,
+                'log' => $this->logFile,
             ],
         );
     }
@@ -75,7 +75,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
     {
         return new DebugStaticAnalysisMutantProcessFactory(
             self::DEBUG_RUNTIME_SCRIPT,
-            $this->log,
+            $this->logFile,
             $this->timeout,
             $this->commandLine,
         );
@@ -88,5 +88,6 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
 
     public function assertMinimumVersionSatisfied(): void
     {
+        // Nothing to do.
     }
 }

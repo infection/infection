@@ -199,12 +199,9 @@ class SchemaConfigurationFactory
 
     private static function createPhpStan(stdClass $phpStan): PhpStan
     {
-        /** @var string|null $customPath */
-        $customPath = $phpStan->customPath ?? null;
-
         return new PhpStan(
             self::normalizeString($phpStan->configDir ?? null),
-            self::normalizeString($customPath),
+            self::normalizeString($phpStan->customPath ?? null),
         );
     }
 

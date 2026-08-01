@@ -35,41 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Testing\TestFramework\Debug;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Symfony\Component\Process\Process;
 
-/** @internal */
+/**
+ * @internal
+ */
 final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
 {
     public function __construct(
         private string $runtime,
-        private string $log,
+        private string $logFile,
         private float $timeout,
         private DebugCommandLine $commandLine,
     ) {
     }
 
-    /** @throws FinderException */
     public function create(Mutant $mutant): MutantProcess
     {
         return new MutantProcess(
             new Process(
                 command: $this->commandLine->create(
-                    $this->runtime,
-                    ['-d', 'memory_limit=-1'],
-                    [
+                    runtime: $this->runtime,
+                    phpArguments: ['-d', 'memory_limit=-1'],
+                    options: [
                         'stage' => 'static-analysis-mutant',
-                        'log' => $this->log,
+                        'log' => $this->logFile,
                         'mutationHash' => $mutant->getMutation()->getHash(),
                     ],
                 ),
                 timeout: $this->timeout,
             ),
             $mutant,
+            // There is not enough differences to warrant a different factory yet at the time of writing.
             new PHPStanMutantExecutionResultFactory(),
         );
     }

@@ -45,14 +45,17 @@ use const JSON_THROW_ON_ERROR;
 use const PHP_SAPI;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-/** @internal */
+/**
+ * @internal
+ */
 final class DebugCommandLine
 {
     /** @var string[]|null */
     private ?array $cachedPhpCommandLine = null;
 
-    public function __construct(private readonly PhpExecutableFinder $phpExecutableFinder)
-    {
+    public function __construct(
+        private readonly PhpExecutableFinder $phpExecutableFinder,
+    ) {
     }
 
     /**
@@ -70,11 +73,7 @@ final class DebugCommandLine
     ): array {
         $command = array_merge(
             $this->findPhp(),
-            array_values(
-                array_filter(
-                    $phpArguments,
-                    static fn (string $argument): bool => $argument !== ''),
-            ),
+            $this->filterEmptyArguments($phpArguments),
             [$runtime],
         );
 
@@ -85,6 +84,20 @@ final class DebugCommandLine
         $command[] = 'command=' . base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
 
         return $command;
+    }
+
+    /**
+     * @param string[] $phpArguments
+     * @return list<non-empty-string>
+     */
+    public function filterEmptyArguments(array $phpArguments): array
+    {
+        return array_values(
+            array_filter(
+                $phpArguments,
+                static fn (string $argument): bool => $argument !== '',
+            ),
+        );
     }
 
     /**

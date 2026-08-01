@@ -41,10 +41,11 @@ use const FILTER_VALIDATE_FLOAT;
 use function filter_var;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\FileSystem\Finder\Exception\FinderException;
 use function Safe\preg_match;
 
-/** @internal */
+/**
+ * @internal
+ */
 final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, TestFrameworkAdapter
 {
     private const int MEMORY_OUTPUT_PARTS_LIMIT = 2;
@@ -52,7 +53,7 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
     private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../../../resources/debug-runtime.php';
 
     public function __construct(
-        private string $log,
+        private string $logFile,
         private DebugCommandLine $commandLine,
     ) {
     }
@@ -72,23 +73,21 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         return false;
     }
 
-    /** @throws FinderException */
     public function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
         bool $skipCoverage,
     ): array {
         return $this->commandLine->create(
-            self::DEBUG_RUNTIME_SCRIPT,
-            $phpExtraArgs,
-            [
+            runtime: self::DEBUG_RUNTIME_SCRIPT,
+            phpArguments: $phpExtraArgs,
+            options: [
                 'stage' => 'test-framework-initial',
-                'log' => $this->log,
+                'log' => $this->logFile,
             ],
         );
     }
 
-    /** @throws FinderException */
     public function getMutantCommandLine(
         array $coverageTests,
         string $mutatedFilePath,
@@ -97,11 +96,11 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         string $extraOptions,
     ): array {
         return $this->commandLine->create(
-            self::DEBUG_RUNTIME_SCRIPT,
-            [],
-            [
+            runtime: self::DEBUG_RUNTIME_SCRIPT,
+            phpArguments: [],
+            options: [
                 'stage' => 'test-framework-mutant',
-                'log' => $this->log,
+                'log' => $this->logFile,
                 'mutationHash' => $mutationHash,
             ],
         );
@@ -126,9 +125,10 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         }
 
         $memoryParts = explode(' MB', $parts[1], self::MEMORY_OUTPUT_PARTS_LIMIT);
-
         $memoryUsage = filter_var($memoryParts[0], FILTER_VALIDATE_FLOAT);
 
-        return $memoryUsage === false ? -1. : $memoryUsage;
+        return $memoryUsage === false
+            ? -1.
+            : $memoryUsage;
     }
 }
