@@ -186,6 +186,39 @@ final class LogicalOrTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
+
+        // The two cases above put the variable variable on the left of its comparison. These
+        // two put it on the right, so that each of the four operand positions the name list is
+        // built from is exercised with a dynamic name.
+        yield 'It mutates logical or when a variable variable is the right operand' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    'hello' === ${$s} || $myVar === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    'hello' === ${$s} && $myVar === 'world';
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when a variable variable is the right operand (inverse)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' || 'world' === ${$s};
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' && 'world' === ${$s};
+                    PHP,
+            ),
+        ];
     }
 
     private static function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
