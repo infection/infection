@@ -8065,80 +8065,6 @@ message = "Type `iterable` in return type of `mutantProvider` is imprecise, equi
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Mutant/MutantBuilder.php"
-code = "possibly-invalid-argument"
-message = '''
-Possible argument type mismatch for argument #3 of `Infection\Tests\Mutant\MutantBuilder::__construct`: expected `Later\Interfaces\Deferred<string>`, but possibly received `Later\Interfaces\Deferred<string('<?php
-
-namespace Acme;
-
-class Foo
-{
-    public function bar(): void
-    {
-        // Mutated: removed for loop
-    }
-}
-')>`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutant/MutantBuilder.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #3 of `Infection\Tests\Mutant\MutantBuilder::__construct`: expected `Later\Interfaces\Deferred<string>`, but possibly received `Later\Interfaces\Deferred<string('<?php $a = 2;')>`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutant/MutantBuilder.php"
-code = "possibly-invalid-argument"
-message = '''
-Possible argument type mismatch for argument #4 of `Infection\Tests\Mutant\MutantBuilder::__construct`: expected `Later\Interfaces\Deferred<string>`, but possibly received `Later\Interfaces\Deferred<string('--- Original
-+++ Mutated
-@@ @@
--        for ($i = 0; $i < 10; $i++) {
--            echo $i;
--        }
-+        // Mutated: removed for loop')>`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutant/MutantBuilder.php"
-code = "possibly-invalid-argument"
-message = '''
-Possible argument type mismatch for argument #4 of `Infection\Tests\Mutant\MutantBuilder::__construct`: expected `Later\Interfaces\Deferred<string>`, but possibly received `Later\Interfaces\Deferred<string('--- Original
-+++ Mutated
-@@ @@
--$a = 1;
-+$a = 2;')>`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutant/MutantBuilder.php"
-code = "possibly-invalid-argument"
-message = '''
-Possible argument type mismatch for argument #5 of `Infection\Tests\Mutant\MutantBuilder::__construct`: expected `Later\Interfaces\Deferred<string>`, but possibly received `Later\Interfaces\Deferred<string('<?php
-
-namespace Acme;
-
-class Foo
-{
-    public function bar(): void
-    {
-        for ($i = 0; $i < 10; $i++) {
-            echo $i;
-        }
-    }
-}
-')>`.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutant/MutantBuilder.php"
-code = "possibly-invalid-argument"
-message = '''Possible argument type mismatch for argument #5 of `Infection\Tests\Mutant\MutantBuilder::__construct`: expected `Later\Interfaces\Deferred<string>`, but possibly received `Later\Interfaces\Deferred<string('<?php $a = 1;')>`.'''
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Mutant/MutantBuilderTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `mutantBuilder` is imprecise, equivalent to `iterable<mixed, mixed>`."
@@ -8277,12 +8203,6 @@ file = "tests/phpunit/Mutant/MutantTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `valuesProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 6
 
 [[issues]]
 file = "tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php"
@@ -10590,12 +10510,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php"
 code = "impossible-assignment"
 message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
 count = 1
@@ -10731,12 +10645,6 @@ file = "tests/phpunit/Process/Runner/InitialTestsRunnerTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Tests\Process\Runner\InitialTestsRunnerTest::test_it_stops_the_process_execution_on_the_first_error`.'
 count = 1
-
-[[issues]]
-file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 11
 
 [[issues]]
 file = "tests/phpunit/Process/Runner/MutationTestingRunnerTest.php"
@@ -11675,34 +11583,10 @@ message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\
 count = 1
 
 [[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 5
-
-[[issues]]
-file = "tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 3
-
-[[issues]]
 file = "tests/phpunit/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `provideValidVersions` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
-
-[[issues]]
-file = "tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 4
-
-[[issues]]
-file = "tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Tests\Mutant\MutantBuilder::materialize`.'
-count = 3
 
 [[issues]]
 file = "tests/phpunit/TestFramework/Common/VersionParserTest.php"

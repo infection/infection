@@ -109,8 +109,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     [],
                     '',
                 ))
-                ->withMutatedCode(now('notCovered#0'))
-                ->withDiff(now($mutantDiff = <<<'DIFF'
+                ->withMutatedCode('notCovered#0')
+                ->withDiff($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -118,8 +118,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'notCovered#0';
 
-                    DIFF))
-                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                    DIFF)
+                ->withPrettyPrintedOriginalCode('<?php $a = 1;')
                 ->build(),
             $this->resultFactory,
         );
@@ -191,8 +191,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     [],
                     '',
                 ))
-                ->withMutatedCode(now('errored#0'))
-                ->withDiff(now($mutantDiff = <<<'DIFF'
+                ->withMutatedCode('errored#0')
+                ->withDiff($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -200,8 +200,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'errored#0';
 
-                    DIFF))
-                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                    DIFF)
+                ->withPrettyPrintedOriginalCode('<?php $a = 1;')
                 ->build(),
             $this->resultFactory,
         );
@@ -271,8 +271,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     [],
                     '',
                 ))
-                ->withMutatedCode(now('escaped#0'))
-                ->withDiff(now($mutantDiff = <<<'DIFF'
+                ->withMutatedCode('escaped#0')
+                ->withDiff($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -280,8 +280,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'escaped#0';
 
-                    DIFF))
-                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                    DIFF)
+                ->withPrettyPrintedOriginalCode('<?php $a = 1;')
                 ->build(),
             $this->resultFactory,
         );
@@ -352,8 +352,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     [],
                     '',
                 ))
-                ->withMutatedCode(now('killed#0'))
-                ->withDiff(now($mutantDiff = <<<'DIFF'
+                ->withMutatedCode('killed#0')
+                ->withDiff($mutantDiff = <<<'DIFF'
                     --- Original
                     +++ New
                     @@ @@
@@ -361,8 +361,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     - echo 'original';
                     + echo 'killed#0';
 
-                    DIFF))
-                ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                    DIFF)
+                ->withPrettyPrintedOriginalCode('<?php $a = 1;')
                 ->build(),
             $this->resultFactory,
         );

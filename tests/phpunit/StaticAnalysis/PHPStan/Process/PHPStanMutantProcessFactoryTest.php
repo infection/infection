@@ -83,8 +83,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 [],
                 '',
             ))
-            ->withMutatedCode(now('killed#0'))
-            ->withDiff(now(<<<'DIFF'
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -92,8 +92,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF))
-            ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
             ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
@@ -180,8 +180,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 [],
                 '',
             ))
-            ->withMutatedCode(now('killed#0'))
-            ->withDiff(now(<<<'DIFF'
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -189,8 +189,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF))
-            ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
             ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
@@ -278,8 +278,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 [],
                 '',
             ))
-            ->withMutatedCode(now('killed#0'))
-            ->withDiff(now(<<<'DIFF'
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -287,8 +287,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF))
-            ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
             ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
