@@ -61,7 +61,6 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\WithConsecutive;
-use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -158,12 +157,12 @@ final class MutationTestingRunnerTest extends TestCase
                 $mutant0 = MutantBuilder::withMinimalTestData()
                     ->withMutantFilePath('/path/to/mutant0')
                     ->withMutation($mutation0)
-                    ->withMutatedCode(now('mutated code 0'))
+                    ->withMutatedCode('mutated code 0')
                     ->build(),
                 $mutant1 = MutantBuilder::withMinimalTestData()
                     ->withMutantFilePath('/path/to/mutant1')
                     ->withMutation($mutation1)
-                    ->withMutatedCode(now('mutated code 1'))
+                    ->withMutatedCode('mutated code 1')
                     ->build(),
                 MutantBuilder::withMinimalTestData()
                     ->withMutation($mutation2)
@@ -250,7 +249,7 @@ final class MutationTestingRunnerTest extends TestCase
                 $mutant0 = MutantBuilder::withMinimalTestData()
                     ->withMutantFilePath('/path/to/mutant0')
                     ->withMutation($mutation0)
-                    ->withMutatedCode(now('mutated code 0'))
+                    ->withMutatedCode('mutated code 0')
                     ->build(),
             )
         ;
@@ -327,12 +326,12 @@ final class MutationTestingRunnerTest extends TestCase
                 $mutant0 = MutantBuilder::withMinimalTestData()
                     ->withMutantFilePath('/path/to/mutant0')
                     ->withMutation($mutation0)
-                    ->withMutatedCode(now('mutated code 0'))
+                    ->withMutatedCode('mutated code 0')
                     ->build(),
                 $mutant1 = MutantBuilder::withMinimalTestData()
                     ->withMutantFilePath('/path/to/mutant1')
                     ->withMutation($mutation1)
-                    ->withMutatedCode(now('mutated code 1'))
+                    ->withMutatedCode('mutated code 1')
                     ->build(),
             )
         ;
@@ -400,8 +399,8 @@ final class MutationTestingRunnerTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutantFilePath('/path/to/mutant0')
             ->withMutation($mutation0)
-            ->withMutatedCode(now('mutated code 0'))
-            ->withDiff(now('- Assert::integer(1)'))
+            ->withMutatedCode('mutated code 0')
+            ->withDiff('- Assert::integer(1)')
             ->build();
 
         $this->mutantFactoryMock
@@ -466,8 +465,8 @@ final class MutationTestingRunnerTest extends TestCase
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutantFilePath('/path/to/mutant0')
             ->withMutation($mutation0)
-            ->withMutatedCode(now('mutated code 0'))
-            ->withDiff(now('- Assert::integer(1)'))
+            ->withMutatedCode('mutated code 0')
+            ->withDiff('- Assert::integer(1)')
             ->build();
 
         $this->mutantFactoryMock
@@ -545,7 +544,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $mutant = MutantBuilder::withMinimalTestData()
             ->withMutation($mutation)
-            ->withMutatedCode(now('mutated code 0'))
+            ->withMutatedCode('mutated code 0')
             ->build();
 
         $result = $this->invokeMethod('ignoredByRegex', $mutant);

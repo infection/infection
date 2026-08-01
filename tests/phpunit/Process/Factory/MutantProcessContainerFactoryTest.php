@@ -47,7 +47,6 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
-use function Later\now;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -89,8 +88,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 [],
                 '',
             ))
-            ->withMutatedCode(now('killed#0'))
-            ->withDiff(now($mutantDiff = <<<'DIFF'
+            ->withMutatedCode('killed#0')
+            ->withDiff($mutantDiff = <<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -98,8 +97,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF))
-            ->withPrettyPrintedOriginalCode(now('<?php $a = 1;'))
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
             ->build();
 
         $testFrameworkExtraOptions = '--verbose';
