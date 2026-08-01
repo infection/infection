@@ -59,6 +59,20 @@ Two properties of this table are deliberate. The `Bug` row never falls below `Qu
 every reported bug earns a review even when it is minor. The `Other` row is flat, because urgency
 reorders work but does not make a type 4 change into work that the project needs.
 
+Priority determines which work receives attention first. It does not prescribe the same review
+depth for every change. Review effort is proportional to the change's exposure: who it affects,
+whether its correctness has objective boundaries, how easily it can be reverted, and who will
+maintain it. A small change to mutation generation may need substantial review because an error
+can silently affect users. A change confined to contributor tooling, guarded by PHPUnit or
+static-analysis failures, or otherwise isolated from shipped behaviour may need much less.
+
+Low-exposure work may therefore land opportunistically, including type 4 work, when its review
+does not materially delay higher-priority work. Review capacity is not fully interchangeable:
+work performed and maintained by someone with a particular need or area of expertise does not
+necessarily displace a bug fix that requires another maintainer. "Does not compete" refers to
+the implementation and review attention actually needed by higher-priority work, not merely to
+the presence of such work in the queue.
+
 Every pull request states its type, and the author is the one who states it. Type 3 also names
 and links the issue that the refactoring unblocks, because the type alone does not tell the
 reviewer what the change brings. A refactoring that cannot name that issue is type 4, and we
@@ -74,6 +88,14 @@ much as to first-time contributors.
 Infection is not a playground. Its users are other maintainers who trust its results, so a
 change to working code answers to their needs, not to our curiosity about a technique. Try
 ideas out in a fork, and bring back the ones that a bug or a feature needs.
+
+At the same time, readability work is not inherently without value. Difficult code imposes a recurring
+comprehension cost on every future change and a refactoring can transfer that repeated cost
+into a single reviewed change. Because readability is subjective, the proposal must make that
+cost verifiable, for example through repeated misunderstandings, defects caused by the current
+structure, disproportionate effort in recent changes or a substantial and demonstrable
+reduction in complexity. Without that evidence, or a specific bug or feature that the
+refactoring enables, it remains type 4 work and retains the corresponding priority.
 
 ## Consequences
 
