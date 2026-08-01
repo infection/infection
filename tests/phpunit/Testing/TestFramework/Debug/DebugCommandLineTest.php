@@ -33,19 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Testing\Debug;
+namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use Infection\Testing\Debug\DebugStaticAnalysisMutantProcessFactory;
+use function array_slice;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
-#[CoversClass(DebugStaticAnalysisMutantProcessFactory::class)]
-final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
+#[CoversClass(DebugCommandLine::class)]
+final class DebugCommandLineTest extends TestCase
 {
-    public function test_it_can_be_created(): void
+    /** @throws FinderException */
+    public function test_it_builds_a_self_describing_command(): void
     {
-        $factory = new DebugStaticAnalysisMutantProcessFactory('/debug.php', '/debug.jsonl', 10.);
+        $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
+        $phpExecutableFinder->method('find')->willReturn('/php');
+        $commandLine = new DebugCommandLine($phpExecutableFinder);
 
-        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $factory);
+        $command = $commandLine->create('/debug.php', ['', '-d', 'memory_limit=-1'], ['stage' => 'initial']);
+
+        $this->assertSame(
+            ['/php', '-d', 'memory_limit=-1', '/debug.php', 'stage=initial'],
+            array_slice($command, 0, -1),
+        );
+        $this->assertStringStartsWith('command=', $command[5]);
     }
 }

@@ -33,31 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\Debug;
+namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use Infection\Mutant\Mutant;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\MutantProcess;
-use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
-use Symfony\Component\Process\Process;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
-/** @internal */
-final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
+#[CoversClass(DebugStaticAnalysisAdapter::class)]
+final class DebugStaticAnalysisAdapterTest extends TestCase
 {
-    public function __construct(private string $runtime, private string $log, private float $timeout)
+    /** @throws FinderException */
+    public function test_it_builds_debug_processes(): void
     {
-    }
-
-    public function create(Mutant $mutant): MutantProcess
-    {
-        return new MutantProcess(
-            new Process(DebugCommandLine::create($this->runtime, ['-d', 'memory_limit=-1'], [
-                'stage' => 'static-analysis-mutant',
-                'log' => $this->log,
-                'mutationHash' => $mutant->getMutation()->getHash(),
-            ]), timeout: $this->timeout),
-            $mutant,
-            new PHPStanMutantExecutionResultFactory(),
+        $adapter = new DebugStaticAnalysisAdapter(
+            '/tmp/infection',
+            10.,
+            new DebugCommandLine(new PhpExecutableFinder()),
         );
+
+        $this->assertContains('memory_limit=-1', $adapter->getInitialRunCommandLine());
+        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());
     }
 }

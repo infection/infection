@@ -109,7 +109,7 @@ readonly class Configuration
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
         public string $configurationPathname,
-        public string $debugLogFile,
+        public string $debugTestFrameworkLogFile,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allIsInstanceOf($mutators, Mutator::class);

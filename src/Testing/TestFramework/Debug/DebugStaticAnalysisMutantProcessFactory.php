@@ -33,48 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\Debug;
+namespace Infection\Testing\TestFramework\Debug;
 
-use function dirname;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Process\MutantProcess;
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Symfony\Component\Process\Process;
 
 /** @internal */
-final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAdapter
+final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMutantProcessFactory
 {
-    private const int PROJECT_ROOT_LEVEL = 3;
-
-    private string $runtime;
-
-    public function __construct(private string $log, private float $timeout)
-    {
-        $this->runtime = dirname(__DIR__, self::PROJECT_ROOT_LEVEL) . '/resources/debug-runtime.php';
+    public function __construct(
+        private string $runtime,
+        private string $log,
+        private float $timeout,
+        private DebugCommandLine $commandLine,
+    ) {
     }
 
-    public function getName(): string
+    /** @throws FinderException */
+    public function create(Mutant $mutant): MutantProcess
     {
-        return 'Debug';
-    }
-
-    public function getInitialRunCommandLine(): array
-    {
-        return DebugCommandLine::create($this->runtime, ['-d', 'memory_limit=-1'], [
-            'stage' => 'static-analysis-initial',
-            'log' => $this->log,
-        ]);
-    }
-
-    public function createMutantProcessFactory(): LazyMutantProcessFactory
-    {
-        return new DebugStaticAnalysisMutantProcessFactory($this->runtime, $this->log, $this->timeout);
-    }
-
-    public function getVersion(): string
-    {
-        return '1.0.0';
-    }
-
-    public function assertMinimumVersionSatisfied(): void
-    {
+        return new MutantProcess(
+            new Process(
+                command: $this->commandLine->create(
+                    $this->runtime,
+                    ['-d', 'memory_limit=-1'],
+                    [
+                        'stage' => 'static-analysis-mutant',
+                        'log' => $this->log,
+                        'mutationHash' => $mutant->getMutation()->getHash(),
+                    ],
+                ),
+                timeout: $this->timeout,
+            ),
+            $mutant,
+            new PHPStanMutantExecutionResultFactory(),
+        );
     }
 }

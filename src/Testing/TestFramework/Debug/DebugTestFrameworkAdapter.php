@@ -33,29 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\Debug;
+namespace Infection\Testing\TestFramework\Debug;
 
 use function array_key_exists;
-use function dirname;
 use function explode;
 use const FILTER_VALIDATE_FLOAT;
 use function filter_var;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\FileSystem\Finder\Exception\FinderException;
 use function Safe\preg_match;
 
 /** @internal */
 final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, TestFrameworkAdapter
 {
-    private const int PROJECT_ROOT_LEVEL = 3;
-
     private const int MEMORY_OUTPUT_PARTS_LIMIT = 2;
 
-    private string $runtime;
+    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../../../resources/debug-runtime.php';
 
-    public function __construct(private string $log)
-    {
-        $this->runtime = dirname(__DIR__, self::PROJECT_ROOT_LEVEL) . '/resources/debug-runtime.php';
+    public function __construct(
+        private string $log,
+        private DebugCommandLine $commandLine,
+    ) {
     }
 
     public function getName(): string
@@ -73,21 +72,39 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         return false;
     }
 
-    public function getInitialTestRunCommandLine(string $extraOptions, array $phpExtraArgs, bool $skipCoverage): array
-    {
-        return DebugCommandLine::create($this->runtime, $phpExtraArgs, [
-            'stage' => 'test-framework-initial',
-            'log' => $this->log,
-        ]);
+    /** @throws FinderException */
+    public function getInitialTestRunCommandLine(
+        string $extraOptions,
+        array $phpExtraArgs,
+        bool $skipCoverage,
+    ): array {
+        return $this->commandLine->create(
+            self::DEBUG_RUNTIME_SCRIPT,
+            $phpExtraArgs,
+            [
+                'stage' => 'test-framework-initial',
+                'log' => $this->log,
+            ],
+        );
     }
 
-    public function getMutantCommandLine(array $coverageTests, string $mutatedFilePath, string $mutationHash, string $mutationOriginalFilePath, string $extraOptions): array
-    {
-        return DebugCommandLine::create($this->runtime, [], [
-            'stage' => 'test-framework-mutant',
-            'log' => $this->log,
-            'mutationHash' => $mutationHash,
-        ]);
+    /** @throws FinderException */
+    public function getMutantCommandLine(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+    ): array {
+        return $this->commandLine->create(
+            self::DEBUG_RUNTIME_SCRIPT,
+            [],
+            [
+                'stage' => 'test-framework-mutant',
+                'log' => $this->log,
+                'mutationHash' => $mutationHash,
+            ],
+        );
     }
 
     public function getVersion(): string

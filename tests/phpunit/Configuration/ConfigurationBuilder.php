@@ -104,7 +104,7 @@ final class ConfigurationBuilder
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
-        private string $debugLogFile,
+        private string $debugTestFrameworkLogFile,
     ) {
     }
 
@@ -151,7 +151,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
             configPathname: $configuration->configurationPathname,
-            debugLogFile: $configuration->debugLogFile,
+            debugTestFrameworkLogFile: $configuration->debugTestFrameworkLogFile,
         );
     }
 
@@ -196,7 +196,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
-            debugLogFile: '/tmp/infection.debug.jsonl',
+            debugTestFrameworkLogFile: '/tmp/infection.debug.jsonl',
         );
     }
 
@@ -265,7 +265,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
             configPathname: '/path/to/project/infection.json5',
-            debugLogFile: '/debug.jsonl',
+            debugTestFrameworkLogFile: '/debug.jsonl',
         );
     }
 
@@ -616,10 +616,10 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withDebugLogFile(string $debugLogFile): self
+    public function withDebugTestFrameworkLogFile(string $debugTestFrameworkLogFile): self
     {
         $clone = clone $this;
-        $clone->debugLogFile = $debugLogFile;
+        $clone->debugTestFrameworkLogFile = $debugTestFrameworkLogFile;
 
         return $clone;
     }
@@ -665,7 +665,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
             configurationPathname: $this->configPathname,
-            debugLogFile: $this->debugLogFile,
+            debugTestFrameworkLogFile: $this->debugTestFrameworkLogFile,
         );
     }
 }

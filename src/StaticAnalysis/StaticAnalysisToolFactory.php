@@ -42,9 +42,11 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\Testing\Debug\DebugStaticAnalysisAdapter;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use InvalidArgumentException;
 use function sprintf;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
@@ -63,8 +65,9 @@ final readonly class StaticAnalysisToolFactory
     {
         if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
             return new DebugStaticAnalysisAdapter(
-                $this->infectionConfig->debugLogFile,
+                $this->infectionConfig->debugTestFrameworkLogFile,
                 $timeout,
+                new DebugCommandLine(new PhpExecutableFinder()),
             );
         }
 
@@ -100,7 +103,11 @@ final readonly class StaticAnalysisToolFactory
             );
         }
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN, StaticAnalysisToolTypes::MAGO, StaticAnalysisToolTypes::DEBUG];
+        $availableTestFrameworks = [
+            StaticAnalysisToolTypes::PHPSTAN,
+            StaticAnalysisToolTypes::MAGO,
+            StaticAnalysisToolTypes::DEBUG,
+        ];
 
         throw new InvalidArgumentException(sprintf(
             'Invalid name of static analysis tool "%s". Available names are: %s',

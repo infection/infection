@@ -90,7 +90,7 @@ class SchemaConfigurationFactory
             threads: $rawConfig->threads ?? null,
             dotsPerRow: $rawConfig->dotsPerRow ?? null,
             staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
-            debugLogFile: self::normalizeString($rawConfig->debug->logFile ?? null),
+            debugTestFrameworkLogFile: self::normalizeString($rawConfig->debug->logFile ?? null),
         );
     }
 

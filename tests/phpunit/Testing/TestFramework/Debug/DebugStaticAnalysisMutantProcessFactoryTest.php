@@ -33,42 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing\Debug;
+namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use function array_filter;
-use function array_merge;
-use function array_values;
-use function base64_encode;
-use Infection\CannotBeInstantiated;
-use function json_encode;
-use const JSON_THROW_ON_ERROR;
-use const PHP_BINARY;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
-/** @internal */
-final class DebugCommandLine
+#[CoversClass(DebugStaticAnalysisMutantProcessFactory::class)]
+final class DebugStaticAnalysisMutantProcessFactoryTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @param string[] $phpArguments
-     * @param array<string, string> $options
-     *
-     * @return list<string>
-     */
-    public static function create(string $runtime, array $phpArguments, array $options): array
+    public function test_it_can_be_created(): void
     {
-        $command = array_merge(
-            [PHP_BINARY],
-            array_values(array_filter($phpArguments, static fn (string $argument): bool => $argument !== '')),
-            [$runtime],
+        $factory = new DebugStaticAnalysisMutantProcessFactory(
+            '/debug.php',
+            '/debug.jsonl',
+            10.,
+            new DebugCommandLine(new PhpExecutableFinder()),
         );
 
-        foreach ($options as $name => $value) {
-            $command[] = $name . '=' . $value;
-        }
-
-        $command[] = 'command=' . base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
-
-        return $command;
+        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $factory);
     }
 }

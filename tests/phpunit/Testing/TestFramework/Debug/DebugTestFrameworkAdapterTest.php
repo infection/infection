@@ -33,29 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Testing\Debug;
+namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use Infection\Testing\Debug\DebugTestFrameworkAdapter;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use function str_starts_with;
 use function strlen;
 use function substr;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(DebugTestFrameworkAdapter::class)]
-#[Group('integration')]
 final class DebugTestFrameworkAdapterTest extends TestCase
 {
+    /** @throws FinderException */
     public function test_it_describes_successful_debug_runs(): void
     {
-        $adapter = new DebugTestFrameworkAdapter('/tmp/infection');
+        $adapter = new DebugTestFrameworkAdapter(
+            '/tmp/infection',
+            new DebugCommandLine(new PhpExecutableFinder()),
+        );
 
         $this->assertTrue($adapter->testsPass('DEBUG_TEST_FRAMEWORK_PASSED'));
         $this->assertSame(16., $adapter->getMemoryUsed('Memory: 16.00 MB'));
-        $this->assertSame('test-framework-initial', $this->option($adapter->getInitialTestRunCommandLine('', [], false), 'stage'));
-        $this->assertSame('test-framework-mutant', $this->option($adapter->getMutantCommandLine([], '', 'hash', '', ''), 'stage'));
+        $this->assertSame(
+            'test-framework-initial',
+            $this->option($adapter->getInitialTestRunCommandLine('', [], false), 'stage'),
+        );
+        $this->assertSame(
+            'test-framework-mutant',
+            $this->option($adapter->getMutantCommandLine([], '', 'hash', '', ''), 'stage'),
+        );
     }
 
     /** @param string[] $command */

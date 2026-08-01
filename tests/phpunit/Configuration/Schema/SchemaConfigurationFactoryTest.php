@@ -804,7 +804,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
                 JSON,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'debugLogFile' => 'var/processes.jsonl',
+                'debugTestFrameworkLogFile' => 'var/processes.jsonl',
             ]),
         ];
 
@@ -2800,7 +2800,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'threadCount' => null,
             'dotsPerRow' => null,
             'staticAnalysisTool' => null,
-            'debugLogFile' => null,
+            'debugTestFrameworkLogFile' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

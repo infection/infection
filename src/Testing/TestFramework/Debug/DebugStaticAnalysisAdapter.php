@@ -33,23 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Testing\Debug;
+namespace Infection\Testing\TestFramework\Debug;
 
-use Infection\Testing\Debug\DebugStaticAnalysisAdapter;
-use Infection\Testing\Debug\DebugStaticAnalysisMutantProcessFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 
-#[CoversClass(DebugStaticAnalysisAdapter::class)]
-#[Group('integration')]
-final class DebugStaticAnalysisAdapterTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAdapter
 {
-    public function test_it_builds_debug_processes(): void
-    {
-        $adapter = new DebugStaticAnalysisAdapter('/tmp/infection', 10.);
+    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../../../resources/debug-runtime.php';
 
-        $this->assertContains('memory_limit=-1', $adapter->getInitialRunCommandLine());
-        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());
+    public function __construct(
+        private string $log,
+        private float $timeout,
+        private DebugCommandLine $commandLine,
+    ) {
+    }
+
+    public function getName(): string
+    {
+        return 'Debug';
+    }
+
+    /** @throws FinderException */
+    public function getInitialRunCommandLine(): array
+    {
+        return $this->commandLine->create(
+            self::DEBUG_RUNTIME_SCRIPT,
+            ['-d', 'memory_limit=-1'],
+            [
+                'stage' => 'static-analysis-initial',
+                'log' => $this->log,
+            ],
+        );
+    }
+
+    public function createMutantProcessFactory(): LazyMutantProcessFactory
+    {
+        return new DebugStaticAnalysisMutantProcessFactory(
+            self::DEBUG_RUNTIME_SCRIPT,
+            $this->log,
+            $this->timeout,
+            $this->commandLine,
+        );
+    }
+
+    public function getVersion(): string
+    {
+        return '1.0.0';
+    }
+
+    public function assertMinimumVersionSatisfied(): void
+    {
     }
 }

@@ -78,7 +78,7 @@ final class SchemaConfigurationBuilder
         private string|int|null $threads,
         private string|int|null $dotsPerRow,
         private ?string $staticAnalysisTool,
-        private ?string $debugLogFile,
+        private ?string $debugTestFrameworkLogFile,
     ) {
     }
 
@@ -108,7 +108,7 @@ final class SchemaConfigurationBuilder
             threads: $schema->threads,
             dotsPerRow: $schema->dotsPerRow,
             staticAnalysisTool: $schema->staticAnalysisTool,
-            debugLogFile: $schema->debugLogFile,
+            debugTestFrameworkLogFile: $schema->debugTestFrameworkLogFile,
         );
     }
 
@@ -138,7 +138,7 @@ final class SchemaConfigurationBuilder
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: null,
-            debugLogFile: null,
+            debugTestFrameworkLogFile: null,
         );
     }
 
@@ -179,7 +179,7 @@ final class SchemaConfigurationBuilder
             threads: 4,
             dotsPerRow: 80,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
-            debugLogFile: '/debug.jsonl',
+            debugTestFrameworkLogFile: '/debug.jsonl',
         );
     }
 
@@ -374,10 +374,10 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
-    public function withDebugLogFile(?string $debugLogFile): self
+    public function withDebugTestFrameworkLogFile(?string $debugTestFrameworkLogFile): self
     {
         $clone = clone $this;
-        $clone->debugLogFile = $debugLogFile;
+        $clone->debugTestFrameworkLogFile = $debugTestFrameworkLogFile;
 
         return $clone;
     }
@@ -408,7 +408,7 @@ final class SchemaConfigurationBuilder
             threads: $this->threads,
             dotsPerRow: $this->dotsPerRow,
             staticAnalysisTool: $this->staticAnalysisTool,
-            debugLogFile: $this->debugLogFile,
+            debugTestFrameworkLogFile: $this->debugTestFrameworkLogFile,
         );
     }
 }
