@@ -33,54 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Testing\Debug;
 
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function dirname;
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 
-#[CoversClass(TestFrameworkTypes::class)]
-final class TestFrameworkTypesTest extends TestCase
+/** @internal */
+final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAdapter
 {
-    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
-    {
-        $types = TestFrameworkTypes::getTypes([]);
+    private const int PROJECT_ROOT_LEVEL = 3;
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-            ],
-            $types,
-        );
+    private string $runtime;
+
+    public function __construct(private string $log, private float $timeout)
+    {
+        $this->runtime = dirname(__DIR__, self::PROJECT_ROOT_LEVEL) . '/resources/debug-runtime.php';
     }
 
-    public function test_it_uses_installed_test_framework_adapters(): void
+    public function getName(): string
     {
-        $types = TestFrameworkTypes::getTypes(
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
-        );
+        return 'Debug';
+    }
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-                'dummy',
-            ],
-            $types,
-        );
+    public function getInitialRunCommandLine(): array
+    {
+        return DebugCommandLine::create($this->runtime, ['-d', 'memory_limit=-1'], [
+            'stage' => 'static-analysis-initial',
+            'log' => $this->log,
+        ]);
+    }
+
+    public function createMutantProcessFactory(): LazyMutantProcessFactory
+    {
+        return new DebugStaticAnalysisMutantProcessFactory($this->runtime, $this->log, $this->timeout);
+    }
+
+    public function getVersion(): string
+    {
+        return '1.0.0';
+    }
+
+    public function assertMinimumVersionSatisfied(): void
+    {
     }
 }

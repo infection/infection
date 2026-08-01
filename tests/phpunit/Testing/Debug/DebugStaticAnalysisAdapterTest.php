@@ -33,54 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\Testing\Debug;
 
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use Infection\Testing\Debug\DebugStaticAnalysisAdapter;
+use Infection\Testing\Debug\DebugStaticAnalysisMutantProcessFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TestFrameworkTypes::class)]
-final class TestFrameworkTypesTest extends TestCase
+#[CoversClass(DebugStaticAnalysisAdapter::class)]
+#[Group('integration')]
+final class DebugStaticAnalysisAdapterTest extends TestCase
 {
-    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
+    public function test_it_builds_debug_processes(): void
     {
-        $types = TestFrameworkTypes::getTypes([]);
+        $adapter = new DebugStaticAnalysisAdapter('/tmp/infection', 10.);
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-            ],
-            $types,
-        );
-    }
-
-    public function test_it_uses_installed_test_framework_adapters(): void
-    {
-        $types = TestFrameworkTypes::getTypes(
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
-        );
-
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-                'dummy',
-            ],
-            $types,
-        );
+        $this->assertContains('memory_limit=-1', $adapter->getInitialRunCommandLine());
+        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());
     }
 }

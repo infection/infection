@@ -33,54 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\Testing\Debug;
 
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use Infection\Testing\Debug\DebugTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
+use function str_starts_with;
+use function strlen;
+use function substr;
 
-#[CoversClass(TestFrameworkTypes::class)]
-final class TestFrameworkTypesTest extends TestCase
+#[CoversClass(DebugTestFrameworkAdapter::class)]
+#[Group('integration')]
+final class DebugTestFrameworkAdapterTest extends TestCase
 {
-    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
+    public function test_it_describes_successful_debug_runs(): void
     {
-        $types = TestFrameworkTypes::getTypes([]);
+        $adapter = new DebugTestFrameworkAdapter('/tmp/infection');
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-            ],
-            $types,
-        );
+        $this->assertTrue($adapter->testsPass('DEBUG_TEST_FRAMEWORK_PASSED'));
+        $this->assertSame(16., $adapter->getMemoryUsed('Memory: 16.00 MB'));
+        $this->assertSame('test-framework-initial', $this->option($adapter->getInitialTestRunCommandLine('', [], false), 'stage'));
+        $this->assertSame('test-framework-mutant', $this->option($adapter->getMutantCommandLine([], '', 'hash', '', ''), 'stage'));
     }
 
-    public function test_it_uses_installed_test_framework_adapters(): void
+    /** @param string[] $command */
+    private function option(array $command, string $name): string
     {
-        $types = TestFrameworkTypes::getTypes(
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
-        );
+        foreach ($command as $argument) {
+            if (str_starts_with($argument, $name . '=')) {
+                return substr($argument, strlen($name) + 1);
+            }
+        }
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-                'dummy',
-            ],
-            $types,
-        );
+        $this->fail(sprintf('Option "%s" was not found.', $name));
     }
 }

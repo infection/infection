@@ -33,54 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Testing\Debug;
 
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function array_filter;
+use function array_merge;
+use function array_values;
+use function base64_encode;
+use Infection\CannotBeInstantiated;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
+use const PHP_BINARY;
 
-#[CoversClass(TestFrameworkTypes::class)]
-final class TestFrameworkTypesTest extends TestCase
+/** @internal */
+final class DebugCommandLine
 {
-    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
+    use CannotBeInstantiated;
+
+    /**
+     * @param string[] $phpArguments
+     * @param array<string, string> $options
+     *
+     * @return list<string>
+     */
+    public static function create(string $runtime, array $phpArguments, array $options): array
     {
-        $types = TestFrameworkTypes::getTypes([]);
-
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-            ],
-            $types,
-        );
-    }
-
-    public function test_it_uses_installed_test_framework_adapters(): void
-    {
-        $types = TestFrameworkTypes::getTypes(
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
+        $command = array_merge(
+            [PHP_BINARY],
+            array_values(array_filter($phpArguments, static fn (string $argument): bool => $argument !== '')),
+            [$runtime],
         );
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-                'dummy',
-            ],
-            $types,
-        );
+        foreach ($options as $name => $value) {
+            $command[] = $name . '=' . $value;
+        }
+
+        $command[] = 'command=' . base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
+
+        return $command;
     }
 }

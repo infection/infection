@@ -45,6 +45,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\Testing\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
 use function is_a;
 use SplFileInfo;
@@ -74,6 +75,10 @@ final readonly class Factory
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
+        if ($adapterName === TestFrameworkTypes::DEBUG) {
+            return new DebugTestFrameworkAdapter($this->infectionConfig->debugLogFile);
+        }
+
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
@@ -97,7 +102,7 @@ final readonly class Factory
             );
         }
 
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
+        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::DEBUG];
 
         foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];

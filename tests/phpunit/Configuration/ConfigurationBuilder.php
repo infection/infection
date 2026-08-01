@@ -104,6 +104,7 @@ final class ConfigurationBuilder
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
         private string $configPathname,
+        private string $debugLogFile,
     ) {
     }
 
@@ -150,6 +151,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
             configPathname: $configuration->configurationPathname,
+            debugLogFile: $configuration->debugLogFile,
         );
     }
 
@@ -194,6 +196,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: null,
             mutantId: null,
             configPathname: '/path/to/project/infection.json5',
+            debugLogFile: '/tmp/infection.debug.jsonl',
         );
     }
 
@@ -262,6 +265,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
             configPathname: '/path/to/project/infection.json5',
+            debugLogFile: '/debug.jsonl',
         );
     }
 
@@ -612,6 +616,14 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    public function withDebugLogFile(string $debugLogFile): self
+    {
+        $clone = clone $this;
+        $clone->debugLogFile = $debugLogFile;
+
+        return $clone;
+    }
+
     public function build(): Configuration
     {
         return new Configuration(
@@ -653,6 +665,7 @@ final class ConfigurationBuilder
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
             configurationPathname: $this->configPathname,
+            debugLogFile: $this->debugLogFile,
         );
     }
 }

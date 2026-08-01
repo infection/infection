@@ -57,7 +57,7 @@ final class StaticAnalysisToolFactoryTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
+        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan, mago, debug');
 
         $factory->create('Fake SA Tool', 30);
     }
