@@ -62,6 +62,31 @@ final readonly class TestLocationBucketSorter
     ];
 
     /**
+     * Fixed-point scale applied to the execution time (in seconds) before it
+     * is reduced to a bucket index, so truncating to int does not throw away
+     * sub-eighth-of-a-second precision.
+     */
+    private const int TIME_TO_FIXED_POINT_SCALE = 1024;
+
+    /**
+     * Shifts a TIME_TO_FIXED_POINT_SCALE-scaled time down to an eighth-of-a-second
+     * bucket (1024 >> 7 = 8 buckets per second).
+     */
+    private const int BUCKET_SHIFT = 7;
+
+    /**
+     * Bucket index, in eighth-of-a-second units, above which precision drops
+     * to whole 4-second buckets: 32 eighths of a second is 4 seconds.
+     */
+    private const int COARSE_BUCKET_THRESHOLD = 32;
+
+    /**
+     * Clears the low bits of a bucket index, widening its granularity from
+     * an eighth of a second to 4 seconds (1 << 5 eighths of a second).
+     */
+    private const int COARSE_BUCKET_SHIFT = 5;
+
+    /**
      * Sorts tests to run the fastest first. Exposed for benchmarking purposes.
      *
      * @param TestLocation[] $uniqueTestLocations
@@ -77,11 +102,11 @@ final readonly class TestLocationBucketSorter
             // This is a very hot path. Factoring here another method just to test this math may not be as good idea.
 
             // Quick drop off lower bits, reducing precision to 8th of a second
-            $msTime = (int) (($location->getExecutionTime() ?? 0) * 1024) >> 7; // * 1024 / 128
+            $msTime = (int) (($location->getExecutionTime() ?? 0) * self::TIME_TO_FIXED_POINT_SCALE) >> self::BUCKET_SHIFT;
 
             // For anything above 4 seconds reduce precision to 4 seconds
-            if ($msTime > 32) {
-                $msTime = $msTime >> 5 << 5; // 7 + 5 = 12 bits
+            if ($msTime > self::COARSE_BUCKET_THRESHOLD) {
+                $msTime = $msTime >> self::COARSE_BUCKET_SHIFT << self::COARSE_BUCKET_SHIFT;
             }
             // @codeCoverageIgnoreEnd
 

@@ -335,11 +335,6 @@ parameters:
 			path: ../src/Mutator/Extensions/MBString.php
 
 		-
-			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
-			count: 1
-			path: ../src/Mutator/Extensions/MBString.php
-
-		-
 			rawMessage: 'Call to function array_filter() requires parameter #2 to be passed to avoid loose comparison semantics.'
 			identifier: arrayFilter.strict
 			count: 1
@@ -977,21 +972,6 @@ parameters:
 			identifier: offsetAccess.notFound
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationVersionProvider.php
-
-		-
-			rawMessage: Do not use magic number in arithmetic operations. Move to constant with a suitable name.
-			count: 1
-			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
-
-		-
-			rawMessage: Do not use magic number in bitwise operations. Move to constant with a suitable name.
-			count: 3
-			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
-
-		-
-			rawMessage: Do not use magic number in comparison operations. Move to constant with a suitable name.
-			count: 1
-			path: ../src/TestFramework/Tracing/TestLocationBucketSorter.php
 
 		-
 			rawMessage: 'Generator expects value type string, string|null given.'
