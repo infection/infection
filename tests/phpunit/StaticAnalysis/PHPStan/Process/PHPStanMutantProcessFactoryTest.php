@@ -54,9 +54,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -81,9 +81,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -91,9 +91,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -151,9 +151,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_with_multiple_options(): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -178,9 +178,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -188,9 +188,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -249,9 +249,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_without_options(): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -276,9 +276,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -286,9 +286,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);

@@ -1039,6 +1039,12 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
 
 		-
+			rawMessage: 'Parameter #1 $filename of method DOMDocument::schemaValidate() expects non-empty-string, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php
+
+		-
 			rawMessage: Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider should not depend on Infection\TestFramework\XML\SafeDOMXPath
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 2
@@ -1076,6 +1082,12 @@ parameters:
 			identifier: phpat.testConcreteSourceClassesHaveTests
 			count: 1
 			path: ../src/TestFramework/Tracing/Trace/EmptyTrace.php
+
+		-
+			rawMessage: 'Parameter #1 $filename of method DOMDocument::load() expects non-empty-string, string given.'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/XML/SafeDOMXPath.php
 
 		-
 			rawMessage: Infection\Testing\BaseMutatorTestCase should not exist
@@ -1379,15 +1391,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/MockedContainer.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 6
-			path: ../tests/phpunit/Mutant/TestFrameworkMutantExecutionResultFactoryTest.php
 
 		-
 			rawMessage: 'Parameter #3 $mutators of method Infection\Mutation\FileMutationGenerator::generate() expects array<Infection\Mutator\Mutator<PhpParser\Node>>, array{Infection\Mutator\Arithmetic\Plus} given.'
@@ -1696,24 +1699,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
 
 		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 1
-			path: ../tests/phpunit/Process/Factory/MutantProcessContainerFactoryTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 11
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Process\Runner\MutationTestingRunnerTest::emptyIterable() return type with generic class PHPUnit\Framework\Constraint\Callback does not specify its types: CallbackInput'
 			identifier: missingType.generics
 			count: 1
@@ -1832,42 +1817,6 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 5
-			path: ../tests/phpunit/StaticAnalysis/Mago/Mutant/MagoMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 3
-			path: ../tests/phpunit/StaticAnalysis/Mago/Process/MagoMutantProcessFactoryTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 4
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Mutant/PHPStanMutantExecutionResultFactoryTest.php
-
-		-
-			rawMessage: '''
-				Call to deprecated method materialize() of class Infection\Tests\Mutant\MutantBuilder:
-				use `::withMinimalTestData()` or `::withCompleteTestData()` instead
-			'''
-			identifier: staticMethod.deprecated
-			count: 3
-			path: ../tests/phpunit/StaticAnalysis/PHPStan/Process/PHPStanMutantProcessFactoryTest.php
 
 		-
 			rawMessage: Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator\DemoReportLocator should not exist
