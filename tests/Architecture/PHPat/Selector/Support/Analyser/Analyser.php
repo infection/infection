@@ -48,7 +48,6 @@ use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PHPStan\Reflection\ClassReflection;
-use PHPStanTurbo\NodeTraverser as TurboNodeTraverser;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -160,7 +159,7 @@ final class Analyser
         );
     }
 
-    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface|TurboNodeTraverser
+    private function createTraverser(?NodeVisitor ...$visitors): NodeTraverserInterface
     {
         return new NodeTraverser(
             new ParentConnectingVisitor(),
