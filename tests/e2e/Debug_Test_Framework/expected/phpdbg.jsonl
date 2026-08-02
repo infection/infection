@@ -1,4 +1,0 @@
-{"stage":"test-framework-initial","php":{"sapi":"phpdbg"},"coverage":{"driver":"phpdbg","phpdbg":true},"xdebug":{"loaded":false},"xdebugHandler":{"restartSettingsPresent":false,"originalInisPresent":false}}
-{"stage":"static-analysis-initial","php":{"sapi":"phpdbg"},"coverage":{"driver":"phpdbg","phpdbg":true},"xdebug":{"loaded":false},"xdebugHandler":{"restartSettingsPresent":false,"originalInisPresent":false}}
-{"stage":"test-framework-mutant","php":{"sapi":"phpdbg"},"coverage":{"driver":"phpdbg","phpdbg":true},"xdebug":{"loaded":false},"xdebugHandler":{"restartSettingsPresent":false,"originalInisPresent":false}}
-{"stage":"static-analysis-mutant","php":{"sapi":"phpdbg"},"coverage":{"driver":"phpdbg","phpdbg":true},"xdebug":{"loaded":false},"xdebugHandler":{"restartSettingsPresent":false,"originalInisPresent":false}}

@@ -1,7 +1,15 @@
 {
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
     "autoload": {
         "psr-4": {
             "Debug_Test_Framework\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Debug_Test_Framework\\Tests\\": "tests/"
         }
     }
 }
