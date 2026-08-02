@@ -146,14 +146,14 @@ jobs:
               $SUMMARY_OPT \
             || true
 
-          # Stop sar and wait for it to finish writing
-          kill $sar_pid 2>/dev/null
+          # Send SIGINT to sar so it outputs the Average summary line
+          kill -INT $sar_pid 2>/dev/null
           wait $sar_pid 2>/dev/null || true
 
           cat timing.json
 
-          # Extract steal % from sar's final Average line (second-to-last field is %steal)
-          steal_percent=$(grep "Average" sar-output.txt | tail -1 | awk '{print $(NF-1)}')
+          # Extract steal % from sar's Average line (second-to-last field is %steal)
+          steal_percent=$(grep "Average:" sar-output.txt | tail -1 | awk '{print $(NF-1)}')
           echo "steal_percent=${steal_percent:-0.00}" >> $GITHUB_OUTPUT
 
       - name: Checkout metrics repository
