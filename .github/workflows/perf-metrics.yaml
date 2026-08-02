@@ -121,11 +121,6 @@ jobs:
             echo "has_summary_logger=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install sysstat for CPU metrics
-        uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: sysstat
-
       - name: Run Infection with timing and steal metrics
         id: run-infection
         env:
