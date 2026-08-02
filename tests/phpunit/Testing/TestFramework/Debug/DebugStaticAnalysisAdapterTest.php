@@ -55,7 +55,6 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
             new DebugCommandLine(new PhpExecutableFinder()),
         );
 
-        $this->assertContains('memory_limit=-1', $adapter->getInitialRunCommandLine());
         $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());
     }
 }

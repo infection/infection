@@ -160,7 +160,3 @@ if ($testMutant['mutationHash'] !== $staticAnalysisMutant['mutationHash']) {
         'The test framework and static analysis did not evaluate the same mutant.',
     );
 }
-
-if (!in_array('memory_limit=-1', $staticAnalysisMutant['command'], true)) {
-    throw new RuntimeException('The static analysis command does not contain its memory limit override.');
-}

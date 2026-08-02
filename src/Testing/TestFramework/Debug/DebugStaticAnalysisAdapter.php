@@ -63,7 +63,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
     {
         return $this->commandLine->create(
             runtime: self::DEBUG_RUNTIME_SCRIPT,
-            phpArguments: ['-d', 'memory_limit=-1'],
+            phpArguments: [],
             options: [
                 'stage' => 'static-analysis-initial',
                 'log' => $this->logFile,

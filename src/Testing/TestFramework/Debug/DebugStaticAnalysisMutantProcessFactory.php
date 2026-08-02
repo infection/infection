@@ -60,7 +60,7 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
             new Process(
                 command: $this->commandLine->create(
                     runtime: $this->runtime,
-                    phpArguments: ['-d', 'memory_limit=-1'],
+                    phpArguments: [],
                     options: [
                         'stage' => 'static-analysis-mutant',
                         'log' => $this->logFile,
