@@ -121,7 +121,12 @@ jobs:
             echo "has_summary_logger=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Run Infection with timing
+      - name: Install sysstat for CPU metrics
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: sysstat
+
+      - name: Run Infection with timing and steal metrics
         id: run-infection
         env:
           HAS_SUMMARY_LOGGER: ${{ steps.feature-check.outputs.has_summary_logger }}
@@ -131,7 +136,9 @@ jobs:
             SUMMARY_OPT="--logger-summary-json=infection-summary.json"
           fi
 
-          grep '^cpu ' /proc/stat > stat-before.txt
+          # Background sar to collect CPU metrics during the run, sampling every 1 second
+          sar -u 1 > sar-output.txt 2>&1 &
+          sar_pid=$!
 
           /usr/bin/time -f '{"user_time_sec":%U,"system_time_sec":%S,"wall_clock_sec":%e,"max_rss_kb":%M,"cpu_percent":"%P","voluntary_ctx_switches":%w,"involuntary_ctx_switches":%c,"exit_status":%x}' \
             -o timing.json \
@@ -144,16 +151,15 @@ jobs:
               $SUMMARY_OPT \
             || true
 
-          grep '^cpu ' /proc/stat > stat-after.txt
+          # Stop sar and wait for it to finish writing
+          kill $sar_pid 2>/dev/null
+          wait $sar_pid 2>/dev/null || true
+
           cat timing.json
 
-          # CPU steal over the run: jiffies the hypervisor gave to other tenants.
-          # paste joins the snapshots, so fields 2-11 are before, 13-22 after; steal is field 9.
-          steal_percent=$(paste stat-before.txt stat-after.txt | awk '{
-            for (i = 2; i <= 11; i++) total += $(i + 11) - $i
-            printf "%.2f", (total > 0 ? 100 * ($20 - $9) / total : 0)
-          }')
-          echo "steal_percent=$steal_percent" >> $GITHUB_OUTPUT
+          # Extract steal % from sar's final Average line (second-to-last field is %steal)
+          steal_percent=$(grep "Average" sar-output.txt | tail -1 | awk '{print $(NF-1)}')
+          echo "steal_percent=${steal_percent:-0.00}" >> $GITHUB_OUTPUT
 
       - name: Checkout metrics repository
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
