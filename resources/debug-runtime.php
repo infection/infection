@@ -12,6 +12,17 @@ $command = array_key_exists('command', $options)
     ? json_decode(base64_decode($options['command'], true), true, flags: JSON_THROW_ON_ERROR)
     : null;
 
+$xdebugLoaded = extension_loaded('xdebug');
+$xdebugModes = $xdebugLoaded && function_exists('xdebug_info')
+    ? xdebug_info('mode')
+    : [];
+$coverageDriver = match (true) {
+    PHP_SAPI === 'phpdbg' => 'phpdbg',
+    extension_loaded('pcov') => 'pcov',
+    in_array('coverage', $xdebugModes, true) => 'xdebug',
+    default => null,
+};
+
 $record = [
     'stage' => $options['stage'],
     'mutationHash' => $options['mutationHash'] ?? null,
@@ -25,9 +36,28 @@ $record = [
         'scannedIniFiles' => php_ini_scanned_files(),
         'extensions' => [
             'pcov' => extension_loaded('pcov'),
-            'xdebug' => extension_loaded('xdebug'),
+            'xdebug' => $xdebugLoaded,
         ],
         'xdebugMode' => ini_get('xdebug.mode'),
+    ],
+    'coverage' => [
+        'driver' => $coverageDriver,
+        'xdebugAvailable' => function_exists('xdebug_start_code_coverage'),
+        'pcovAvailable' => function_exists('pcov\\start'),
+        'phpdbg' => PHP_SAPI === 'phpdbg',
+    ],
+    'xdebug' => [
+        'loaded' => $xdebugLoaded,
+        'version' => phpversion('xdebug'),
+        'mode' => ini_get('xdebug.mode'),
+        'coverageAvailable' => in_array('coverage', $xdebugModes, true),
+    ],
+    'xdebugHandler' => [
+        'restartSettingsPresent' => getenv('XDEBUG_HANDLER_SETTINGS') !== false,
+        'originalInisPresent' => getenv('INFECTION_ORIGINAL_INIS') !== false,
+        'allowXdebug' => getenv('INFECTION_ALLOW_XDEBUG'),
+        'phprc' => getenv('PHPRC'),
+        'phpIniScanDir' => getenv('PHP_INI_SCAN_DIR'),
     ],
     'environment' => [
         'INFECTION' => getenv('INFECTION'),
