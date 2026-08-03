@@ -86,7 +86,7 @@ final class DebugCommandLineTest extends TestCase
                 'stage' => 'initial',
                 'log' => '/tmp/infection',
             ],
-            'expectedCommandLine' => self::createExpectedCommand([
+            'expected' => self::createExpectedCommand([
                 '/php',
                 '-d',
                 'memory_limit=-1',
@@ -102,10 +102,11 @@ final class DebugCommandLineTest extends TestCase
             'runtime' => 'phar:///infection.phar/debug.php',
             'phpArguments' => [],
             'options' => [],
-            'expectedCommandLine' => self::createExpectedCommand([
+            'expected' => self::createExpectedCommand([
                 '/php',
                 '-r',
                 "require 'phar:///infection.phar/debug.php';",
+                '--',
             ]),
         ];
     }
@@ -146,10 +147,9 @@ final class DebugCommandLineTest extends TestCase
      */
     private static function createExpectedCommand(array $commandLine): array
     {
-        return [
-            ...$commandLine,
-            '--command',
-            base64_encode(json_encode($commandLine, JSON_THROW_ON_ERROR)),
-        ];
+        $commandLine[] = '--command';
+        $commandLine[] = base64_encode(json_encode($commandLine, JSON_THROW_ON_ERROR));
+
+        return $commandLine;
     }
 }

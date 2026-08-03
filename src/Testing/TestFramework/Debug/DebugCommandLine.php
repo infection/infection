@@ -76,7 +76,7 @@ final class DebugCommandLine
     ): array {
         $command = array_merge(
             $this->findPhp(),
-            $this->filterEmptyArguments($phpArguments),
+            self::filterEmptyArguments($phpArguments),
             self::createRuntimeArguments($runtime),
         );
 
@@ -93,9 +93,10 @@ final class DebugCommandLine
 
     /**
      * @param string[] $phpArguments
+     *
      * @return list<non-empty-string>
      */
-    public function filterEmptyArguments(array $phpArguments): array
+    private static function filterEmptyArguments(array $phpArguments): array
     {
         return array_values(
             array_filter(
@@ -118,6 +119,7 @@ final class DebugCommandLine
             ? [
                 '-r',
                 sprintf('require %s;', var_export($runtime, true)),
+                '--',
             ]
             : [$runtime];
     }

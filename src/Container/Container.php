@@ -185,6 +185,7 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -313,6 +314,7 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
                     $container->getShellCommandLineExecutor(),
+                    new PhpExecutableFinder(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

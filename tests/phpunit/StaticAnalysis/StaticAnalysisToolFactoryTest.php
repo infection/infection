@@ -43,6 +43,7 @@ use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(StaticAnalysisToolFactory::class)]
 final class StaticAnalysisToolFactoryTest extends TestCase
@@ -54,6 +55,7 @@ final class StaticAnalysisToolFactoryTest extends TestCase
             $this->createStub(StaticAnalysisToolExecutableFinder::class),
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
             $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(PhpExecutableFinder::class),
         );
 
         $this->expectException(InvalidArgumentException::class);

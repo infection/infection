@@ -60,6 +60,7 @@ final readonly class StaticAnalysisToolFactory
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private PhpExecutableFinder $phpExecutableFinder,
     ) {
     }
 
@@ -70,7 +71,7 @@ final readonly class StaticAnalysisToolFactory
                 self::DEBUG_RUNTIME_SCRIPT,
                 $this->infectionConfig->debugTestFrameworkLogFile,
                 $timeout,
-                new DebugCommandLine(new PhpExecutableFinder()),
+                new DebugCommandLine($this->phpExecutableFinder),
             );
         }
 
