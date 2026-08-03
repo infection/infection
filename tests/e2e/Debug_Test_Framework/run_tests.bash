@@ -24,4 +24,4 @@ fi
 XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-xml=var/coverage
 XDEBUG_MODE=coverage php -d memory_limit=-1 "$INFECTION" --coverage=var/coverage --no-progress
 
-php verify.php var/infection.debug.jsonl "expected/$environment.jsonl"
+php verify.php var/infection.debug.jsonl "expected/$environment.json"

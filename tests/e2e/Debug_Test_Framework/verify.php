@@ -47,9 +47,10 @@ final class DebugRecords
      */
     public static function loadExpected(string $filename): array
     {
-        return array_map(
-            static fn(string $line): array => json_decode($line, true, flags: JSON_THROW_ON_ERROR),
-            file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES),
+        return json_decode(
+            file_get_contents($filename),
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
         );
     }
 
