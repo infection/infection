@@ -80,6 +80,7 @@ final readonly class SchemaConfiguration
         public string|int|null $threads,
         public string|int|null $dotsPerRow,
         public ?string $staticAnalysisTool,
+        public ?string $debugTestFrameworkLogFile,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());

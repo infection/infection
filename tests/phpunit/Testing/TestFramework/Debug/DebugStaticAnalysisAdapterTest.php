@@ -33,54 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use Infection\TestFramework\TestFrameworkTypes;
-use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
-#[CoversClass(TestFrameworkTypes::class)]
-final class TestFrameworkTypesTest extends TestCase
+#[CoversClass(DebugStaticAnalysisAdapter::class)]
+final class DebugStaticAnalysisAdapterTest extends TestCase
 {
-    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
+    /** @throws FinderException */
+    public function test_it_builds_debug_processes(): void
     {
-        $types = TestFrameworkTypes::getTypes([]);
+        $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
+        $phpExecutableFinder
+            ->method('find')
+            ->willReturn('/php');
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-            ],
-            $types,
-        );
-    }
-
-    public function test_it_uses_installed_test_framework_adapters(): void
-    {
-        $types = TestFrameworkTypes::getTypes(
-            [
-                'infection/codeception-adapter' => [
-                    'install_path' => '/path/to/dummy/adapter/factory.php',
-                    'extra' => ['class' => DummyTestFrameworkFactory::class],
-                    'version' => '1.0.0',
-                ],
-            ],
+        $adapter = new DebugStaticAnalysisAdapter(
+            '/debug.php',
+            '/tmp/infection',
+            10.,
+            new DebugCommandLine($phpExecutableFinder),
         );
 
-        $this->assertSame(
-            [
-                TestFrameworkTypes::PHPUNIT,
-                TestFrameworkTypes::PHPSPEC,
-                TestFrameworkTypes::CODECEPTION,
-                TestFrameworkTypes::TESTO,
-                TestFrameworkTypes::DEBUG,
-                'dummy',
-            ],
-            $types,
-        );
+        $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());
     }
 }

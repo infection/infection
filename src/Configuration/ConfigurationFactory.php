@@ -223,6 +223,11 @@ class ConfigurationFactory
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
             configurationPathname: $schema->pathname,
+            debugTestFrameworkLogFile: self::retrieveDebugTestFrameworkLogFile(
+                $schema->debugTestFrameworkLogFile,
+                $configDir,
+                $namespacedTmpDir,
+            ),
         );
     }
 
@@ -288,6 +293,20 @@ class ConfigurationFactory
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
         return $schema->phpUnit->withAbsolutePaths($configDir);
+    }
+
+    private static function retrieveDebugTestFrameworkLogFile(
+        ?string $logFile,
+        string $configDir,
+        string $tmpDir,
+    ): string {
+        if ($logFile === null) {
+            return $tmpDir . '.debug.jsonl';
+        }
+
+        return Path::isAbsolute($logFile)
+            ? $logFile
+            : Path::join($configDir, $logFile);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
