@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Testing\TestFramework\Debug;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 
@@ -44,9 +43,8 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
  */
 final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAdapter
 {
-    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../../../resources/debug-runtime.php';
-
     public function __construct(
+        private string $runtime,
         private string $logFile,
         private float $timeout,
         private DebugCommandLine $commandLine,
@@ -58,11 +56,10 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
         return 'Debug';
     }
 
-    /** @throws FinderException */
     public function getInitialRunCommandLine(): array
     {
         return $this->commandLine->create(
-            runtime: self::DEBUG_RUNTIME_SCRIPT,
+            runtime: $this->runtime,
             phpArguments: [],
             options: [
                 'stage' => 'static-analysis-initial',
@@ -74,7 +71,7 @@ final readonly class DebugStaticAnalysisAdapter implements StaticAnalysisToolAda
     public function createMutantProcessFactory(): LazyMutantProcessFactory
     {
         return new DebugStaticAnalysisMutantProcessFactory(
-            self::DEBUG_RUNTIME_SCRIPT,
+            $this->runtime,
             $this->logFile,
             $this->timeout,
             $this->commandLine,

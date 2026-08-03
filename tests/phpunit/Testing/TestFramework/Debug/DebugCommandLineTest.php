@@ -35,29 +35,121 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use function array_slice;
+use function base64_encode;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(DebugCommandLine::class)]
 final class DebugCommandLineTest extends TestCase
 {
-    /** @throws FinderException */
-    public function test_it_builds_a_self_describing_command(): void
+    private DebugCommandLine $commandLine;
+
+    protected function setUp(): void
     {
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
-        $phpExecutableFinder->method('find')->willReturn('/php');
+        $phpExecutableFinder
+            ->method('find')
+            ->willReturn('/php');
+
+        $this->commandLine = new DebugCommandLine($phpExecutableFinder);
+    }
+
+    /**
+     * @param string[] $phpArguments
+     * @param array<string, string> $options
+     * @param string[] $expected
+     */
+    #[DataProvider('commandLineProvider')]
+    public function test_it_builds_a_self_describing_command(
+        string $runtime,
+        array $phpArguments,
+        array $options,
+        array $expected,
+    ): void {
+        $actual = $this->commandLine->create($runtime, $phpArguments, $options);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function commandLineProvider(): iterable
+    {
+        yield 'filesystem runtime with PHP arguments and options' => [
+            'runtime' => '/debug.php',
+            'phpArguments' => ['', '-d', 'memory_limit=-1'],
+            'options' => [
+                'stage' => 'initial',
+                'log' => '/tmp/infection',
+            ],
+            'expectedCommandLine' => self::createExpectedCommand([
+                '/php',
+                '-d',
+                'memory_limit=-1',
+                '/debug.php',
+                '--stage',
+                'initial',
+                '--log',
+                '/tmp/infection',
+            ]),
+        ];
+
+        yield 'PHAR runtime without optional arguments' => [
+            'runtime' => 'phar:///infection.phar/debug.php',
+            'phpArguments' => [],
+            'options' => [],
+            'expectedCommandLine' => self::createExpectedCommand([
+                '/php',
+                '-r',
+                "require 'phar:///infection.phar/debug.php';",
+            ]),
+        ];
+    }
+
+    public function test_it_memoizes_the_php_executable(): void
+    {
+        $phpExecutableFinder = $this->createMock(PhpExecutableFinder::class);
+        $phpExecutableFinder
+            ->expects($this->once())
+            ->method('find')
+            ->with(false)
+            ->willReturn('/php');
+
         $commandLine = new DebugCommandLine($phpExecutableFinder);
 
-        $command = $commandLine->create('/debug.php', ['', '-d', 'memory_limit=-1'], ['stage' => 'initial']);
+        $commandLine->create('/debug.php', [], []);
+        $commandLine->create('/debug.php', [], []);
+    }
 
-        $this->assertSame(
-            ['/php', '-d', 'memory_limit=-1', '/debug.php', 'stage=initial'],
-            array_slice($command, 0, -1),
-        );
-        $this->assertStringStartsWith('command=', $command[5]);
+    public function test_it_cannot_build_a_command_without_a_php_executable(): void
+    {
+        $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
+        $phpExecutableFinder
+            ->method('find')
+            ->willReturn(false);
+
+        $commandLine = new DebugCommandLine($phpExecutableFinder);
+
+        $this->expectExceptionObject(FinderException::phpExecutableNotFound());
+
+        $commandLine->create('/debug.php', [], []);
+    }
+
+    /**
+     * @param string[] $commandLine
+     *
+     * @return string[]
+     */
+    private static function createExpectedCommand(array $commandLine): array
+    {
+        return [
+            ...$commandLine,
+            '--command',
+            base64_encode(json_encode($commandLine, JSON_THROW_ON_ERROR)),
+        ];
     }
 }

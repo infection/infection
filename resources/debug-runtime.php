@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
-parse_str(implode('&', array_slice($_SERVER['argv'], 1)), $options);
+// This script represents the "debug" test framework.
+//
+// Its purpose is to collect information about its environment and how it was
+// executed and log them in the given file.
+
+$options = getopt('', ['log:', 'stage:', 'mutationHash:', 'command:']);
 
 if (!array_key_exists('log', $options) || !array_key_exists('stage', $options)) {
     throw new RuntimeException('The debug runtime requires log and stage options.');

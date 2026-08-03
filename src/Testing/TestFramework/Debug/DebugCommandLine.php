@@ -43,7 +43,10 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
 use const PHP_SAPI;
+use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Process\PhpExecutableFinder;
+use function var_export;
 
 /**
  * @internal
@@ -74,14 +77,16 @@ final class DebugCommandLine
         $command = array_merge(
             $this->findPhp(),
             $this->filterEmptyArguments($phpArguments),
-            [$runtime],
+            self::createRuntimeArguments($runtime),
         );
 
         foreach ($options as $name => $value) {
-            $command[] = $name . '=' . $value;
+            $command[] = '--' . $name;
+            $command[] = $value;
         }
 
-        $command[] = 'command=' . base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
+        $command[] = '--command';
+        $command[] = base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
 
         return $command;
     }
@@ -98,6 +103,23 @@ final class DebugCommandLine
                 static fn (string $argument): bool => $argument !== '',
             ),
         );
+    }
+
+    /**
+     * @return non-empty-list<string>
+     */
+    private static function createRuntimeArguments(string $runtime): array
+    {
+        // We cannot have `php phar:///project/dist/infection.phar/resources/debug-runtime.php`
+        // as PHP's CLI does not accept `phar://`.
+        // However, we can have:
+        // php -r "require 'phar:///project/dist/infection.phar/resources/debug-runtime.php';"
+        return str_starts_with($runtime, 'phar://')
+            ? [
+                '-r',
+                sprintf('require %s;', var_export($runtime, true)),
+            ]
+            : [$runtime];
     }
 
     /**

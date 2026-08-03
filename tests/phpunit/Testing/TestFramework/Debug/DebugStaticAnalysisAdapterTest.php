@@ -49,10 +49,16 @@ final class DebugStaticAnalysisAdapterTest extends TestCase
     /** @throws FinderException */
     public function test_it_builds_debug_processes(): void
     {
+        $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
+        $phpExecutableFinder
+            ->method('find')
+            ->willReturn('/php');
+
         $adapter = new DebugStaticAnalysisAdapter(
+            '/debug.php',
             '/tmp/infection',
             10.,
-            new DebugCommandLine(new PhpExecutableFinder()),
+            new DebugCommandLine($phpExecutableFinder),
         );
 
         $this->assertInstanceOf(DebugStaticAnalysisMutantProcessFactory::class, $adapter->createMutantProcessFactory());

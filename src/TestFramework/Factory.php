@@ -59,6 +59,8 @@ use Webmozart\Assert\Assert;
  */
 final readonly class Factory
 {
+    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../resources/debug-runtime.php';
+
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
@@ -79,6 +81,7 @@ final readonly class Factory
     {
         if ($adapterName === TestFrameworkTypes::DEBUG) {
             return new DebugTestFrameworkAdapter(
+                self::DEBUG_RUNTIME_SCRIPT,
                 $this->infectionConfig->debugTestFrameworkLogFile,
                 new DebugCommandLine(new PhpExecutableFinder()),
             );

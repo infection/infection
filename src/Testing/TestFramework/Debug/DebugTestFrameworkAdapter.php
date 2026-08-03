@@ -50,9 +50,8 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
 {
     private const int MEMORY_OUTPUT_PARTS_LIMIT = 2;
 
-    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../../../resources/debug-runtime.php';
-
     public function __construct(
+        private string $runtime,
         private string $logFile,
         private DebugCommandLine $commandLine,
     ) {
@@ -79,7 +78,7 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         bool $skipCoverage,
     ): array {
         return $this->commandLine->create(
-            runtime: self::DEBUG_RUNTIME_SCRIPT,
+            runtime: $this->runtime,
             phpArguments: $phpExtraArgs,
             options: [
                 'stage' => 'test-framework-initial',
@@ -96,7 +95,7 @@ final readonly class DebugTestFrameworkAdapter implements MemoryUsageAware, Test
         string $extraOptions,
     ): array {
         return $this->commandLine->create(
-            runtime: self::DEBUG_RUNTIME_SCRIPT,
+            runtime: $this->runtime,
             phpArguments: [],
             options: [
                 'stage' => 'test-framework-mutant',

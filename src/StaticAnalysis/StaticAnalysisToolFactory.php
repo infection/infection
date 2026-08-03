@@ -53,6 +53,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 final readonly class StaticAnalysisToolFactory
 {
+    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../resources/debug-runtime.php';
+
     public function __construct(
         private Configuration $infectionConfig,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
@@ -65,6 +67,7 @@ final readonly class StaticAnalysisToolFactory
     {
         if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
             return new DebugStaticAnalysisAdapter(
+                self::DEBUG_RUNTIME_SCRIPT,
                 $this->infectionConfig->debugTestFrameworkLogFile,
                 $timeout,
                 new DebugCommandLine(new PhpExecutableFinder()),

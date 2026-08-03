@@ -35,49 +35,175 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
+use function base64_encode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
-use function str_starts_with;
-use function strlen;
-use function substr;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(DebugTestFrameworkAdapter::class)]
 final class DebugTestFrameworkAdapterTest extends TestCase
 {
-    /** @throws FinderException */
-    public function test_it_describes_successful_debug_runs(): void
-    {
-        $adapter = new DebugTestFrameworkAdapter(
-            '/tmp/infection',
-            new DebugCommandLine(new PhpExecutableFinder()),
-        );
+    private DebugTestFrameworkAdapter $adapter;
 
-        $this->assertTrue($adapter->testsPass('DEBUG_TEST_FRAMEWORK_PASSED'));
-        $this->assertSame(16., $adapter->getMemoryUsed('Memory: 16.00 MB'));
-        $this->assertSame(
-            'test-framework-initial',
-            $this->option($adapter->getInitialTestRunCommandLine('', [], false), 'stage'),
-        );
-        $this->assertSame(
-            'test-framework-mutant',
-            $this->option($adapter->getMutantCommandLine([], '', 'hash', '', ''), 'stage'),
+    protected function setUp(): void
+    {
+        $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
+        $phpExecutableFinder
+            ->method('find')
+            ->willReturn('/php');
+
+        $this->adapter = new DebugTestFrameworkAdapter(
+            '/debug.php',
+            '/tmp/infection',
+            new DebugCommandLine($phpExecutableFinder),
         );
     }
 
-    /** @param string[] $command */
-    private function option(array $command, string $name): string
+    public function test_it_describes_successful_debug_runs(): void
     {
-        foreach ($command as $argument) {
-            if (str_starts_with($argument, $name . '=')) {
-                return substr($argument, strlen($name) + 1);
-            }
-        }
+        $output = <<<EOF
+            DEBUG_TEST_FRAMEWORK_PASSED
+            Memory: 16.00 MB
 
-        $this->fail(sprintf('Option "%s" was not found.', $name));
+            EOF;
+
+        $this->assertTrue($this->adapter->testsPass($output));
+        $this->assertSame(16., $this->adapter->getMemoryUsed($output));
+    }
+
+    /**
+     * @param string[] $phpExtraArgs
+     * @param string[] $expected
+     */
+    #[DataProvider('initialCommandLineProvider')]
+    public function test_it_builds_the_initial_command_line(
+        string $extraOptions,
+        array $phpExtraArgs,
+        bool $skipCoverage,
+        array $expected,
+    ): void {
+        $actual = $this->adapter->getInitialTestRunCommandLine(
+            $extraOptions,
+            $phpExtraArgs,
+            $skipCoverage,
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function initialCommandLineProvider(): iterable
+    {
+        yield 'without optional arguments' => [
+            'extraOptions' => '',
+            'phpExtraArgs' => [],
+            'skipCoverage' => false,
+            'expected' => self::createExpectedCommand([
+                '/php',
+                '/debug.php',
+                '--stage',
+                'test-framework-initial',
+                '--log',
+                '/tmp/infection',
+            ]),
+        ];
+
+        yield 'with optional arguments' => [
+            'extraOptions' => '--filter=test',
+            'phpExtraArgs' => ['-d', 'memory_limit=-1'],
+            'skipCoverage' => true,
+            'expected' => self::createExpectedCommand([
+                '/php',
+                '-d',
+                'memory_limit=-1',
+                '/debug.php',
+                '--stage',
+                'test-framework-initial',
+                '--log',
+                '/tmp/infection',
+            ]),
+        ];
+    }
+
+    /**
+     * @param TestLocation[] $coverageTests
+     * @param string[] $expected
+     */
+    #[DataProvider('mutantCommandLineProvider')]
+    public function test_it_builds_the_mutant_command_line(
+        array $coverageTests,
+        string $mutatedFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
+        string $extraOptions,
+        array $expected,
+    ): void {
+        $actual = $this->adapter->getMutantCommandLine(
+            $coverageTests,
+            $mutatedFilePath,
+            $mutationHash,
+            $mutationOriginalFilePath,
+            $extraOptions,
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function mutantCommandLineProvider(): iterable
+    {
+        yield 'without optional arguments' => [
+            'coverageTests' => [],
+            'mutatedFilePath' => '',
+            'mutationHash' => 'hash',
+            'mutationOriginalFilePath' => '',
+            'extraOptions' => '',
+            'expected' => self::createExpectedCommand([
+                '/php',
+                '/debug.php',
+                '--stage',
+                'test-framework-mutant',
+                '--log',
+                '/tmp/infection',
+                '--mutationHash',
+                'hash',
+            ]),
+        ];
+
+        yield 'with optional arguments' => [
+            'coverageTests' => [TestLocation::forTestMethod('Test::test')],
+            'mutatedFilePath' => '/mutant.php',
+            'mutationHash' => 'other-hash',
+            'mutationOriginalFilePath' => '/source.php',
+            'extraOptions' => '--filter=test',
+            'expected' => self::createExpectedCommand([
+                '/php',
+                '/debug.php',
+                '--stage',
+                'test-framework-mutant',
+                '--log',
+                '/tmp/infection',
+                '--mutationHash',
+                'other-hash',
+            ]),
+        ];
+    }
+
+    /**
+     * @param string[] $command
+     *
+     * @return string[]
+     */
+    private static function createExpectedCommand(array $command): array
+    {
+        return [
+            ...$command,
+            '--command',
+            base64_encode(json_encode($command, JSON_THROW_ON_ERROR)),
+        ];
     }
 }
