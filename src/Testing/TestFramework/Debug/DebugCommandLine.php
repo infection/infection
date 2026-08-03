@@ -85,8 +85,10 @@ final class DebugCommandLine
             $command[] = $value;
         }
 
+        $encodedCommand = base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
+
         $command[] = '--command';
-        $command[] = base64_encode(json_encode($command, JSON_THROW_ON_ERROR));
+        $command[] = $encodedCommand;
 
         return $command;
     }

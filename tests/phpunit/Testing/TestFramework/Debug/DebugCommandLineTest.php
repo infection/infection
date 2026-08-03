@@ -147,9 +147,10 @@ final class DebugCommandLineTest extends TestCase
      */
     private static function createExpectedCommand(array $commandLine): array
     {
-        $commandLine[] = '--command';
-        $commandLine[] = base64_encode(json_encode($commandLine, JSON_THROW_ON_ERROR));
-
-        return $commandLine;
+        return [
+            ...$commandLine,
+            '--command',
+            base64_encode(json_encode($commandLine, JSON_THROW_ON_ERROR)),
+        ];
     }
 }
