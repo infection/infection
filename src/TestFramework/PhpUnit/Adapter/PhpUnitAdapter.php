@@ -59,7 +59,7 @@ use function version_compare;
  */
 final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
-    final public const string COVERAGE_DIR = 'coverage-xml';
+    public const string COVERAGE_DIR = 'coverage-xml';
 
     public function __construct(
         string $testFrameworkExecutable,
