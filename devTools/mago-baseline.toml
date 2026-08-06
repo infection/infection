@@ -1881,7 +1881,7 @@ count = 1
 [[issues]]
 file = "src/Logger/Console/ConsoleLogger.php"
 code = "possibly-invalid-argument"
-message = "Possible argument type mismatch for argument #2 of `strtr`: expected `array<string, string>|string`, but possibly received `array<non-empty-string, has-method<'__toString'>|non-empty-string|null>`."
+message = "Possible argument type mismatch for argument #2 of `strtr`: expected `array<string, string>|string`, but possibly received `array<non-empty-string, (has-method<'__toString'>&has-method<'__toString'>)|non-empty-string|null>`."
 count = 1
 
 [[issues]]
@@ -6224,18 +6224,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileTest.php"
-code = "possible-method-access-on-null"
-message = "Attempting to call a method on `null`."
-count = 3
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileTest.php"
-code = "possibly-null-property-access"
-message = "Attempting static access on a possibly `null` value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Configuration/Schema/SchemaConfigurationFileTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\Configuration\Schema\InvalidFile` in `Infection\Tests\Configuration\Schema\SchemaConfigurationFileTest::test_its_contents_is_retrieved_lazily`.'
 count = 1
@@ -10150,12 +10138,6 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "invalid-throw"
-message = "Cannot throw type `null` because it is not an instance of Throwable."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\PhpParser\FileParserTest::test_it_can_parse_a_file`.'
 count = 1
@@ -10164,12 +10146,6 @@ count = 1
 file = "tests/phpunit/PhpParser/FileParserTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\PhpParser\UnparsableFile` in `Infection\Tests\PhpParser\FileParserTest::test_it_parses_the_given_file_only_once`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/PhpParser/FileParserTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Throwable` in `Infection\Tests\PhpParser\FileParserTest::test_it_throws_upon_failure`.'
 count = 1
 
 [[issues]]
