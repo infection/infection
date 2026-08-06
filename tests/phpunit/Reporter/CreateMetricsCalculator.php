@@ -181,13 +181,14 @@ trait CreateMetricsCalculator
         string $mutatorClassName,
         DetectionStatus $detectionStatus,
         string $echoMutatedMessage,
+        ?string $mutantDiff = null,
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,
             now(
-                Str::rTrimLines(
+                $mutantDiff ?? Str::rTrimLines(
                     <<<DIFF
                         --- Original
                         +++ New

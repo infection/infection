@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Reporter;
 
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutator\Loop\For_;
 use Infection\Reporter\GitHubAnnotationsReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -94,5 +96,26 @@ final class GitHubAnnotationsReporterTest extends TestCase
         $reporter = new GitHubAnnotationsReporter($resultsCollector, '/custom/project/dir/');
 
         $this->assertStringContainsString('warning file=foo/bar', $reporter->getLines()[0]);
+    }
+
+    public function test_it_escapes_github_command_data_and_properties(): void
+    {
+        self::setOriginalFilePrefix("/path/to/project/foo%,:\r\n");
+
+        $resultsCollector = new ResultsCollector();
+        $resultsCollector->collect(self::createMutantExecutionResult(
+            0,
+            For_::class,
+            DetectionStatus::ESCAPED,
+            'unused',
+            mutantDiff: "%\r\n::error::Injected",
+        ));
+
+        $reporter = new GitHubAnnotationsReporter($resultsCollector, '/path/to/project');
+
+        $this->assertSame(
+            "::warning file=foo%25%2C%3A%0D%0Afoo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A%25%0D%0A::error::Injected\n",
+            $reporter->getLines()[0],
+        );
     }
 }
