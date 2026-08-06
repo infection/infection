@@ -182,6 +182,7 @@ trait CreateMetricsCalculator
         DetectionStatus $detectionStatus,
         string $echoMutatedMessage,
         ?string $mutantDiff = null,
+        ?string $originalFilePath = null,
     ): MutantExecutionResult {
         return new MutantExecutionResult(
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
@@ -203,7 +204,7 @@ trait CreateMetricsCalculator
             'a1b2c3',
             $mutatorClassName,
             MutatorName::getName($mutatorClassName),
-            self::$originalFilePrefix . 'foo/bar',
+            $originalFilePath ?? self::$originalFilePrefix . 'foo/bar',
             10 - $i,
             20 - $i,
             10 - $i,

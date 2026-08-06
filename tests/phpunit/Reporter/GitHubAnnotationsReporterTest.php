@@ -37,6 +37,7 @@ namespace Infection\Tests\Reporter;
 
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Reporter\GitHubAnnotationsReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -85,6 +86,37 @@ final class GitHubAnnotationsReporterTest extends TestCase
                 "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
             ],
         ];
+
+        yield 'reserved GitHub command data characters' => [
+            self::createResultsCollector(
+                self::createMutantExecutionResult(
+                    0,
+                    For_::class,
+                    DetectionStatus::ESCAPED,
+                    'unused',
+                    mutantDiff: "%\r\n::error::Injected",
+                ),
+            ),
+            [
+                "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A%25%0D%0A::error::Injected\n",
+            ],
+        ];
+
+        yield 'reserved GitHub command property characters' => [
+            self::createResultsCollector(
+                self::createMutantExecutionResult(
+                    0,
+                    For_::class,
+                    DetectionStatus::ESCAPED,
+                    'unused',
+                    mutantDiff: 'diff',
+                    originalFilePath: "/path/to/project/foo%,:\r\nfoo/bar",
+                ),
+            ),
+            [
+                "::warning file=foo%25%2C%3A%0D%0Afoo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0Adiff\n",
+            ],
+        ];
     }
 
     public function test_it_reports_correctly_with_custom_github_workspace(): void
@@ -98,24 +130,11 @@ final class GitHubAnnotationsReporterTest extends TestCase
         $this->assertStringContainsString('warning file=foo/bar', $reporter->getLines()[0]);
     }
 
-    public function test_it_escapes_github_command_data_and_properties(): void
+    private static function createResultsCollector(MutantExecutionResult ...$executionResults): ResultsCollector
     {
-        self::setOriginalFilePrefix("/path/to/project/foo%,:\r\n");
-
         $resultsCollector = new ResultsCollector();
-        $resultsCollector->collect(self::createMutantExecutionResult(
-            0,
-            For_::class,
-            DetectionStatus::ESCAPED,
-            'unused',
-            mutantDiff: "%\r\n::error::Injected",
-        ));
+        $resultsCollector->collect(...$executionResults);
 
-        $reporter = new GitHubAnnotationsReporter($resultsCollector, '/path/to/project');
-
-        $this->assertSame(
-            "::warning file=foo%25%2C%3A%0D%0Afoo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A%25%0D%0A::error::Injected\n",
-            $reporter->getLines()[0],
-        );
+        return $resultsCollector;
     }
 }
