@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Reporter;
 
 use Infection\Metrics\ResultsCollector;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 
@@ -80,10 +81,27 @@ final readonly class GitHubAnnotationsReporter implements LineMutationTestingRes
      */
     private function buildAnnotation(string $filePath, array $error): string
     {
-        // new lines need to be encoded
-        // see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
-        $message = str_replace("\n", '%0A', $error['message']);
+        // Data and properties need to be escaped to avoid a file path or error message to hijack
+        // the GitHub annotations by leveraging the annotation delimiters.
+        //
+        // See:
+        // https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#about-workflow-commands
+        // https://github.com/actions/toolkit/blob/193fa46c20fde8b0ed54194bc08b841c78c0776d/packages/core/src/command.ts#L92-L111
+        return sprintf(
+            "::warning file=%s,line=%d::%s\n",
+            self::escapeProperty($filePath),
+            $error['line'],
+            self::escapeData($error['message']),
+        );
+    }
 
-        return "::warning file={$filePath},line={$error['line']}::{$message}\n";
+    private static function escapeData(string $value): string
+    {
+        return str_replace(['%', "\r", "\n"], ['%25', '%0D', '%0A'], $value);
+    }
+
+    private static function escapeProperty(string $value): string
+    {
+        return str_replace(['%', "\r", "\n", ':', ','], ['%25', '%0D', '%0A', '%3A', '%2C'], $value);
     }
 }
