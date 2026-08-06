@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Reporter;
 
+use function array_map;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\MutantExecutionResult;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
@@ -55,32 +57,33 @@ final readonly class GitHubAnnotationsReporter implements LineMutationTestingRes
 
     public function getLines(): array
     {
-        $lines = [];
-
-        foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
-            $error = [
-                'line' => $escapedExecutionResult->getOriginalStartingLine(),
-                'message' => <<<"TEXT"
-                    Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
-
-                    {$escapedExecutionResult->getMutantDiff()}
-                    TEXT,
-            ];
-
-            $lines[] = $this->buildAnnotation(
-                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->projectDirectory),
-                $error,
-            );
-        }
-
-        return $lines;
+        return array_map(
+            $this->mapToAnnotation(...),
+            $this->resultsCollector->getEscapedExecutionResults(),
+        );
     }
 
-    /**
-     * @param array{line: int, message: string} $error
-     */
-    private function buildAnnotation(string $filePath, array $error): string
+    private function mapToAnnotation(MutantExecutionResult $result): string
     {
+        return self::buildAnnotation(
+            Path::makeRelative(
+                $result->getOriginalFilePath(),
+                $this->projectDirectory,
+            ),
+            $result->getOriginalStartingLine(),
+            <<<TEXT
+                Escaped Mutant for Mutator "{$result->getMutatorName()}":
+
+                {$result->getMutantDiff()}
+                TEXT,
+        );
+    }
+
+    private static function buildAnnotation(
+        string $filePath,
+        int $line,
+        string $message,
+    ): string {
         // Data and properties need to be escaped to avoid a file path or error message to hijack
         // the GitHub annotations by leveraging the annotation delimiters.
         //
@@ -88,19 +91,21 @@ final readonly class GitHubAnnotationsReporter implements LineMutationTestingRes
         // https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#about-workflow-commands
         // https://github.com/actions/toolkit/blob/193fa46c20fde8b0ed54194bc08b841c78c0776d/packages/core/src/command.ts#L92-L111
         return sprintf(
+            // The format is:
+            // ::workflow-command parameter1={data},parameter2={data}::{command value}
             "::warning file=%s,line=%d::%s\n",
-            self::escapeProperty($filePath),
-            $error['line'],
-            self::escapeData($error['message']),
+            self::escapeParameterValue($filePath),
+            $line,
+            self::escapeCommandValue($message),
         );
     }
 
-    private static function escapeData(string $value): string
+    private static function escapeCommandValue(string $value): string
     {
         return str_replace(['%', "\r", "\n"], ['%25', '%0D', '%0A'], $value);
     }
 
-    private static function escapeProperty(string $value): string
+    private static function escapeParameterValue(string $value): string
     {
         return str_replace(['%', "\r", "\n", ':', ','], ['%25', '%0D', '%0A', '%3A', '%2C'], $value);
     }
