@@ -90,8 +90,8 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
-- `adr/` - Architecture Decision Records; short rationale for standing conventions. Read
-  before challenging one. New ADRs must follow the template `adr/0000-template.md`. Keep jargon to a minimum (ASD-STE100) when writing.
+- `adr/` - Architecture Decision Records; short rationale for standing conventions. See
+  `## Suggest Architecture Decision Records` for when to read, update, or create one.
 - `resources/schema.json` - the infection.json5 schema; every mutator is listed here.
 - Vendored-with-intent: `src/Differ/UnifiedDiffOutputBuilder.php` (sebastian/diff fork,
   excluded from CS so upstream's header survives). Mark any code copied from upstream with a
@@ -102,19 +102,41 @@ transcluded here:
 
 @.github/CONTRIBUTING.md
 
-## Suggest ADRs for durable decisions
+## Suggest Architecture Decision Records (ADRs)
+
+`AGENTS.md` reflects the current outcomes agents usually need, so ADRs are mainly for
+durable rationale. Read an ADR when changing, challenging, or extending one of its decisions.
 
 When a task exposes an undocumented, durable choice about architecture, public API,
 dependencies, testing strategy, or a project-wide convention, tell the contributor that it
 is a candidate for an ADR. Suggest an ADR especially when credible alternatives exist or the
 same decision is likely to recur in reviews. First search `adr/`: update or supersede an
 existing decision instead of creating a competing record. Follow the criteria and workflow
-in `adr/README.md` and the template in `adr/0000-template.md`.
+in `adr/README.md` and the template in `adr/0000-template.md`. Keep jargon to a minimum
+(follow ASD-STE100) when writing.
 
 Suggest the ADR; do not expand the task by writing one unless the contributor asks for it.
 Do not suggest ADRs for implementation descriptions, subsystem invariants, contribution
 workflows, command lists, or one-off details. Put those in architecture documentation,
 contributor documentation, or code comments as appropriate.
+
+Current ADRs:
+
+<!-- adr-list:start -->
+- [`adr/0001-inheritdoc.md`](adr/0001-inheritdoc.md) - Inheritdoc usage
+- [`adr/0002-@covers-annotations.md`](adr/0002-@covers-annotations.md) - `@covers` annotations usage
+- [`adr/0003-PHPUnit-this-over-self.md`](adr/0003-PHPUnit-this-over-self.md) - Use `$this` instead of `self` for PHPUnit assertions
+- [`adr/0004-PHPUnit-expect-exception-over-try-catch.md`](adr/0004-PHPUnit-expect-exception-over-try-catch.md) - Use PHPUnit `expectException*()` API over `try-catch`
+- [`adr/0005-Bump-PHP-versions.md`](adr/0005-Bump-PHP-versions.md) - Bumping PHP version requirements
+- [`adr/0006-memoized-over-cached-nomenclature.md`](adr/0006-memoized-over-cached-nomenclature.md) - Use `Memoized` over `Cached` for object-local result reuse
+- [`adr/0007-declare-phpunit-coverage-metadata.md`](adr/0007-declare-phpunit-coverage-metadata.md) - Declare PHPUnit coverage metadata explicitly
+- [`adr/0008-PHP-version-support-policy.md`](adr/0008-PHP-version-support-policy.md) - PHP version support policy
+- [`adr/0009-event-and-subscriber-naming.md`](adr/0009-event-and-subscriber-naming.md) - Event and subscriber naming conventions
+- [`adr/0010-compare-objects-with-assert-equals.md`](adr/0010-compare-objects-with-assert-equals.md) - Compare objects with PHPUnit `assertEquals()`
+- [`adr/0011-use-phpunit-environment-variable-attribute.md`](adr/0011-use-phpunit-environment-variable-attribute.md) - Use PHPUnit attributes for test environment variables
+- [`adr/0012-final-classes-over-final-docblock.md`](adr/0012-final-classes-over-final-docblock.md) - Prefer `final` to `@final` where possible
+- [`adr/0013-public-api-extension-point-registry.md`](adr/0013-public-api-extension-point-registry.md) - Define the public API through an extension-point registry
+<!-- adr-list:end -->
 
 ## Commands
 
@@ -267,6 +289,29 @@ This style rule often surprises agents. Code is structured for killability:
 
 An escaping mutant means either a missing test or code that should be reshaped; "only
 performance" escapes can be accepted, but say so explicitly in the PR.
+
+### Propose the smallest change that does the job
+
+Agents default to a complete, defensible artifact: a class where a function works, a test
+suite where a CI check already fails, a generator script where `git diff` answers the
+question. Every line is individually justifiable and the total is still wrong - reviewers
+here read totals, not lines. Removing or reducing code outranks adding it. Where CI already
+fails on the condition your change prevents, that failure is the test; do not restate it as
+unit tests. In tests, one data provider with named cases beats a row of near-identical test
+methods. Tooling gets the same size bar as `src/`: every contributor reads it and no user
+exercises it, so "it is only tooling" makes it cheaper to write and not cheaper to keep.
+
+Work in two passes:
+
+1. **Write** the change as you planned it.
+2. **Re-read it as a reviewer, then cut.** Delete what nothing needs, merge what repeats,
+   shorten what stands. Count the files and the lines you added, and drop the ones you
+   cannot defend one by one.
+
+The second pass is not polish, and it is where most of the value is. It does not override
+the killability rules above: keep separate `return` statements and early returns even when
+one expression would be shorter. Do the task asked; when you see adjacent work, name it and
+stop.
 
 ## Subsystem invariants
 
@@ -562,6 +607,8 @@ The costliest traps:
     "optimizing" (`make benchmark`), and re-validate old perf hacks before extending them.
 12. Escaped mutant on a literal? Extract a named constant. Escaped mutant on a loose mock?
     Tighten `->with(...)`. Truly unkillable? Discuss a bypass - do not fake a test.
+13. Volume is not rigor. Fewer files is the default; adding one means saying why the
+    smaller shape fails.
 
 ## Maintaining this file
 

@@ -47,6 +47,16 @@
                 // complicated for this is not worth.
                 "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator",
             ]
+        },
+        "UnwrapArrayMap": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
+        "UnwrapArrayValues": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
         }
     }
 }

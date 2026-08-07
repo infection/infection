@@ -38,6 +38,7 @@ namespace Infection\Container;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
+use function dirname;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -184,6 +185,7 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -312,6 +314,7 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
                     $container->getShellCommandLineExecutor(),
+                    new PhpExecutableFinder(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -616,10 +619,10 @@ final class Container extends DIContainer
                 return $sourceFilter instanceof GitDiffFilter
                     ? new GitDiffSourceLineMatcher(
                         $container->getGit(),
-                        $container->getFileSystem(),
                         $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
+                        dirname($configuration->configurationPathname),
                     )
                     : new NullSourceLineMatcher();
             },

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Persist unfinished work for a fresh session"
+  default_prompt: "Use $handoff to preserve the current work so a fresh session can resume it."
+policy:
+  allow_implicit_invocation: false

@@ -154,22 +154,22 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation3],
             ))
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = MutantBuilder::materialize(
-                    '/path/to/mutant0',
-                    $mutation0,
-                    'mutated code 0',
-                ),
-                $mutant1 = MutantBuilder::materialize(
-                    '/path/to/mutant1',
-                    $mutation1,
-                    'mutated code 1',
-                ),
-                MutantBuilder::materialize(
-                    mutation: $mutation2,
-                ),
-                MutantBuilder::materialize(
-                    mutation: $mutation3,
-                ),
+                $mutant0 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant0')
+                    ->withMutation($mutation0)
+                    ->withMutatedCode('mutated code 0')
+                    ->build(),
+                $mutant1 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant1')
+                    ->withMutation($mutation1)
+                    ->withMutatedCode('mutated code 1')
+                    ->build(),
+                MutantBuilder::withMinimalTestData()
+                    ->withMutation($mutation2)
+                    ->build(),
+                MutantBuilder::withMinimalTestData()
+                    ->withMutation($mutation3)
+                    ->build(),
             )
         ;
 
@@ -246,11 +246,11 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation0],
             ))
             ->willReturn(
-                $mutant0 = MutantBuilder::materialize(
-                    '/path/to/mutant0',
-                    $mutation0,
-                    'mutated code 0',
-                ),
+                $mutant0 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant0')
+                    ->withMutation($mutation0)
+                    ->withMutatedCode('mutated code 0')
+                    ->build(),
             )
         ;
 
@@ -323,16 +323,16 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1],
             ))
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = MutantBuilder::materialize(
-                    '/path/to/mutant0',
-                    $mutation0,
-                    'mutated code 0',
-                ),
-                $mutant1 = MutantBuilder::materialize(
-                    '/path/to/mutant1',
-                    $mutation1,
-                    'mutated code 1',
-                ),
+                $mutant0 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant0')
+                    ->withMutation($mutation0)
+                    ->withMutatedCode('mutated code 0')
+                    ->build(),
+                $mutant1 = MutantBuilder::withMinimalTestData()
+                    ->withMutantFilePath('/path/to/mutant1')
+                    ->withMutation($mutation1)
+                    ->withMutatedCode('mutated code 1')
+                    ->build(),
             )
         ;
 
@@ -396,12 +396,12 @@ final class MutationTestingRunnerTest extends TestCase
 
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
-        $mutant = MutantBuilder::materialize(
-            '/path/to/mutant0',
-            $mutation0,
-            'mutated code 0',
-            '- Assert::integer(1)',
-        );
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath('/path/to/mutant0')
+            ->withMutation($mutation0)
+            ->withMutatedCode('mutated code 0')
+            ->withDiff('- Assert::integer(1)')
+            ->build();
 
         $this->mutantFactoryMock
             ->method('create')
@@ -462,12 +462,12 @@ final class MutationTestingRunnerTest extends TestCase
 
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
-        $mutant = MutantBuilder::materialize(
-            '/path/to/mutant0',
-            $mutation0,
-            'mutated code 0',
-            '- Assert::integer(1)',
-        );
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath('/path/to/mutant0')
+            ->withMutation($mutation0)
+            ->withMutatedCode('mutated code 0')
+            ->withDiff('- Assert::integer(1)')
+            ->build();
 
         $this->mutantFactoryMock
             ->method('create')
@@ -542,10 +542,10 @@ final class MutationTestingRunnerTest extends TestCase
 
         $mutation = $this->createMutation(0);
 
-        $mutant = MutantBuilder::materialize(
-            mutation: $mutation,
-            mutatedCode: 'mutated code 0',
-        );
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutation($mutation)
+            ->withMutatedCode('mutated code 0')
+            ->build();
 
         $result = $this->invokeMethod('ignoredByRegex', $mutant);
 
@@ -624,7 +624,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $mutation = $this->createMutation(0, coveredByTests: false);
 
-        $mutant = MutantBuilder::materialize(mutation: $mutation);
+        $mutant = MutantBuilder::withMinimalTestData()->withMutation($mutation)->build();
 
         $result = $this->invokeMethod('uncoveredByTest', $mutant);
 
