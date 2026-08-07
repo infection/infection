@@ -98,29 +98,19 @@ final readonly class XmlConfigurationManipulator
     public function deactivateResultCaching(string $version, SafeDOMXPath $xPath): void
     {
         // PHPUnit 13.3 deprecated cacheResult in favour of recordTestRunHistory
-        if (version_compare($version, '13.3', '>=')) {
-            $this->setAttributeValue($xPath, 'recordTestRunHistory', 'false');
+        $attribute = version_compare($version, '13.3', '>=') ? 'recordTestRunHistory' : 'cacheResult';
 
-            return;
-        }
-
-        $this->setAttributeValue($xPath, 'cacheResult', 'false');
+        $this->setAttributeValue($xPath, $attribute, 'false');
     }
 
     public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash, string $tmpDir): void
     {
-        // PHPUnit 13.3 deprecated cacheResult in favour of recordTestRunHistory
-        if (version_compare($version, '13.3', '>=')) {
-            $this->setAttributeValue($xPath, 'recordTestRunHistory', 'true');
-            $this->setAttributeValue($xPath, 'cacheDirectory', sprintf('%s/.phpunit.result.cache.%s', $tmpDir, $mutationHash));
-            $this->setAttributeValue($xPath, 'executionOrder', 'defects');
-
-            return;
-        }
-
         // starting from PHPUnit 11.0 the cacheResultFile was removed, we now set cacheDirectory instead https://github.com/sebastianbergmann/phpunit/blob/11.0.0/phpunit.xsd
         if (version_compare($version, '11.0', '>=')) {
-            $this->setAttributeValue($xPath, 'cacheResult', 'true');
+            // PHPUnit 13.3 deprecated cacheResult in favour of recordTestRunHistory
+            $attribute = version_compare($version, '13.3', '>=') ? 'recordTestRunHistory' : 'cacheResult';
+
+            $this->setAttributeValue($xPath, $attribute, 'true');
             $this->setAttributeValue($xPath, 'cacheDirectory', sprintf('%s/.phpunit.result.cache.%s', $tmpDir, $mutationHash));
             $this->setAttributeValue($xPath, 'executionOrder', 'defects');
 
