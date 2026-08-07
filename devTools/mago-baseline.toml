@@ -12863,6 +12863,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_disables_caching_for_phpunit_13_3`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_disables_caching`.'
 count = 1
 

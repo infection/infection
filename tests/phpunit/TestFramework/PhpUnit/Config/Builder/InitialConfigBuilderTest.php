@@ -191,6 +191,21 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame('false', $cacheResult);
     }
 
+    public function test_it_disables_caching_for_phpunit_13_3(): void
+    {
+        $xml = $this->filesystem->readFile($this->builder->build('13.3'));
+
+        $cacheResult = $this->queryXpath($xml, '/phpunit/@cacheResult');
+
+        $this->assertInstanceOf(DOMNodeList::class, $cacheResult);
+
+        $this->assertSame(0, $cacheResult->length);
+
+        $recordTestRunHistory = $this->queryXpath($xml, '/phpunit/@recordTestRunHistory')[0]->nodeValue;
+
+        $this->assertSame('false', $recordTestRunHistory);
+    }
+
     public function test_it_deactivates_stderr_redirection(): void
     {
         $xml = $this->filesystem->readFile($this->builder->build('6.5'));
