@@ -156,8 +156,7 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
-        if (PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version) && version_compare($version, '13.3', '<')) {
+        if (PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version)) {
             if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
                 $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
             }
