@@ -1,11 +1,3 @@
-Total: 2
-
-Killed by Test Framework: 0
-Killed by Static Analysis: 0
-Errored: 0
-Syntax Errors: 0
-Escaped: 2
-Timed Out: 0
-Skipped: 0
-Ignored: 0
-Not Covered: 0
+Cannot run mutation testing with PHP's auto_prepend_file setting enabled:
+/Preloaded_Source/preload.php
+The preloaded file runs before Infection can enable its mutant interceptor, so Infection cannot guarantee that tests execute mutated code. Disable auto_prepend_file before running Infection.
