@@ -363,7 +363,7 @@ Memory is released by `unset()` of the container reference before freeing the sl
 
 `XmlConfigurationManipulator` is ~15 small public methods, one edit each, composed by two
 builders; the
-`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0) each have a comment
+`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0, 13.3) each have a comment
 linking the phpunit.xsd change - keep them. Hard rules: PHPUnit >= 12's coverage/`<source>`
 config is authoritative - leave it untouched (#3043 regression); when the user has an
 include filter and no source filtering is requested, preserve their config rather than

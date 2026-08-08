@@ -12767,6 +12767,12 @@ count = 1
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "imprecise-type"
+message = "Type `iterable` in return type of `executionOrderValueProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "imprecise-type"
 message = "Type `iterable` in return type of `failOnProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
 count = 1
 
@@ -12774,13 +12780,13 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "non-existent-property"
 message = "Property `$value` does not exist on class `DOMNameSpaceNode`."
-count = 3
+count = 4
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "non-existent-property"
 message = "Property `$value` does not exist on class `DOMNode`."
-count = 3
+count = 4
 
 [[issues]]
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
@@ -12804,6 +12810,12 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_adds_fail_on_risky_and_warning_for_proper_phpunit_versions`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_adds_the_execution_order_supported_by_the_phpunit_version`.'
 count = 1
 
 [[issues]]
@@ -12852,6 +12864,12 @@ count = 1
 file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_deactivates_the_colors`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Exception\IOException` in `Infection\Tests\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilderTest::test_it_disables_caching_for_phpunit_13_3`.'
 count = 1
 
 [[issues]]
