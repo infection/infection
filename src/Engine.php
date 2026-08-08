@@ -48,8 +48,8 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\UnparsableFile;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -83,7 +83,7 @@ final readonly class Engine
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
-        private InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
+        private InitialStaticAnalysis $initialStaticAnalysis,
     ) {
     }
 
@@ -103,7 +103,7 @@ final readonly class Engine
     public function execute(): void
     {
         $initialTestSuiteOutput = $this->runInitialTestSuite();
-        $this->initialStaticAnalysisRunner->run();
+        $this->initialStaticAnalysis->run();
 
         /*
          * Limit the memory used for the mutation processes based on the memory

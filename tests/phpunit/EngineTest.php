@@ -47,7 +47,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -233,8 +233,8 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'test output');
 
-        $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
-        $initialStaticAnalysisRunner
+        $initialStaticAnalysis = $this->createMock(InitialStaticAnalysis::class);
+        $initialStaticAnalysis
             ->expects($this->once())
             ->method('run')
             ->willReturnCallback(static function () use (&$callOrder): void {
@@ -286,7 +286,7 @@ final class EngineTest extends TestCase
 
         $engine = $this->createEngine(
             $config,
-            $initialStaticAnalysisRunner,
+            $initialStaticAnalysis,
         );
 
         $engine->execute();
@@ -546,7 +546,7 @@ final class EngineTest extends TestCase
 
     private function createEngine(
         ?Configuration $config = null,
-        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
+        ?InitialStaticAnalysis $initialStaticAnalysis = null,
     ): Engine {
         return new Engine(
             config: $config ?? ConfigurationBuilder::withMinimalTestData()
@@ -565,7 +565,7 @@ final class EngineTest extends TestCase
             consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
             testFrameworkExtraOptionsFilter: $this->testFrameworkExtraOptionsFilter,
-            initialStaticAnalysisRunner: $initialStaticAnalysisRunner ?? new NullInitialStaticAnalysisRunner(),
+            initialStaticAnalysis: $initialStaticAnalysis ?? new NullInitialStaticAnalysisRunner(),
         );
     }
 }

@@ -42,8 +42,8 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Infection\Process\Runner\InitialStaticAnalysisProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
@@ -53,8 +53,8 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(InitialStaticAnalysisProcessRunner::class)]
-final class InitialStaticAnalysisProcessRunnerTest extends TestCase
+#[CoversClass(InitialStaticAnalysisRunner::class)]
+final class InitialStaticAnalysisRunnerTest extends TestCase
 {
     private InitialStaticAnalysisProcessFactory&Stub $processFactoryStub;
 
@@ -62,7 +62,7 @@ final class InitialStaticAnalysisProcessRunnerTest extends TestCase
 
     private StaticAnalysisToolAdapter&Stub $staticAnalysisToolAdapter;
 
-    private InitialStaticAnalysisProcessRunner $runner;
+    private InitialStaticAnalysisRunner $runner;
 
     protected function setUp(): void
     {
@@ -76,7 +76,7 @@ final class InitialStaticAnalysisProcessRunnerTest extends TestCase
 
         $this->staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
-        $this->runner = new InitialStaticAnalysisProcessRunner(
+        $this->runner = new InitialStaticAnalysisRunner(
             $this->processFactoryStub,
             $this->eventDispatcher,
             $this->staticAnalysisToolAdapter,

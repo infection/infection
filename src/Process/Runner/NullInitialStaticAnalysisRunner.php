@@ -41,7 +41,7 @@ namespace Infection\Process\Runner;
  *
  * @internal
  */
-final readonly class NullInitialStaticAnalysisRunner implements InitialStaticAnalysisRunner
+final readonly class NullInitialStaticAnalysisRunner implements InitialStaticAnalysis
 {
     public function run(): void
     {

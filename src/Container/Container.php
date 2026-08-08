@@ -125,7 +125,7 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\Process\Runner\InitialStaticAnalysisProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -563,12 +563,12 @@ final class Container extends DIContainer
             InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
                 $container->getStaticAnalysisToolAdapter(),
             ),
-            InitialStaticAnalysisRunner::class => static function (self $container): InitialStaticAnalysisRunner {
+            InitialStaticAnalysis::class => static function (self $container): InitialStaticAnalysis {
                 if (!$container->getConfiguration()->isStaticAnalysisEnabled()) {
                     return new NullInitialStaticAnalysisRunner();
                 }
 
-                return $container->getInitialStaticAnalysisProcessRunner();
+                return $container->getInitialStaticAnalysisRunner();
             },
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
@@ -957,17 +957,17 @@ final class Container extends DIContainer
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
+    public function getInitialStaticAnalysis(): InitialStaticAnalysis
     {
-        return $this->get(InitialStaticAnalysisRunner::class);
+        return $this->get(InitialStaticAnalysis::class);
     }
 
     /**
      * Autowired: every dependency of its constructor is a registered service.
      */
-    public function getInitialStaticAnalysisProcessRunner(): InitialStaticAnalysisProcessRunner
+    public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
     {
-        return $this->get(InitialStaticAnalysisProcessRunner::class);
+        return $this->get(InitialStaticAnalysisRunner::class);
     }
 
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
