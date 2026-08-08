@@ -194,7 +194,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(1000, 2.0, 3.0, $this->consoleOutput);
+            ->with(1000, 2.0, 3.0);
 
         $this->metricsCalculator
             ->expects($this->once())
@@ -277,7 +277,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 80.0, 85.0, $this->consoleOutput);
+            ->with(100, 80.0, 85.0);
 
         $this->metricsCalculator
             ->method('getTestedMutantsCount')
@@ -504,7 +504,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 50.0, 55.0, $this->consoleOutput)
+            ->with(100, 50.0, 55.0)
             ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0));
 
         $this->metricsCalculator

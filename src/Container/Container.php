@@ -56,6 +56,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
@@ -385,6 +386,7 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $container->getConsoleOutput(),
                     $config->ignoreMsiWithNoMutations,
                     (float) $config->minMsi,
                     (float) $config->minCoveredMsi,
@@ -987,6 +989,11 @@ final class Container extends DIContainer
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getConsoleOutput(): ConsoleOutput
+    {
+        return $this->get(ConsoleOutput::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator
