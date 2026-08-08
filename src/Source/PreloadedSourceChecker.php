@@ -39,6 +39,8 @@ use Infection\Source\Exception\PreloadedSourceFound;
 use function Safe\ini_get;
 
 /**
+ * Prevents PHP's auto-prepend mechanism from loading source before Infection can substitute mutant code.
+ *
  * @internal
  */
 final readonly class PreloadedSourceChecker
