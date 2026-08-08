@@ -48,7 +48,6 @@ use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 
@@ -70,14 +69,12 @@ final readonly class EngineFactory
         private MaxTimeoutsChecker $maxTimeoutsChecker,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private InitialStaticAnalysisRunner $initialStaticAnalysisRunner,
     ) {
     }
 
-    public function create(
-        ConsoleOutput $consoleOutput,
-        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
-        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
-    ): Engine {
+    public function create(ConsoleOutput $consoleOutput): Engine
+    {
         return new Engine(
             $this->config,
             $this->adapter,
@@ -92,8 +89,7 @@ final readonly class EngineFactory
             $consoleOutput,
             $this->metricsCalculator,
             $this->testFrameworkExtraOptionsFilter,
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
+            $this->initialStaticAnalysisRunner,
         );
     }
 }

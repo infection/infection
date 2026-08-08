@@ -59,6 +59,7 @@ use Infection\Configuration\SourceFilter\PositionalPathsFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
+use Infection\Container\Builder\InitialStaticAnalysisRunnerBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -270,6 +271,10 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
+            // The container registers itself so that builders needing lazy access to other
+            // services can receive the very instance they are resolved from; without this
+            // entry the autowiring would build a fresh, empty container.
+            self::class => static fn (self $container): self => $container,
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
@@ -556,10 +561,7 @@ final class Container extends DIContainer
             InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
                 $container->getStaticAnalysisToolAdapter(),
             ),
-            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
+            InitialStaticAnalysisRunner::class => InitialStaticAnalysisRunnerBuilder::class,
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 

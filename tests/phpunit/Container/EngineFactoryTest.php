@@ -50,8 +50,6 @@ use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -62,11 +60,9 @@ use Psr\Log\NullLogger;
 #[CoversClass(EngineFactory::class)]
 final class EngineFactoryTest extends TestCase
 {
-    public function test_it_builds_the_engine_without_the_static_analysis_chain(): void
+    public function test_it_creates_the_engine(): void
     {
-        $configuration = ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisTool(null)
-            ->build();
+        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
 
         $container = $this->createContainerWithDoubles($configuration);
         $consoleOutput = new ConsoleOutput(new NullLogger());
@@ -75,35 +71,6 @@ final class EngineFactoryTest extends TestCase
 
         $this->assertEquals(
             $this->createExpectedEngine($configuration, $container, $consoleOutput),
-            $engine,
-        );
-    }
-
-    public function test_it_builds_the_engine_with_the_static_analysis_chain(): void
-    {
-        $configuration = ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
-            ->build();
-
-        $container = $this->createContainerWithDoubles($configuration);
-        $consoleOutput = new ConsoleOutput(new NullLogger());
-        $initialStaticAnalysisRunner = $this->createStub(InitialStaticAnalysisRunner::class);
-        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
-
-        $engine = $container->getEngineFactory()->create(
-            $consoleOutput,
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
-        );
-
-        $this->assertEquals(
-            $this->createExpectedEngine(
-                $configuration,
-                $container,
-                $consoleOutput,
-                $initialStaticAnalysisRunner,
-                $staticAnalysisToolAdapter,
-            ),
             $engine,
         );
     }
@@ -126,6 +93,7 @@ final class EngineFactoryTest extends TestCase
             MaxTimeoutsChecker::class,
             MetricsCalculator::class,
             TestFrameworkExtraOptionsFilter::class,
+            InitialStaticAnalysisRunner::class,
         ] as $id) {
             $container->inject($id, $this->createStub($id));
         }
@@ -137,8 +105,6 @@ final class EngineFactoryTest extends TestCase
         Configuration $configuration,
         Container $container,
         ConsoleOutput $consoleOutput,
-        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
-        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ): Engine {
         return new Engine(
             $configuration,
@@ -154,8 +120,7 @@ final class EngineFactoryTest extends TestCase
             $consoleOutput,
             $container->getMetricsCalculator(),
             $container->getTestFrameworkExtraOptionsFilter(),
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
+            $container->getInitialStaticAnalysisRunner(),
         );
     }
 }

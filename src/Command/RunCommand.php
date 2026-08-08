@@ -386,14 +386,7 @@ final class RunCommand extends BaseCommand
         try {
             $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
-            $config = $container->getConfiguration();
-
-            $engine = $container->getEngineFactory()->create(
-                $consoleOutput,
-                // do not create a chain of classes for SA if not enabled
-                $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
-                $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
-            );
+            $engine = $container->getEngineFactory()->create($consoleOutput);
 
             $engine->execute();
 
