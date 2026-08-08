@@ -386,6 +386,7 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $container->getConsoleOutput(),
                     $config->ignoreMsiWithNoMutations,
                     (float) $config->minMsi,
                     (float) $config->minCoveredMsi,
