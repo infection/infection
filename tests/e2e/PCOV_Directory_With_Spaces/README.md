@@ -1,12 +1,15 @@
 # PCOV directory containing spaces
 
-This scenario covers a project whose source directory contains spaces. When PCOV has no
-configured `pcov.directory`, Infection provides the source directory to the initial test run
-as a PHP `-d` argument.
+This scenario covers a project whose source directory contains spaces. When
+`pcov.directory` is not configured, Infection passes the inferred source directory to the
+initial test run using PHP's `-d` option.
 
-Symfony Process receives the command as an argument list, so the directory must remain
-unescaped. Shell quotes would become part of PCOV's configured directory and prevent it from
-collecting coverage for the source file.
+The PHPUnit process is executed from an argument list, so the directory is passed as one raw
+argument and does not require shell escaping.
+
+The previous implementation applied `escapeshellarg()`. PHP currently removes the resulting
+matching quotes when parsing `-d`, so both forms behave equivalently. This scenario records
+the intended behaviour for source paths containing spaces.
 
 Run the scenario with a PHP installation that loads PCOV and leaves `pcov.directory` unset:
 

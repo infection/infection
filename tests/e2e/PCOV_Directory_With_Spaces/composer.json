@@ -9,7 +9,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PCOVDirectoryWithSpaces\\Tests\\": "tests/"
+            "PCOVDirectoryWithSpaces\\Test\\": "tests/"
         }
     },
     "config": {

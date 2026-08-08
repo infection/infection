@@ -14,7 +14,7 @@
         "customPath": "vendor/bin/phpunit"
     },
     "mutators": {
-        "TrueValue": true
+        "PublicVisibility": true
     },
     "tmpDir": "var/infection-tmp"
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace PCOVDirectoryWithSpaces;
 
-final class SourceClass
+class SourceClass
 {
-    public function returnsTrue(): bool
+    public function hello(): string
     {
-        return true;
+        return 'hello';
     }
 }
