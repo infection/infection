@@ -36,12 +36,6 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 /**
- * Runs the static analysis tool against the original code base during artefact
- * collection. This is needed for 2 purposes:
- *
- * 1. To warm up the SA tool's cache
- * 2. To make sure SA passes before using it inside Infection to kill Mutants
- *
  * @internal
  */
 interface InitialStaticAnalysis

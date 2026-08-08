@@ -43,6 +43,11 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 
 /**
+ * This is needed for 2 purposes:
+ *
+ * 1. To warm up the SA tool's cache
+ * 2. To make sure SA passes before using it inside Infection to kill Mutants
+ *
  * @internal
  * @final
  */
