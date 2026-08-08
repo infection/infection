@@ -33,6 +33,8 @@
 
 declare(strict_types=1);
 
+// @php-cs-fixer-ignore ordered_class_elements Maintain existing ordering to preserve `git blame` and reduce the diff size.
+
 namespace Infection\Command;
 
 use function extension_loaded;
@@ -534,7 +536,7 @@ class RunCommand extends BaseCommand
     /**
      * @param non-empty-string|null $configFile
      */
-    private function startUp(
+    protected function startUp(
         Container $container,
         ?string $configFile,
         ConsoleOutput $consoleOutput,
