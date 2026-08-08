@@ -112,8 +112,8 @@ final class EngineFactoryTest extends TestCase
     {
         $container = Container::create();
 
-        $container->set(Configuration::class, static fn (): Configuration => $configuration);
-        $container->set(SyncEventDispatcher::class, static fn (): SyncEventDispatcher => new SyncEventDispatcher());
+        $container->inject(Configuration::class, $configuration);
+        $container->inject(SyncEventDispatcher::class, new SyncEventDispatcher());
 
         foreach ([
             TestFrameworkAdapter::class,
@@ -127,7 +127,7 @@ final class EngineFactoryTest extends TestCase
             MetricsCalculator::class,
             TestFrameworkExtraOptionsFilter::class,
         ] as $id) {
-            $container->set($id, fn (): object => $this->createStub($id));
+            $container->inject($id, $this->createStub($id));
         }
 
         return $container;
