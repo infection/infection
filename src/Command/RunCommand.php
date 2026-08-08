@@ -388,12 +388,14 @@ final class RunCommand extends BaseCommand
 
             $config = $container->getConfiguration();
 
-            $container->getEngineFactory()->create(
+            $engine = $container->getEngineFactory()->create(
                 $consoleOutput,
                 // do not create a chain of classes for SA if not enabled
                 $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
                 $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
-            )->execute();
+            );
+
+            $engine->execute();
 
             return true;
         } catch (NoSourceFound $noSourceFoundException) {
