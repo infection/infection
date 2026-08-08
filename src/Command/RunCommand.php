@@ -403,6 +403,7 @@ final class RunCommand extends BaseCommand
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
+                $container->getPreloadedSourceChecker(),
                 // do not create a chain of classes for SA if not enabled
                 $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
                 $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,

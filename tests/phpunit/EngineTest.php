@@ -52,6 +52,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -92,6 +93,8 @@ final class EngineTest extends TestCase
 
     private Stub&TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter;
 
+    private PreloadedSourceChecker $preloadedSourceChecker;
+
     protected function setUp(): void
     {
         $this->adapter = $this->createMock(TestFrameworkAdapter::class);
@@ -106,6 +109,7 @@ final class EngineTest extends TestCase
         $this->consoleOutput = $this->createMock(ConsoleOutput::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
+        $this->preloadedSourceChecker = new PreloadedSourceChecker('');
     }
 
     public function test_initial_test_run_fails(): void
@@ -573,6 +577,7 @@ final class EngineTest extends TestCase
             consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
             testFrameworkExtraOptionsFilter: $this->testFrameworkExtraOptionsFilter,
+            preloadedSourceChecker: $this->preloadedSourceChecker,
             initialStaticAnalysisRunner: $initialStaticAnalysisRunner,
             staticAnalysisToolAdapter: $staticAnalysisToolAdapter,
         );
