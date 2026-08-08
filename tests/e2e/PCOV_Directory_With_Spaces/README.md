@@ -11,7 +11,8 @@ The previous implementation applied `escapeshellarg()`. PHP currently removes th
 matching quotes when parsing `-d`, so both forms behave equivalently. This scenario records
 the intended behaviour for source paths containing spaces.
 
-Run the scenario with a PHP installation that loads PCOV and leaves `pcov.directory` unset:
+The scenario is skipped unless the selected PHP installation loads PCOV and leaves
+`pcov.directory` unset. Check those preconditions and run it with:
 
 ```shell
 php -r 'var_dump(extension_loaded("pcov"), ini_get("pcov.directory"));'
