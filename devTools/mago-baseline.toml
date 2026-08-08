@@ -1113,7 +1113,7 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:566:51}`.'
+message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `{closure:src/Container/Container.php:566:45}`.'
 count = 1
 
 [[issues]]
@@ -1317,7 +1317,7 @@ count = 1
 [[issues]]
 file = "src/Container/Container.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:566:51}`.'
+message = 'Potentially unhandled exception `Infection\Source\Exception\NoSourceFound` in `{closure:src/Container/Container.php:566:45}`.'
 count = 1
 
 [[issues]]
@@ -2833,27 +2833,27 @@ message = 'Parameter `$env` of `Infection\Process\OriginalPhpProcess::start()` e
 count = 1
 
 [[issues]]
-file = "src/Process/Runner/InitialStaticAnalysisProcessRunner.php"
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Process\Runner\InitialStaticAnalysisProcessRunner::run`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessSignaledException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
 count = 1
 
 [[issues]]
-file = "src/Process/Runner/InitialStaticAnalysisProcessRunner.php"
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessStartFailedException` in `Infection\Process\Runner\InitialStaticAnalysisProcessRunner::run`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessStartFailedException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
 count = 1
 
 [[issues]]
-file = "src/Process/Runner/InitialStaticAnalysisProcessRunner.php"
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Process\Runner\InitialStaticAnalysisProcessRunner::run`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
 count = 1
 
 [[issues]]
-file = "src/Process/Runner/InitialStaticAnalysisProcessRunner.php"
+file = "src/Process/Runner/InitialStaticAnalysisRunner.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Process\Runner\InitialStaticAnalysisProcessRunner::run`.'
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\RuntimeException` in `Infection\Process\Runner\InitialStaticAnalysisRunner::run`.'
 count = 1
 
 [[issues]]
@@ -10563,31 +10563,31 @@ message = 'Argument type mismatch for argument #1 of `Infection\Process\Runner\D
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/Runner/InitialStaticAnalysisProcessRunnerTest.php"
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "invalid-method-access"
 message = 'Attempting to access a method on a non-object type (`unknown-ref(Infection\Tests\Fixtures\Event\EventDispatcherCollector)`).'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/Runner/InitialStaticAnalysisProcessRunnerTest.php"
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `array_map`: expected `array<('K.array_map() extends array-key), object>`, but found `mixed`."
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/Runner/InitialStaticAnalysisProcessRunnerTest.php"
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "no-value"
-message = 'Argument #2 passed to method `Infection\Process\Runner\InitialStaticAnalysisProcessRunner::__construct` has type `never`, meaning it cannot produce a value.'
+message = 'Argument #2 passed to method `Infection\Process\Runner\InitialStaticAnalysisRunner::__construct` has type `never`, meaning it cannot produce a value.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/Runner/InitialStaticAnalysisProcessRunnerTest.php"
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "non-existent-class"
 message = 'Class `Infection\Tests\Fixtures\Event\EventDispatcherCollector` not found.'
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Process/Runner/InitialStaticAnalysisProcessRunnerTest.php"
+file = "tests/phpunit/Process/Runner/InitialStaticAnalysisRunnerTest.php"
 code = "non-existent-class-like"
 message = 'Cannot find class, interface, enum, or type alias `Infection\Tests\Fixtures\Event\EventDispatcherCollector`.'
 count = 1
