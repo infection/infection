@@ -55,6 +55,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -83,6 +84,7 @@ final readonly class Engine
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private PreloadedSourceChecker $preloadedSourceChecker,
         private InitialStaticAnalysis $initialStaticAnalysis,
     ) {
     }
@@ -102,6 +104,8 @@ final readonly class Engine
      */
     public function execute(): void
     {
+        $this->preloadedSourceChecker->check();
+
         $initialTestSuiteOutput = $this->runInitialTestSuite();
         $this->initialStaticAnalysis->run();
 

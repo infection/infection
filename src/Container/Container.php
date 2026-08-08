@@ -156,6 +156,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -649,6 +650,7 @@ final class Container extends DIContainer
                     );
                 },
             ),
+            PreloadedSourceChecker::class => PreloadedSourceChecker::create(...),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
                 $container->getDiffer(),
@@ -887,6 +889,11 @@ final class Container extends DIContainer
     public function getSourceCollector(): SourceCollector
     {
         return $this->get(SourceCollector::class);
+    }
+
+    public function getPreloadedSourceChecker(): PreloadedSourceChecker
+    {
+        return $this->get(PreloadedSourceChecker::class);
     }
 
     public function getNodeTraverserFactory(): NodeTraverserFactory
