@@ -37,12 +37,24 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
 use Infection\Console\Application;
+use Infection\Container\Container;
+use Infection\Engine;
+use Infection\Metrics\MaxTimeoutCountReached;
+use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Throwable;
 
+// The terminal must be wide enough for the messages Symfony renders in a block to stay on one
+// line.
+#[WithEnvironmentVariable('COLUMNS', '200')]
 #[CoversClass(RunCommand::class)]
 final class RunCommandTest extends TestCase
 {
@@ -158,5 +170,74 @@ final class RunCommandTest extends TestCase
         $tester->execute([
             'paths' => ['\App\Foo'],
         ]);
+    }
+
+    public function test_it_succeeds_when_the_engine_found_no_source_to_mutate_because_of_a_filter(): void
+    {
+        $failure = NoSourceFound::noFilesForGitDiff('AM', 'master');
+
+        $tester = $this->createCommandTesterWithFailingEngine($failure);
+
+        $tester->execute([]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] ' . $failure->getMessage(), $tester->getDisplay(normalize: true));
+    }
+
+    public function test_it_rethrows_when_the_engine_found_no_source_to_mutate_without_a_filter(): void
+    {
+        $expected = NoSourceFound::noExecutableSourceCode();
+
+        $tester = $this->createCommandTesterWithFailingEngine($expected);
+
+        $this->expectExceptionObject($expected);
+
+        $tester->execute([]);
+    }
+
+    #[DataProvider('reportedEngineFailureProvider')]
+    public function test_it_reports_an_engine_failure_as_an_error(Throwable $failure): void
+    {
+        $tester = $this->createCommandTesterWithFailingEngine($failure);
+
+        $tester->execute([]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('[ERROR] ' . $failure->getMessage(), $tester->getDisplay(normalize: true));
+    }
+
+    /**
+     * @return iterable<string, array{Throwable}>
+     */
+    public static function reportedEngineFailureProvider(): iterable
+    {
+        yield 'initial tests failed' => [new InitialTestsFailed('Project tests must be in a passing state before running Infection.')];
+
+        yield 'minimum MSI not reached' => [MinMsiCheckFailed::createForMsi(80.0, 20.0)];
+
+        yield 'too many timeouts' => [MaxTimeoutCountReached::create(1, 2)];
+    }
+
+    private function createCommandTesterWithFailingEngine(Throwable $failure): CommandTester
+    {
+        $engineMock = $this->createMock(Engine::class);
+        $engineMock
+            ->expects($this->once())
+            ->method('execute')
+            ->willThrowException($failure);
+
+        $container = Container::create()->cloneWithService(Engine::class, $engineMock);
+
+        // The start-up steps locate the configuration, check the coverage driver and create the
+        // temporary directory. None of that concerns the error handling under test here.
+        $command = $this->getMockBuilder(RunCommand::class)
+            ->onlyMethods(['startUp'])
+            ->getMock();
+        $command
+            ->expects($this->once())
+            ->method('startUp');
+        $command->setApplication(new Application($container));
+
+        return new CommandTester($command);
     }
 }
