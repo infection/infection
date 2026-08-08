@@ -79,10 +79,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * @final
  */
-class RunCommand extends BaseCommand
+final class RunCommand extends BaseCommand
 {
     public const string OPTION_THREADS = 'threads';
 
@@ -413,64 +411,6 @@ class RunCommand extends BaseCommand
     /**
      * @param non-empty-string|null $configFile
      */
-    protected function startUp(
-        Container $container,
-        ?string $configFile,
-        ConsoleOutput $consoleOutput,
-        LoggerInterface $logger,
-        IO $io,
-    ): void {
-        $locator = $container->getRootsFileOrDirectoryLocator();
-
-        if ($configFile !== null) {
-            $locator->locate($configFile);
-        } else {
-            $this->runConfigurationCommand($locator, $io);
-        }
-
-        $this->installTestFrameworkIfNeeded($container, $io);
-
-        // Check if the application needs a restart _after_ configuring the command or adding
-        // a missing test framework
-        XdebugHandler::check($logger);
-
-        $application = $this->getApplication();
-
-        $io->writeln($application->getHelp());
-        $io->newLine();
-
-        $this->logRunningWithDebugger($consoleOutput);
-
-        if (!$application->isAutoExitEnabled()) {
-            // When we're not in control of exit codes, that means it's the caller
-            // responsibility to disable xdebug if it isn't needed. As of writing
-            // that's only the case during E2E testing. Show a warning nevertheless.
-
-            $consoleOutput->logNotInControlOfExitCodes();
-        }
-
-        $container->getCoverageChecker()->checkCoverageRequirements();
-
-        $config = $container->getConfiguration();
-
-        $consoleOutput->logRunningWithThreadCount($config->threadCount);
-
-        if ($config->isStaticAnalysisEnabled()) {
-            $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
-        }
-
-        $container->getFileSystem()->mkdir($config->tmpDir);
-
-        LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
-
-        $container->getSubscriberRegisterer()->registerSubscribers();
-
-        $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
-    }
-
-    /**
-     * @param non-empty-string|null $configFile
-     */
     private function createContainer(
         ?string $configFile,
         IO $io,
@@ -587,6 +527,64 @@ class RunCommand extends BaseCommand
         ));
 
         $container->getAdapterInstaller()->install($adapterName);
+    }
+
+    /**
+     * @param non-empty-string|null $configFile
+     */
+    private function startUp(
+        Container $container,
+        ?string $configFile,
+        ConsoleOutput $consoleOutput,
+        LoggerInterface $logger,
+        IO $io,
+    ): void {
+        $locator = $container->getRootsFileOrDirectoryLocator();
+
+        if ($configFile !== null) {
+            $locator->locate($configFile);
+        } else {
+            $this->runConfigurationCommand($locator, $io);
+        }
+
+        $this->installTestFrameworkIfNeeded($container, $io);
+
+        // Check if the application needs a restart _after_ configuring the command or adding
+        // a missing test framework
+        XdebugHandler::check($logger);
+
+        $application = $this->getApplication();
+
+        $io->writeln($application->getHelp());
+        $io->newLine();
+
+        $this->logRunningWithDebugger($consoleOutput);
+
+        if (!$application->isAutoExitEnabled()) {
+            // When we're not in control of exit codes, that means it's the caller
+            // responsibility to disable xdebug if it isn't needed. As of writing
+            // that's only the case during E2E testing. Show a warning nevertheless.
+
+            $consoleOutput->logNotInControlOfExitCodes();
+        }
+
+        $container->getCoverageChecker()->checkCoverageRequirements();
+
+        $config = $container->getConfiguration();
+
+        $consoleOutput->logRunningWithThreadCount($config->threadCount);
+
+        if ($config->isStaticAnalysisEnabled()) {
+            $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
+        }
+
+        $container->getFileSystem()->mkdir($config->tmpDir);
+
+        LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
+
+        $container->getSubscriberRegisterer()->registerSubscribers();
+
+        $container->getEventDispatcher()->dispatch(new ApplicationExecutionWasStarted());
     }
 
     private function runConfigurationCommand(Locator $locator, IO $io): void

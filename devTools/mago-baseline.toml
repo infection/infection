@@ -5895,12 +5895,6 @@ count = 3
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::createCommandTesterWithFailingEngine`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_a_positional_argument_is_an_fqcn`.'
 count = 1
 
@@ -5944,18 +5938,6 @@ count = 1
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::test_it_fails_when_threads_value_is_string_but_not_max`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_reports_an_engine_failure_as_an_error`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_succeeds_when_the_engine_found_no_source_to_mutate_because_of_a_filter`.'
 count = 1
 
 [[issues]]
