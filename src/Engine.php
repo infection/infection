@@ -55,7 +55,6 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Exception\PreloadedSourceFound;
 use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -101,7 +100,6 @@ final readonly class Engine
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
-     * @throws PreloadedSourceFound
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
