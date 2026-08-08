@@ -107,7 +107,6 @@ final readonly class Engine
         $this->preloadedSourceChecker->check();
 
         $initialTestSuiteOutput = $this->runInitialTestSuite();
-
         $this->initialStaticAnalysis->run();
 
         /*
