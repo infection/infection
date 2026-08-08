@@ -563,6 +563,7 @@ final class Container extends DIContainer
                 $container->getStaticAnalysisToolAdapter(),
             ),
             InitialStaticAnalysis::class => static function (self $container): InitialStaticAnalysis {
+                // do not create a chain of classes for SA if not enabled
                 if (!$container->getConfiguration()->isStaticAnalysisEnabled()) {
                     return new NullInitialStaticAnalysisRunner();
                 }
