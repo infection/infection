@@ -38,7 +38,6 @@ namespace Infection\Container\Builder;
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
 use Infection\Container\Container;
-use Infection\Process\Runner\InitialStaticAnalysisProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 
@@ -65,10 +64,6 @@ final readonly class InitialStaticAnalysisRunnerBuilder implements Builder
             return new NullInitialStaticAnalysisRunner();
         }
 
-        return new InitialStaticAnalysisProcessRunner(
-            $this->container->getInitialStaticAnalysisProcessFactory(),
-            $this->container->getEventDispatcher(),
-            $this->container->getStaticAnalysisToolAdapter(),
-        );
+        return $this->container->getInitialStaticAnalysisProcessRunner();
     }
 }

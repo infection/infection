@@ -65,6 +65,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
+use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -125,6 +126,7 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysisProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -958,6 +960,14 @@ final class Container extends DIContainer
         return $this->get(InitialStaticAnalysisRunner::class);
     }
 
+    /**
+     * Autowired: every dependency of its constructor is a registered service.
+     */
+    public function getInitialStaticAnalysisProcessRunner(): InitialStaticAnalysisProcessRunner
+    {
+        return $this->get(InitialStaticAnalysisProcessRunner::class);
+    }
+
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
     {
         return $this->get(MutantProcessContainerFactory::class);
@@ -993,9 +1003,12 @@ final class Container extends DIContainer
         return $this->get(ConsoleOutput::class);
     }
 
-    public function getEngineFactory(): EngineFactory
+    /**
+     * The Engine is autowired: every dependency of its constructor is a registered service.
+     */
+    public function getEngine(): Engine
     {
-        return $this->get(EngineFactory::class);
+        return $this->get(Engine::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator

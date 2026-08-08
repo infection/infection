@@ -37,10 +37,26 @@ namespace Infection\Tests\Container;
 
 use function array_keys;
 use Error;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Console\ConsoleOutput;
 use Infection\Container\Container;
+use Infection\Engine;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Metrics\MaxTimeoutsChecker;
+use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\MinMsiChecker;
+use Infection\Mutation\MutationGenerator;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\Process\Runner\InitialTestsRunner;
+use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Resource\Memory\MemoryLimiter;
+use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -101,6 +117,20 @@ final class ContainerTest extends TestCase
         $container = SingletonContainer::getContainer();
 
         $container->getFileSystem();
+    }
+
+    public function test_it_provides_the_engine(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+
+        $container = $this->createContainerWithDoubles($configuration);
+
+        $engine = $container->getEngine();
+
+        $this->assertEquals(
+            $this->createExpectedEngine($configuration, $container),
+            $engine,
+        );
     }
 
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
@@ -214,5 +244,54 @@ final class ContainerTest extends TestCase
         );
 
         $this->assertSame($service, $reflection->getService($id));
+    }
+
+    private function createContainerWithDoubles(Configuration $configuration): Container
+    {
+        $container = Container::create();
+
+        $container->inject(Configuration::class, $configuration);
+        $container->inject(SyncEventDispatcher::class, new SyncEventDispatcher());
+        $container->inject(ConsoleOutput::class, new ConsoleOutput(new NullLogger()));
+
+        foreach ([
+            TestFrameworkAdapter::class,
+            CoverageChecker::class,
+            InitialTestsRunner::class,
+            MemoryLimiter::class,
+            MutationGenerator::class,
+            MutationTestingRunner::class,
+            MinMsiChecker::class,
+            MaxTimeoutsChecker::class,
+            MetricsCalculator::class,
+            TestFrameworkExtraOptionsFilter::class,
+            InitialStaticAnalysisRunner::class,
+        ] as $id) {
+            $container->inject($id, $this->createStub($id));
+        }
+
+        return $container;
+    }
+
+    private function createExpectedEngine(
+        Configuration $configuration,
+        Container $container,
+    ): Engine {
+        return new Engine(
+            $configuration,
+            $container->getTestFrameworkAdapter(),
+            $container->getCoverageChecker(),
+            $container->getEventDispatcher(),
+            $container->getInitialTestsRunner(),
+            $container->getMemoryLimiter(),
+            $container->getMutationGenerator(),
+            $container->getMutationTestingRunner(),
+            $container->getMinMsiChecker(),
+            $container->getMaxTimeoutsChecker(),
+            $container->getConsoleOutput(),
+            $container->getMetricsCalculator(),
+            $container->getTestFrameworkExtraOptionsFilter(),
+            $container->getInitialStaticAnalysisRunner(),
+        );
     }
 }

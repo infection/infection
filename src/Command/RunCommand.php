@@ -386,7 +386,7 @@ final class RunCommand extends BaseCommand
         try {
             $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
-            $engine = $container->getEngineFactory()->create();
+            $engine = $container->getEngine();
 
             $engine->execute();
 
