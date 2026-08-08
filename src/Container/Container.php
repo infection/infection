@@ -1010,9 +1010,6 @@ final class Container extends DIContainer
         return $this->get(ConsoleOutput::class);
     }
 
-    /**
-     * The Engine is autowired: every dependency of its constructor is a registered service.
-     */
     public function getEngine(): Engine
     {
         return $this->get(Engine::class);
