@@ -42,9 +42,7 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Infection\Process\Runner\InitialStaticAnalysisProcessRunner;
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
@@ -53,16 +51,14 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(InitialStaticAnalysisProcessRunner::class)]
-final class InitialStaticAnalysisProcessRunnerTest extends TestCase
+#[CoversClass(InitialStaticAnalysisRunner::class)]
+final class InitialStaticAnalysisRunnerTest extends TestCase
 {
     private InitialStaticAnalysisProcessFactory&Stub $processFactoryStub;
 
     private EventDispatcherCollector $eventDispatcher;
 
-    private StaticAnalysisToolAdapter&Stub $staticAnalysisToolAdapter;
-
-    private InitialStaticAnalysisProcessRunner $runner;
+    private InitialStaticAnalysisRunner $runner;
 
     protected function setUp(): void
     {
@@ -74,18 +70,9 @@ final class InitialStaticAnalysisProcessRunnerTest extends TestCase
 
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
-
-        $this->runner = new InitialStaticAnalysisProcessRunner(
-            $this->processFactoryStub,
-            $this->eventDispatcher,
-            $this->staticAnalysisToolAdapter,
-        );
+        $this->runner = new InitialStaticAnalysisRunner($this->processFactoryStub, $this->eventDispatcher);
     }
 
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
         $process = $this->createProcessForCode(<<<STR
@@ -109,29 +96,6 @@ final class InitialStaticAnalysisProcessRunnerTest extends TestCase
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
-    }
-
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
-    public function test_it_throws_when_the_static_analysis_process_fails(): void
-    {
-        $process = $this->createProcessForCode('exit(3);');
-
-        $this->processFactoryStub
-            ->method('createProcess')
-            ->willReturn($process)
-        ;
-
-        $this->staticAnalysisToolAdapter
-            ->method('getName')
-            ->willReturn('phpstan')
-        ;
-
-        $this->expectException(InitialStaticAnalysisRunFailed::class);
-        $this->expectExceptionMessageMatches('/phpstan reported an exit code of 3\\./');
-
-        $this->runner->run();
     }
 
     private function createProcessForCode(string $code): Process

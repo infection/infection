@@ -60,7 +60,6 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
-use Infection\Container\Builder\InitialStaticAnalysisRunnerBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -126,7 +125,6 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\Process\Runner\InitialStaticAnalysisProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -274,13 +272,6 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            // The container registers itself so that builders needing lazy access to other
-            // services can receive the very instance they are resolved from; without this
-            // entry the autowiring would build a fresh, empty container.
-            self::class => static fn (self $container): self => $container,
-            ConsoleOutput::class => static fn (self $container): ConsoleOutput => new ConsoleOutput(
-                $container->getLogger(),
-            ),
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
@@ -567,7 +558,10 @@ final class Container extends DIContainer
             InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
                 $container->getStaticAnalysisToolAdapter(),
             ),
-            InitialStaticAnalysisRunner::class => InitialStaticAnalysisRunnerBuilder::class,
+            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
+                $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getEventDispatcher(),
+            ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -677,6 +671,30 @@ final class Container extends DIContainer
                 ),
                 new CurrentWorkingDirectoryProvider(),
             ),
+            ConsoleOutput::class => static fn (self $container): ConsoleOutput => new ConsoleOutput(
+                $container->getLogger(),
+            ),
+            Engine::class => static function (self $container): Engine {
+                $config = $container->getConfiguration();
+
+                return new Engine(
+                    $config,
+                    $container->getTestFrameworkAdapter(),
+                    $container->getCoverageChecker(),
+                    $container->getEventDispatcher(),
+                    $container->getInitialTestsRunner(),
+                    $container->getMemoryLimiter(),
+                    $container->getMutationGenerator(),
+                    $container->getMutationTestingRunner(),
+                    $container->getMinMsiChecker(),
+                    $container->getMaxTimeoutsChecker(),
+                    $container->getConsoleOutput(),
+                    $container->getMetricsCalculator(),
+                    $container->getTestFrameworkExtraOptionsFilter(),
+                    $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
+                    $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -960,14 +978,6 @@ final class Container extends DIContainer
         return $this->get(InitialStaticAnalysisRunner::class);
     }
 
-    /**
-     * Autowired: every dependency of its constructor is a registered service.
-     */
-    public function getInitialStaticAnalysisProcessRunner(): InitialStaticAnalysisProcessRunner
-    {
-        return $this->get(InitialStaticAnalysisProcessRunner::class);
-    }
-
     public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
     {
         return $this->get(MutantProcessContainerFactory::class);
@@ -1003,9 +1013,6 @@ final class Container extends DIContainer
         return $this->get(ConsoleOutput::class);
     }
 
-    /**
-     * The Engine is autowired: every dependency of its constructor is a registered service.
-     */
     public function getEngine(): Engine
     {
         return $this->get(Engine::class);

@@ -51,8 +51,8 @@ use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -233,13 +233,19 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'test output');
 
+        $staticAnalysisProcess = $this->createMock(Process::class);
+        $staticAnalysisProcess
+            ->expects($this->once())
+            ->method('isSuccessful')
+            ->willReturn(true);
+
         $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
         $initialStaticAnalysisRunner
             ->expects($this->once())
             ->method('run')
-            ->willReturnCallback(static function () use (&$callOrder): void {
-                $callOrder[] = 'staticAnalysis';
-            });
+            ->willReturn($staticAnalysisProcess);
+
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
         $this->memoryLimiter
             ->expects($this->once())
@@ -287,11 +293,12 @@ final class EngineTest extends TestCase
         $engine = $this->createEngine(
             $config,
             $initialStaticAnalysisRunner,
+            $staticAnalysisToolAdapter,
         );
 
         $engine->execute();
 
-        $this->assertSame(['staticAnalysis', 'limitMemory', 'generate'], $callOrder);
+        $this->assertSame(['limitMemory', 'generate'], $callOrder);
     }
 
     public function test_memory_limiter_is_not_applied_when_initial_tests_are_skipped(): void
@@ -547,6 +554,7 @@ final class EngineTest extends TestCase
     private function createEngine(
         ?Configuration $config = null,
         ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
+        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ): Engine {
         return new Engine(
             config: $config ?? ConfigurationBuilder::withMinimalTestData()
@@ -565,7 +573,8 @@ final class EngineTest extends TestCase
             consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
             testFrameworkExtraOptionsFilter: $this->testFrameworkExtraOptionsFilter,
-            initialStaticAnalysisRunner: $initialStaticAnalysisRunner ?? new NullInitialStaticAnalysisRunner(),
+            initialStaticAnalysisRunner: $initialStaticAnalysisRunner,
+            staticAnalysisToolAdapter: $staticAnalysisToolAdapter,
         );
     }
 }
