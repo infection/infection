@@ -62,10 +62,6 @@ use Psr\Log\NullLogger;
 #[CoversClass(EngineFactory::class)]
 final class EngineFactoryTest extends TestCase
 {
-    /**
-     * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
-     */
     public function test_it_builds_the_engine_without_the_static_analysis_chain(): void
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()
