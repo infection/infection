@@ -120,21 +120,21 @@ final class LogicalOr implements Mutator
         if ($leftSigil === '===' && $rightSigil === '===') {
             $varNameLeft = [];
 
-            if ($nodeLeftLeft instanceof Node\Expr\Variable) {
+            if ($nodeLeftLeft instanceof Node\Expr\Variable && is_string($nodeLeftLeft->name)) {
                 $varNameLeft[] = $nodeLeftLeft->name;
             }
 
-            if ($nodeLeftRight instanceof Node\Expr\Variable) {
+            if ($nodeLeftRight instanceof Node\Expr\Variable && is_string($nodeLeftRight->name)) {
                 $varNameLeft[] = $nodeLeftRight->name;
             }
 
             $varNameRight = [];
 
-            if ($nodeRightLeft instanceof Node\Expr\Variable) {
+            if ($nodeRightLeft instanceof Node\Expr\Variable && is_string($nodeRightLeft->name)) {
                 $varNameRight[] = $nodeRightLeft->name;
             }
 
-            if ($nodeRightRight instanceof Node\Expr\Variable) {
+            if ($nodeRightRight instanceof Node\Expr\Variable && is_string($nodeRightRight->name)) {
                 $varNameRight[] = $nodeRightRight->name;
             }
 

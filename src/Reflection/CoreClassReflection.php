@@ -43,6 +43,9 @@ use ReflectionException;
  */
 final readonly class CoreClassReflection implements ClassReflection
 {
+    /**
+     * @param ReflectionClass<object> $reflectionClass
+     */
     private function __construct(
         private ReflectionClass $reflectionClass,
     ) {

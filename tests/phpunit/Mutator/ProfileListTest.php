@@ -104,6 +104,9 @@ final class ProfileListTest extends TestCase
         );
     }
 
+    /**
+     * @param string[] $profileOrMutators
+     */
     #[DataProviderExternal(ProfileListProvider::class, 'profileProvider')]
     public function test_all_mutator_profiles_are_sorted_lexicographically(
         string $profile,

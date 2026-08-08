@@ -54,17 +54,17 @@ final class LogVerbosity
     public const string NONE = 'none';
 
     /**
-     * @deprecated
+     * The legacy numeric form of the `--log-verbosity` option (e.g. `--log-verbosity=1`).
      */
     public const int DEBUG_INTEGER = 1;
 
     /**
-     * @deprecated
+     * The legacy numeric form of the `--log-verbosity` option (e.g. `--log-verbosity=2`).
      */
     public const int NORMAL_INTEGER = 2;
 
     /**
-     * @deprecated
+     * The legacy numeric form of the `--log-verbosity` option (e.g. `--log-verbosity=3`).
      */
     public const int NONE_INTEGER = 3;
 

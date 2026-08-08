@@ -153,6 +153,72 @@ final class LogicalOrTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
+
+        // Regression test: ${$s} has a dynamic (Expr) name rather than a string one. Building
+        // the variable-name list used to push that Expr straight into array_intersect(), which
+        // fatals with "Object ... could not be converted to string" instead of returning a bool.
+        yield 'It mutates logical or when used with a variable variable' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' || $myVar === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' && $myVar === 'world';
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when used with a variable variable (inverse)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' || ${$s} === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' && ${$s} === 'world';
+                    PHP,
+            ),
+        ];
+
+        // The two cases above put the variable variable on the left of its comparison. These
+        // two put it on the right, so that each of the four operand positions the name list is
+        // built from is exercised with a dynamic name.
+        yield 'It mutates logical or when a variable variable is the right operand' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    'hello' === ${$s} || $myVar === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    'hello' === ${$s} && $myVar === 'world';
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when a variable variable is the right operand (inverse)' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' || 'world' === ${$s};
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    $myVar === 'hello' && 'world' === ${$s};
+                    PHP,
+            ),
+        ];
     }
 
     private static function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable

@@ -150,6 +150,12 @@ phpstan-baseline:	## Regenerates the PHPStan baseline
 phpstan-baseline: vendor $(PHPSTAN)
 	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
 
+.PHONY: phpstan-debt
+phpstan-debt:		## Lists the PHPStan errors hidden by the baseline, as JSONL
+phpstan-debt: vendor $(PHPSTAN)
+	@$(PHPSTAN) analyse --configuration devTools/phpstan-debt.neon --no-interaction --no-progress --error-format=json 2>/dev/null | \
+		jq -c --arg root "$$PWD/" '.files | to_entries[] | (.key | ltrimstr($$root)) as $$file | .value.messages[] | {file: $$file, line, identifier, message}'
+
 .PHONY: mago
 mago: vendor $(MAGO)
 	$(MAGO) analyze
@@ -358,7 +364,7 @@ $(PHP_CS_FIXER): Makefile
 	touch -c $@
 
 $(PHPSTAN): vendor
-	touch -c $@
+	@touch -c $@
 
 $(MAGO): vendor
 	touch -c $@
@@ -379,12 +385,12 @@ $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/H
 	touch -c $@
 
 vendor: composer.lock
-	composer install --prefer-dist
-	touch -c $@
+	@chronic composer install --prefer-dist
+	@chronic touch -c $@
 
 composer.lock: composer.json
-	composer install --prefer-dist
-	touch -c $@
+	@chronic composer install --prefer-dist
+	@chronic touch -c $@
 
 $(PHPUNIT_BIN): vendor phpunit.xml.dist
 	touch -c $@

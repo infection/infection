@@ -194,6 +194,8 @@ class TestFrameworkFinder
          *   php %~dp0/path %*
          */
         if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
+            Assert::keyExists($match, 1, 'The regex has a mandatory capture group; its absence indicates the pattern above was changed without updating this code.');
+
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 

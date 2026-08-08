@@ -33,37 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\PhpParser\MutatedNode;
-use PhpParser\Node\Scalar\LNumber;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Override;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-#[CoversClass(MutatedNode::class)]
-final class MutatedNodeTest extends TestCase
+/**
+ * Records the line range calculated for the last visited node of interest. Exposing
+ * `$range` as a declared property (rather than an anonymous class) lets
+ * LineRangeCalculatorTest read it back without going through the NodeVisitor
+ * interface, which does not declare it.
+ *
+ * @internal
+ */
+final class RangeSpyVisitor extends NodeVisitorAbstract
 {
     /**
-     * @param LNumber|LNumber[] $node
+     * @var int[]
      */
-    #[DataProvider('nodeProvider')]
-    public function test_it_can_be_instantiated(LNumber|array $node): void
+    public array $range = [];
+
+    #[Override]
+    public function leaveNode(Node $node)
     {
-        $mutatedNode = MutatedNode::wrap($node);
+        if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === 'findMe') {
+            $node->setAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, true);
 
-        $this->assertSame($node, $mutatedNode->unwrap());
-    }
+            $this->range = (new LineRangeCalculator())->calculateRange($node)->range;
+        }
 
-    public static function nodeProvider(): iterable
-    {
-        yield 'single node' => [new LNumber(1)];
+        if ($node instanceof Node\Expr\Variable && $node->name === 'findMe') {
+            $this->range = (new LineRangeCalculator())->calculateRange($node)->range;
+        }
 
-        yield 'multiple nodes' => [
-            [
-                new LNumber(1),
-                new LNumber(-1),
-            ],
-        ];
+        return null;
     }
 }

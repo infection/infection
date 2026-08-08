@@ -1922,12 +1922,6 @@ count = 1
 
 [[issues]]
 file = "src/Metrics/TargetDetectionStatusesProvider.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\Metrics\TargetDetectionStatusesProvider::findRequired`.'
-count = 1
-
-[[issues]]
-file = "src/Metrics/TargetDetectionStatusesProvider.php"
 code = "docblock-type-mismatch"
 message = 'Docblock return type `array<key-of<enum(Infection\Mutant\DetectionStatus)>, enum(Infection\Mutant\DetectionStatus)>` is incompatible with native return type `array<array-key, mixed>`.'
 count = 1
@@ -2272,6 +2266,12 @@ count = 1
 file = "src/Mutator/MutatorResolver.php"
 code = "less-specific-return-statement"
 message = 'Returned type `array<array-key, mixed>` is less specific than the declared return type `array<string, array<array-key, mixed>>|bool` for function `Infection\Mutator\MutatorResolver::resolveSettings`.'
+count = 2
+
+[[issues]]
+file = "src/Mutator/MutatorResolver.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `array<string, mixed>` is less specific than the declared return type `array<string, array<array-key, mixed>>|bool` for function `Infection\Mutator\MutatorResolver::resolveSettings` due to nested 'mixed'.'''
 count = 2
 
 [[issues]]
@@ -3062,12 +3062,6 @@ count = 1
 
 [[issues]]
 file = "src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\FileSystem\Locator\FileOrDirectoryNotFound::multipleFilesDoNotExist`.'
-count = 1
-
-[[issues]]
-file = "src/StaticAnalysis/Config/StaticAnalysisConfigLocator.php"
 code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Infection\FileSystem\Locator\FileOrDirectoryNotFound` in `Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator::locate`.'
 count = 1
@@ -3226,12 +3220,6 @@ count = 1
 file = "src/TestFramework/Common/VersionParser.php"
 code = "possibly-null-array-access"
 message = "Cannot perform array access on possibly `null` value."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/Config/TestFrameworkConfigLocator.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\FileSystem\Locator\FileOrDirectoryNotFound::multipleFilesDoNotExist`.'
 count = 1
 
 [[issues]]
@@ -7390,12 +7378,6 @@ count = 1
 file = "tests/phpunit/FileSystem/Locator/FileNotFoundTest.php"
 code = "imprecise-type"
 message = "Type `iterable` in return type of `nonExistentPathsProvider` is imprecise, equivalent to `iterable<mixed, mixed>`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/FileSystem/Locator/FileOrDirectoryNotFoundTest.php"
-code = "deprecated-method"
-message = 'Call to deprecated method: `Infection\FileSystem\Locator\FileOrDirectoryNotFound::multipleFilesDoNotExist`.'
 count = 1
 
 [[issues]]

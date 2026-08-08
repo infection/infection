@@ -63,6 +63,12 @@ final readonly class MBString implements ConfigurableMutator
     use GetMutatorName;
 
     /**
+     * mb_convert_case()'s mode is its 2nd argument, so a call needs at least
+     * this many arguments for a mode to be present.
+     */
+    private const int ARGS_COUNT_WITH_MODE = 2;
+
+    /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
     private array $converters;
@@ -197,7 +203,7 @@ final readonly class MBString implements ConfigurableMutator
 
     private static function getConvertCaseModeValue(Node\Expr\FuncCall $node): ?int
     {
-        if (count($node->args) < 2) {
+        if (count($node->args) < self::ARGS_COUNT_WITH_MODE) {
             return null;
         }
 

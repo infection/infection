@@ -112,11 +112,14 @@ final class MakeCustomMutatorCommand extends BaseCommand
             return $answer;
         });
 
-        return $this->io->askQuestion(
+        return $this->getIO()->askQuestion(
             $question,
         );
     }
 
+    /**
+     * @phpstan-assert-if-false non-empty-string $mutatorName
+     */
     private function mutatorNameIsEmpty(?string $mutatorName): bool
     {
         return $mutatorName === null || trim($mutatorName) === '';

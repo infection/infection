@@ -768,17 +768,26 @@ final class MutationTestingRunnerTest extends TestCase
         return $this->createMock(MutantProcessContainer::class);
     }
 
+    /**
+     * @param (callable(iterable<MutantProcessContainer>): bool)|null $callback
+     *
+     * @return Callback<iterable<MutantProcessContainer>>
+     */
     private function someIterable(?callable $callback = null): Callback
     {
-        return $this->callback(static function (iterable $subject) use ($callback) {
-            if ($callback !== null) {
-                return $callback($subject);
-            }
+        if ($callback !== null) {
+            return $this->callback($callback);
+        }
 
-            return true;
-        });
+        /** @var Callback<iterable<MutantProcessContainer>> $result */
+        $result = $this->callback(static fn (iterable $_subject): bool => true);
+
+        return $result;
     }
 
+    /**
+     * @return Callback<iterable<MutantProcessContainer>>
+     */
     private function emptyIterable(): Callback
     {
         return $this->someIterable(static function (iterable $subject): bool {
@@ -792,6 +801,8 @@ final class MutationTestingRunnerTest extends TestCase
 
     /**
      * @param MutantProcessContainer[] $expected
+     *
+     * @return Callback<iterable<MutantProcessContainer>>
      */
     private function iterableContaining(array $expected): Callback
     {
