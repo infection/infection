@@ -33,8 +33,6 @@
 
 declare(strict_types=1);
 
-// @php-cs-fixer-ignore ordered_class_elements Maintain existing ordering to preserve `git blame` and reduce the diff size.
-
 namespace Infection\Command;
 
 use function extension_loaded;
@@ -81,10 +79,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * @final
  */
-class RunCommand extends BaseCommand
+final class RunCommand extends BaseCommand
 {
     public const string OPTION_THREADS = 'threads';
 
@@ -536,7 +532,7 @@ class RunCommand extends BaseCommand
     /**
      * @param non-empty-string|null $configFile
      */
-    protected function startUp(
+    private function startUp(
         Container $container,
         ?string $configFile,
         ConsoleOutput $consoleOutput,

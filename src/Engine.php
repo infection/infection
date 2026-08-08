@@ -67,10 +67,8 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 
 /**
  * @internal
- *
- * @final
  */
-readonly class Engine
+final readonly class Engine
 {
     public function __construct(
         private Configuration $config,

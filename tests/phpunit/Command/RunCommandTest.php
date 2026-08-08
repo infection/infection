@@ -38,7 +38,7 @@ namespace Infection\Tests\Command;
 use Infection\Command\RunCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
-use Infection\Engine;
+use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -172,11 +172,11 @@ final class RunCommandTest extends TestCase
         ]);
     }
 
-    public function test_it_succeeds_when_the_engine_found_no_source_to_mutate_because_of_a_filter(): void
+    public function test_it_succeeds_when_no_source_to_mutate_was_found_because_of_a_filter(): void
     {
         $failure = NoSourceFound::noFilesForGitDiff('AM', 'master');
 
-        $tester = $this->createCommandTesterWithFailingEngine($failure);
+        $tester = $this->createCommandTesterFailingOnStartUp($failure);
 
         $tester->execute([]);
 
@@ -184,21 +184,21 @@ final class RunCommandTest extends TestCase
         $this->assertStringContainsString('[OK] ' . $failure->getMessage(), $tester->getDisplay(normalize: true));
     }
 
-    public function test_it_rethrows_when_the_engine_found_no_source_to_mutate_without_a_filter(): void
+    public function test_it_rethrows_when_no_source_to_mutate_was_found_without_a_filter(): void
     {
         $expected = NoSourceFound::noExecutableSourceCode();
 
-        $tester = $this->createCommandTesterWithFailingEngine($expected);
+        $tester = $this->createCommandTesterFailingOnStartUp($expected);
 
         $this->expectExceptionObject($expected);
 
         $tester->execute([]);
     }
 
-    #[DataProvider('reportedEngineFailureProvider')]
-    public function test_it_reports_an_engine_failure_as_an_error(Throwable $failure): void
+    #[DataProvider('reportedFailureProvider')]
+    public function test_it_reports_a_run_failure_as_an_error(Throwable $failure): void
     {
-        $tester = $this->createCommandTesterWithFailingEngine($failure);
+        $tester = $this->createCommandTesterFailingOnStartUp($failure);
 
         $tester->execute([]);
 
@@ -209,7 +209,7 @@ final class RunCommandTest extends TestCase
     /**
      * @return iterable<string, array{Throwable}>
      */
-    public static function reportedEngineFailureProvider(): iterable
+    public static function reportedFailureProvider(): iterable
     {
         yield 'initial tests failed' => [new InitialTestsFailed('Project tests must be in a passing state before running Infection.')];
 
@@ -218,26 +218,17 @@ final class RunCommandTest extends TestCase
         yield 'too many timeouts' => [MaxTimeoutCountReached::create(1, 2)];
     }
 
-    private function createCommandTesterWithFailingEngine(Throwable $failure): CommandTester
+    private function createCommandTesterFailingOnStartUp(Throwable $failure): CommandTester
     {
-        $engineMock = $this->createMock(Engine::class);
-        $engineMock
-            ->expects($this->once())
-            ->method('execute')
-            ->willThrowException($failure);
+        // The command catches around the start-up steps as well as the engine run. The locator is
+        // the first service the start-up asks for, so failing it keeps the test off the disk.
+        $container = Container::create()->cloneWithService(
+            RootsFileOrDirectoryLocator::class,
+            static fn (): never => throw $failure,
+        );
 
-        $container = Container::create()->cloneWithService(Engine::class, $engineMock);
+        $application = new Application($container);
 
-        // The start-up steps locate the configuration, check the coverage driver and create the
-        // temporary directory. None of that concerns the error handling under test here.
-        $command = $this->getMockBuilder(RunCommand::class)
-            ->onlyMethods(['startUp'])
-            ->getMock();
-        $command
-            ->expects($this->once())
-            ->method('startUp');
-        $command->setApplication(new Application($container));
-
-        return new CommandTester($command);
+        return new CommandTester($application->find('run'));
     }
 }

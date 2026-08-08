@@ -5895,7 +5895,7 @@ count = 3
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::createCommandTesterWithFailingEngine`.'
+message = 'Potentially unhandled exception `OutOfBoundsException` in `Infection\Tests\Command\RunCommandTest::createCommandTesterFailingOnStartUp`.'
 count = 1
 
 [[issues]]
@@ -5949,13 +5949,19 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_reports_an_engine_failure_as_an_error`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_reports_a_run_failure_as_an_error`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_succeeds_when_the_engine_found_no_source_to_mutate_because_of_a_filter`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_succeeds_when_no_source_to_mutate_was_found_because_of_a_filter`.'
+count = 1
+
+[[issues]]
+file = "tests/phpunit/Command/RunCommandTest.php"
+code = "unhandled-thrown-type"
+message = "Potentially unhandled exception `Throwable` in `{closure:tests/phpunit/Command/RunCommandTest.php:227:13}`."
 count = 1
 
 [[issues]]
