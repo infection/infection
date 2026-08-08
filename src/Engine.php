@@ -108,19 +108,7 @@ final readonly class Engine
 
         $initialTestSuiteOutput = $this->runInitialTestSuite();
 
-        // if ($this->config->shouldSkipInitialTests()) {
-        //     $this->consoleOutput->logSkippingInitialTests();
-        //     $this->coverageChecker->checkCoverageExists();
-        //     return;
-        // }
-
         $this->initialStaticAnalysis->run();
-
-        // todo [phpstan-integration] check cache has been generated
-        // $this->coverageChecker->checkCoverageHasBeenGenerated(
-        //     $initialTestSuiteProcess->getCommandLine(),
-        //     $initialTestSuiteProcess->getOutput(),
-        // );
 
         /*
          * Limit the memory used for the mutation processes based on the memory

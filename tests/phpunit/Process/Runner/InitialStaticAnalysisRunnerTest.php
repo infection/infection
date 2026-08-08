@@ -83,9 +83,6 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         );
     }
 
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
         $process = $this->createProcessForCode(<<<STR
@@ -111,9 +108,6 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
         );
     }
 
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
     public function test_it_throws_when_the_static_analysis_process_fails(): void
     {
         $process = $this->createProcessForCode('exit(3);');
