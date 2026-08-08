@@ -274,9 +274,6 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            ConsoleOutput::class => static fn (self $container): ConsoleOutput => new ConsoleOutput(
-                $container->getLogger(),
-            ),
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
