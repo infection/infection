@@ -56,6 +56,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
@@ -275,6 +276,9 @@ final class Container extends DIContainer
             // services can receive the very instance they are resolved from; without this
             // entry the autowiring would build a fresh, empty container.
             self::class => static fn (self $container): self => $container,
+            ConsoleOutput::class => static fn (self $container): ConsoleOutput => new ConsoleOutput(
+                $container->getLogger(),
+            ),
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
@@ -982,6 +986,11 @@ final class Container extends DIContainer
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getConsoleOutput(): ConsoleOutput
+    {
+        return $this->get(ConsoleOutput::class);
     }
 
     public function getEngineFactory(): EngineFactory

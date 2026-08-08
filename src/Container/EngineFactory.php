@@ -58,6 +58,7 @@ final readonly class EngineFactory
 {
     public function __construct(
         private Configuration $config,
+        private ConsoleOutput $consoleOutput,
         private TestFrameworkAdapter $adapter,
         private CoverageChecker $coverageChecker,
         private EventDispatcher $eventDispatcher,
@@ -73,7 +74,7 @@ final readonly class EngineFactory
     ) {
     }
 
-    public function create(ConsoleOutput $consoleOutput): Engine
+    public function create(): Engine
     {
         return new Engine(
             $this->config,
@@ -86,7 +87,7 @@ final readonly class EngineFactory
             $this->mutationTestingRunner,
             $this->minMsiChecker,
             $this->maxTimeoutsChecker,
-            $consoleOutput,
+            $this->consoleOutput,
             $this->metricsCalculator,
             $this->testFrameworkExtraOptionsFilter,
             $this->initialStaticAnalysisRunner,

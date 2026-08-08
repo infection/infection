@@ -65,12 +65,11 @@ final class EngineFactoryTest extends TestCase
         $configuration = ConfigurationBuilder::withMinimalTestData()->build();
 
         $container = $this->createContainerWithDoubles($configuration);
-        $consoleOutput = new ConsoleOutput(new NullLogger());
 
-        $engine = $container->getEngineFactory()->create($consoleOutput);
+        $engine = $container->getEngineFactory()->create();
 
         $this->assertEquals(
-            $this->createExpectedEngine($configuration, $container, $consoleOutput),
+            $this->createExpectedEngine($configuration, $container),
             $engine,
         );
     }
@@ -81,6 +80,7 @@ final class EngineFactoryTest extends TestCase
 
         $container->inject(Configuration::class, $configuration);
         $container->inject(SyncEventDispatcher::class, new SyncEventDispatcher());
+        $container->inject(ConsoleOutput::class, new ConsoleOutput(new NullLogger()));
 
         foreach ([
             TestFrameworkAdapter::class,
@@ -104,7 +104,6 @@ final class EngineFactoryTest extends TestCase
     private function createExpectedEngine(
         Configuration $configuration,
         Container $container,
-        ConsoleOutput $consoleOutput,
     ): Engine {
         return new Engine(
             $configuration,
@@ -117,7 +116,7 @@ final class EngineFactoryTest extends TestCase
             $container->getMutationTestingRunner(),
             $container->getMinMsiChecker(),
             $container->getMaxTimeoutsChecker(),
-            $consoleOutput,
+            $container->getConsoleOutput(),
             $container->getMetricsCalculator(),
             $container->getTestFrameworkExtraOptionsFilter(),
             $container->getInitialStaticAnalysisRunner(),
