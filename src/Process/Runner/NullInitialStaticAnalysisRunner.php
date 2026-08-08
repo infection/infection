@@ -35,46 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-
 /**
- * This is needed for 2 purposes:
- *
- * 1. To warm up the SA tool's cache
- * 2. To make sure SA passes before using it inside Infection to kill Mutants
+ * Takes the place of the process-backed runner when no static analysis tool is
+ * configured: the initial static analysis phase then has nothing to do.
  *
  * @internal
- * @final
  */
-readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
+final readonly class NullInitialStaticAnalysisRunner implements InitialStaticAnalysis
 {
-    public function __construct(
-        private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
-        private EventDispatcher $eventDispatcher,
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
-    ) {
-    }
-
     public function run(): void
     {
-        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
-
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
-
-        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
-
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
-
-        if (!$process->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
-                $process,
-                $this->staticAnalysisToolAdapter->getName(),
-            );
-        }
     }
 }
