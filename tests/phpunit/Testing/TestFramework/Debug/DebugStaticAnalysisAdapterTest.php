@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Testing\TestFramework\Debug;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisMutantProcessFactory;
@@ -46,7 +45,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 #[CoversClass(DebugStaticAnalysisAdapter::class)]
 final class DebugStaticAnalysisAdapterTest extends TestCase
 {
-    /** @throws FinderException */
     public function test_it_builds_debug_processes(): void
     {
         $phpExecutableFinder = $this->createStub(PhpExecutableFinder::class);
