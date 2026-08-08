@@ -129,7 +129,6 @@ final readonly class Engine
                 $this->metricsCalculator->getTestedMutantsCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-                $this->consoleOutput,
             );
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());
