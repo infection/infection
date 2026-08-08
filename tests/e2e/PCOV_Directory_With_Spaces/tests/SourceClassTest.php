@@ -1,6 +1,6 @@
 <?php
 
-namespace PCOVDirectoryWithSpaces\Test;
+namespace PCOVDirectoryWithSpaces\Tests;
 
 use PCOVDirectoryWithSpaces\SourceClass;
 use PHPUnit\Framework\TestCase;
