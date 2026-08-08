@@ -5961,7 +5961,7 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `Throwable` in `{closure:tests/phpunit/Command/RunCommandTest.php:227:13}`."
+message = "Potentially unhandled exception `Throwable` in `{closure:tests/phpunit/Command/RunCommandTest.php:223:13}`."
 count = 1
 
 [[issues]]

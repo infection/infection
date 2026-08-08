@@ -47,14 +47,10 @@ use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Throwable;
 
-// The terminal must be wide enough for the messages Symfony renders in a block to stay on one
-// line.
-#[WithEnvironmentVariable('COLUMNS', '200')]
 #[CoversClass(RunCommand::class)]
 final class RunCommandTest extends TestCase
 {
@@ -174,7 +170,7 @@ final class RunCommandTest extends TestCase
 
     public function test_it_succeeds_when_no_source_to_mutate_was_found_because_of_a_filter(): void
     {
-        $failure = NoSourceFound::noFilesForGitDiff('AM', 'master');
+        $failure = NoSourceFound::noExecutableSourceCodeForDiff();
 
         $tester = $this->createCommandTesterFailingOnStartUp($failure);
 
