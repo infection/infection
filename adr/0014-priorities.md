@@ -33,13 +33,10 @@ the default order in which maintainers review it.
    static-analysis rules, and comparable work. We accept these only when they do not compete
    with work of types 1 to 3.
 
-Urgency is the second axis, and it varies inside every type. Two bug fixes are not equally
+Urgency is the second independent axis. Two bug fixes are not equally
 urgent: a crash or a wrong MSI in a common configuration comes before a rare edge case that has
 a workaround. A maintainer may therefore review a very urgent item ahead of a whole type, and
 say in the pull request why it goes first.
-
-Urgency cannot promote a change into work that we want. It reorders the queue; it does not turn
-a type 4 change into required work, and "this cleanup is urgent for me" is not urgency.
 
 The two axes together give the review order:
 
