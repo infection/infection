@@ -55,6 +55,7 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
@@ -85,6 +86,7 @@ final readonly class Engine
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
+        private PreloadedSourceChecker $preloadedSourceChecker,
         private ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
         private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ) {
@@ -105,6 +107,8 @@ final readonly class Engine
      */
     public function execute(): void
     {
+        $this->preloadedSourceChecker->check();
+
         $initialTestSuiteOutput = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
 
@@ -128,7 +132,6 @@ final readonly class Engine
                 $this->metricsCalculator->getTestedMutantsCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),
                 $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
-                $this->consoleOutput,
             );
         } finally {
             $this->eventDispatcher->dispatch(new ApplicationExecutionWasFinished());

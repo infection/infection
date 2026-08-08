@@ -374,7 +374,6 @@ final class RunCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
-        $consoleOutput = new ConsoleOutput($logger);
 
         // Currently, the configuration is mandatory, hence there is no way to
         // say "do not use a config". If this becomes possible in the future,
@@ -383,6 +382,7 @@ final class RunCommand extends BaseCommand
         $configFile = ConfigurationOption::get($io);
 
         $container = $this->createContainer($configFile, $io, $logger);
+        $consoleOutput = $container->getConsoleOutput();
 
         try {
             $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
@@ -403,6 +403,7 @@ final class RunCommand extends BaseCommand
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
+                $container->getPreloadedSourceChecker(),
                 // do not create a chain of classes for SA if not enabled
                 $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
                 $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,

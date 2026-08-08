@@ -56,6 +56,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
@@ -152,6 +153,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -384,6 +386,7 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $container->getConsoleOutput(),
                     $config->ignoreMsiWithNoMutations,
                     (float) $config->minMsi,
                     (float) $config->minCoveredMsi,
@@ -642,6 +645,7 @@ final class Container extends DIContainer
                     );
                 },
             ),
+            PreloadedSourceChecker::class => PreloadedSourceChecker::create(...),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
                 $container->getDiffer(),
@@ -882,6 +886,11 @@ final class Container extends DIContainer
         return $this->get(SourceCollector::class);
     }
 
+    public function getPreloadedSourceChecker(): PreloadedSourceChecker
+    {
+        return $this->get(PreloadedSourceChecker::class);
+    }
+
     public function getNodeTraverserFactory(): NodeTraverserFactory
     {
         return $this->get(NodeTraverserFactory::class);
@@ -980,6 +989,11 @@ final class Container extends DIContainer
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getConsoleOutput(): ConsoleOutput
+    {
+        return $this->get(ConsoleOutput::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator
