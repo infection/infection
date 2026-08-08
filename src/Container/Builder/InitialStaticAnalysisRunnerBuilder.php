@@ -33,21 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Container\Builder;
+
+use DIContainer\Builder;
+use Infection\Configuration\Configuration;
+use Infection\Container\Container;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 
 /**
- * Runs the static analysis tool against the original code base during artefact
- * collection. This is needed for 2 purposes:
- *
- * 1. To warm up the SA tool's cache
- * 2. To make sure SA passes before using it inside Infection to kill Mutants
+ * Builds the process-backed runner when a static analysis tool is configured, and a
+ * no-op runner otherwise. The static analysis service chain is only created in the
+ * former case, which is why this builder receives the container instead of the
+ * services themselves.
  *
  * @internal
+ * @implements Builder<InitialStaticAnalysisRunner>
  */
-interface InitialStaticAnalysisRunner
+final readonly class InitialStaticAnalysisRunnerBuilder implements Builder
 {
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
-    public function run(): void;
+    public function __construct(
+        private Configuration $configuration,
+        private Container $container,
+    ) {
+    }
+
+    public function build(): InitialStaticAnalysisRunner
+    {
+        if (!$this->configuration->isStaticAnalysisEnabled()) {
+            return new NullInitialStaticAnalysisRunner();
+        }
+
+        return $this->container->getInitialStaticAnalysisProcessRunner();
+    }
 }
