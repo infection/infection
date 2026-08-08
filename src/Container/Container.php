@@ -967,9 +967,6 @@ final class Container extends DIContainer
         return $this->get(InitialStaticAnalysis::class);
     }
 
-    /**
-     * Autowired: every dependency of its constructor is a registered service.
-     */
     public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
     {
         return $this->get(InitialStaticAnalysisRunner::class);
