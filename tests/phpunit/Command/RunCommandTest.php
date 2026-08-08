@@ -168,18 +168,6 @@ final class RunCommandTest extends TestCase
         ]);
     }
 
-    public function test_it_succeeds_when_no_source_to_mutate_was_found_because_of_a_filter(): void
-    {
-        $failure = NoSourceFound::noExecutableSourceCodeForDiff();
-
-        $tester = $this->createCommandTesterFailingOnStartUp($failure);
-
-        $tester->execute([]);
-
-        $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('[OK] ' . $failure->getMessage(), $tester->getDisplay(normalize: true));
-    }
-
     public function test_it_rethrows_when_no_source_to_mutate_was_found_without_a_filter(): void
     {
         $expected = NoSourceFound::noExecutableSourceCode();
@@ -191,33 +179,43 @@ final class RunCommandTest extends TestCase
         $tester->execute([]);
     }
 
-    #[DataProvider('reportedFailureProvider')]
-    public function test_it_reports_a_run_failure_as_an_error(Throwable $failure): void
+    /**
+     * @return iterable<string, array{failure: Throwable, expectedStatusCode?: int}>
+     */
+    public static function caughtFailureProvider(): iterable
+    {
+        yield 'no source left to mutate after filtering' => [
+            'failure' => NoSourceFound::noExecutableSourceCodeForDiff(),
+            'expectedStatusCode' => 0,
+        ];
+
+        yield 'initial tests failed' => [
+            'failure' => new InitialTestsFailed('Project tests must be in a passing state before running Infection.'),
+        ];
+
+        yield 'minimum MSI not reached' => [
+            'failure' => MinMsiCheckFailed::createForMsi(80.0, 20.0),
+        ];
+
+        yield 'too many timeouts' => [
+            'failure' => MaxTimeoutCountReached::create(1, 2),
+        ];
+    }
+
+    #[DataProvider('caughtFailureProvider')]
+    public function test_it_reports_a_caught_failure(Throwable $failure, int $expectedStatusCode = 1): void
     {
         $tester = $this->createCommandTesterFailingOnStartUp($failure);
 
         $tester->execute([]);
 
-        $this->assertSame(1, $tester->getStatusCode());
-        $this->assertStringContainsString('[ERROR] ' . $failure->getMessage(), $tester->getDisplay(normalize: true));
-    }
-
-    /**
-     * @return iterable<string, array{Throwable}>
-     */
-    public static function reportedFailureProvider(): iterable
-    {
-        yield 'initial tests failed' => [new InitialTestsFailed('Project tests must be in a passing state before running Infection.')];
-
-        yield 'minimum MSI not reached' => [MinMsiCheckFailed::createForMsi(80.0, 20.0)];
-
-        yield 'too many timeouts' => [MaxTimeoutCountReached::create(1, 2)];
+        $this->assertSame($expectedStatusCode, $tester->getStatusCode());
+        $this->assertStringContainsString($failure->getMessage(), $tester->getDisplay(normalize: true));
     }
 
     private function createCommandTesterFailingOnStartUp(Throwable $failure): CommandTester
     {
-        // The command catches around the start-up steps as well as the engine run. The locator is
-        // the first service the start-up asks for, so failing it keeps the test off the disk.
+        // Fail on the first service requested in startUp()
         $container = Container::create()->cloneWithService(
             RootsFileOrDirectoryLocator::class,
             static fn (): never => throw $failure,

@@ -5949,19 +5949,13 @@ count = 1
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_reports_a_run_failure_as_an_error`.'
+message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_reports_a_caught_failure`.'
 count = 1
 
 [[issues]]
 file = "tests/phpunit/Command/RunCommandTest.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `RuntimeException` in `Infection\Tests\Command\RunCommandTest::test_it_succeeds_when_no_source_to_mutate_was_found_because_of_a_filter`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Command/RunCommandTest.php"
-code = "unhandled-thrown-type"
-message = "Potentially unhandled exception `Throwable` in `{closure:tests/phpunit/Command/RunCommandTest.php:223:13}`."
+message = "Potentially unhandled exception `Throwable` in `{closure:tests/phpunit/Command/RunCommandTest.php:221:13}`."
 count = 1
 
 [[issues]]
