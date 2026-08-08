@@ -47,7 +47,7 @@ use function Safe\ini_get;
 final class PCOVDirectoryProviderTest extends TestCase
 {
     /**
-     * @param list<string> $sourceDirectoryPaths
+     * @param non-empty-list<string> $sourceDirectoryPaths
      */
     #[DataProvider('sourceDirectoryPathsProvider')]
     public function test_it_provides_the_source_directory(
@@ -65,7 +65,7 @@ final class PCOVDirectoryProviderTest extends TestCase
     #[RequiresPhpExtension('pcov')]
     public function test_it_reads_pcov_directory_from_the_ini_configuration(): void
     {
-        $provider = new PCOVDirectoryProvider([]);
+        $provider = new PCOVDirectoryProvider(['/project/src']);
 
         // Note that `pcov.directory` is a `PHP_INI_SYSTEM | PHP_INI_PERDIR` so
         // it cannot be set at runtime.
@@ -94,11 +94,6 @@ final class PCOVDirectoryProviderTest extends TestCase
 
     public static function sourceDirectoryPathsProvider(): iterable
     {
-        yield 'no source directory paths' => [
-            'sourceDirectoryPaths' => [],
-            'expectedDirectory' => '.',
-        ];
-
         yield 'source directory paths with a common base path' => [
             'sourceDirectoryPaths' => [
                 '/path/to/project/src',
@@ -114,8 +109,8 @@ final class PCOVDirectoryProviderTest extends TestCase
         ];
 
         yield 'configured PCOV directory' => [
-            'sourceDirectoryPaths' => [],
-            'expectedDirectory' => '.',
+            'sourceDirectoryPaths' => ['/project/src'],
+            'expectedDirectory' => '/project/src',
             'expectedShouldProvide' => false,
             'iniValue' => 'example',
         ];
