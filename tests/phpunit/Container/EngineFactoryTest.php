@@ -83,10 +83,6 @@ final class EngineFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
-     */
     public function test_it_builds_the_engine_with_the_static_analysis_chain(): void
     {
         $configuration = ConfigurationBuilder::withMinimalTestData()
@@ -94,19 +90,23 @@ final class EngineFactoryTest extends TestCase
             ->build();
 
         $container = $this->createContainerWithDoubles($configuration);
-        $container->set(InitialStaticAnalysisRunner::class, fn (): InitialStaticAnalysisRunner => $this->createStub(InitialStaticAnalysisRunner::class));
-        $container->set(StaticAnalysisToolAdapter::class, fn (): StaticAnalysisToolAdapter => $this->createStub(StaticAnalysisToolAdapter::class));
         $consoleOutput = new ConsoleOutput(new NullLogger());
+        $initialStaticAnalysisRunner = $this->createStub(InitialStaticAnalysisRunner::class);
+        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
 
-        $engine = $container->getEngineFactory()->create($consoleOutput);
+        $engine = $container->getEngineFactory()->create(
+            $consoleOutput,
+            $initialStaticAnalysisRunner,
+            $staticAnalysisToolAdapter,
+        );
 
         $this->assertEquals(
             $this->createExpectedEngine(
                 $configuration,
                 $container,
                 $consoleOutput,
-                $container->getInitialStaticAnalysisRunner(),
-                $container->getStaticAnalysisToolAdapter(),
+                $initialStaticAnalysisRunner,
+                $staticAnalysisToolAdapter,
             ),
             $engine,
         );

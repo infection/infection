@@ -270,11 +270,6 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            // The container registers itself so that autowired services can receive the very
-            // instance they are resolved from; without this entry the autowiring would build
-            // a fresh, empty container. Factories always receive the resolving instance, so
-            // after withValues() this yields the configured clone (see EngineFactory).
-            self::class => static fn (self $container): self => $container,
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),

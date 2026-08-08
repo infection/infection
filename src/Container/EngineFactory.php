@@ -44,9 +44,11 @@ use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Mutation\MutationGenerator;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 
@@ -56,7 +58,6 @@ use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 final readonly class EngineFactory
 {
     public function __construct(
-        private Container $container,
         private Configuration $config,
         private TestFrameworkAdapter $adapter,
         private CoverageChecker $coverageChecker,
@@ -72,8 +73,11 @@ final readonly class EngineFactory
     ) {
     }
 
-    public function create(ConsoleOutput $consoleOutput): Engine
-    {
+    public function create(
+        ConsoleOutput $consoleOutput,
+        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
+        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
+    ): Engine {
         return new Engine(
             $this->config,
             $this->adapter,
@@ -88,9 +92,8 @@ final readonly class EngineFactory
             $consoleOutput,
             $this->metricsCalculator,
             $this->testFrameworkExtraOptionsFilter,
-            // do not create a chain of classes for SA if not enabled
-            $this->config->isStaticAnalysisEnabled() ? $this->container->getInitialStaticAnalysisRunner() : null,
-            $this->config->isStaticAnalysisEnabled() ? $this->container->getStaticAnalysisToolAdapter() : null,
+            $initialStaticAnalysisRunner,
+            $staticAnalysisToolAdapter,
         );
     }
 }
