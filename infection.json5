@@ -33,6 +33,11 @@
                 "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
             ]
         },
+        "FalseValue": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create"
+            ]
+        },
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
                 // This is for the Symfony Console commands: the description is purely for documentation purposes.
@@ -50,6 +55,7 @@
         },
         "UnwrapArrayMap": {
             "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create",
                 "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
             ]
         },
