@@ -2299,18 +2299,6 @@ message = 'Potentially unhandled exception `Infection\Mutator\InvalidMutator` in
 count = 1
 
 [[issues]]
-file = "src/Mutator/Number/DecrementInteger.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Number/IncrementInteger.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
 file = "src/Mutator/Number/OneZeroFloat.php"
 code = "deprecated-class"
 message = 'Class `PhpParser\Node\Scalar\DNumber` is deprecated and should no longer be used.'
@@ -2320,12 +2308,6 @@ count = 2
 file = "src/Mutator/Operator/SpreadOneItem.php"
 code = "deprecated-class"
 message = 'Class `PhpParser\Node\Expr\ArrayItem` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/Operator/SpreadOneItem.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
 count = 1
 
 [[issues]]
@@ -2407,21 +2389,9 @@ message = "Invalid type for left operand."
 count = 2
 
 [[issues]]
-file = "src/Mutator/ReturnValue/ArrayOneItem.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 3
-
-[[issues]]
 file = "src/Mutator/ReturnValue/FloatNegation.php"
 code = "deprecated-class"
 message = 'Class `PhpParser\Node\Scalar\DNumber` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
-file = "src/Mutator/ReturnValue/IntegerNegation.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
 count = 1
 
 [[issues]]
@@ -3476,26 +3446,8 @@ count = 1
 
 [[issues]]
 file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
-code = "falsable-return-statement"
-message = "Function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:119:21}` is declared to return `string` but possibly returns 'false' (inferred as `false|string`)."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
 code = "incompatible-parameter-type"
 message = 'Parameter `$sourceDirectories` of `Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory::create()` expects type `array<array-key, string>` but parent `Infection\AbstractTestFramework\TestFrameworkAdapterFactory::create()` expects type `array<array-key, mixed>`'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
-code = "invalid-return-statement"
-message = "Invalid return type for function `{closure:src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php:119:21}`: expected `string`, but found `false|string`."
-count = 1
-
-[[issues]]
-file = "src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php"
-code = "possibly-invalid-argument"
-message = 'Possible argument type mismatch for argument #7 of `Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder::__construct`: expected `array<array-key, string>`, but possibly received `array<array-key, false|string>|list<false|string>`.'
 count = 1
 
 [[issues]]
@@ -4714,14 +4666,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutation/MutationTest.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 12
-
-[[issues]]
-file = "tests/phpunit/Mutation/MutationTest.php"
 code = "invalid-argument"
-message = 'Invalid argument type for argument #2 of `PhpParser\Node\Stmt\Namespace_::__construct`: expected `array<array-key, PhpParser\Node\Stmt>|null`, but found `list{PhpParser\Node\Scalar\LNumber}`.'
+message = 'Invalid argument type for argument #2 of `PhpParser\Node\Stmt\Namespace_::__construct`: expected `array<array-key, PhpParser\Node\Stmt>|null`, but found `list{PhpParser\Node\Scalar\Int_}`.'
 count = 5
 
 [[issues]]
@@ -4732,14 +4678,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/Mutator/Arithmetic/PlusTest.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 4
-
-[[issues]]
-file = "tests/phpunit/Mutator/Arithmetic/PlusTest.php"
 code = "invalid-argument"
-message = 'Invalid argument type for argument #1 of `PhpParser\Node\Expr\Array_::__construct`: expected `array<array-key, PhpParser\Node\ArrayItem>`, but found `list{PhpParser\Node\Scalar\LNumber}`.'
+message = 'Invalid argument type for argument #1 of `PhpParser\Node\Expr\Array_::__construct`: expected `array<array-key, PhpParser\Node\ArrayItem>`, but found `list{PhpParser\Node\Scalar\Int_}`.'
 count = 2
 
 [[issues]]
@@ -5037,12 +4977,6 @@ message = '''Possible argument type mismatch for argument #1 of `Infection\Mutat
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Mutator/ReturnValue/IntegerNegationTest.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/PhpParser/FakeToken.php"
 code = "incompatible-parameter-type"
 message = 'Parameter `$kind` of `Infection\Tests\PhpParser\FakeToken::is()` expects type `array<array-key, int|string>|int|string` but parent `PhpToken::is()` expects type `array<array-key, mixed>|int|string`'
@@ -5056,14 +4990,8 @@ count = 1
 
 [[issues]]
 file = "tests/phpunit/PhpParser/MutatedNodeTest.php"
-code = "deprecated-class"
-message = 'Class `PhpParser\Node\Scalar\LNumber` is deprecated and should no longer be used.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/PhpParser/MutatedNodeTest.php"
 code = "docblock-type-mismatch"
-message = 'Docblock type `PhpParser\Node|array<array-key, PhpParser\Node>` for parameter `$node` is incompatible with native type `PhpParser\Node\Scalar\LNumber|array<array-key, mixed>`.'
+message = 'Docblock type `PhpParser\Node|array<array-key, PhpParser\Node>` for parameter `$node` is incompatible with native type `PhpParser\Node\Scalar\Int_|array<array-key, mixed>`.'
 count = 1
 
 [[issues]]
