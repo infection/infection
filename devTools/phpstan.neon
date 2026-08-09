@@ -105,7 +105,12 @@ parameters:
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
-        - '#Method Infection\\Tests\\.*::.*\(\) return type has no value type specified in iterable type iterable#'
+        -
+            identifier: missingType.iterableValue
+            path: ../tests/*
+        -
+            identifier: missingType.generics
+            path: ../tests/*
         -
             message: '#Do not (use|return|assign) magic number (.)#'
             paths:
