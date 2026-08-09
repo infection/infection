@@ -275,7 +275,9 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            Tracer::class => TraceProviderAdapterTracer::class,
+            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
+                $container->getTraceProvider(),
+            ),
             TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
                 $container->getJUnitTestExecutionInfoAdder(),
