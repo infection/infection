@@ -330,9 +330,6 @@ final class PHPStanAdapterTest extends TestCase
         yield 'PHPStan-src dev' => ['dev-648dbd911cef28707338fe5c25875d50e7875391@648dbd9'];
     }
 
-    /**
-     * @return iterable<string, array{string}>
-     */
     public static function provideInvalidVersions(): iterable
     {
         yield 'major version 2 with too low minor' => ['2.0.17'];
