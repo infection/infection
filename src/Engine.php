@@ -48,15 +48,14 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\UnparsableFile;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\PreloadedSourceChecker;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\JUnit\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -65,7 +64,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -87,8 +85,7 @@ final readonly class Engine
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private PreloadedSourceChecker $preloadedSourceChecker,
-        private ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
-        private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
+        private InitialStaticAnalysis $initialStaticAnalysis,
     ) {
     }
 
@@ -110,7 +107,7 @@ final readonly class Engine
         $this->preloadedSourceChecker->check();
 
         $initialTestSuiteOutput = $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $this->initialStaticAnalysis->run();
 
         /*
          * Limit the memory used for the mutation processes based on the memory
@@ -163,42 +160,6 @@ final readonly class Engine
         );
 
         return $initialTestSuiteProcess->getOutput();
-    }
-
-    /**
-     * This is needed for 2 purposes:
-     * 1. To warm up SA tool's cache
-     * 2. To make sure SA passes before using it inside Infection to kill Mutants
-     */
-    private function runInitialStaticAnalysis(): void
-    {
-        if (!$this->config->isStaticAnalysisEnabled()) {
-            return;
-        }
-
-        Assert::notNull($this->initialStaticAnalysisRunner);
-        Assert::notNull($this->staticAnalysisToolAdapter);
-
-        //        if ($this->config->shouldSkipInitialTests()) {
-        //            $this->consoleOutput->logSkippingInitialTests();
-        //            $this->coverageChecker->checkCoverageExists();
-        //
-        //            return;
-        //        }
-        $initialStaticAnalysisProcess = $this->initialStaticAnalysisRunner->run();
-
-        if (!$initialStaticAnalysisProcess->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
-                $initialStaticAnalysisProcess,
-                $this->staticAnalysisToolAdapter->getName(),
-            );
-        }
-
-        // todo [phpstan-integration] check cache has been generated
-        //        $this->coverageChecker->checkCoverageHasBeenGenerated(
-        //            $initialTestSuiteProcess->getCommandLine(),
-        //            $initialTestSuiteProcess->getOutput(),
-        //        );
     }
 
     /**

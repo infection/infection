@@ -64,6 +64,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
+use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -124,9 +125,11 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
@@ -559,10 +562,14 @@ final class Container extends DIContainer
             InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
                 $container->getStaticAnalysisToolAdapter(),
             ),
-            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
+            InitialStaticAnalysis::class => static function (self $container): InitialStaticAnalysis {
+                // do not create a chain of classes for SA if not enabled
+                if (!$container->getConfiguration()->isStaticAnalysisEnabled()) {
+                    return new NullInitialStaticAnalysisRunner();
+                }
+
+                return $container->getInitialStaticAnalysisRunner();
+            },
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -956,6 +963,11 @@ final class Container extends DIContainer
         return $this->get(InitialTestsRunner::class);
     }
 
+    public function getInitialStaticAnalysis(): InitialStaticAnalysis
+    {
+        return $this->get(InitialStaticAnalysis::class);
+    }
+
     public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
     {
         return $this->get(InitialStaticAnalysisRunner::class);
@@ -994,6 +1006,11 @@ final class Container extends DIContainer
     public function getConsoleOutput(): ConsoleOutput
     {
         return $this->get(ConsoleOutput::class);
+    }
+
+    public function getEngine(): Engine
+    {
+        return $this->get(Engine::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator
