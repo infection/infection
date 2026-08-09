@@ -179,9 +179,6 @@ final class RunCommandTest extends TestCase
         $tester->execute([]);
     }
 
-    /**
-     * @return iterable<string, array{failure: Throwable, expectedStatusCode?: int}>
-     */
     public static function caughtFailureProvider(): iterable
     {
         yield 'no source left to mutate after filtering' => [
