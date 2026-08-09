@@ -85,9 +85,10 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   scenarios also run via `--group e2e`.
 - `tests/benchmark/` - PHPBench suites (mutation generation, git-diff parsing, tracing).
   Performance PRs cite before/after numbers from these.
-- `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
-  are for pre-existing debt only; never baseline a finding your new code introduced.
-  Regenerate with `make phpstan-baseline` or `make mago-baseline`.
+- `devTools/` - `phpstan.neon`, Docker bits, and both static-analysis baselines:
+  `devTools/phpstan-baseline.neon` and `devTools/mago-baseline.toml` (Mago's config itself is
+  `mago.toml` in the root). Baselines are for pre-existing debt only; never baseline a finding
+  your new code introduced. Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. See

@@ -33,51 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Report;
+namespace Infection\Tests\Process\Runner;
 
-use Infection\Report\ComposableReporter;
-use Infection\Report\Framework\DataProducer;
-use Infection\Report\Framework\Writer\ReportWriter;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ComposableReporter::class)]
-final class ComposableReporterTest extends TestCase
+#[CoversClass(NullInitialStaticAnalysisRunner::class)]
+final class NullInitialStaticAnalysisRunnerTest extends TestCase
 {
-    /**
-     * @param iterable<string>|string $contentOrLines
-     */
-    #[DataProvider('contentsOrLinesProvider')]
-    public function test_it_writes_the_content_produced(iterable|string $contentOrLines): void
+    public function test_it_does_nothing(): void
     {
-        $dataProducerMock = $this->createMock(DataProducer::class);
-        $dataProducerMock
-            ->expects($this->once())
-            ->method('produce')
-            ->willReturn($contentOrLines);
+        $this->expectNotToPerformAssertions();
 
-        $writerMock = $this->createMock(ReportWriter::class);
-        $writerMock
-            ->expects($this->once())
-            ->method('write')
-            ->with($contentOrLines);
-
-        $reporter = new ComposableReporter($dataProducerMock, $writerMock);
-        $reporter->report();
-    }
-
-    public static function contentsOrLinesProvider(): iterable
-    {
-        yield 'contents' => [
-            'Hello World!',
-        ];
-
-        yield 'lines' => [
-            [
-                'First line',
-                'Second line',
-            ],
-        ];
+        (new NullInitialStaticAnalysisRunner())->run();
     }
 }

@@ -33,51 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Report;
+namespace Infection\Process\Runner;
 
-use Infection\Report\ComposableReporter;
-use Infection\Report\Framework\DataProducer;
-use Infection\Report\Framework\Writer\ReportWriter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(ComposableReporter::class)]
-final class ComposableReporterTest extends TestCase
+/**
+ * Takes the place of the process-backed runner when no static analysis tool is
+ * configured: the initial static analysis phase then has nothing to do.
+ *
+ * @internal
+ */
+final readonly class NullInitialStaticAnalysisRunner implements InitialStaticAnalysis
 {
-    /**
-     * @param iterable<string>|string $contentOrLines
-     */
-    #[DataProvider('contentsOrLinesProvider')]
-    public function test_it_writes_the_content_produced(iterable|string $contentOrLines): void
+    public function run(): void
     {
-        $dataProducerMock = $this->createMock(DataProducer::class);
-        $dataProducerMock
-            ->expects($this->once())
-            ->method('produce')
-            ->willReturn($contentOrLines);
-
-        $writerMock = $this->createMock(ReportWriter::class);
-        $writerMock
-            ->expects($this->once())
-            ->method('write')
-            ->with($contentOrLines);
-
-        $reporter = new ComposableReporter($dataProducerMock, $writerMock);
-        $reporter->report();
-    }
-
-    public static function contentsOrLinesProvider(): iterable
-    {
-        yield 'contents' => [
-            'Hello World!',
-        ];
-
-        yield 'lines' => [
-            [
-                'First line',
-                'Second line',
-            ],
-        ];
     }
 }

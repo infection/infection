@@ -42,7 +42,9 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
@@ -58,6 +60,8 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     private EventDispatcherCollector $eventDispatcher;
 
+    private StaticAnalysisToolAdapter&Stub $staticAnalysisToolAdapter;
+
     private InitialStaticAnalysisRunner $runner;
 
     protected function setUp(): void
@@ -70,7 +74,13 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->eventDispatcher = new EventDispatcherCollector();
 
-        $this->runner = new InitialStaticAnalysisRunner($this->processFactoryStub, $this->eventDispatcher);
+        $this->staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+
+        $this->runner = new InitialStaticAnalysisRunner(
+            $this->processFactoryStub,
+            $this->eventDispatcher,
+            $this->staticAnalysisToolAdapter,
+        );
     }
 
     public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
@@ -96,6 +106,26 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
+    }
+
+    public function test_it_throws_when_the_static_analysis_process_fails(): void
+    {
+        $process = $this->createProcessForCode('exit(3);');
+
+        $this->processFactoryStub
+            ->method('createProcess')
+            ->willReturn($process)
+        ;
+
+        $this->staticAnalysisToolAdapter
+            ->method('getName')
+            ->willReturn('phpstan')
+        ;
+
+        $this->expectException(InitialStaticAnalysisRunFailed::class);
+        $this->expectExceptionMessageMatches('/phpstan reported an exit code of 3\\./');
+
+        $this->runner->run();
     }
 
     private function createProcessForCode(string $code): Process
