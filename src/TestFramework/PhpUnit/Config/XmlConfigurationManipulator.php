@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use function array_filter;
+use DOMAttr;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use function explode;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
@@ -97,10 +100,15 @@ final readonly class XmlConfigurationManipulator
 
     public function deactivateResultCaching(string $version, SafeDOMXPath $xPath): void
     {
-        // PHPUnit 13.3 deprecated cacheResult in favour of recordTestRunHistory
-        $attribute = version_compare($version, '13.3', '>=') ? 'recordTestRunHistory' : 'cacheResult';
+        // PHPUnit 13.3 deprecated cacheResult in favour of recordTestRunHistory, and warns when tests are ordered by defects while that history is not recorded https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
+        if (version_compare($version, '13.3', '>=')) {
+            $this->setAttributeValue($xPath, 'recordTestRunHistory', 'false');
+            $this->removeDefectsFromExecutionOrder($xPath->queryAttribute('/phpunit/@executionOrder'));
 
-        $this->setAttributeValue($xPath, $attribute, 'false');
+            return;
+        }
+
+        $this->setAttributeValue($xPath, 'cacheResult', 'false');
     }
 
     public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash, string $tmpDir): void
@@ -347,6 +355,26 @@ final readonly class XmlConfigurationManipulator
             Assert::isInstanceOf($document, DOMElement::class);
             $document->removeAttribute($name);
         }
+    }
+
+    private function removeDefectsFromExecutionOrder(?DOMAttr $executionOrder): void
+    {
+        if ($executionOrder === null) {
+            return;
+        }
+
+        $order = array_filter(
+            explode(',', $executionOrder->value),
+            static fn (string $value): bool => $value !== 'defects',
+        );
+
+        if ($order === []) {
+            $executionOrder->value = 'default';
+
+            return;
+        }
+
+        $executionOrder->value = implode(',', $order);
     }
 
     private function setAttributeValue(SafeDOMXPath $xPath, string $name, string $value): void

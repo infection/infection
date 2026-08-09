@@ -690,6 +690,56 @@ final class XmlConfigurationManipulatorTest extends TestCase
         );
     }
 
+    public function test_it_drops_the_defects_execution_order_for_phpunit_13_3(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                executionOrder="depends,defects"
+                syntaxCheck="false"
+            >
+            </phpunit>
+            XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->deactivateResultCaching('13.3', $xPath);
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    executionOrder="depends"
+                    syntaxCheck="false"
+                    recordTestRunHistory="false"
+                >
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_falls_back_to_the_default_execution_order_for_phpunit_13_3(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                executionOrder="defects"
+                syntaxCheck="false"
+            >
+            </phpunit>
+            XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->deactivateResultCaching('13.3', $xPath);
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    executionOrder="default"
+                    syntaxCheck="false"
+                    recordTestRunHistory="false"
+                >
+                </phpunit>
+                XML,
+        );
+    }
+
     public function test_it_sets_stderr_to_false_when_it_exists(): void
     {
         $this->assertItChangesXML(<<<'XML'
