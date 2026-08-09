@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -43,9 +42,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(NullInitialStaticAnalysisRunner::class)]
 final class NullInitialStaticAnalysisRunnerTest extends TestCase
 {
-    /**
-     * @throws InitialStaticAnalysisRunFailed
-     */
     public function test_it_does_nothing(): void
     {
         $this->expectNotToPerformAssertions();
