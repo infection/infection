@@ -64,7 +64,7 @@ readonly class PCOVDirectoryProvider
     private ?string $phpConfiguredPcovDirectory;
 
     /**
-     * @param list<string> $sourceDirectoryPaths
+     * @param non-empty-list<string> $sourceDirectoryPaths
      */
     public function __construct(
         private array $sourceDirectoryPaths,
@@ -85,10 +85,6 @@ readonly class PCOVDirectoryProvider
 
     public function getDirectory(): string
     {
-        if ($this->sourceDirectoryPaths === []) {
-            return '.';
-        }
-
         $longestCommonBasePath = Path::getLongestCommonBasePath(...$this->sourceDirectoryPaths);
 
         Assert::notNull(

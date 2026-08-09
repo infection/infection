@@ -33,6 +33,11 @@
                 "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
             ]
         },
+        "ArrayOneItem": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
         "FalseValue": {
             "ignore": [
                 "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create"
