@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
+use function array_filter;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use function explode;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
@@ -98,9 +100,16 @@ final readonly class XmlConfigurationManipulator
     public function deactivateResultCaching(string $version, SafeDOMXPath $xPath): void
     {
         // PHPUnit 13.3 deprecated cacheResult in favour of recordTestRunHistory
-        $attribute = version_compare($version, '13.3', '>=') ? 'recordTestRunHistory' : 'cacheResult';
+        if (version_compare($version, '13.3', '<')) {
+            $this->setAttributeValue($xPath, 'cacheResult', 'false');
 
-        $this->setAttributeValue($xPath, $attribute, 'false');
+            return;
+        }
+
+        $this->setAttributeValue($xPath, 'recordTestRunHistory', 'false');
+
+        // Ordering tests by defects requires the test run history which is deactivated right above. PHPUnit ignored that combination silently until 13.3 turned it into a test runner warning, which aborts the initial run because of failOnWarning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
+        $this->removeDefectsFromExecutionOrder($xPath);
     }
 
     public function handleResultCacheAndExecutionOrder(string $version, SafeDOMXPath $xPath, string $mutationHash, string $tmpDir): void
@@ -333,6 +342,26 @@ final readonly class XmlConfigurationManipulator
         Assert::fileExists($schemaPath, 'Invalid schema path found %s');
 
         return $schemaPath;
+    }
+
+    /**
+     * The `defects` component of `executionOrder` is orthogonal to the other ones, so dropping it
+     * leaves the meaning of the remaining components untouched.
+     */
+    private function removeDefectsFromExecutionOrder(SafeDOMXPath $xPath): void
+    {
+        $node = $xPath->queryAttribute('/phpunit/@executionOrder');
+
+        if ($node === null) {
+            return;
+        }
+
+        $orders = array_filter(
+            explode(',', (string) $node->nodeValue),
+            static fn (string $order): bool => $order !== 'defects',
+        );
+
+        $node->nodeValue = $orders === [] ? 'default' : implode(',', $orders);
     }
 
     private function removeAttribute(SafeDOMXPath $xPath, string $name): void
