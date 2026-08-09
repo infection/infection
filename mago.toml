@@ -7,22 +7,25 @@ php-version = "8.3.0"
 workspace = "."
 paths = [
     "src",
-    "tests/autoloaded",
     "tests/Architecture",
     "tests/benchmark",
     "tests/phpunit"
 ]
-includes = ["vendor"]
-excludes = [
+includes = [
+    "vendor",
     "src/FileSystem/DummyFileSystem.php",
+    "tests/autoloaded",
+    "tests/phpunit/Fixtures",
+]
+excludes = [
     "src/CustomMutator/templates",
+    "tests/phpunit/Fixtures/Locator",
     "tests/benchmark/MutationGenerator/sources",
     "tests/benchmark/Tracing/benchmark-source",
     "tests/benchmark/Tracing/coverage",
     "tests/benchmark/Tracing/sources",
     "tests/Architecture",
     "tests/phpunit/Architecture",
-    "tests/phpunit/Fixtures",
     "tests/phpunit/Command/Debug/DumpAstCommand/Greeter.php",
     "tests/phpunit/Command/Debug/DumpAstCommand/EchoGreeter.php",
     "tests/phpunit/Mutation/FileMutationGenerator/Fixtures",
@@ -63,6 +66,7 @@ unchecked-exceptions = [
 ]
 ignore = [
     { code = "unhandled-thrown-type", in = ["tests/"] },
+    { code = "imprecise-type", in = ["tests/"] },
 ]
 check-missing-override = false
 find-unused-parameters = true

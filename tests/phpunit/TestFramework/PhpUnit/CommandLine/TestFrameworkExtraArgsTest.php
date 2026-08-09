@@ -68,9 +68,6 @@ final class TestFrameworkExtraArgsTest extends TestCase
         $this->assertSame($expectedTokens, self::parseRawTokensWithFallbackTokenizer($rawArgs));
     }
 
-    /**
-     * @return iterable<string, array{string, list<string>}>
-     */
     public static function rawTokensProvider(): iterable
     {
         yield 'quoted value' => [
