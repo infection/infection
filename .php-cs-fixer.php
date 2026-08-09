@@ -63,6 +63,7 @@ $finder = Finder::create()
         'tests/benchmark/Tracing/sources',
         'tests/benchmark/Tracing/benchmark-source',
         'tests/e2e',
+        'tests/phpunit/Architecture/PHPat/Selector/HasInheritDoc/Fixtures',
         'tests/phpunit/Fixtures',
         'var',
     ])

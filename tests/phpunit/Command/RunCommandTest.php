@@ -37,11 +37,19 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
 use Infection\Console\Application;
+use Infection\Container\Container;
+use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
+use Infection\Metrics\MaxTimeoutCountReached;
+use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Throwable;
 
 #[CoversClass(RunCommand::class)]
 final class RunCommandTest extends TestCase
@@ -158,5 +166,60 @@ final class RunCommandTest extends TestCase
         $tester->execute([
             'paths' => ['\App\Foo'],
         ]);
+    }
+
+    public function test_it_rethrows_when_no_source_to_mutate_was_found_without_a_filter(): void
+    {
+        $expected = NoSourceFound::noExecutableSourceCode();
+
+        $tester = $this->createCommandTesterFailingOnStartUp($expected);
+
+        $this->expectExceptionObject($expected);
+
+        $tester->execute([]);
+    }
+
+    public static function caughtFailureProvider(): iterable
+    {
+        yield 'no source left to mutate after filtering' => [
+            'failure' => NoSourceFound::noExecutableSourceCodeForDiff(),
+            'expectedStatusCode' => 0,
+        ];
+
+        yield 'initial tests failed' => [
+            'failure' => new InitialTestsFailed('Project tests must be in a passing state before running Infection.'),
+        ];
+
+        yield 'minimum MSI not reached' => [
+            'failure' => MinMsiCheckFailed::createForMsi(80.0, 20.0),
+        ];
+
+        yield 'too many timeouts' => [
+            'failure' => MaxTimeoutCountReached::create(1, 2),
+        ];
+    }
+
+    #[DataProvider('caughtFailureProvider')]
+    public function test_it_reports_a_caught_failure(Throwable $failure, int $expectedStatusCode = 1): void
+    {
+        $tester = $this->createCommandTesterFailingOnStartUp($failure);
+
+        $tester->execute([]);
+
+        $this->assertSame($expectedStatusCode, $tester->getStatusCode());
+        $this->assertStringContainsString($failure->getMessage(), $tester->getDisplay(normalize: true));
+    }
+
+    private function createCommandTesterFailingOnStartUp(Throwable $failure): CommandTester
+    {
+        // Fail on the first service requested in startUp()
+        $container = Container::create()->cloneWithService(
+            RootsFileOrDirectoryLocator::class,
+            static fn (): never => throw $failure,
+        );
+
+        $application = new Application($container);
+
+        return new CommandTester($application->find('run'));
     }
 }

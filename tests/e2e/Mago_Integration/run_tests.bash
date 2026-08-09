@@ -10,7 +10,7 @@ fi
 
 readonly INFECTION=../../../${1}
 
-set -e pipefail
+set -eo pipefail
 
 if [ "$DRIVER" = "phpdbg" ]
 then

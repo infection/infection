@@ -6,7 +6,7 @@ readonly INFECTION=../../../bin/infection
 
 rm -rf infection-file.txt
 
-set -e pipefail
+set -eo pipefail
 
 if [ "$DRIVER" = "phpdbg" ]
 then

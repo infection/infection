@@ -90,7 +90,7 @@ final readonly class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
         $this->configManipulator->setStopOnFailureOrDefect($version, $xPath);
         $this->configManipulator->deactivateColours($xPath);
-        $this->configManipulator->deactivateResultCaching($xPath);
+        $this->configManipulator->deactivateResultCaching($version, $xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);

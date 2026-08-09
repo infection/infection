@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector\Support;
 
+use function array_merge;
 use function count;
+use Infection\CannotBeInstantiated;
 use function is_string;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionAttribute;
 use PHPStan\Reflection\ClassReflection;
@@ -45,12 +47,15 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use function str_ends_with;
 use function str_starts_with;
 
 final class PHPUnitTestClassAnalysis
 {
+    use CannotBeInstantiated;
+
     private const string COVERS_ATTRIBUTE_NAMESPACE = 'PHPUnit\\Framework\\Attributes\\Covers';
 
     private const string GROUP_NAME = 'integration';
@@ -58,7 +63,7 @@ final class PHPUnitTestClassAnalysis
     public static function isPHPUnitTestCase(ClassReflection $classReflection): bool
     {
         return str_ends_with($classReflection->getName(), 'Test')
-            && ConcreteClassReflection::isConcreteClass($classReflection)
+            && ClassReflectionPredicates::isConcreteClass($classReflection)
             && $classReflection->isSubclassOf(TestCase::class);
     }
 
@@ -103,6 +108,45 @@ final class PHPUnitTestClassAnalysis
     }
 
     /**
+     * @return list<string|null>
+     */
+    public static function getEnvironmentVariables(ClassReflection $testCaseReflection): array
+    {
+        $environmentVariablesList = [
+            self::getEnvironmentVariablesFromAttributes(
+                self::getAttributes($testCaseReflection),
+            ),
+        ];
+
+        foreach ($testCaseReflection->getNativeReflection()->getMethods() as $method) {
+            $environmentVariablesList[] = self::getEnvironmentVariablesFromAttributes($method->getAttributes());
+        }
+
+        return array_merge(...$environmentVariablesList);
+    }
+
+    /**
+     * @param iterable<object> $attributes
+     *
+     * @return list<string|null>
+     */
+    private static function getEnvironmentVariablesFromAttributes(iterable $attributes): array
+    {
+        $environmentVariables = [];
+
+        foreach ($attributes as $attribute) {
+            if (
+                $attribute instanceof ReflectionAttribute
+                && $attribute->getName() === WithEnvironmentVariable::class
+            ) {
+                $environmentVariables[] = self::getEnvironmentVariableName($attribute);
+            }
+        }
+
+        return $environmentVariables;
+    }
+
+    /**
      * @see Group
      */
     private static function isIntegrationGroup(ReflectionAttribute $attribute): bool
@@ -142,6 +186,20 @@ final class PHPUnitTestClassAnalysis
         $symbolExists = $symbol !== null && $reflectionProvider->hasClass($symbol);
 
         return $symbolExists ? $symbol : null;
+    }
+
+    private static function getEnvironmentVariableName(
+        ReflectionAttribute $attribute,
+    ): ?string {
+        if ($attribute->getName() !== WithEnvironmentVariable::class) {
+            return null;
+        }
+
+        return self::getStringArgument(
+            attribute: $attribute,
+            index: 0,
+            name: 'environmentVariableName',
+        );
     }
 
     private static function getStringArgument(

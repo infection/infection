@@ -39,8 +39,8 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapter;
 use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -297,9 +297,6 @@ final class MagoAdapterTest extends TestCase
         yield 'major version 2' => ['2.0.0'];
     }
 
-    /**
-     * @return iterable<string, array{string}>
-     */
     public static function provideInvalidVersions(): iterable
     {
         yield 'major version 1 with too low minor' => ['1.19.0'];

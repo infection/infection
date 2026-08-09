@@ -40,7 +40,6 @@ use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetc
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
-use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
 use Rector\CodeQuality\Rector\Include_\AbsolutizeRequireAndIncludePathRector;
 use Rector\Config\RectorConfig;
@@ -76,7 +75,6 @@ use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromPropertyDe
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarFromParamDocblockInConstructorRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockBasedOnArrayMapRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromAssignsParamToParamReferenceRector;
-use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDataProviderRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDimFetchAccessRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForArrayDimAssignedObjectRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForCommonObjectDenominatorRector;
@@ -88,6 +86,9 @@ $skippedPaths = [
     __DIR__ . '/tests/benchmark/MutationGenerator/sources',
     __DIR__ . '/tests/benchmark/Tracing/benchmark-source',
     __DIR__ . '/tests/benchmark/Tracing/coverage',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/ClassWithNoArgumentPrivateConstructor/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/HasInheritDoc/Fixtures',
+    __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/StaticOrConstOnlyClass/Fixtures',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/DetectConcreteClassMeaningfulImplementationVisitor/Fixture',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/Support/Analyser/PublicPropertyAnalysisTest/Fixtures',
     __DIR__ . '/tests/phpunit/Architecture/PHPat/Selector/PHPUnitTestRequiringIoWithoutIntegrationGroup/Fixtures/CoveredClassWithoutIo.php',
@@ -113,7 +114,6 @@ $config = RectorConfig::configure()
     )
     ->withRules([
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
-        AddParamArrayDocblockFromDataProviderRector::class,
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
         AddReturnDocblockForCommonObjectDenominatorRector::class,
         AddReturnDocblockForJsonArrayRector::class,
@@ -147,9 +147,6 @@ $config = RectorConfig::configure()
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
         AddInstanceofAssertForNullableInstanceRector::class,
-        AddParamArrayDocblockFromDataProviderRector::class => [
-            __DIR__ . '/tests/phpunit/Framework/Iterable/GeneratorFactory/GeneratorFactoryTest.php',
-        ],
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
         ],
@@ -193,7 +190,6 @@ $config = RectorConfig::configure()
         ],
         SensitiveHereNowDocRector::class,
         SimplifyDeMorganBinaryRector::class,
-        SimplifyIfElseToTernaryRector::class,
         SimplifyIfReturnBoolRector::class => [
             __DIR__ . '/src/Process/OriginalPhpProcess.php',
         ],

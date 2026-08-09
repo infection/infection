@@ -791,6 +791,23 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ]),
         ];
 
+        yield '[debug][logFile] nominal' => [
+            <<<'JSON'
+                {
+                    "source": {
+                        "directories": ["src"]
+                    },
+                    "debug": {
+                        "logFile": "var/processes.jsonl"
+                    }
+                }
+                JSON,
+            self::createConfig([
+                'source' => new Source(['src'], []),
+                'debugTestFrameworkLogFile' => 'var/processes.jsonl',
+            ]),
+        ];
+
         yield '[phpUnit] no property' => [
             <<<'JSON'
                 {
@@ -2783,6 +2800,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'threadCount' => null,
             'dotsPerRow' => null,
             'staticAnalysisTool' => null,
+            'debugTestFrameworkLogFile' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

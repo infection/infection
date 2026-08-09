@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\CommandLineBuilder;
-use Infection\TestFramework\VersionParser;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -73,7 +73,7 @@ final class ClassNamedAnyTest extends SelectorTestCase
         $actual = $selector->getName();
 
         $this->assertSame(
-            'Infection\CannotBeInstantiated, Infection\TestFramework\CommandLineBuilder',
+            'Infection\CannotBeInstantiated, Infection\TestFramework\Common\CommandLineBuilder',
             $actual,
         );
     }

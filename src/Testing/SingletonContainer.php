@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
+use Infection\CannotBeInstantiated;
 use Infection\Container\Container;
 use Infection\Mutant\MutantCodePrinter;
 use Infection\PhpParser\InfectionPrettyPrinter;
@@ -49,6 +50,8 @@ use PhpParser\NodeDumper;
  */
 final class SingletonContainer
 {
+    use CannotBeInstantiated;
+
     private static ?Container $container = null;
 
     private static ?NodeDumper $dumper = null;

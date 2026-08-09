@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 readonly INFECTION="../../../bin/infection --filter=nonExistentFile.php"
 rm -f var/infection-execution.log || true
 
-set -e pipefail
+set -eo pipefail
 
 if [ "$DRIVER" = "phpdbg" ]
 then

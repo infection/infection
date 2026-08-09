@@ -41,7 +41,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -54,9 +54,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -81,9 +81,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -91,16 +91,16 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
                 '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
@@ -151,9 +151,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_with_multiple_options(): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -178,9 +178,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -188,16 +188,16 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
                 '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
@@ -249,9 +249,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
     public function test_it_creates_a_process_without_options(): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -276,9 +276,9 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff(<<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -286,16 +286,16 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $phpStanMutantExecutionResultFactory = $this->createStub(MutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [
+            ->with('/path/to/phpstan', ['-d memory_limit=-1'], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
                 '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',

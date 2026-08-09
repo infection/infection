@@ -60,7 +60,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(PHPUnitTestSupportConcreteClassWithoutCanonicalTest::class)]
 #[CoversClass(HasTrivialImplementation::class)]
 #[CoversClass(AnalysisResult::class)]
-#[CoversClass(Support\ConcreteClassReflection::class)]
+#[CoversClass(Support\ClassReflectionPredicates::class)]
 #[CoversClass(Analyser::class)]
 #[CoversClass(DetectConcreteClassMeaningfulImplementationVisitor::class)]
 final class PHPUnitTestSupportConcreteClassWithoutCanonicalTestTest extends SelectorTestCase

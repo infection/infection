@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function array_map;
+use function array_values;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\Common\CommandLineBuilder;
+use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -48,10 +51,10 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\Tracing\TestRunOrderResolver;
-use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
@@ -60,6 +63,8 @@ use Webmozart\Assert\Assert;
  */
 final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 {
+    use CannotBeInstantiated;
+
     /**
      * @param string[] $sourceDirectories
      * @param SplFileInfo[] $filteredSourceFilesToMutate
@@ -77,9 +82,15 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?string $sourceDirectoryBasePath = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
+        Assert::notEmpty(
+            $sourceDirectories,
+            'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
+        );
         Assert::notNull($shellCommandLineExecutor);
+        Assert::notNull($sourceDirectoryBasePath);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 
@@ -95,7 +106,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $testFrameworkExecutable,
             $tmpDir,
             $jUnitFilePath,
-            new PCOVDirectoryProvider(),
+            new PCOVDirectoryProvider(
+                self::makeSourcePathsAbsolute(
+                    $sourceDirectoryBasePath,
+                    $sourceDirectories,
+                ),
+            ),
             new InitialConfigBuilder(
                 $tmpDir,
                 $testFrameworkConfigContent,
@@ -104,7 +120,13 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 new Filesystem(),
                 $sourceDirectories,
                 array_map(
-                    static fn (SplFileInfo $fileInfo): string => $fileInfo->getRealPath(),
+                    static function (SplFileInfo $fileInfo): string {
+                        $realPath = $fileInfo->getRealPath();
+
+                        Assert::string($realPath, 'The filtered source file must have a real path.');
+
+                        return $realPath;
+                    },
                     $filteredSourceFilesToMutate,
                 ),
             ),
@@ -137,5 +159,29 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
+    }
+
+    /**
+     * @param non-empty-array<string> $sourceDirectories
+     *
+     * @return non-empty-list<string>
+     */
+    private static function makeSourcePathsAbsolute(
+        string $sourceDirectoryBasePath,
+        array $sourceDirectories,
+    ): array {
+        $absolutePaths = array_values(
+            array_map(
+                static fn (string $sourceDirectory): string => Path::makeAbsolute(
+                    $sourceDirectory,
+                    $sourceDirectoryBasePath,
+                ),
+                $sourceDirectories,
+            ),
+        );
+
+        Assert::notEmpty($absolutePaths);
+
+        return $absolutePaths;
     }
 }

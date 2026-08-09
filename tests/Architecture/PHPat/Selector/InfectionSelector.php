@@ -38,6 +38,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPat\Selector\Selector;
@@ -170,6 +171,16 @@ final class InfectionSelector
         );
     }
 
+    public static function phpunitTestMissingEnvironmentVariable(ReflectionProvider $reflectionProvider): SelectorInterface
+    {
+        return new PHPUnitTestMissingEnvironmentVariable(
+            new EnvironmentVariableUsageDetector(
+                self::analyser(),
+                $reflectionProvider,
+            ),
+        );
+    }
+
     public static function autoreviewTestCode(): SelectorInterface
     {
         return Selector::AllOf(
@@ -221,6 +232,16 @@ final class InfectionSelector
         return new SourceClassWithPublicNonReadonlyProperty(self::analyser());
     }
 
+    public static function staticOrConstOnlyClass(): SelectorInterface
+    {
+        return new StaticOrConstOnlyClass();
+    }
+
+    public static function classesWithNoArgumentPrivateConstructor(): SelectorInterface
+    {
+        return new ClassWithNoArgumentPrivateConstructor();
+    }
+
     public static function hasDocBlock(): SelectorInterface
     {
         return new HasDocBlock();
@@ -229,6 +250,11 @@ final class InfectionSelector
     public static function hasInternalDocBlock(): SelectorInterface
     {
         return new HasInternalDocBlock();
+    }
+
+    public static function hasInheritDoc(): SelectorInterface
+    {
+        return new HasInheritDoc();
     }
 
     public static function isAnonymousClass(): SelectorInterface

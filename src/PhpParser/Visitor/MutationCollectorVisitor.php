@@ -63,11 +63,6 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NoSourceFound
-     */
     public function leaveNode(Node $node): ?Node
     {
         $this->mutationChunks[] = $this->mutationGenerator->generate($node);
@@ -76,6 +71,8 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return iterable<Mutation>
      */
     public function getMutations(): iterable

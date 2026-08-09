@@ -37,6 +37,7 @@ namespace Infection\StaticAnalysis;
 
 use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
+use Infection\CannotBeInstantiated;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use function is_a;
 use Webmozart\Assert\Assert;
@@ -46,9 +47,13 @@ use Webmozart\Assert\Assert;
  */
 final class StaticAnalysisToolTypes
 {
+    use CannotBeInstantiated;
+
     public const string PHPSTAN = 'phpstan';
 
     public const string MAGO = 'mago';
+
+    public const string DEBUG = 'debug';
 
     /**
      * @var string[]
@@ -56,6 +61,7 @@ final class StaticAnalysisToolTypes
     private static array $defaultTypes = [
         self::PHPSTAN,
         self::MAGO,
+        self::DEBUG,
     ];
 
     /**

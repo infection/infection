@@ -38,6 +38,7 @@ namespace Infection\Container;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
+use function dirname;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -63,6 +64,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
+use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -123,9 +125,11 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
@@ -152,6 +156,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -187,6 +192,7 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -315,6 +321,7 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
                     $container->getShellCommandLineExecutor(),
+                    new PhpExecutableFinder(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -384,6 +391,7 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $container->getConsoleOutput(),
                     $config->ignoreMsiWithNoMutations,
                     (float) $config->minMsi,
                     (float) $config->minCoveredMsi,
@@ -556,10 +564,14 @@ final class Container extends DIContainer
             InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
                 $container->getStaticAnalysisToolAdapter(),
             ),
-            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
+            InitialStaticAnalysis::class => static function (self $container): InitialStaticAnalysis {
+                // do not create a chain of classes for SA if not enabled
+                if (!$container->getConfiguration()->isStaticAnalysisEnabled()) {
+                    return new NullInitialStaticAnalysisRunner();
+                }
+
+                return $container->getInitialStaticAnalysisRunner();
+            },
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -619,10 +631,10 @@ final class Container extends DIContainer
                 return $sourceFilter instanceof GitDiffFilter
                     ? new GitDiffSourceLineMatcher(
                         $container->getGit(),
-                        $container->getFileSystem(),
                         $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
+                        dirname($configuration->configurationPathname),
                     )
                     : new NullSourceLineMatcher();
             },
@@ -642,6 +654,7 @@ final class Container extends DIContainer
                     );
                 },
             ),
+            PreloadedSourceChecker::class => PreloadedSourceChecker::create(...),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
                 $container->getDiffer(),
@@ -891,6 +904,11 @@ final class Container extends DIContainer
         return $this->get(SourceCollector::class);
     }
 
+    public function getPreloadedSourceChecker(): PreloadedSourceChecker
+    {
+        return $this->get(PreloadedSourceChecker::class);
+    }
+
     public function getNodeTraverserFactory(): NodeTraverserFactory
     {
         return $this->get(NodeTraverserFactory::class);
@@ -961,6 +979,11 @@ final class Container extends DIContainer
         return $this->get(InitialTestsRunner::class);
     }
 
+    public function getInitialStaticAnalysis(): InitialStaticAnalysis
+    {
+        return $this->get(InitialStaticAnalysis::class);
+    }
+
     public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
     {
         return $this->get(InitialStaticAnalysisRunner::class);
@@ -994,6 +1017,16 @@ final class Container extends DIContainer
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getConsoleOutput(): ConsoleOutput
+    {
+        return $this->get(ConsoleOutput::class);
+    }
+
+    public function getEngine(): Engine
+    {
+        return $this->get(Engine::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator

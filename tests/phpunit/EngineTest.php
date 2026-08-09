@@ -46,10 +46,11 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Resource\Memory\MemoryLimiter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Contracts\InitialRunResults;
 use Infection\TestFramework\Contracts\TestFramework;
@@ -60,7 +61,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
 #[CoversClass(Engine::class)]
@@ -84,6 +84,8 @@ final class EngineTest extends TestCase
 
     private MockObject&MetricsCalculator $metricsCalculator;
 
+    private PreloadedSourceChecker $preloadedSourceChecker;
+
     protected function setUp(): void
     {
         $this->testFramework = $this->createMock(TestFramework::class);
@@ -95,6 +97,7 @@ final class EngineTest extends TestCase
         $this->maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
         $this->consoleOutput = $this->createStub(ConsoleOutput::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $this->preloadedSourceChecker = new PreloadedSourceChecker('');
     }
 
     public function test_initial_test_run_fails(): void
@@ -152,7 +155,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(1000, 2.0, 3.0, $this->consoleOutput);
+            ->with(1000, 2.0, 3.0);
 
         $this->metricsCalculator
             ->expects($this->once())
@@ -190,19 +193,13 @@ final class EngineTest extends TestCase
             ->method('executeInitialRun')
             ->willReturn($initialRunResults);
 
-        $staticAnalysisProcess = $this->createMock(Process::class);
-        $staticAnalysisProcess
-            ->expects($this->once())
-            ->method('isSuccessful')
-            ->willReturn(true);
-
-        $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
-        $initialStaticAnalysisRunner
+        $initialStaticAnalysis = $this->createMock(InitialStaticAnalysis::class);
+        $initialStaticAnalysis
             ->expects($this->once())
             ->method('run')
-            ->willReturn($staticAnalysisProcess);
-
-        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+            ->willReturnCallback(static function () use (&$callOrder): void {
+                $callOrder[] = 'staticAnalysis';
+            });
 
         $this->memoryLimiter
             ->expects($this->once())
@@ -226,6 +223,11 @@ final class EngineTest extends TestCase
             ->method('run')
             ->with([]);
 
+        $this->minMsiChecker
+            ->expects($this->once())
+            ->method('checkMetrics')
+            ->with(100, 80.0, 85.0);
+
         $this->metricsCalculator
             ->method('getTestedMutantsCount')
             ->willReturn(100);
@@ -238,13 +240,12 @@ final class EngineTest extends TestCase
 
         $engine = $this->createEngine(
             $config,
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
+            $initialStaticAnalysis,
         );
 
         $engine->execute();
 
-        $this->assertSame(['limitMemory', 'generate'], $callOrder);
+        $this->assertSame(['staticAnalysis', 'limitMemory', 'generate'], $callOrder);
     }
 
     public function test_memory_limiter_receives_null_when_initial_tests_are_skipped(): void
@@ -357,6 +358,16 @@ final class EngineTest extends TestCase
             ->method('generate')
             ->willReturn([]);
 
+        $this->mutationTestingRunner
+            ->expects($this->once())
+            ->method('run')
+            ->with([]);
+
+        $this->minMsiChecker
+            ->expects($this->once())
+            ->method('checkMetrics')
+            ->with(100, 50.0, 55.0)
+            ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0));
         $this->metricsCalculator
             ->method('getTimedOutCount')
             ->willReturn(0);
@@ -370,10 +381,6 @@ final class EngineTest extends TestCase
             ->method('getCoveredCodeMutationScoreIndicator')
             ->willReturn(55.0);
 
-        $this->minMsiChecker
-            ->method('checkMetrics')
-            ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0));
-
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
@@ -386,8 +393,7 @@ final class EngineTest extends TestCase
 
     private function createEngine(
         ?Configuration $config = null,
-        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
-        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
+        ?InitialStaticAnalysis $initialStaticAnalysis = null,
     ): Engine {
         return new Engine(
             config: $config ?? ConfigurationBuilder::withMinimalTestData()
@@ -401,10 +407,10 @@ final class EngineTest extends TestCase
             mutationTestingRunner: $this->mutationTestingRunner,
             minMsiChecker: $this->minMsiChecker,
             maxTimeoutsChecker: $this->maxTimeoutsChecker,
-            consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
-            initialStaticAnalysisRunner: $initialStaticAnalysisRunner,
-            staticAnalysisToolAdapter: $staticAnalysisToolAdapter,
+            preloadedSourceChecker: $this->preloadedSourceChecker,
+            initialStaticAnalysis: $initialStaticAnalysis ?? new NullInitialStaticAnalysisRunner(),
+            consoleOutput: $this->consoleOutput,
         );
     }
 }
