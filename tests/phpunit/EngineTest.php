@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Configuration\Configuration;
-use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
@@ -80,8 +79,6 @@ final class EngineTest extends TestCase
 
     private MockObject&MaxTimeoutsChecker $maxTimeoutsChecker;
 
-    private Stub&ConsoleOutput $consoleOutput;
-
     private MockObject&MetricsCalculator $metricsCalculator;
 
     private PreloadedSourceChecker $preloadedSourceChecker;
@@ -95,7 +92,6 @@ final class EngineTest extends TestCase
         $this->mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
         $this->minMsiChecker = $this->createMock(MinMsiChecker::class);
         $this->maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
-        $this->consoleOutput = $this->createStub(ConsoleOutput::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->preloadedSourceChecker = new PreloadedSourceChecker('');
     }
@@ -410,7 +406,6 @@ final class EngineTest extends TestCase
             metricsCalculator: $this->metricsCalculator,
             preloadedSourceChecker: $this->preloadedSourceChecker,
             initialStaticAnalysis: $initialStaticAnalysis ?? new NullInitialStaticAnalysisRunner(),
-            consoleOutput: $this->consoleOutput,
         );
     }
 }
