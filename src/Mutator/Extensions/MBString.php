@@ -207,7 +207,7 @@ final readonly class MBString implements ConfigurableMutator
 
         $mode = $node->args[1]->value;
 
-        if ($mode instanceof Node\Scalar\LNumber) {
+        if ($mode instanceof Node\Scalar\Int_) {
             return $mode->value;
         }
 
