@@ -349,11 +349,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         yield [true, '13.0'];
 
-        yield [true, '13.2.99'];
-
-        yield [false, '13.3'];
-
-        yield [false, '14.0'];
+        yield [true, '13.3'];
     }
 
     #[DataProvider('coverageWithoutSourceProvider')]
