@@ -108,7 +108,7 @@ final class FloatNegation implements Mutator
         $expression = $node->expr;
 
         if ($expression instanceof Node\Expr\UnaryMinus) {
-            /** @var Node\Scalar\LNumber $innerExpression */
+            /** @var Node\Scalar\DNumber $innerExpression */
             $innerExpression = $expression->expr;
 
             return -$innerExpression->value;

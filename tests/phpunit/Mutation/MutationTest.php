@@ -124,8 +124,8 @@ final class MutationTest extends TestCase
             'mutatorClass' => Plus::class,
             'mutatorName' => MutatorName::getName(Plus::class),
             'attributes' => $nominalAttributes,
-            'mutatedNodeClass' => Node\Scalar\LNumber::class,
-            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+            'mutatedNodeClass' => Node\Scalar\Int_::class,
+            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\Int_(1)),
             'mutationByMutatorIndex' => -1,
             'tests' => [],
             'originalFileTokens' => [],
@@ -141,13 +141,13 @@ final class MutationTest extends TestCase
             'originalFilePath' => '/path/to/acme/Foo.php',
             'originalFileAst' => [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)],
+                [new Node\Scalar\Int_(0)],
             )],
             'mutatorClass' => Plus::class,
             'mutatorName' => MutatorName::getName(Plus::class),
             'attributes' => $nominalAttributes,
-            'mutatedNodeClass' => Node\Scalar\LNumber::class,
-            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+            'mutatedNodeClass' => Node\Scalar\Int_::class,
+            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\Int_(1)),
             'mutationByMutatorIndex' => 0,
             'tests' => [
                 new TestLocation(
@@ -169,13 +169,13 @@ final class MutationTest extends TestCase
             'originalFilePath' => '/path/to/acme/Foo.php',
             'originalFileAst' => [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)],
+                [new Node\Scalar\Int_(0)],
             )],
             'mutatorClass' => Plus::class,
             'mutatorName' => MutatorName::getName(Plus::class),
             'attributes' => $nominalAttributes,
-            'mutatedNodeClass' => Node\Scalar\LNumber::class,
-            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+            'mutatedNodeClass' => Node\Scalar\Int_::class,
+            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\Int_(1)),
             'mutationByMutatorIndex' => 99,
             'tests' => [
                 new TestLocation(
@@ -197,13 +197,13 @@ final class MutationTest extends TestCase
             'originalFilePath' => '/path/to/acme/Foo.php',
             'originalFileAst' => [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)],
+                [new Node\Scalar\Int_(0)],
             )],
             'mutatorClass' => Plus::class,
             'mutatorName' => MutatorName::getName(Plus::class),
             'attributes' => array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
-            'mutatedNodeClass' => Node\Scalar\LNumber::class,
-            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+            'mutatedNodeClass' => Node\Scalar\Int_::class,
+            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\Int_(1)),
             'mutationByMutatorIndex' => 0,
             'tests' => [
                 new TestLocation(
@@ -230,13 +230,13 @@ final class MutationTest extends TestCase
             'originalFilePath' => '/path/to/acme/Foo.php',
             'originalFileAst' => [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)],
+                [new Node\Scalar\Int_(0)],
             )],
             'mutatorClass' => Plus::class,
             'mutatorName' => MutatorName::getName(Plus::class),
             'attributes' => $nominalAttributes,
-            'mutatedNodeClass' => Node\Scalar\LNumber::class,
-            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
+            'mutatedNodeClass' => Node\Scalar\Int_::class,
+            'mutatedNode' => MutatedNode::wrap(new Node\Scalar\Int_(1)),
             'mutationByMutatorIndex' => 0,
             'tests' => [],
             'originalFileTokens' => [],
@@ -252,15 +252,15 @@ final class MutationTest extends TestCase
             'originalFilePath' => '/path/to/acme/Foo.php',
             'originalFileAst' => [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)],
+                [new Node\Scalar\Int_(0)],
             )],
             'mutatorClass' => Plus::class,
             'mutatorName' => MutatorName::getName(Plus::class),
             'attributes' => $nominalAttributes,
-            'mutatedNodeClass' => Node\Scalar\LNumber::class,
+            'mutatedNodeClass' => Node\Scalar\Int_::class,
             'mutatedNode' => MutatedNode::wrap([
-                new Node\Scalar\LNumber(1),
-                new Node\Scalar\LNumber(-1),
+                new Node\Scalar\Int_(1),
+                new Node\Scalar\Int_(-1),
             ]),
             'mutationByMutatorIndex' => 0,
             'tests' => [
