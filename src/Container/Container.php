@@ -603,7 +603,7 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
-            ShellCommandRunner::class => static fn (): ShellCommandRunner => new SymfonyProcessShellCommandRunner(),
+            ShellCommandRunner::class => SymfonyProcessShellCommandRunner::class,
             Git::class => static fn (self $container): Git => new CommandLineGit(
                 $container->getShellCommandRunner(),
                 $container->getLogger(),

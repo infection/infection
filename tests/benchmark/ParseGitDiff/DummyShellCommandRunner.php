@@ -64,6 +64,11 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
         ?Closure $callback = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
     ): CompletedProcess {
-        return new CompletedProcess($command, 0, $this->executeResult, '');
+        return new CompletedProcess(
+            command: $command,
+            exitCode: 0,
+            stdout: $this->executeResult,
+            stderr: '',
+        );
     }
 }
