@@ -93,7 +93,7 @@ final class Division implements Mutator
 
     private function isNumericOne(Node $node): bool
     {
-        if ($node instanceof Node\Scalar\LNumber && $node->value === 1) {
+        if ($node instanceof Node\Scalar\Int_ && $node->value === 1) {
             return true;
         }
 

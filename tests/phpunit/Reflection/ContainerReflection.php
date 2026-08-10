@@ -57,6 +57,8 @@ final readonly class ContainerReflection
 
     private ReflectionProperty $factories;
 
+    private ReflectionProperty $implementations;
+
     private ReflectionProperty $values;
 
     public function __construct(private Container $container)
@@ -67,6 +69,7 @@ final readonly class ContainerReflection
         Assert::notFalse($parentReflection);
 
         $this->factories = $parentReflection->getProperty('factories');
+        $this->implementations = $parentReflection->getProperty('implementations');
         $this->values = $parentReflection->getProperty('values');
 
         $this->createServiceClosure = $parentReflection->getMethod('createService')->getClosure($container);
@@ -101,6 +104,14 @@ final readonly class ContainerReflection
     public function getFactories(): array
     {
         return $this->factories->getValue($this->container);
+    }
+
+    /**
+     * @return array<class-string<object>, class-string<object>>
+     */
+    public function getImplementations(): array
+    {
+        return $this->implementations->getValue($this->container);
     }
 
     /**

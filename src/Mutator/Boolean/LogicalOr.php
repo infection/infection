@@ -153,7 +153,7 @@ final class LogicalOr implements Mutator
             if ($nodeLeftLeft instanceof Node\Expr\Variable) {
                 $varNameLeft = $nodeLeftLeft->name;
             } elseif (
-                $nodeLeftLeft instanceof Node\Scalar\LNumber
+                $nodeLeftLeft instanceof Node\Scalar\Int_
                 || $nodeLeftLeft instanceof Node\Scalar\DNumber
             ) {
                 $valueLeft = $nodeLeftLeft->value;
@@ -165,7 +165,7 @@ final class LogicalOr implements Mutator
                 $varNameLeft = $nodeLeftRight->name;
             } elseif (
                 (
-                    $nodeLeftRight instanceof Node\Scalar\LNumber
+                    $nodeLeftRight instanceof Node\Scalar\Int_
                     || $nodeLeftRight instanceof Node\Scalar\DNumber
                 ) && $valueLeft === null
             ) {
@@ -180,7 +180,7 @@ final class LogicalOr implements Mutator
             if ($nodeRightLeft instanceof Node\Expr\Variable) {
                 $varNameRight = $nodeRightLeft->name;
             } elseif (
-                $nodeRightLeft instanceof Node\Scalar\LNumber
+                $nodeRightLeft instanceof Node\Scalar\Int_
                 || $nodeRightLeft instanceof Node\Scalar\DNumber
             ) {
                 $valueRight = $nodeRightLeft->value;
@@ -192,7 +192,7 @@ final class LogicalOr implements Mutator
                 $varNameRight = $nodeRightRight->name;
             } elseif (
                 (
-                    $nodeRightRight instanceof Node\Scalar\LNumber
+                    $nodeRightRight instanceof Node\Scalar\Int_
                     || $nodeRightRight instanceof Node\Scalar\DNumber
                 ) && $valueRight === null
             ) {
