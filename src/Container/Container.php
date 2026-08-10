@@ -131,7 +131,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandLineExecutor;
 use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
@@ -162,6 +162,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -602,7 +603,11 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
-            Git::class => CommandLineGit::class,
+            ShellCommandLineExecutor::class => SymfonyProcessShellCommandLineExecutor::class,
+            Git::class => static fn (self $container): Git => new CommandLineGit(
+                $container->getShellCommandLineExecutor(),
+                $container->getLogger(),
+            ),
             SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
                 $configuration = $container->getConfiguration();
                 $sourceFilter = $configuration->sourceFilter;

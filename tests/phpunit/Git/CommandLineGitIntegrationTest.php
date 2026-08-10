@@ -40,7 +40,7 @@ use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoGitProjectFound;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandLineExecutor;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -88,7 +88,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         chdir($this->cwd);
 
         $this->git = new CommandLineGit(
-            new ShellCommandLineExecutor(),
+            new SymfonyProcessShellCommandLineExecutor(),
         );
     }
 
@@ -124,7 +124,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
 
-        $executor = new ShellCommandLineExecutor();
+        $executor = new SymfonyProcessShellCommandLineExecutor();
         $executor->execute(['git', '-C', $this->tmp, 'init', '--quiet']);
         $executor->execute(['git', '-C', $this->tmp, 'add', '.']);
         $executor->execute([
@@ -305,7 +305,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     private static function checkIfCommitReferenceExists(): bool
     {
         try {
-            (new ShellCommandLineExecutor())->execute([
+            (new SymfonyProcessShellCommandLineExecutor())->execute([
                 'git',
                 'cat-file',
                 '-e',

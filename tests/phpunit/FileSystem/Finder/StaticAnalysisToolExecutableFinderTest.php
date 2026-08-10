@@ -41,7 +41,8 @@ use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
@@ -91,7 +92,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         $this->composerFinder->method('find')
             ->willReturn(['/usr/bin/composer']);
 
-        $this->shellCommandLineExecutor = new ShellCommandLineExecutor();
+        $this->shellCommandLineExecutor = new SymfonyProcessShellCommandLineExecutor();
     }
 
     public function test_it_can_load_a_custom_path(): void
