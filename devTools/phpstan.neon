@@ -109,9 +109,6 @@ parameters:
             identifier: missingType.iterableValue
             path: ../tests/*
         -
-            identifier: missingType.generics
-            path: ../tests/*
-        -
             message: '#Do not (use|return|assign) magic number (.)#'
             paths:
                 - ../tests/*
