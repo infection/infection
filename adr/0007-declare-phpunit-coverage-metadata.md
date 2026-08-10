@@ -19,7 +19,7 @@ enforcement of [PHPat][phpat] rules.
 
 **The question is which convention to enforce.**
 
-Historically, ADR 0002 (now deprecated and deleted) stated that:
+Historically, ADR 0002 (now deprecated and superseded by this ADR) stated that:
 
 - The `@covers` annotation was not required.
 - The [`Symfony\Bridge\PhpUnit\CoverageListener`][code-coverage-listener] from

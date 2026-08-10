@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Process\SymfonyProcessShellCommandRunner;
+use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -46,11 +47,11 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 #[Group('integration')]
 final class SymfonyProcessShellCommandRunnerTest extends TestCase
 {
-    private SymfonyProcessShellCommandRunner $runner;
+    private SymfonyProcessShellCommandRunner $executor;
 
     protected function setUp(): void
     {
-        $this->runner = new SymfonyProcessShellCommandRunner();
+        $this->executor = new SymfonyProcessShellCommandRunner();
     }
 
     /**
@@ -61,7 +62,7 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         array $command,
         string $expectedOutput,
     ): void {
-        $output = $this->runner->mustRun($command);
+        $output = $this->executor->mustRun($command);
 
         $this->assertSame($expectedOutput, $output);
     }
@@ -69,22 +70,22 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
     public static function commandProvider(): iterable
     {
         yield 'simple output' => [
-            ['echo', 'test output'],
+            [PHP_BINARY, '-r', 'echo "test output";'],
             'test output',
         ];
 
         yield 'output with leading whitespace' => [
-            ['echo', '  whitespace'],
+            [PHP_BINARY, '-r', 'echo "  whitespace";'],
             'whitespace',
         ];
 
         yield 'output with trailing whitespace' => [
-            ['echo', 'whitespace  '],
+            [PHP_BINARY, '-r', 'echo "whitespace  ";'],
             'whitespace',
         ];
 
         yield 'output with both leading and trailing whitespace' => [
-            ['echo', '  whitespace  '],
+            [PHP_BINARY, '-r', 'echo "  whitespace  ";'],
             'whitespace',
         ];
 
@@ -96,7 +97,7 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
 
     public function test_it_does_not_include_stderr_in_output(): void
     {
-        $output = $this->runner->mustRun([
+        $output = $this->executor->mustRun([
             'php',
             '-r',
             'fwrite(STDOUT, "stdout content"); fwrite(STDERR, "stderr content");',
@@ -110,7 +111,7 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessageMatches('/stdout output.*stderr output/s');
 
-        $this->runner->mustRun([
+        $this->executor->mustRun([
             'php',
             '-r',
             'fwrite(STDOUT, "stdout output"); fwrite(STDERR, "stderr output"); exit(1);',
@@ -119,7 +120,7 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
 
     public function test_it_does_not_provide_interactive_input(): void
     {
-        $output = $this->runner->mustRun([
+        $output = $this->executor->mustRun([
             'php',
             '-r',
             'echo fgets(STDIN) ?: "no input";',

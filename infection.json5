@@ -33,6 +33,16 @@
                 "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
             ]
         },
+        "ArrayOneItem": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create"
+            ]
+        },
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
                 // This is for the Symfony Console commands: the description is purely for documentation purposes.
@@ -46,6 +56,17 @@
                 // However, it is a tested extension point already hence making those tests more
                 // complicated for this is not worth.
                 "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator",
+            ]
+        },
+        "UnwrapArrayMap": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create",
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
+        "UnwrapArrayValues": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
             ]
         }
     }

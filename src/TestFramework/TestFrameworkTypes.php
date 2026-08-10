@@ -56,6 +56,8 @@ final class TestFrameworkTypes
 
     public const string TESTO = 'testo';
 
+    public const string DEBUG = 'debug';
+
     /**
      * @var string[]
      */
@@ -64,6 +66,7 @@ final class TestFrameworkTypes
         self::PHPSPEC,
         self::CODECEPTION,
         self::TESTO,
+        self::DEBUG,
     ];
 
     /**

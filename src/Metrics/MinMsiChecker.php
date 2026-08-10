@@ -46,6 +46,7 @@ class MinMsiChecker
     private const int VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
     public function __construct(
+        private readonly ConsoleOutput $consoleOutput,
         private readonly bool $ignoreMsiWithNoMutations,
         private readonly float $minMsi,
         private readonly float $minCoveredCodeMsi,
@@ -59,10 +60,9 @@ class MinMsiChecker
         int $totalMutantCount,
         float $msi,
         float $coveredCodeMsi,
-        ConsoleOutput $consoleOutput,
     ): void {
         $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
-        $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
+        $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi);
     }
 
     private function checkMinMsi(int $totalMutantCount, float $msi, float $coveredCodeMsi): void
@@ -88,17 +88,17 @@ class MinMsiChecker
         }
     }
 
-    private function checkIfMinMsiCanBeIncreased(float $msi, float $coveredCodeMsi, ConsoleOutput $output): void
+    private function checkIfMinMsiCanBeIncreased(float $msi, float $coveredCodeMsi): void
     {
         if ($this->canIncreaseMsi($msi)) {
-            $output->logMinMsiCanGetIncreasedNotice(
+            $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
                 $this->minMsi,
                 $msi,
             );
         }
 
         if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {
-            $output->logMinCoveredCodeMsiCanGetIncreasedNotice(
+            $this->consoleOutput->logMinCoveredCodeMsiCanGetIncreasedNotice(
                 $this->minCoveredCodeMsi,
                 $coveredCodeMsi,
             );

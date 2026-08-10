@@ -74,7 +74,7 @@ final class IntegerNegation implements Mutator
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), NodeAttributes::getAllExceptOriginalNode($node)),
+            new Node\Scalar\Int_(-1 * $this->getIntegerValueOfNode($node), NodeAttributes::getAllExceptOriginalNode($node)),
         );
     }
 
@@ -90,7 +90,7 @@ final class IntegerNegation implements Mutator
             $expr = $expr->expr;
         }
 
-        if (!$expr instanceof Node\Scalar\LNumber) {
+        if (!$expr instanceof Node\Scalar\Int_) {
             return false;
         }
 
@@ -104,11 +104,11 @@ final class IntegerNegation implements Mutator
      */
     private function getIntegerValueOfNode(Node $node): int
     {
-        /** @var Node\Expr\UnaryMinus|Node\Scalar\LNumber $expression */
+        /** @var Node\Expr\UnaryMinus|Node\Scalar\Int_ $expression */
         $expression = $node->expr;
 
         if ($expression instanceof Node\Expr\UnaryMinus) {
-            /** @var Node\Scalar\LNumber $innerExpression */
+            /** @var Node\Scalar\Int_ $innerExpression */
             $innerExpression = $expression->expr;
 
             return -$innerExpression->value;

@@ -1,0 +1,19 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "GitDiffFromSubdirectory\\": "src/",
+            "GitDiffFromSubdirectory\\Shared\\": "../shared/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GitDiffFromSubdirectory\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

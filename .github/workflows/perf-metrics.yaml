@@ -8,6 +8,8 @@ on:
     branches:
       - main
       - master
+    tags:
+      - '*'
     paths:
       - '.github/workflows/perf-metrics.yaml'
       - 'src/**'
@@ -44,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # When ref input is provided, checkout from upstream (where tags exist)
           repository: ${{ github.event.inputs.ref && 'infection/infection' || github.repository }}
@@ -65,6 +67,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
+        # zizmor: ignore[cache-poisoning] This workflow only collects metrics (no publishing) and runs with read-only repo permissions.
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
@@ -76,6 +79,12 @@ jobs:
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Collect tool versions
+        id: tool-versions
+        # PHPUnit is most of what a mutant process runs; its version explains
+        # workload shifts that php_version alone cannot (e.g. the PHPUnit 12 upgrade)
+        run: echo "phpunit_version=$(composer show phpunit/phpunit --format=json | jq -r '.versions[0]')" >> $GITHUB_OUTPUT
 
       - name: Collect coverage report
         run: |
@@ -112,7 +121,8 @@ jobs:
             echo "has_summary_logger=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Run Infection with timing
+      - name: Run Infection with timing and steal metrics
+        id: run-infection
         env:
           HAS_SUMMARY_LOGGER: ${{ steps.feature-check.outputs.has_summary_logger }}
         run: |
@@ -120,6 +130,10 @@ jobs:
           if [[ "${HAS_SUMMARY_LOGGER}" == "true" ]]; then
             SUMMARY_OPT="--logger-summary-json=infection-summary.json"
           fi
+
+          # Background sar to collect CPU metrics during the run, sampling every 1 second
+          sar -u 1 > sar-output.txt 2>&1 &
+          sar_pid=$!
 
           /usr/bin/time -f '{"user_time_sec":%U,"system_time_sec":%S,"wall_clock_sec":%e,"max_rss_kb":%M,"cpu_percent":"%P","voluntary_ctx_switches":%w,"involuntary_ctx_switches":%c,"exit_status":%x}' \
             -o timing.json \
@@ -131,12 +145,21 @@ jobs:
               --no-interaction \
               $SUMMARY_OPT \
             || true
+
+          # Send SIGINT to sar (not SIGTERM) so it outputs the Average summary line
+          kill -INT $sar_pid 2>/dev/null
+          wait $sar_pid 2>/dev/null || true
+
           cat timing.json
+
+          # Extract steal % from sar output: column 7 is %steal on lines starting with "Average"
+          steal_percent=$(awk '/^Average/ {print $7}' sar-output.txt)
+          echo "steal_percent=${steal_percent:-0.00}" >> $GITHUB_OUTPUT
 
       - name: Checkout metrics repository
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         # zizmor: ignore[artipacked] This checkout persists the SSH key used by the later git push to the metrics repository.
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: infection/infection-metrics
           ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
@@ -150,12 +173,16 @@ jobs:
           TRIGGER: ${{ github.event_name }}
           CPU_MODEL: ${{ steps.runner-specs.outputs.cpu_model }}
           CPU_ARCH: ${{ steps.runner-specs.outputs.cpu_arch }}
-          REF_INPUT: ${{ github.event.inputs.ref }}
           TOTAL_MEM: ${{ steps.runner-specs.outputs.total_memory_kb }}
+          PHPUNIT_VERSION: ${{ steps.tool-versions.outputs.phpunit_version }}
+          STEAL_PERCENT: ${{ steps.run-infection.outputs.steal_percent }}
         run: |
           export COMMIT_DATE=$(git log -1 --format='%cI')
           export GIT_SHA=$(git rev-parse HEAD)
           export IMAGE_VERSION="${ImageVersion:-unknown}"
+
+          # extract tags from bare refs (refs/tags/<tag>)
+          export GIT_REF="${GIT_REF#refs/tags/}"
 
           php metrics-repo/scripts/prepare-metrics.php timing.json entry.json
 
@@ -179,12 +206,11 @@ jobs:
           git diff --staged --quiet && echo "No changes to commit" && exit 0
 
           # Build commit message with tag (if provided) and short SHA
-          SHORT_SHA="${{ github.sha }}"
-          SHORT_SHA="${SHORT_SHA:0:7}"
-          if [[ -n "$REF_INPUT" ]]; then
-            COMMIT_MSG="perf: Add metrics for $REF_INPUT ($SHORT_SHA)"
-          else
+          SHORT_SHA="${GIT_SHA:0:7}"
+          if [[ "$GIT_REF" == refs/heads/* ]]; then
             COMMIT_MSG="perf: Add metrics for $SHORT_SHA"
+          else
+            COMMIT_MSG="perf: Add metrics for $GIT_REF ($SHORT_SHA)"
           fi
 
           git commit -m "$COMMIT_MSG"

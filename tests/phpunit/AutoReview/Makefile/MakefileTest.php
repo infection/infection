@@ -265,6 +265,8 @@ final class MakefileTest extends BaseMakefileTestCase
             [33msbx-kit-validate:[0m	 Validates the sbx kit specs
             [33msbx-image-build:[0m	 Builds the PHP sbx image
             [33msbx-image-test:[0m	 Verifies the PHP sbx image contains the expected tooling
+            [33mupdate-agents-adr-list:[0m	 Updates the generated ADR list in AGENTS.md
+            [33mcheck-agents-adr-list:[0m	 Checks the generated ADR list in AGENTS.md
             [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
             [33mcs-docker:[0m		 Runs PHP-CS-Fixer in docker
             [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
