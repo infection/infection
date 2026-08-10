@@ -105,9 +105,7 @@ parameters:
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'
-        -
-            identifier: missingType.iterableValue
-            path: ../tests/*
+        - '#Method Infection\\Tests\\.*::.*\(\) return type has no value type specified in iterable type iterable#'
         -
             identifier: missingType.generics
             path: ../tests/*
