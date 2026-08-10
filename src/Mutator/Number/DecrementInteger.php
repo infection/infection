@@ -48,7 +48,7 @@ use function stripos;
 /**
  * @internal
  *
- * @extends AbstractNumberMutator<Node\Scalar\LNumber>
+ * @extends AbstractNumberMutator<Node\Scalar\Int_>
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
@@ -88,7 +88,7 @@ final class DecrementInteger extends AbstractNumberMutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Scalar\LNumber>
+     * @return iterable<Node\Scalar\Int_>
      */
     public function mutate(Node $node): iterable
     {
@@ -108,12 +108,12 @@ final class DecrementInteger extends AbstractNumberMutator
             $value = $node->value + 1;
         }
 
-        yield new Node\Scalar\LNumber($value);
+        yield new Node\Scalar\Int_($value);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Scalar\LNumber) {
+        if (!$node instanceof Node\Scalar\Int_) {
             return false;
         }
 
@@ -150,7 +150,7 @@ final class DecrementInteger extends AbstractNumberMutator
         return $this->isAllowedComparison($node);
     }
 
-    private function isAllowedComparison(Node\Scalar\LNumber $node): bool
+    private function isAllowedComparison(Node\Scalar\Int_ $node): bool
     {
         if ($node->value !== 0) {
             return true;
@@ -220,7 +220,7 @@ final class DecrementInteger extends AbstractNumberMutator
         return false;
     }
 
-    private function isArrayZeroIndexAccess(Node\Scalar\LNumber $node): bool
+    private function isArrayZeroIndexAccess(Node\Scalar\Int_ $node): bool
     {
         if ($node->value !== 0) {
             return false;
@@ -229,7 +229,7 @@ final class DecrementInteger extends AbstractNumberMutator
         return ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch;
     }
 
-    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
+    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\Int_ $node): bool
     {
         if ($node->value !== 0) {
             return false;
