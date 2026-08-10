@@ -29,6 +29,7 @@ PHPUNIT_BIN=vendor/phpunit/phpunit/phpunit
 CI ?=
 PHPUNIT=$(PHPUNIT_BIN)$(if $(CI), --no-progress,)
 PARATEST=vendor/bin/paratest
+AGENTS_MD=AGENTS.md
 
 PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 
@@ -109,6 +110,16 @@ sbx-image-test:
 check_trailing_whitespaces:
 	./devTools/check_trailing_whitespaces.sh
 
+.PHONY: update-agents-adr-list
+update-agents-adr-list:	## Updates the generated ADR list in AGENTS.md
+update-agents-adr-list:
+	./devTools/update-agents-adr-list.sh "$(AGENTS_MD)"
+
+.PHONY: check-agents-adr-list
+check-agents-adr-list:	## Checks the generated ADR list in AGENTS.md
+check-agents-adr-list: update-agents-adr-list
+	git diff --exit-code -- "$(AGENTS_MD)"
+
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
@@ -173,6 +184,7 @@ zizmor:
 profile: 	 	## Runs Blackfire
 profile:
 	$(MAKE) profile_mutation_generator
+	$(MAKE) profile_ast_processing
 	$(MAKE) profile_parse_git_diff
 	$(MAKE) profile_tracing
 
@@ -195,10 +207,25 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 		php tests/benchmark/MutationGenerator/profile.php
 	composer dump
 
+.PHONY: profile_ast_processing
+profile_ast_processing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	blackfire run \
+		--title="AstProcessing" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/AstProcessing/profile.php
+	composer dump
+
 .PHONY: benchmark_mutation_generator
 benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
 	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: benchmark_ast_processing
+benchmark_ast_processing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/AstProcessing $(PHPBENCH_REPORTS)
 	composer dump
 
 .PHONY: profile_parse_git_diff
@@ -234,7 +261,7 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions $(if $(CI),,zizmor)
+autoreview: cs-check phpstan mago validate test-autoreview rector-check detect-collisions check-agents-adr-list $(if $(CI),,zizmor)
 
 .PHONY: test
 test:		 	## Runs all the tests

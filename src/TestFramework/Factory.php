@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use function dirname;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -44,10 +45,13 @@ use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugTestFrameworkAdapter;
 use InvalidArgumentException;
 use function is_a;
 use SplFileInfo;
 use function sprintf;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -55,6 +59,8 @@ use Webmozart\Assert\Assert;
  */
 final readonly class Factory
 {
+    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../resources/debug-runtime.php';
+
     /**
      * @param array<string, array<string, mixed>> $installedExtensions
      */
@@ -73,6 +79,14 @@ final readonly class Factory
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
+        if ($adapterName === TestFrameworkTypes::DEBUG) {
+            return new DebugTestFrameworkAdapter(
+                self::DEBUG_RUNTIME_SCRIPT,
+                $this->infectionConfig->debugTestFrameworkLogFile,
+                new DebugCommandLine(new PhpExecutableFinder()),
+            );
+        }
+
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
@@ -92,10 +106,11 @@ final readonly class Factory
                 $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
                 $this->shellCommandRunner,
+                sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
             );
         }
 
-        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT];
+        $availableTestFrameworks = [TestFrameworkTypes::PHPUNIT, TestFrameworkTypes::DEBUG];
 
         foreach ($this->installedExtensions as $installedExtension) {
             $factory = $installedExtension['extra']['class'];

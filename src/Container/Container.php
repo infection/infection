@@ -38,6 +38,7 @@ namespace Infection\Container;
 use function array_filter;
 use Closure;
 use DIContainer\Container as DIContainer;
+use function dirname;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -55,6 +56,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\PositionalPathsFilter;
+use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
@@ -62,6 +64,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Differ\UnifiedDiffOutputBuilder;
+use Infection\Engine;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -107,7 +110,6 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
@@ -122,9 +124,11 @@ use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\SymfonyProcessShellCommandRunner;
@@ -151,6 +155,7 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -185,6 +190,7 @@ use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\Assert\Assert;
 
 /**
@@ -313,6 +319,7 @@ final class Container extends DIContainer
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
                     $container->getShellCommandRunner(),
+                    new PhpExecutableFinder(),
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
@@ -320,14 +327,8 @@ final class Container extends DIContainer
                 $container->getDiffer(),
                 $container->getMutantCodeFactory(),
             ),
-            MutantCodeFactory::class => static fn (self $container): MutantCodeFactory => new MutantCodeFactory(
-                $container->getMutatedCodePrinter(),
-            ),
-            MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
-                $container->getPrinter(),
-            ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())),
-            SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
+            EventDispatcher::class => SyncEventDispatcher::class,
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner(
                 $container->getConfiguration()->threadCount,
             ),
@@ -341,7 +342,7 @@ final class Container extends DIContainer
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
             ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
-            PrettyPrinterAbstract::class => static fn (): InfectionPrettyPrinter => new InfectionPrettyPrinter(),
+            PrettyPrinterAbstract::class => InfectionPrettyPrinter::class,
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
                 $container->getConfiguration()->msiPrecision,
                 $container->getConfiguration()->timeoutsAsEscaped,
@@ -382,6 +383,7 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
+                    $container->getConsoleOutput(),
                     $config->ignoreMsiWithNoMutations,
                     (float) $config->minMsi,
                     (float) $config->minCoveredMsi,
@@ -459,12 +461,6 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
                 $container->getOutput(),
-            ),
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getTracer(),
-                $container->getFileStore(),
             ),
             NodeTraverserFactory::class => static fn (self $container) => new NodeTraverserFactory(
                 $container->getSourceLineMatcher(),
@@ -551,13 +547,14 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
-                $container->getStaticAnalysisToolAdapter(),
-            ),
-            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
+            InitialStaticAnalysis::class => static function (self $container): InitialStaticAnalysis {
+                // do not create a chain of classes for SA if not enabled
+                if (!$container->getConfiguration()->isStaticAnalysisEnabled()) {
+                    return new NullInitialStaticAnalysisRunner();
+                }
+
+                return $container->getInitialStaticAnalysisRunner();
+            },
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -618,16 +615,13 @@ final class Container extends DIContainer
                 return $sourceFilter instanceof GitDiffFilter
                     ? new GitDiffSourceLineMatcher(
                         $container->getGit(),
-                        $container->getFileSystem(),
                         $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
+                        dirname($configuration->configurationPathname),
                     )
                     : new NullSourceLineMatcher();
             },
-            SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
-                $container->getGit(),
-            ),
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {
                     $configuration = $container->getConfiguration();
@@ -641,6 +635,7 @@ final class Container extends DIContainer
                     );
                 },
             ),
+            PreloadedSourceChecker::class => PreloadedSourceChecker::create(...),
             TeamCity::class => static fn (self $container): TeamCity => new TeamCity(
                 $container->getConfiguration()->timeoutsAsEscaped,
                 $container->getDiffer(),
@@ -650,7 +645,6 @@ final class Container extends DIContainer
                 $container->get(TeamCity::class),
                 $container->getConfiguration()->configurationPathname,
             ),
-            NodeDumper::class => static fn (self $container): NodeDumper => new NodeDumper(),
             ProjectDirectoryProvider::class => static fn (self $container): ProjectDirectoryProvider => new ChainProjectDirectoryProvider(
                 new EnvironmentVariableBasedProjectDirectoryProvider(
                     $container->getFileSystem(),
@@ -881,6 +875,11 @@ final class Container extends DIContainer
         return $this->get(SourceCollector::class);
     }
 
+    public function getPreloadedSourceChecker(): PreloadedSourceChecker
+    {
+        return $this->get(PreloadedSourceChecker::class);
+    }
+
     public function getNodeTraverserFactory(): NodeTraverserFactory
     {
         return $this->get(NodeTraverserFactory::class);
@@ -946,6 +945,11 @@ final class Container extends DIContainer
         return $this->get(InitialTestsRunner::class);
     }
 
+    public function getInitialStaticAnalysis(): InitialStaticAnalysis
+    {
+        return $this->get(InitialStaticAnalysis::class);
+    }
+
     public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
     {
         return $this->get(InitialStaticAnalysisRunner::class);
@@ -979,6 +983,16 @@ final class Container extends DIContainer
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
+    }
+
+    public function getConsoleOutput(): ConsoleOutput
+    {
+        return $this->get(ConsoleOutput::class);
+    }
+
+    public function getEngine(): Engine
+    {
+        return $this->get(Engine::class);
     }
 
     public function getLineRangeCalculator(): LineRangeCalculator
@@ -1088,7 +1102,7 @@ final class Container extends DIContainer
 
     public function getEventDispatcher(): EventDispatcher
     {
-        return $this->get(SyncEventDispatcher::class);
+        return $this->get(EventDispatcher::class);
     }
 
     public function getMinMsiChecker(): MinMsiChecker
@@ -1135,11 +1149,6 @@ final class Container extends DIContainer
         return $this->get(NodeDumper::class);
     }
 
-    private function getMutatedCodePrinter(): MutantCodePrinter
-    {
-        return $this->get(MutantCodePrinter::class);
-    }
-
     private function getStopwatch(): Stopwatch
     {
         return $this->get(Stopwatch::class);
@@ -1173,11 +1182,6 @@ final class Container extends DIContainer
     private function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
-    }
-
-    private function getPrinter(): PrettyPrinterAbstract
-    {
-        return $this->get(PrettyPrinterAbstract::class);
     }
 
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator

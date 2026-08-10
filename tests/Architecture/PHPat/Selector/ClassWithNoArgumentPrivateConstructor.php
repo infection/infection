@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Architecture\PHPat\Selector;
 
-use Infection\Tests\Architecture\PHPat\Selector\Support\ConcreteClassReflection;
+use Infection\Tests\Architecture\PHPat\Selector\Support\ClassReflectionPredicates;
 use PHPat\Selector\SelectorInterface;
 use PHPStan\Reflection\ClassReflection;
 
@@ -49,7 +49,7 @@ final class ClassWithNoArgumentPrivateConstructor implements SelectorInterface
     public function matches(ClassReflection $classReflection): bool
     {
         if (
-            !ConcreteClassReflection::isConcreteClass($classReflection)
+            !ClassReflectionPredicates::isConcreteClass($classReflection)
             || $classReflection->isEnum()
         ) {
             return false;

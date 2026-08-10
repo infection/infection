@@ -182,6 +182,27 @@ final class ContainerTest extends TestCase
         // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
     }
 
+    public static function provideImplementationsWithReflection(): iterable
+    {
+        $reflection = new ContainerReflection(Container::create());
+
+        foreach ($reflection->getImplementations() as $id => $implementation) {
+            yield $id => [$id, $implementation];
+        }
+    }
+
+    /**
+     * @param class-string $id
+     * @param class-string $implementation
+     */
+    #[DataProvider('provideImplementationsWithReflection')]
+    public function test_it_can_provide_all_services_bound_to_an_implementation(string $id, string $implementation): void
+    {
+        $service = Container::create()->get($id);
+
+        $this->assertInstanceOf($implementation, $service);
+    }
+
     public static function provideExpectedConcreteServicesWithReflection(): iterable
     {
         $container = Container::create();

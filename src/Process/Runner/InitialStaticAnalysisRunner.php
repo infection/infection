@@ -40,21 +40,27 @@ use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStati
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
-use Symfony\Component\Process\Process;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 
 /**
+ * This is needed for 2 purposes:
+ *
+ * 1. To warm up the SA tool's cache
+ * 2. To make sure SA passes before using it inside Infection to kill Mutants
+ *
  * @internal
  * @final
  */
-readonly class InitialStaticAnalysisRunner
+readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
 {
     public function __construct(
         private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
         private EventDispatcher $eventDispatcher,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
-    public function run(): Process
+    public function run(): void
     {
         $process = $this->initialStaticAnalysisProcessFactory->createProcess();
 
@@ -64,6 +70,11 @@ readonly class InitialStaticAnalysisRunner
 
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
 
-        return $process;
+        if (!$process->isSuccessful()) {
+            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
+                $process,
+                $this->staticAnalysisToolAdapter->getName(),
+            );
+        }
     }
 }

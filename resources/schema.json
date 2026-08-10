@@ -165,6 +165,17 @@
                 }
             }
         },
+        "debug": {
+            "type": "object",
+            "description": "Debug test framework settings.",
+            "additionalProperties": false,
+            "properties": {
+                "logFile": {
+                    "type": "string",
+                    "description": "Path to the JSONL file in which debug process information is recorded."
+                }
+            }
+        },
         "mago": {
             "type": "object",
             "description": "Mago additional settings.",
@@ -655,14 +666,16 @@
                 "phpunit",
                 "phpspec",
                 "codeception",
-                "testo"
+                "testo",
+                "debug"
             ]
         },
         "staticAnalysisTool": {
             "type": "string",
             "description": "Sets the Static Analysis tool to use to catch escaped Mutants.",
             "anyOf": [
-                "phpstan"
+                "phpstan",
+                "debug"
             ]
         },
         "staticAnalysisToolOptions": {

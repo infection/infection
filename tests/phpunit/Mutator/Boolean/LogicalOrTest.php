@@ -551,6 +551,32 @@ final class LogicalOrTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
+
+        yield 'It mutates logical or when the left comparison starts with a string' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1' < $myVar || $myVar > 5;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    '1' < $myVar && $myVar > 5;
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates logical or when the right comparison starts with a string' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $myVar < 5 || '9' > $myVar;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $myVar < 5 && '9' > $myVar;
+                    PHP,
+            ),
+        ];
     }
 
     private static function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable

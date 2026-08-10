@@ -64,7 +64,7 @@ final class ExpectsThrowablesTest extends TestCase
     public function test_it_returns_the_thrown_throwable(): void
     {
         $expected = new Exception('The expected exception.');
-        $action = /** @throws Exception */ static fn () => throw $expected;
+        $action = static fn () => throw $expected;
 
         $actual = $this->expectToThrow($action);
 

@@ -94,9 +94,6 @@ final class StreamWriterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @return iterable<string, array{iterable<string>|string, string}>
-     */
     public static function contentsOrLinesProvider(): iterable
     {
         yield 'contents' => [

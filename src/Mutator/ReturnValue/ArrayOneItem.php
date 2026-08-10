@@ -97,12 +97,12 @@ final class ArrayOneItem implements Mutator
             new Node\Expr\Ternary(
                 new Node\Expr\BinaryOp\Greater(
                     new Node\Expr\FuncCall(new Node\Name('count'), [new Node\Arg($arrayVariable)]),
-                    new Node\Scalar\LNumber(1),
+                    new Node\Scalar\Int_(1),
                 ),
                 new Node\Expr\FuncCall(new Node\Name('array_slice'), [
                     new Node\Arg($arrayVariable),
-                    new Node\Arg(new Node\Scalar\LNumber(0)),
-                    new Node\Arg(new Node\Scalar\LNumber(1)),
+                    new Node\Arg(new Node\Scalar\Int_(0)),
+                    new Node\Arg(new Node\Scalar\Int_(1)),
                     new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true'))),
                 ]),
                 $arrayVariable,

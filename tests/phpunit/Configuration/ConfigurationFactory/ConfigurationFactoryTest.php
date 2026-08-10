@@ -81,6 +81,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function str_contains;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -153,9 +154,10 @@ final class ConfigurationFactoryTest extends TestCase
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
+            debugTestFrameworkLogFile: null,
         );
 
-        $this->expectExceptionMessage('Expected one of: "phpstan", "mago". Got: "non-supported-static-analysis-tool"');
+        $this->expectExceptionMessage('Expected one of: "phpstan", "mago", "debug". Got: "non-supported-static-analysis-tool"');
 
         $this
             ->createConfigurationFactory(
@@ -234,6 +236,7 @@ final class ConfigurationFactoryTest extends TestCase
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: null,
+            debugTestFrameworkLogFile: null,
         );
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
 
@@ -280,7 +283,7 @@ final class ConfigurationFactoryTest extends TestCase
             sourceFilter: new GitDiffFilter('AM', 'reference(master)'),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
-            tmpDir: sys_get_temp_dir() . '/infection',
+            tmpDir: Path::normalize(sys_get_temp_dir() . '/infection'),
             phpUnit: new PhpUnit('/path/to', null),
             phpStan: new PhpStan('/path/to', null),
             mago: new Mago('/path/to', null),
@@ -290,7 +293,7 @@ final class ConfigurationFactoryTest extends TestCase
             initialTestsPhpOptions: null,
             testFrameworkExtraOptions: '',
             staticAnalysisToolOptions: null,
-            coveragePath: sys_get_temp_dir() . '/infection',
+            coveragePath: Path::normalize(sys_get_temp_dir() . '/infection'),
             skipCoverage: false,
             skipInitialTests: false,
             isDebugEnabled: false,
@@ -313,6 +316,7 @@ final class ConfigurationFactoryTest extends TestCase
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
+            debugTestFrameworkLogFile: Path::normalize(sys_get_temp_dir() . '/infection.debug.jsonl'),
         );
         $defaultConfigurationBuilder = ConfigurationBuilder::from($defaultConfiguration);
 
@@ -326,6 +330,16 @@ final class ConfigurationFactoryTest extends TestCase
         );
 
         yield 'minimal' => [$defaultScenario];
+
+        yield 'relative debug log file path' => [
+            $defaultScenario
+                ->withSchema($defaultSchemaBuilder->withDebugTestFrameworkLogFile('var/processes.jsonl'))
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withDebugTestFrameworkLogFile('/path/to/var/processes.jsonl')
+                        ->build(),
+                ),
+        ];
 
         yield 'null html file log path' => [
             $defaultScenario->forValueForHtmlLogFilePath(
@@ -455,14 +469,14 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'null tmp dir' => [
             $defaultScenario->forValueForTmpDir(
                 null,
-                sys_get_temp_dir() . '/infection',
+                Path::normalize(sys_get_temp_dir() . '/infection'),
             ),
         ];
 
         yield 'empty tmp dir' => [
             $defaultScenario->forValueForTmpDir(
                 '',
-                sys_get_temp_dir() . '/infection',
+                Path::normalize(sys_get_temp_dir() . '/infection'),
             ),
         ];
 
@@ -484,7 +498,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario->forValueForCoveragePath(
                 null,
                 false,
-                sys_get_temp_dir() . '/infection',
+                Path::normalize(sys_get_temp_dir() . '/infection'),
             ),
         ];
 
@@ -1576,6 +1590,7 @@ final class ConfigurationFactoryTest extends TestCase
                     )
                     ->withLogVerbosity(LogVerbosity::NONE)
                     ->withTmpDir('/path/to/config/tmp/infection')
+                    ->withDebugTestFrameworkLogFile('/path/to/config/tmp/infection.debug.jsonl')
                     ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', '/path/to/config/phpunit'))
                     ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'))
                     ->withMago(new Mago('/path/to/config/mago-dir', '/path/to/bin/mago'))

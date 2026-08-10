@@ -50,6 +50,7 @@ final class StaticAnalysisToolTypesTest extends TestCase
             [
                 StaticAnalysisToolTypes::PHPSTAN,
                 StaticAnalysisToolTypes::MAGO,
+                StaticAnalysisToolTypes::DEBUG,
             ],
             $types,
         );

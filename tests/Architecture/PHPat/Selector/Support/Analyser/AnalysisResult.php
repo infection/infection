@@ -44,6 +44,8 @@ final readonly class AnalysisResult
         public bool $hasCoversNothing,
         public bool $belongsToIntegrationGroup,
         public bool $declaresPublicNonReadonlyProperty,
+        /** @var list<string> */
+        public array $environmentVariables,
     ) {
     }
 }

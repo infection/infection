@@ -78,6 +78,7 @@ final class SchemaConfigurationBuilder
         private string|int|null $threads,
         private string|int|null $dotsPerRow,
         private ?string $staticAnalysisTool,
+        private ?string $debugTestFrameworkLogFile,
     ) {
     }
 
@@ -107,6 +108,7 @@ final class SchemaConfigurationBuilder
             threads: $schema->threads,
             dotsPerRow: $schema->dotsPerRow,
             staticAnalysisTool: $schema->staticAnalysisTool,
+            debugTestFrameworkLogFile: $schema->debugTestFrameworkLogFile,
         );
     }
 
@@ -136,6 +138,7 @@ final class SchemaConfigurationBuilder
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: null,
+            debugTestFrameworkLogFile: null,
         );
     }
 
@@ -176,6 +179,7 @@ final class SchemaConfigurationBuilder
             threads: 4,
             dotsPerRow: 80,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
+            debugTestFrameworkLogFile: '/debug.jsonl',
         );
     }
 
@@ -370,6 +374,14 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    public function withDebugTestFrameworkLogFile(?string $debugTestFrameworkLogFile): self
+    {
+        $clone = clone $this;
+        $clone->debugTestFrameworkLogFile = $debugTestFrameworkLogFile;
+
+        return $clone;
+    }
+
     public function build(): SchemaConfiguration
     {
         return new SchemaConfiguration(
@@ -396,6 +408,7 @@ final class SchemaConfigurationBuilder
             threads: $this->threads,
             dotsPerRow: $this->dotsPerRow,
             staticAnalysisTool: $this->staticAnalysisTool,
+            debugTestFrameworkLogFile: $this->debugTestFrameworkLogFile,
         );
     }
 }

@@ -10,21 +10,12 @@ The test forces those preconditions in `run_tests.bash`:
 
 The PHPUnit test prints `Memory: 16.00 MB` during the initial test run. PHPUnit's own final memory line may vary between environments, but Infection reads the first matching memory line from the process output. This makes `MemoryLimiter` append `memory_limit = 32M` to the temporary php.ini after the initial static analysis run and before mutant execution.
 
-`phpstan-bootstrap.php` is loaded by PHPStan. It is a no-op for the initial PHPStan run. For mutant PHPStan runs, identified by `--tmp-file=...`, it asserts the regression setup:
+`phpstan-bootstrap.php` is loaded by PHPStan. It is a no-op for the initial PHPStan run. For mutant PHPStan runs, identified by `--tmp-file=...`, it asserts both sides of the fixed behavior:
 
 - the temporary `php.ini` contains the expected `memory_limit = 32M` cap, proving `MemoryLimiter` ran;
-- the effective PHP memory limit is still `-1`.
+- the effective PHP memory limit is still `-1`, proving the PHPStan process opted out of that cap.
 
-The current expected output documents the existing bug: mutant PHPStan runs see the effective `32M` limit, fail the bootstrap check, and are reported as errors:
-
-```text
-Killed by Test Framework: 1
-Killed by Static Analysis: 0
-Errored: 7
-Escaped: 0
-```
-
-When the bug is fixed, mutant PHPStan runs should inherit the capped php.ini but override it with PHP `-d memory_limit=-1`. At that point, this fixture's expected summary should be changed to:
+Mutant PHPStan runs should inherit the capped php.ini but override it with PHP `-d memory_limit=-1`, so the expected summary remains:
 
 ```text
 Killed by Test Framework: 1

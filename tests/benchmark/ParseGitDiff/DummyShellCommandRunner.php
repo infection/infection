@@ -46,11 +46,16 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
 {
     public function __construct(
         public string $executeResult,
+        public string $workingDirectory,
     ) {
     }
 
     public function mustRun(array $command): string
     {
+        if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
+            return $this->workingDirectory;
+        }
+
         return $this->executeResult;
     }
 
