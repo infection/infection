@@ -124,7 +124,7 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
         FS::dumpFile($projectDirectory . '/src/SourceClass.php', 'before');
         FS::dumpFile($this->tmp . '/shared/SharedClass.php', 'before');
 
-        $executor = new ShellCommandLineExecutor();
+        $executor = new SymfonyProcessShellCommandLineExecutor();
         $executor->execute(['git', '-C', $this->tmp, 'init', '--quiet']);
         $executor->execute(['git', '-C', $this->tmp, 'add', '.']);
         $executor->execute([

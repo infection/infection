@@ -4471,18 +4471,6 @@ message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUti
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "impossible-assignment"
-message = "Invalid assignment: the right-hand side has type `never` and cannot produce a value."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "non-existent-class"
-message = 'Class `Infection\Tests\Git\ShellCommandLineExecutor` not found.'
-count = 1
-
-[[issues]]
 file = "tests/phpunit/Logger/Console/ConsoleLoggerTest.php"
 code = "missing-parameter-type"
 message = "Parameter `$value` is missing a type hint."
