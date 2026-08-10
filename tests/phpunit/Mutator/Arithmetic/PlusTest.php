@@ -39,7 +39,7 @@ use Infection\Mutator\Arithmetic\Plus;
 use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\Int_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -116,7 +116,7 @@ final class PlusTest extends BaseMutatorTestCase
 
     public function test_it_should_mutate_plus_expression(): void
     {
-        $plusExpression = new Node\Expr\BinaryOp\Plus(new LNumber(1), new LNumber(2));
+        $plusExpression = new Node\Expr\BinaryOp\Plus(new Int_(1), new Int_(2));
 
         $this->assertTrue($this->mutator->canMutate($plusExpression));
     }
@@ -124,8 +124,8 @@ final class PlusTest extends BaseMutatorTestCase
     public function test_it_should_not_mutate_plus_with_arrays(): void
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(
-            new Array_([new LNumber(1)]),
-            new Array_([new LNumber(1)]),
+            new Array_([new Int_(1)]),
+            new Array_([new Int_(1)]),
         );
 
         $this->assertFalse($this->mutator->canMutate($plusExpression));

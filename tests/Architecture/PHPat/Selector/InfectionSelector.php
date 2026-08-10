@@ -38,6 +38,7 @@ namespace Infection\Tests\Architecture\PHPat\Selector;
 use Infection\CannotBeInstantiated;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Architecture\PHPat\Selector\Support\Analyser\Analyser;
+use Infection\Tests\Architecture\PHPat\Selector\Support\EnvironmentVariableUsageDetector;
 use Infection\Tests\Architecture\PHPat\Selector\Support\EventArchitecture;
 use Infection\Tests\Architecture\PHPat\Selector\Support\IoCodeDetector;
 use PHPat\Selector\Selector;
@@ -167,6 +168,16 @@ final class InfectionSelector
     {
         return new PHPUnitTestNotRequiringIoWithIntegrationGroup(
             self::getIoCodeDetector($reflectionProvider),
+        );
+    }
+
+    public static function phpunitTestMissingEnvironmentVariable(ReflectionProvider $reflectionProvider): SelectorInterface
+    {
+        return new PHPUnitTestMissingEnvironmentVariable(
+            new EnvironmentVariableUsageDetector(
+                self::analyser(),
+                $reflectionProvider,
+            ),
         );
     }
 

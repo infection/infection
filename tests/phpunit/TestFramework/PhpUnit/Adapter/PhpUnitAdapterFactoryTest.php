@@ -54,9 +54,10 @@ final class PhpUnitAdapterFactoryTest extends TestCase
             '/path/to/config-dir',
             '/path/to/junit.xml',
             '/path/to/project',
-            [],
+            ['src'],
             true,
             shellCommandLineExecutor: new SymfonyProcessShellCommandLineExecutor(),
+            sourceDirectoryBasePath: '/path/to/project',
         );
 
         $this->assertSame('PHPUnit', $adapter->getName());

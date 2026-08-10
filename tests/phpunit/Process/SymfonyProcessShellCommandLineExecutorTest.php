@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Process\SymfonyProcessShellCommandLineExecutor;
+use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -69,22 +70,22 @@ final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
     public static function commandProvider(): iterable
     {
         yield 'simple output' => [
-            ['echo', 'test output'],
+            [PHP_BINARY, '-r', 'echo "test output";'],
             'test output',
         ];
 
         yield 'output with leading whitespace' => [
-            ['echo', '  whitespace'],
+            [PHP_BINARY, '-r', 'echo "  whitespace";'],
             'whitespace',
         ];
 
         yield 'output with trailing whitespace' => [
-            ['echo', 'whitespace  '],
+            [PHP_BINARY, '-r', 'echo "whitespace  ";'],
             'whitespace',
         ];
 
         yield 'output with both leading and trailing whitespace' => [
-            ['echo', '  whitespace  '],
+            [PHP_BINARY, '-r', 'echo "  whitespace  ";'],
             'whitespace',
         ];
 

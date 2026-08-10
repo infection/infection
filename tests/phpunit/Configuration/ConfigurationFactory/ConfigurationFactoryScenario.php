@@ -274,6 +274,7 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($previousExpected)
                     ->withTmpDir($expectedTmpDir)
+                    ->withDebugTestFrameworkLogFile($expectedTmpDir . '.debug.jsonl')
                     ->withCoveragePath($expectedTmpDir)
                     ->build(),
             );

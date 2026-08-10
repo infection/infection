@@ -38,6 +38,7 @@ namespace Infection\Tests\Command\ListSourcesCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Console\Application;
 use Infection\Container\Container;
+use Infection\Framework\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -74,7 +75,7 @@ final class ListSourcesCommandTest extends TestCase
                 File2.php
 
                 STDOUT,
-            $tester->getDisplay(),
+            Str::toUnixLineEndings($tester->getDisplay()),
         );
         $tester->assertCommandIsSuccessful();
     }

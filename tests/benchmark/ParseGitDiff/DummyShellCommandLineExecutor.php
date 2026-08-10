@@ -44,11 +44,16 @@ final readonly class DummyShellCommandLineExecutor implements ShellCommandLineEx
 {
     public function __construct(
         public string $executeResult,
+        public string $workingDirectory,
     ) {
     }
 
     public function execute(array $command): string
     {
+        if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
+            return $this->workingDirectory;
+        }
+
         return $this->executeResult;
     }
 }

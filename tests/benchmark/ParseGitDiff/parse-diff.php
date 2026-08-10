@@ -45,11 +45,11 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 $diff = file_get_contents(__DIR__ . '/diff');
 
 $git = new CommandLineGit(
-    new DummyShellCommandLineExecutor($diff),
+    new DummyShellCommandLineExecutor($diff, __DIR__),
 );
 
 // The values used for this method do not matter: we return the diff content.
 /**
  * @return Closure(): positive-int|0
  */
-return static fn (): int => count($git->getChangedLinesRangesByFileRelativePaths('AM', 'unknown', []));
+return static fn (): int => count($git->getChangedLinesRangesByFilePaths('AM', 'unknown', [], __DIR__));

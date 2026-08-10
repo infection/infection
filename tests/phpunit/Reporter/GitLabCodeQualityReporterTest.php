@@ -92,7 +92,7 @@ final class GitLabCodeQualityReporterTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'PregQuote',
                     'description' => 'Escaped Mutant for Mutator PregQuote',
-                    'content' => Str::toSystemLineEndings(
+                    'content' => Str::toUnixLineEndings(
                         "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';",
                     ),
                     'categories' => ['Escaped Mutant'],
@@ -109,7 +109,7 @@ final class GitLabCodeQualityReporterTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => Str::toSystemLineEndings(
+                    'content' => Str::toUnixLineEndings(
                         "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';",
                     ),
                     'categories' => ['Escaped Mutant'],
@@ -132,7 +132,7 @@ final class GitLabCodeQualityReporterTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => Str::toSystemLineEndings(
+                    'content' => Str::toUnixLineEndings(
                         "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';",
                     ),
                     'categories' => ['Escaped Mutant'],

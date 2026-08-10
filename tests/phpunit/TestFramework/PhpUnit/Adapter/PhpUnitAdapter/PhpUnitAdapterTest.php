@@ -39,7 +39,6 @@ use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\FileSystem\FileSystem;
-use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
@@ -100,7 +99,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $this->assertSame('PHPUnit', $this->adapter->getName());
     }
@@ -112,7 +111,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $this->assertTrue($this->adapter->hasJUnitReport());
     }
@@ -152,7 +151,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $actual = $this->adapter->testsPass($output);
 
@@ -169,7 +168,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $actual = $this->adapter->isSyntaxError($output);
 
@@ -186,7 +185,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $result = $this->adapter->getMemoryUsed($output);
 
@@ -200,7 +199,7 @@ final class PhpUnitAdapterTest extends TestCase
             ->method('dumpFile');
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $options = $this->adapter->getInitialRunOnlyOptions();
 
@@ -222,7 +221,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->pcovDirectoryProvider
             ->expects($scenario->skipCoverage ? $this->never() : $this->once())
-            ->method('shallProvide')
+            ->method('shouldProvide')
             ->willReturn($scenario->pcovDirectory !== '');
         $this->pcovDirectoryProvider
             ->expects($this->atMost(1))
@@ -260,7 +259,7 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->pcovDirectoryProvider
             ->expects($this->never())
-            ->method('shallProvide');
+            ->method('shouldProvide');
 
         $adapter = $this->createAdapter(
             testFrameworkConfigContent: $scenario->testFrameworkConfigContent,
@@ -348,6 +347,12 @@ final class PhpUnitAdapterTest extends TestCase
         yield [true, '12.2.99'];
 
         yield [true, '13.0'];
+
+        yield [true, '13.2.99'];
+
+        yield [false, '13.3'];
+
+        yield [false, '14.0'];
     }
 
     #[DataProvider('coverageWithoutSourceProvider')]
@@ -744,9 +749,7 @@ final class PhpUnitAdapterTest extends TestCase
                     '-d',
                     'memory_limit=-1',
                     '-d',
-                    OperatingSystem::isWindows()
-                        ? 'pcov.directory="."'
-                        : "pcov.directory='.'",
+                    'pcov.directory=.',
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',
@@ -1074,15 +1077,13 @@ final class PhpUnitAdapterTest extends TestCase
                 ]),
         ];
 
-        yield 'with PCOV directory requiring shell escaping' => [
+        yield 'with PCOV directory containing spaces' => [
             $default
                 ->withPcovDirectory('/path with spaces/src')
                 ->withExpected([
                     self::PHP_EXECUTABLE,
                     '-d',
-                    OperatingSystem::isWindows()
-                        ? 'pcov.directory="/path with spaces/src"'
-                        : "pcov.directory='/path with spaces/src'",
+                    'pcov.directory=/path with spaces/src',
                     '/path/to/phpunit',
                     '--configuration',
                     '/tmp/phpunitConfiguration.initial.infection.xml',

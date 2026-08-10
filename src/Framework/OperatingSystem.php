@@ -54,4 +54,9 @@ final class OperatingSystem
     {
         return PHP_OS_FAMILY === 'Windows';
     }
+
+    public static function isCaseSensitive(): bool
+    {
+        return !(self::isMacOs() || self::isWindows());
+    }
 }
