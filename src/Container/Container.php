@@ -131,7 +131,7 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Reporter\AdvisoryReporter;
 use Infection\Reporter\FederatedReporter;
 use Infection\Reporter\FileLocationReporter;
@@ -162,7 +162,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -308,7 +308,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
-                    $container->getShellCommandLineExecutor(),
+                    $container->getShellCommandRunner(),
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -318,7 +318,7 @@ final class Container extends DIContainer
                     $config,
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
-                    $container->getShellCommandLineExecutor(),
+                    $container->getShellCommandRunner(),
                     new PhpExecutableFinder(),
                 );
             },
@@ -603,9 +603,9 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
-            ShellCommandLineExecutor::class => SymfonyProcessShellCommandLineExecutor::class,
+            ShellCommandRunner::class => SymfonyProcessShellCommandRunner::class,
             Git::class => static fn (self $container): Git => new CommandLineGit(
-                $container->getShellCommandLineExecutor(),
+                $container->getShellCommandRunner(),
                 $container->getLogger(),
             ),
             SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
@@ -1065,9 +1065,9 @@ final class Container extends DIContainer
         return $this->get(DiffSourceCodeMatcher::class);
     }
 
-    public function getShellCommandLineExecutor(): ShellCommandLineExecutor
+    public function getShellCommandRunner(): ShellCommandRunner
     {
-        return $this->get(ShellCommandLineExecutor::class);
+        return $this->get(ShellCommandRunner::class);
     }
 
     public function getGit(): Git

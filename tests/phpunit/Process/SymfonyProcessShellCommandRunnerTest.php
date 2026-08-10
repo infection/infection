@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process;
 
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandRunner;
 use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -43,15 +43,15 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-#[CoversClass(SymfonyProcessShellCommandLineExecutor::class)]
+#[CoversClass(SymfonyProcessShellCommandRunner::class)]
 #[Group('integration')]
-final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
+final class SymfonyProcessShellCommandRunnerTest extends TestCase
 {
-    private SymfonyProcessShellCommandLineExecutor $executor;
+    private SymfonyProcessShellCommandRunner $executor;
 
     protected function setUp(): void
     {
-        $this->executor = new SymfonyProcessShellCommandLineExecutor();
+        $this->executor = new SymfonyProcessShellCommandRunner();
     }
 
     /**
@@ -62,7 +62,7 @@ final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
         array $command,
         string $expectedOutput,
     ): void {
-        $output = $this->executor->execute($command);
+        $output = $this->executor->mustRun($command);
 
         $this->assertSame($expectedOutput, $output);
     }
@@ -97,7 +97,7 @@ final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
 
     public function test_it_does_not_include_stderr_in_output(): void
     {
-        $output = $this->executor->execute([
+        $output = $this->executor->mustRun([
             'php',
             '-r',
             'fwrite(STDOUT, "stdout content"); fwrite(STDERR, "stderr content");',
@@ -111,7 +111,7 @@ final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessageMatches('/stdout output.*stderr output/s');
 
-        $this->executor->execute([
+        $this->executor->mustRun([
             'php',
             '-r',
             'fwrite(STDOUT, "stdout output"); fwrite(STDERR, "stderr output"); exit(1);',
@@ -120,7 +120,7 @@ final class SymfonyProcessShellCommandLineExecutorTest extends TestCase
 
     public function test_it_does_not_provide_interactive_input(): void
     {
-        $output = $this->executor->execute([
+        $output = $this->executor->mustRun([
             'php',
             '-r',
             'echo fgets(STDIN) ?: "no input";',

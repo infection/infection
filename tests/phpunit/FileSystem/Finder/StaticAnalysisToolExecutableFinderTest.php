@@ -41,8 +41,8 @@ use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\SymfonyProcessShellCommandLineExecutor;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
@@ -76,7 +76,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
     private ComposerExecutableFinder&Stub $composerFinder;
 
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
+    private ShellCommandRunner $shellCommandRunner;
 
     protected function setUp(): void
     {
@@ -92,14 +92,14 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         $this->composerFinder->method('find')
             ->willReturn(['/usr/bin/composer']);
 
-        $this->shellCommandLineExecutor = new SymfonyProcessShellCommandLineExecutor();
+        $this->shellCommandRunner = new SymfonyProcessShellCommandRunner();
     }
 
     public function test_it_can_load_a_custom_path(): void
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandRunner);
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -110,7 +110,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandRunner);
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -122,7 +122,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
     {
         $path = self::getPath();
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandRunner);
 
         $expected = realpath('vendor/bin/phpunit');
 
@@ -157,15 +157,15 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::PATH_NAME, $this->tmp));
         putenv('PATHEXT=');
 
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
             ->expects($this->once())
-            ->method('execute')
+            ->method('mustRun')
             ->with(['/usr/bin/composer', 'config', 'bin-dir'])
             ->willThrowException(new RuntimeException())
         ;
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $shellCommandLineExecutor);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $shellCommandRunner);
 
         if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
@@ -197,7 +197,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::PATH_NAME, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandRunner);
 
         if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
@@ -223,7 +223,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::PATH_NAME, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder, $this->shellCommandRunner);
 
         $this->assertSame(
             Path::canonicalize($mock->getPackageScript()),

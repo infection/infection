@@ -33,27 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Contracts;
+namespace Infection\Benchmark\ParseGitDiff;
 
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Exception\RuntimeException;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
  * @internal
- *
- * Provides test framework adapters with a testable boundary for running blocking shell commands.
  */
-interface ShellCommandLineExecutor
+final readonly class DummyShellCommandRunner implements ShellCommandRunner
 {
-    /**
-     * @param string[] $command
-     *
-     * @throws ProcessFailedException When process didn't terminate successfully.
-     * @throws RuntimeException When process can't be launched.
-     * @throws ProcessTimedOutException When process timed out.
-     * @throws ProcessSignaledException When process stopped after receiving signal.
-     */
-    public function execute(array $command): string;
+    public function __construct(
+        public string $executeResult,
+        public string $workingDirectory,
+    ) {
+    }
+
+    public function mustRun(array $command): string
+    {
+        if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
+            return $this->workingDirectory;
+        }
+
+        return $this->executeResult;
+    }
 }

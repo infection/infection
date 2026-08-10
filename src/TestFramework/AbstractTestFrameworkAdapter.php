@@ -41,7 +41,7 @@ use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use function sprintf;
 
 /**
@@ -54,7 +54,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         private readonly InitialConfigBuilder $initialConfigBuilder,
         private readonly MutationConfigBuilder $mutationConfigBuilder,
         private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private readonly ShellCommandRunner $shellCommandRunner,
         private readonly VersionParser $versionParser,
         private readonly CommandLineBuilder $commandLineBuilder,
         private ?string $version = null,
@@ -174,7 +174,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         );
 
         return $this->versionParser->parse(
-            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+            $this->shellCommandRunner->mustRun($testFrameworkVersionExecutable),
         );
     }
 }

@@ -41,7 +41,7 @@ use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Testing\TestFramework\Debug\DebugCommandLine;
 use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use InvalidArgumentException;
@@ -59,7 +59,7 @@ final readonly class StaticAnalysisToolFactory
         private Configuration $infectionConfig,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandRunner $shellCommandRunner,
         private PhpExecutableFinder $phpExecutableFinder,
     ) {
     }
@@ -87,7 +87,7 @@ final readonly class StaticAnalysisToolFactory
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
-                $this->shellCommandLineExecutor,
+                $this->shellCommandRunner,
             );
         }
 
@@ -103,7 +103,7 @@ final readonly class StaticAnalysisToolFactory
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
-                $this->shellCommandLineExecutor,
+                $this->shellCommandRunner,
             );
         }
 

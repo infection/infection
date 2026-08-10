@@ -41,7 +41,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -61,7 +61,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         float $timeout,
         string $tmpDir,
         array $staticAnalysisToolOptions,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ShellCommandRunner $shellCommandRunner,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
             new Filesystem(),
@@ -75,7 +75,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             $timeout,
             $tmpDir,
             $staticAnalysisToolOptions,
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
         );
     }
 }

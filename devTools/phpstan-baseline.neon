@@ -1573,10 +1573,10 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
 
 		-
-			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandLineExecutorTest should not exist
+			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
-			path: ../tests/phpunit/Process/SymfonyProcessShellCommandLineExecutorTest.php
+			path: ../tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php
 
 		-
 			rawMessage: 'Parameter #1 $className of static method Infection\Reflection\AnonymousClassReflection::fromClassName() expects class-string, string given.'

@@ -42,7 +42,7 @@ use Infection\StaticAnalysis\Mago\Process\MagoMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use RuntimeException;
 use Safe\Exceptions\PcreException;
 use function sprintf;
@@ -67,7 +67,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
         private readonly array $staticAnalysisToolOptions,
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private readonly ShellCommandRunner $shellCommandRunner,
         private ?string $version = null,
     ) {
     }
@@ -142,7 +142,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
         );
 
         return $this->versionParser->parse(
-            $this->shellCommandLineExecutor->execute($testFrameworkVersionExecutable),
+            $this->shellCommandRunner->mustRun($testFrameworkVersionExecutable),
         );
     }
 }

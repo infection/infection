@@ -43,7 +43,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
@@ -81,7 +81,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         bool $executeOnlyCoveringTestCases = false,
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
-        ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
+        ?ShellCommandRunner $shellCommandRunner = null,
         ?string $sourceDirectoryBasePath = null,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
@@ -89,7 +89,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $sourceDirectories,
             'The source directories cannot be empty. This indicates that an invalid configuration reached the test framework adapter factory.',
         );
-        Assert::notNull($shellCommandLineExecutor);
+        Assert::notNull($shellCommandRunner);
         Assert::notNull($sourceDirectoryBasePath);
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
@@ -143,7 +143,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
             ),
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
             new VersionParser(),
             new CommandLineBuilder(
                 new PhpExecutableFinder(),

@@ -33,17 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Contracts;
+namespace Infection\Process;
 
-use DomainException;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Symfony\Component\Process\Process;
+use function trim;
 
 /**
  * @internal
  */
-final readonly class FakeShellCommandLineExecutor implements ShellCommandLineExecutor
+final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
 {
-    public function execute(array $command): string
+    public function mustRun(array $command): string
     {
-        throw new DomainException('Unexpected call.');
+        return trim((new Process($command))->mustRun()->getOutput());
     }
 }

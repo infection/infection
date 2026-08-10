@@ -40,7 +40,7 @@ use function dirname;
 use function file_exists;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use const PATH_SEPARATOR;
@@ -70,7 +70,7 @@ class TestFrameworkFinder
 
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private readonly ShellCommandRunner $shellCommandRunner,
     ) {
     }
 
@@ -111,7 +111,7 @@ class TestFrameworkFinder
         $vendorPath = null;
 
         try {
-            $vendorPath = $this->shellCommandLineExecutor->execute([
+            $vendorPath = $this->shellCommandRunner->mustRun([
                 ...$this->findComposer(),
                 'config',
                 'bin-dir',

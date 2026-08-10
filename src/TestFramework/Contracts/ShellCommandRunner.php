@@ -33,19 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\TestFramework\Contracts;
 
-use Infection\TestFramework\Contracts\ShellCommandLineExecutor;
-use Symfony\Component\Process\Process;
-use function trim;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @internal
+ *
+ * Provides test framework adapters with a testable boundary for running blocking shell commands.
  */
-final readonly class SymfonyProcessShellCommandLineExecutor implements ShellCommandLineExecutor
+interface ShellCommandRunner
 {
-    public function execute(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
-    }
+    /**
+     * @param string[] $command
+     *
+     * @throws ProcessFailedException When process didn't terminate successfully.
+     * @throws RuntimeException When process can't be launched.
+     * @throws ProcessTimedOutException When process timed out.
+     * @throws ProcessSignaledException When process stopped after receiving signal.
+     */
+    public function mustRun(array $command): string;
 }
