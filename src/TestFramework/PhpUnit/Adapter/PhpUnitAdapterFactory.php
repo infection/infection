@@ -83,6 +83,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         ?string $mapSourceClassToTestStrategy = null,
         ?ShellCommandLineExecutor $shellCommandLineExecutor = null,
         ?string $sourceDirectoryBasePath = null,
+        bool $useWindowsFilterLimit = false,
     ): TestFrameworkAdapter {
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
         Assert::notEmpty(
@@ -142,6 +143,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
+                $useWindowsFilterLimit,
             ),
             $shellCommandLineExecutor,
             new VersionParser(),
