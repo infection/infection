@@ -1249,18 +1249,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Locator/FileOrDirectoryNotFoundTest.php
 
 		-
-			rawMessage: 'Call to an undefined method Infection\Git\Git::getChangedFileRelativePaths().'
-			identifier: method.notFound
-			count: 2
-			path: ../tests/phpunit/Git/CommandLineGitIntegrationTest.php
-
-		-
-			rawMessage: 'Call to an undefined method Infection\Git\Git::getChangedLinesRangesByFileRelativePaths().'
-			identifier: method.notFound
-			count: 3
-			path: ../tests/phpunit/Git/CommandLineGitIntegrationTest.php
-
-		-
 			rawMessage: Infection\Tests\Logger\Console\BufferedOutputWithStdErrOutput should not exist
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
@@ -1793,12 +1781,6 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestingUtility/Console/Command/TestOptionCommand.php
-
-		-
-			rawMessage: Unused Infection\Tests\TestingUtility\FS::dumpFile
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: ../tests/phpunit/TestingUtility/FS.php
 
 		-
 			rawMessage: Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder should not exist
