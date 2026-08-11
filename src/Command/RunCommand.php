@@ -372,10 +372,6 @@ final class RunCommand extends BaseCommand
             );
     }
 
-    /**
-     * @throws ProcessTimedOutException
-     * @throws ProcessException
-     */
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);

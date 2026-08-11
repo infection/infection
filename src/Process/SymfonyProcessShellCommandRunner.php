@@ -40,7 +40,7 @@ use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Stringable;
 use Symfony\Component\Process\Process;
-use function trim as trim1;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -66,7 +66,7 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
             $idleTimeout,
         );
 
-        return trim1($process->mustRun($callback)->getOutput());
+        return trim($process->mustRun($callback)->getOutput());
     }
 
     public function run(
@@ -95,8 +95,8 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         return new CompletedProcess(
             $command,
             $exitCode,
-            trim1($process->getOutput()),
-            trim1($process->getErrorOutput()),
+            trim($process->getOutput()),
+            trim($process->getErrorOutput()),
         );
     }
 
