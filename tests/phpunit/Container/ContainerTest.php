@@ -214,11 +214,10 @@ final class ContainerTest extends TestCase
 
     public static function provideExpectedConcreteServicesWithReflection(): iterable
     {
-        $container = Container::create();
-        $reflection = new ContainerReflection($container);
+        $reflection = new ContainerReflection(SingletonContainer::getContainer());
 
         foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
-            yield $methodName => [$id, $methodName, $container];
+            yield $methodName => [$id, $methodName];
         }
     }
 
@@ -226,14 +225,14 @@ final class ContainerTest extends TestCase
      * @param class-string $id
      */
     #[DataProvider('provideExpectedConcreteServicesWithReflection')]
-    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container): void
+    public function test_it_can_provide_all_services(string $id, string $methodName): void
     {
+        $this->assertNotNull(self::$container);
+
         try {
-            $service = $container->{$methodName}();
+            $service = self::$container->{$methodName}();
         } catch (Error|AssertException) {
             // Ignore services that require extra configuration
-            $this->expectNotToPerformAssertions();
-
             return;
         }
 
@@ -243,7 +242,7 @@ final class ContainerTest extends TestCase
             sprintf('Service should be an instance of "%s"', $id),
         );
 
-        $this->assertSame($service, $container->get($id));
+        $this->assertSame($service, self::$container->get($id));
     }
 
     /**
