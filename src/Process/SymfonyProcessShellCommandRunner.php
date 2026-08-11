@@ -64,16 +64,6 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
 
         $process->run($callback);
 
-        return self::createResult($command, $process);
-    }
-
-    /**
-     * @param list<string> $command
-     */
-    private function createResult(
-        array $command,
-        Process $process,
-    ): CompletedProcess {
         $exitCode = $process->getExitCode();
         Assert::integer($exitCode);
 

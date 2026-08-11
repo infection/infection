@@ -4465,42 +4465,6 @@ message = 'Argument type mismatch for argument #2 of `Infection\Tests\TestingUti
 count = 1
 
 [[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertArrayHasKey`: expected `ArrayAccess<array-key, mixed>|array<array-key, mixed>`, but found `mixed`.'
-count = 3
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "mixed-argument"
-message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertArrayNotHasKey`: expected `ArrayAccess<array-key, mixed>|array<array-key, mixed>`, but found `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "mixed-argument"
-message = "Invalid argument type for argument #2 of `explode`: expected `string`, but found `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 3
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "non-existent-method"
-message = 'Method `getchangedfilerelativepaths` does not exist on type `Infection\Git\Git`.'
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Git/CommandLineGitIntegrationTest.php"
-code = "non-existent-method"
-message = 'Method `getchangedlinesrangesbyfilerelativepaths` does not exist on type `Infection\Git\Git`.'
-count = 3
-
-[[issues]]
 file = "tests/phpunit/Logger/Console/ConsoleLoggerTest.php"
 code = "missing-parameter-type"
 message = "Parameter `$value` is missing a type hint."
