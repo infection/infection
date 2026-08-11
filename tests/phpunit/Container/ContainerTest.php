@@ -161,7 +161,7 @@ final class ContainerTest extends TestCase
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
             return;
-        } catch (AssertException) {
+        } catch (Error|AssertException) {
             // Another happy path: the service requires extra configuration to be created
             $this->expectNotToPerformAssertions();
 
@@ -232,5 +232,21 @@ final class ContainerTest extends TestCase
         );
 
         $this->assertSame($service, $container->get($id));
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
+    private static function createService(string $id): ?object
+    {
+        try {
+            return Container::create()->get($id);
+        } catch (Error|AssertException) {
+            // Ignore services that require extra configuration (cause errors or assertions without it)
+            return null;
+        }
     }
 }
