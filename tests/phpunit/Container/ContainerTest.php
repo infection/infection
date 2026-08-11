@@ -172,6 +172,9 @@ final class ContainerTest extends TestCase
             $service,
             sprintf('Service should be an instance of "%s"', $id),
         );
+
+        // Here we can check that all other services can be created without a factory for this service
+        // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
     }
 
     /**
