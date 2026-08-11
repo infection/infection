@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Container;
 
-use function array_keys;
+use DIContainer\Exception as ContainerException;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
@@ -135,13 +135,11 @@ final class ContainerTest extends TestCase
         );
     }
 
-    public static function provideServicesWithReflection(): iterable
+    public static function provideRegisteredServices(): iterable
     {
-        $reflection = new ContainerReflection(
-            SingletonContainer::getContainer(),
-        );
-
-        foreach (array_keys($reflection->getFactories()) as $id) {
+        // The container may hold non-class bindings; ours are all class-string IDs
+        foreach (Container::create() as $id) {
+            /** @var class-string $id */
             yield $id => [$id];
         }
     }
@@ -149,24 +147,22 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideServicesWithReflection')]
-    public function test_factory_is_essential(string $id): void
+    #[DataProvider('provideRegisteredServices')]
+    public function test_registration_is_essential(string $id): void
     {
-        $reflection = new ContainerReflection(Container::create());
+        $container = Container::create();
 
-        $reflection->unsetFactory($id);
+        $container->remove($id);
 
         try {
-            $service = $reflection->createService($id);
-        } catch (InvalidArgumentException $e) {
-            // All good: the service needs a factory
+            $service = $container->get($id);
+        } catch (ContainerException $e) {
+            // All good: the service needs its registration
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
             return;
-        }
-
-        // Another happy path: the service cannot be created without a factory
-        if ($service === null) {
+        } catch (AssertException) {
+            // Another happy path: the service requires extra configuration to be created
             $this->expectNotToPerformAssertions();
 
             return;
@@ -177,30 +173,28 @@ final class ContainerTest extends TestCase
             $service,
             sprintf('Service should be an instance of "%s"', $id),
         );
-
-        // Here we can check that all other services can be created without a factory for this service
-        // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
-    }
-
-    public static function provideImplementationsWithReflection(): iterable
-    {
-        $reflection = new ContainerReflection(Container::create());
-
-        foreach ($reflection->getImplementations() as $id => $implementation) {
-            yield $id => [$id, $implementation];
-        }
     }
 
     /**
      * @param class-string $id
-     * @param class-string $implementation
      */
-    #[DataProvider('provideImplementationsWithReflection')]
-    public function test_it_can_provide_all_services_bound_to_an_implementation(string $id, string $implementation): void
+    #[DataProvider('provideRegisteredServices')]
+    public function test_it_can_provide_all_registered_services(string $id): void
     {
-        $service = Container::create()->get($id);
+        try {
+            $service = Container::create()->get($id);
+        } catch (AssertException) {
+            // Ignore services that require extra configuration
+            $this->expectNotToPerformAssertions();
 
-        $this->assertInstanceOf($implementation, $service);
+            return;
+        }
+
+        $this->assertInstanceOf(
+            $id,
+            $service,
+            sprintf('Service should be an instance of "%s"', $id),
+        );
     }
 
     public static function provideExpectedConcreteServicesWithReflection(): iterable
@@ -209,7 +203,7 @@ final class ContainerTest extends TestCase
         $reflection = new ContainerReflection($container);
 
         foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
-            yield $methodName => [$id, $methodName, $container, $reflection];
+            yield $methodName => [$id, $methodName, $container];
         }
     }
 
@@ -217,7 +211,7 @@ final class ContainerTest extends TestCase
      * @param class-string $id
      */
     #[DataProvider('provideExpectedConcreteServicesWithReflection')]
-    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container, ContainerReflection $reflection): void
+    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container): void
     {
         try {
             $service = $container->{$methodName}();
@@ -234,6 +228,6 @@ final class ContainerTest extends TestCase
             sprintf('Service should be an instance of "%s"', $id),
         );
 
-        $this->assertSame($service, $reflection->getService($id));
+        $this->assertSame($service, $container->get($id));
     }
 }
