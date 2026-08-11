@@ -155,14 +155,16 @@ final class ContainerTest extends TestCase
         $container->remove($id);
 
         try {
-            $service = $container->get($id);
+            $service = self::createService($container, $id);
         } catch (ContainerException $e) {
             // All good: the service needs a factory
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
             return;
-        } catch (Error|AssertException) {
-            // Another happy path: the service requires extra configuration to be created
+        }
+
+        // Another happy path: the service cannot be created without a factory
+        if ($service === null) {
             $this->expectNotToPerformAssertions();
 
             return;
@@ -184,10 +186,9 @@ final class ContainerTest extends TestCase
     #[DataProvider('provideRegisteredServices')]
     public function test_it_can_provide_all_registered_services(string $id): void
     {
-        try {
-            $service = Container::create()->get($id);
-        } catch (Error|AssertException) {
-            // Ignore services that require extra configuration (cause errors or assertions without it)
+        $service = self::createService(Container::create(), $id);
+
+        if ($service === null) {
             $this->expectNotToPerformAssertions();
 
             return;
@@ -240,10 +241,10 @@ final class ContainerTest extends TestCase
      * @param class-string<T> $id
      * @phpstan-return ?T
      */
-    private static function createService(string $id): ?object
+    private static function createService(Container $container, string $id): ?object
     {
         try {
-            return Container::create()->get($id);
+            return $container->get($id);
         } catch (Error|AssertException) {
             // Ignore services that require extra configuration (cause errors or assertions without it)
             return null;
