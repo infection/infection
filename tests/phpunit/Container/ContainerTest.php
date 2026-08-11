@@ -183,7 +183,7 @@ final class ContainerTest extends TestCase
         try {
             $service = Container::create()->get($id);
         } catch (AssertException) {
-            // Ignore services that require extra configuration
+            // Ignore services that require extra configuration (cause errors or assertions without it)
             $this->expectNotToPerformAssertions();
 
             return;
