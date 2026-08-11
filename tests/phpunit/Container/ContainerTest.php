@@ -146,7 +146,7 @@ final class ContainerTest extends TestCase
         );
     }
 
-    public static function provideServices(): iterable
+    public static function provideServicesWithReflection(): iterable
     {
         foreach (SingletonContainer::getContainer() as $id) {
             /** @var class-string $id */
@@ -157,7 +157,7 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideServices')]
+    #[DataProvider('provideServicesWithReflection')]
     public function test_factory_is_essential(string $id): void
     {
         $container = Container::create();
@@ -193,8 +193,8 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideServices')]
-    public function test_it_can_provide_all_registered_services(string $id): void
+    #[DataProvider('provideServicesWithReflection')]
+    public function test_it_can_provide_all_services_bound_to_an_implementation(string $id): void
     {
         // Nothing here mutates the container, so all the cases can share one
         $this->assertNotNull(self::$container);
