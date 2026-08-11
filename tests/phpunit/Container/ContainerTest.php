@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Container;
 
-use DIContainer\Exception as ContainerException;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
@@ -155,7 +154,7 @@ final class ContainerTest extends TestCase
 
         try {
             $service = self::createService($container, $id);
-        } catch (ContainerException $e) {
+        } catch (InvalidArgumentException $e) {
             // All good: the service needs a factory
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
