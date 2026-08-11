@@ -38,7 +38,6 @@ namespace Infection\Benchmark\ParseGitDiff;
 use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Stringable;
 
 /**
  * @internal
@@ -51,9 +50,6 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
     ) {
     }
 
-    /**
-     * @param array<string, string|Stringable|false> $env
-     */
     public function mustRun(
         array $command,
         ?Closure $callback = null,
