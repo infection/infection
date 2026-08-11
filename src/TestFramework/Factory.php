@@ -41,6 +41,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Framework\OperatingSystem;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -107,6 +108,7 @@ final readonly class Factory
                 $this->infectionConfig->mapSourceClassToTestStrategy,
                 $this->shellCommandRunner,
                 sourceDirectoryBasePath: dirname($this->infectionConfig->configurationPathname),
+                useWindowsFilterLimit: OperatingSystem::isWindows(),
             );
         }
 
