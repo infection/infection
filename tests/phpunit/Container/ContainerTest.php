@@ -55,6 +55,18 @@ use Webmozart\Assert\InvalidArgumentException as AssertException;
 #[Group('integration')]
 final class ContainerTest extends TestCase
 {
+    private static ?Container $container = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$container = Container::create();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$container = null;
+    }
+
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -134,7 +146,7 @@ final class ContainerTest extends TestCase
         );
     }
 
-    public static function provideServicesWithReflection(): iterable
+    public static function provideServices(): iterable
     {
         foreach (Container::create() as $id) {
             /** @var class-string $id */
@@ -145,7 +157,7 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideServicesWithReflection')]
+    #[DataProvider('provideServices')]
     public function test_factory_is_essential(string $id): void
     {
         $container = Container::create();
@@ -181,14 +193,16 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideServicesWithReflection')]
-    public function test_it_can_provide_all_services_bound_to_an_implementation(string $id): void
+    #[DataProvider('provideServices')]
+    public function test_it_can_provide_all_registered_services(string $id): void
     {
-        $service = self::createService(Container::create(), $id);
+        // Nothing here mutates the container, so all the cases can share one
+        $this->assertNotNull(self::$container);
 
+        $service = self::createService(self::$container, $id);
+
+        // The service cannot be created without extra configuration
         if ($service === null) {
-            $this->expectNotToPerformAssertions();
-
             return;
         }
 
