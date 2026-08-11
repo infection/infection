@@ -3147,12 +3147,6 @@ count = 1
 [[issues]]
 file = "src/TestFramework/AdapterInstaller.php"
 code = "unhandled-thrown-type"
-message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessStartFailedException` in `Infection\TestFramework\AdapterInstaller::install`.'
-count = 1
-
-[[issues]]
-file = "src/TestFramework/AdapterInstaller.php"
-code = "unhandled-thrown-type"
 message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\TestFramework\AdapterInstaller::install`.'
 count = 1
 

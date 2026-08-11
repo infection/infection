@@ -61,12 +61,12 @@ final class CommandLineGitIntegrationTest extends FileSystemTestCase
     // At minimum we will have the following files in the entire output:
     // - src/Git/CommandLineGit.php
     // - src/Git/Git.php
-    // - src/Process/ShellCommandRunner.php
+    // - src/Process/SymfonyProcessShellCommandRunner.php
     // - tests/phpunit/AutoReview/ProjectCode/ProjectCodeProvider.php
     // - tests/phpunit/Differ/FilesDiffChangedLinesTest.php
     // - tests/phpunit/Git/CommandLineGitIntegrationTest.php
     // - tests/phpunit/Git/CommandLineGitTest.php
-    // - tests/phpunit/Process/ShellCommandRunnerTest.php
+    // - tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php
     private const string COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
     private const string BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
