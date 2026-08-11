@@ -37,7 +37,6 @@ namespace Infection\Tests\Container;
 
 use DIContainer\Exception as ContainerException;
 use Error;
-use function get_class;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
@@ -136,7 +135,7 @@ final class ContainerTest extends TestCase
         );
     }
 
-    public static function provideRegisteredServices(): iterable
+    public static function provideServicesWithReflection(): iterable
     {
         foreach (Container::create() as $id) {
             /** @var class-string $id */
@@ -147,8 +146,8 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideRegisteredServices')]
-    public function test_registration_is_essential(string $id): void
+    #[DataProvider('provideServicesWithReflection')]
+    public function test_factory_is_essential(string $id): void
     {
         $container = Container::create();
 
@@ -183,7 +182,7 @@ final class ContainerTest extends TestCase
     /**
      * @param class-string $id
      */
-    #[DataProvider('provideRegisteredServices')]
+    #[DataProvider('provideServicesWithReflection')]
     public function test_it_can_provide_all_registered_services(string $id): void
     {
         $service = self::createService(Container::create(), $id);
@@ -197,7 +196,7 @@ final class ContainerTest extends TestCase
         $this->assertInstanceOf(
             $id,
             $service,
-            sprintf('Service "%s" should be an instance of "%s"', get_class($service), $id),
+            sprintf('Service "%s" should be an instance of "%s"', $service::class, $id),
         );
     }
 
