@@ -52,9 +52,6 @@ final class ConfigurationBuilderTest extends TestCase
         $this->assertEquals($configuration, $actual);
     }
 
-    /**
-     * @return iterable<string, array{Configuration}>
-     */
     public static function configurationProvider(): iterable
     {
         yield 'minimal test data' => [

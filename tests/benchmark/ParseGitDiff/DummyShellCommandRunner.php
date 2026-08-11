@@ -38,7 +38,6 @@ namespace Infection\Benchmark\ParseGitDiff;
 use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Stringable;
 
 /**
  * @internal
@@ -47,12 +46,10 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
 {
     public function __construct(
         public string $executeResult,
+        public string $workingDirectory,
     ) {
     }
 
-    /**
-     * @param array<string, string|Stringable|false> $env
-     */
     public function mustRun(
         array $command,
         ?Closure $callback = null,
@@ -62,12 +59,13 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
     ): string {
+        if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
+            return $this->workingDirectory;
+        }
+
         return $this->executeResult;
     }
 
-    /**
-     * @param array<string, string|Stringable|false> $env
-     */
     public function run(
         array $command,
         ?Closure $callback = null,
@@ -77,6 +75,11 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
         ?float $timeout = self::DEFAULT_TIMEOUT,
         ?float $idleTimeout = null,
     ): CompletedProcess {
-        return new CompletedProcess($command, 0, $this->executeResult, '');
+        return new CompletedProcess(
+            command: $command,
+            exitCode: 0,
+            stdout: $this->executeResult,
+            stderr: '',
+        );
     }
 }

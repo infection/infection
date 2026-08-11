@@ -75,9 +75,6 @@ abstract class CommandOptionTestCase extends TestCase
         }
     }
 
-    /**
-     * @return iterable<string, array{InputInterface, mixed}>
-     */
     abstract public static function optionProvider(): iterable;
 
     /**

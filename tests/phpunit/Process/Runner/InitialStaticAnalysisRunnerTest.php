@@ -35,96 +35,105 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Closure;
-use Infection\Event\EventDispatcher\EventDispatcher;
+use function array_map;
+use function array_unique;
+use function array_values;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
+use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
+use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
+use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
-    private ShellCommandRunner&MockObject $shellCommandRunner;
+    private InitialStaticAnalysisProcessFactory&Stub $processFactoryStub;
 
-    private StaticAnalysisToolAdapter&MockObject $adapter;
+    private EventDispatcherCollector $eventDispatcher;
 
-    private EventDispatcher&MockObject $eventDispatcher;
+    private StaticAnalysisToolAdapter&Stub $staticAnalysisToolAdapter;
 
     private InitialStaticAnalysisRunner $runner;
 
     protected function setUp(): void
     {
-        $this->shellCommandRunner = $this->createMock(ShellCommandRunner::class);
-        $this->adapter = $this->createMock(StaticAnalysisToolAdapter::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        if (PHP_SAPI === 'phpdbg') {
+            $this->markTestSkipped('The processes do not work the same way in PGPDBG');
+        }
+
+        $this->processFactoryStub = $this->createStub(InitialStaticAnalysisProcessFactory::class);
+
+        $this->eventDispatcher = new EventDispatcherCollector();
+
+        $this->staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+
         $this->runner = new InitialStaticAnalysisRunner(
-            $this->shellCommandRunner,
-            $this->adapter,
+            $this->processFactoryStub,
             $this->eventDispatcher,
+            $this->staticAnalysisToolAdapter,
         );
     }
 
-    /**
-     * @throws ProcessException
-     */
-    public function test_it_runs_the_initial_static_analysis_and_dispatches_events(): void
+    public function test_it_creates_a_process_execute_it_and_dispatch_events_accordingly(): void
     {
-        $command = ['phpstan', 'analyse'];
-        $expected = CompletedProcessBuilder::withMinimalTestData()
-            ->withCommand($command)
-            ->withStdout('analysis output')
-            ->build();
+        $process = $this->createProcessForCode(<<<STR
+            echo 'ping';
+            echo 'pong';
+            STR
+        );
 
-        $this->adapter
-            ->expects($this->once())
-            ->method('getInitialRunCommandLine')
-            ->willReturn($command);
+        $this->processFactoryStub
+            ->method('createProcess')
+            ->willReturn($process)
+        ;
 
-        $this->shellCommandRunner
-            ->expects($this->once())
-            ->method('run')
-            ->with(
-                $command,
-                $this->isInstanceOf(Closure::class),
-                null,
-                [],
-                null,
-                null,
-            )
-            ->willReturnCallback(
-                static function (array $_command, Closure $callback) use ($expected): CompletedProcess {
-                    $callback('out', 'analysis output');
+        $this->runner->run();
 
-                    return $expected;
-                },
-            );
+        $this->assertSame(
+            [
+                InitialStaticAnalysisRunWasStarted::class,
+                InitialStaticAnalysisSubStepWasCompleted::class,
+                InitialStaticAnalysisRunWasFinished::class,
+            ],
+            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
+        );
+    }
 
-        $expectedEvents = [
-            new InitialStaticAnalysisRunWasStarted(),
-            new InitialStaticAnalysisSubStepWasCompleted(),
-            new InitialStaticAnalysisRunWasFinished('analysis output'),
-        ];
-        $eventIndex = 0;
+    public function test_it_throws_when_the_static_analysis_process_fails(): void
+    {
+        $process = $this->createProcessForCode('exit(3);');
 
-        $this->eventDispatcher
-            ->expects($this->exactly(3))
-            ->method('dispatch')
-            ->willReturnCallback(function (object $event) use ($expectedEvents, &$eventIndex): void {
-                $this->assertEquals($expectedEvents[$eventIndex], $event);
-                ++$eventIndex;
-            });
+        $this->processFactoryStub
+            ->method('createProcess')
+            ->willReturn($process)
+        ;
 
-        $actual = $this->runner->run();
+        $this->staticAnalysisToolAdapter
+            ->method('getName')
+            ->willReturn('phpstan')
+        ;
 
-        $this->assertEquals($expected, $actual);
+        $this->expectException(InitialStaticAnalysisRunFailed::class);
+        $this->expectExceptionMessageMatches('/phpstan reported an exit code of 3\\./');
+
+        $this->runner->run();
+    }
+
+    private function createProcessForCode(string $code): Process
+    {
+        return new Process([
+            TestPhpExecutableFinder::find(),
+            '-r',
+            $code,
+        ]);
     }
 }

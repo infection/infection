@@ -53,12 +53,15 @@ final class StaticAnalysisToolTypes
 
     public const string MAGO = 'mago';
 
+    public const string DEBUG = 'debug';
+
     /**
      * @var string[]
      */
     private static array $defaultTypes = [
         self::PHPSTAN,
         self::MAGO,
+        self::DEBUG,
     ];
 
     /**

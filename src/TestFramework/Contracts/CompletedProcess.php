@@ -47,7 +47,9 @@ final readonly class CompletedProcess
         // @phpstan-ignore shipmonk.deadProperty.neverRead
         public array $command,
         public int $exitCode,
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
         public string $stdout,
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
         public string $stderr,
     ) {
     }

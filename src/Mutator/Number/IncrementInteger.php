@@ -46,7 +46,7 @@ use PhpParser\Node;
 /**
  * @internal
  *
- * @extends AbstractNumberMutator<Node\Scalar\LNumber>
+ * @extends AbstractNumberMutator<Node\Scalar\Int_>
  */
 final class IncrementInteger extends AbstractNumberMutator
 {
@@ -72,7 +72,7 @@ final class IncrementInteger extends AbstractNumberMutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Scalar\LNumber>
+     * @return iterable<Node\Scalar\Int_>
      */
     public function mutate(Node $node): iterable
     {
@@ -89,12 +89,12 @@ final class IncrementInteger extends AbstractNumberMutator
             $value = $node->value - 1;
         }
 
-        yield new Node\Scalar\LNumber($value);
+        yield new Node\Scalar\Int_($value);
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Scalar\LNumber) {
+        if (!$node instanceof Node\Scalar\Int_) {
             return false;
         }
 
@@ -123,7 +123,7 @@ final class IncrementInteger extends AbstractNumberMutator
         return $this->isAllowedComparison($node);
     }
 
-    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
+    private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\Int_ $node): bool
     {
         if ($node->value !== 1) {
             return false;
@@ -149,7 +149,7 @@ final class IncrementInteger extends AbstractNumberMutator
         ;
     }
 
-    private function isAllowedComparison(Node\Scalar\LNumber $node): bool
+    private function isAllowedComparison(Node\Scalar\Int_ $node): bool
     {
         if (!$this->isPartOfComparison($node)) {
             return true;

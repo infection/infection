@@ -35,44 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function array_values;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 
 /**
+ * This is needed for 2 purposes:
+ *
+ * 1. To warm up the SA tool's cache
+ * 2. To make sure SA passes before using it inside Infection to kill Mutants
+ *
  * @internal
  * @final
  */
-readonly class InitialStaticAnalysisRunner
+readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
 {
     public function __construct(
-        private ShellCommandRunner $shellCommandRunner,
-        private StaticAnalysisToolAdapter $adapter,
+        private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
         private EventDispatcher $eventDispatcher,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
-    /**
-     * @throws ProcessException
-     */
-    public function run(): CompletedProcess
+    public function run(): void
     {
+        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
+
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $result = $this->shellCommandRunner->run(
-            command: array_values($this->adapter->getInitialRunCommandLine()),
-            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
-            timeout: null, // Ignore the default timeout of 60 seconds
-        );
+        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($result->stdout));
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
 
-        return $result;
+        if (!$process->isSuccessful()) {
+            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
+                $process,
+                $this->staticAnalysisToolAdapter->getName(),
+            );
+        }
     }
 }

@@ -39,9 +39,6 @@ use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Stringable;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -51,14 +48,6 @@ use Webmozart\Assert\Assert;
  */
 final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
 {
-    /**
-     * @param string[] $command
-     * @param array<string, string|Stringable|false> $env
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws ProcessException
-     */
     public function mustRun(
         array $command,
         ?Closure $callback = null,
@@ -80,10 +69,6 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         return trim($process->mustRun($callback)->getOutput());
     }
 
-    /**
-     * @param list<string> $command
-     * @param array<string, string|Stringable|false> $env
-     */
     public function run(
         array $command,
         ?Closure $callback = null,
@@ -104,7 +89,15 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
 
         $process->run($callback);
 
-        return self::createResult($command, $process);
+        $exitCode = $process->getExitCode();
+        Assert::integer($exitCode);
+
+        return new CompletedProcess(
+            $command,
+            $exitCode,
+            trim($process->getOutput()),
+            trim($process->getErrorOutput()),
+        );
     }
 
     /**
@@ -123,23 +116,5 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         $process->setIdleTimeout($idleTimeout);
 
         return $process;
-    }
-
-    /**
-     * @param list<string> $command
-     */
-    private function createResult(
-        array $command,
-        Process $process,
-    ): CompletedProcess {
-        $exitCode = $process->getExitCode();
-        Assert::integer($exitCode);
-
-        return new CompletedProcess(
-            $command,
-            $exitCode,
-            trim($process->getOutput()),
-            trim($process->getErrorOutput()),
-        );
     }
 }

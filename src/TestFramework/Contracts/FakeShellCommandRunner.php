@@ -37,16 +37,12 @@ namespace Infection\TestFramework\Contracts;
 
 use Closure;
 use DomainException;
-use Stringable;
 
 /**
  * @internal
  */
 final readonly class FakeShellCommandRunner implements ShellCommandRunner
 {
-    /**
-     * @param array<string, string|Stringable|false> $env
-     */
     public function mustRun(
         array $command,
         ?Closure $callback = null,
@@ -59,9 +55,6 @@ final readonly class FakeShellCommandRunner implements ShellCommandRunner
         throw new DomainException('Unexpected call.');
     }
 
-    /**
-     * @param array<string, string|Stringable|false> $env
-     */
     public function run(
         array $command,
         ?Closure $callback = null,

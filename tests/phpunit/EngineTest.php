@@ -47,23 +47,22 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
-use Infection\Process\Runner\InitialStaticAnalysisRunner;
+use Infection\Process\Runner\InitialStaticAnalysis;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
 use Infection\Resource\Memory\MemoryLimiter;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\Source\PreloadedSourceChecker;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\Tests\Configuration\ConfigurationBuilder;
-use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Process;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -94,6 +93,8 @@ final class EngineTest extends TestCase
 
     private Stub&TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter;
 
+    private PreloadedSourceChecker $preloadedSourceChecker;
+
     protected function setUp(): void
     {
         $this->adapter = $this->createMock(TestFrameworkAdapter::class);
@@ -108,11 +109,9 @@ final class EngineTest extends TestCase
         $this->consoleOutput = $this->createMock(ConsoleOutput::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->testFrameworkExtraOptionsFilter = $this->createStub(TestFrameworkExtraOptionsFilter::class);
+        $this->preloadedSourceChecker = new PreloadedSourceChecker('');
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_initial_test_run_fails(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -157,9 +156,6 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_initial_test_run_succeeds(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -198,7 +194,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(1000, 2.0, 3.0, $this->consoleOutput);
+            ->with(1000, 2.0, 3.0);
 
         $this->metricsCalculator
             ->expects($this->once())
@@ -221,9 +217,6 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_memory_limiter_is_applied_after_static_analysis_when_enabled(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -244,15 +237,13 @@ final class EngineTest extends TestCase
             ->method('checkCoverageHasBeenGenerated')
             ->with('/tmp/bar', 'test output');
 
-        $staticAnalysisProcess = CompletedProcessBuilder::withMinimalTestData()->build();
-
-        $initialStaticAnalysisRunner = $this->createMock(InitialStaticAnalysisRunner::class);
-        $initialStaticAnalysisRunner
+        $initialStaticAnalysis = $this->createMock(InitialStaticAnalysis::class);
+        $initialStaticAnalysis
             ->expects($this->once())
             ->method('run')
-            ->willReturn($staticAnalysisProcess);
-
-        $staticAnalysisToolAdapter = $this->createStub(StaticAnalysisToolAdapter::class);
+            ->willReturnCallback(static function () use (&$callOrder): void {
+                $callOrder[] = 'staticAnalysis';
+            });
 
         $this->memoryLimiter
             ->expects($this->once())
@@ -280,7 +271,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 80.0, 85.0, $this->consoleOutput);
+            ->with(100, 80.0, 85.0);
 
         $this->metricsCalculator
             ->method('getTestedMutantsCount')
@@ -299,18 +290,14 @@ final class EngineTest extends TestCase
 
         $engine = $this->createEngine(
             $config,
-            $initialStaticAnalysisRunner,
-            $staticAnalysisToolAdapter,
+            $initialStaticAnalysis,
         );
 
         $engine->execute();
 
-        $this->assertSame(['limitMemory', 'generate'], $callOrder);
+        $this->assertSame(['staticAnalysis', 'limitMemory', 'generate'], $callOrder);
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_memory_limiter_is_not_applied_when_initial_tests_are_skipped(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -365,9 +352,6 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_max_timeouts_checker_receives_correct_timed_out_count(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -429,9 +413,6 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_application_execution_was_finished_is_dispatched_when_max_timeouts_checker_throws(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -484,9 +465,6 @@ final class EngineTest extends TestCase
         $this->createEngine($config)->execute();
     }
 
-    /**
-     * @throws ProcessException
-     */
     public function test_application_execution_was_finished_is_dispatched_when_min_msi_checker_throws(): void
     {
         $config = ConfigurationBuilder::withMinimalTestData()
@@ -519,7 +497,7 @@ final class EngineTest extends TestCase
         $this->minMsiChecker
             ->expects($this->once())
             ->method('checkMetrics')
-            ->with(100, 50.0, 55.0, $this->consoleOutput)
+            ->with(100, 50.0, 55.0)
             ->willThrowException(MinMsiCheckFailed::createForMsi(80.0, 50.0));
 
         $this->metricsCalculator
@@ -572,8 +550,7 @@ final class EngineTest extends TestCase
 
     private function createEngine(
         ?Configuration $config = null,
-        ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
-        ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
+        ?InitialStaticAnalysis $initialStaticAnalysis = null,
     ): Engine {
         return new Engine(
             config: $config ?? ConfigurationBuilder::withMinimalTestData()
@@ -592,8 +569,8 @@ final class EngineTest extends TestCase
             consoleOutput: $this->consoleOutput,
             metricsCalculator: $this->metricsCalculator,
             testFrameworkExtraOptionsFilter: $this->testFrameworkExtraOptionsFilter,
-            initialStaticAnalysisRunner: $initialStaticAnalysisRunner,
-            staticAnalysisToolAdapter: $staticAnalysisToolAdapter,
+            preloadedSourceChecker: $this->preloadedSourceChecker,
+            initialStaticAnalysis: $initialStaticAnalysis ?? new NullInitialStaticAnalysisRunner(),
         );
     }
 }
