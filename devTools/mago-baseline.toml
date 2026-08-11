@@ -4348,7 +4348,7 @@ count = 1
 file = "tests/phpunit/Container/ContainerTest.php"
 code = "avoid-catching-error"
 message = "Avoid catching 'Error' class instances."
-count = 1
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Container/ContainerTest.php"
