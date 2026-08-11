@@ -78,7 +78,7 @@ final class MagoAdapter implements StaticAnalysisToolAdapter
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     public function getInitialRunCommandLine(): array
     {

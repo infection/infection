@@ -39,8 +39,8 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
  * This is needed for 2 purposes:
@@ -54,7 +54,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
 {
     public function __construct(
-        private InitialStaticAnalysisProcessFactory $initialStaticAnalysisProcessFactory,
+        private ShellCommandRunner $shellCommandRunner,
         private EventDispatcher $eventDispatcher,
         private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
@@ -62,16 +62,18 @@ readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
 
     public function run(): void
     {
-        $process = $this->initialStaticAnalysisProcessFactory->createProcess();
-
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
+        $process = $this->shellCommandRunner->run(
+            $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
+            fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
+            timeout: null,
+        );
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->stdout));
 
         if (!$process->isSuccessful()) {
-            throw InitialStaticAnalysisRunFailed::fromProcessAndAdapter(
+            throw InitialStaticAnalysisRunFailed::fromCompletedProcessAndAdapter(
                 $process,
                 $this->staticAnalysisToolAdapter->getName(),
             );

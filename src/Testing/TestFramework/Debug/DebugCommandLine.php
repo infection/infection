@@ -67,7 +67,7 @@ final class DebugCommandLine
      *
      * @throws FinderException
      *
-     * @return string[]
+     * @return list<string>
      */
     public function create(
         string $runtime,
@@ -90,7 +90,7 @@ final class DebugCommandLine
         $command[] = '--command';
         $command[] = $encodedCommand;
 
-        return $command;
+        return array_values($command);
     }
 
     /**
