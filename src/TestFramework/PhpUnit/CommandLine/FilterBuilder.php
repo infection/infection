@@ -84,7 +84,7 @@ final class FilterBuilder
     public static function createFilters(
         array $tests,
         string $testFrameworkVersion,
-        bool $useWindowsFilterLimit,
+        bool $useWindowsFilterLimit = false,
         int $optimizationLevel = self::NO_OPTIMIZATION_LEVEL,
     ): array {
         $usedTests = [];

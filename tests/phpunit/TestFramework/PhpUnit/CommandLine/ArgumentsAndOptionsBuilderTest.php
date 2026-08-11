@@ -193,6 +193,23 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         $this->assertSame($expectedArgumentsAndOptions, $actual);
     }
 
+    public function test_it_can_build_the_filter_string_with_the_default_non_windows_limit(): void
+    {
+        $providerKey = str_repeat('x', 9_960);
+
+        $this->assertSame(
+            [
+                'ServiceTest\:\:test_case with data set "' . $providerKey . '"',
+            ],
+            FilterBuilder::createFilters(
+                [
+                    TestLocation::forTestMethod('App\ServiceTest::test_case#' . $providerKey),
+                ],
+                '10.1',
+            ),
+        );
+    }
+
     public static function provideTestCases(): iterable
     {
         $phpunit9 = '9.5';
