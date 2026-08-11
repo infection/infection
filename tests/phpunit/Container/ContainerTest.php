@@ -156,7 +156,7 @@ final class ContainerTest extends TestCase
         try {
             $service = $container->get($id);
         } catch (ContainerException $e) {
-            // All good: the service needs its registration
+            // All good: the service needs a factory
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
             return;
@@ -186,7 +186,7 @@ final class ContainerTest extends TestCase
         try {
             $service = Container::create()->get($id);
         } catch (AssertException) {
-            // Ignore services that require extra configuration
+            // Ignore services that require extra configuration (cause errors or assertions without it)
             $this->expectNotToPerformAssertions();
 
             return;
