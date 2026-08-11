@@ -159,6 +159,33 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->assertSame($expected, $callbackOutput);
     }
 
+    public function test_it_streams_stdout_and_stderr_to_the_callback(): void
+    {
+        $output = [
+            Process::OUT => '',
+            Process::ERR => '',
+        ];
+        $callback = static function (string $type, string $buffer) use (&$output): void {
+            $output[$type] .= $buffer;
+        };
+
+        $this->runner->mustRun(
+            [
+                'php',
+                '-r',
+                'fwrite(STDOUT, "stdout content"); fwrite(STDERR, "stderr content");',
+            ],
+            $callback,
+        );
+
+        $expected = [
+            Process::OUT => 'stdout content',
+            Process::ERR => 'stderr content',
+        ];
+
+        $this->assertSame($expected, $output);
+    }
+
     public function test_it_runs_a_successful_command(): void
     {
         $command = [
@@ -221,6 +248,17 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function test_it_returns_empty_trimmed_output(): void
+    {
+        $command = [PHP_BINARY, '-r', 'echo "  ";'];
+
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->build();
+
+        $this->assertEquals($expected, $this->runner->run($command));
+    }
+
     public function test_it_streams_output_to_the_callback(): void
     {
         $output = [
@@ -269,5 +307,33 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             timeout: null,
             idleTimeout: 0.01,
         );
+    }
+
+    /**
+     * @param array{timeout?: ?float, idleTimeout?: ?float} $arguments
+     */
+    #[DataProvider('mustRunTimeoutProvider')]
+    public function test_it_uses_the_given_timeout_when_the_command_must_run(array $arguments): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+
+        $this->runner->mustRun(
+            ['php', '-r', 'echo "started"; sleep(1);'],
+            ...$arguments,
+        );
+    }
+
+    public static function mustRunTimeoutProvider(): iterable
+    {
+        yield 'timeout' => [
+            ['timeout' => 0.01],
+        ];
+
+        yield 'idle timeout' => [
+            [
+                'timeout' => null,
+                'idleTimeout' => 0.01,
+            ],
+        ];
     }
 }
