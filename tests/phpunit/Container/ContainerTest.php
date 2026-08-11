@@ -156,7 +156,7 @@ final class ContainerTest extends TestCase
         try {
             $service = $container->get($id);
         } catch (ContainerException $e) {
-            // All good: the service needs its registration
+            // All good: the service needs a factory
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
             return;
