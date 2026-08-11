@@ -137,7 +137,6 @@ final class ContainerTest extends TestCase
 
     public static function provideRegisteredServices(): iterable
     {
-        // The container may hold non-class bindings; ours are all class-string IDs
         foreach (Container::create() as $id) {
             /** @var class-string $id */
             yield $id => [$id];
