@@ -196,7 +196,6 @@ final class ContainerTest extends TestCase
     #[DataProvider('provideServicesWithReflection')]
     public function test_it_can_provide_all_services_bound_to_an_implementation(string $id): void
     {
-        // Nothing here mutates the container, so all the cases can share one
         $this->assertNotNull(self::$container);
 
         $service = self::createService(self::$container, $id);
