@@ -158,4 +158,17 @@ final class FS
             ),
         );
     }
+
+    /**
+     * Atomically dumps content into a file.
+     *
+     * @param string|resource $content The data to write into the file
+     *
+     * @throws IOException if the file cannot be written to
+     */
+    public static function dumpFile(string $filename, mixed $content): void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($filename, $content);
+    }
 }

@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\ReturnValue\IntegerNegation;
 use Infection\Testing\BaseMutatorTestCase;
-use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Return_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -127,7 +127,7 @@ final class IntegerNegationTest extends BaseMutatorTestCase
 
     public function test_it_does_not_mutate_zero(): void
     {
-        $node = new Return_(new LNumber(0));
+        $node = new Return_(new Int_(0));
         $this->assertFalse($this->createMutator()->canMutate($node));
     }
 }

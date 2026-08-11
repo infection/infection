@@ -297,9 +297,6 @@ final class MagoAdapterTest extends TestCase
         yield 'major version 2' => ['2.0.0'];
     }
 
-    /**
-     * @return iterable<string, array{string}>
-     */
     public static function provideInvalidVersions(): iterable
     {
         yield 'major version 1 with too low minor' => ['1.19.0'];

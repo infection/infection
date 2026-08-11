@@ -191,6 +191,21 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame('false', $cacheResult);
     }
 
+    public function test_it_disables_caching_for_phpunit_13_3(): void
+    {
+        $xml = $this->filesystem->readFile($this->builder->build('13.3'));
+
+        $cacheResult = $this->queryXpath($xml, '/phpunit/@cacheResult');
+
+        $this->assertInstanceOf(DOMNodeList::class, $cacheResult);
+
+        $this->assertSame(0, $cacheResult->length);
+
+        $recordTestRunHistory = $this->queryXpath($xml, '/phpunit/@recordTestRunHistory')[0]->nodeValue;
+
+        $this->assertSame('false', $recordTestRunHistory);
+    }
+
     public function test_it_deactivates_stderr_redirection(): void
     {
         $xml = $this->filesystem->readFile($this->builder->build('6.5'));
@@ -420,6 +435,20 @@ final class InitialConfigBuilderTest extends TestCase
         $this->assertSame($expectedNodeCount, $nodes->length);
     }
 
+    #[DataProvider('executionOrderValueProvider')]
+    public function test_it_adds_the_execution_order_supported_by_the_phpunit_version(
+        string $version,
+        string $expectedExecutionOrder,
+    ): void {
+        $xml = $this->filesystem->readFile($this->builder->build($version));
+
+        $executionOrder = $this->queryXpath($xml, '/phpunit/@executionOrder');
+
+        $this->assertInstanceOf(DOMNodeList::class, $executionOrder);
+
+        $this->assertSame($expectedExecutionOrder, $executionOrder[0]->value);
+    }
+
     public function test_it_does_not_update_order_if_it_is_already_set(): void
     {
         $phpunitXmlPath = self::FIXTURES . '/phpunit_with_order_set.xml';
@@ -559,6 +588,19 @@ final class InitialConfigBuilderTest extends TestCase
             '7.3.1',
             'resolveDependencies',
             1,
+        ];
+    }
+
+    public static function executionOrderValueProvider(): iterable
+    {
+        yield 'PHPUnit 12.2.7 orders by defects and randomly' => [
+            '12.2.7',
+            'defects,random',
+        ];
+
+        yield 'PHPUnit 13.3 only orders randomly, it records no test run history' => [
+            '13.3',
+            'random',
         ];
     }
 

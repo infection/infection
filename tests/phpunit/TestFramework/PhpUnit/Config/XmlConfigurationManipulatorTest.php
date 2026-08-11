@@ -602,7 +602,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
             XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->deactivateResultCaching($xPath);
+                $configManipulator->deactivateResultCaching('11.0', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -643,7 +643,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             </phpunit>
             XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
-                $configManipulator->deactivateResultCaching($xPath);
+                $configManipulator->deactivateResultCaching('11.0', $xPath);
             },
             <<<'XML'
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -658,6 +658,31 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     printerClass="Fake\Printer\Class"
                     processIsolation="false"
                     stopOnFailure="false"
+                    syntaxCheck="false"
+                >
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_sets_record_test_run_history_to_false_for_phpunit_13_3(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                cacheResult="true"
+                syntaxCheck="false"
+            >
+            </phpunit>
+            XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->deactivateResultCaching('13.3', $xPath);
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    cacheResult="true"
+                    recordTestRunHistory="false"
                     syntaxCheck="false"
                 >
                 </phpunit>
@@ -705,6 +730,31 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 <?xml version="1.0" encoding="UTF-8"?>
                 <phpunit
                     stderr="false"
+                    syntaxCheck="false"
+                >
+                </phpunit>
+                XML,
+        );
+    }
+
+    public function test_it_activates_result_cache_and_execution_order_defects_for_phpunit_13_3(): void
+    {
+        $this->assertItChangesXML(<<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <phpunit
+                syntaxCheck="false"
+            >
+            </phpunit>
+            XML,
+            static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
+                $configManipulator->handleResultCacheAndExecutionOrder('13.3', $xPath, 'a1b2c3', '/tmp');
+            },
+            <<<'XML'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <phpunit
+                    executionOrder="defects"
+                    recordTestRunHistory="true"
+                    cacheDirectory="/tmp/.phpunit.result.cache.a1b2c3"
                     syntaxCheck="false"
                 >
                 </phpunit>

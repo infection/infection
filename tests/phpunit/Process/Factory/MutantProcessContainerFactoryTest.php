@@ -60,9 +60,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
     #[DataProvider('timeoutDataProvider')]
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
-        $mutant = MutantBuilder::materialize(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
+        $mutant = MutantBuilder::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath = '/path/to/mutant')
+            ->withMutation(new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
                 For_::class,
@@ -87,9 +87,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 ],
                 [],
                 '',
-            ),
-            'killed#0',
-            $mutantDiff = <<<'DIFF'
+            ))
+            ->withMutatedCode('killed#0')
+            ->withDiff($mutantDiff = <<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -97,9 +97,9 @@ final class MutantProcessContainerFactoryTest extends TestCase
                 - echo 'original';
                 + echo 'killed#0';
 
-                DIFF,
-            '<?php $a = 1;',
-        );
+                DIFF)
+            ->withPrettyPrintedOriginalCode('<?php $a = 1;')
+            ->build();
 
         $testFrameworkExtraOptions = '--verbose';
 

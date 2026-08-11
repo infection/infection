@@ -50,6 +50,8 @@ use Symfony\Component\Process\Process;
  */
 final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
+    private const array PHP_EXTRA_ARGS = ['-d memory_limit=-1'];
+
     /**
      * @param list<string> $staticAnalysisToolOptions
      */
@@ -105,7 +107,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
-            [],
+            self::PHP_EXTRA_ARGS,
             $options,
         );
     }

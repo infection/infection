@@ -38,28 +38,17 @@ namespace Infection\Tests\Configuration\ProjectDirectoryProvider;
 use Exception;
 use Infection\Configuration\ProjectDirectoryProvider\EnvironmentVariableBasedProjectDirectoryProvider;
 use Infection\FileSystem\FileSystem;
-use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use function Safe\putenv;
 
 #[CoversClass(EnvironmentVariableBasedProjectDirectoryProvider::class)]
+#[WithEnvironmentVariable('INFECTION_TEST_PROJECT_DIR')]
 final class EnvironmentVariableBasedProjectDirectoryProviderTest extends TestCase
 {
-    use BacksUpEnvironmentVariables;
-
-    protected function setUp(): void
-    {
-        $this->backupEnvironmentVariables();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     #[DataProvider('directoryProvider')]
     public function test_it_provides_the_project_directory(
         string|false $directory,

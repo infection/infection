@@ -10,6 +10,7 @@
         "KevinGH\\Box\\Compactor\\PhpScoper"
     ],
     "files": [
+        "resources/debug-runtime.php",
         "resources/schema.json"
     ]
 }

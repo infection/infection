@@ -30,7 +30,19 @@
 
         "ArrayItemRemoval": {
             "ignore": [
-                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
+                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase",
+                "Infection\\Git\\CommandLineGit::getProjectDirectory",
+                "Infection\\Git\\CommandLineGit::readSymbolicReference"
+            ]
+        },
+        "ArrayOneItem": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create"
             ]
         },
         "MethodCallRemoval": {
@@ -46,6 +58,17 @@
                 // However, it is a tested extension point already hence making those tests more
                 // complicated for this is not worth.
                 "Infection\\TestFramework\\Coverage\\Locator\\BaseReportLocator",
+            ]
+        },
+        "UnwrapArrayMap": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::create",
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
+            ]
+        },
+        "UnwrapArrayValues": {
+            "ignore": [
+                "Infection\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterFactory::makeSourcePathsAbsolute"
             ]
         }
     }
