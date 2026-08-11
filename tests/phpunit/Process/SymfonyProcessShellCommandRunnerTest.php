@@ -37,6 +37,7 @@ namespace Infection\Tests\Process;
 
 use Infection\Process\SymfonyProcessShellCommandRunner;
 use Infection\Tests\TestFramework\Contracts\CompletedProcessBuilder;
+use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -72,27 +73,27 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
     public static function commandProvider(): iterable
     {
         yield 'simple output' => [
-            ['echo', 'test output'],
+            [PHP_BINARY, '-r', 'echo "test output";'],
             'test output',
         ];
 
         yield 'output with leading whitespace' => [
-            ['echo', '  whitespace'],
+            [PHP_BINARY, '-r', 'echo "  whitespace";'],
             'whitespace',
         ];
 
         yield 'output with trailing whitespace' => [
-            ['echo', 'whitespace  '],
+            [PHP_BINARY, '-r', 'echo "whitespace  ";'],
             'whitespace',
         ];
 
         yield 'output with both leading and trailing whitespace' => [
-            ['echo', '  whitespace  '],
+            [PHP_BINARY, '-r', 'echo "  whitespace  ";'],
             'whitespace',
         ];
 
         yield 'empty output' => [
-            ['php', '-r', ''],
+            [PHP_BINARY, '-r', ''],
             '',
         ];
     }
@@ -152,10 +153,10 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             input: 'input',
         );
 
-        $expectedOutput = __DIR__ . '|environment|input';
+        $expected = __DIR__ . '|environment|input';
 
-        $this->assertSame($expectedOutput, $output);
-        $this->assertSame($expectedOutput, $callbackOutput);
+        $this->assertSame($expected, $output);
+        $this->assertSame($expected, $callbackOutput);
     }
 
     public function test_it_runs_a_successful_command(): void
@@ -166,15 +167,15 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             'fwrite(STDOUT, "  stdout content  "); fwrite(STDERR, "  stderr content  ");',
         ];
 
-        $result = $this->runner->run($command);
-
         $expected = CompletedProcessBuilder::withMinimalTestData()
             ->withCommand($command)
             ->withStdout('stdout content')
             ->withStderr('stderr content')
             ->build();
 
-        $this->assertEquals($expected, $result);
+        $actual = $this->runner->run($command);
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function test_it_returns_a_process_run_with_the_given_execution_context(): void
