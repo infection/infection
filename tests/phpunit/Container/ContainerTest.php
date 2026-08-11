@@ -148,7 +148,7 @@ final class ContainerTest extends TestCase
 
     public static function provideServices(): iterable
     {
-        foreach (Container::create() as $id) {
+        foreach (SingletonContainer::getContainer() as $id) {
             /** @var class-string $id */
             yield $id => [$id];
         }
