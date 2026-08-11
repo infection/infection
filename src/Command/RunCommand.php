@@ -74,6 +74,8 @@ use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -507,6 +509,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
+     */
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
         $installationDecider = $container->getAdapterInstallationDecider();
@@ -531,6 +537,9 @@ final class RunCommand extends BaseCommand
 
     /**
      * @param non-empty-string|null $configFile
+     *
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
      */
     private function startUp(
         Container $container,

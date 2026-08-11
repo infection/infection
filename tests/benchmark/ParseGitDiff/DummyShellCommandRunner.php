@@ -50,8 +50,15 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
     ) {
     }
 
-    public function mustRun(array $command): string
-    {
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string {
         if ($command === ['git', '-C', $this->workingDirectory, 'rev-parse', '--show-toplevel']) {
             return $this->workingDirectory;
         }
@@ -62,7 +69,11 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
     public function run(
         array $command,
         ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
     ): CompletedProcess {
         return new CompletedProcess(
             command: $command,
