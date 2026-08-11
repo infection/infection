@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\ParseGitDiff;
 
+use Closure;
+use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
 
 /**
@@ -55,5 +57,18 @@ final readonly class DummyShellCommandRunner implements ShellCommandRunner
         }
 
         return $this->executeResult;
+    }
+
+    public function run(
+        array $command,
+        ?Closure $callback = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+    ): CompletedProcess {
+        return new CompletedProcess(
+            command: $command,
+            exitCode: 0,
+            stdout: $this->executeResult,
+            stderr: '',
+        );
     }
 }

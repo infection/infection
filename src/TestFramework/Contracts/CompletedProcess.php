@@ -33,45 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
-
-use Closure;
-use Infection\TestFramework\Contracts\CompletedProcess;
-use Infection\TestFramework\Contracts\ShellCommandRunner;
-use Symfony\Component\Process\Process;
-use function trim;
-use Webmozart\Assert\Assert;
+namespace Infection\TestFramework\Contracts;
 
 /**
  * @internal
  */
-final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRunner
+final readonly class CompletedProcess
 {
-    public function mustRun(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
+    /**
+     * @param list<string> $command
+     */
+    public function __construct(
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public array $command,
+        public int $exitCode,
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public string $stdout,
+        // @phpstan-ignore shipmonk.deadProperty.neverRead
+        public string $stderr,
+    ) {
     }
 
-    public function run(
-        array $command,
-        ?Closure $callback = null,
-        ?float $timeout = self::DEFAULT_TIMEOUT,
-    ): CompletedProcess {
-        $process = new Process(
-            $command,
-            timeout: $timeout,
-        );
-
-        $process->run($callback);
-
-        $exitCode = $process->getExitCode();
-        Assert::integer($exitCode);
-
-        return new CompletedProcess(
-            $command,
-            $exitCode,
-            trim($process->getOutput()),
-            trim($process->getErrorOutput()),
-        );
+    public function isSuccessful(): bool
+    {
+        return $this->exitCode === 0;
     }
 }
