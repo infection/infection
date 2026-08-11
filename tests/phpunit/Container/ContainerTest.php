@@ -37,6 +37,7 @@ namespace Infection\Tests\Container;
 
 use DIContainer\Exception as ContainerException;
 use Error;
+use function get_class;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
@@ -185,7 +186,7 @@ final class ContainerTest extends TestCase
     {
         try {
             $service = Container::create()->get($id);
-        } catch (AssertException) {
+        } catch (Error|AssertException) {
             // Ignore services that require extra configuration (cause errors or assertions without it)
             $this->expectNotToPerformAssertions();
 
@@ -195,7 +196,7 @@ final class ContainerTest extends TestCase
         $this->assertInstanceOf(
             $id,
             $service,
-            sprintf('Service should be an instance of "%s"', $id),
+            sprintf('Service "%s" should be an instance of "%s"', get_class($service), $id),
         );
     }
 
