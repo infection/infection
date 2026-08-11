@@ -162,7 +162,7 @@ final class ContainerTest extends TestCase
 
             return;
         } catch (AssertException) {
-            // Another happy path: the service requires extra configuration to be created
+            // Another happy path: the service cannot be created without a factory
             $this->expectNotToPerformAssertions();
 
             return;
