@@ -41,6 +41,7 @@ use const PHP_BINARY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -117,6 +118,18 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         );
 
         $this->assertSame('2', $output);
+    }
+
+    #[WithEnvironmentVariable('SHELL_VERBOSITY', '2')]
+    public function test_it_disables_shell_verbosity_by_default(): void
+    {
+        $output = $this->runner->mustRun([
+            PHP_BINARY,
+            '-r',
+            'echo getenv("SHELL_VERBOSITY");',
+        ]);
+
+        $this->assertSame('0', $output);
     }
 
     public function test_it_throws_exception_on_command_failure(): void
