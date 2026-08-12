@@ -52,5 +52,6 @@ final class InitialStaticAnalysisProcessFactoryTest extends TestCase
         $process = $factory->createProcess();
 
         $this->assertNull($process->getTimeout());
+        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
     }
 }

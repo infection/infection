@@ -80,6 +80,7 @@ class MutantProcessContainerFactory
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions,
             ),
+            env: ['SHELL_VERBOSITY' => '0'],
             timeout: $timeout,
         );
 

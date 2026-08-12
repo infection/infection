@@ -69,6 +69,7 @@ class InitialTestsRunProcessFactory
                 $phpExtraOptions,
                 $skipCoverage,
             ),
+            env: ['SHELL_VERBOSITY' => '0'],
             timeout: null, // Ignore the default timeout of 60 seconds
         );
     }

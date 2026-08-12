@@ -122,12 +122,7 @@ final class PhpUnitAdapterTest extends TestCase
         $shellCommandRunner
             ->expects($this->once())
             ->method('mustRun')
-            ->with(
-                [self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'],
-                null,
-                null,
-                ['SHELL_VERBOSITY' => '0'],
-            )
+            ->with([self::PHP_EXECUTABLE, '/path/to/phpunit', '--version'])
             ->willReturn('PHPUnit 10.5.1 by Sebastian Bergmann and contributors.');
 
         $expected = '10.5.1';

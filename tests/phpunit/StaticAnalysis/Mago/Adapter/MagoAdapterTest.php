@@ -217,12 +217,7 @@ final class MagoAdapterTest extends TestCase
         $shellCommandRunner
             ->expects($this->once())
             ->method('mustRun')
-            ->with(
-                ['/path/to/mago', '--version'],
-                null,
-                null,
-                ['SHELL_VERBOSITY' => '0'],
-            )
+            ->with(['/path/to/mago', '--version'])
             ->willReturn('mago 1.23.0')
         ;
 

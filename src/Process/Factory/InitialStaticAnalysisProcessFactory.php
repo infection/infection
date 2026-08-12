@@ -53,6 +53,7 @@ readonly class InitialStaticAnalysisProcessFactory
     {
         return new Process(
             command: $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
+            env: ['SHELL_VERBOSITY' => '0'],
             timeout: null, // Ignore the default timeout of 60 seconds
         );
     }

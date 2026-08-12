@@ -67,6 +67,7 @@ final readonly class DebugStaticAnalysisMutantProcessFactory implements LazyMuta
                         'mutationHash' => $mutant->getMutation()->getHash(),
                     ],
                 ),
+                env: ['SHELL_VERBOSITY' => '0'],
                 timeout: $this->timeout,
             ),
             $mutant,

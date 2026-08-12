@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use function array_merge;
 use Closure;
 use Infection\TestFramework\Contracts\CompletedProcess;
 use Infection\TestFramework\Contracts\ShellCommandRunner;
@@ -112,7 +113,13 @@ final readonly class SymfonyProcessShellCommandRunner implements ShellCommandRun
         ?float $timeout,
         ?float $idleTimeout,
     ): Process {
-        $process = new Process($command, $cwd, $env, $input, $timeout);
+        $process = new Process(
+            $command,
+            $cwd,
+            array_merge($env, ['SHELL_VERBOSITY' => '0']),
+            $input,
+            $timeout,
+        );
         $process->setIdleTimeout($idleTimeout);
 
         return $process;

@@ -81,6 +81,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         ]);
 
         $this->assertNull($process->getTimeout());
+        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
         $this->assertNotInstanceOf(OriginalPhpProcess::class, $process);
     }
 
@@ -109,6 +110,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
         ]);
 
         $this->assertNull($process->getTimeout());
+        $this->assertSame(['SHELL_VERBOSITY' => '0'], $process->getEnv());
         $this->assertInstanceOf(OriginalPhpProcess::class, $process);
     }
 }

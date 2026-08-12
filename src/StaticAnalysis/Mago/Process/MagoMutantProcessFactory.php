@@ -67,6 +67,7 @@ final readonly class MagoMutantProcessFactory implements LazyMutantProcessFactor
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
             ),
+            env: ['SHELL_VERBOSITY' => '0'],
             timeout: $this->timeout,
         );
 

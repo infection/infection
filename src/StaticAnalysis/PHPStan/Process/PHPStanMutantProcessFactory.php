@@ -77,6 +77,7 @@ final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFac
                     $mutant->getMutation()->getHash(),
                 ),
             ),
+            env: ['SHELL_VERBOSITY' => '0'],
             timeout: $this->timeout,
         );
 

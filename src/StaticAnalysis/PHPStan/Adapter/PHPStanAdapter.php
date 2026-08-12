@@ -184,10 +184,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         );
 
         return $this->versionParser->parse(
-            $this->shellCommandRunner->mustRun(
-                $testFrameworkVersionExecutable,
-                env: ['SHELL_VERBOSITY' => '0'],
-            ),
+            $this->shellCommandRunner->mustRun($testFrameworkVersionExecutable),
         );
     }
 }
