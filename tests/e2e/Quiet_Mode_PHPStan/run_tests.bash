@@ -9,7 +9,7 @@ set -eo pipefail
 run_test() {
     SHELL_VERBOSITY="$1" php $INFECTION --no-progress
 
-    diff -u --ignore-all-space expected-output.txt infection.log
+    diff --unified --ignore-all-space expected-output.txt var/infection.log
 }
 
 run_test 0

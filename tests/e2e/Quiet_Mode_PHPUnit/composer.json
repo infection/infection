@@ -4,16 +4,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Infection\\E2ETests\\PHPUnit_13_3\\": "src/"
-        },
-        "files": [
-            "src/Covered/functions.php",
-            "src/Uncovered/functions.php"
-        ]
+            "Infection\\E2ETests\\QuietModePHPUnit\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Infection\\E2ETests\\PHPUnit_13_3\\Tests\\": "tests/"
+            "Infection\\E2ETests\\QuietModePHPUnit\\Tests\\": "tests/"
         }
     },
     "config": {

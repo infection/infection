@@ -9,7 +9,10 @@
         ]
     },
     "logs": {
-        "summary": "infection.log"
+        "summary": "var/infection.log"
     },
-    "tmpDir": "."
+    "mutators": {
+        "UnwrapArrayValues": true
+    },
+    "tmpDir": "var/infection-tmp"
 }
