@@ -43,15 +43,26 @@ use DomainException;
  */
 final readonly class FakeShellCommandRunner implements ShellCommandRunner
 {
-    public function mustRun(array $command): string
-    {
+    public function mustRun(
+        array $command,
+        ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
+        ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
+    ): string {
         throw new DomainException('Unexpected call.');
     }
 
     public function run(
         array $command,
         ?Closure $callback = null,
+        ?string $cwd = null,
+        array $env = [],
+        mixed $input = null,
         ?float $timeout = self::DEFAULT_TIMEOUT,
+        ?float $idleTimeout = null,
     ): CompletedProcess {
         throw new DomainException('Unexpected call.');
     }

@@ -89,6 +89,9 @@ final class AdapterInstallerTest extends TestCase
                     $packageName,
                 ],
                 null,
+                null,
+                [],
+                null,
                 120.0,
             )
             ->willReturn(

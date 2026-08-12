@@ -48,6 +48,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 use function sprintf;
+use function str_repeat;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 #[CoversClass(FilterBuilder::class)]
@@ -56,7 +57,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_can_build_the_command_without_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -70,7 +71,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -86,7 +87,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_raw_extra_args(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -112,6 +113,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/bar/Baz.php'),
             ],
             'simple',
+            false,
         );
         $configPath = '/config/path';
 
@@ -130,7 +132,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, false);
         $configPath = '/the config/path';
 
         $this->assertSame(
@@ -154,10 +156,16 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         array $testCases,
         string $phpUnitVersion,
         ?string $expectedFilterOptionValue,
+        bool $useWindowsFilterLimit = false,
     ): void {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(
+            $executeOnlyCoveringTestCases,
+            [],
+            null,
+            $useWindowsFilterLimit,
+        );
 
         $expectedArgumentsAndOptions = [
             '--configuration',
@@ -183,6 +191,23 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
 
         $this->assertSame($expectedArgumentsAndOptions, $actual);
+    }
+
+    public function test_it_can_build_the_filter_string_with_the_default_non_windows_limit(): void
+    {
+        $providerKey = str_repeat('x', 9_960);
+
+        $this->assertSame(
+            [
+                'ServiceTest\:\:test_case with data set "' . $providerKey . '"',
+            ],
+            FilterBuilder::createFilters(
+                [
+                    TestLocation::forTestMethod('App\ServiceTest::test_case#' . $providerKey),
+                ],
+                '10.1',
+            ),
+        );
     }
 
     public static function provideTestCases(): iterable
@@ -350,6 +375,50 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             ],
             $phpunit10,
             '/ServiceTest\:\:test_case1 with data set "With special character \\>@&\\\\\\:\\:"|ServiceTest\:\:test_case2/',
+        ];
+
+        yield 'Windows limit accepts the exact 10,000-byte fragment boundary' => [
+            'executeOnlyCoveringTestCases' => true,
+            'testCases' => [
+                'App\ServiceTest::test_case#' . str_repeat('x', 9_959),
+            ],
+            'phpUnitVersion' => $phpunit10,
+            'expectedFilterOptionValue' => '/ServiceTest\:\:test_case with data set "' . str_repeat('x', 9_959) . '"/',
+            'useWindowsFilterLimit' => true,
+        ];
+
+        yield 'Windows limit drops the provider key for a 10,001-byte fragment' => [
+            'executeOnlyCoveringTestCases' => true,
+            'testCases' => [
+                'App\ServiceTest::test_case#' . str_repeat('x', 9_960),
+            ],
+            'phpUnitVersion' => $phpunit10,
+            'expectedFilterOptionValue' => '/ServiceTest\:\:test_case/',
+            'useWindowsFilterLimit' => true,
+        ];
+
+        yield 'PCRE limit accepts the same 10,001-byte fragment' => [
+            'executeOnlyCoveringTestCases' => true,
+            'testCases' => [
+                'App\ServiceTest::test_case#' . str_repeat('x', 9_960),
+            ],
+            'phpUnitVersion' => $phpunit10,
+            'expectedFilterOptionValue' => '/ServiceTest\:\:test_case with data set "' . str_repeat('x', 9_960) . '"/',
+        ];
+
+        yield '240 provider keys totaling 29,760 fragment bytes degrade to the method level on Windows' => [
+            'executeOnlyCoveringTestCases' => true,
+            'testCases' => self::createArray(
+                static fn (int $index) => sprintf(
+                    'App\ServiceTest::test_case#dataset_%03d_%s',
+                    $index,
+                    str_repeat('x', 71),
+                ),
+                240,
+            ),
+            'phpUnitVersion' => $phpunit10,
+            'expectedFilterOptionValue' => '/ServiceTest\:\:test_case/',
+            'useWindowsFilterLimit' => true,
         ];
 
         yield 'too many tests; all from the same test case' => [

@@ -57,6 +57,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         private bool $executeOnlyCoveringTestCases,
         private array $filteredSourceFilesToMutate,
         private ?string $mapSourceClassToTestStrategy,
+        private bool $useWindowsFilterLimit,
     ) {
     }
 
@@ -142,7 +143,11 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         array $tests,
         string $testFrameworkVersion,
     ): ?string {
-        $filters = FilterBuilder::createFilters($tests, $testFrameworkVersion);
+        $filters = FilterBuilder::createFilters(
+            $tests,
+            $testFrameworkVersion,
+            useWindowsFilterLimit: $this->useWindowsFilterLimit,
+        );
 
         return count($filters) === 0
             ? null

@@ -1667,6 +1667,7 @@ final class PhpUnitAdapterTest extends TestCase
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
+                false,
             ),
             $shellCommandRunner ?? $this->createStub(ShellCommandRunner::class),
             new VersionParser(),    // won't be used since we pass the version

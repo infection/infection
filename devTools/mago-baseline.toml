@@ -487,6 +487,18 @@ message = 'Potentially unhandled exception `Symfony\Component\Filesystem\Excepti
 count = 1
 
 [[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ExceptionInterface` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
+file = "src/Command/RunCommand.php"
+code = "unhandled-thrown-type"
+message = 'Potentially unhandled exception `Symfony\Component\Process\Exception\ProcessTimedOutException` in `Infection\Command\RunCommand::executeCommand`.'
+count = 1
+
+[[issues]]
 file = "src/Command/RunCommandHelper.php"
 code = "mixed-argument"
 message = "Invalid argument type for argument #2 of `sprintf`: expected `Stringable|null|scalar`, but found `nonnull`."

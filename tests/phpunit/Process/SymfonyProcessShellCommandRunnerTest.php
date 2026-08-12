@@ -132,6 +132,60 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->assertSame('no input', $output);
     }
 
+    public function test_it_runs_a_command_with_the_given_execution_context(): void
+    {
+        $callbackOutput = '';
+        $callback = static function (string $type, string $buffer) use (&$callbackOutput): void {
+            if ($type === Process::OUT) {
+                $callbackOutput .= $buffer;
+            }
+        };
+
+        $output = $this->runner->mustRun(
+            [
+                'php',
+                '-r',
+                'echo getcwd(), "|", getenv("INFECTION_TEST_ENV"), "|", stream_get_contents(STDIN);',
+            ],
+            callback: $callback,
+            cwd: __DIR__,
+            env: ['INFECTION_TEST_ENV' => 'environment'],
+            input: 'input',
+        );
+
+        $expected = __DIR__ . '|environment|input';
+
+        $this->assertSame($expected, $output);
+        $this->assertSame($expected, $callbackOutput);
+    }
+
+    public function test_it_streams_stdout_and_stderr_to_the_callback(): void
+    {
+        $output = [
+            Process::OUT => '',
+            Process::ERR => '',
+        ];
+        $callback = static function (string $type, string $buffer) use (&$output): void {
+            $output[$type] .= $buffer;
+        };
+
+        $this->runner->mustRun(
+            [
+                'php',
+                '-r',
+                'fwrite(STDOUT, "stdout content"); fwrite(STDERR, "stderr content");',
+            ],
+            $callback,
+        );
+
+        $expected = [
+            Process::OUT => 'stdout content',
+            Process::ERR => 'stderr content',
+        ];
+
+        $this->assertSame($expected, $output);
+    }
+
     public function test_it_runs_a_successful_command(): void
     {
         $command = [
@@ -140,12 +194,35 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             'fwrite(STDOUT, "  stdout content  "); fwrite(STDERR, "  stderr content  ");',
         ];
 
-        $result = $this->runner->run($command);
-
         $expected = CompletedProcessBuilder::withMinimalTestData()
             ->withCommand($command)
             ->withStdout('stdout content')
             ->withStderr('stderr content')
+            ->build();
+
+        $actual = $this->runner->run($command);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test_it_returns_a_process_run_with_the_given_execution_context(): void
+    {
+        $command = [
+            'php',
+            '-r',
+            'echo getcwd(), "|", getenv("INFECTION_TEST_ENV"), "|", stream_get_contents(STDIN);',
+        ];
+
+        $result = $this->runner->run(
+            $command,
+            cwd: __DIR__,
+            env: ['INFECTION_TEST_ENV' => 'environment'],
+            input: 'input',
+        );
+
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->withStdout(__DIR__ . '|environment|input')
             ->build();
 
         $this->assertEquals($expected, $result);
@@ -169,6 +246,17 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             ->build();
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function test_it_returns_empty_trimmed_output(): void
+    {
+        $command = [PHP_BINARY, '-r', 'echo "  ";'];
+
+        $expected = CompletedProcessBuilder::withMinimalTestData()
+            ->withCommand($command)
+            ->build();
+
+        $this->assertEquals($expected, $this->runner->run($command));
     }
 
     public function test_it_streams_output_to_the_callback(): void
@@ -208,5 +296,44 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
             ['php', '-r', 'sleep(1);'],
             timeout: 0.01,
         );
+    }
+
+    public function test_it_uses_the_given_idle_timeout(): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+
+        $this->runner->run(
+            ['php', '-r', 'echo "started"; sleep(1);'],
+            timeout: null,
+            idleTimeout: 0.01,
+        );
+    }
+
+    /**
+     * @param array{timeout?: ?float, idleTimeout?: ?float} $arguments
+     */
+    #[DataProvider('mustRunTimeoutProvider')]
+    public function test_it_uses_the_given_timeout_when_the_command_must_run(array $arguments): void
+    {
+        $this->expectException(ProcessTimedOutException::class);
+
+        $this->runner->mustRun(
+            ['php', '-r', 'echo "started"; sleep(1);'],
+            ...$arguments,
+        );
+    }
+
+    public static function mustRunTimeoutProvider(): iterable
+    {
+        yield 'timeout' => [
+            ['timeout' => 0.01],
+        ];
+
+        yield 'idle timeout' => [
+            [
+                'timeout' => null,
+                'idleTimeout' => 0.01,
+            ],
+        ];
     }
 }
