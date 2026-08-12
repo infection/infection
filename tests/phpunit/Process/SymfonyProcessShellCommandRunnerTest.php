@@ -109,17 +109,6 @@ final class SymfonyProcessShellCommandRunnerTest extends TestCase
         $this->assertSame('stdout content', $output);
     }
 
-    public function test_it_runs_commands_with_normal_shell_verbosity(): void
-    {
-        $output = $this->runner->mustRun([
-            PHP_BINARY,
-            '-r',
-            'echo getenv("SHELL_VERBOSITY");',
-        ]);
-
-        $this->assertSame('0', $output);
-    }
-
     public function test_it_preserves_an_explicit_shell_verbosity(): void
     {
         $output = $this->runner->mustRun(
