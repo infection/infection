@@ -46,7 +46,7 @@ use PHPUnit\Framework\TestCase;
 final class MutatedNodeTest extends TestCase
 {
     /**
-     * @param LNumber|LNumber[] $node
+     * @param Int_|Int_[] $node
      */
     #[DataProvider('nodeProvider')]
     public function test_it_can_be_instantiated(Int_|array $node): void
