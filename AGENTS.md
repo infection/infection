@@ -85,11 +85,10 @@ One pass, phase by phase (diagram: `doc/nomenclature.md#execution-phases`):
   scenarios also run via `--group e2e`.
 - `tests/benchmark/` - PHPBench suites (mutation generation, git-diff parsing, tracing).
   Performance PRs cite before/after numbers from these.
-- `devTools/` - `phpstan.neon` (+ baseline), `mago-baseline.toml`, Docker bits. Baselines
-  are for pre-existing debt only; never baseline a finding your new code introduced.
-  Regenerate with `make phpstan-baseline` or `make mago-baseline`. The PHPStan rules live
-  in `phpstan-analysis.neon`; `phpstan.neon` adds the baseline on top, and
-  `phpstan-debt.neon` omits it so `make phpstan-debt` can list what the baseline hides.
+- `devTools/` - `phpstan.neon`, Docker bits, and both static-analysis baselines:
+  `devTools/phpstan-baseline.neon` and `devTools/mago-baseline.toml` (Mago's config itself is
+  `mago.toml` in the root). Baselines are for pre-existing debt only; never baseline a finding
+  your new code introduced. Regenerate with `make phpstan-baseline` or `make mago-baseline`.
 - `doc/` - `nomenclature.md`, `benchmarking.md`. User docs are NOT here - they live in the
   separate repo github.com/infection/site.
 - `adr/` - Architecture Decision Records; short rationale for standing conventions. See
@@ -365,7 +364,7 @@ Memory is released by `unset()` of the container reference before freeing the sl
 
 `XmlConfigurationManipulator` is ~15 small public methods, one edit each, composed by two
 builders; the
-`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0) each have a comment
+`version_compare` cutoffs (5.2, 7.2, 7.3, 9.3, 10, 10.1, 11.0, 12.0, 13.3) each have a comment
 linking the phpunit.xsd change - keep them. Hard rules: PHPUnit >= 12's coverage/`<source>`
 config is authoritative - leave it untouched (#3043 regression); when the user has an
 include filter and no source filtering is requested, preserve their config rather than

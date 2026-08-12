@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Container;
 
-use function array_keys;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
@@ -56,6 +55,18 @@ use Webmozart\Assert\InvalidArgumentException as AssertException;
 #[Group('integration')]
 final class ContainerTest extends TestCase
 {
+    private static ?Container $container = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$container = Container::create();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$container = null;
+    }
+
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -137,11 +148,8 @@ final class ContainerTest extends TestCase
 
     public static function provideServicesWithReflection(): iterable
     {
-        $reflection = new ContainerReflection(
-            SingletonContainer::getContainer(),
-        );
-
-        foreach (array_keys($reflection->getFactories()) as $id) {
+        foreach (SingletonContainer::getContainer() as $id) {
+            /** @var class-string $id */
             yield $id => [$id];
         }
     }
@@ -152,12 +160,12 @@ final class ContainerTest extends TestCase
     #[DataProvider('provideServicesWithReflection')]
     public function test_factory_is_essential(string $id): void
     {
-        $reflection = new ContainerReflection(Container::create());
+        $container = Container::create();
 
-        $reflection->unsetFactory($id);
+        $container->remove($id);
 
         try {
-            $service = $reflection->createService($id);
+            $service = self::createService($container, $id);
         } catch (InvalidArgumentException $e) {
             // All good: the service needs a factory
             $this->assertStringContainsString('Unknown service ', $e->getMessage());
@@ -182,13 +190,34 @@ final class ContainerTest extends TestCase
         // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
     }
 
+    /**
+     * @param class-string $id
+     */
+    #[DataProvider('provideServicesWithReflection')]
+    public function test_it_can_provide_all_services_bound_to_an_implementation(string $id): void
+    {
+        $this->assertNotNull(self::$container);
+
+        $service = self::createService(self::$container, $id);
+
+        // The service cannot be created without extra configuration
+        if ($service === null) {
+            return;
+        }
+
+        $this->assertInstanceOf(
+            $id,
+            $service,
+            sprintf('Service "%s" should be an instance of "%s"', $service::class, $id),
+        );
+    }
+
     public static function provideExpectedConcreteServicesWithReflection(): iterable
     {
-        $container = Container::create();
-        $reflection = new ContainerReflection($container);
+        $reflection = new ContainerReflection(SingletonContainer::getContainer());
 
         foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
-            yield $methodName => [$id, $methodName, $container, $reflection];
+            yield $methodName => [$id, $methodName];
         }
     }
 
@@ -196,14 +225,14 @@ final class ContainerTest extends TestCase
      * @param class-string $id
      */
     #[DataProvider('provideExpectedConcreteServicesWithReflection')]
-    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container, ContainerReflection $reflection): void
+    public function test_it_can_provide_all_services(string $id, string $methodName): void
     {
+        $this->assertNotNull(self::$container);
+
         try {
-            $service = $container->{$methodName}();
+            $service = self::$container->{$methodName}();
         } catch (Error|AssertException) {
             // Ignore services that require extra configuration
-            $this->expectNotToPerformAssertions();
-
             return;
         }
 
@@ -213,6 +242,22 @@ final class ContainerTest extends TestCase
             sprintf('Service should be an instance of "%s"', $id),
         );
 
-        $this->assertSame($service, $reflection->getService($id));
+        $this->assertSame($service, self::$container->get($id));
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
+    private static function createService(Container $container, string $id): ?object
+    {
+        try {
+            return $container->get($id);
+        } catch (Error|AssertException) {
+            // Ignore services that require extra configuration (cause errors or assertions without it)
+            return null;
+        }
     }
 }

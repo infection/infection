@@ -40,7 +40,6 @@ use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetc
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
-use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
 use Rector\CodeQuality\Rector\Include_\AbsolutizeRequireAndIncludePathRector;
 use Rector\Config\RectorConfig;
@@ -191,7 +190,6 @@ $config = RectorConfig::configure()
         ],
         SensitiveHereNowDocRector::class,
         SimplifyDeMorganBinaryRector::class,
-        SimplifyIfElseToTernaryRector::class,
         SimplifyIfReturnBoolRector::class => [
             __DIR__ . '/src/Process/OriginalPhpProcess.php',
         ],

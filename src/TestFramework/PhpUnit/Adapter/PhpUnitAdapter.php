@@ -35,18 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
-use function escapeshellarg;
 use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\Common\CommandLineBuilder;
 use Infection\TestFramework\Common\VersionParser;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Override;
 use function Safe\preg_match;
@@ -60,7 +59,7 @@ use Webmozart\Assert\Assert;
  */
 final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
-    final public const string COVERAGE_DIR = 'coverage-xml';
+    public const string COVERAGE_DIR = 'coverage-xml';
 
     public function __construct(
         string $testFrameworkExecutable,
@@ -70,7 +69,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        ShellCommandLineExecutor $shellCommandLineExecutor,
+        ShellCommandRunner $shellCommandRunner,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
         ?string $version = null,
@@ -80,7 +79,7 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             $initialConfigBuilder,
             $mutationConfigBuilder,
             $argumentsAndOptionsBuilder,
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
             $versionParser,
             $commandLineBuilder,
             $version,
@@ -127,7 +126,10 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
             // all target source code in the coverage report.
             if ($this->pcovDirectoryProvider->shouldProvide()) {
                 $phpExtraArgs[] = '-d';
-                $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
+                $phpExtraArgs[] = sprintf(
+                    'pcov.directory=%s',
+                    $this->pcovDirectoryProvider->getDirectory(),
+                );
             }
         }
 
@@ -216,6 +218,11 @@ final class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements Memor
 
     public static function supportsExecutionOrderDefectsRandom(string $version): bool
     {
+        // ordering by defects needs the test run history, which the initial run deactivates. PHPUnit ignored that combination silently until 13.3 turned it into a warning https://github.com/sebastianbergmann/phpunit/blob/13.3.0/src/TextUI/Application.php
+        if (version_compare($version, '13.3', '>=')) {
+            return false;
+        }
+
         return
             version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
             || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')

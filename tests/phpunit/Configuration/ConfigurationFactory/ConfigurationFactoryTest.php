@@ -155,9 +155,10 @@ final class ConfigurationFactoryTest extends TestCase
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
+            debugTestFrameworkLogFile: null,
         );
 
-        $this->expectExceptionMessage('Expected one of: "phpstan", "mago". Got: "non-supported-static-analysis-tool"');
+        $this->expectExceptionMessage('Expected one of: "phpstan", "mago", "debug". Got: "non-supported-static-analysis-tool"');
 
         $this
             ->createConfigurationFactory(
@@ -236,6 +237,7 @@ final class ConfigurationFactoryTest extends TestCase
             threads: null,
             dotsPerRow: null,
             staticAnalysisTool: null,
+            debugTestFrameworkLogFile: null,
         );
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
 
@@ -315,6 +317,7 @@ final class ConfigurationFactoryTest extends TestCase
             staticAnalysisTool: null,
             mutantId: null,
             configurationPathname: '/path/to/infection.json',
+            debugTestFrameworkLogFile: Path::normalize(sys_get_temp_dir() . '/infection.debug.jsonl'),
         );
         $defaultConfigurationBuilder = ConfigurationBuilder::from($defaultConfiguration);
 
@@ -328,6 +331,16 @@ final class ConfigurationFactoryTest extends TestCase
         );
 
         yield 'minimal' => [$defaultScenario];
+
+        yield 'relative debug log file path' => [
+            $defaultScenario
+                ->withSchema($defaultSchemaBuilder->withDebugTestFrameworkLogFile('var/processes.jsonl'))
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withDebugTestFrameworkLogFile('/path/to/var/processes.jsonl')
+                        ->build(),
+                ),
+        ];
 
         yield 'null html file log path' => [
             $defaultScenario->forValueForHtmlLogFilePath(
@@ -1596,6 +1609,7 @@ final class ConfigurationFactoryTest extends TestCase
                     )
                     ->withLogVerbosity(LogVerbosity::NONE)
                     ->withTmpDir('/path/to/config/tmp/infection')
+                    ->withDebugTestFrameworkLogFile('/path/to/config/tmp/infection.debug.jsonl')
                     ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', '/path/to/config/phpunit'))
                     ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'))
                     ->withMago(new Mago('/path/to/config/mago-dir', '/path/to/bin/mago'))

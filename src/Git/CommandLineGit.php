@@ -42,8 +42,8 @@ use function count;
 use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -74,7 +74,7 @@ final readonly class CommandLineGit implements Git
     private const string DIFF_LINE_RANGE_KEY = 'range';
 
     public function __construct(
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandRunner $shellCommandRunner,
         private LoggerInterface $logger = new NullLogger(),
     ) {
     }
@@ -138,7 +138,7 @@ final readonly class CommandLineGit implements Git
     public function getBaseReference(string $base): string
     {
         try {
-            $reference = $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandRunner->mustRun([
                 'git',
                 'merge-base',
                 $base,
@@ -167,7 +167,7 @@ final readonly class CommandLineGit implements Git
         // bubble up instead of throwing a dedicated exception or providing a
         // fallback.
         try {
-            $directory = $this->shellCommandLineExecutor->execute([
+            $directory = $this->shellCommandRunner->mustRun([
                 'git',
                 'rev-parse',
                 '--show-toplevel',
@@ -327,7 +327,7 @@ final readonly class CommandLineGit implements Git
         bool $nameOnly = false,
         bool $noContext = false,
     ): array {
-        $projectDirectory = $this->shellCommandLineExecutor->execute([
+        $projectDirectory = $this->shellCommandRunner->mustRun([
             'git',
             '-C',
             $workingDirectory,
@@ -350,7 +350,7 @@ final readonly class CommandLineGit implements Git
             '--',
         ];
 
-        $diff = $this->shellCommandLineExecutor->execute(
+        $diff = $this->shellCommandRunner->mustRun(
             array_merge(
                 array_filter($command),
                 $sourceDirectories,
@@ -374,7 +374,7 @@ final readonly class CommandLineGit implements Git
     {
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
-            $reference = $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandRunner->mustRun([
                 'git',
                 'symbolic-ref',
                 $name,

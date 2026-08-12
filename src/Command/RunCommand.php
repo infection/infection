@@ -53,7 +53,6 @@ use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
 use Infection\Console\XdebugHandler;
 use Infection\Container\Container;
-use Infection\Engine;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
@@ -75,6 +74,8 @@ use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function trim;
 use Webmozart\Assert\Assert;
 
@@ -374,7 +375,6 @@ final class RunCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
-        $consoleOutput = new ConsoleOutput($logger);
 
         // Currently, the configuration is mandatory, hence there is no way to
         // say "do not use a config". If this becomes possible in the future,
@@ -383,30 +383,12 @@ final class RunCommand extends BaseCommand
         $configFile = ConfigurationOption::get($io);
 
         $container = $this->createContainer($configFile, $io, $logger);
+        $consoleOutput = $container->getConsoleOutput();
 
         try {
             $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
-            $config = $container->getConfiguration();
-
-            $engine = new Engine(
-                $container->getConfiguration(),
-                $container->getTestFrameworkAdapter(),
-                $container->getCoverageChecker(),
-                $container->getEventDispatcher(),
-                $container->getInitialTestsRunner(),
-                $container->getMemoryLimiter(),
-                $container->getMutationGenerator(),
-                $container->getMutationTestingRunner(),
-                $container->getMinMsiChecker(),
-                $container->getMaxTimeoutsChecker(),
-                $consoleOutput,
-                $container->getMetricsCalculator(),
-                $container->getTestFrameworkExtraOptionsFilter(),
-                // do not create a chain of classes for SA if not enabled
-                $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
-                $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
-            );
+            $engine = $container->getEngine();
 
             $engine->execute();
 
@@ -527,6 +509,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
+     */
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
         $installationDecider = $container->getAdapterInstallationDecider();
@@ -551,6 +537,9 @@ final class RunCommand extends BaseCommand
 
     /**
      * @param non-empty-string|null $configFile
+     *
+     * @throws ProcessTimedOutException
+     * @throws ProcessException
      */
     private function startUp(
         Container $container,

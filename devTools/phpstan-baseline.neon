@@ -458,22 +458,10 @@ parameters:
 			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
 			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testMagoAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/Mago/Adapter/MagoAdapterFactory.php
 
 		-
 			rawMessage: Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
@@ -548,22 +536,10 @@ parameters:
 			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
 
 		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
 			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapter.php
-
-		-
-			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testPHPStanAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/StaticAnalysis/PHPStan/Adapter/PHPStanAdapterFactory.php
 
 		-
 			rawMessage: Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory should not depend on Infection\StaticAnalysis\StaticAnalysisToolAdapter
@@ -632,8 +608,8 @@ parameters:
 			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
 
 		-
-			rawMessage: Infection\TestFramework\AdapterInstaller should not exist
-			identifier: phpat.testConcreteSourceClassesHaveTests
+			rawMessage: 'Parameter #2 $paths of method Composer\Autoload\ClassLoader::setPsr4() expects list<string>|string, array<string> given.'
+			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/AdapterInstaller.php
 
@@ -698,12 +674,6 @@ parameters:
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
 
 		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\Process\ShellCommandLineExecutor
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapter.php
-
-		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter should not depend on Infection\TestFramework\AbstractTestFrameworkAdapter
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 6
@@ -735,12 +705,6 @@ parameters:
 
 		-
 			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Config\ValueProvider\PCOVDirectoryProvider
-			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
-			count: 1
-			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
-
-		-
-			rawMessage: Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory should not depend on Infection\Process\ShellCommandLineExecutor
 			identifier: phpat.testPHPUnitAdapterStaysWithinFuturePackageBoundary
 			count: 1
 			path: ../src/TestFramework/PhpUnit/Adapter/PhpUnitAdapterFactory.php
@@ -1085,6 +1049,12 @@ parameters:
 			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
 
 		-
+			rawMessage: 'Cannot call method isPublic() on ReflectionClassConstant|false.'
+			identifier: method.nonObject
+			count: 2
+			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
+
+		-
 			rawMessage: 'Parameter #1 $resolvedMutators of method Infection\Mutator\MutatorFactory::create() expects array<class-string<Infection\Mutator\ConfigurableMutator<PhpParser\Node>>, array<mixed>>, array{Infection\Mutator\Arithmetic\Assignment: array{}, Infection\Mutator\Arithmetic\AssignmentEqual: array{}, Infection\Mutator\Arithmetic\BitwiseAnd: array{}, Infection\Mutator\Arithmetic\BitwiseNot: array{}, Infection\Mutator\Arithmetic\BitwiseOr: array{}, Infection\Mutator\Arithmetic\BitwiseXor: array{}, Infection\Mutator\Arithmetic\Decrement: array{}, Infection\Mutator\Arithmetic\DivEqual: array{}, ...} given.'
 			identifier: argument.type
 			count: 1
@@ -1202,10 +1172,22 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
+			rawMessage: 'Method Infection\Tests\Mutator\ProfileListProvider::getProfiles() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListProvider.php
+
+		-
 			rawMessage: 'Parameter #1 $objectOrClass of class ReflectionClass constructor expects class-string<T of object>|T of object, string given.'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/ProfileListProvider.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Mutator\ProfileListTest::test_all_mutator_profiles_are_sorted_lexicographically() has parameter $profileOrMutators with no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/ProfileListTest.php
 
 		-
 			rawMessage: 'Parameter #1 $kind (array<int|string>|int|string) of method Infection\Tests\PhpParser\FakeToken::is() should be contravariant with parameter $kind (array|int|string) of method PhpToken::is()'
@@ -1238,10 +1220,10 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/VisitorTestCase/ConcreteVisitorTestCase.php
 
 		-
-			rawMessage: Infection\Tests\Process\ShellCommandLineExecutorTest should not exist
+			rawMessage: Infection\Tests\Process\SymfonyProcessShellCommandRunnerTest should not exist
 			identifier: phpat.testPHPUnitTestsNotRequiringIoDoNotBelongToIntegrationGroup
 			count: 1
-			path: ../tests/phpunit/Process/ShellCommandLineExecutorTest.php
+			path: ../tests/phpunit/Process/SymfonyProcessShellCommandRunnerTest.php
 
 		-
 			rawMessage: 'Parameter #1 $className of static method Infection\Reflection\AnonymousClassReflection::fromClassName() expects class-string, string given.'
@@ -1332,6 +1314,12 @@ parameters:
 			identifier: phpat.testConcretePHPUnitTestSupportClassesHaveTests
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/Locator/BaseReportLocator/DemoReportLocator.php
+
+		-
+			rawMessage: 'Method Infection\Tests\TestFramework\Coverage\XmlReport\TestLocatorTest::getTestsLocations() return type has no value type specified in iterable type array.'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
 
 		-
 			rawMessage: Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.

@@ -38,28 +38,43 @@ namespace Infection\StaticAnalysis;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\Mago\Adapter\MagoAdapterFactory;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
+use Infection\Testing\TestFramework\Debug\DebugCommandLine;
+use Infection\Testing\TestFramework\Debug\DebugStaticAnalysisAdapter;
 use InvalidArgumentException;
 use function sprintf;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * @internal
  */
 final readonly class StaticAnalysisToolFactory
 {
+    private const string DEBUG_RUNTIME_SCRIPT = __DIR__ . '/../../resources/debug-runtime.php';
+
     public function __construct(
         private Configuration $infectionConfig,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
         private TestFrameworkConfigLocatorInterface $staticAnalysisConfigLocator,
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandRunner $shellCommandRunner,
+        private PhpExecutableFinder $phpExecutableFinder,
     ) {
     }
 
     public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
     {
+        if ($adapterName === StaticAnalysisToolTypes::DEBUG) {
+            return new DebugStaticAnalysisAdapter(
+                self::DEBUG_RUNTIME_SCRIPT,
+                $this->infectionConfig->debugTestFrameworkLogFile,
+                $timeout,
+                new DebugCommandLine($this->phpExecutableFinder),
+            );
+        }
+
         if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
             $phpStanConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::PHPSTAN);
 
@@ -72,7 +87,7 @@ final readonly class StaticAnalysisToolFactory
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
-                $this->shellCommandLineExecutor,
+                $this->shellCommandRunner,
             );
         }
 
@@ -88,11 +103,15 @@ final readonly class StaticAnalysisToolFactory
                 $timeout,
                 $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
-                $this->shellCommandLineExecutor,
+                $this->shellCommandRunner,
             );
         }
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN, StaticAnalysisToolTypes::MAGO];
+        $availableTestFrameworks = [
+            StaticAnalysisToolTypes::PHPSTAN,
+            StaticAnalysisToolTypes::MAGO,
+            StaticAnalysisToolTypes::DEBUG,
+        ];
 
         throw new InvalidArgumentException(sprintf(
             'Invalid name of static analysis tool "%s". Available names are: %s',

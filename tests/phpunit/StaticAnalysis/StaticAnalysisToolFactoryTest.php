@@ -36,13 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis;
 
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 #[CoversClass(StaticAnalysisToolFactory::class)]
 final class StaticAnalysisToolFactoryTest extends TestCase
@@ -53,11 +54,12 @@ final class StaticAnalysisToolFactoryTest extends TestCase
             ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createStub(StaticAnalysisToolExecutableFinder::class),
             $this->createStub(TestFrameworkConfigLocatorInterface::class),
-            $this->createStub(ShellCommandLineExecutor::class),
+            $this->createStub(ShellCommandRunner::class),
+            $this->createStub(PhpExecutableFinder::class),
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
+        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan, mago, debug');
 
         $factory->create('Fake SA Tool', 30);
     }

@@ -42,7 +42,8 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\SymfonyProcessShellCommandRunner;
+use Infection\TestFramework\Contracts\ShellCommandRunner;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
@@ -78,7 +79,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     private ComposerExecutableFinder&Stub $composerFinder;
 
-    private ShellCommandLineExecutor $shellCommandLineExecutor;
+    private ShellCommandRunner $shellCommandRunner;
 
     protected function setUp(): void
     {
@@ -94,14 +95,14 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->composerFinder->method('find')
             ->willReturn(['/usr/bin/composer']);
 
-        $this->shellCommandLineExecutor = new ShellCommandLineExecutor();
+        $this->shellCommandRunner = new SymfonyProcessShellCommandRunner();
     }
 
     public function test_it_can_load_a_custom_path(): void
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandRunner);
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -112,7 +113,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandRunner);
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -124,7 +125,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $path = self::getPath();
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandRunner);
 
         $expected = realpath('vendor/bin/phpunit');
 
@@ -159,16 +160,16 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::PATH_NAME, $this->tmp));
         putenv('PATHEXT=');
 
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
+        $shellCommandRunner = $this->createMock(ShellCommandRunner::class);
+        $shellCommandRunner
             ->expects($this->once())
-            ->method('execute')
+            ->method('mustRun')
             ->with(['/usr/bin/composer', 'config', 'bin-dir'])
             ->willThrowException(new RuntimeException());
 
         $frameworkFinder = new TestFrameworkFinder(
             $this->composerFinder,
-            $shellCommandLineExecutor,
+            $shellCommandRunner,
         );
 
         if (OperatingSystem::isWindows()) {
@@ -205,7 +206,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder(
             new ConcreteComposerExecutableFinder(),
-            $this->shellCommandLineExecutor,
+            $this->shellCommandRunner,
         );
 
         $expected = Path::canonicalize($phpUnitPath);
@@ -225,7 +226,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::PATH_NAME, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandRunner);
 
         if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
@@ -251,7 +252,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::PATH_NAME, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandLineExecutor);
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder, $this->shellCommandRunner);
 
         $this->assertSame(
             Path::canonicalize($mock->getPackageScript()),

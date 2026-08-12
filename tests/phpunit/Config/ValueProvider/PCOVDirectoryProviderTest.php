@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\ValueProvider;
 
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -46,7 +47,7 @@ use function Safe\ini_get;
 final class PCOVDirectoryProviderTest extends TestCase
 {
     /**
-     * @param list<string> $sourceDirectoryPaths
+     * @param non-empty-list<string> $sourceDirectoryPaths
      */
     #[DataProvider('sourceDirectoryPathsProvider')]
     public function test_it_provides_the_source_directory(
@@ -64,7 +65,7 @@ final class PCOVDirectoryProviderTest extends TestCase
     #[RequiresPhpExtension('pcov')]
     public function test_it_reads_pcov_directory_from_the_ini_configuration(): void
     {
-        $provider = new PCOVDirectoryProvider([]);
+        $provider = new PCOVDirectoryProvider(['/project/src']);
 
         // Note that `pcov.directory` is a `PHP_INI_SYSTEM | PHP_INI_PERDIR` so
         // it cannot be set at runtime.
@@ -76,13 +77,23 @@ final class PCOVDirectoryProviderTest extends TestCase
         $this->assertSame($expected, $provider->shouldProvide());
     }
 
+    public function test_it_throws_when_the_source_directories_do_not_have_a_common_filesystem_root(): void
+    {
+        $provider = new PCOVDirectoryProvider(
+            [
+                '/project/src',
+                'relative/src',
+            ],
+            '',
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $provider->getDirectory();
+    }
+
     public static function sourceDirectoryPathsProvider(): iterable
     {
-        yield 'no source directory paths' => [
-            'sourceDirectoryPaths' => [],
-            'expectedDirectory' => '.',
-        ];
-
         yield 'source directory paths with a common base path' => [
             'sourceDirectoryPaths' => [
                 '/path/to/project/src',
@@ -97,18 +108,9 @@ final class PCOVDirectoryProviderTest extends TestCase
             'expectedDirectory' => '/project/src',
         ];
 
-        yield 'incompatible source directory paths' => [
-            'sourceDirectoryPaths' => [
-                '/project/src',
-                'relative/src',
-            ],
-            // TODO: this is incorrect... And we should issue a warning about this, or fail.
-            'expectedDirectory' => '.',
-        ];
-
         yield 'configured PCOV directory' => [
-            'sourceDirectoryPaths' => [],
-            'expectedDirectory' => '.',
+            'sourceDirectoryPaths' => ['/project/src'],
+            'expectedDirectory' => '/project/src',
             'expectedShouldProvide' => false,
             'iniValue' => 'example',
         ];

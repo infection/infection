@@ -55,9 +55,6 @@ final class DiffColorizerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @return iterable<non-empty-string, list<non-empty-string>>
-     */
     public static function provideDiffs(): iterable
     {
         yield 'full-deletion' => [

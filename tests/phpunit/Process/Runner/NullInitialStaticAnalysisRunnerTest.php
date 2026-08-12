@@ -33,32 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests\Process\Runner;
 
-use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Symfony\Component\Process\Process;
-use function trim;
+use Infection\Process\Runner\NullInitialStaticAnalysisRunner;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @final
- *
- * Tiny wrapper around the Symfony Process component to easily get the output of a command.
- */
-class ShellCommandLineExecutor
+#[CoversClass(NullInitialStaticAnalysisRunner::class)]
+final class NullInitialStaticAnalysisRunnerTest extends TestCase
 {
-    /**
-     * @param string[] $command
-     *
-     * @throws ProcessTimedOutException
-     * @throws ProcessFailedException
-     * @throws ProcessException
-     */
-    public function execute(array $command): string
+    public function test_it_does_nothing(): void
     {
-        return trim((new Process($command))->mustRun()->getOutput());
+        $this->expectNotToPerformAssertions();
+
+        (new NullInitialStaticAnalysisRunner())->run();
     }
 }
