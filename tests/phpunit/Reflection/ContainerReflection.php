@@ -35,96 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reflection;
 
-use Closure;
-use Error;
 use Infection\Container\Container;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use ReflectionProperty;
 use function str_starts_with;
-use Webmozart\Assert\Assert;
-use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 final readonly class ContainerReflection
 {
     /** @var ReflectionClass<Container> */
     private ReflectionClass $reflection;
 
-    private Closure $createServiceClosure;
-
-    private Closure $getServiceClosure;
-
-    private ReflectionProperty $factories;
-
-    private ReflectionProperty $implementations;
-
-    private ReflectionProperty $values;
-
-    public function __construct(private Container $container)
+    public function __construct(Container $container)
     {
         $this->reflection = new ReflectionClass($container);
-
-        $parentReflection = $this->reflection->getParentClass();
-        Assert::notFalse($parentReflection);
-
-        $this->factories = $parentReflection->getProperty('factories');
-        $this->implementations = $parentReflection->getProperty('implementations');
-        $this->values = $parentReflection->getProperty('values');
-
-        $this->createServiceClosure = $parentReflection->getMethod('createService')->getClosure($container);
-        $this->getServiceClosure = $parentReflection->getMethod('get')->getClosure($container);
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @phpstan-return ?T
-     */
-    public function createService(string $id): ?object
-    {
-        return self::handleCommonErrors($this->createServiceClosure, $id);
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @phpstan-return ?T
-     */
-    public function getService(string $id): ?object
-    {
-        return self::handleCommonErrors($this->getServiceClosure, $id);
-    }
-
-    /**
-     * @return array<class-string<object>, Closure>
-     */
-    public function getFactories(): array
-    {
-        return $this->factories->getValue($this->container);
-    }
-
-    /**
-     * @return array<class-string<object>, class-string<object>>
-     */
-    public function getImplementations(): array
-    {
-        return $this->implementations->getValue($this->container);
-    }
-
-    /**
-     * @param class-string $id
-     */
-    public function unsetFactory(string $id): void
-    {
-        foreach ([$this->factories, $this->values] as $property) {
-            $value = $property->getValue($this->container);
-
-            unset($value[$id]);
-            $property->setValue($this->container, $value);
-        }
     }
 
     /**
@@ -153,23 +77,6 @@ final readonly class ContainerReflection
             }
 
             yield $method->getName() => $returnTypeClassName;
-        }
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param callable(class-string<T>):?T $callable
-     * @param class-string<T> $id
-     * @phpstan-return ?T
-     */
-    private static function handleCommonErrors(callable $callable, string $id): ?object
-    {
-        try {
-            return $callable($id);
-        } catch (Error|AssertException) {
-            // Ignore services that require extra configuration (cause errors or assertions without it)
-            return null;
         }
     }
 }

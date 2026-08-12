@@ -4354,13 +4354,13 @@ count = 1
 file = "tests/phpunit/Container/ContainerTest.php"
 code = "avoid-catching-error"
 message = "Avoid catching 'Error' class instances."
-count = 1
+count = 2
 
 [[issues]]
 file = "tests/phpunit/Container/ContainerTest.php"
 code = "mixed-assignment"
 message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 2
+count = 1
 
 [[issues]]
 file = "tests/phpunit/Container/ContainerTest.php"
@@ -5119,54 +5119,6 @@ file = "tests/phpunit/Process/Runner/ParallelProcessRunnerTest.php"
 code = "redundant-comparison"
 message = "Redundant `<=` comparison: left-hand side is always less than or equal to right-hand side."
 count = 2
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "avoid-catching-error"
-message = "Avoid catching 'Error' class instances."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "invalid-return-tag"
-message = "Failed to resolve `@return` type string."
-count = 2
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "less-specific-nested-argument-type"
-message = '''Argument type mismatch for argument #1 of `Infection\Tests\Reflection\ContainerReflection::handleCommonErrors`: expected `(callable(class-string<'T.infection\tests\reflection\containerreflection::createservice() extends object>): ('T.infection\tests\reflection\containerreflection::createservice() extends object)|null)`, but provided type `(closure(...mixed=): mixed)` is less specific.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "less-specific-nested-argument-type"
-message = '''Argument type mismatch for argument #1 of `Infection\Tests\Reflection\ContainerReflection::handleCommonErrors`: expected `(callable(class-string<'T.infection\tests\reflection\containerreflection::getservice() extends object>): ('T.infection\tests\reflection\containerreflection::getservice() extends object)|null)`, but provided type `(closure(...mixed=): mixed)` is less specific.'''
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "mixed-array-access"
-message = "Unsafe array access on type `mixed`."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "mixed-assignment"
-message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\Tests\Reflection\ContainerReflection::getFactories`. Saw type `mixed`.'
-count = 1
-
-[[issues]]
-file = "tests/phpunit/Reflection/ContainerReflection.php"
-code = "mixed-return-statement"
-message = 'Could not infer a precise return type for function `Infection\Tests\Reflection\ContainerReflection::getImplementations`. Saw type `mixed`.'
-count = 1
 
 [[issues]]
 file = "tests/phpunit/Reflection/ContainerReflection.php"
