@@ -46,7 +46,12 @@ final class InitialStaticAnalysisRunFailedTest extends TestCase
 {
     public function test_log_initial_tests_do_not_pass(): void
     {
-        $process = new CompletedProcess(['phpstan', 'analyse'], 0, 'output string', 'error string');
+        $process = new CompletedProcess(
+            ['phpstan', 'analyse'],
+            0,
+            'output string',
+            'error string',
+        );
 
         $error = implode("\n", [
             'Project static analysis must be in a passing state before running Infection.',

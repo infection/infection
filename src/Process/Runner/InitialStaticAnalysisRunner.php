@@ -65,8 +65,8 @@ readonly class InitialStaticAnalysisRunner implements InitialStaticAnalysis
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
         $process = $this->shellCommandRunner->run(
-            $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
-            fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
+            command: $this->staticAnalysisToolAdapter->getInitialRunCommandLine(),
+            callback: fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()),
             timeout: null,
         );
 
