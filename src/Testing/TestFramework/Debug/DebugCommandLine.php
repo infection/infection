@@ -53,7 +53,7 @@ use function var_export;
  */
 final class DebugCommandLine
 {
-    /** @var string[]|null */
+    /** @var list<string>|null */
     private ?array $cachedPhpCommandLine = null;
 
     public function __construct(
@@ -90,7 +90,7 @@ final class DebugCommandLine
         $command[] = '--command';
         $command[] = $encodedCommand;
 
-        return array_values($command);
+        return $command;
     }
 
     /**
@@ -131,7 +131,7 @@ final class DebugCommandLine
      *
      * @throws FinderException
      *
-     * @return string[]
+     * @return list<string>
      */
     private function findPhp(): array
     {
