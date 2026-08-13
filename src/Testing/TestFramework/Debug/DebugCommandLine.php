@@ -90,7 +90,7 @@ final class DebugCommandLine
         $command[] = '--command';
         $command[] = $encodedCommand;
 
-        return array_values($command);
+        return $command;
     }
 
     /**
