@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Reporter;
 
+use function implode;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\DetectionStatus;
 use Infection\Reporter\TextFileReporter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -79,6 +81,61 @@ final class TextFileReporterTest extends TestCase
         );
 
         $this->assertReportedContentIs($expectedContents, $reporter);
+    }
+
+    /**
+     * @param array<int, DetectionStatus> $displayedStatuses
+     * @param array<string> $expectedSections
+     * @param array<string> $unexpectedSections
+     */
+    #[DataProvider('filteredStatusesProvider')]
+    public function test_it_only_reports_the_requested_statuses(
+        array $displayedStatuses,
+        bool $debugVerbosity,
+        array $expectedSections,
+        array $unexpectedSections,
+    ): void {
+        $reporter = new TextFileReporter(
+            self::createCompleteResultsCollector(),
+            $debugVerbosity,
+            false,
+            false,
+            $displayedStatuses,
+        );
+
+        $output = implode("\n", $reporter->getLines());
+
+        foreach ($expectedSections as $section) {
+            $this->assertStringContainsString($section, $output);
+        }
+
+        foreach ($unexpectedSections as $section) {
+            $this->assertStringNotContainsString($section, $output);
+        }
+    }
+
+    public static function filteredStatusesProvider(): iterable
+    {
+        yield 'only escaped and timed out' => [
+            [DetectionStatus::ESCAPED, DetectionStatus::TIMED_OUT],
+            false,
+            ['Escaped mutants:', 'Timed Out mutants:'],
+            ['Skipped mutants:', 'Killed by Test Framework mutants:', 'Not Covered mutants:'],
+        ];
+
+        yield 'only errors with debug verbosity' => [
+            [DetectionStatus::ERROR],
+            true,
+            ['Errors mutants:', '  process output'],
+            ['Escaped mutants:', 'Timed Out mutants:'],
+        ];
+
+        yield 'none' => [
+            [],
+            false,
+            [],
+            ['Escaped mutants:', 'Timed Out mutants:', 'Skipped mutants:'],
+        ];
     }
 
     public static function emptyMetricsProvider(): iterable
