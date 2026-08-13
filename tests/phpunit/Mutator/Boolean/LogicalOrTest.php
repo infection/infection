@@ -213,6 +213,21 @@ final class LogicalOrTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
+
+        yield 'It mutates logical or when the same variable variable is tested against "Identical" on both sides' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' || ${$s} === 'world';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $s = 'other';
+                    ${$s} === 'hello' && ${$s} === 'world';
+                    PHP,
+            ),
+        ];
     }
 
     private static function nonMutableSmallerAndGreaterMatrixMutationsProvider(): iterable
