@@ -53,6 +53,13 @@ use Symfony\Component\Process\Process;
 interface ShellCommandRunner
 {
     /**
+     * Disables shell verbosity inherited from the parent process. 0 = normal verbosity.
+     *
+     * @see https://symfony.com/doc/current/console/verbosity.html
+     */
+    public const string DEFAULT_SHELL_VERBOSITY = '0';
+
+    /**
      * The default timeout used by Symfony Process.
      *
      * @see Process::__construct
