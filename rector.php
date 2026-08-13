@@ -64,7 +64,6 @@ use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatPa
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\MergeWithCallableAndWillReturnRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
-use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnParentClassMethodRector;
 use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
@@ -73,7 +72,6 @@ use Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamF
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromGetterReturnRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromPropertyDefaultsRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarFromParamDocblockInConstructorRector;
-use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockBasedOnArrayMapRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromAssignsParamToParamReferenceRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDimFetchAccessRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForArrayDimAssignedObjectRector;
@@ -117,10 +115,8 @@ $config = RectorConfig::configure()
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
         AddReturnDocblockForCommonObjectDenominatorRector::class,
         AddReturnDocblockForJsonArrayRector::class,
-        AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
-        DisallowedEmptyRuleFixerRector::class,
         DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
