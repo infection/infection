@@ -41,7 +41,7 @@ namespace Infection\TestFramework\Contracts;
 final readonly class CompletedProcess
 {
     /**
-     * @param list<string> $command
+     * @param string[] $command
      */
     public function __construct(
         // @phpstan-ignore shipmonk.deadProperty.neverRead
